@@ -1,0 +1,34 @@
+# Explicit production overlay:
+#   docker compose -f compose.yaml -f compose.prod.yaml up -d
+services:
+  api:
+    image: ${API_IMAGE:-scanapp-api:prod}
+    restart: unless-stopped
+    ports: []
+    environment:
+      ENABLE_MATCHED: ${ENABLE_MATCHED:-false}
+    mem_limit: 1536m
+    cpus: "1.5"
+    pids_limit: 256
+
+  web:
+    image: ${WEB_IMAGE:-scanapp-web:prod}
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+      - "443:443/udp"
+    volumes:
+      - ./docker/Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy-data:/data
+      - caddy-config:/config
+    environment:
+      SITE_ADDRESS: ${PUBLIC_HOST:?PUBLIC_HOST is required}
+
+  bootstrap:
+    profiles: ["tools"]
+    image: ${BOOTSTRAP_IMAGE:-scanapp-bootstrap:prod}
+
+volumes:
+  caddy-data:
+  caddy-config:

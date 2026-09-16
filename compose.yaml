@@ -1,0 +1,68 @@
+services:
+  api:
+    build:
+      context: .
+      dockerfile: docker/api.Dockerfile
+    image: scanapp-api:local
+    environment:
+      DATA_DIR: /data
+      TMP_DIR: /tmp/scanapp
+      PREPROCESS_CONFIG: ${PREPROCESS_CONFIG:-pad}
+      USE_OCR: ${USE_OCR:-true}
+      ENABLE_MATCHED: ${ENABLE_MATCHED:-false}
+      ORT_INTRA_THREADS: ${ORT_INTRA_THREADS:-1}
+      ORT_INTER_THREADS: ${ORT_INTER_THREADS:-1}
+      OMP_NUM_THREADS: ${OMP_NUM_THREADS:-1}
+      MAX_IMAGE_PIXELS: ${MAX_IMAGE_PIXELS:-12000000}
+      MAX_UPLOAD_BYTES: ${MAX_UPLOAD_BYTES:-12582912}
+      SCAN_WAIT_LIMIT: ${SCAN_WAIT_LIMIT:-2}
+    volumes:
+      - scanapp-data:/data
+      - scanapp-tmp:/tmp/scanapp
+    expose:
+      - "8000"
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "python",
+          "-c",
+          "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/api/v1/health')",
+        ]
+      interval: 15s
+      timeout: 5s
+      retries: 10
+      start_period: 20s
+
+  web:
+    build:
+      context: .
+      dockerfile: docker/web.Dockerfile
+    image: scanapp-web:local
+    depends_on:
+      api:
+        condition: service_started
+    environment:
+      SITE_ADDRESS: ${SITE_ADDRESS:-:80}
+
+  bootstrap:
+    profiles: ["tools"]
+    build:
+      context: .
+      dockerfile: docker/bootstrap.Dockerfile
+    image: scanapp-bootstrap:local
+    environment:
+      DATA_DIR: /data
+      PREPROCESS_CONFIG: ${PREPROCESS_CONFIG:-pad}
+      CATALOGUE_SETS: ${CATALOGUE_SETS:-all}
+      TCGDEX_IMAGE_QUALITY: ${TCGDEX_IMAGE_QUALITY:-high}
+      TCGDEX_LANGUAGE: ${TCGDEX_LANGUAGE:-en}
+      BOOTSTRAP_CONCURRENCY: ${BOOTSTRAP_CONCURRENCY:-8}
+      HF_HUB_DISABLE_TELEMETRY: "1"
+      OMP_NUM_THREADS: ${OMP_NUM_THREADS:-1}
+    volumes:
+      - scanapp-data:/data
+
+volumes:
+  scanapp-data:
+  scanapp-tmp:

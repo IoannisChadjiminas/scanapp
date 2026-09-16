@@ -1,0 +1,17 @@
+# Automatically merged for local `docker compose` commands.
+services:
+  api:
+    ports:
+      - "8000:8000"
+
+  web:
+    ports:
+      - "${HTTP_PORT:-8080}:80"
+      - "${HTTPS_PORT:-8443}:443"
+    volumes:
+      - ./docker/Caddyfile.local:/etc/caddy/Caddyfile:ro
+    environment:
+      LAN_HTTPS: ${LAN_HTTPS:-false}
+
+  bootstrap:
+    init: true

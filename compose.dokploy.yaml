@@ -1,0 +1,72 @@
+# Dokploy: set Compose file to this path only (do not use compose.override.yaml).
+# Traefik terminates HTTPS. Caddy in `web` listens on :80 and proxies /api/v1 → api:8000.
+services:
+  api:
+    build:
+      context: .
+      dockerfile: docker/api.Dockerfile
+    restart: unless-stopped
+    environment:
+      DATA_DIR: /data
+      TMP_DIR: /tmp/scanapp
+      PREPROCESS_CONFIG: ${PREPROCESS_CONFIG:-pad}
+      USE_OCR: ${USE_OCR:-true}
+      ENABLE_MATCHED: ${ENABLE_MATCHED:-false}
+      ORT_INTRA_THREADS: ${ORT_INTRA_THREADS:-1}
+      ORT_INTER_THREADS: ${ORT_INTER_THREADS:-1}
+      OMP_NUM_THREADS: ${OMP_NUM_THREADS:-1}
+      MAX_IMAGE_PIXELS: ${MAX_IMAGE_PIXELS:-12000000}
+      MAX_UPLOAD_BYTES: ${MAX_UPLOAD_BYTES:-12582912}
+      SCAN_WAIT_LIMIT: ${SCAN_WAIT_LIMIT:-2}
+    volumes:
+      - scanapp-data:/data
+      - scanapp-tmp:/tmp/scanapp
+    expose:
+      - "8000"
+    mem_limit: 1536m
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "python",
+          "-c",
+          "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/api/v1/health')",
+        ]
+      interval: 15s
+      timeout: 5s
+      retries: 10
+      start_period: 40s
+
+  web:
+    build:
+      context: .
+      dockerfile: docker/web.Dockerfile
+    restart: unless-stopped
+    depends_on:
+      api:
+        condition: service_started
+    environment:
+      SITE_ADDRESS: ":80"
+    expose:
+      - "80"
+
+  bootstrap:
+    profiles: ["tools"]
+    build:
+      context: .
+      dockerfile: docker/bootstrap.Dockerfile
+    environment:
+      DATA_DIR: /data
+      PREPROCESS_CONFIG: ${PREPROCESS_CONFIG:-pad}
+      CATALOGUE_SETS: ${CATALOGUE_SETS:-base1,sv01,swsh3}
+      TCGDEX_IMAGE_QUALITY: ${TCGDEX_IMAGE_QUALITY:-high}
+      TCGDEX_LANGUAGE: ${TCGDEX_LANGUAGE:-en}
+      BOOTSTRAP_CONCURRENCY: ${BOOTSTRAP_CONCURRENCY:-8}
+      HF_HUB_DISABLE_TELEMETRY: "1"
+      OMP_NUM_THREADS: ${OMP_NUM_THREADS:-1}
+    volumes:
+      - scanapp-data:/data
+
+volumes:
+  scanapp-data:
+  scanapp-tmp:

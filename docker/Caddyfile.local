@@ -1,0 +1,27 @@
+{
+	local_certs
+	auto_https disable_redirects
+}
+
+(app) {
+	encode gzip
+
+	handle /api/v1* {
+		reverse_proxy api:8000
+	}
+
+	handle {
+		root * /srv
+		try_files {path} {path}/ {path}.html /index.html
+		file_server
+	}
+}
+
+:80 {
+	import app
+}
+
+:443 {
+	tls internal
+	import app
+}
