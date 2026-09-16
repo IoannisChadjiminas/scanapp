@@ -49,6 +49,20 @@ services:
       SITE_ADDRESS: ":80"
     expose:
       - "80"
+    networks:
+      - default
+      - dokploy-network
+    labels:
+      - traefik.enable=true
+      - traefik.docker.network=dokploy-network
+      - traefik.http.routers.scanapp.rule=Host(`staging-scan.auctaro.com`)
+      - traefik.http.routers.scanapp.entrypoints=web
+      - traefik.http.routers.scanapp.service=scanapp
+      - traefik.http.services.scanapp.loadbalancer.server.port=80
+      - traefik.http.routers.scanapp-secure.rule=Host(`staging-scan.auctaro.com`)
+      - traefik.http.routers.scanapp-secure.entrypoints=websecure
+      - traefik.http.routers.scanapp-secure.tls=true
+      - traefik.http.routers.scanapp-secure.service=scanapp
 
   bootstrap:
     profiles: ["tools"]
@@ -70,3 +84,7 @@ services:
 volumes:
   scanapp-data:
   scanapp-tmp:
+
+networks:
+  dokploy-network:
+    external: true
