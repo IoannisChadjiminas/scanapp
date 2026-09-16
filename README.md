@@ -91,4 +91,4 @@ PYTHONPATH=api python -m eval.harness --dataset datasets/dev --preprocess pad --
 
 Tesseract is only for a 50-image development comparison (`python -m eval.tesseract_compare`). Production OCR is RapidOCR.
 
-Confident `matched` status stays disabled (`ENABLE_MATCHED=false`) until thresholds are frozen on development data.
+The scanner returns the most likely card as `matched`, or `no_match` when visual score or the gap to the next card is too small.

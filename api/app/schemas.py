@@ -9,6 +9,7 @@ from pydantic import BaseModel, Field
 
 class ScanStatus(str, Enum):
     matched = "matched"
+    no_match = "no_match"
     uncertain = "uncertain"
     retake = "retake"
     failed = "failed"

@@ -14,7 +14,7 @@ class Settings(BaseSettings):
     tmp_dir: Path = Path("/tmp/scanapp")
     preprocess_config: str = "pad"
     use_ocr: bool = True
-    enable_matched: bool = False
+    enable_matched: bool = True
     ort_intra_threads: int = 1
     ort_inter_threads: int = 1
     max_image_pixels: int = 12_000_000

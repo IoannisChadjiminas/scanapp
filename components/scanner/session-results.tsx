@@ -29,6 +29,12 @@ function outcome(row: SessionResult) {
   if (row.confirmed_card_id) {
     return row.confirmed_card_id;
   }
+  if (row.status === "matched") {
+    return "Match";
+  }
+  if (row.status === "no_match" || row.status === "uncertain") {
+    return "Not a match";
+  }
   return row.status;
 }
 

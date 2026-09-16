@@ -5,8 +5,6 @@ import { RotateCw } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 
-const CARD_RATIO = 63 / 88;
-
 type CropEditorProps = {
   src: string;
   onConfirm: (blob: Blob) => void;
@@ -17,7 +15,7 @@ export function CropEditor({ src, onConfirm, onRetry }: CropEditorProps) {
   const imageRef = useRef<HTMLImageElement>(null);
   const stageRef = useRef<HTMLDivElement>(null);
   const [rotation, setRotation] = useState(0);
-  const [crop, setCrop] = useState({ x: 0.18, y: 0.1, w: 0.64, h: 0.64 / CARD_RATIO });
+  const [crop, setCrop] = useState({ x: 0.03, y: 0.03, w: 0.94, h: 0.94 });
   const drag = useRef<{ startX: number; startY: number; crop: typeof crop } | null>(null);
 
   function onPointerDown(event: React.PointerEvent<HTMLDivElement>) {

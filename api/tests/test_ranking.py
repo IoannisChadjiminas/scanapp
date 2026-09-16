@@ -44,7 +44,7 @@ def test_missing_ocr_does_not_block_visual_order() -> None:
     assert ranked[0]["ocr_consistent"] is None
 
 
-def test_matched_disabled_stays_uncertain() -> None:
+def test_matched_disabled_stays_no_match() -> None:
     suggestions = [_card("a", "Pikachu", "25", 0.95)]
     status = decide_status(
         suggestions,
@@ -53,7 +53,53 @@ def test_matched_disabled_stays_uncertain() -> None:
         min_gap=0.01,
         retake=False,
     )
-    assert status == "uncertain"
+    assert status == "no_match"
+
+
+def test_matched_when_visual_and_gap_pass() -> None:
+    suggestions = [
+        _card("a", "Pikachu", "25", 0.92),
+        _card("b", "Raichu", "26", 0.70),
+    ]
+    suggestions[0]["ocr_consistent"] = False
+    status = decide_status(
+        suggestions,
+        enable_matched=True,
+        min_visual=0.78,
+        min_gap=0.04,
+        retake=False,
+    )
+    assert status == "matched"
+
+
+def test_no_match_when_visual_is_low() -> None:
+    suggestions = [
+        _card("a", "Pikachu", "25", 0.62),
+        _card("b", "Raichu", "26", 0.40),
+    ]
+    status = decide_status(
+        suggestions,
+        enable_matched=True,
+        min_visual=0.78,
+        min_gap=0.04,
+        retake=False,
+    )
+    assert status == "no_match"
+
+
+def test_no_match_when_gap_is_small() -> None:
+    suggestions = [
+        _card("a", "Switch", "95", 0.88),
+        _card("b", "Scoop Up", "78", 0.87),
+    ]
+    status = decide_status(
+        suggestions,
+        enable_matched=True,
+        min_visual=0.78,
+        min_gap=0.04,
+        retake=False,
+    )
+    assert status == "no_match"
 
 
 def test_retake_when_image_unsuitable() -> None:

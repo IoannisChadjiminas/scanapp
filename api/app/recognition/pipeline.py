@@ -133,10 +133,13 @@ def recognize_bytes(
         message = "The photograph is too blurry for useful recognition. Try again."
     elif retake and too_small:
         message = "Move closer so the card fills more of the frame."
-    elif status == "uncertain":
-        message = "Suggestions are uncertain until selection thresholds are frozen."
+    elif status == "matched":
+        message = "This is the most likely match."
+    elif status in {"no_match", "uncertain"}:
+        message = "This photograph did not match a catalogue card."
     if not detected and not skip_detect and status != "retake":
-        message = (message or "") + " Automatic card detection was unreliable; using the provided crop."
+        extra = " Automatic card detection was unreliable; using the provided crop."
+        message = (message or "") + extra
 
     suggestions = [Candidate.model_validate(item) for item in top3]
     scan_id = str(uuid.uuid4())

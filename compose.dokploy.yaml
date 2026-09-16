@@ -11,7 +11,7 @@ services:
       TMP_DIR: /tmp/scanapp
       PREPROCESS_CONFIG: ${PREPROCESS_CONFIG:-pad}
       USE_OCR: ${USE_OCR:-true}
-      ENABLE_MATCHED: ${ENABLE_MATCHED:-false}
+      ENABLE_MATCHED: ${ENABLE_MATCHED:-true}
       ORT_INTRA_THREADS: ${ORT_INTRA_THREADS:-1}
       ORT_INTER_THREADS: ${ORT_INTER_THREADS:-1}
       OMP_NUM_THREADS: ${OMP_NUM_THREADS:-1}
@@ -76,10 +76,13 @@ services:
       TCGDEX_IMAGE_QUALITY: ${TCGDEX_IMAGE_QUALITY:-high}
       TCGDEX_LANGUAGE: ${TCGDEX_LANGUAGE:-en}
       BOOTSTRAP_CONCURRENCY: ${BOOTSTRAP_CONCURRENCY:-8}
+      BOOTSTRAP_EXTRAS_ONLY: ${BOOTSTRAP_EXTRAS_ONLY:-false}
+      EXTRA_CARDS_DIR: /extra-cards
       HF_HUB_DISABLE_TELEMETRY: "1"
       OMP_NUM_THREADS: ${OMP_NUM_THREADS:-1}
     volumes:
       - scanapp-data:/data
+      - ./extra-cards:/extra-cards:ro
 
 volumes:
   scanapp-data:

@@ -10,6 +10,13 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import {
+  Empty,
+  EmptyContent,
+  EmptyDescription,
+  EmptyHeader,
+  EmptyTitle,
+} from "@/components/ui/empty";
 import { assetUrl } from "@/lib/api";
 import type { Candidate, ScanStatus } from "@/lib/api-types";
 
@@ -25,7 +32,7 @@ type SuggestionsProps = {
 
 function statusLabel(status: ScanStatus) {
   if (status === "matched") {
-    return "Matched";
+    return "Match";
   }
   if (status === "retake") {
     return "Retake";
@@ -33,7 +40,7 @@ function statusLabel(status: ScanStatus) {
   if (status === "failed") {
     return "Failed";
   }
-  return "Uncertain";
+  return "Not a match";
 }
 
 export function Suggestions({
@@ -45,55 +52,105 @@ export function Suggestions({
   onReject,
   onScanAgain,
 }: SuggestionsProps) {
+  const top = suggestions[0];
+  const matched = status === "matched" && top;
+  const notAMatch = status === "no_match" || status === "uncertain";
+
   return (
     <div className="flex flex-col gap-4">
       <div className="flex items-center justify-between gap-3">
-        <h2 className="font-heading text-lg font-medium">Suggestions</h2>
-        <Badge variant={status === "retake" ? "destructive" : "secondary"}>
+        <h2 className="font-heading text-lg font-medium">
+          {matched ? "Most likely card" : "Result"}
+        </h2>
+        <Badge variant={matched ? "secondary" : "destructive"}>
           {statusLabel(status)}
         </Badge>
       </div>
       {message ? <p className="text-sm text-muted-foreground">{message}</p> : null}
-      <ol className="grid gap-3">
-        {suggestions.map((item, index) => (
-          <li key={item.card_id}>
-            <Card>
-              <CardHeader>
-                <CardTitle>
-                  {index + 1}. {item.name}
-                </CardTitle>
-                <CardDescription>
-                  {item.set_name} · #{item.collector_number}
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
-                  src={assetUrl(item.image_url)}
-                  alt={`${item.name} from ${item.set_name}`}
-                  className="mx-auto max-h-64 w-auto rounded-md"
-                />
-              </CardContent>
-              <CardFooter className="justify-end">
-                <Button
-                  type="button"
-                  className="h-11 min-h-11"
-                  onClick={() => onConfirm(item.card_id)}
-                >
-                  This is the card
-                </Button>
-              </CardFooter>
-            </Card>
-          </li>
-        ))}
-      </ol>
-      <div className="grid gap-3 sm:grid-cols-3">
-        <Button type="button" variant="secondary" className="h-11 min-h-11" onClick={onChooseAnother}>
-          Choose another
-        </Button>
-        <Button type="button" variant="outline" className="h-11 min-h-11" onClick={onReject}>
-          None of these
-        </Button>
+
+      {matched ? (
+        <Card>
+          <CardHeader>
+            <CardTitle>{top.name}</CardTitle>
+            <CardDescription>
+              {top.set_name} · #{top.collector_number}
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={assetUrl(top.image_url)}
+              alt={`${top.name} from ${top.set_name}`}
+              className="mx-auto max-h-72 w-auto rounded-md"
+            />
+          </CardContent>
+          <CardFooter className="flex flex-col gap-3 sm:flex-row sm:justify-end">
+            <Button
+              type="button"
+              variant="outline"
+              className="h-11 min-h-11 w-full sm:w-auto"
+              onClick={onReject}
+            >
+              Not this card
+            </Button>
+            <Button
+              type="button"
+              className="h-11 min-h-11 w-full sm:w-auto"
+              onClick={() => onConfirm(top.card_id)}
+            >
+              This is the card
+            </Button>
+          </CardFooter>
+        </Card>
+      ) : null}
+
+      {notAMatch ? (
+        <Empty className="border">
+          <EmptyHeader>
+            <EmptyTitle>Not a match</EmptyTitle>
+            <EmptyDescription>
+              Nothing in the catalogue was close enough. Scan again with a tighter
+              crop, or pick the card from the list.
+            </EmptyDescription>
+          </EmptyHeader>
+          {top ? (
+            <EmptyContent>
+              <p className="text-muted-foreground text-xs">Closest card (not a match)</p>
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={assetUrl(top.image_url)}
+                alt=""
+                className="mx-auto max-h-40 w-auto rounded-md opacity-70"
+              />
+              <p className="text-sm">
+                {top.name} · {top.set_name} #{top.collector_number}
+              </p>
+            </EmptyContent>
+          ) : null}
+        </Empty>
+      ) : null}
+
+      {status === "retake" || status === "failed" ? (
+        <Empty className="border">
+          <EmptyHeader>
+            <EmptyTitle>{status === "retake" ? "Retake the photograph" : "Recognition failed"}</EmptyTitle>
+            <EmptyDescription>
+              {message ?? "Try a clearer, closer photograph of a single card."}
+            </EmptyDescription>
+          </EmptyHeader>
+        </Empty>
+      ) : null}
+
+      <div className="grid gap-3 sm:grid-cols-2">
+        {notAMatch ? (
+          <Button type="button" variant="secondary" className="h-11 min-h-11" onClick={onChooseAnother}>
+            Choose from catalogue
+          </Button>
+        ) : (
+          <Button type="button" variant="secondary" className="h-11 min-h-11" onClick={onChooseAnother}>
+            Choose another
+          </Button>
+        )}
         <Button type="button" variant="outline" className="h-11 min-h-11" onClick={onScanAgain}>
           Scan again
         </Button>

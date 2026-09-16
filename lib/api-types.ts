@@ -1,4 +1,4 @@
-export type ScanStatus = "matched" | "uncertain" | "retake" | "failed";
+export type ScanStatus = "matched" | "no_match" | "uncertain" | "retake" | "failed";
 
 export type Candidate = {
   card_id: string;

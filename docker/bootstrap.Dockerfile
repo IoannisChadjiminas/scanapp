@@ -31,6 +31,9 @@ COPY api/app /app/app
 COPY api/bootstrap /app/bootstrap
 COPY api/eval /app/eval
 
+COPY extra-cards /extra-cards
+ENV EXTRA_CARDS_DIR=/extra-cards
+
 RUN mkdir -p /data
 WORKDIR /app
 

@@ -9,8 +9,8 @@ export default function Home() {
           Identify an English Pokémon card
         </h1>
         <p className="mt-2 text-sm text-muted-foreground">
-          Photographs are processed, then discarded. Suggestions stay uncertain until
-          development thresholds are frozen.
+          Photographs are processed, then discarded. The scanner shows the most
+          likely card, or tells you when it is not a match.
         </p>
       </header>
       <ScannerApp />

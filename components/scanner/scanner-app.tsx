@@ -134,7 +134,9 @@ export function ScannerApp() {
       setStatusText(
         result.status === "retake"
           ? result.message ?? "Please retake the photograph."
-          : "Three suggestions are ready.",
+          : result.status === "matched"
+            ? "Most likely card is ready."
+            : "Not a match.",
       );
       await refreshResults();
     } catch (cause) {

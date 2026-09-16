@@ -6,7 +6,7 @@ services:
     restart: unless-stopped
     ports: []
     environment:
-      ENABLE_MATCHED: ${ENABLE_MATCHED:-false}
+      ENABLE_MATCHED: ${ENABLE_MATCHED:-true}
     mem_limit: 1536m
     cpus: "1.5"
     pids_limit: 256

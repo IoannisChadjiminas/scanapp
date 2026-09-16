@@ -103,14 +103,12 @@ def decide_status(
     if retake:
         return "retake"
     if not suggestions:
-        return "uncertain"
+        return "no_match"
     if not enable_matched:
-        return "uncertain"
+        return "no_match"
     top = suggestions[0]
     second = suggestions[1]["combined_score"] if len(suggestions) > 1 else 0.0
     gap = float(top["combined_score"]) - float(second)
     if float(top["visual_score"]) >= min_visual and gap >= min_gap:
-        if top.get("ocr_consistent") is False:
-            return "uncertain"
         return "matched"
-    return "uncertain"
+    return "no_match"

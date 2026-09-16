@@ -1,0 +1,70 @@
+{
+  "cards": [
+    {
+      "id": "extra-blaziken-vmax-217-184",
+      "name": "Blaziken VMAX",
+      "set_id": "s8b",
+      "set_name": "VMAX Climax",
+      "collector_number": "217/184",
+      "language": "ja",
+      "category": "Pokemon",
+      "rarity": "SSR",
+      "file": "blaziken-vmax.jpg"
+    },
+    {
+      "id": "extra-lugia-v-326-s-p",
+      "name": "Lugia V",
+      "set_id": "s-p",
+      "set_name": "SWSH Promo",
+      "collector_number": "326/S-P",
+      "language": "ja",
+      "category": "Pokemon",
+      "rarity": "Promo",
+      "file": "lugia-v.jpg"
+    },
+    {
+      "id": "extra-charmander-001-032",
+      "name": "Charmander",
+      "set_id": "cl",
+      "set_name": "Pokémon Card Game Classic",
+      "collector_number": "001/032",
+      "language": "ja",
+      "category": "Pokemon",
+      "rarity": "Common",
+      "file": "charmander-001-032.jpg"
+    },
+    {
+      "id": "extra-gengar-mimikyu-gx-103-095",
+      "name": "Gengar & Mimikyu GX",
+      "set_id": "sm9a",
+      "set_name": "Night Unison",
+      "collector_number": "103/095",
+      "language": "ja",
+      "category": "Pokemon",
+      "rarity": "SSR",
+      "file": "gengar-mimikyu-gx.jpg"
+    },
+    {
+      "id": "extra-m-tyranitar-ex-089-081",
+      "name": "M Tyranitar EX",
+      "set_id": "xy9",
+      "set_name": "Rage of the Broken Heavens",
+      "collector_number": "089/081",
+      "language": "ja",
+      "category": "Pokemon",
+      "rarity": "RR",
+      "file": "m-tyranitar-ex.jpg"
+    },
+    {
+      "id": "extra-pikachu-mcdonalds-2022-008-015",
+      "name": "Pikachu",
+      "set_id": "mcd22",
+      "set_name": "McDonald's Collection 2022",
+      "collector_number": "008/015",
+      "language": "en",
+      "category": "Pokemon",
+      "rarity": "Promo",
+      "file": "pikachu-mcdonalds-2022.jpg"
+    }
+  ]
+}
