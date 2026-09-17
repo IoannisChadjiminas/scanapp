@@ -5,6 +5,7 @@ export const RENEW_ALARM = "scanapp-cardmarket-renew";
 export const IDLE_PERIOD_MINUTES = 0.5;
 export const NAV_SPACING_MS = 30_000;
 export const PAGE_DEADLINE_MS = 60_000;
+export const FETCH_TIMEOUT_MS = 8_000;
 export const CLAIM_LIFETIME_MS = 180_000;
 export const MAX_RECENT_FAILURES = 5;
 export const SERVERS = {

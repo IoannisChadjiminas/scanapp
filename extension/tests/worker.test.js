@@ -215,3 +215,26 @@ test("closing the helper tab pauses instead of reopening it", async () => {
   await worker.wake("alarm");
   assert.equal(createdTabs.length, before);
 });
+
+test("status snapshot is not blocked by a hung API", async () => {
+  const local = memoryStore({
+    apiBase: "https://staging-scan.auctaro.com",
+    helperToken: "helper.token",
+    connection: "disconnected",
+  });
+  const worker = createWorker({
+    local,
+    session: memoryStore(),
+    fetchImpl: () => new Promise(() => {}),
+    tabs: {
+      get: async () => {
+        throw new Error("missing");
+      },
+    },
+    alarms: { create: async () => undefined },
+  });
+  void worker.wake("startup");
+  const status = await worker.handleMessage({ type: "get-status" });
+  assert.equal(status.helperToken, "helper.token");
+  assert.equal(status.apiBase, "https://staging-scan.auctaro.com");
+});

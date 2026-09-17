@@ -56,3 +56,7 @@ label {
   display: grid;
   gap: 4px;
 }
+
+label[hidden] {
+  display: none !important;
+}

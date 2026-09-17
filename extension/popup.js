@@ -73,9 +73,17 @@ async function send(message) {
 }
 
 async function refresh(message) {
-  const status = await send(message);
-  if (status) {
-    render(status);
+  try {
+    const status = await send(message);
+    if (status?.error && !status.connection) {
+      connectionEl.textContent = `Connection: disconnected (${status.error})`;
+      return;
+    }
+    if (status) {
+      render(status);
+    }
+  } catch (error) {
+    connectionEl.textContent = `Connection: disconnected (${error instanceof Error ? error.message : error})`;
   }
 }
 

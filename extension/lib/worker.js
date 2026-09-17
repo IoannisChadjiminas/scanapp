@@ -1,5 +1,6 @@
 import {
   DEFAULT_API,
+  FETCH_TIMEOUT_MS,
   IDLE_ALARM,
   IDLE_PERIOD_MINUTES,
   MAX_RECENT_FAILURES,
@@ -59,18 +60,26 @@ export function createWorker({
     if (body !== undefined) {
       headers["Content-Type"] = "application/json";
     }
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), FETCH_TIMEOUT_MS);
+    if (typeof timer === "object" && typeof timer.unref === "function") {
+      timer.unref();
+    }
     let response;
     try {
       response = await fetchImpl(`${apiBase}/api/v1${path}`, {
         method,
         headers,
         body: body === undefined ? undefined : JSON.stringify(body),
+        signal: controller.signal,
       });
     } catch (cause) {
       const error = new Error("disconnected");
       error.code = "network";
       error.cause = cause;
       throw error;
+    } finally {
+      clearTimeout(timer);
     }
     if (response.status === 401) {
       const error = new Error("authentication required");
@@ -502,18 +511,18 @@ export function createWorker({
       return;
     }
     await patchLocal({ helperTabClosed: false, attention: null, activity: "idle" });
-    await enqueue(tick);
+    await tick();
   }
 
   async function changeServer(apiBase) {
     await releaseCurrent("server-change");
     await patchLocal({ apiBase: String(apiBase || DEFAULT_API).replace(/\/$/, ""), currentJob: null, pendingResult: null });
-    await enqueue(tick);
+    await tick();
   }
 
   async function changeToken(helperToken) {
     await patchLocal({ helperToken: String(helperToken || "") });
-    await enqueue(tick);
+    await tick();
   }
 
   async function onMessage(message, sender) {
@@ -532,7 +541,7 @@ export function createWorker({
       return snapshot();
     }
     if (message?.type === "check-connection") {
-      await enqueue(tick);
+      await tick();
       return snapshot();
     }
     if (message?.type === "open-helper-tab") {
@@ -593,7 +602,7 @@ export function createWorker({
       return;
     }
     if (info.status === "complete" || kind === "product") {
-      await enqueue(tick);
+      await tick();
     }
   }
 
@@ -607,6 +616,9 @@ export function createWorker({
       });
     },
     handleMessage(message, sender) {
+      if (message?.type === "get-status") {
+        return snapshot();
+      }
       return enqueue(() => onMessage(message, sender));
     },
     tabRemoved(tabId) {
