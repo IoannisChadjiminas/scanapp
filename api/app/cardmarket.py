@@ -294,19 +294,25 @@ def enqueue_job(
 
 
 _STALE_CLAIM_SECONDS = 90
+_MAX_JOB_ATTEMPTS = 3
 
 
-def _reclaim_stale_jobs(conn: sqlite3.Connection) -> None:
+def _settle_stale_jobs(conn: sqlite3.Connection) -> None:
     cutoff = time.strftime(
         "%Y-%m-%dT%H:%M:%SZ", time.gmtime(time.time() - _STALE_CLAIM_SECONDS)
     )
+    now = datetime_now()
     conn.execute(
         """
         UPDATE cardmarket_jobs
-        SET status = 'pending', updated_at = ?
+        SET status = CASE
+                WHEN COALESCE(attempts, 0) >= ? THEN 'failed'
+                ELSE 'pending'
+            END,
+            updated_at = ?
         WHERE status = 'claimed' AND updated_at < ?
         """,
-        (datetime_now(), cutoff),
+        (_MAX_JOB_ATTEMPTS, now, cutoff),
     )
 
 
@@ -315,7 +321,7 @@ def claim_job(conn: sqlite3.Connection) -> dict[str, str] | None:
         conn.execute("BEGIN IMMEDIATE")
     except sqlite3.OperationalError:
         pass
-    _reclaim_stale_jobs(conn)
+    _settle_stale_jobs(conn)
     row = conn.execute(
         """
         SELECT id, url, card_id FROM cardmarket_jobs
@@ -328,7 +334,11 @@ def claim_job(conn: sqlite3.Connection) -> dict[str, str] | None:
         conn.commit()
         return None
     conn.execute(
-        "UPDATE cardmarket_jobs SET status = 'claimed', updated_at = ? WHERE id = ?",
+        """
+        UPDATE cardmarket_jobs
+        SET status = 'claimed', updated_at = ?, attempts = COALESCE(attempts, 0) + 1
+        WHERE id = ?
+        """,
         (datetime_now(), row["id"]),
     )
     conn.commit()
@@ -344,16 +354,19 @@ def is_job_url(url: str | None) -> bool:
 
 def job_by_id(conn: sqlite3.Connection, job_id: str) -> dict[str, str] | None:
     row = conn.execute(
-        "SELECT id, url, card_id, status FROM cardmarket_jobs WHERE id = ?",
+        "SELECT id, url, card_id, status, attempts FROM cardmarket_jobs WHERE id = ?",
         (job_id,),
     ).fetchone()
     if row is None:
         return None
+    keys = set(row.keys())
+    attempts = int(row["attempts"] or 0) if "attempts" in keys else 0
     return {
         "id": str(row["id"]),
         "url": str(row["url"]),
         "card_id": str(row["card_id"] or ""),
         "status": str(row["status"] or ""),
+        "attempts": str(attempts),
     }
 
 
@@ -363,6 +376,40 @@ def complete_job(conn: sqlite3.Connection, job_id: str, status: str = "done") ->
         (status, datetime_now(), job_id),
     )
     conn.commit()
+
+
+def retry_or_fail_job(conn: sqlite3.Connection, job_id: str) -> str:
+    job = job_by_id(conn, job_id)
+    if job is None:
+        return "failed"
+    attempts = int(job.get("attempts") or 0)
+    if attempts >= _MAX_JOB_ATTEMPTS:
+        complete_job(conn, job_id, "failed")
+        return "failed"
+    conn.execute(
+        "UPDATE cardmarket_jobs SET status = 'pending', updated_at = ? WHERE id = ?",
+        (datetime_now(), job_id),
+    )
+    conn.commit()
+    return "pending"
+
+
+def latest_job_status(conn: sqlite3.Connection, url: str | None) -> str | None:
+    key = normalize_product_url(url)
+    if not key:
+        return None
+    row = conn.execute(
+        """
+        SELECT status FROM cardmarket_jobs
+        WHERE url = ?
+        ORDER BY updated_at DESC
+        LIMIT 1
+        """,
+        (key,),
+    ).fetchone()
+    if row is None:
+        return None
+    return str(row["status"] or "") or None
 
 
 def _row_value(row: Any, key: str, default: Any = None) -> Any:

@@ -29,6 +29,14 @@ async function nextJob() {
   return response.json();
 }
 
+async function failJob(jobId) {
+  if (!jobId) {
+    return;
+  }
+  const base = await apiBase();
+  await fetch(`${base}/api/v1/cardmarket/jobs/${jobId}/fail`, { method: "POST" });
+}
+
 async function saveOffers(url, prices, jobId) {
   const base = await apiBase();
   const response = await fetch(`${base}/api/v1/cardmarket/offers`, {
@@ -79,7 +87,15 @@ chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
   const jobId = pendingJobs.get(url) || activeJobId;
   const prices = Array.isArray(message.prices) ? message.prices : [];
   if (!prices.length) {
-    sendResponse({ ok: false });
+    failJob(jobId)
+      .then(() => {
+        pendingJobs.delete(url);
+        if (jobId && activeJobId === jobId) {
+          activeJobId = null;
+        }
+        sendResponse({ ok: false });
+      })
+      .catch(() => sendResponse({ ok: false }));
     return true;
   }
   saveOffers(url, prices, jobId)
@@ -92,7 +108,9 @@ chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
     })
     .catch((error) => {
       console.warn("scanapp cardmarket helper", error);
-      sendResponse({ ok: false });
+      failJob(jobId)
+        .catch(() => undefined)
+        .finally(() => sendResponse({ ok: false }));
     });
   return true;
 });

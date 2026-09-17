@@ -217,8 +217,8 @@ def test_normalize_and_snapshot_roundtrip(tmp_path: Path) -> None:
     assert snapshot_prices(conn, key) == prices
 
 
-def test_claim_reclaims_stale_job(tmp_path: Path) -> None:
-    from app.cardmarket import claim_job, enqueue_job
+def test_job_retries_up_to_three_times(tmp_path: Path) -> None:
+    from app.cardmarket import claim_job, enqueue_job, retry_or_fail_job
 
     conn = connect(tmp_path / "catalog.sqlite")
     init_catalog(conn)
@@ -227,14 +227,15 @@ def test_claim_reclaims_stale_job(tmp_path: Path) -> None:
         "https://www.cardmarket.com/en/Pokemon/Products/Singles/Tag-Bolt/Gengar-Mimikyu-GX-V2-sm9102",
         "extra-gengar",
     )
-    conn.execute(
-        "UPDATE cardmarket_jobs SET status = 'claimed', updated_at = '2020-01-01T00:00:00Z' WHERE id = ?",
-        (job_id,),
-    )
-    conn.commit()
+    for _ in range(2):
+        claimed = claim_job(conn)
+        assert claimed is not None
+        assert claimed["id"] == job_id
+        assert retry_or_fail_job(conn, job_id) == "pending"
     claimed = claim_job(conn)
     assert claimed is not None
-    assert claimed["id"] == job_id
+    assert retry_or_fail_job(conn, job_id) == "failed"
+    assert claim_job(conn) is None
 
 
 def test_prices_for_row_prefers_snapshot(tmp_path: Path) -> None:

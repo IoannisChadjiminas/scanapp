@@ -9,7 +9,9 @@ from app.cardmarket import (
     enqueue_job,
     is_job_url,
     job_by_id,
+    latest_job_status,
     normalize_product_url,
+    retry_or_fail_job,
     save_snapshot,
     snapshot_prices,
 )
@@ -43,6 +45,7 @@ class OfferPayload(BaseModel):
 class PriceResponse(BaseModel):
     url: str | None = None
     prices: list[PriceItem] = Field(default_factory=list)
+    status: str | None = None
 
 
 @router.post("/cardmarket/jobs", response_model=JobResponse)
@@ -88,7 +91,16 @@ def save_offers(payload: OfferPayload, request: Request) -> PriceResponse:
             job_url = str(row["url"] or "")
             if job_url == key or job_url == url:
                 complete_job(catalog, str(row["id"]))
-    return PriceResponse(url=key, prices=[PriceItem.model_validate(item) for item in prices])
+    return PriceResponse(url=key, prices=[PriceItem.model_validate(item) for item in prices], status="done")
+
+
+@router.post("/cardmarket/jobs/{job_id}/fail")
+def fail_job(job_id: str, request: Request) -> PriceResponse:
+    job = job_by_id(request.app.state.dbs.catalog, job_id)
+    if job is None:
+        raise HTTPException(status_code=404, detail="Unknown job")
+    status = retry_or_fail_job(request.app.state.dbs.catalog, job_id)
+    return PriceResponse(url=job["url"], prices=[], status=status)
 
 
 @router.get("/cardmarket/prices", response_model=PriceResponse)
@@ -100,4 +112,5 @@ def get_prices(
     return PriceResponse(
         url=key,
         prices=[PriceItem.model_validate(item) for item in prices],
+        status=latest_job_status(request.app.state.dbs.catalog, key),
     )

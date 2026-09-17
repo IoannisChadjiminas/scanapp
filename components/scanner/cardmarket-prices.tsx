@@ -77,10 +77,14 @@ export function useCardmarketListings(
       setWaiting(false);
       return;
     }
+    const needsLive = !initial?.length || isGuideOnly(initial);
+    if (!needsLive) {
+      setWaiting(false);
+      return;
+    }
     let stopped = false;
     let attempts = 0;
-    const needsLive = !initial?.length || isGuideOnly(initial);
-    setWaiting(needsLive);
+    setWaiting(true);
 
     const tick = async () => {
       attempts += 1;
@@ -94,13 +98,18 @@ export function useCardmarketListings(
           setWaiting(false);
           return;
         }
+        if (payload.status === "failed" || payload.status === "done") {
+          setWaiting(false);
+          return;
+        }
       } catch {
-        /* helper may still be opening the page */
+        setWaiting(false);
+        return;
       }
       if (stopped) {
         return;
       }
-      if (attempts >= 40) {
+      if (attempts >= 20) {
         setWaiting(false);
         return;
       }
@@ -110,7 +119,7 @@ export function useCardmarketListings(
     return () => {
       stopped = true;
     };
-  }, [url, initial]);
+  }, [url]);
 
   return { prices, waiting };
 }

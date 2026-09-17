@@ -70,6 +70,11 @@ def init_catalog(conn: sqlite3.Connection) -> None:
             ON cardmarket_jobs(status, created_at);
         """
     )
+    job_columns = {row[1] for row in conn.execute("PRAGMA table_info(cardmarket_jobs)")}
+    if "attempts" not in job_columns:
+        conn.execute(
+            "ALTER TABLE cardmarket_jobs ADD COLUMN attempts INTEGER NOT NULL DEFAULT 0"
+        )
     conn.commit()
 
 
