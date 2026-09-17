@@ -66,6 +66,17 @@ def pick_name_line(lines: list[str]) -> str | None:
     return None
 
 
+COLLECTOR_FRACTION_RE = re.compile(r"\d{1,4}\s*/\s*\d{1,4}")
+
+
+def pick_collector_text(number_lines: list[str]) -> str | None:
+    for line in number_lines:
+        match = COLLECTOR_FRACTION_RE.search(line)
+        if match:
+            return re.sub(r"\s+", "", match.group(0))
+    return number_lines[-1] if number_lines else None
+
+
 class CardOcr:
     def __init__(
         self,
@@ -121,7 +132,7 @@ class CardOcr:
             lines = [*name_lines, *number_lines, *extra]
             return OcrResult(
                 name_text=pick_name_line(name_lines) or pick_name_line(lines),
-                collector_text=number_lines[-1] if number_lines else None,
+                collector_text=pick_collector_text(number_lines),
                 lines=lines,
                 failed=False,
             )

@@ -23,6 +23,8 @@ def test_import_extra_cards(tmp_path: Path, monkeypatch) -> None:
                         "collector_number": "1",
                         "language": "en",
                         "file": "demo.jpg",
+                        "cardmarket_expansion": "Base-Set",
+                        "cardmarket_set_code": "BS",
                     }
                 ]
             }
@@ -43,5 +45,7 @@ def test_import_extra_cards(tmp_path: Path, monkeypatch) -> None:
         "SELECT cardmarket_url FROM cards WHERE id = 'extra-demo'"
     ).fetchone()
     assert row is not None
-    assert "cardmarket.com" in row["cardmarket_url"]
-    assert "/Products/Singles/" in row["cardmarket_url"]
+    assert (
+        row["cardmarket_url"]
+        == "https://www.cardmarket.com/en/Pokemon/Products/Singles/Base-Set/Demo-BS1"
+    )

@@ -54,6 +54,13 @@ def name_match(ocr_name: str | None, card_name: str) -> bool:
     return False
 
 
+def _norm_digits(value: str) -> str:
+    digits = re.sub(r"\D", "", value)
+    if not digits:
+        return ""
+    return digits.lstrip("0") or "0"
+
+
 def _collector_left(value: str) -> str:
     for part in re.split(r"[^\d]+", value.strip()):
         if part:
@@ -61,24 +68,36 @@ def _collector_left(value: str) -> str:
     return ""
 
 
+def _collector_fraction(value: str) -> tuple[str, str | None]:
+    compact = (value or "").replace(" ", "")
+    match = re.search(r"(?:[A-Z]{0,4})(\d{1,4})/(\d{1,4})", compact, re.IGNORECASE)
+    if match:
+        return _norm_digits(match.group(1)), _norm_digits(match.group(2))
+    left = _norm_digits(_collector_left(value))
+    return left, None
+
+
 def number_match(ocr_numbers: list[str], collector_number: str) -> bool | None:
-    expected = normalize_text(collector_number)
-    if not expected:
+    expected_left, expected_right = _collector_fraction(collector_number)
+    if not expected_left:
         return None
-    expected_left = _collector_left(collector_number)
-    tokens: list[str] = []
+    fractions: list[tuple[str, str]] = []
+    lefts: list[str] = []
     for token in ocr_numbers:
-        got = normalize_text(token)
-        if got:
-            tokens.append(got)
-        left = _collector_left(token)
-        if left:
-            tokens.append(left)
-    tokens = list(dict.fromkeys(tokens))
-    if not tokens:
+        left, right = _collector_fraction(token)
+        if left and right:
+            fractions.append((left, right))
+        elif left:
+            lefts.append(left)
+    if not fractions and not lefts:
         return None
-    for got in tokens:
-        if got == expected or (expected_left and got == expected_left):
+    if fractions:
+        if expected_right:
+            return (expected_left, expected_right) in fractions
+        return any(left == expected_left for left, _right in fractions)
+    expected_full = _norm_digits(collector_number)
+    for got in lefts:
+        if got == expected_left or (expected_full and got == expected_full):
             return True
         if len(got) < 2:
             continue
@@ -89,7 +108,7 @@ def number_match(ocr_numbers: list[str], collector_number: str) -> bool | None:
             and len(got) > len(expected_left)
         ):
             return True
-        if len(got) >= 3 and (expected.startswith(got) or expected_left.startswith(got)):
+        if len(got) >= 3 and expected_left.startswith(got):
             return True
     return False
 
@@ -115,15 +134,15 @@ def rerank(
                 combined -= 0.04
         if ocr_failed:
             consistent = None
+        elif number_ok is False and ocr_numbers:
+            consistent = False
+            combined -= 0.12
         elif name_ok or number_ok is True:
             consistent = True
             if name_ok:
                 combined += 0.06
             if number_ok is True:
                 combined += 0.08
-        elif number_ok is False and ocr_numbers:
-            consistent = False
-            combined -= 0.12
         elif ocr_name and not name_ok:
             consistent = False if similar(ocr_name, item["name"]) < 0.4 else None
             if consistent is False:
@@ -143,6 +162,8 @@ def _prefer_language_print(
         return ranked
     matching = [row for row in ranked if row.get("language") in languages]
     if not matching:
+        return ranked
+    if ranked[0].get("language") in languages:
         return ranked
     best = max(matching, key=lambda row: float(row["visual_score"]))
     visual_best = max(ranked, key=lambda row: float(row["visual_score"]))
@@ -197,4 +218,13 @@ def decide_status(
     gap = float(top["visual_score"]) - second
     if float(top["visual_score"]) >= min_visual and (second <= 0.0 or gap >= min_gap):
         return "matched"
+    if float(top["visual_score"]) >= min_visual and top.get("ocr_consistent") is True:
+        twins = [
+            row
+            for row in peers
+            if abs(float(row["visual_score"]) - float(top["visual_score"])) < min_gap
+        ]
+        others = [row for row in twins if row["card_id"] != top["card_id"]]
+        if others and all(row.get("ocr_consistent") is False for row in others):
+            return "matched"
     return "no_match"

@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from app.recognition.ocr import pick_name_line
+from app.recognition.ocr import pick_collector_text, pick_name_line
 from app.recognition.rank import decide_status, name_match, number_match, rerank
 
 
@@ -152,6 +152,39 @@ def test_number_match_ignores_short_damage_digits() -> None:
     assert number_match(["2"], "2") is True
     assert number_match(["103/095"], "103/095") is True
     assert number_match(["103"], "103/095") is True
+
+
+def test_ocr_fraction_distinguishes_reprints() -> None:
+    assert number_match(["008/034", "008034"], "008/034") is True
+    assert number_match(["008/034", "008034"], "008/015") is False
+    assert number_match(["008"], "008/015") is True
+    assert number_match(["008"], "008/034") is True
+
+
+def test_reprint_with_matching_fraction_is_matched() -> None:
+    visual = [
+        _card("mcd", "Pikachu", "008/015", 0.9997),
+        _card("clc", "Pikachu", "008/034", 0.9989),
+        _card("base", "Pikachu", "58", 0.84),
+    ]
+    ranked = rerank(visual, "Pikachu", ["008/034"], ocr_failed=False, detected_languages=("en",))
+    assert ranked[0]["card_id"] == "clc"
+    assert ranked[0]["ocr_consistent"] is True
+    assert ranked[1]["card_id"] == "mcd"
+    assert ranked[1]["ocr_consistent"] is False
+    status = decide_status(
+        ranked,
+        enable_matched=True,
+        min_visual=0.78,
+        min_gap=0.04,
+        retake=False,
+    )
+    assert status == "matched"
+
+
+def test_pick_collector_prefers_fraction_line() -> None:
+    assert pick_collector_text(["008/034", "33 Pokemoen/Mrtendo"]) == "008/034"
+    assert pick_collector_text(["Illus. Mitsuhiro Arita"]) == "Illus. Mitsuhiro Arita"
 
 
 def test_pick_name_skips_japanese_stage_label() -> None:

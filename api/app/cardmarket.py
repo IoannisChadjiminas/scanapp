@@ -42,6 +42,33 @@ def cardmarket_slug(value: str) -> str:
     return text.strip("-")
 
 
+def collector_digits(collector_number: str) -> str:
+    head = (collector_number or "").split("/")[0].strip()
+    return re.sub(r"\D", "", head)
+
+
+def cardmarket_singles_url(
+    *,
+    name: str,
+    expansion: str,
+    set_code: str,
+    collector_number: str = "",
+    language: str | None = "en",
+) -> str | None:
+    """Canonical Cardmarket product page: /Singles/{expansion}/{Name}-{CODE}{number}."""
+    expansion_slug = cardmarket_slug(expansion)
+    name_slug = cardmarket_slug(name)
+    code = re.sub(r"[^A-Za-z0-9]", "", set_code or "").upper()
+    number = collector_digits(collector_number)
+    if not expansion_slug or not name_slug or not code or not number:
+        return None
+    locale = cardmarket_locale(language)
+    return (
+        f"https://www.cardmarket.com/{locale}/Pokemon/Products/Singles/"
+        f"{expansion_slug}/{name_slug}-{code}{number}"
+    )
+
+
 def cardmarket_product_url(
     product_id: object = None,
     *,
@@ -49,29 +76,40 @@ def cardmarket_product_url(
     name: str | None = None,
     set_name: str | None = None,
     language: str | None = "en",
+    expansion: str | None = None,
+    set_code: str | None = None,
+    collector_number: str | None = None,
 ) -> str | None:
-    locale = cardmarket_locale(language)
+    del product_id
     pid = str(provider_id or "").split(":")[-1]
     lang = (language or "en").lower()
-    # TCGdex English IDs match pokemontcg.io, which redirects to the canonical Cardmarket product page.
+    # One official English catalogue id maps to one Cardmarket product via pokemontcg.io.
     if pid and not pid.startswith("extra-") and lang == "en":
         return f"https://prices.pokemontcg.io/cardmarket/{pid}"
-    expansion = cardmarket_slug(set_name or "")
-    product = cardmarket_slug(name or "")
-    if expansion and product:
-        return (
-            f"https://www.cardmarket.com/{locale}/Pokemon/Products/Singles/"
-            f"{expansion}/{product}"
-        )
-    parsed = parse_product_id(product_id)
-    if parsed:
-        return (
-            f"https://www.cardmarket.com/{locale}/Pokemon/Products/Search"
-            f"?idProduct={parsed}"
-        )
-    if name:
-        return cardmarket_search_url(name, language=language)
-    return None
+    return cardmarket_singles_url(
+        name=name or "",
+        expansion=expansion or set_name or "",
+        set_code=set_code or "",
+        collector_number=collector_number or "",
+        language=language,
+    )
+
+
+def url_from_manifest_card(card: dict[str, Any]) -> tuple[int | None, str | None]:
+    """1-to-1 extra image → Cardmarket URL. Explicit URL wins; else expansion+set code."""
+    language = str(card.get("language") or "en")
+    product_id = parse_product_id(card.get("cardmarket_id"))
+    raw = card.get("cardmarket_url")
+    if isinstance(raw, str) and raw.strip():
+        return product_id, raw.strip()
+    url = cardmarket_singles_url(
+        name=str(card.get("name") or ""),
+        expansion=str(card.get("cardmarket_expansion") or ""),
+        set_code=str(card.get("cardmarket_set_code") or ""),
+        collector_number=str(card.get("collector_number") or ""),
+        language=language,
+    )
+    return product_id, url
 
 
 def cardmarket_search_url(
@@ -133,15 +171,15 @@ def fields_from_payload(
         market = pricing.get("cardmarket")
         if isinstance(market, dict) and isinstance(market.get("url"), str):
             candidate = market["url"].strip()
-            if candidate.startswith("https://www.cardmarket.com/") and "/Products/Singles/" in candidate:
+            if (
+                candidate.startswith("https://www.cardmarket.com/")
+                and "/Products/Singles/" in candidate
+            ):
                 url = candidate
     if not url:
-        set_info = payload.get("set") if isinstance(payload.get("set"), dict) else {}
         url = cardmarket_product_url(
             product_id,
             provider_id=str(payload.get("id") or ""),
-            name=str(payload.get("name") or ""),
-            set_name=str(set_info.get("name") or ""),
             language=language,
         )
     return product_id, url
@@ -149,25 +187,18 @@ def fields_from_payload(
 
 def url_for_row(row: sqlite3.Row) -> str | None:
     keys = set(row.keys())
+    if "cardmarket_url" in keys and row["cardmarket_url"]:
+        return str(row["cardmarket_url"])
     language = str(row["language"] or "en") if "language" in keys else "en"
-    name = str(row["name"] or "") if "name" in keys else ""
-    set_name = str(row["set_name"] or "") if "set_name" in keys else ""
     provider_id = str(row["provider_id"] or "") if "provider_id" in keys else ""
     if not provider_id and "id" in keys:
         provider_id = str(row["id"] or "")
     product_id = row["cardmarket_id"] if "cardmarket_id" in keys else None
-    rebuilt = cardmarket_product_url(
+    return cardmarket_product_url(
         product_id,
         provider_id=provider_id,
-        name=name,
-        set_name=set_name,
         language=language,
     )
-    if rebuilt:
-        return rebuilt
-    if "cardmarket_url" in keys and row["cardmarket_url"]:
-        return str(row["cardmarket_url"])
-    return None
 
 
 def _language_from_cache_path(path: Path, cache_root: Path) -> str:
@@ -212,18 +243,7 @@ def apply_extra_manifest(conn: sqlite3.Connection, extra_dir: Path) -> int:
     for card in payload.get("cards") or []:
         if not isinstance(card, dict) or not card.get("id"):
             continue
-        language = str(card.get("language") or "en")
-        product_id = parse_product_id(card.get("cardmarket_id"))
-        raw_url = card.get("cardmarket_url")
-        url = raw_url.strip() if isinstance(raw_url, str) and raw_url.strip() else None
-        if not url:
-            url = cardmarket_product_url(
-                product_id,
-                provider_id=str(card.get("id") or ""),
-                name=str(card.get("name") or ""),
-                set_name=str(card.get("set_name") or ""),
-                language=language,
-            )
+        product_id, url = url_from_manifest_card(card)
         if not url:
             continue
         cursor = conn.execute(
@@ -255,29 +275,6 @@ def sync_cardmarket_links(data_dir: Path, conn: sqlite3.Connection) -> int:
                 continue
             provider_id = str(payload.get("id") or path.stem)
             updated += _update_official(conn, product_id, url, provider_id, language)
-
-    extra_rows = conn.execute(
-        """
-        SELECT id, name, set_name, collector_number, language
-        FROM cards
-        WHERE (cardmarket_url IS NULL OR cardmarket_url = '')
-          AND (id LIKE 'extra-%' OR provider_id LIKE 'extra-%')
-        """
-    ).fetchall()
-    for row in extra_rows:
-        url = cardmarket_product_url(
-            name=row["name"],
-            set_name=row["set_name"],
-            provider_id=row["id"],
-            language=row["language"],
-        )
-        if not url:
-            continue
-        conn.execute(
-            "UPDATE cards SET cardmarket_url = ? WHERE id = ?",
-            (url, row["id"]),
-        )
-        updated += 1
 
     extra_dir = Path(os.environ.get("EXTRA_CARDS_DIR", "/extra-cards"))
     updated += apply_extra_manifest(conn, extra_dir)

@@ -67,6 +67,20 @@
       "category": "Pokemon",
       "rarity": "Promo",
       "file": "pikachu-mcdonalds-2022.jpg"
+    },
+    {
+      "id": "extra-pikachu-classic-clc008",
+      "name": "Pikachu",
+      "set_id": "clc",
+      "set_name": "Pokémon Trading Card Game Classic — Charizard & Ho-Oh ex Deck",
+      "collector_number": "008/034",
+      "language": "en",
+      "category": "Pokemon",
+      "rarity": "Common",
+      "cardmarket_expansion": "Pokemon-Trading-Card-Game-Classic-Charizard-Ho-Oh-ex-Deck",
+      "cardmarket_set_code": "CLC",
+      "cardmarket_url": "https://www.cardmarket.com/en/Pokemon/Products/Singles/Pokemon-Trading-Card-Game-Classic-Charizard-Ho-Oh-ex-Deck/Pikachu-CLC008",
+      "file": "pikachu-classic-clc008.jpg"
     }
   ]
 }
