@@ -1,0 +1,217 @@
+import assert from "node:assert/strict";
+import test from "node:test";
+
+import { createWorker } from "../lib/worker.js";
+
+const GENGAR =
+  "https://www.cardmarket.com/en/Pokemon/Products/Singles/Tag-Bolt/Gengar-Mimikyu-GX-V2-sm9102";
+const PIKACHU =
+  "https://www.cardmarket.com/en/Pokemon/Products/Singles/Pokemon-Trading-Card-Game-Classic-Charizard-Ho-Oh-ex-Deck/Pikachu-CLC008";
+
+function memoryStore(initial = {}) {
+  const data = { ...initial };
+  return {
+    async get(keys) {
+      if (keys == null) {
+        return { ...data };
+      }
+      const list = Array.isArray(keys)
+        ? keys
+        : typeof keys === "string"
+          ? [keys]
+          : Object.keys(keys);
+      const out = {};
+      for (const key of list) {
+        out[key] = data[key];
+      }
+      return out;
+    },
+    async set(values) {
+      Object.assign(data, values);
+    },
+    async remove(keys) {
+      for (const key of [].concat(keys)) {
+        delete data[key];
+      }
+    },
+  };
+}
+
+function jsonResponse(payload, status = 200) {
+  return {
+    ok: status >= 200 && status < 300,
+    status,
+    json: async () => payload,
+  };
+}
+
+function createHarness({ extract } = {}) {
+  const local = memoryStore({
+    apiBase: "http://127.0.0.1:8000",
+    helperToken: "helper.token",
+  });
+  const session = memoryStore();
+  const tabs = new Map();
+  let tabSeq = 1;
+  let activeTab = 99;
+  const claims = [];
+  const completes = [];
+  const createdTabs = [];
+  const fetchImpl = async (url, init = {}) => {
+    const path = new URL(url).pathname;
+    const body = init.body ? JSON.parse(init.body) : {};
+    if (path.endsWith("/cardmarket/helper/status")) {
+      return jsonResponse({ queued: 1, helper_ready: true, helper_online: true });
+    }
+    if (path.endsWith("/cardmarket/helper/claim")) {
+      if (!body.job_id) {
+        if (claims.length) {
+          return jsonResponse({ status: "idle", queued: 0 });
+        }
+        claims.push(body);
+      }
+      return jsonResponse({
+        id: "job-1",
+        url: GENGAR,
+        card_id: "gengar",
+        claim_token: "claim-1",
+        claim_expires_at: "2099-01-01T00:00:00Z",
+        product_identity: "singles:sm9102",
+        status: "claimed",
+      });
+    }
+    if (path.endsWith("/cardmarket/helper/renew")) {
+      return jsonResponse({ id: "job-1", claim_token: "claim-1", url: GENGAR, status: "claimed" });
+    }
+    if (path.endsWith("/cardmarket/helper/complete")) {
+      completes.push(body);
+      return jsonResponse({ status: "done", prices: body.prices || [], idempotent: completes.length > 1 });
+    }
+    if (path.endsWith("/cardmarket/helper/release") || path.endsWith("/cardmarket/helper/fail")) {
+      return jsonResponse({ status: "pending" });
+    }
+    return jsonResponse({ detail: "missing" }, 404);
+  };
+  const tabApi = {
+    async create({ url, active }) {
+      const tab = { id: tabSeq++, url, active: Boolean(active), documentId: `doc-${tabSeq}` };
+      tabs.set(tab.id, tab);
+      createdTabs.push(tab);
+      if (active) {
+        activeTab = tab.id;
+      }
+      return tab;
+    },
+    async get(id) {
+      const tab = tabs.get(id);
+      if (!tab) {
+        throw new Error("missing tab");
+      }
+      return tab;
+    },
+    async update(id, props) {
+      const tab = tabs.get(id);
+      Object.assign(tab, props);
+      if (props.active) {
+        activeTab = id;
+      }
+      return tab;
+    },
+    async sendMessage(_id, message) {
+      if (extract) {
+        return extract(message);
+      }
+      return {
+        outcome: "offers",
+        url: GENGAR,
+        prices: [{ label: "NM", amount: 10, currency: "EUR" }],
+        observedAt: "2026-09-17T12:00:00Z",
+        parserVersion: "offers-v1",
+        sampledOfferCount: 1,
+      };
+    },
+  };
+  const worker = createWorker({
+    local,
+    session,
+    fetchImpl,
+    tabs: tabApi,
+    alarms: { create: async () => undefined },
+    now: () => 1_000_000,
+    randomId: () => "req-1",
+  });
+  return { worker, local, session, claims, completes, createdTabs, tabs, activeTab: () => activeTab };
+}
+
+test("overlapping wake events claim only one job", async () => {
+  const { worker, claims } = createHarness();
+  await Promise.all([worker.wake("alarm"), worker.wake("popup"), worker.wake("startup")]);
+  assert.equal(claims.length, 1);
+});
+
+test("helper tab stays in the background", async () => {
+  const { worker, createdTabs, activeTab } = createHarness();
+  await worker.wake("alarm");
+  assert.equal(createdTabs[0].active, false);
+  assert.equal(activeTab(), 99);
+});
+
+test("delayed extract from another card is rejected", async () => {
+  const { worker } = createHarness();
+  await worker.wake("alarm");
+  const result = await worker.handleMessage(
+    {
+      type: "extract-result",
+      requestId: "old-card",
+      jobId: "job-a",
+      url: PIKACHU,
+      outcome: "offers",
+      prices: [{ label: "NM", amount: 3, currency: "EUR" }],
+    },
+    { tab: { id: 1 } },
+  );
+  assert.equal(result.ok, false);
+  assert.equal(result.reason, "stale-message");
+});
+
+test("lost upload acknowledgement retries the same submission id", async () => {
+  const { worker, completes, local } = createHarness();
+  await worker.wake("alarm");
+  await local.set({
+    pendingResult: {
+      job_id: "job-1",
+      claim_token: "claim-1",
+      submission_id: "same-sub",
+      url: GENGAR,
+      prices: [{ label: "NM", amount: 10, currency: "EUR" }],
+      empty: false,
+    },
+  });
+  await worker.wake("alarm");
+  await worker.wake("alarm");
+  const ids = completes.map((item) => item.submission_id);
+  assert.ok(ids.includes("same-sub"));
+  assert.equal(ids.filter((item) => item === "same-sub").length >= 1, true);
+});
+
+test("pause persists and stops new claims", async () => {
+  const { worker, claims, local } = createHarness();
+  await worker.handleMessage({ type: "pause" });
+  const before = claims.length;
+  await worker.wake("alarm");
+  assert.equal(claims.length, before);
+  const stored = await local.get("paused");
+  assert.equal(stored.paused, true);
+});
+
+test("closing the helper tab pauses instead of reopening it", async () => {
+  const { worker, createdTabs, local } = createHarness();
+  await worker.wake("alarm");
+  await worker.tabRemoved(createdTabs[0].id);
+  const stored = await local.get(["paused", "attention"]);
+  assert.equal(stored.paused, true);
+  assert.equal(stored.attention, "Helper tab closed");
+  const before = createdTabs.length;
+  await worker.wake("alarm");
+  assert.equal(createdTabs.length, before);
+});

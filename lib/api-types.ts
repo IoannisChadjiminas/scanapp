@@ -6,6 +6,20 @@ export type CardmarketPrice = {
   currency: string;
 };
 
+export type CardmarketPriceResponse = {
+  url: string | null;
+  prices: CardmarketPrice[];
+  status?: string | null;
+  helper_online?: boolean;
+  helper_ready?: boolean;
+  helper_paused?: boolean;
+  helper_attention?: string | null;
+  observed_at?: string | null;
+  sampled_offer_count?: number | null;
+  freshness?: string | null;
+  queued?: number | null;
+};
+
 export type Candidate = {
   card_id: string;
   name: string;

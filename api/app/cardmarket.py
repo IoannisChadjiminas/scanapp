@@ -1,13 +1,11 @@
 from __future__ import annotations
 
-import calendar
 import json
 import os
 import re
 import sqlite3
 import time
 import unicodedata
-import uuid
 from pathlib import Path
 from typing import Any
 from urllib.parse import quote_plus, urlparse, urlunparse
@@ -212,6 +210,10 @@ def url_for_row(row: sqlite3.Row) -> str | None:
     )
 
 
+def datetime_now() -> str:
+    return time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())
+
+
 def normalize_product_url(url: str | None) -> str | None:
     raw = (url or "").strip()
     if not raw:
@@ -226,118 +228,6 @@ def normalize_product_url(url: str | None) -> str | None:
     return raw.split("#")[0].split("?")[0]
 
 
-def snapshot_prices(conn: sqlite3.Connection, url: str | None) -> list[dict[str, Any]]:
-    key = normalize_product_url(url)
-    if not key:
-        return []
-    row = conn.execute(
-        "SELECT prices_json FROM cardmarket_snapshots WHERE url = ?",
-        (key,),
-    ).fetchone()
-    if row is None:
-        return []
-    try:
-        payload = json.loads(row["prices_json"])
-    except (TypeError, json.JSONDecodeError):
-        return []
-    return payload if isinstance(payload, list) else []
-
-
-def save_snapshot(
-    conn: sqlite3.Connection, url: str, prices: list[dict[str, Any]]
-) -> str:
-    key = normalize_product_url(url) or url
-    conn.execute(
-        """
-        INSERT INTO cardmarket_snapshots (url, prices_json, fetched_at)
-        VALUES (?, ?, ?)
-        ON CONFLICT(url) DO UPDATE SET
-            prices_json = excluded.prices_json,
-            fetched_at = excluded.fetched_at
-        """,
-        (key, json.dumps(prices), datetime_now()),
-    )
-    conn.commit()
-    _price_cache.clear()
-    return key
-
-
-def datetime_now() -> str:
-    return time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())
-
-
-def enqueue_job(
-    conn: sqlite3.Connection, url: str, card_id: str | None = None
-) -> str:
-    key = normalize_product_url(url) or url
-    existing = conn.execute(
-        """
-        SELECT id FROM cardmarket_jobs
-        WHERE url = ? AND status IN ('pending', 'claimed')
-        ORDER BY created_at DESC
-        LIMIT 1
-        """,
-        (key,),
-    ).fetchone()
-    if existing:
-        return str(existing["id"])
-    job_id = str(uuid.uuid4())
-    now = datetime_now()
-    conn.execute(
-        """
-        INSERT INTO cardmarket_jobs (id, url, card_id, status, created_at, updated_at)
-        VALUES (?, ?, ?, 'pending', ?, ?)
-        """,
-        (job_id, key, card_id or "", now, now),
-    )
-    conn.commit()
-    return job_id
-
-
-_STALE_CLAIM_SECONDS = 90
-_MAX_JOB_ATTEMPTS = 3
-
-
-def _settle_stale_jobs(conn: sqlite3.Connection) -> None:
-    cutoff = time.strftime(
-        "%Y-%m-%dT%H:%M:%SZ", time.gmtime(time.time() - _STALE_CLAIM_SECONDS)
-    )
-    now = datetime_now()
-    conn.execute(
-        """
-        UPDATE cardmarket_jobs
-        SET status = 'pending', updated_at = ?
-        WHERE status = 'claimed' AND updated_at < ?
-        """,
-        (now, cutoff),
-    )
-
-
-def claim_job(conn: sqlite3.Connection) -> dict[str, str] | None:
-    try:
-        conn.execute("BEGIN IMMEDIATE")
-    except sqlite3.OperationalError:
-        pass
-    _settle_stale_jobs(conn)
-    row = conn.execute(
-        """
-        SELECT id, url, card_id FROM cardmarket_jobs
-        WHERE status = 'pending'
-        ORDER BY created_at
-        LIMIT 1
-        """
-    ).fetchone()
-    if row is None:
-        conn.commit()
-        return None
-    conn.execute(
-        "UPDATE cardmarket_jobs SET status = 'claimed', updated_at = ? WHERE id = ?",
-        (datetime_now(), row["id"]),
-    )
-    conn.commit()
-    return {"id": str(row["id"]), "url": str(row["url"]), "card_id": str(row["card_id"] or "")}
-
-
 def is_job_url(url: str | None) -> bool:
     raw = (url or "").lower()
     if "prices.pokemontcg.io/cardmarket/" in raw:
@@ -345,102 +235,101 @@ def is_job_url(url: str | None) -> bool:
     return singles_code_and_number(url) is not None
 
 
-def job_by_id(conn: sqlite3.Connection, job_id: str) -> dict[str, str] | None:
-    row = conn.execute(
-        "SELECT id, url, card_id, status, attempts FROM cardmarket_jobs WHERE id = ?",
-        (job_id,),
-    ).fetchone()
-    if row is None:
-        return None
-    keys = set(row.keys())
-    attempts = int(row["attempts"] or 0) if "attempts" in keys else 0
-    return {
-        "id": str(row["id"]),
-        "url": str(row["url"]),
-        "card_id": str(row["card_id"] or ""),
-        "status": str(row["status"] or ""),
-        "attempts": str(attempts),
-    }
-
-
-def complete_job(conn: sqlite3.Connection, job_id: str, status: str = "done") -> None:
-    conn.execute(
-        "UPDATE cardmarket_jobs SET status = ?, updated_at = ? WHERE id = ?",
-        (status, datetime_now(), job_id),
-    )
-    conn.commit()
-
-
-def retry_or_fail_job(conn: sqlite3.Connection, job_id: str) -> str:
-    job = job_by_id(conn, job_id)
-    if job is None:
-        return "failed"
-    attempts = int(job.get("attempts") or 0) + 1
-    if attempts >= _MAX_JOB_ATTEMPTS:
-        conn.execute(
-            """
-            UPDATE cardmarket_jobs
-            SET status = 'failed', attempts = ?, updated_at = ?
-            WHERE id = ?
-            """,
-            (attempts, datetime_now(), job_id),
-        )
-        conn.commit()
-        return "failed"
-    conn.execute(
-        """
-        UPDATE cardmarket_jobs
-        SET status = 'pending', attempts = ?, updated_at = ?
-        WHERE id = ?
-        """,
-        (attempts, datetime_now(), job_id),
-    )
-    conn.commit()
-    return "pending"
-
-
-def touch_helper(conn: sqlite3.Connection) -> None:
-    conn.execute(
-        """
-        INSERT INTO cardmarket_helper (id, last_seen)
-        VALUES (1, ?)
-        ON CONFLICT(id) DO UPDATE SET last_seen = excluded.last_seen
-        """,
-        (datetime_now(),),
-    )
-    conn.commit()
-
-
-def helper_is_online(conn: sqlite3.Connection, *, within_seconds: int = 120) -> bool:
-    row = conn.execute(
-        "SELECT last_seen FROM cardmarket_helper WHERE id = 1"
-    ).fetchone()
-    if row is None:
-        return False
+def _decode_prices(raw: Any) -> list[dict[str, Any]]:
     try:
-        last = time.strptime(str(row["last_seen"]), "%Y-%m-%dT%H:%M:%SZ")
-    except (TypeError, ValueError):
-        return False
-    age = time.time() - calendar.timegm(last)
-    return 0 <= age <= within_seconds
+        payload = json.loads(raw) if isinstance(raw, str) else raw
+    except (TypeError, json.JSONDecodeError):
+        return []
+    return payload if isinstance(payload, list) else []
 
 
-def latest_job_status(conn: sqlite3.Connection, url: str | None) -> str | None:
+def snapshot_record(conn: sqlite3.Connection, url: str | None) -> dict[str, Any] | None:
     key = normalize_product_url(url)
     if not key:
         return None
     row = conn.execute(
-        """
-        SELECT status FROM cardmarket_jobs
-        WHERE url = ?
-        ORDER BY updated_at DESC
-        LIMIT 1
-        """,
+        "SELECT * FROM cardmarket_snapshots WHERE url = ?",
         (key,),
     ).fetchone()
     if row is None:
         return None
-    return str(row["status"] or "") or None
+    keys = set(row.keys())
+    prices = _decode_prices(row["prices_json"])
+    return {
+        "url": key,
+        "prices": prices,
+        "fetched_at": str(row["fetched_at"] or "") or None,
+        "observed_at": str(row["observed_at"] or "") if "observed_at" in keys else None,
+        "parser_version": str(row["parser_version"] or "") if "parser_version" in keys else None,
+        "sampled_offer_count": (
+            int(row["sampled_offer_count"])
+            if "sampled_offer_count" in keys and row["sampled_offer_count"] is not None
+            else len(prices)
+        ),
+        "submission_id": str(row["submission_id"] or "") if "submission_id" in keys else None,
+        "empty": not prices,
+    }
+
+
+def snapshot_prices(conn: sqlite3.Connection, url: str | None) -> list[dict[str, Any]]:
+    record = snapshot_record(conn, url)
+    return list(record["prices"]) if record else []
+
+
+def write_snapshot(
+    conn: sqlite3.Connection,
+    url: str,
+    prices: list[dict[str, Any]],
+    *,
+    observed_at: str | None = None,
+    parser_version: str | None = None,
+    sampled_offer_count: int | None = None,
+    submission_id: str | None = None,
+    allow_empty: bool = False,
+    commit: bool = True,
+) -> str:
+    if not prices and not allow_empty:
+        raise ValueError("Need at least one price")
+    key = normalize_product_url(url) or url
+    stamp = observed_at or datetime_now()
+    existing = snapshot_record(conn, key)
+    existing_observed = str((existing or {}).get("observed_at") or "")
+    if existing_observed and existing_observed > stamp:
+        return key
+    conn.execute(
+        """
+        INSERT INTO cardmarket_snapshots (
+            url, prices_json, fetched_at, observed_at, parser_version,
+            sampled_offer_count, submission_id
+        ) VALUES (?, ?, ?, ?, ?, ?, ?)
+        ON CONFLICT(url) DO UPDATE SET
+            prices_json = excluded.prices_json,
+            fetched_at = excluded.fetched_at,
+            observed_at = excluded.observed_at,
+            parser_version = excluded.parser_version,
+            sampled_offer_count = excluded.sampled_offer_count,
+            submission_id = excluded.submission_id
+        """,
+        (
+            key,
+            json.dumps(prices),
+            datetime_now(),
+            stamp,
+            parser_version,
+            sampled_offer_count if sampled_offer_count is not None else len(prices),
+            submission_id,
+        ),
+    )
+    if commit:
+        conn.commit()
+    _price_cache.clear()
+    return key
+
+
+def save_snapshot(
+    conn: sqlite3.Connection, url: str, prices: list[dict[str, Any]]
+) -> str:
+    return write_snapshot(conn, url, prices, commit=True)
 
 
 def _row_value(row: Any, key: str, default: Any = None) -> Any:
@@ -679,3 +568,14 @@ def sync_cardmarket_links(data_dir: Path, conn: sqlite3.Connection) -> int:
     updated += apply_extra_manifest(conn, extra_dir)
     conn.commit()
     return updated
+
+
+from app.cardmarket_queue import (  # noqa: E402
+    claim_job,
+    enqueue_job,
+    helper_is_online,
+    job_by_id,
+    latest_job_status,
+    retry_or_fail_job,
+    touch_helper,
+)

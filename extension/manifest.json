@@ -1,10 +1,11 @@
 {
   "manifest_version": 3,
   "name": "Scanapp Cardmarket helper",
-  "version": "0.1.0",
-  "description": "When Scanapp queues a product URL, open it here and save the first listings back to the local API.",
+  "version": "0.2.0",
+  "description": "Quiet background helper that fetches Cardmarket listings for Scanapp, one card at a time.",
   "action": {
-    "default_title": "Fetch Scanapp Cardmarket jobs"
+    "default_title": "Scanapp Cardmarket helper",
+    "default_popup": "popup.html"
   },
   "permissions": ["alarms", "storage", "tabs"],
   "host_permissions": [
@@ -13,15 +14,22 @@
     "http://127.0.0.1:8080/*",
     "http://localhost:8080/*",
     "https://staging-scan.auctaro.com/*",
-    "https://www.cardmarket.com/*"
+    "https://www.cardmarket.com/*",
+    "https://prices.pokemontcg.io/*"
   ],
   "background": {
-    "service_worker": "background.js"
+    "service_worker": "background.js",
+    "type": "module"
   },
   "content_scripts": [
     {
-      "matches": ["https://www.cardmarket.com/*/Pokemon/Products/Singles/*"],
+      "matches": [
+        "https://www.cardmarket.com/*/Pokemon/Products/Singles/*",
+        "https://www.cardmarket.com/*/Pokemon/Products/Search*",
+        "https://www.cardmarket.com/*/Login*"
+      ],
       "js": ["content.js"],
+      "type": "module",
       "run_at": "document_idle"
     }
   ]

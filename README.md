@@ -40,11 +40,15 @@ Runtime containers do not include Node.js, PyTorch, or PaddlePaddle. Bootstrap i
 - `GET /api/v1/session/results` — anonymous session results
 - `GET /api/v1/health` — catalogue and model readiness
 - `POST /api/v1/cardmarket/jobs` — queue a product page for the PC Chrome helper
-- `GET /api/v1/cardmarket/jobs/next` — helper claims the next queued page
-- `POST /api/v1/cardmarket/offers` — helper saves the first listings
-- `GET /api/v1/cardmarket/prices?url=` — stored listings for a product URL
+- `GET /api/v1/cardmarket/prices?url=` — stored listings plus helper/job status
+- `POST /api/v1/cardmarket/helper/claim` — helper claims or recovers one job
+- `POST /api/v1/cardmarket/helper/renew` — extend the active claim
+- `POST /api/v1/cardmarket/helper/complete` — save a sample of listings (idempotent by submission id)
+- `POST /api/v1/cardmarket/helper/fail` — retry with backoff or fail the job
+- `POST /api/v1/cardmarket/helper/release` — return a claim without burning an attempt
+- `POST /api/v1/cardmarket/helper/status` — helper heartbeat and queue counts
 
-Frontend types live in `lib/api-types.ts`. The PC Chrome helper lives in `extension/` (`extension/README.md`). **Open on Cardmarket** queues a job; the helper opens that Singles page and writes the first listings back.
+Helper write routes require `Authorization: Bearer <token>` from `python -m app.helper_credential`. Frontend types live in `lib/api-types.ts`. The PC Chrome helper lives in `extension/` (`extension/README.md`). A confident match or confirmation queues the product; the helper reads listings in one background tab.
 
 Regenerate the OpenAPI document with:
 

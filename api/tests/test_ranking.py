@@ -159,11 +159,13 @@ def test_ocr_fraction_distinguishes_reprints() -> None:
     assert number_match(["008/034", "008034"], "008/015") is False
     assert number_match(["008"], "008/015") is True
     assert number_match(["008"], "008/034") is True
+    assert number_match(["008"], "007/015") is False
+    assert number_match(["008/034"], "007/015") is False
 
 
 def test_reprint_with_matching_fraction_is_matched() -> None:
     visual = [
-        _card("mcd", "Pikachu", "008/015", 0.9997),
+        _card("mcd", "Pikachu", "007/015", 0.9997),
         _card("clc", "Pikachu", "008/034", 0.9989),
         _card("base", "Pikachu", "58", 0.84),
     ]

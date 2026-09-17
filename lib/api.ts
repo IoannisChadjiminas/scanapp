@@ -1,5 +1,5 @@
 import type {
-  CardmarketPrice,
+  CardmarketPriceResponse,
   CardSummary,
   HealthResponse,
   PrepareResponse,
@@ -100,10 +100,17 @@ export const api = {
       body: JSON.stringify({ url, card_id: cardId ?? null }),
     }),
   cardmarketPrices: (url: string, signal?: AbortSignal) =>
-    request<{
-      url: string | null;
-      prices: CardmarketPrice[];
-      status?: string | null;
-      helper_online?: boolean;
-    }>(`/api/v1/cardmarket/prices?url=${encodeURIComponent(url)}`, { signal }),
+    request<CardmarketPriceResponse>(
+      `/api/v1/cardmarket/prices?url=${encodeURIComponent(url)}`,
+      { signal },
+    ),
 };
+
+export function queueCardmarketLookup(url?: string | null, cardId?: string) {
+  if (!url) {
+    return;
+  }
+  void api.enqueueCardmarketJob(url, cardId).catch(() => {
+    /* listing fetch must not block recognition */
+  });
+}

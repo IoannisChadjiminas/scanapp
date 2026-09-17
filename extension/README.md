@@ -1,35 +1,93 @@
 # Scanapp Cardmarket helper (Chrome)
 
-Your PC Chrome does not need to stay open. A scan queues the product URL. Whenever this Chrome profile is running, the helper drains the queue, reads the first listings (NM/EX/…), and saves them. Until then the app shows TCGdex From/Trend/7-day.
+The helper is a quiet background worker. Scanapp queues a product URL; this Chrome profile claims one job at a time, loads it in a dedicated inactive tab, and saves a sample of the first listings. Your normal Cardmarket tabs are left alone.
 
-It does not bypass Cloudflare. It uses a real tab in your profile.
+It does not bypass Cloudflare. Login or browser challenges pause collection and ask for attention in the popup.
 
 ## Install
 
 1. Chrome → `chrome://extensions` → Developer mode → **Load unpacked**
 2. Choose the `extension` folder in this repo
-3. After load, click **Reload** on the extension card
+3. Click **Reload** after upgrades
 
-**Hetzner (remote users):** point the helper at the public site.
+Existing `apiBase` values are kept. New installs can pick **Local development** or **Staging** in the popup without opening DevTools.
 
-1. On `chrome://extensions`, find **Scanapp Cardmarket helper**
-2. Click **service worker** (or **Inspect views: service worker**)
-3. In the Console tab, paste and Enter:
+## Helper credential
 
-```js
-chrome.storage.local.set({ apiBase: "https://staging-scan.auctaro.com" })
+Write routes require a revocable credential.
+
+On the API host:
+
+```bash
+docker compose exec api python -m app.helper_credential
 ```
 
-4. Close DevTools, click **Reload** on the extension, then click the helper icon once
+Dokploy/Hetzner, from the API container:
 
-**Local Docker:** skip that, or set `apiBase` back to `http://127.0.0.1:8000`.
+```bash
+python -m app.helper_credential
+```
 
-## Use
+Paste the printed token once in the popup. It is stored only in extension storage and is never sent to content scripts, URLs, or logs.
 
-1. Scan a card in Scanapp (phone or this PC). Guide prices show immediately.
-2. Open this Chrome profile when you can — it does not need to stay open all day
-3. The helper writes live listings; the next scan of that card shows them
+Rotate or revoke with `--helper-id` / `--revoke HELPER_ID`.
 
-If Chrome has been idle, click the Scanapp helper icon in the toolbar to wake it.
+## Popup
 
-Phone and PC must share the same API. For local Docker, the phone has to reach this machine’s `:8000` / `:8080`, not only `127.0.0.1` on the phone.
+The toolbar icon opens a compact panel:
+
+- **Connection:** connected, disconnected, or authentication required
+- **Activity:** idle, fetching, saving, paused, or needs attention
+- Current card and queued-job count from the server
+- Last successful update and recent failures
+- **Pause / Resume**, **Check connection**, **Open helper tab**
+
+Pause survives Chrome restarts. It stops new claims immediately. A collected result can still upload; a page load is released at a safe checkpoint.
+
+**Open helper tab** is the only control that brings the helper tab forward.
+
+## Behaviour
+
+- One helper tab, reused, created inactive
+- One serialized worker; overlapping alarms, popup clicks, and page messages cannot claim two jobs
+- State is persisted (settings, pause, current job, claim, unsaved result). Service worker timers are not trusted for recovery
+- After a Chrome restart, tab IDs are discarded and ownership is established again
+- Results are bound to the helper tab, document, extraction request, and product URL. Delayed messages from another card are dropped
+- Redirects from `prices.pokemontcg.io` are tracked. Search, login, or a different product cannot complete the job
+- Empty listings are stored only when the page explicitly has no articles
+- Closing the helper tab, or navigating it elsewhere, pauses with a clear reason instead of reopening it
+
+Scheduling targets (Chrome may delay background work):
+
+| Setting | Default |
+|---|---|
+| Concurrent jobs | 1 |
+| Idle queue check | 30 seconds |
+| Spacing between product navigations | 30 seconds |
+| Page-loading deadline | 60 seconds |
+| Server claim lifetime | 3 minutes, renewed during work |
+| Transient-failure attempts | 3, with increasing delays |
+
+## Upgrade from 0.1.x
+
+1. Reload the unpacked extension
+2. Provision a helper credential and paste it in the popup
+3. Confirm the Scanapp server (local or staging)
+4. Click **Check connection**
+
+The old four-second poller and focus-stealing product tabs are gone.
+
+## Troubleshooting
+
+- **Authentication required:** paste a fresh token from `python -m app.helper_credential`
+- **Helper tab closed / navigated away:** click **Open helper tab**, then **Resume**
+- **Cardmarket needs attention:** solve login or the browser challenge in the helper tab, then **Resume**
+- Phone and PC must share the same API. For local Docker, the phone has to reach this machine, not only `127.0.0.1` on the phone
+
+## Tests
+
+```bash
+node --test extension/tests/*.test.js
+```
+
+Automated tests use fixtures and a mocked API. Manual checks against live Cardmarket pages: ordinary listings, a redirected `prices.pokemontcg.io` catalogue link, and sleep/resume recovery.

@@ -98,6 +98,7 @@ export function Suggestions({
             <CardmarketPrices
               prices={listings.prices}
               waiting={listings.waiting}
+              message={listings.message}
             />
           </CardContent>
           <CardFooter className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:justify-end">
@@ -155,6 +156,7 @@ export function Suggestions({
               <CardmarketPrices
                 prices={listings.prices}
                 waiting={listings.waiting}
+                message={listings.message}
               />
               {top.cardmarket_url ? (
                 <CardmarketOpen
