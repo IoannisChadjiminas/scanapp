@@ -337,7 +337,9 @@ def claim_job(conn: sqlite3.Connection) -> dict[str, str] | None:
 
 def is_job_url(url: str | None) -> bool:
     raw = (url or "").lower()
-    return "/products/singles/" in raw or "prices.pokemontcg.io/cardmarket/" in raw
+    if "prices.pokemontcg.io/cardmarket/" in raw:
+        return True
+    return singles_code_and_number(url) is not None
 
 
 def job_by_id(conn: sqlite3.Connection, job_id: str) -> dict[str, str] | None:

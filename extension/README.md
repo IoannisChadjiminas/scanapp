@@ -8,13 +8,21 @@ It does not bypass Cloudflare. It uses the tab you already have (or opens one).
 
 1. Chrome → `chrome://extensions` → Developer mode → **Load unpacked**
 2. Choose the `extension` folder in this repo
-3. Keep Scanapp API on `http://127.0.0.1:8000` (Docker Compose default)
+3. After load, click **Reload** on the extension card
 
-If the API is elsewhere, in DevTools for the service worker:
+**Hetzner (remote users):** point the helper at the public site.
+
+1. On `chrome://extensions`, find **Scanapp Cardmarket helper**
+2. Click **service worker** (or **Inspect views: service worker**)
+3. In the Console tab, paste and Enter:
 
 ```js
-chrome.storage.local.set({ apiBase: "http://127.0.0.1:8000" })
+chrome.storage.local.set({ apiBase: "https://staging-scan.auctaro.com" })
 ```
+
+4. Close DevTools, click **Reload** on the extension, then click the helper icon once
+
+**Local Docker:** skip that, or set `apiBase` back to `http://127.0.0.1:8000`.
 
 ## Use
 

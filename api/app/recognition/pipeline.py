@@ -10,7 +10,7 @@ from typing import Any
 import numpy as np
 
 from app.config import Settings
-from app.cardmarket import prices_for_row, url_for_row
+from app.cardmarket import enqueue_job, is_job_url, prices_for_row, url_for_row
 from app.db import coverage_payload
 from app.recognition.detect import detect_and_rectify
 from app.recognition.embed import top_k
@@ -149,6 +149,9 @@ def recognize_bytes(
             combined[0]["cardmarket_prices"] = prices_for_row(
                 top_row, data_dir=settings.data_dir, catalog=catalog
             )
+            live_url = combined[0].get("cardmarket_url")
+            if is_job_url(live_url):
+                enqueue_job(catalog, str(live_url), str(combined[0]["card_id"]))
     timings["cardmarket_ms"] = (time.perf_counter() - mark) * 1000
     status = decide_status(
         combined,

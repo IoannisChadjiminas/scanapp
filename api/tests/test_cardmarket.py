@@ -263,3 +263,7 @@ def test_job_url_accepts_pokemontcg_price_link() -> None:
     )
     assert is_job_url("https://prices.pokemontcg.io/cardmarket/base1-4")
     assert not is_job_url("https://www.cardmarket.com/en/Pokemon/Cards")
+    assert not is_job_url(
+        "https://www.cardmarket.com/en/Pokemon/Products/Singles/McDonalds-Collection-2022/Pikachu"
+    )
+

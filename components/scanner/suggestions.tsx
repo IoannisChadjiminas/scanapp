@@ -1,7 +1,5 @@
 "use client";
 
-import { useEffect, useState } from "react";
-
 import { Badge } from "@/components/ui/badge";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { cn } from "cn";
@@ -64,16 +62,10 @@ export function Suggestions({
   const top = suggestions[0];
   const matched = status === "matched" && top;
   const notAMatch = status === "no_match" || status === "uncertain";
-  const [watchingMarket, setWatchingMarket] = useState(false);
   const listings = useCardmarketListings(
     top?.cardmarket_url,
     top?.cardmarket_prices,
-    watchingMarket,
   );
-
-  useEffect(() => {
-    setWatchingMarket(false);
-  }, [top?.card_id, top?.cardmarket_url]);
 
   return (
     <div className="flex flex-col gap-4">
@@ -117,7 +109,6 @@ export function Suggestions({
                   buttonVariants({ variant: "outline" }),
                   "h-11 min-h-11 w-full gap-2 sm:w-auto",
                 )}
-                onQueued={() => setWatchingMarket(true)}
               />
             ) : null}
             <Button
@@ -170,7 +161,6 @@ export function Suggestions({
                   url={top.cardmarket_url}
                   cardId={top.card_id}
                   className="inline-flex items-center gap-1 text-sm underline-offset-4 hover:underline"
-                  onQueued={() => setWatchingMarket(true)}
                 />
               ) : null}
             </EmptyContent>

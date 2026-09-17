@@ -5,6 +5,8 @@ import { useEffect, useState } from "react";
 import { api } from "@/lib/api";
 import type { CardmarketPrice } from "@/lib/api-types";
 
+const GUIDE_LABELS = new Set(["From", "Trend", "7-day"]);
+
 function formatAmount(amount: number, currency: string) {
   try {
     return new Intl.NumberFormat("en-IE", {
@@ -15,6 +17,10 @@ function formatAmount(amount: number, currency: string) {
   } catch {
     return `${amount.toFixed(2)} ${currency}`;
   }
+}
+
+function isGuideOnly(prices: CardmarketPrice[] | undefined) {
+  return Boolean(prices?.length) && prices!.every((item) => GUIDE_LABELS.has(item.label));
 }
 
 export function CardmarketPrices({
@@ -31,7 +37,9 @@ export function CardmarketPrices({
     <div className="w-full">
       <p className="text-muted-foreground mb-2 text-xs">
         {waiting
-          ? "Waiting for the PC helper to save Cardmarket listings…"
+          ? prices?.length
+            ? "Guide prices — fetching live Cardmarket listings…"
+            : "Fetching live Cardmarket listings…"
           : "Cardmarket prices"}
       </p>
       {prices?.length ? (
@@ -56,7 +64,6 @@ export function CardmarketPrices({
 export function useCardmarketListings(
   url: string | null | undefined,
   initial: CardmarketPrice[] | undefined,
-  watching: boolean,
 ) {
   const [prices, setPrices] = useState(initial ?? []);
   const [waiting, setWaiting] = useState(false);
@@ -66,13 +73,14 @@ export function useCardmarketListings(
   }, [url, initial]);
 
   useEffect(() => {
-    if (!watching || !url) {
+    if (!url) {
       setWaiting(false);
       return;
     }
     let stopped = false;
     let attempts = 0;
-    setWaiting(true);
+    const needsLive = !initial?.length || isGuideOnly(initial);
+    setWaiting(needsLive);
 
     const tick = async () => {
       attempts += 1;
@@ -102,7 +110,7 @@ export function useCardmarketListings(
     return () => {
       stopped = true;
     };
-  }, [watching, url]);
+  }, [url, initial]);
 
   return { prices, waiting };
 }
