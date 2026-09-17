@@ -626,13 +626,3 @@ def sync_cardmarket_links(data_dir: Path, conn: sqlite3.Connection) -> int:
     conn.commit()
     return updated
 
-
-from app.cardmarket_queue import (  # noqa: E402
-    claim_job,
-    enqueue_job,
-    helper_is_online,
-    job_by_id,
-    latest_job_status,
-    retry_or_fail_job,
-    touch_helper,
-)

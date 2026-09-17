@@ -194,12 +194,11 @@ def test_price_targets_prefer_singles_slug() -> None:
 
 def test_normalize_and_snapshot_roundtrip(tmp_path: Path) -> None:
     from app.cardmarket import (
-        enqueue_job,
         normalize_product_url,
         save_snapshot,
         snapshot_prices,
     )
-    from app.cardmarket_queue import claim_job
+    from app.cardmarket_queue import claim_job, enqueue_job
 
     dirty = (
         "https://www.cardmarket.com/en/Pokemon/Products/Singles/"
