@@ -1,5 +1,11 @@
 export type ScanStatus = "matched" | "no_match" | "uncertain" | "retake" | "failed";
 
+export type CardmarketPrice = {
+  label: string;
+  amount: number;
+  currency: string;
+};
+
 export type Candidate = {
   card_id: string;
   name: string;
@@ -11,6 +17,7 @@ export type Candidate = {
   ocr_consistent: boolean | null;
   language?: string;
   cardmarket_url?: string | null;
+  cardmarket_prices?: CardmarketPrice[];
 };
 
 export type Coverage = {

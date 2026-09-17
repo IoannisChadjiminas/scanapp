@@ -10,6 +10,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from app.config import get_settings
 from app.db import Databases
 from app.recognition.runtime import Runtime
+from app.routes.cardmarket import router as cardmarket_router
 from app.routes.cards import router as cards_router
 from app.routes.health import router as health_router
 from app.routes.images import router as images_router
@@ -75,6 +76,7 @@ app = FastAPI(
 app.add_middleware(
     CORSMiddleware,
     allow_origins=get_settings().cors_origin_list,
+    allow_origin_regex=r"chrome-extension://.*",
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -84,3 +86,4 @@ app.include_router(health_router, prefix="/api/v1", tags=["health"])
 app.include_router(images_router, prefix="/api/v1", tags=["images"])
 app.include_router(scans_router, prefix="/api/v1", tags=["scans"])
 app.include_router(cards_router, prefix="/api/v1", tags=["cards"])
+app.include_router(cardmarket_router, prefix="/api/v1", tags=["cardmarket"])

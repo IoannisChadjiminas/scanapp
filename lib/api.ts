@@ -1,4 +1,5 @@
 import type {
+  CardmarketPrice,
   CardSummary,
   HealthResponse,
   PrepareResponse,
@@ -92,4 +93,15 @@ export const api = {
     }),
   sessionResults: (signal?: AbortSignal) =>
     request<SessionResultsResponse>("/api/v1/session/results", { signal }),
+  enqueueCardmarketJob: (url: string, cardId?: string) =>
+    request<{ id: string; url: string; card_id: string }>("/api/v1/cardmarket/jobs", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ url, card_id: cardId ?? null }),
+    }),
+  cardmarketPrices: (url: string, signal?: AbortSignal) =>
+    request<{ url: string | null; prices: CardmarketPrice[] }>(
+      `/api/v1/cardmarket/prices?url=${encodeURIComponent(url)}`,
+      { signal },
+    ),
 };

@@ -4,10 +4,20 @@ import json
 import os
 import re
 import sqlite3
+import time
 import unicodedata
+import uuid
 from pathlib import Path
 from typing import Any
-from urllib.parse import quote_plus
+from urllib.parse import quote_plus, urlparse, urlunparse
+
+import httpx
+
+TCGDEX_BASE = "https://api.tcgdex.net/v2"
+_PRICE_TTL_SECONDS = 600.0
+_price_cache: dict[str, tuple[float, list[dict[str, Any]]]] = {}
+_PRODUCT_SLUG_RE = re.compile(r"/Products/Singles/[^/]+/([^/?#]+)", re.I)
+_SLUG_CODE_RE = re.compile(r"-([A-Za-z]+)(\d+)$")
 
 CARDMARKET_LOCALES = {"en", "de", "fr", "es", "it"}
 LANGUAGE_DIRS = {"en", "ja", "zh-cn", "zh-tw", "ko", "fr", "de", "es", "it", "pt"}
@@ -199,6 +209,315 @@ def url_for_row(row: sqlite3.Row) -> str | None:
         provider_id=provider_id,
         language=language,
     )
+
+
+def normalize_product_url(url: str | None) -> str | None:
+    raw = (url or "").strip()
+    if not raw:
+        return None
+    parts = urlparse(raw)
+    path = (parts.path or "").rstrip("/")
+    host = (parts.netloc or "").lower()
+    if "cardmarket.com" in host and path:
+        return urlunparse(("https", "www.cardmarket.com", path, "", "", ""))
+    if path:
+        return f"{parts.scheme}://{parts.netloc}{path}" if parts.netloc else raw.split("#")[0].split("?")[0]
+    return raw.split("#")[0].split("?")[0]
+
+
+def snapshot_prices(conn: sqlite3.Connection, url: str | None) -> list[dict[str, Any]]:
+    key = normalize_product_url(url)
+    if not key:
+        return []
+    row = conn.execute(
+        "SELECT prices_json FROM cardmarket_snapshots WHERE url = ?",
+        (key,),
+    ).fetchone()
+    if row is None:
+        return []
+    try:
+        payload = json.loads(row["prices_json"])
+    except (TypeError, json.JSONDecodeError):
+        return []
+    return payload if isinstance(payload, list) else []
+
+
+def save_snapshot(
+    conn: sqlite3.Connection, url: str, prices: list[dict[str, Any]]
+) -> str:
+    key = normalize_product_url(url) or url
+    conn.execute(
+        """
+        INSERT INTO cardmarket_snapshots (url, prices_json, fetched_at)
+        VALUES (?, ?, ?)
+        ON CONFLICT(url) DO UPDATE SET
+            prices_json = excluded.prices_json,
+            fetched_at = excluded.fetched_at
+        """,
+        (key, json.dumps(prices), datetime_now()),
+    )
+    conn.commit()
+    _price_cache.clear()
+    return key
+
+
+def datetime_now() -> str:
+    return time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())
+
+
+def enqueue_job(
+    conn: sqlite3.Connection, url: str, card_id: str | None = None
+) -> str:
+    key = normalize_product_url(url) or url
+    existing = conn.execute(
+        """
+        SELECT id FROM cardmarket_jobs
+        WHERE url = ? AND status IN ('pending', 'claimed')
+        ORDER BY created_at DESC
+        LIMIT 1
+        """,
+        (key,),
+    ).fetchone()
+    if existing:
+        return str(existing["id"])
+    job_id = str(uuid.uuid4())
+    now = datetime_now()
+    conn.execute(
+        """
+        INSERT INTO cardmarket_jobs (id, url, card_id, status, created_at, updated_at)
+        VALUES (?, ?, ?, 'pending', ?, ?)
+        """,
+        (job_id, key, card_id or "", now, now),
+    )
+    conn.commit()
+    return job_id
+
+
+_STALE_CLAIM_SECONDS = 90
+
+
+def _reclaim_stale_jobs(conn: sqlite3.Connection) -> None:
+    cutoff = time.strftime(
+        "%Y-%m-%dT%H:%M:%SZ", time.gmtime(time.time() - _STALE_CLAIM_SECONDS)
+    )
+    conn.execute(
+        """
+        UPDATE cardmarket_jobs
+        SET status = 'pending', updated_at = ?
+        WHERE status = 'claimed' AND updated_at < ?
+        """,
+        (datetime_now(), cutoff),
+    )
+
+
+def claim_job(conn: sqlite3.Connection) -> dict[str, str] | None:
+    try:
+        conn.execute("BEGIN IMMEDIATE")
+    except sqlite3.OperationalError:
+        pass
+    _reclaim_stale_jobs(conn)
+    row = conn.execute(
+        """
+        SELECT id, url, card_id FROM cardmarket_jobs
+        WHERE status = 'pending'
+        ORDER BY created_at
+        LIMIT 1
+        """
+    ).fetchone()
+    if row is None:
+        conn.commit()
+        return None
+    conn.execute(
+        "UPDATE cardmarket_jobs SET status = 'claimed', updated_at = ? WHERE id = ?",
+        (datetime_now(), row["id"]),
+    )
+    conn.commit()
+    return {"id": str(row["id"]), "url": str(row["url"]), "card_id": str(row["card_id"] or "")}
+
+
+def is_job_url(url: str | None) -> bool:
+    raw = (url or "").lower()
+    return "/products/singles/" in raw or "prices.pokemontcg.io/cardmarket/" in raw
+
+
+def job_by_id(conn: sqlite3.Connection, job_id: str) -> dict[str, str] | None:
+    row = conn.execute(
+        "SELECT id, url, card_id, status FROM cardmarket_jobs WHERE id = ?",
+        (job_id,),
+    ).fetchone()
+    if row is None:
+        return None
+    return {
+        "id": str(row["id"]),
+        "url": str(row["url"]),
+        "card_id": str(row["card_id"] or ""),
+        "status": str(row["status"] or ""),
+    }
+
+
+def complete_job(conn: sqlite3.Connection, job_id: str, status: str = "done") -> None:
+    conn.execute(
+        "UPDATE cardmarket_jobs SET status = ?, updated_at = ? WHERE id = ?",
+        (status, datetime_now(), job_id),
+    )
+    conn.commit()
+
+
+def _row_value(row: Any, key: str, default: Any = None) -> Any:
+    if isinstance(row, dict):
+        return row.get(key, default)
+    try:
+        keys = row.keys()
+    except Exception:
+        return default
+    if key not in keys:
+        return default
+    return row[key]
+
+
+def _positive_amount(value: object) -> float | None:
+    if isinstance(value, bool) or value is None:
+        return None
+    if isinstance(value, (int, float)):
+        amount = float(value)
+        return amount if amount > 0 else None
+    return None
+
+
+def prices_from_market(market: dict[str, Any] | None) -> list[dict[str, Any]]:
+    """Cardmarket From / Trend / 7-day average (latest published guide)."""
+    if not isinstance(market, dict):
+        return []
+    currency = str(market.get("unit") or "EUR")
+    prices: list[dict[str, Any]] = []
+    for label, key, holo_key in (
+        ("From", "low", "low-holo"),
+        ("Trend", "trend", "trend-holo"),
+        ("7-day", "avg7", "avg7-holo"),
+    ):
+        amount = _positive_amount(market.get(key)) or _positive_amount(
+            market.get(holo_key)
+        )
+        if amount is None:
+            continue
+        prices.append(
+            {"label": label, "amount": round(amount, 2), "currency": currency}
+        )
+    return prices[:3]
+
+
+def singles_code_and_number(url: str | None) -> tuple[str, str] | None:
+    if not url:
+        return None
+    match = _PRODUCT_SLUG_RE.search(url)
+    if not match:
+        return None
+    slug = match.group(1)
+    coded = _SLUG_CODE_RE.search(slug)
+    if not coded:
+        return None
+    letters, digits = coded.group(1), coded.group(2)
+    if len(digits) > 3:
+        letters += digits[:-3]
+        digits = digits[-3:]
+    number = digits.lstrip("0") or "0"
+    return letters, number
+
+
+def tcgdex_price_targets(row: Any) -> list[tuple[str, str]]:
+    language = str(_row_value(row, "language") or "en").lower()
+    provider = str(_row_value(row, "provider_id") or _row_value(row, "id") or "")
+    pid = provider.split(":")[-1]
+    set_id = str(_row_value(row, "set_id") or "")
+    collector = collector_digits(str(_row_value(row, "collector_number") or ""))
+    url = str(_row_value(row, "cardmarket_url") or "")
+    seen: list[tuple[str, str]] = []
+
+    def add(lang: str, card_id: str) -> None:
+        item = (lang, card_id)
+        if card_id and item not in seen:
+            seen.append(item)
+
+    parsed = singles_code_and_number(url)
+    if parsed:
+        code, number = parsed
+        add(language, f"{code}-{number}")
+        add(language, f"{code.lower()}-{number}")
+        add(language, f"{code.upper()}-{number}")
+    if pid and not pid.startswith("extra-"):
+        add(language, pid)
+    if set_id and collector:
+        number = collector.lstrip("0") or collector
+        add(language, f"{set_id}-{number}")
+        add(language, f"{set_id.lower()}-{number}")
+        add(language, f"{set_id.upper()}-{number}")
+    return seen
+
+
+def _market_from_payload(payload: dict[str, Any] | None) -> dict[str, Any] | None:
+    if not isinstance(payload, dict):
+        return None
+    pricing = payload.get("pricing")
+    if not isinstance(pricing, dict):
+        return None
+    market = pricing.get("cardmarket")
+    return market if isinstance(market, dict) else None
+
+
+def _prices_from_cache(data_dir: Path, language: str, card_id: str) -> list[dict[str, Any]]:
+    path = data_dir / "cache" / "cards" / language / f"{card_id}.json"
+    if not path.is_file():
+        return []
+    try:
+        payload = json.loads(path.read_text())
+    except (OSError, json.JSONDecodeError):
+        return []
+    return prices_from_market(_market_from_payload(payload))
+
+
+def _prices_from_tcgdex(language: str, card_id: str) -> list[dict[str, Any]]:
+    url = f"{TCGDEX_BASE}/{language}/cards/{card_id}"
+    with httpx.Client(timeout=2.5, follow_redirects=True) as client:
+        response = client.get(url, headers={"User-Agent": "scanapp"})
+        if response.status_code == 404:
+            return []
+        response.raise_for_status()
+        payload = response.json()
+    if not isinstance(payload, dict):
+        return []
+    return prices_from_market(_market_from_payload(payload))
+
+
+def prices_for_row(
+    row: Any, *, data_dir: Path | None = None, catalog: sqlite3.Connection | None = None
+) -> list[dict[str, Any]]:
+    url = None
+    try:
+        url = url_for_row(row)
+    except Exception:
+        url = str(_row_value(row, "cardmarket_url") or "") or None
+    if catalog is not None:
+        stored = snapshot_prices(catalog, url)
+        if stored:
+            return stored
+    card_id = str(_row_value(row, "id") or "")
+    now = time.monotonic()
+    cached = _price_cache.get(card_id)
+    if card_id and cached and now - cached[0] < _PRICE_TTL_SECONDS:
+        return cached[1]
+    found: list[dict[str, Any]] = []
+    for language, tcgdex_id in tcgdex_price_targets(row):
+        try:
+            found = _prices_from_tcgdex(language, tcgdex_id)
+        except Exception:  # noqa: BLE001 - scan must not fail if prices are down
+            found = []
+        if not found and data_dir is not None:
+            found = _prices_from_cache(data_dir, language, tcgdex_id)
+        if found:
+            break
+    if card_id:
+        _price_cache[card_id] = (now, found)
+    return found
 
 
 def _language_from_cache_path(path: Path, cache_root: Path) -> str:

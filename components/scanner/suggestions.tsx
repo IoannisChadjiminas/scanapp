@@ -1,6 +1,6 @@
 "use client";
 
-import { ExternalLink } from "lucide-react";
+import { useEffect, useState } from "react";
 
 import { Badge } from "@/components/ui/badge";
 import { Button, buttonVariants } from "@/components/ui/button";
@@ -23,6 +23,11 @@ import {
 import { assetUrl } from "@/lib/api";
 import type { Candidate, ScanStatus } from "@/lib/api-types";
 import { languageLabel } from "@/lib/languages";
+import { CardmarketOpen } from "@/components/scanner/cardmarket-open";
+import {
+  CardmarketPrices,
+  useCardmarketListings,
+} from "@/components/scanner/cardmarket-prices";
 
 type SuggestionsProps = {
   status: ScanStatus;
@@ -59,6 +64,16 @@ export function Suggestions({
   const top = suggestions[0];
   const matched = status === "matched" && top;
   const notAMatch = status === "no_match" || status === "uncertain";
+  const [watchingMarket, setWatchingMarket] = useState(false);
+  const listings = useCardmarketListings(
+    top?.cardmarket_url,
+    top?.cardmarket_prices,
+    watchingMarket,
+  );
+
+  useEffect(() => {
+    setWatchingMarket(false);
+  }, [top?.card_id, top?.cardmarket_url]);
 
   return (
     <div className="flex flex-col gap-4">
@@ -88,21 +103,22 @@ export function Suggestions({
               alt={`${top.name} from ${top.set_name}`}
               className="mx-auto max-h-72 w-auto rounded-md"
             />
+            <CardmarketPrices
+              prices={listings.prices}
+              waiting={listings.waiting}
+            />
           </CardContent>
           <CardFooter className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:justify-end">
             {top.cardmarket_url ? (
-              <a
-                href={top.cardmarket_url}
-                target="_blank"
-                rel="noopener noreferrer"
+              <CardmarketOpen
+                url={top.cardmarket_url}
+                cardId={top.card_id}
                 className={cn(
                   buttonVariants({ variant: "outline" }),
                   "h-11 min-h-11 w-full gap-2 sm:w-auto",
                 )}
-              >
-                Open on Cardmarket
-                <ExternalLink />
-              </a>
+                onQueued={() => setWatchingMarket(true)}
+              />
             ) : null}
             <Button
               type="button"
@@ -145,15 +161,17 @@ export function Suggestions({
                 {top.name} · {top.set_name} #{top.collector_number}
                 {top.language ? ` · ${languageLabel(top.language)}` : ""}
               </p>
+              <CardmarketPrices
+                prices={listings.prices}
+                waiting={listings.waiting}
+              />
               {top.cardmarket_url ? (
-                <a
-                  href={top.cardmarket_url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-sm underline-offset-4 hover:underline"
-                >
-                  Open on Cardmarket
-                </a>
+                <CardmarketOpen
+                  url={top.cardmarket_url}
+                  cardId={top.card_id}
+                  className="inline-flex items-center gap-1 text-sm underline-offset-4 hover:underline"
+                  onQueued={() => setWatchingMarket(true)}
+                />
               ) : null}
             </EmptyContent>
           ) : null}

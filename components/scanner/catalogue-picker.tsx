@@ -24,6 +24,7 @@ import { useMediaQuery } from "@/hooks/use-media-query";
 import { api, assetUrl } from "@/lib/api";
 import type { CardSummary } from "@/lib/api-types";
 import { languageLabel } from "@/lib/languages";
+import { CardmarketOpen } from "@/components/scanner/cardmarket-open";
 
 type CataloguePickerProps = {
   open: boolean;
@@ -104,15 +105,14 @@ function SearchBody({
               </span>
             </button>
             {card.cardmarket_url ? (
-              <a
-                href={card.cardmarket_url}
-                target="_blank"
-                rel="noopener noreferrer"
-                aria-label={`Open ${card.name} on Cardmarket`}
+              <CardmarketOpen
+                url={card.cardmarket_url}
+                cardId={card.id}
+                showIcon={false}
                 className="inline-flex min-h-11 min-w-11 items-center justify-center rounded-lg border px-2 text-muted-foreground hover:bg-muted hover:text-foreground"
               >
-                <ExternalLink className="size-4" />
-              </a>
+                <ExternalLink className="size-4" aria-label={`Open ${card.name} on Cardmarket`} />
+              </CardmarketOpen>
             ) : null}
           </li>
         ))}

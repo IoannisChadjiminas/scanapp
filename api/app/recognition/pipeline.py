@@ -10,7 +10,7 @@ from typing import Any
 import numpy as np
 
 from app.config import Settings
-from app.cardmarket import url_for_row
+from app.cardmarket import prices_for_row, url_for_row
 from app.db import coverage_payload
 from app.recognition.detect import detect_and_rectify
 from app.recognition.embed import top_k
@@ -142,6 +142,14 @@ def recognize_bytes(
         ocr.failed,
         detected_languages=rank_languages,
     )
+    mark = time.perf_counter()
+    if combined:
+        top_row = cards.get(str(combined[0]["card_id"]))
+        if top_row is not None:
+            combined[0]["cardmarket_prices"] = prices_for_row(
+                top_row, data_dir=settings.data_dir, catalog=catalog
+            )
+    timings["cardmarket_ms"] = (time.perf_counter() - mark) * 1000
     status = decide_status(
         combined,
         enable_matched=settings.enable_matched,

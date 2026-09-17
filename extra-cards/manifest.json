@@ -37,13 +37,16 @@
     {
       "id": "extra-gengar-mimikyu-gx-103-095",
       "name": "Gengar & Mimikyu GX",
-      "set_id": "sm9a",
-      "set_name": "Night Unison",
+      "set_id": "sm9",
+      "set_name": "Tag Bolt",
       "collector_number": "103/095",
       "language": "ja",
       "category": "Pokemon",
-      "rarity": "SSR",
+      "rarity": "SR",
       "cardmarket_id": 558478,
+      "cardmarket_expansion": "Tag-Bolt",
+      "cardmarket_set_code": "sm9",
+      "cardmarket_url": "https://www.cardmarket.com/en/Pokemon/Products/Singles/Tag-Bolt/Gengar-Mimikyu-GX-V2-sm9102",
       "file": "gengar-mimikyu-gx.jpg"
     },
     {

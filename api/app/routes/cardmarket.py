@@ -1,0 +1,103 @@
+from __future__ import annotations
+
+from fastapi import APIRouter, HTTPException, Query, Request, Response
+from pydantic import BaseModel, Field
+
+from app.cardmarket import (
+    claim_job,
+    complete_job,
+    enqueue_job,
+    is_job_url,
+    job_by_id,
+    normalize_product_url,
+    save_snapshot,
+    snapshot_prices,
+)
+
+router = APIRouter()
+
+
+class JobRequest(BaseModel):
+    url: str
+    card_id: str | None = None
+
+
+class JobResponse(BaseModel):
+    id: str
+    url: str
+    card_id: str = ""
+
+
+class PriceItem(BaseModel):
+    label: str
+    amount: float
+    currency: str = "EUR"
+
+
+class OfferPayload(BaseModel):
+    url: str
+    job_id: str | None = None
+    prices: list[PriceItem] = Field(default_factory=list)
+
+
+class PriceResponse(BaseModel):
+    url: str | None = None
+    prices: list[PriceItem] = Field(default_factory=list)
+
+
+@router.post("/cardmarket/jobs", response_model=JobResponse)
+def create_job(payload: JobRequest, request: Request) -> JobResponse:
+    url = normalize_product_url(payload.url)
+    if not is_job_url(url):
+        raise HTTPException(status_code=400, detail="Need a Cardmarket product URL")
+    job_id = enqueue_job(request.app.state.dbs.catalog, url, payload.card_id)
+    return JobResponse(id=job_id, url=url, card_id=payload.card_id or "")
+
+
+@router.get("/cardmarket/jobs/next", response_model=None)
+def next_job(request: Request) -> JobResponse | Response:
+    job = claim_job(request.app.state.dbs.catalog)
+    if job is None:
+        return Response(status_code=204)
+    return JobResponse(id=job["id"], url=job["url"], card_id=job["card_id"] or "")
+
+
+@router.post("/cardmarket/offers")
+def save_offers(payload: OfferPayload, request: Request) -> PriceResponse:
+    url = normalize_product_url(payload.url)
+    if not url:
+        raise HTTPException(status_code=400, detail="Need a Cardmarket URL")
+    prices = [item.model_dump() for item in payload.prices[:8]]
+    if not prices:
+        raise HTTPException(status_code=400, detail="Need at least one price")
+    key = save_snapshot(request.app.state.dbs.catalog, url, prices)
+    catalog = request.app.state.dbs.catalog
+    if payload.job_id:
+        job = job_by_id(catalog, payload.job_id)
+        if job and job["url"] and job["url"] != key:
+            save_snapshot(catalog, job["url"], prices)
+        complete_job(catalog, payload.job_id)
+    else:
+        pending = catalog.execute(
+            """
+            SELECT id, url FROM cardmarket_jobs
+            WHERE status IN ('pending', 'claimed')
+            """,
+        ).fetchall()
+        for row in pending:
+            job_url = str(row["url"] or "")
+            if job_url == key or job_url == url:
+                complete_job(catalog, str(row["id"]))
+    return PriceResponse(url=key, prices=[PriceItem.model_validate(item) for item in prices])
+
+
+@router.get("/cardmarket/prices", response_model=PriceResponse)
+def get_prices(
+    request: Request, url: str = Query(min_length=8, max_length=500)
+) -> PriceResponse:
+    key = normalize_product_url(url)
+    prices = snapshot_prices(request.app.state.dbs.catalog, key)
+    return PriceResponse(
+        url=key,
+        prices=[PriceItem.model_validate(item) for item in prices],
+    )

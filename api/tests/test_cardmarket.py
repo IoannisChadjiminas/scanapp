@@ -8,7 +8,10 @@ from app.cardmarket import (
     cardmarket_singles_url,
     extract_cardmarket_id,
     fields_from_payload,
+    prices_from_market,
+    singles_code_and_number,
     sync_cardmarket_links,
+    tcgdex_price_targets,
     url_for_row,
     url_from_manifest_card,
 )
@@ -78,6 +81,23 @@ def test_manifest_card_is_one_to_one_with_url() -> None:
     assert url.endswith("/Pikachu-CLC008")
 
 
+def test_gengar_extra_uses_explicit_tag_bolt_url() -> None:
+    product_id, url = url_from_manifest_card(
+        {
+            "id": "extra-gengar-mimikyu-gx-103-095",
+            "name": "Gengar & Mimikyu GX",
+            "collector_number": "103/095",
+            "cardmarket_id": 558478,
+            "cardmarket_url": (
+                "https://www.cardmarket.com/en/Pokemon/Products/Singles/"
+                "Tag-Bolt/Gengar-Mimikyu-GX-V2-sm9102"
+            ),
+        }
+    )
+    assert product_id == 558478
+    assert url.endswith("/Gengar-Mimikyu-GX-V2-sm9102")
+
+
 def test_url_for_row_prefers_stored_product_page(tmp_path: Path) -> None:
     conn = connect(tmp_path / "catalog.sqlite")
     init_catalog(conn)
@@ -132,3 +152,114 @@ def test_sync_from_cache_without_reloading_images(tmp_path: Path) -> None:
     assert updated == 1
     assert row["cardmarket_id"] == 273699
     assert url_for_row(row) == "https://prices.pokemontcg.io/cardmarket/base1-4"
+
+
+def test_prices_from_market_are_from_trend_and_7day() -> None:
+    prices = prices_from_market(
+        {
+            "unit": "EUR",
+            "low": 129.9,
+            "trend": 233.74,
+            "avg7": 224.14,
+            "avg": 239.83,
+        }
+    )
+    assert [item["label"] for item in prices] == ["From", "Trend", "7-day"]
+    assert prices[0]["amount"] == 129.9
+    assert prices[0]["currency"] == "EUR"
+
+
+def test_price_targets_prefer_singles_slug() -> None:
+    assert singles_code_and_number(
+        "https://www.cardmarket.com/en/Pokemon/Products/Singles/Tag-Bolt/Gengar-Mimikyu-GX-V2-sm9102"
+    ) == ("sm9", "102")
+    targets = tcgdex_price_targets(
+        {
+            "id": "extra-gengar-mimikyu-gx-103-095",
+            "provider_id": "extra-gengar-mimikyu-gx-103-095",
+            "language": "ja",
+            "set_id": "sm9",
+            "collector_number": "103/095",
+            "cardmarket_url": (
+                "https://www.cardmarket.com/en/Pokemon/Products/Singles/"
+                "Tag-Bolt/Gengar-Mimikyu-GX-V2-sm9102"
+            ),
+        }
+    )
+    assert targets[0] == ("ja", "sm9-102")
+
+
+def test_normalize_and_snapshot_roundtrip(tmp_path: Path) -> None:
+    from app.cardmarket import (
+        claim_job,
+        enqueue_job,
+        normalize_product_url,
+        save_snapshot,
+        snapshot_prices,
+    )
+
+    dirty = (
+        "https://www.cardmarket.com/en/Pokemon/Products/Singles/"
+        "Tag-Bolt/Gengar-Mimikyu-GX-V2-sm9102?utm_source=x#offers"
+    )
+    key = normalize_product_url(dirty)
+    assert key.endswith("/Gengar-Mimikyu-GX-V2-sm9102")
+    conn = connect(tmp_path / "catalog.sqlite")
+    init_catalog(conn)
+    job_id = enqueue_job(conn, dirty, "extra-gengar")
+    assert enqueue_job(conn, key, "extra-gengar") == job_id
+    claimed = claim_job(conn)
+    assert claimed is not None
+    assert claimed["id"] == job_id
+    assert claim_job(conn) is None
+    prices = [{"label": "NM", "amount": 449.99, "currency": "EUR"}]
+    save_snapshot(conn, dirty, prices)
+    assert snapshot_prices(conn, key) == prices
+
+
+def test_claim_reclaims_stale_job(tmp_path: Path) -> None:
+    from app.cardmarket import claim_job, enqueue_job
+
+    conn = connect(tmp_path / "catalog.sqlite")
+    init_catalog(conn)
+    job_id = enqueue_job(
+        conn,
+        "https://www.cardmarket.com/en/Pokemon/Products/Singles/Tag-Bolt/Gengar-Mimikyu-GX-V2-sm9102",
+        "extra-gengar",
+    )
+    conn.execute(
+        "UPDATE cardmarket_jobs SET status = 'claimed', updated_at = '2020-01-01T00:00:00Z' WHERE id = ?",
+        (job_id,),
+    )
+    conn.commit()
+    claimed = claim_job(conn)
+    assert claimed is not None
+    assert claimed["id"] == job_id
+
+
+def test_prices_for_row_prefers_snapshot(tmp_path: Path) -> None:
+    from app.cardmarket import prices_for_row, save_snapshot
+
+    conn = connect(tmp_path / "catalog.sqlite")
+    init_catalog(conn)
+    url = (
+        "https://www.cardmarket.com/en/Pokemon/Products/Singles/"
+        "Tag-Bolt/Gengar-Mimikyu-GX-V2-sm9102"
+    )
+    save_snapshot(
+        conn,
+        url,
+        [{"label": "NM", "amount": 449.99, "currency": "EUR"}],
+    )
+    found = prices_for_row({"id": "extra-gengar", "cardmarket_url": url}, catalog=conn)
+    assert found == [{"label": "NM", "amount": 449.99, "currency": "EUR"}]
+
+
+def test_job_url_accepts_pokemontcg_price_link() -> None:
+    from app.cardmarket import is_job_url
+
+    assert is_job_url(
+        "https://www.cardmarket.com/en/Pokemon/Products/Singles/Tag-Bolt/Gengar-Mimikyu-GX-V2-sm9102"
+    )
+    assert is_job_url("https://prices.pokemontcg.io/cardmarket/base1-4")
+    assert not is_job_url("https://www.cardmarket.com/en/Pokemon/Cards")

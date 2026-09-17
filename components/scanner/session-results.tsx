@@ -15,6 +15,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { CardmarketOpen } from "@/components/scanner/cardmarket-open";
 import type { SessionResult } from "@/lib/api-types";
 
 type SessionResultsProps = {
@@ -73,14 +74,14 @@ export function SessionResults({ results, onExport }: SessionResultsProps) {
               {row.timings_ms.total_ms ? `${Math.round(row.timings_ms.total_ms)} ms` : "—"}
             </p>
             {row.suggestions[0]?.cardmarket_url ? (
-              <a
-                href={row.suggestions[0].cardmarket_url}
-                target="_blank"
-                rel="noopener noreferrer"
+              <CardmarketOpen
+                url={row.suggestions[0].cardmarket_url}
+                cardId={row.suggestions[0].card_id}
+                showIcon={false}
                 className="text-sm underline-offset-4 hover:underline"
               >
                 Cardmarket
-              </a>
+              </CardmarketOpen>
             ) : null}
           </div>
         ))}
@@ -106,14 +107,14 @@ export function SessionResults({ results, onExport }: SessionResultsProps) {
                   {row.suggestions[0]?.cardmarket_url ? (
                     <>
                       {" "}
-                      <a
-                        href={row.suggestions[0].cardmarket_url}
-                        target="_blank"
-                        rel="noopener noreferrer"
+                      <CardmarketOpen
+                        url={row.suggestions[0].cardmarket_url}
+                        cardId={row.suggestions[0].card_id}
+                        showIcon={false}
                         className="underline-offset-4 hover:underline"
                       >
                         Cardmarket
-                      </a>
+                      </CardmarketOpen>
                     </>
                   ) : null}
                 </TableCell>

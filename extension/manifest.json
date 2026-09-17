@@ -1,0 +1,27 @@
+{
+  "manifest_version": 3,
+  "name": "Scanapp Cardmarket helper",
+  "version": "0.1.0",
+  "description": "When Scanapp queues a product URL, open it here and save the first listings back to the local API.",
+  "action": {
+    "default_title": "Fetch Scanapp Cardmarket jobs"
+  },
+  "permissions": ["alarms", "storage", "tabs"],
+  "host_permissions": [
+    "http://127.0.0.1:8000/*",
+    "http://localhost:8000/*",
+    "http://127.0.0.1:8080/*",
+    "http://localhost:8080/*",
+    "https://www.cardmarket.com/*"
+  ],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "content_scripts": [
+    {
+      "matches": ["https://www.cardmarket.com/*/Pokemon/Products/Singles/*"],
+      "js": ["content.js"],
+      "run_at": "document_idle"
+    }
+  ]
+}

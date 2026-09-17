@@ -27,6 +27,7 @@ Default catalogue import is a few English sets (`base1,sv01,swsh3`). Set `CATALO
 | `api/bootstrap/` | Model export, TCGdex import, embeddings |
 | `api/eval/` | Accuracy harness and optional Tesseract comparison |
 | `docker/` | API, web, bootstrap images and Caddyfiles |
+| `extension/` | Chrome helper: reads Cardmarket listings into the local API |
 
 Runtime containers do not include Node.js, PyTorch, or PaddlePaddle. Bootstrap is the tools image.
 
@@ -38,8 +39,14 @@ Runtime containers do not include Node.js, PyTorch, or PaddlePaddle. Bootstrap i
 - `POST /api/v1/scans/{id}/feedback` — confirm, correct, or reject
 - `GET /api/v1/session/results` — anonymous session results
 - `GET /api/v1/health` — catalogue and model readiness
+- `POST /api/v1/cardmarket/jobs` — queue a product page for the PC Chrome helper
+- `GET /api/v1/cardmarket/jobs/next` — helper claims the next queued page
+- `POST /api/v1/cardmarket/offers` — helper saves the first listings
+- `GET /api/v1/cardmarket/prices?url=` — stored listings for a product URL
 
-Frontend types live in `lib/api-types.ts`. Regenerate the OpenAPI document with:
+Frontend types live in `lib/api-types.ts`. The PC Chrome helper lives in `extension/` (`extension/README.md`). **Open on Cardmarket** queues a job; the helper opens that Singles page and writes the first listings back.
+
+Regenerate the OpenAPI document with:
 
 ```bash
 PYTHONPATH=api python -c "from app.main import app; import json; print(json.dumps(app.openapi(), indent=2))"

@@ -51,6 +51,25 @@ def init_catalog(conn: sqlite3.Connection) -> None:
         conn.execute("ALTER TABLE cards ADD COLUMN cardmarket_id INTEGER")
     if "cardmarket_url" not in columns:
         conn.execute("ALTER TABLE cards ADD COLUMN cardmarket_url TEXT")
+    conn.executescript(
+        """
+        CREATE TABLE IF NOT EXISTS cardmarket_snapshots (
+            url TEXT PRIMARY KEY,
+            prices_json TEXT NOT NULL,
+            fetched_at TEXT NOT NULL
+        );
+        CREATE TABLE IF NOT EXISTS cardmarket_jobs (
+            id TEXT PRIMARY KEY,
+            url TEXT NOT NULL,
+            card_id TEXT,
+            status TEXT NOT NULL,
+            created_at TEXT NOT NULL,
+            updated_at TEXT NOT NULL
+        );
+        CREATE INDEX IF NOT EXISTS idx_cardmarket_jobs_status
+            ON cardmarket_jobs(status, created_at);
+        """
+    )
     conn.commit()
 
 

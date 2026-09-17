@@ -21,6 +21,12 @@ class FeedbackAction(str, Enum):
     reject = "reject"
 
 
+class CardmarketPrice(BaseModel):
+    label: str
+    amount: float
+    currency: str = "EUR"
+
+
 class Candidate(BaseModel):
     card_id: str
     name: str
@@ -32,6 +38,7 @@ class Candidate(BaseModel):
     ocr_consistent: bool | None = None
     language: str = ""
     cardmarket_url: str | None = None
+    cardmarket_prices: list[CardmarketPrice] = Field(default_factory=list)
 
 
 class OcrEvidence(BaseModel):
