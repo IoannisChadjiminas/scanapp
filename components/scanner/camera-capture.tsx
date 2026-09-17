@@ -5,8 +5,13 @@ import { Camera, CircleAlert } from "lucide-react";
 
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
-
-const CARD_RATIO = 63 / 88;
+import {
+  CARD_RATIO,
+  cardGuideInView,
+  clampRect,
+  coverSourceRect,
+  viewRectToSource,
+} from "@/lib/image-frame";
 
 type CameraCaptureProps = {
   onCapture: (blob: Blob) => void;
@@ -33,7 +38,12 @@ export function CameraCapture({ onCapture, onCancel }: CameraCaptureProps) {
       }
       try {
         const stream = await navigator.mediaDevices.getUserMedia({
-          video: { facingMode: { ideal: "environment" }, width: { ideal: 1920 } },
+          video: {
+            facingMode: { ideal: "environment" },
+            width: { ideal: 1920 },
+            height: { ideal: 2560 },
+            aspectRatio: { ideal: 3 / 4 },
+          },
           audio: false,
         });
         if (cancelled) {
@@ -43,6 +53,7 @@ export function CameraCapture({ onCapture, onCancel }: CameraCaptureProps) {
         streamRef.current = stream;
         if (videoRef.current) {
           videoRef.current.srcObject = stream;
+          videoRef.current.setAttribute("playsinline", "true");
           await videoRef.current.play();
         }
       } catch (cause) {
@@ -69,16 +80,45 @@ export function CameraCapture({ onCapture, onCancel }: CameraCaptureProps) {
     if (!video || video.videoWidth === 0) {
       return;
     }
+    const view = video.getBoundingClientRect();
+    const cover = coverSourceRect(
+      video.videoWidth,
+      video.videoHeight,
+      view.width,
+      view.height,
+    );
+    const guide = cardGuideInView(view.width, view.height);
+    const padded = {
+      x: guide.x - guide.w * 0.03,
+      y: guide.y - guide.h * 0.03,
+      w: guide.w * 1.06,
+      h: guide.h * 1.06,
+    };
+    const source = clampRect(
+      viewRectToSource(padded, cover, view.width),
+      video.videoWidth,
+      video.videoHeight,
+    );
     const canvas = document.createElement("canvas");
-    canvas.width = video.videoWidth;
-    canvas.height = video.videoHeight;
+    canvas.width = Math.max(1, Math.round(source.w));
+    canvas.height = Math.max(1, Math.round(source.h));
     const context = canvas.getContext("2d");
     if (!context) {
       return;
     }
-    context.drawImage(video, 0, 0);
+    context.drawImage(
+      video,
+      source.x,
+      source.y,
+      source.w,
+      source.h,
+      0,
+      0,
+      canvas.width,
+      canvas.height,
+    );
     const blob = await new Promise<Blob | null>((resolve) =>
-      canvas.toBlob(resolve, "image/jpeg", 0.92),
+      canvas.toBlob(resolve, "image/jpeg", 0.95),
     );
     if (blob) {
       streamRef.current?.getTracks().forEach((track) => track.stop());
@@ -109,11 +149,15 @@ export function CameraCapture({ onCapture, onCancel }: CameraCaptureProps) {
           >
             <div
               className="rounded-md border-2 border-white/80 shadow-[0_0_0_999px_rgba(0,0,0,0.35)]"
-              style={{ width: "70%", aspectRatio: CARD_RATIO }}
+              style={{ width: "78%", aspectRatio: CARD_RATIO }}
             />
           </div>
         </div>
       )}
+      <p className="text-sm text-muted-foreground">
+        Fill the white frame with the card. The scan uses that frame, not the
+        whole camera view.
+      </p>
       <div className="flex gap-3">
         <Button
           type="button"
