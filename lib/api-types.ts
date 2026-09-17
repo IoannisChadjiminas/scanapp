@@ -9,12 +9,14 @@ export type Candidate = {
   visual_score: number;
   combined_score: number;
   ocr_consistent: boolean | null;
+  language?: string;
 };
 
 export type Coverage = {
   cards: number;
   indexed: number;
   missing_images: number;
+  languages?: { language: string; cards: number; indexed: number }[];
 };
 
 export type HealthResponse = {
@@ -51,6 +53,8 @@ export type ScanResponse = {
   timings_ms: Record<string, number>;
   versions: Record<string, string>;
   message: string | null;
+  detected_language?: string | null;
+  search_languages?: string[];
 };
 
 export type CardSummary = {

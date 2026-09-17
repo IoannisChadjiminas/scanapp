@@ -5,7 +5,7 @@ import os
 import shutil
 from pathlib import Path
 
-from app.db import connect, coverage, init_catalog
+from app.db import connect, coverage, coverage_by_language, init_catalog
 
 
 def extra_cards_dir() -> Path:
@@ -88,6 +88,10 @@ def import_extra_cards(data_dir: Path) -> int:
 
     conn.commit()
     cards_n, indexed, missing = coverage(conn)
+    languages = {
+        str(item["language"]): int(item["indexed"])
+        for item in coverage_by_language(conn)
+    }
     conn.close()
 
     version_path = data_dir / "catalogue-version.json"
@@ -105,6 +109,7 @@ def import_extra_cards(data_dir: Path) -> int:
             "indexed": indexed,
             "missing_images": missing,
             "extra_cards": imported,
+            "languages": languages,
         }
     )
     version_path.write_text(json.dumps(version_info, indent=2))

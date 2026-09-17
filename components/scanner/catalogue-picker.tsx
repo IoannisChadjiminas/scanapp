@@ -21,17 +21,21 @@ import {
 import { useMediaQuery } from "@/hooks/use-media-query";
 import { api, assetUrl } from "@/lib/api";
 import type { CardSummary } from "@/lib/api-types";
+import { languageLabel } from "@/lib/languages";
 
 type CataloguePickerProps = {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onSelect: (card: CardSummary) => void;
+  language?: string;
 };
 
 function SearchBody({
   onSelect,
+  language,
 }: {
   onSelect: (card: CardSummary) => void;
+  language?: string;
 }) {
   const [query, setQuery] = useState("");
   const [items, setItems] = useState<CardSummary[]>([]);
@@ -41,7 +45,7 @@ function SearchBody({
     const controller = new AbortController();
     const handle = window.setTimeout(() => {
       api
-        .searchCards(query, controller.signal)
+        .searchCards(query, language, controller.signal)
         .then((payload) => {
           setItems(payload.items);
           setError(null);
@@ -57,7 +61,7 @@ function SearchBody({
       controller.abort();
       window.clearTimeout(handle);
     };
-  }, [query]);
+  }, [query, language]);
 
   return (
     <div className="flex flex-col gap-3">
@@ -93,6 +97,7 @@ function SearchBody({
                 <span className="block font-medium">{card.name}</span>
                 <span className="block text-sm text-muted-foreground">
                   {card.set_name} · #{card.collector_number}
+                  {card.language ? ` · ${languageLabel(card.language)}` : ""}
                 </span>
               </span>
             </button>
@@ -103,10 +108,15 @@ function SearchBody({
   );
 }
 
-export function CataloguePicker({ open, onOpenChange, onSelect }: CataloguePickerProps) {
+export function CataloguePicker({
+  open,
+  onOpenChange,
+  onSelect,
+  language,
+}: CataloguePickerProps) {
   const desktop = useMediaQuery("(min-width: 768px)");
   const title = "Correct the card";
-  const description = "Search the indexed English catalogue and pick the actual card.";
+  const description = "Search the indexed catalogue and pick the actual card.";
 
   if (desktop) {
     return (
@@ -116,7 +126,7 @@ export function CataloguePicker({ open, onOpenChange, onSelect }: CataloguePicke
             <DialogTitle>{title}</DialogTitle>
             <DialogDescription>{description}</DialogDescription>
           </DialogHeader>
-          <SearchBody onSelect={onSelect} />
+          <SearchBody onSelect={onSelect} language={language} />
         </DialogContent>
       </Dialog>
     );
@@ -130,7 +140,7 @@ export function CataloguePicker({ open, onOpenChange, onSelect }: CataloguePicke
           <SheetDescription>{description}</SheetDescription>
         </SheetHeader>
         <div className="px-4 pb-6">
-          <SearchBody onSelect={onSelect} />
+          <SearchBody onSelect={onSelect} language={language} />
         </div>
       </SheetContent>
     </Sheet>

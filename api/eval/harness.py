@@ -38,6 +38,7 @@ def main() -> None:
     dbs.results.commit()
     runtime = Runtime(settings=settings)
     runtime.load()
+    runtime.bind_card_languages(dbs.catalog)
     if not runtime.ready:
         raise SystemExit(runtime.error or "runtime not ready")
 

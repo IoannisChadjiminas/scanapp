@@ -19,6 +19,7 @@ import {
 } from "@/components/ui/empty";
 import { assetUrl } from "@/lib/api";
 import type { Candidate, ScanStatus } from "@/lib/api-types";
+import { languageLabel } from "@/lib/languages";
 
 type SuggestionsProps = {
   status: ScanStatus;
@@ -73,6 +74,7 @@ export function Suggestions({
           <CardHeader>
             <CardTitle>{top.name}</CardTitle>
             <CardDescription>
+              {top.language ? `${languageLabel(top.language)} · ` : ""}
               {top.set_name} · #{top.collector_number}
             </CardDescription>
           </CardHeader>
@@ -124,6 +126,7 @@ export function Suggestions({
               />
               <p className="text-sm">
                 {top.name} · {top.set_name} #{top.collector_number}
+                {top.language ? ` · ${languageLabel(top.language)}` : ""}
               </p>
             </EmptyContent>
           ) : null}

@@ -31,11 +31,22 @@ class DinoEmbedder:
         return vector / norm
 
 
-def top_k(embeddings: np.ndarray, query: np.ndarray, k: int = 20) -> tuple[np.ndarray, np.ndarray]:
+def top_k(
+    embeddings: np.ndarray,
+    query: np.ndarray,
+    k: int = 20,
+    keep: np.ndarray | None = None,
+) -> tuple[np.ndarray, np.ndarray]:
     scores = embeddings @ query.astype(np.float32)
-    k = min(k, scores.shape[0])
-    if k == 0:
+    if keep is not None:
+        if keep.shape[0] != scores.shape[0] or not np.any(keep):
+            return np.array([], dtype=np.int64), np.array([], dtype=np.float32)
+        scores = np.where(keep, scores, np.float32("-inf"))
+    finite = np.isfinite(scores)
+    available = int(finite.sum())
+    if available <= 0:
         return np.array([], dtype=np.int64), np.array([], dtype=np.float32)
+    k = min(k, available, scores.shape[0])
     idx = np.argpartition(-scores, k - 1)[:k]
     idx = idx[np.argsort(-scores[idx])]
     return idx, scores[idx]

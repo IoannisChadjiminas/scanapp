@@ -24,7 +24,7 @@ class Settings(BaseSettings):
     session_cookie: str = "scanapp_session"
     session_ttl_days: int = 30
 
-    ranking_version: str = "rank-v1"
+    ranking_version: str = "rank-v2"
     ocr_version: str = "rapidocr-ppocrv6-small"
     model_name: str = "dinov2-small"
 

@@ -4,6 +4,8 @@ from dataclasses import dataclass
 from threading import Lock
 from typing import Any
 
+import numpy as np
+
 from app.config import Settings
 from app.recognition.artifacts import ArtifactError, ArtifactSnapshot, load_snapshot
 from app.recognition.embed import DinoEmbedder
@@ -16,6 +18,7 @@ class Runtime:
     snapshot: ArtifactSnapshot | None = None
     embedder: DinoEmbedder | None = None
     ocr: CardOcr | None = None
+    card_languages: np.ndarray | None = None
     error: str | None = None
     _lock: Lock = Lock()
 
@@ -45,12 +48,27 @@ class Runtime:
                 self.snapshot = snapshot
                 self.embedder = embedder
                 self.ocr = ocr
+                self.card_languages = None
                 self.error = None
             except Exception as exc:  # noqa: BLE001 - startup must report unreadiness, not crash
                 self.snapshot = None
                 self.embedder = None
                 self.ocr = None
+                self.card_languages = None
                 self.error = str(exc)
+
+    def bind_card_languages(self, catalog) -> None:  # noqa: ANN001 - sqlite connection
+        if self.snapshot is None:
+            self.card_languages = None
+            return
+        lookup = {
+            str(row["id"]): str(row["language"] or "en")
+            for row in catalog.execute("SELECT id, language FROM cards")
+        }
+        self.card_languages = np.array(
+            [lookup.get(str(card_id), "en") for card_id in self.snapshot.card_ids],
+            dtype=object,
+        )
 
     def require(self) -> tuple[ArtifactSnapshot, DinoEmbedder, CardOcr | None]:
         if not self.ready or self.snapshot is None or self.embedder is None:

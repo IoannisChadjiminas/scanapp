@@ -1,6 +1,8 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, field
+import re
+import unicodedata
 
 import numpy as np
 from PIL import Image
@@ -19,6 +21,49 @@ def _region(image: Image.Image, y0: float, y1: float) -> Image.Image:
     top = int(height * y0)
     bottom = max(top + 8, int(height * y1))
     return image.crop((0, top, width, bottom))
+
+
+NAME_BOILERPLATE = {
+    "basicpokemon",
+    "trainer",
+    "energy",
+    "evolvesfrom",
+}
+NAME_PREFIX_SKIP = ("evolves from", "put ")
+NAME_EXACT_SKIP = {"たね", "基本", "トレーナー", "エネルギー", "gx", "vmax", "vstar", "ex"}
+STAGE_ONLY = {"gx", "vmax", "vstar", "ex"}
+
+
+def _has_cjk(text: str) -> bool:
+    return any(
+        "\u3040" <= char <= "\u30ff" or "\u4e00" <= char <= "\u9fff" for char in text
+    )
+
+
+def _compact_latin(text: str) -> str:
+    decomposed = unicodedata.normalize("NFKD", text.lower())
+    return re.sub(r"[^a-z0-9]+", "", decomposed)
+
+
+def pick_name_line(lines: list[str]) -> str | None:
+    for line in lines:
+        text = line.strip()
+        if not text:
+            continue
+        lowered = text.lower()
+        if lowered in NAME_EXACT_SKIP or text in NAME_EXACT_SKIP:
+            continue
+        if any(lowered.startswith(prefix) for prefix in NAME_PREFIX_SKIP):
+            continue
+        compact = _compact_latin(text)
+        if compact in NAME_BOILERPLATE:
+            continue
+        if compact in STAGE_ONLY and not _has_cjk(text):
+            continue
+        if len(text) < 2:
+            continue
+        return text
+    return None
 
 
 class CardOcr:
@@ -75,7 +120,7 @@ class CardOcr:
                 extra = self._run(image)
             lines = [*name_lines, *number_lines, *extra]
             return OcrResult(
-                name_text=name_lines[0] if name_lines else (extra[0] if extra else None),
+                name_text=pick_name_line(name_lines) or pick_name_line(lines),
                 collector_text=number_lines[-1] if number_lines else None,
                 lines=lines,
                 failed=False,

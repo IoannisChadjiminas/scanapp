@@ -2,8 +2,8 @@ from __future__ import annotations
 
 from fastapi import APIRouter, Request
 
-from app.db import coverage
-from app.schemas import Coverage, HealthResponse
+from app.db import coverage_payload
+from app.schemas import HealthResponse
 
 router = APIRouter()
 
@@ -13,7 +13,7 @@ def health(request: Request) -> HealthResponse:
     settings = request.app.state.settings
     runtime = request.app.state.runtime
     dbs = request.app.state.dbs
-    cards, indexed, missing = coverage(dbs.catalog)
+    coverage_model = coverage_payload(dbs.catalog)
     snapshot = runtime.snapshot
     ready = runtime.ready
     return HealthResponse(
@@ -24,6 +24,6 @@ def health(request: Request) -> HealthResponse:
         preprocess_config=settings.preprocess_config,
         use_ocr=settings.use_ocr,
         snapshot=settings.snapshot_name,
-        coverage=Coverage(cards=cards, indexed=indexed, missing_images=missing),
+        coverage=coverage_model,
         detail=runtime.error,
     )

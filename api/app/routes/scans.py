@@ -4,13 +4,12 @@ import json
 
 from fastapi import APIRouter, Form, HTTPException, Request, Response, UploadFile
 
-from app.db import coverage
+from app.db import coverage_payload
 from app.recognition.artifacts import ArtifactError
 from app.recognition.images import ImageError
 from app.recognition.pipeline import recognize_bytes
 from app.schemas import (
     Candidate,
-    Coverage,
     FeedbackRequest,
     FeedbackResponse,
     ScanResponse,
@@ -31,6 +30,7 @@ async def create_scan(
     crop_h: float | None = Form(default=None),
     rotation: int = Form(default=0),
     skip_detect: bool = Form(default=False),
+    language: str = Form(default="auto"),
 ) -> ScanResponse:
     settings = request.app.state.settings
     limiter = request.app.state.scan_limiter
@@ -63,6 +63,7 @@ async def create_scan(
                 crop_h=crop_h,
                 rotation=rotation,
                 skip_detect=skip_detect,
+                language=language,
             ),
         )
     except ArtifactError as exc:
@@ -140,9 +141,9 @@ async def session_results(request: Request, response: Response) -> dict:
                 timings_ms=json.loads(row["timings_json"] or "{}"),
             )
         )
-    cards, indexed, missing = coverage(dbs.catalog)
+    coverage_model = coverage_payload(dbs.catalog)
     return SessionResultsResponse(
         session_id=session_id,
         results=results,
-        coverage=Coverage(cards=cards, indexed=indexed, missing_images=missing),
+        coverage=coverage_model,
     ).model_dump(mode="json")

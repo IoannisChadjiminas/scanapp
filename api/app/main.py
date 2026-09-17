@@ -50,6 +50,7 @@ async def lifespan(app: FastAPI):
     dbs = Databases(settings)
     runtime = Runtime(settings=settings)
     runtime.load()
+    runtime.bind_card_languages(dbs.catalog)
     app.state.settings = settings
     app.state.dbs = dbs
     app.state.runtime = runtime

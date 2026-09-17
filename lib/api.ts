@@ -75,9 +75,13 @@ export const api = {
       signal,
     });
   },
-  searchCards: (q: string, signal?: AbortSignal) =>
+  searchCards: (q: string, language?: string, signal?: AbortSignal) =>
     request<{ items: CardSummary[]; total: number }>(
-      `/api/v1/cards?q=${encodeURIComponent(q)}`,
+      `/api/v1/cards?q=${encodeURIComponent(q)}${
+        language && language !== "auto"
+          ? `&language=${encodeURIComponent(language)}`
+          : ""
+      }`,
       { signal },
     ),
   feedback: (scanId: string, action: string, cardId?: string) =>

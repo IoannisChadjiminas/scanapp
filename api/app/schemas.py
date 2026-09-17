@@ -30,6 +30,7 @@ class Candidate(BaseModel):
     visual_score: float
     combined_score: float
     ocr_consistent: bool | None = None
+    language: str = ""
 
 
 class OcrEvidence(BaseModel):
@@ -39,10 +40,17 @@ class OcrEvidence(BaseModel):
     failed: bool = False
 
 
+class LanguageCoverage(BaseModel):
+    language: str
+    cards: int
+    indexed: int
+
+
 class Coverage(BaseModel):
     cards: int
     indexed: int
     missing_images: int
+    languages: list[LanguageCoverage] = Field(default_factory=list)
 
 
 class HealthResponse(BaseModel):
@@ -74,6 +82,8 @@ class ScanResponse(BaseModel):
     timings_ms: dict[str, float]
     versions: dict[str, str]
     message: str | None = None
+    detected_language: str | None = None
+    search_languages: list[str] = Field(default_factory=list)
 
 
 class FeedbackRequest(BaseModel):

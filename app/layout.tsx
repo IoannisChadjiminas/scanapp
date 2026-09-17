@@ -14,7 +14,7 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "Scanapp",
-  description: "Visual identification experiment for English Pokémon cards.",
+  description: "Visual identification experiment for Pokémon cards.",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {

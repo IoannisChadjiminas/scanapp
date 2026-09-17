@@ -4,6 +4,7 @@ import sqlite3
 from pathlib import Path
 
 from app.config import Settings
+from app.schemas import Coverage, LanguageCoverage
 
 
 def connect(path: Path) -> sqlite3.Connection:
@@ -37,6 +38,7 @@ def init_catalog(conn: sqlite3.Connection) -> None:
         CREATE INDEX IF NOT EXISTS idx_cards_name ON cards(name);
         CREATE INDEX IF NOT EXISTS idx_cards_set ON cards(set_id);
         CREATE INDEX IF NOT EXISTS idx_cards_number ON cards(collector_number);
+        CREATE INDEX IF NOT EXISTS idx_cards_language ON cards(language);
         CREATE VIRTUAL TABLE IF NOT EXISTS cards_fts USING fts5(
             name, set_name, collector_number, id UNINDEXED
         );
@@ -93,6 +95,38 @@ def coverage(conn: sqlite3.Connection) -> tuple[int, int, int]:
     indexed = int(row["indexed"] or 0)
     missing = int(row["missing_images"] or 0)
     return cards, indexed, missing
+
+
+def coverage_by_language(conn: sqlite3.Connection) -> list[dict[str, int | str]]:
+    rows = conn.execute(
+        """
+        SELECT
+            language,
+            COUNT(*) AS cards,
+            SUM(CASE WHEN has_image = 1 THEN 1 ELSE 0 END) AS indexed
+        FROM cards
+        GROUP BY language
+        ORDER BY language
+        """
+    ).fetchall()
+    return [
+        {
+            "language": str(row["language"] or "en"),
+            "cards": int(row["cards"] or 0),
+            "indexed": int(row["indexed"] or 0),
+        }
+        for row in rows
+    ]
+
+
+def coverage_payload(conn: sqlite3.Connection) -> Coverage:
+    cards, indexed, missing = coverage(conn)
+    return Coverage(
+        cards=cards,
+        indexed=indexed,
+        missing_images=missing,
+        languages=[LanguageCoverage.model_validate(item) for item in coverage_by_language(conn)],
+    )
 
 
 class Databases:

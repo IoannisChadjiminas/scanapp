@@ -10,12 +10,31 @@ import { SessionResults } from "@/components/scanner/session-results";
 import { Suggestions } from "@/components/scanner/suggestions";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
+import { Label } from "@/components/ui/label";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { api } from "@/lib/api";
 import type { CardSummary, HealthResponse, ScanResponse, SessionResult } from "@/lib/api-types";
+import { LANGUAGE_CHOICES, languageLabel } from "@/lib/languages";
 
 type Stage = "idle" | "camera" | "crop" | "processing" | "result";
+
+const LANGUAGE_STORAGE_KEY = "scanapp.cardLanguage";
+
+function coverageText(health: HealthResponse) {
+  const coverage = health.coverage;
+  if (!coverage) {
+    return null;
+  }
+  const languages = coverage.languages?.filter((item) => item.indexed > 0) ?? [];
+  const languagePart = languages.length
+    ? ` (${languages.map((item) => `${item.indexed} ${languageLabel(item.language)}`).join(", ")})`
+    : "";
+  const missing = coverage.missing_images
+    ? ` · ${coverage.missing_images} missing reference images`
+    : "";
+  return `Indexed ${coverage.indexed} of ${coverage.cards} cards${languagePart}${missing}. Snapshot ${health.snapshot}.`;
+}
 
 function needsServerPreview(file: File) {
   const type = file.type.toLowerCase();
@@ -37,6 +56,7 @@ export function ScannerApp() {
   const [results, setResults] = useState<SessionResult[]>([]);
   const [pickerOpen, setPickerOpen] = useState(false);
   const [tab, setTab] = useState("scan");
+  const [language, setLanguage] = useState("auto");
   const fileRef = useRef<HTMLInputElement>(null);
   const abortRef = useRef<AbortController | null>(null);
   const objectUrlRef = useRef<string | null>(null);
@@ -54,6 +74,13 @@ export function ScannerApp() {
       setResults(payload.results);
     } catch {
       /* session results are best-effort until the first scan */
+    }
+  }, []);
+
+  useEffect(() => {
+    const stored = window.localStorage.getItem(LANGUAGE_STORAGE_KEY);
+    if (stored) {
+      setLanguage(stored);
     }
   }, []);
 
@@ -128,7 +155,7 @@ export function ScannerApp() {
     setStatusText("Identifying the card.");
     setError(null);
     try {
-      const result = await api.scan(blob, { skip_detect: "true" }, controller.signal);
+      const result = await api.scan(blob, { skip_detect: "true", language }, controller.signal);
       setScan(result);
       setStage("result");
       setStatusText(
@@ -211,14 +238,33 @@ export function ScannerApp() {
         </Alert>
       ) : null}
       {health?.coverage ? (
-        <p className="text-sm text-muted-foreground">
-          Indexed {health.coverage.indexed} of {health.coverage.cards} English cards
-          {health.coverage.missing_images
-            ? ` · ${health.coverage.missing_images} missing reference images`
-            : null}
-          . Snapshot {health.snapshot}.
-        </p>
+        <p className="text-sm text-muted-foreground">{coverageText(health)}</p>
       ) : null}
+
+      <div className="grid gap-2">
+        <Label htmlFor="card-language">Language</Label>
+        <select
+          id="card-language"
+          className="h-11 w-full rounded-lg border border-input bg-transparent px-2.5 text-base md:text-sm"
+          value={language}
+          onChange={(event) => {
+            const next = event.target.value;
+            setLanguage(next);
+            window.localStorage.setItem(LANGUAGE_STORAGE_KEY, next);
+          }}
+        >
+          {LANGUAGE_CHOICES.map((code) => (
+            <option key={code} value={code}>
+              {languageLabel(code)}
+            </option>
+          ))}
+        </select>
+        <p className="text-xs text-muted-foreground">
+          Leave Auto-detect on. The photograph chooses English, Japanese, or
+          Chinese. Only lock a language if you want to search that catalogue
+          alone.
+        </p>
+      </div>
 
       <div aria-live="polite" className="sr-only">
         {statusText}
@@ -340,6 +386,7 @@ export function ScannerApp() {
         open={pickerOpen}
         onOpenChange={setPickerOpen}
         onSelect={onCatalogueSelect}
+        language={language}
       />
     </div>
   );
