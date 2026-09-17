@@ -7,6 +7,7 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
+from app.admission import ScanLimiter
 from app.config import get_settings
 from app.db import Databases
 from app.recognition.runtime import Runtime
@@ -14,34 +15,8 @@ from app.routes.cardmarket import router as cardmarket_router
 from app.routes.cards import router as cards_router
 from app.routes.health import router as health_router
 from app.routes.images import router as images_router
+from app.routes.review import router as review_router
 from app.routes.scans import router as scans_router
-
-
-class ScanLimiter:
-    def __init__(self, wait_limit: int) -> None:
-        self._lock = asyncio.Lock()
-        self._busy = False
-        self._waiting = 0
-        self.wait_limit = wait_limit
-
-    async def acquire(self) -> bool:
-        async with self._lock:
-            if not self._busy:
-                self._busy = True
-                return True
-            if self._waiting >= self.wait_limit:
-                return False
-            self._waiting += 1
-        while True:
-            await asyncio.sleep(0.05)
-            async with self._lock:
-                if not self._busy:
-                    self._waiting -= 1
-                    self._busy = True
-                    return True
-
-    def release(self) -> None:
-        self._busy = False
 
 
 @asynccontextmanager
@@ -57,11 +32,13 @@ async def lifespan(app: FastAPI):
     app.state.runtime = runtime
     app.state.scan_limiter = ScanLimiter(settings.scan_wait_limit)
     app.state.executor = ThreadPoolExecutor(max_workers=1, thread_name_prefix="scan")
+    app.state.image_executor = ThreadPoolExecutor(max_workers=2, thread_name_prefix="image")
     app.state.loop = asyncio.get_running_loop()
     try:
         yield
     finally:
         app.state.executor.shutdown(wait=False, cancel_futures=True)
+        app.state.image_executor.shutdown(wait=False, cancel_futures=True)
         dbs.close()
 
 
@@ -84,6 +61,7 @@ app.add_middleware(
 
 app.include_router(health_router, prefix="/api/v1", tags=["health"])
 app.include_router(images_router, prefix="/api/v1", tags=["images"])
+app.include_router(review_router, prefix="/api/v1", tags=["review"])
 app.include_router(scans_router, prefix="/api/v1", tags=["scans"])
 app.include_router(cards_router, prefix="/api/v1", tags=["cards"])
 app.include_router(cardmarket_router, prefix="/api/v1", tags=["cardmarket"])

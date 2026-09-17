@@ -7,7 +7,7 @@ from pathlib import Path
 
 import httpx
 
-from app.cardmarket import fields_from_payload
+from app.cardmarket import mapping_from_payload
 from app.db import connect, init_catalog
 from bootstrap.download import download_file
 from bootstrap.pins import TCGDEX_BASE
@@ -156,16 +156,15 @@ def import_catalogue(data_dir: Path) -> dict:
                 )
                 variants = card.get("variants") or {}
                 has_image = 1 if card.get("_image_path") else 0
-                cardmarket_id, cardmarket_url = fields_from_payload(
-                    card, language=language
-                )
+                mapping = mapping_from_payload(card, language=language)
                 conn.execute(
                     """
                     INSERT INTO cards (
                         id, provider_id, name, set_id, set_name, collector_number,
                         language, category, rarity, illustrator, variants_json,
-                        image_path, has_image, cardmarket_id, cardmarket_url
-                    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                        image_path, has_image, cardmarket_id, cardmarket_url,
+                        cardmarket_verified, cardmarket_provenance, cardmarket_verified_at
+                    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                     """,
                     (
                         card_id,
@@ -181,8 +180,11 @@ def import_catalogue(data_dir: Path) -> dict:
                         json.dumps(variants),
                         card.get("_image_path"),
                         has_image,
-                        cardmarket_id,
-                        cardmarket_url,
+                        mapping.product_id,
+                        mapping.url,
+                        int(mapping.verified),
+                        mapping.provenance,
+                        mapping.verified_at,
                     ),
                 )
                 conn.execute(

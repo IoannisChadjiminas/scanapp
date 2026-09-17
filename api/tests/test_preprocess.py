@@ -1,11 +1,13 @@
 from __future__ import annotations
 
+import json
 from pathlib import Path
 
 import numpy as np
 from PIL import Image
 
 from app.config import Settings
+from app.db import connect, init_catalog
 from app.recognition.artifacts import ArtifactError, load_snapshot
 from app.recognition.preprocess import MODEL_SIZE, prepare_full_card, to_nchw
 
@@ -55,3 +57,35 @@ def test_vector_alignment_rejects_mismatch(tmp_path: Path) -> None:
         raise AssertionError("expected mismatch")
     except ArtifactError as exc:
         assert "does not match" in str(exc)
+
+
+def test_snapshot_rejects_ids_missing_from_catalogue(tmp_path: Path) -> None:
+    embeddings = np.ones((1, 384), dtype=np.float32)
+    embeddings /= np.linalg.norm(embeddings, axis=1, keepdims=True)
+    ids = np.array(["ghost"])
+    vectors = tmp_path / "vectors" / "pad"
+    vectors.mkdir(parents=True)
+    np.save(vectors / "embeddings.npy", embeddings)
+    np.save(vectors / "embedding_card_ids.npy", ids)
+    (vectors / "manifest.json").write_text(
+        json.dumps(
+            {
+                "preprocess_config": "pad",
+                "use_ocr": True,
+                "catalogue_version": "x",
+                "model_revision": "r",
+                "embedding_dim": 384,
+            }
+        )
+    )
+    (tmp_path / "models").mkdir()
+    (tmp_path / "models" / "dinov2_small.onnx").write_bytes(b"not-a-model")
+    conn = connect(tmp_path / "catalog.sqlite")
+    init_catalog(conn)
+    conn.commit()
+    settings = Settings(data_dir=tmp_path, preprocess_config="pad")
+    try:
+        load_snapshot(settings)
+        raise AssertionError("expected catalogue mismatch")
+    except ArtifactError as exc:
+        assert "catalogue" in str(exc).lower()

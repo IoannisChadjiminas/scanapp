@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import asyncio
 import json
 
 from fastapi import APIRouter, Form, HTTPException, Request, Response, UploadFile
@@ -7,7 +8,9 @@ from fastapi import APIRouter, Form, HTTPException, Request, Response, UploadFil
 from app.db import coverage_payload
 from app.recognition.artifacts import ArtifactError
 from app.recognition.images import ImageError
+from app.recognition.captures import apply_feedback
 from app.recognition.pipeline import recognize_bytes
+from app.recognition.upload import read_upload_limited
 from app.schemas import (
     Candidate,
     FeedbackRequest,
@@ -37,6 +40,7 @@ async def create_scan(
     session_id = get_or_create_session(
         request, response, request.app.state.dbs, settings
     )
+    data = await read_upload_limited(image, settings.max_upload_bytes)
     acquired = await limiter.acquire()
     if not acquired:
         raise HTTPException(
@@ -44,11 +48,8 @@ async def create_scan(
             detail="Recognition is busy. Try again shortly.",
             headers={"Retry-After": "3"},
         )
-    data = await image.read()
     try:
-        if len(data) > settings.max_upload_bytes:
-            raise HTTPException(status_code=413, detail="Upload is too large")
-        return await request.app.state.loop.run_in_executor(
+        future = request.app.state.loop.run_in_executor(
             request.app.state.executor,
             lambda: recognize_bytes(
                 data,
@@ -66,12 +67,20 @@ async def create_scan(
                 language=language,
             ),
         )
+        try:
+            return await asyncio.shield(future)
+        except asyncio.CancelledError:
+            try:
+                await asyncio.shield(future)
+            except Exception:
+                pass
+            raise
     except ArtifactError as exc:
         raise HTTPException(status_code=503, detail=str(exc)) from exc
     except ImageError as exc:
         raise HTTPException(status_code=400, detail=str(exc)) from exc
     finally:
-        limiter.release()
+        await limiter.release()
 
 
 @router.post("/scans/{scan_id}/feedback", response_model=FeedbackResponse)
@@ -106,6 +115,16 @@ async def scan_feedback(
         (confirmed, rejected, scan_id),
     )
     dbs.results.commit()
+    try:
+        apply_feedback(
+            settings,
+            scan_id,
+            action=payload.action.value,
+            confirmed_card_id=confirmed,
+            rejected=bool(rejected),
+        )
+    except Exception:  # noqa: BLE001 - review files must never fail feedback
+        pass
     return FeedbackResponse(id=scan_id, action=payload.action, confirmed_card_id=confirmed)
 
 

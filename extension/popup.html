@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Scanapp Cardmarket helper</title>
+    <link rel="stylesheet" href="popup.css" />
+  </head>
+  <body>
+    <header>
+      <h1>Cardmarket helper</h1>
+      <p id="connection">Checking connection…</p>
+    </header>
+    <section>
+      <p><span class="label">Activity</span> <strong id="activity">idle</strong></p>
+      <p><span class="label">Current card</span> <span id="card">None</span></p>
+      <p><span class="label">Queued</span> <span id="queued">0</span></p>
+      <p><span class="label">Last success</span> <span id="success">Never</span></p>
+      <p id="failures" class="muted">No recent failures</p>
+    </section>
+    <div class="actions">
+      <button id="pause" type="button">Pause</button>
+      <button id="check" type="button">Check connection</button>
+      <button id="open-tab" type="button">Open helper tab</button>
+    </div>
+    <form id="settings">
+      <h2>Settings</h2>
+      <label>
+        Scanapp server
+        <select id="server">
+          <option value="http://127.0.0.1:8000">Local development</option>
+          <option value="https://staging-scan.auctaro.com">Staging</option>
+          <option value="custom">Custom…</option>
+        </select>
+      </label>
+      <label id="custom-wrap" hidden>
+        Custom URL
+        <input id="custom-url" type="url" placeholder="https://scan.example.com" />
+      </label>
+      <label>
+        Helper credential
+        <input id="token" type="password" autocomplete="off" />
+      </label>
+      <button type="submit">Save settings</button>
+    </form>
+    <script src="popup.js" type="module"></script>
+  </body>
+</html>

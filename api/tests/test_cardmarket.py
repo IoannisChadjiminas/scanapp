@@ -25,7 +25,7 @@ def test_extract_id_from_pricing() -> None:
         cardmarket_product_url(
             273699, name="Charizard", set_name="Base Set", provider_id="base1-4"
         )
-        == "https://prices.pokemontcg.io/cardmarket/base1-4"
+        is None
     )
 
 
@@ -109,10 +109,12 @@ def test_url_for_row_prefers_stored_product_page(tmp_path: Path) -> None:
         """
         INSERT INTO cards (
             id, provider_id, name, set_id, set_name, collector_number,
-            language, variants_json, has_image, cardmarket_url
+            language, variants_json, has_image, cardmarket_url,
+            cardmarket_verified, cardmarket_provenance, cardmarket_verified_at
         ) VALUES (
             'extra-pikachu-classic-clc008', 'extra-pikachu-classic-clc008',
-            'Pikachu', 'clc', 'Classic', '008/034', 'en', '{}', 1, ?
+            'Pikachu', 'clc', 'Classic', '008/034', 'en', '{}', 1, ?,
+            1, 'manifest-url', '2026-09-17T00:00:00Z'
         )
         """,
         (stored,),
@@ -151,7 +153,8 @@ def test_sync_from_cache_without_reloading_images(tmp_path: Path) -> None:
     row = conn.execute("SELECT * FROM cards").fetchone()
     assert updated == 1
     assert row["cardmarket_id"] == 273699
-    assert url_for_row(row) == "https://prices.pokemontcg.io/cardmarket/base1-4"
+    assert url_for_row(row) is None
+    assert int(row["cardmarket_verified"] or 0) == 0
 
 
 def test_prices_from_market_are_from_trend_and_7day() -> None:
@@ -191,12 +194,12 @@ def test_price_targets_prefer_singles_slug() -> None:
 
 def test_normalize_and_snapshot_roundtrip(tmp_path: Path) -> None:
     from app.cardmarket import (
-        claim_job,
         enqueue_job,
         normalize_product_url,
         save_snapshot,
         snapshot_prices,
     )
+    from app.cardmarket_queue import claim_job
 
     dirty = (
         "https://www.cardmarket.com/en/Pokemon/Products/Singles/"
@@ -208,17 +211,19 @@ def test_normalize_and_snapshot_roundtrip(tmp_path: Path) -> None:
     init_catalog(conn)
     job_id = enqueue_job(conn, dirty, "extra-gengar")
     assert enqueue_job(conn, key, "extra-gengar") == job_id
-    claimed = claim_job(conn)
+    claimed = claim_job(conn, "helper-a")
     assert claimed is not None
     assert claimed["id"] == job_id
-    assert claim_job(conn) is None
+    assert claimed["claim_token"]
+    assert claim_job(conn, "helper-a")["id"] == job_id
+    assert claim_job(conn, "helper-b") is None
     prices = [{"label": "NM", "amount": 449.99, "currency": "EUR"}]
     save_snapshot(conn, dirty, prices)
     assert snapshot_prices(conn, key) == prices
 
 
 def test_job_retries_up_to_three_times(tmp_path: Path) -> None:
-    from app.cardmarket import claim_job, enqueue_job, retry_or_fail_job
+    from app.cardmarket_queue import claim_job, enqueue_job, retry_or_fail_job
 
     conn = connect(tmp_path / "catalog.sqlite")
     init_catalog(conn)
@@ -227,19 +232,40 @@ def test_job_retries_up_to_three_times(tmp_path: Path) -> None:
         "https://www.cardmarket.com/en/Pokemon/Products/Singles/Tag-Bolt/Gengar-Mimikyu-GX-V2-sm9102",
         "extra-gengar",
     )
+    helper = "helper-a"
     for _ in range(2):
-        claimed = claim_job(conn)
+        claimed = claim_job(conn, helper)
         assert claimed is not None
         assert claimed["id"] == job_id
-        assert retry_or_fail_job(conn, job_id) == "pending"
-    claimed = claim_job(conn)
+        assert retry_or_fail_job(
+            conn,
+            job_id,
+            helper_id=helper,
+            claim_token=claimed["claim_token"],
+            reason="network",
+        ) == "pending"
+        conn.execute(
+            "UPDATE cardmarket_jobs SET next_attempt_at = '2020-01-01T00:00:00Z' WHERE id = ?",
+            (job_id,),
+        )
+        conn.commit()
+    claimed = claim_job(conn, helper)
     assert claimed is not None
-    assert retry_or_fail_job(conn, job_id) == "failed"
-    assert claim_job(conn) is None
+    assert (
+        retry_or_fail_job(
+            conn,
+            job_id,
+            helper_id=helper,
+            claim_token=claimed["claim_token"],
+            reason="network",
+        )
+        == "failed"
+    )
+    assert claim_job(conn, helper) is None
 
 
 def test_stale_claim_does_not_burn_retries(tmp_path: Path) -> None:
-    from app.cardmarket import claim_job, enqueue_job
+    from app.cardmarket_queue import claim_job, enqueue_job
 
     conn = connect(tmp_path / "catalog.sqlite")
     init_catalog(conn)
@@ -248,31 +274,33 @@ def test_stale_claim_does_not_burn_retries(tmp_path: Path) -> None:
         "https://www.cardmarket.com/en/Pokemon/Products/Singles/Tag-Bolt/Gengar-Mimikyu-GX-V2-sm9102",
         "extra-gengar",
     )
-    first = claim_job(conn)
+    first = claim_job(conn, "helper-a")
     assert first is not None
     conn.execute(
-        "UPDATE cardmarket_jobs SET updated_at = '2020-01-01T00:00:00Z' WHERE id = ?",
+        "UPDATE cardmarket_jobs SET claim_expires_at = '2020-01-01T00:00:00Z' WHERE id = ?",
         (job_id,),
     )
     conn.commit()
-    again = claim_job(conn)
+    again = claim_job(conn, "helper-b")
     assert again is not None
     assert again["id"] == job_id
     row = conn.execute(
-        "SELECT status, attempts FROM cardmarket_jobs WHERE id = ?", (job_id,)
+        "SELECT status, attempts, helper_id FROM cardmarket_jobs WHERE id = ?", (job_id,)
     ).fetchone()
     assert row is not None
     assert row["status"] == "claimed"
     assert int(row["attempts"] or 0) == 0
+    assert row["helper_id"] == "helper-b"
 
 
 def test_helper_online_after_ping(tmp_path: Path) -> None:
-    from app.cardmarket import helper_is_online, touch_helper
+    from app.cardmarket_queue import helper_is_online, issue_helper_credential, update_helper_status
 
     conn = connect(tmp_path / "catalog.sqlite")
     init_catalog(conn)
     assert helper_is_online(conn) is False
-    touch_helper(conn)
+    helper_id, _token = issue_helper_credential(conn)
+    update_helper_status(conn, helper_id, ready=True)
     assert helper_is_online(conn) is True
 
 

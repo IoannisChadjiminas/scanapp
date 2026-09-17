@@ -5,7 +5,7 @@ import os
 import shutil
 from pathlib import Path
 
-from app.cardmarket import url_from_manifest_card
+from app.cardmarket import mapping_from_manifest
 from app.db import connect, coverage, coverage_by_language, init_catalog
 
 
@@ -42,14 +42,15 @@ def import_extra_cards(data_dir: Path) -> int:
         shutil.copy2(src, dest)
         card_id = str(card["id"])
         language = card.get("language") or "en"
-        cardmarket_id, cardmarket_url = url_from_manifest_card(card)
+        mapping = mapping_from_manifest(card)
         conn.execute(
             """
             INSERT INTO cards (
                 id, provider_id, name, set_id, set_name, collector_number,
                 language, category, rarity, illustrator, variants_json,
-                image_path, has_image, cardmarket_id, cardmarket_url
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, '{}', ?, 1, ?, ?)
+                image_path, has_image, cardmarket_id, cardmarket_url,
+                cardmarket_verified, cardmarket_provenance, cardmarket_verified_at
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, '{}', ?, 1, ?, ?, ?, ?, ?)
             ON CONFLICT(id) DO UPDATE SET
                 provider_id = excluded.provider_id,
                 name = excluded.name,
@@ -62,7 +63,10 @@ def import_extra_cards(data_dir: Path) -> int:
                 image_path = excluded.image_path,
                 has_image = 1,
                 cardmarket_id = excluded.cardmarket_id,
-                cardmarket_url = excluded.cardmarket_url
+                cardmarket_url = excluded.cardmarket_url,
+                cardmarket_verified = excluded.cardmarket_verified,
+                cardmarket_provenance = excluded.cardmarket_provenance,
+                cardmarket_verified_at = excluded.cardmarket_verified_at
             """,
             (
                 card_id,
@@ -76,8 +80,11 @@ def import_extra_cards(data_dir: Path) -> int:
                 card.get("rarity"),
                 card.get("illustrator"),
                 str(dest),
-                cardmarket_id,
-                cardmarket_url,
+                mapping.product_id,
+                mapping.url,
+                int(mapping.verified),
+                mapping.provenance,
+                mapping.verified_at,
             ),
         )
         conn.execute("DELETE FROM cards_fts WHERE id = ?", (card_id,))

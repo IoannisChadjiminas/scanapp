@@ -16,8 +16,11 @@ services:
       MAX_IMAGE_PIXELS: ${MAX_IMAGE_PIXELS:-12000000}
       MAX_UPLOAD_BYTES: ${MAX_UPLOAD_BYTES:-12582912}
       SCAN_WAIT_LIMIT: ${SCAN_WAIT_LIMIT:-2}
+      STORE_CAPTURES: ${STORE_CAPTURES:-true}
+      REVIEW_TOKEN: ${REVIEW_TOKEN:-}
     volumes:
       - scanapp-data:/data
+      - ./datasets/review:/data/review
       - scanapp-tmp:/tmp/scanapp
     expose:
       - "8000"

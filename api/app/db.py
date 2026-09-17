@@ -51,6 +51,25 @@ def init_catalog(conn: sqlite3.Connection) -> None:
         conn.execute("ALTER TABLE cards ADD COLUMN cardmarket_id INTEGER")
     if "cardmarket_url" not in columns:
         conn.execute("ALTER TABLE cards ADD COLUMN cardmarket_url TEXT")
+    _add_columns(
+        conn,
+        "cards",
+        {
+            "cardmarket_verified": "INTEGER NOT NULL DEFAULT 0",
+            "cardmarket_provenance": "TEXT",
+            "cardmarket_verified_at": "TEXT",
+        },
+    )
+    conn.execute(
+        """
+        UPDATE cards
+        SET cardmarket_verified = 1,
+            cardmarket_provenance = COALESCE(cardmarket_provenance, 'legacy-singles'),
+            cardmarket_verified_at = COALESCE(cardmarket_verified_at, '1970-01-01T00:00:00Z')
+        WHERE cardmarket_verified = 0
+          AND cardmarket_url LIKE '%cardmarket.com%/Products/Singles/%'
+        """
+    )
     conn.executescript(
         """
         CREATE TABLE IF NOT EXISTS cardmarket_snapshots (
@@ -72,14 +91,69 @@ def init_catalog(conn: sqlite3.Connection) -> None:
             id INTEGER PRIMARY KEY CHECK (id = 1),
             last_seen TEXT NOT NULL
         );
+        CREATE TABLE IF NOT EXISTS cardmarket_helper_tokens (
+            helper_id TEXT PRIMARY KEY,
+            token_hash TEXT NOT NULL,
+            created_at TEXT NOT NULL,
+            revoked_at TEXT
+        );
+        CREATE TABLE IF NOT EXISTS cardmarket_helpers (
+            helper_id TEXT PRIMARY KEY,
+            last_seen TEXT NOT NULL,
+            ready INTEGER NOT NULL DEFAULT 0,
+            paused INTEGER NOT NULL DEFAULT 0,
+            attention TEXT,
+            last_success_at TEXT,
+            last_failure_at TEXT,
+            last_failure_reason TEXT,
+            current_job_id TEXT
+        );
         """
     )
-    job_columns = {row[1] for row in conn.execute("PRAGMA table_info(cardmarket_jobs)")}
-    if "attempts" not in job_columns:
-        conn.execute(
-            "ALTER TABLE cardmarket_jobs ADD COLUMN attempts INTEGER NOT NULL DEFAULT 0"
-        )
+    _add_columns(
+        conn,
+        "cardmarket_jobs",
+        {
+            "attempts": "INTEGER NOT NULL DEFAULT 0",
+            "helper_id": "TEXT",
+            "claim_token": "TEXT",
+            "claim_expires_at": "TEXT",
+            "next_attempt_at": "TEXT",
+            "failure_reason": "TEXT",
+            "filters_json": "TEXT NOT NULL DEFAULT '{}'",
+            "product_identity": "TEXT",
+            "submission_id": "TEXT",
+            "observed_at": "TEXT",
+        },
+    )
+    _add_columns(
+        conn,
+        "cardmarket_snapshots",
+        {
+            "observed_at": "TEXT",
+            "parser_version": "TEXT",
+            "sampled_offer_count": "INTEGER",
+            "submission_id": "TEXT",
+        },
+    )
+    conn.executescript(
+        """
+        CREATE INDEX IF NOT EXISTS idx_cardmarket_jobs_claim
+            ON cardmarket_jobs(claim_token);
+        CREATE INDEX IF NOT EXISTS idx_cardmarket_jobs_helper
+            ON cardmarket_jobs(helper_id, status);
+        CREATE INDEX IF NOT EXISTS idx_cardmarket_jobs_retry
+            ON cardmarket_jobs(status, next_attempt_at, created_at);
+        """
+    )
     conn.commit()
+
+
+def _add_columns(conn: sqlite3.Connection, table: str, columns: dict[str, str]) -> None:
+    existing = {row[1] for row in conn.execute(f"PRAGMA table_info({table})")}
+    for name, ddl in columns.items():
+        if name not in existing:
+            conn.execute(f"ALTER TABLE {table} ADD COLUMN {name} {ddl}")
 
 
 def init_results(conn: sqlite3.Connection) -> None:

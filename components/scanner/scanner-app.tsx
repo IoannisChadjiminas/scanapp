@@ -13,7 +13,7 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { api } from "@/lib/api";
+import { api, queueCardmarketLookup } from "@/lib/api";
 import type { CardSummary, HealthResponse, ScanResponse, SessionResult } from "@/lib/api-types";
 import { LANGUAGE_CHOICES, languageLabel } from "@/lib/languages";
 
@@ -163,8 +163,14 @@ export function ScannerApp() {
           ? result.message ?? "Please retake the photograph."
           : result.status === "matched"
             ? "Most likely card is ready."
-            : "Not a match.",
+            : result.status === "uncertain"
+              ? "More than one print could match. Choose the correct card."
+              : "Not a match.",
       );
+      if (result.status === "matched") {
+        const top = result.suggestions[0];
+        queueCardmarketLookup(top?.cardmarket_url, top?.card_id);
+      }
       await refreshResults();
     } catch (cause) {
       if (cause instanceof DOMException && cause.name === "AbortError") {
@@ -182,6 +188,11 @@ export function ScannerApp() {
     }
     try {
       await api.feedback(scan.id, action, cardId);
+      if (action !== "reject") {
+        const selected =
+          scan.suggestions.find((item) => item.card_id === cardId) ?? scan.suggestions[0];
+        queueCardmarketLookup(selected?.cardmarket_url, cardId || selected?.card_id);
+      }
       await refreshResults();
       setStatusText(
         action === "reject" ? "Suggestions rejected." : "Correction saved for this session.",
@@ -219,6 +230,7 @@ export function ScannerApp() {
 
   function onCatalogueSelect(card: CardSummary) {
     setPickerOpen(false);
+    queueCardmarketLookup(card.cardmarket_url, card.id);
     void sendFeedback("correct", card.id);
   }
 

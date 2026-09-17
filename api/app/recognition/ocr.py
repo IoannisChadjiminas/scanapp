@@ -9,10 +9,26 @@ from PIL import Image
 
 
 @dataclass
+class OcrHit:
+    text: str
+    confidence: float | None = None
+    region: str = "unknown"
+
+    @property
+    def reliable(self) -> bool:
+        if self.region != "collector":
+            return False
+        if self.confidence is None:
+            return True
+        return self.confidence >= 0.55
+
+
+@dataclass
 class OcrResult:
     name_text: str | None = None
     collector_text: str | None = None
     lines: list[str] = field(default_factory=list)
+    hits: list[OcrHit] = field(default_factory=list)
     failed: bool = False
 
 
@@ -102,38 +118,68 @@ class CardOcr:
             }
         )
 
-    def _run(self, image: Image.Image) -> list[str]:
+    def _run(self, image: Image.Image) -> tuple[list[str], list[float | None]]:
         array = np.asarray(image.convert("RGB"))
         output = self.engine(array)
         texts: list[str] = []
+        scores: list[float | None] = []
         if output is None:
-            return texts
+            return texts, scores
         txts = getattr(output, "txts", None)
+        raw_scores = getattr(output, "scores", None)
         if txts:
             texts.extend(str(item) for item in txts if item)
-            return texts
+            if raw_scores:
+                scores.extend(
+                    float(score) if score is not None else None for score in list(raw_scores)[: len(texts)]
+                )
+            while len(scores) < len(texts):
+                scores.append(None)
+            return texts, scores
         if isinstance(output, (list, tuple)):
             for item in output:
                 if item is None:
                     continue
                 if isinstance(item, (list, tuple)) and len(item) >= 2:
                     texts.append(str(item[1]))
+                    score = item[2] if len(item) >= 3 else None
+                    try:
+                        scores.append(float(score) if score is not None else None)
+                    except (TypeError, ValueError):
+                        scores.append(None)
                 elif isinstance(item, str):
                     texts.append(item)
-        return texts
+                    scores.append(None)
+        return texts, scores
 
     def read(self, image: Image.Image) -> OcrResult:
         try:
-            name_lines = self._run(_region(image, 0.0, 0.22))
-            number_lines = self._run(_region(image, 0.82, 1.0))
-            extra = []
+            name_lines, name_scores = self._run(_region(image, 0.0, 0.22))
+            number_lines, number_scores = self._run(_region(image, 0.82, 1.0))
+            extra_lines: list[str] = []
+            extra_scores: list[float | None] = []
             if not name_lines and not number_lines:
-                extra = self._run(image)
-            lines = [*name_lines, *number_lines, *extra]
+                extra_lines, extra_scores = self._run(image)
+            lines = [*name_lines, *number_lines, *extra_lines]
+            hits = [
+                *[
+                    OcrHit(text=text, confidence=score, region="name")
+                    for text, score in zip(name_lines, name_scores, strict=False)
+                ],
+                *[
+                    OcrHit(text=text, confidence=score, region="collector")
+                    for text, score in zip(number_lines, number_scores, strict=False)
+                ],
+                *[
+                    OcrHit(text=text, confidence=score, region="full")
+                    for text, score in zip(extra_lines, extra_scores, strict=False)
+                ],
+            ]
             return OcrResult(
                 name_text=pick_name_line(name_lines) or pick_name_line(lines),
                 collector_text=pick_collector_text(number_lines),
                 lines=lines,
+                hits=hits,
                 failed=False,
             )
         except Exception:  # noqa: BLE001 - OCR must never block retrieval

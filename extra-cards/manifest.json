@@ -65,10 +65,11 @@
       "name": "Pikachu",
       "set_id": "mcd22",
       "set_name": "McDonald's Collection 2022",
-      "collector_number": "008/015",
+      "collector_number": "007/015",
       "language": "en",
       "category": "Pokemon",
       "rarity": "Promo",
+      "cardmarket_url": "https://prices.pokemontcg.io/cardmarket/mcd22-7",
       "file": "pikachu-mcdonalds-2022.jpg"
     },
     {

@@ -52,6 +52,6 @@ venv/
 
 # local recognition artifacts
 /data/
-/datasets/
+/datasets/review/
 playwright-report/
 test-results/

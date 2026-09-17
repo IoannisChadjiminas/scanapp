@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from app.recognition.ocr import pick_collector_text, pick_name_line
+from app.recognition.ocr import OcrHit, pick_collector_text, pick_name_line
 from app.recognition.rank import decide_status, name_match, number_match, rerank
 
 
@@ -59,7 +59,7 @@ def test_matched_when_visual_and_gap_pass() -> None:
         min_gap=0.04,
         retake=False,
     )
-    assert status == "matched"
+    assert status == "uncertain"
 
 
 def test_no_match_when_visual_is_low() -> None:
@@ -159,11 +159,13 @@ def test_ocr_fraction_distinguishes_reprints() -> None:
     assert number_match(["008/034", "008034"], "008/015") is False
     assert number_match(["008"], "008/015") is True
     assert number_match(["008"], "008/034") is True
+    assert number_match(["008"], "007/015") is False
+    assert number_match(["008/034"], "007/015") is False
 
 
 def test_reprint_with_matching_fraction_is_matched() -> None:
     visual = [
-        _card("mcd", "Pikachu", "008/015", 0.9997),
+        _card("mcd", "Pikachu", "007/015", 0.9997),
         _card("clc", "Pikachu", "008/034", 0.9989),
         _card("base", "Pikachu", "58", 0.84),
     ]
@@ -194,3 +196,86 @@ def test_pick_name_skips_japanese_stage_label() -> None:
 
 def test_japanese_ocr_name_does_not_match_english_card() -> None:
     assert not name_match("ゲンガー&ミミッキュGX", "Gengar & Mimikyu GX")
+
+
+def test_collector_prefix_is_required() -> None:
+    assert number_match(["TG01"], "GG01") is False
+    assert number_match(["TG01"], "TG01") is True
+
+
+def test_collector_number_is_not_a_prefix_of_another() -> None:
+    assert number_match(["1030"], "103") is False
+    assert number_match(["103"], "1030") is False
+    assert number_match(["103"], "103") is True
+
+
+def test_enable_matched_false_never_returns_matched() -> None:
+    suggestions = [
+        _card("a", "Pikachu", "25", 0.95),
+        _card("b", "Raichu", "26", 0.50),
+    ]
+    assert (
+        decide_status(
+            suggestions,
+            enable_matched=False,
+            min_visual=0.78,
+            min_gap=0.04,
+            retake=False,
+        )
+        == "uncertain"
+    )
+
+
+def test_language_gap_uses_all_candidates() -> None:
+    suggestions = [
+        _card("en-zard", "Charizard", "4", 0.90, "en"),
+        _card("ja-zard", "リザードン", "006", 0.89, "ja"),
+    ]
+    assert (
+        decide_status(
+            suggestions,
+            enable_matched=True,
+            min_visual=0.78,
+            min_gap=0.04,
+            retake=False,
+        )
+        == "no_match"
+    )
+
+
+def test_reliable_collector_conflict_is_uncertain() -> None:
+    visual = [
+        _card("gengar", "Gengar & Mimikyu GX", "103/095", 0.918, "ja"),
+        _card("crobat", "Crobat V", "182", 0.90, "en"),
+    ]
+    hits = [OcrHit(text="182", confidence=0.92, region="collector")]
+    ranked = rerank(visual, "Crobat V", hits, ocr_failed=False, detected_languages=("ja",))
+    assert ranked[0]["card_id"] == "crobat"
+    assert ranked[1].get("collector_conflict") is True
+    status = decide_status(
+        ranked,
+        enable_matched=True,
+        min_visual=0.78,
+        min_gap=0.04,
+        retake=False,
+    )
+    assert status == "uncertain"
+
+
+def test_finish_twins_are_uncertain() -> None:
+    suggestions = [
+        _card("holo", "Pikachu", "25", 0.91),
+        _card("nonholo", "Pikachu", "25", 0.905),
+    ]
+    suggestions[0]["set_name"] = "Base"
+    suggestions[1]["set_name"] = "Base"
+    assert (
+        decide_status(
+            suggestions,
+            enable_matched=True,
+            min_visual=0.78,
+            min_gap=0.04,
+            retake=False,
+        )
+        == "uncertain"
+    )
