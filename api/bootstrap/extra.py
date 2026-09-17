@@ -5,6 +5,10 @@ import os
 import shutil
 from pathlib import Path
 
+from app.cardmarket import (
+    cardmarket_product_url,
+    parse_product_id,
+)
 from app.db import connect, coverage, coverage_by_language, init_catalog
 
 
@@ -40,13 +44,27 @@ def import_extra_cards(data_dir: Path) -> int:
         dest = images_dir / f"{card['id']}{src.suffix.lower()}"
         shutil.copy2(src, dest)
         card_id = str(card["id"])
+        language = card.get("language") or "en"
+        cardmarket_id = parse_product_id(card.get("cardmarket_id"))
+        raw_url = card.get("cardmarket_url")
+        cardmarket_url = (
+            raw_url.strip()
+            if isinstance(raw_url, str) and raw_url.strip()
+            else cardmarket_product_url(
+                cardmarket_id,
+                provider_id=card_id,
+                name=card.get("name") or "",
+                set_name=card.get("set_name") or "",
+                language=language,
+            )
+        )
         conn.execute(
             """
             INSERT INTO cards (
                 id, provider_id, name, set_id, set_name, collector_number,
                 language, category, rarity, illustrator, variants_json,
-                image_path, has_image
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, '{}', ?, 1)
+                image_path, has_image, cardmarket_id, cardmarket_url
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, '{}', ?, 1, ?, ?)
             ON CONFLICT(id) DO UPDATE SET
                 provider_id = excluded.provider_id,
                 name = excluded.name,
@@ -57,7 +75,9 @@ def import_extra_cards(data_dir: Path) -> int:
                 category = excluded.category,
                 rarity = excluded.rarity,
                 image_path = excluded.image_path,
-                has_image = 1
+                has_image = 1,
+                cardmarket_id = excluded.cardmarket_id,
+                cardmarket_url = excluded.cardmarket_url
             """,
             (
                 card_id,
@@ -66,11 +86,13 @@ def import_extra_cards(data_dir: Path) -> int:
                 card.get("set_id") or "extra",
                 card.get("set_name") or "Extra",
                 str(card.get("collector_number") or ""),
-                card.get("language") or "en",
+                language,
                 card.get("category"),
                 card.get("rarity"),
                 card.get("illustrator"),
                 str(dest),
+                cardmarket_id,
+                cardmarket_url,
             ),
         )
         conn.execute("DELETE FROM cards_fts WHERE id = ?", (card_id,))

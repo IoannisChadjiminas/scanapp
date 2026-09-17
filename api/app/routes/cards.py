@@ -7,6 +7,7 @@ from pathlib import Path
 from fastapi import APIRouter, HTTPException, Query, Request
 from fastapi.responses import FileResponse
 
+from app.cardmarket import url_for_row
 from app.recognition.language import expand_language
 from app.schemas import CardSearchResponse, CardSummary
 
@@ -30,6 +31,7 @@ def _summary(row) -> CardSummary:  # noqa: ANN001
         has_image=bool(row["has_image"]),
         image_url=_image_url(row["id"], bool(row["has_image"])),
         variants=json.loads(row["variants_json"] or "{}"),
+        cardmarket_url=url_for_row(row),
     )
 
 

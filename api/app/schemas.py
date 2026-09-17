@@ -31,6 +31,7 @@ class Candidate(BaseModel):
     combined_score: float
     ocr_consistent: bool | None = None
     language: str = ""
+    cardmarket_url: str | None = None
 
 
 class OcrEvidence(BaseModel):
@@ -107,6 +108,7 @@ class CardSummary(BaseModel):
     has_image: bool
     image_url: str | None = None
     variants: dict[str, Any] = Field(default_factory=dict)
+    cardmarket_url: str | None = None
 
 
 class CardSearchResponse(BaseModel):

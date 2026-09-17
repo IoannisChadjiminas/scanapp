@@ -37,3 +37,11 @@ def test_import_extra_cards(tmp_path: Path, monkeypatch) -> None:
     coverage = json.loads((data_dir / "catalogue-version.json").read_text())
     assert coverage["extra_cards"] == 1
     assert coverage["catalogue_version"].endswith("+extra1")
+    from app.db import connect
+
+    row = connect(data_dir / "catalog.sqlite").execute(
+        "SELECT cardmarket_url FROM cards WHERE id = 'extra-demo'"
+    ).fetchone()
+    assert row is not None
+    assert "cardmarket.com" in row["cardmarket_url"]
+    assert "/Products/Singles/" in row["cardmarket_url"]

@@ -33,7 +33,9 @@ def init_catalog(conn: sqlite3.Connection) -> None:
             illustrator TEXT,
             variants_json TEXT NOT NULL DEFAULT '{}',
             image_path TEXT,
-            has_image INTEGER NOT NULL DEFAULT 0
+            has_image INTEGER NOT NULL DEFAULT 0,
+            cardmarket_id INTEGER,
+            cardmarket_url TEXT
         );
         CREATE INDEX IF NOT EXISTS idx_cards_name ON cards(name);
         CREATE INDEX IF NOT EXISTS idx_cards_set ON cards(set_id);
@@ -44,6 +46,11 @@ def init_catalog(conn: sqlite3.Connection) -> None:
         );
         """
     )
+    columns = {row[1] for row in conn.execute("PRAGMA table_info(cards)")}
+    if "cardmarket_id" not in columns:
+        conn.execute("ALTER TABLE cards ADD COLUMN cardmarket_id INTEGER")
+    if "cardmarket_url" not in columns:
+        conn.execute("ALTER TABLE cards ADD COLUMN cardmarket_url TEXT")
     conn.commit()
 
 
@@ -135,6 +142,9 @@ class Databases:
         self.results = connect(settings.results_sqlite)
         init_catalog(self.catalog)
         init_results(self.results)
+        from app.cardmarket import sync_cardmarket_links
+
+        sync_cardmarket_links(settings.data_dir, self.catalog)
 
     def close(self) -> None:
         self.catalog.close()

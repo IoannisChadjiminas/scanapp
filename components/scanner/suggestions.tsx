@@ -1,7 +1,10 @@
 "use client";
 
+import { ExternalLink } from "lucide-react";
+
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
+import { Button, buttonVariants } from "@/components/ui/button";
+import { cn } from "cn";
 import {
   Card,
   CardContent,
@@ -86,7 +89,21 @@ export function Suggestions({
               className="mx-auto max-h-72 w-auto rounded-md"
             />
           </CardContent>
-          <CardFooter className="flex flex-col gap-3 sm:flex-row sm:justify-end">
+          <CardFooter className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:justify-end">
+            {top.cardmarket_url ? (
+              <a
+                href={top.cardmarket_url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className={cn(
+                  buttonVariants({ variant: "outline" }),
+                  "h-11 min-h-11 w-full gap-2 sm:w-auto",
+                )}
+              >
+                Open on Cardmarket
+                <ExternalLink />
+              </a>
+            ) : null}
             <Button
               type="button"
               variant="outline"
@@ -128,6 +145,16 @@ export function Suggestions({
                 {top.name} · {top.set_name} #{top.collector_number}
                 {top.language ? ` · ${languageLabel(top.language)}` : ""}
               </p>
+              {top.cardmarket_url ? (
+                <a
+                  href={top.cardmarket_url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-sm underline-offset-4 hover:underline"
+                >
+                  Open on Cardmarket
+                </a>
+              ) : null}
             </EmptyContent>
           ) : null}
         </Empty>

@@ -18,6 +18,8 @@ import {
   SheetHeader,
   SheetTitle,
 } from "@/components/ui/sheet";
+import { ExternalLink } from "lucide-react";
+
 import { useMediaQuery } from "@/hooks/use-media-query";
 import { api, assetUrl } from "@/lib/api";
 import type { CardSummary } from "@/lib/api-types";
@@ -79,10 +81,10 @@ function SearchBody({
       {error ? <p className="text-sm text-destructive">{error}</p> : null}
       <ul className="grid max-h-[50vh] gap-2 overflow-y-auto">
         {items.map((card) => (
-          <li key={card.id}>
+          <li key={card.id} className="flex items-stretch gap-2">
             <button
               type="button"
-              className="flex min-h-11 w-full items-center gap-3 rounded-lg border px-3 py-2 text-left hover:bg-muted"
+              className="flex min-h-11 min-w-0 flex-1 items-center gap-3 rounded-lg border px-3 py-2 text-left hover:bg-muted"
               onClick={() => onSelect(card)}
             >
               {card.image_url ? (
@@ -101,6 +103,17 @@ function SearchBody({
                 </span>
               </span>
             </button>
+            {card.cardmarket_url ? (
+              <a
+                href={card.cardmarket_url}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label={`Open ${card.name} on Cardmarket`}
+                className="inline-flex min-h-11 min-w-11 items-center justify-center rounded-lg border px-2 text-muted-foreground hover:bg-muted hover:text-foreground"
+              >
+                <ExternalLink className="size-4" />
+              </a>
+            ) : null}
           </li>
         ))}
       </ul>

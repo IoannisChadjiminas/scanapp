@@ -10,6 +10,7 @@ export type Candidate = {
   combined_score: number;
   ocr_consistent: boolean | null;
   language?: string;
+  cardmarket_url?: string | null;
 };
 
 export type Coverage = {
@@ -67,6 +68,7 @@ export type CardSummary = {
   has_image: boolean;
   image_url: string | null;
   variants: Record<string, unknown>;
+  cardmarket_url?: string | null;
 };
 
 export type SessionResult = {

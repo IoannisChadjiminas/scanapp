@@ -10,6 +10,7 @@ from typing import Any
 import numpy as np
 
 from app.config import Settings
+from app.cardmarket import url_for_row
 from app.db import coverage_payload
 from app.recognition.detect import detect_and_rectify
 from app.recognition.embed import top_k
@@ -122,6 +123,7 @@ def recognize_bytes(
                 "combined_score": float(score),
                 "ocr_consistent": None,
                 "language": str(row["language"] or ""),
+                "cardmarket_url": url_for_row(row),
             }
         )
 

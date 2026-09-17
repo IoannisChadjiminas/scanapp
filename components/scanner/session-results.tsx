@@ -72,6 +72,16 @@ export function SessionResults({ results, onExport }: SessionResultsProps) {
             <p className="text-muted-foreground">
               {row.timings_ms.total_ms ? `${Math.round(row.timings_ms.total_ms)} ms` : "—"}
             </p>
+            {row.suggestions[0]?.cardmarket_url ? (
+              <a
+                href={row.suggestions[0].cardmarket_url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-sm underline-offset-4 hover:underline"
+              >
+                Cardmarket
+              </a>
+            ) : null}
           </div>
         ))}
       </div>
@@ -91,7 +101,22 @@ export function SessionResults({ results, onExport }: SessionResultsProps) {
               <TableRow key={row.scan_id}>
                 <TableCell>{new Date(row.created_at).toLocaleString()}</TableCell>
                 <TableCell>{row.status}</TableCell>
-                <TableCell>{row.suggestions[0]?.name ?? "—"}</TableCell>
+                <TableCell>
+                  {row.suggestions[0]?.name ?? "—"}
+                  {row.suggestions[0]?.cardmarket_url ? (
+                    <>
+                      {" "}
+                      <a
+                        href={row.suggestions[0].cardmarket_url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="underline-offset-4 hover:underline"
+                      >
+                        Cardmarket
+                      </a>
+                    </>
+                  ) : null}
+                </TableCell>
                 <TableCell>{outcome(row)}</TableCell>
                 <TableCell>
                   {row.timings_ms.total_ms ? `${Math.round(row.timings_ms.total_ms)} ms` : "—"}
