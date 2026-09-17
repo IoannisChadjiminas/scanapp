@@ -25,7 +25,7 @@ def test_extract_id_from_pricing() -> None:
         cardmarket_product_url(
             273699, name="Charizard", set_name="Base Set", provider_id="base1-4"
         )
-        == "https://prices.pokemontcg.io/cardmarket/base1-4"
+        is None
     )
 
 
@@ -109,10 +109,12 @@ def test_url_for_row_prefers_stored_product_page(tmp_path: Path) -> None:
         """
         INSERT INTO cards (
             id, provider_id, name, set_id, set_name, collector_number,
-            language, variants_json, has_image, cardmarket_url
+            language, variants_json, has_image, cardmarket_url,
+            cardmarket_verified, cardmarket_provenance, cardmarket_verified_at
         ) VALUES (
             'extra-pikachu-classic-clc008', 'extra-pikachu-classic-clc008',
-            'Pikachu', 'clc', 'Classic', '008/034', 'en', '{}', 1, ?
+            'Pikachu', 'clc', 'Classic', '008/034', 'en', '{}', 1, ?,
+            1, 'manifest-url', '2026-09-17T00:00:00Z'
         )
         """,
         (stored,),
@@ -151,7 +153,8 @@ def test_sync_from_cache_without_reloading_images(tmp_path: Path) -> None:
     row = conn.execute("SELECT * FROM cards").fetchone()
     assert updated == 1
     assert row["cardmarket_id"] == 273699
-    assert url_for_row(row) == "https://prices.pokemontcg.io/cardmarket/base1-4"
+    assert url_for_row(row) is None
+    assert int(row["cardmarket_verified"] or 0) == 0
 
 
 def test_prices_from_market_are_from_trend_and_7day() -> None:

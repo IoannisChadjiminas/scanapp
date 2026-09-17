@@ -163,7 +163,9 @@ export function ScannerApp() {
           ? result.message ?? "Please retake the photograph."
           : result.status === "matched"
             ? "Most likely card is ready."
-            : "Not a match.",
+            : result.status === "uncertain"
+              ? "More than one print could match. Choose the correct card."
+              : "Not a match.",
       );
       if (result.status === "matched") {
         const top = result.suggestions[0];

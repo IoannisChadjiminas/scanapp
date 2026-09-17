@@ -6,15 +6,11 @@ import re
 import sqlite3
 import time
 import unicodedata
+from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
 from urllib.parse import quote_plus, urlparse, urlunparse
 
-import httpx
-
-TCGDEX_BASE = "https://api.tcgdex.net/v2"
-_PRICE_TTL_SECONDS = 600.0
-_price_cache: dict[str, tuple[float, list[dict[str, Any]]]] = {}
 _PRODUCT_SLUG_RE = re.compile(r"/Products/Singles/[^/]+/([^/?#]+)", re.I)
 _SLUG_CODE_RE = re.compile(r"-([A-Za-z]+)(\d+)$")
 
@@ -78,6 +74,31 @@ def cardmarket_singles_url(
     )
 
 
+def is_verified_singles_url(url: str | None) -> bool:
+    raw = (url or "").strip()
+    if not raw.startswith("https://"):
+        return False
+    host = urlparse(raw).netloc.lower()
+    path = urlparse(raw).path
+    if host not in {"www.cardmarket.com", "cardmarket.com"}:
+        return False
+    return "/Products/Singles/" in path and path.rstrip("/").count("/") >= 5
+
+
+@dataclass(frozen=True)
+class CardmarketMapping:
+    product_id: int | None
+    url: str | None
+    verified: bool
+    provenance: str
+    verified_at: str | None = None
+
+    def public_url(self) -> str | None:
+        if self.verified and self.url:
+            return self.url
+        return None
+
+
 def cardmarket_product_url(
     product_id: object = None,
     *,
@@ -89,12 +110,7 @@ def cardmarket_product_url(
     set_code: str | None = None,
     collector_number: str | None = None,
 ) -> str | None:
-    del product_id
-    pid = str(provider_id or "").split(":")[-1]
-    lang = (language or "en").lower()
-    # One official English catalogue id maps to one Cardmarket product via pokemontcg.io.
-    if pid and not pid.startswith("extra-") and lang == "en":
-        return f"https://prices.pokemontcg.io/cardmarket/{pid}"
+    del product_id, provider_id
     return cardmarket_singles_url(
         name=name or "",
         expansion=expansion or set_name or "",
@@ -104,21 +120,103 @@ def cardmarket_product_url(
     )
 
 
-def url_from_manifest_card(card: dict[str, Any]) -> tuple[int | None, str | None]:
-    """1-to-1 extra image → Cardmarket URL. Explicit URL wins; else expansion+set code."""
+def mapping_from_payload(
+    payload: dict[str, Any], *, language: str | None = "en"
+) -> CardmarketMapping:
+    product_id = extract_cardmarket_id(payload)
+    pricing = payload.get("pricing") if isinstance(payload, dict) else None
+    if isinstance(pricing, dict):
+        market = pricing.get("cardmarket")
+        if isinstance(market, dict) and isinstance(market.get("url"), str):
+            candidate = market["url"].strip()
+            if is_verified_singles_url(candidate):
+                return CardmarketMapping(
+                    product_id=product_id,
+                    url=candidate,
+                    verified=True,
+                    provenance="tcgdex-singles-url",
+                    verified_at=datetime_now(),
+                )
+    return CardmarketMapping(
+        product_id=product_id,
+        url=None,
+        verified=False,
+        provenance="tcgdex-id" if product_id else "none",
+        verified_at=None,
+    )
+
+
+def mapping_from_manifest(card: dict[str, Any]) -> CardmarketMapping:
     language = str(card.get("language") or "en")
     product_id = parse_product_id(card.get("cardmarket_id"))
     raw = card.get("cardmarket_url")
     if isinstance(raw, str) and raw.strip():
-        return product_id, raw.strip()
-    url = cardmarket_singles_url(
+        url = raw.strip()
+        verified = is_verified_singles_url(url)
+        return CardmarketMapping(
+            product_id=product_id,
+            url=url,
+            verified=verified,
+            provenance="manifest-url" if verified else "manifest-unverified",
+            verified_at=datetime_now() if verified else None,
+        )
+    generated = cardmarket_singles_url(
         name=str(card.get("name") or ""),
         expansion=str(card.get("cardmarket_expansion") or ""),
         set_code=str(card.get("cardmarket_set_code") or ""),
         collector_number=str(card.get("collector_number") or ""),
         language=language,
     )
-    return product_id, url
+    return CardmarketMapping(
+        product_id=product_id,
+        url=generated,
+        verified=False,
+        provenance="generated-singles" if generated else "none",
+        verified_at=None,
+    )
+
+
+def url_from_manifest_card(card: dict[str, Any]) -> tuple[int | None, str | None]:
+    mapping = mapping_from_manifest(card)
+    return mapping.product_id, mapping.url
+
+
+def fields_from_payload(
+    payload: dict[str, Any], *, language: str | None = "en"
+) -> tuple[int | None, str | None]:
+    mapping = mapping_from_payload(payload, language=language)
+    return mapping.product_id, mapping.public_url()
+
+
+def mapping_from_row(row: Any) -> CardmarketMapping:
+    if isinstance(row, dict):
+        keys = set(row)
+        get = row.get
+    else:
+        try:
+            keys = set(row.keys())
+        except Exception:
+            keys = set()
+        get = lambda key, default=None: row[key] if key in keys else default  # noqa: E731
+    url = str(get("cardmarket_url") or "") or None
+    product_id = parse_product_id(get("cardmarket_id"))
+    verified = bool(int(get("cardmarket_verified") or 0)) if "cardmarket_verified" in keys else False
+    provenance = str(get("cardmarket_provenance") or "") or "unknown"
+    verified_at = str(get("cardmarket_verified_at") or "") or None
+    if not verified and is_verified_singles_url(url) and "cardmarket_verified" not in keys:
+        verified = True
+        provenance = "legacy-singles"
+    return CardmarketMapping(
+        product_id=product_id,
+        url=url,
+        verified=verified,
+        provenance=provenance,
+        verified_at=verified_at,
+    )
+
+
+def url_for_row(row: sqlite3.Row) -> str | None:
+    return mapping_from_row(row).public_url()
 
 
 def cardmarket_search_url(
@@ -168,46 +266,6 @@ def extract_cardmarket_id(payload: dict[str, Any] | None) -> int | None:
             if found:
                 return found
     return None
-
-
-def fields_from_payload(
-    payload: dict[str, Any], *, language: str | None = "en"
-) -> tuple[int | None, str | None]:
-    product_id = extract_cardmarket_id(payload)
-    url = None
-    pricing = payload.get("pricing")
-    if isinstance(pricing, dict):
-        market = pricing.get("cardmarket")
-        if isinstance(market, dict) and isinstance(market.get("url"), str):
-            candidate = market["url"].strip()
-            if (
-                candidate.startswith("https://www.cardmarket.com/")
-                and "/Products/Singles/" in candidate
-            ):
-                url = candidate
-    if not url:
-        url = cardmarket_product_url(
-            product_id,
-            provider_id=str(payload.get("id") or ""),
-            language=language,
-        )
-    return product_id, url
-
-
-def url_for_row(row: sqlite3.Row) -> str | None:
-    keys = set(row.keys())
-    if "cardmarket_url" in keys and row["cardmarket_url"]:
-        return str(row["cardmarket_url"])
-    language = str(row["language"] or "en") if "language" in keys else "en"
-    provider_id = str(row["provider_id"] or "") if "provider_id" in keys else ""
-    if not provider_id and "id" in keys:
-        provider_id = str(row["id"] or "")
-    product_id = row["cardmarket_id"] if "cardmarket_id" in keys else None
-    return cardmarket_product_url(
-        product_id,
-        provider_id=provider_id,
-        language=language,
-    )
 
 
 def datetime_now() -> str:
@@ -322,7 +380,6 @@ def write_snapshot(
     )
     if commit:
         conn.commit()
-    _price_cache.clear()
     return key
 
 
@@ -444,19 +501,6 @@ def _prices_from_cache(data_dir: Path, language: str, card_id: str) -> list[dict
     return prices_from_market(_market_from_payload(payload))
 
 
-def _prices_from_tcgdex(language: str, card_id: str) -> list[dict[str, Any]]:
-    url = f"{TCGDEX_BASE}/{language}/cards/{card_id}"
-    with httpx.Client(timeout=2.5, follow_redirects=True) as client:
-        response = client.get(url, headers={"User-Agent": "scanapp"})
-        if response.status_code == 404:
-            return []
-        response.raise_for_status()
-        payload = response.json()
-    if not isinstance(payload, dict):
-        return []
-    return prices_from_market(_market_from_payload(payload))
-
-
 def prices_for_row(
     row: Any, *, data_dir: Path | None = None, catalog: sqlite3.Connection | None = None
 ) -> list[dict[str, Any]]:
@@ -469,24 +513,13 @@ def prices_for_row(
         stored = snapshot_prices(catalog, url)
         if stored:
             return stored
-    card_id = str(_row_value(row, "id") or "")
-    now = time.monotonic()
-    cached = _price_cache.get(card_id)
-    if card_id and cached and now - cached[0] < _PRICE_TTL_SECONDS:
-        return cached[1]
-    found: list[dict[str, Any]] = []
+    if data_dir is None:
+        return []
     for language, tcgdex_id in tcgdex_price_targets(row):
-        try:
-            found = _prices_from_tcgdex(language, tcgdex_id)
-        except Exception:  # noqa: BLE001 - scan must not fail if prices are down
-            found = []
-        if not found and data_dir is not None:
-            found = _prices_from_cache(data_dir, language, tcgdex_id)
+        found = _prices_from_cache(data_dir, language, tcgdex_id)
         if found:
-            break
-    if card_id:
-        _price_cache[card_id] = (now, found)
-    return found
+            return found
+    return []
 
 
 def _language_from_cache_path(path: Path, cache_root: Path) -> str:
@@ -501,8 +534,7 @@ def _language_from_cache_path(path: Path, cache_root: Path) -> str:
 
 def _update_official(
     conn: sqlite3.Connection,
-    product_id: int | None,
-    url: str,
+    mapping: CardmarketMapping,
     provider_id: str,
     language: str,
 ) -> int:
@@ -510,11 +542,25 @@ def _update_official(
     cursor = conn.execute(
         """
         UPDATE cards
-        SET cardmarket_id = ?, cardmarket_url = ?
+        SET cardmarket_id = ?,
+            cardmarket_url = ?,
+            cardmarket_verified = ?,
+            cardmarket_provenance = ?,
+            cardmarket_verified_at = ?
         WHERE language = ?
           AND (id = ? OR id = ? OR provider_id = ?)
         """,
-        (product_id, url, language, provider_id, prefixed, provider_id),
+        (
+            mapping.product_id,
+            mapping.url,
+            int(mapping.verified),
+            mapping.provenance,
+            mapping.verified_at,
+            language,
+            provider_id,
+            prefixed,
+            provider_id,
+        ),
     )
     return int(cursor.rowcount or 0)
 
@@ -531,16 +577,27 @@ def apply_extra_manifest(conn: sqlite3.Connection, extra_dir: Path) -> int:
     for card in payload.get("cards") or []:
         if not isinstance(card, dict) or not card.get("id"):
             continue
-        product_id, url = url_from_manifest_card(card)
-        if not url:
+        mapping = mapping_from_manifest(card)
+        if not mapping.url and mapping.product_id is None:
             continue
         cursor = conn.execute(
             """
             UPDATE cards
-            SET cardmarket_id = ?, cardmarket_url = ?
+            SET cardmarket_id = ?,
+                cardmarket_url = ?,
+                cardmarket_verified = ?,
+                cardmarket_provenance = ?,
+                cardmarket_verified_at = ?
             WHERE id = ?
             """,
-            (product_id, url, str(card["id"])),
+            (
+                mapping.product_id,
+                mapping.url,
+                int(mapping.verified),
+                mapping.provenance,
+                mapping.verified_at,
+                str(card["id"]),
+            ),
         )
         updated += int(cursor.rowcount or 0)
     return updated
@@ -558,11 +615,11 @@ def sync_cardmarket_links(data_dir: Path, conn: sqlite3.Connection) -> int:
             if not isinstance(payload, dict):
                 continue
             language = _language_from_cache_path(path, cache_root)
-            product_id, url = fields_from_payload(payload, language=language)
-            if not url:
+            mapping = mapping_from_payload(payload, language=language)
+            if mapping.product_id is None and not mapping.url:
                 continue
             provider_id = str(payload.get("id") or path.stem)
-            updated += _update_official(conn, product_id, url, provider_id, language)
+            updated += _update_official(conn, mapping, provider_id, language)
 
     extra_dir = Path(os.environ.get("EXTRA_CARDS_DIR", "/extra-cards"))
     updated += apply_extra_manifest(conn, extra_dir)

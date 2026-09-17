@@ -1,14 +1,30 @@
 from __future__ import annotations
 
+from dataclasses import dataclass
 from difflib import SequenceMatcher
 import re
 from typing import Any
 import unicodedata
 
+from app.recognition.ocr import OcrHit
+
 COLLECTOR_RE = re.compile(
-    r"\b([A-Z]{0,4}\d{1,4}(?:/\d{1,4})?)\b",
+    r"\b((?:[A-Z]{1,4})?\d{1,4}(?:[A-Z])?(?:/\d{1,4})?)\b",
     re.IGNORECASE,
 )
+COLLECTOR_PARTS_RE = re.compile(
+    r"^([A-Z]{1,4})?(\d{1,4})(?:[A-Z])?(?:/(\d{1,4}))?$",
+    re.IGNORECASE,
+)
+RELIABLE_COLLECTOR_CONF = 0.55
+
+
+@dataclass(frozen=True)
+class CollectorParts:
+    prefix: str
+    number: str
+    denominator: str | None
+    raw: str
 
 
 def normalize_text(value: str | None) -> str:
@@ -26,16 +42,47 @@ def similar(a: str, b: str) -> float:
     return SequenceMatcher(None, left, right).ratio()
 
 
-def extract_collector_candidates(lines: list[str]) -> list[str]:
-    found: list[str] = []
+def parse_collector(value: str | None) -> CollectorParts | None:
+    compact = (value or "").replace(" ", "").upper()
+    if not compact:
+        return None
+    match = COLLECTOR_PARTS_RE.fullmatch(compact)
+    if not match:
+        fraction = re.search(r"^([A-Z]{1,4})?(\d{1,4})/(\d{1,4})$", compact)
+        if not fraction:
+            return None
+        match = fraction
+    prefix = (match.group(1) or "").upper()
+    number = (match.group(2) or "").lstrip("0") or "0"
+    denom_raw = match.group(3) if match.lastindex and match.lastindex >= 3 else None
+    denominator = None
+    if denom_raw:
+        denominator = denom_raw.lstrip("0") or "0"
+    return CollectorParts(prefix=prefix, number=number, denominator=denominator, raw=compact)
+
+
+def extract_collector_candidates(
+    lines: list[str],
+    hits: list[OcrHit] | None = None,
+) -> list[OcrHit]:
+    found: list[OcrHit] = []
+    seen: set[str] = set()
+
+    def add(item: OcrHit) -> None:
+        token = item.text.upper().replace(" ", "")
+        if not token or token in seen:
+            return
+        if parse_collector(token) is None:
+            return
+        seen.add(token)
+        found.append(OcrHit(text=token, confidence=item.confidence, region=item.region))
+
+    for hit in hits or []:
+        for match in COLLECTOR_RE.findall(hit.text.replace(" ", "")):
+            add(OcrHit(text=match, confidence=hit.confidence, region=hit.region))
     for line in lines:
         for match in COLLECTOR_RE.findall(line.replace(" ", "")):
-            token = match.upper()
-            if token not in found:
-                found.append(token)
-        compact = normalize_text(line)
-        if compact and any(char.isdigit() for char in compact) and compact not in found:
-            found.append(compact.upper())
+            add(OcrHit(text=match, region="unknown"))
     return found
 
 
@@ -54,69 +101,47 @@ def name_match(ocr_name: str | None, card_name: str) -> bool:
     return False
 
 
-def _norm_digits(value: str) -> str:
-    digits = re.sub(r"\D", "", value)
-    if not digits:
-        return ""
-    return digits.lstrip("0") or "0"
-
-
-def _collector_left(value: str) -> str:
-    for part in re.split(r"[^\d]+", value.strip()):
-        if part:
-            return part
-    return ""
-
-
-def _collector_fraction(value: str) -> tuple[str, str | None]:
-    compact = (value or "").replace(" ", "")
-    match = re.search(r"(?:[A-Z]{0,4})(\d{1,4})/(\d{1,4})", compact, re.IGNORECASE)
-    if match:
-        return _norm_digits(match.group(1)), _norm_digits(match.group(2))
-    left = _norm_digits(_collector_left(value))
-    return left, None
-
-
-def number_match(ocr_numbers: list[str], collector_number: str) -> bool | None:
-    expected_left, expected_right = _collector_fraction(collector_number)
-    if not expected_left:
+def number_match(
+    ocr_numbers: list[str] | list[OcrHit],
+    collector_number: str,
+) -> bool | None:
+    expected = parse_collector(collector_number)
+    if expected is None:
         return None
-    fractions: list[tuple[str, str]] = []
-    lefts: list[str] = []
+    parsed: list[CollectorParts] = []
     for token in ocr_numbers:
-        left, right = _collector_fraction(token)
-        if left and right:
-            fractions.append((left, right))
-        elif left:
-            lefts.append(left)
-    if not fractions and not lefts:
+        text = token.text if isinstance(token, OcrHit) else str(token)
+        parts = parse_collector(text)
+        if parts:
+            parsed.append(parts)
+    if not parsed:
         return None
-    if fractions:
-        if expected_right:
-            return (expected_left, expected_right) in fractions
-        return any(left == expected_left for left, _right in fractions)
-    expected_full = _norm_digits(collector_number)
-    for got in lefts:
-        if got == expected_left or (expected_full and got == expected_full):
-            return True
-        if len(got) < 2:
+    for got in parsed:
+        if got.prefix != expected.prefix:
             continue
-        if (
-            expected_left
-            and len(expected_left) >= 2
-            and got.startswith(expected_left)
-            and len(got) > len(expected_left)
-        ):
-            return True
-        if len(got) >= 3 and expected_left.startswith(got):
-            return True
+        if got.number != expected.number:
+            continue
+        if got.denominator and expected.denominator and got.denominator != expected.denominator:
+            continue
+        return True
     return False
+
+
+def _has_reliable_conflict(ocr_numbers: list[OcrHit] | list[str], collector_number: str) -> bool:
+    hits = [
+        item
+        for item in ocr_numbers
+        if isinstance(item, OcrHit) and item.reliable
+    ]
+    if not hits:
+        return False
+    return number_match(hits, collector_number) is False
 
 
 def rerank(
     visual: list[dict[str, Any]],
     ocr_name: str | None,
-    ocr_numbers: list[str],
+    ocr_numbers: list[str] | list[OcrHit],
     ocr_failed: bool,
     detected_languages: tuple[str, ...] = (),
 ) -> list[dict[str, Any]]:
@@ -126,6 +151,7 @@ def rerank(
         consistent: bool | None = None
         name_ok = name_match(ocr_name, item["name"])
         number_ok = number_match(ocr_numbers, item["collector_number"])
+        collector_conflict = _has_reliable_conflict(ocr_numbers, item["collector_number"])
         language = str(item.get("language") or "")
         if detected_languages:
             if language in detected_languages:
@@ -137,6 +163,8 @@ def rerank(
         elif number_ok is False and ocr_numbers:
             consistent = False
             combined -= 0.12
+            if collector_conflict:
+                combined -= 0.08
         elif name_ok or number_ok is True:
             consistent = True
             if name_ok:
@@ -147,7 +175,14 @@ def rerank(
             consistent = False if similar(ocr_name, item["name"]) < 0.4 else None
             if consistent is False:
                 combined -= 0.04
-        ranked.append({**item, "combined_score": combined, "ocr_consistent": consistent})
+        ranked.append(
+            {
+                **item,
+                "combined_score": combined,
+                "ocr_consistent": consistent,
+                "collector_conflict": collector_conflict,
+            }
+        )
     ranked.sort(key=lambda row: row["combined_score"], reverse=True)
     ranked = _prefer_language_print(ranked, detected_languages)
     return _keep_visual_leader(ranked)
@@ -166,6 +201,8 @@ def _prefer_language_print(
     if ranked[0].get("language") in languages:
         return ranked
     best = max(matching, key=lambda row: float(row["visual_score"]))
+    if best.get("collector_conflict"):
+        return ranked
     visual_best = max(ranked, key=lambda row: float(row["visual_score"]))
     drop = float(visual_best["visual_score"]) - float(best["visual_score"])
     if drop > max_drop:
@@ -184,11 +221,40 @@ def _keep_visual_leader(
         return ranked
     visual = sorted(ranked, key=lambda row: float(row["visual_score"]), reverse=True)
     lead = visual[0]
+    if lead.get("collector_conflict"):
+        return ranked
     gap = float(lead["visual_score"]) - float(visual[1]["visual_score"])
     if float(lead["visual_score"]) < min_visual or gap < min_gap:
         return ranked
     rest = [row for row in ranked if row["card_id"] != lead["card_id"]]
     return [lead, *rest]
+
+
+def _visual_second(suggestions: list[dict[str, Any]], top_id: str) -> float:
+    second = 0.0
+    for row in sorted(suggestions, key=lambda item: float(item["visual_score"]), reverse=True):
+        if row["card_id"] != top_id:
+            return float(row["visual_score"])
+    return second
+
+
+def _finish_twins(
+    suggestions: list[dict[str, Any]], top: dict[str, Any], min_gap: float
+) -> list[dict[str, Any]]:
+    twins = []
+    for row in suggestions:
+        if row["card_id"] == top["card_id"]:
+            continue
+        if row.get("name") != top.get("name"):
+            continue
+        if row.get("collector_number") != top.get("collector_number"):
+            continue
+        if row.get("language") != top.get("language"):
+            continue
+        if abs(float(row["visual_score"]) - float(top["visual_score"])) >= min_gap:
+            continue
+        twins.append(row)
+    return twins
 
 
 def decide_status(
@@ -204,27 +270,29 @@ def decide_status(
     if not suggestions:
         return "no_match"
     top = suggestions[0]
-    language = str(top.get("language") or "")
-    peers = (
-        [row for row in suggestions if str(row.get("language") or "") == language]
-        if language
-        else suggestions
-    )
-    second = 0.0
-    for row in sorted(peers, key=lambda item: float(item["visual_score"]), reverse=True):
-        if row["card_id"] != top["card_id"]:
-            second = float(row["visual_score"])
-            break
+    visual_lead = max(suggestions, key=lambda row: float(row["visual_score"]))
+    if visual_lead.get("collector_conflict") or top.get("collector_conflict"):
+        return "uncertain"
+    second = _visual_second(suggestions, top["card_id"])
     gap = float(top["visual_score"]) - second
-    if float(top["visual_score"]) >= min_visual and (second <= 0.0 or gap >= min_gap):
+    visual_ok = float(top["visual_score"]) >= min_visual and (second <= 0.0 or gap >= min_gap)
+    if _finish_twins(suggestions, top, min_gap):
+        return "uncertain"
+    if visual_ok:
+        if not enable_matched:
+            return "uncertain"
         return "matched"
     if float(top["visual_score"]) >= min_visual and top.get("ocr_consistent") is True:
         twins = [
             row
-            for row in peers
+            for row in suggestions
             if abs(float(row["visual_score"]) - float(top["visual_score"])) < min_gap
         ]
         others = [row for row in twins if row["card_id"] != top["card_id"]]
         if others and all(row.get("ocr_consistent") is False for row in others):
+            if not enable_matched:
+                return "uncertain"
             return "matched"
+        if others:
+            return "uncertain"
     return "no_match"

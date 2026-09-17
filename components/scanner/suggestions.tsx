@@ -41,6 +41,9 @@ function statusLabel(status: ScanStatus) {
   if (status === "matched") {
     return "Match";
   }
+  if (status === "uncertain") {
+    return "Uncertain";
+  }
   if (status === "retake") {
     return "Retake";
   }
@@ -61,7 +64,8 @@ export function Suggestions({
 }: SuggestionsProps) {
   const top = suggestions[0];
   const matched = status === "matched" && top;
-  const notAMatch = status === "no_match" || status === "uncertain";
+  const uncertain = status === "uncertain" && top;
+  const notAMatch = status === "no_match";
   const listings = useCardmarketListings(
     top?.cardmarket_url,
     top?.cardmarket_prices,
@@ -71,9 +75,9 @@ export function Suggestions({
     <div className="flex flex-col gap-4">
       <div className="flex items-center justify-between gap-3">
         <h2 className="font-heading text-lg font-medium">
-          {matched ? "Most likely card" : "Result"}
+          {matched ? "Most likely card" : uncertain ? "Choose the print" : "Result"}
         </h2>
-        <Badge variant={matched ? "secondary" : "destructive"}>
+        <Badge variant={matched || uncertain ? "secondary" : "destructive"}>
           {statusLabel(status)}
         </Badge>
       </div>
@@ -111,7 +115,11 @@ export function Suggestions({
                   "h-11 min-h-11 w-full gap-2 sm:w-auto",
                 )}
               />
-            ) : null}
+            ) : (
+              <p className="text-muted-foreground w-full text-sm">
+                Cardmarket link unavailable.
+              </p>
+            )}
             <Button
               type="button"
               variant="outline"
@@ -129,6 +137,54 @@ export function Suggestions({
             </Button>
           </CardFooter>
         </Card>
+      ) : null}
+
+      {uncertain ? (
+        <div className="grid gap-3 sm:grid-cols-2">
+          {suggestions.slice(0, 4).map((card) => (
+            <Card key={card.card_id}>
+              <CardHeader>
+                <CardTitle className="text-base">{card.name}</CardTitle>
+                <CardDescription>
+                  {card.language ? `${languageLabel(card.language)} · ` : ""}
+                  {card.set_name} · #{card.collector_number}
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={assetUrl(card.image_url)}
+                  alt={`${card.name} from ${card.set_name}`}
+                  className="mx-auto max-h-48 w-auto rounded-md"
+                />
+                {card.cardmarket_url ? null : (
+                  <p className="text-muted-foreground mt-2 text-xs">
+                    Cardmarket link unavailable.
+                  </p>
+                )}
+              </CardContent>
+              <CardFooter className="flex flex-col gap-2">
+                {card.cardmarket_url ? (
+                  <CardmarketOpen
+                    url={card.cardmarket_url}
+                    cardId={card.card_id}
+                    className={cn(
+                      buttonVariants({ variant: "outline" }),
+                      "h-11 min-h-11 w-full gap-2",
+                    )}
+                  />
+                ) : null}
+                <Button
+                  type="button"
+                  className="h-11 min-h-11 w-full"
+                  onClick={() => onConfirm(card.card_id)}
+                >
+                  This is the card
+                </Button>
+              </CardFooter>
+            </Card>
+          ))}
+        </div>
       ) : null}
 
       {notAMatch ? (

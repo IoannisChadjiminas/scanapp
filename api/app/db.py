@@ -51,6 +51,25 @@ def init_catalog(conn: sqlite3.Connection) -> None:
         conn.execute("ALTER TABLE cards ADD COLUMN cardmarket_id INTEGER")
     if "cardmarket_url" not in columns:
         conn.execute("ALTER TABLE cards ADD COLUMN cardmarket_url TEXT")
+    _add_columns(
+        conn,
+        "cards",
+        {
+            "cardmarket_verified": "INTEGER NOT NULL DEFAULT 0",
+            "cardmarket_provenance": "TEXT",
+            "cardmarket_verified_at": "TEXT",
+        },
+    )
+    conn.execute(
+        """
+        UPDATE cards
+        SET cardmarket_verified = 1,
+            cardmarket_provenance = COALESCE(cardmarket_provenance, 'legacy-singles'),
+            cardmarket_verified_at = COALESCE(cardmarket_verified_at, '1970-01-01T00:00:00Z')
+        WHERE cardmarket_verified = 0
+          AND cardmarket_url LIKE '%cardmarket.com%/Products/Singles/%'
+        """
+    )
     conn.executescript(
         """
         CREATE TABLE IF NOT EXISTS cardmarket_snapshots (

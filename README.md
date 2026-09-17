@@ -1,6 +1,6 @@
 # Scanapp
 
-Visual identification experiment for **English Pokémon cards**. The browser UI captures or uploads a photograph; FastAPI runs DINOv2 Small (ONNX) retrieval with optional RapidOCR reranking. Uploaded photographs are discarded after processing. Model weights are used as published — nothing is trained here.
+Visual identification experiment for **English Pokémon cards**. The browser UI captures or uploads a photograph; FastAPI runs DINOv2 Small (ONNX) retrieval with optional RapidOCR reranking. Each scan keeps the upload, the image used for retrieval, and the ranking result under `datasets/review/` so failures can be inspected. Model weights are used as published — nothing is trained here.
 
 ## Local Docker
 
@@ -26,6 +26,7 @@ Default catalogue import is a few English sets (`base1,sv01,swsh3`). Set `CATALO
 | `api/app/` | FastAPI recognition API |
 | `api/bootstrap/` | Model export, TCGdex import, embeddings |
 | `api/eval/` | Accuracy harness and optional Tesseract comparison |
+| `datasets/review/` | Saved scan photos, sidecars, and `SUMMARY.md` for failure review |
 | `docker/` | API, web, bootstrap images and Caddyfiles |
 | `extension/` | Chrome helper: reads Cardmarket listings into the local API |
 
@@ -39,6 +40,11 @@ Runtime containers do not include Node.js, PyTorch, or PaddlePaddle. Bootstrap i
 - `POST /api/v1/scans/{id}/feedback` — confirm, correct, or reject
 - `GET /api/v1/session/results` — anonymous session results
 - `GET /api/v1/health` — catalogue and model readiness
+- `GET /api/v1/review` — saved scan photos and rankings (`needs_attention`, `status`, `limit`, `offset`)
+- `GET /api/v1/review/summary` — markdown failure list
+- `GET /api/v1/review/cases/{id}` — one scan sidecar
+- `GET /api/v1/review/images/{id}.query.jpg` — image the model scored
+- `GET /api/v1/review/labels` — confirmed/rejected eval labels
 - `POST /api/v1/cardmarket/jobs` — queue a product page for the PC Chrome helper
 - `GET /api/v1/cardmarket/prices?url=` — stored listings plus helper/job status
 - `POST /api/v1/cardmarket/helper/claim` — helper claims or recovers one job
@@ -48,7 +54,7 @@ Runtime containers do not include Node.js, PyTorch, or PaddlePaddle. Bootstrap i
 - `POST /api/v1/cardmarket/helper/release` — return a claim without burning an attempt
 - `POST /api/v1/cardmarket/helper/status` — helper heartbeat and queue counts
 
-Helper write routes require `Authorization: Bearer <token>` from `python -m app.helper_credential`. Frontend types live in `lib/api-types.ts`. The PC Chrome helper lives in `extension/` (`extension/README.md`). A confident match or confirmation queues the product; the helper reads listings in one background tab.
+Helper write routes require `Authorization: Bearer <token>` from `python -m app.helper_credential`. Review routes accept the same helper token, or `REVIEW_TOKEN` (`Authorization: Bearer` or `X-Review-Token`). Frontend types live in `lib/api-types.ts`. The PC Chrome helper lives in `extension/` (`extension/README.md`). A confident match or confirmation queues the product; the helper reads listings in one background tab.
 
 Regenerate the OpenAPI document with:
 
@@ -94,10 +100,10 @@ pip install -r api/requirements.txt -r api/requirements-dev.txt
 pytest -c api/pytest.ini
 ```
 
-Labeled development photographs go in `datasets/` as `images/` plus `labels.jsonl`. After artifacts exist:
+Labeled development photographs go in `datasets/` as `images/` plus `labels.jsonl`. Live scans also write `datasets/review/` (`SUMMARY.md`, query JPEGs, and confirmed `labels.jsonl`). After artifacts exist:
 
 ```bash
-PYTHONPATH=api python -m eval.harness --dataset datasets/dev --preprocess pad --out eval-pad.json
+PYTHONPATH=api python -m eval.harness --dataset datasets/review --preprocess pad --out eval-pad.json
 ```
 
 Tesseract is only for a 50-image development comparison (`python -m eval.tesseract_compare`). Production OCR is RapidOCR.

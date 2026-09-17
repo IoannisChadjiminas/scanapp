@@ -10,8 +10,9 @@ from typing import Any
 import numpy as np
 
 from app.config import Settings
-from app.cardmarket import prices_for_row, url_for_row
+from app.cardmarket import snapshot_prices, url_for_row
 from app.db import coverage_payload
+from app.recognition.captures import save_scan_capture
 from app.recognition.detect import detect_and_rectify
 from app.recognition.embed import top_k
 from app.recognition.images import apply_crop, blur_variance, decode_image
@@ -61,6 +62,7 @@ def recognize_bytes(
     rotation: int = 0,
     skip_detect: bool = False,
     language: str = "auto",
+    store_capture: bool | None = None,
 ) -> ScanResponse:
     started = time.perf_counter()
     timings: dict[str, float] = {}
@@ -68,13 +70,15 @@ def recognize_bytes(
     coverage_model = coverage_payload(catalog)
 
     decoded = decode_image(data, settings.max_image_pixels)
-    image = apply_crop(decoded.image, crop_x, crop_y, crop_w, crop_h, rotation)
+    input_image = apply_crop(decoded.image, crop_x, crop_y, crop_w, crop_h, rotation)
+    image = input_image
     timings["decode_ms"] = (time.perf_counter() - started) * 1000
 
     mark = time.perf_counter()
     detected = False
     if not skip_detect:
         image, detected = detect_and_rectify(image)
+    query_image = image
     timings["detect_ms"] = (time.perf_counter() - mark) * 1000
 
     blur = blur_variance(image)
@@ -128,7 +132,8 @@ def recognize_bytes(
         )
 
     numbers = extract_collector_candidates(
-        [line for line in [ocr.collector_text, *ocr.lines] if line]
+        [line for line in [ocr.collector_text, *ocr.lines] if line],
+        hits=ocr.hits,
     )
     rank_languages = (
         decision.search
@@ -144,11 +149,8 @@ def recognize_bytes(
     )
     mark = time.perf_counter()
     if combined:
-        top_row = cards.get(str(combined[0]["card_id"]))
-        if top_row is not None:
-            combined[0]["cardmarket_prices"] = prices_for_row(
-                top_row, data_dir=settings.data_dir, catalog=catalog
-            )
+        live_url = combined[0].get("cardmarket_url")
+        combined[0]["cardmarket_prices"] = snapshot_prices(catalog, live_url)
     timings["cardmarket_ms"] = (time.perf_counter() - mark) * 1000
     status = decide_status(
         combined,
@@ -179,7 +181,11 @@ def recognize_bytes(
         )
     elif status == "matched":
         message = "This is the most likely match."
-    elif status in {"no_match", "uncertain"}:
+        if combined and not combined[0].get("cardmarket_url"):
+            message = "This is the most likely match. Cardmarket link unavailable."
+    elif status == "uncertain":
+        message = "More than one print could match. Choose the correct card."
+    elif status in {"no_match"}:
         message = "This photograph did not match a catalogue card."
     if not detected and not skip_detect and status != "retake":
         extra = " Automatic card detection was unreliable; using the provided crop."
@@ -187,7 +193,25 @@ def recognize_bytes(
 
     suggestions = [Candidate.model_validate(item) for item in top3]
     scan_id = str(uuid.uuid4())
+    created_at = _now()
     versions = runtime.versions()
+    ocr_payload = {
+        "name_text": ocr.name_text,
+        "collector_text": ocr.collector_text,
+        "lines": ocr.lines,
+        "failed": ocr.failed,
+        "hits": [
+            {
+                "text": hit.text,
+                "confidence": hit.confidence,
+                "region": hit.region,
+            }
+            for hit in ocr.hits
+        ],
+        "detected_language": decision.detected,
+        "requested_language": decision.requested,
+        "search_languages": list(decision.search),
+    }
     results.execute(
         """
         INSERT INTO scans (
@@ -200,7 +224,7 @@ def recognize_bytes(
         (
             scan_id,
             session_id,
-            _now(),
+            created_at,
             status,
             settings.preprocess_config,
             versions["model_revision"],
@@ -208,20 +232,50 @@ def recognize_bytes(
             versions["ocr"],
             versions["ranking"],
             json.dumps(runtime.threshold_config()),
-            json.dumps(
-                {
-                    **ocr.__dict__,
-                    "detected_language": decision.detected,
-                    "requested_language": decision.requested,
-                    "search_languages": list(decision.search),
-                }
-            ),
+            json.dumps(ocr_payload),
             json.dumps(visual[:20]),
             json.dumps(combined[:20]),
             json.dumps(timings),
         ),
     )
     results.commit()
+    persist = settings.store_captures if store_capture is None else store_capture
+    if persist:
+        try:
+            save_scan_capture(
+                settings=settings,
+                scan_id=scan_id,
+                session_id=session_id,
+                created_at=created_at,
+                status=status,
+                message=message.strip() if message else None,
+                input_image=input_image,
+                query_image=query_image,
+                request={
+                    "crop_x": crop_x,
+                    "crop_y": crop_y,
+                    "crop_w": crop_w,
+                    "crop_h": crop_h,
+                    "rotation": rotation,
+                    "skip_detect": skip_detect,
+                    "language": language,
+                },
+                image_stats={
+                    "input_size": list(input_image.size),
+                    "query_size": list(query_image.size),
+                    "blur": round(float(blur), 2),
+                    "detected": detected,
+                    "too_small": too_small,
+                    "too_blurry": too_blurry,
+                },
+                ocr=ocr_payload,
+                predicted=top3,
+                visual=visual,
+                timings=timings,
+                versions=versions,
+            )
+        except Exception:  # noqa: BLE001 - capture files must never fail a scan
+            pass
 
     return ScanResponse(
         id=scan_id,

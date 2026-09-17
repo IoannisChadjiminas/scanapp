@@ -1,18 +1,43 @@
 from __future__ import annotations
 
+import hashlib
 import json
+import os
+import shutil
+import time
 from pathlib import Path
 
 import numpy as np
 from PIL import Image
 
 from app.db import connect
-from app.recognition.artifacts import sha256_file
+from app.recognition.artifacts import sha256_file, validate_embeddings
 from app.recognition.embed import DinoEmbedder
 from bootstrap.pins import DINOV2_DIM, DINOV2_FILENAME
 
 
-def build_embeddings(data_dir: Path, preprocess_config: str, model_revision: str) -> None:
+def reference_fingerprint(rows: list) -> str:
+    digest = hashlib.sha256()
+    for row in rows:
+        digest.update(str(row["id"]).encode())
+        path = Path(str(row["image_path"]))
+        digest.update(sha256_file(path).encode() if path.is_file() else b"missing")
+    return digest.hexdigest()
+
+
+def _write_active(root: Path, name: str) -> None:
+    tmp = root / f".ACTIVE.{os.getpid()}"
+    tmp.write_text(name)
+    tmp.replace(root / "ACTIVE")
+
+
+def build_embeddings(
+    data_dir: Path,
+    preprocess_config: str,
+    model_revision: str,
+    *,
+    force: bool = False,
+) -> None:
     catalog = connect(data_dir / "catalog.sqlite")
     rows = catalog.execute(
         "SELECT id, image_path FROM cards WHERE has_image = 1 AND image_path IS NOT NULL ORDER BY id"
@@ -20,6 +45,21 @@ def build_embeddings(data_dir: Path, preprocess_config: str, model_revision: str
     catalog.close()
     if not rows:
         raise RuntimeError("No reference images available to embed")
+
+    fingerprint = reference_fingerprint(rows)
+    root = data_dir / "vectors" / preprocess_config
+    active_path = root / "ACTIVE"
+    if not force and active_path.is_file():
+        current = root / active_path.read_text().strip() / "manifest.json"
+        if current.is_file():
+            manifest = json.loads(current.read_text())
+            if (
+                manifest.get("image_fingerprint") == fingerprint
+                and manifest.get("model_revision") == model_revision
+                and manifest.get("preprocess_config") == preprocess_config
+            ):
+                print(f"skip embeddings {preprocess_config}: images and model unchanged")
+                return
 
     model_path = data_dir / "models" / DINOV2_FILENAME
     embedder = DinoEmbedder(str(model_path), intra_threads=1, inter_threads=1)
@@ -36,14 +76,18 @@ def build_embeddings(data_dir: Path, preprocess_config: str, model_revision: str
     matrix = np.stack(vectors, axis=0)
     if matrix.shape[1] != DINOV2_DIM:
         raise RuntimeError(f"Unexpected embedding dim {matrix.shape[1]}")
-    out_dir = data_dir / "vectors" / preprocess_config
-    out_dir.mkdir(parents=True, exist_ok=True)
-    embeddings_path = out_dir / "embeddings.npy"
-    ids_path = out_dir / "embedding_card_ids.npy"
+    validate_embeddings(matrix, np.array(ids))
+
+    stamp = time.strftime("%Y%m%dT%H%M%SZ", time.gmtime())
+    coverage = json.loads((data_dir / "catalogue-version.json").read_text())
+    name = f"{coverage['catalogue_version']}-{stamp}".replace("/", "-")
+    staging = root / f".staging-{stamp}-{os.getpid()}"
+    staging.mkdir(parents=True, exist_ok=True)
+    embeddings_path = staging / "embeddings.npy"
+    ids_path = staging / "embedding_card_ids.npy"
     np.save(embeddings_path, matrix)
     np.save(ids_path, np.array(ids))
 
-    coverage = json.loads((data_dir / "catalogue-version.json").read_text())
     manifest = {
         "preprocess_config": preprocess_config,
         "use_ocr": True,
@@ -57,6 +101,13 @@ def build_embeddings(data_dir: Path, preprocess_config: str, model_revision: str
         "embeddings_sha256": sha256_file(embeddings_path),
         "ids_sha256": sha256_file(ids_path),
         "dinov2_sha256": sha256_file(model_path),
+        "image_fingerprint": fingerprint,
+        "indexed_ids": ids,
     }
-    (out_dir / "manifest.json").write_text(json.dumps(manifest, indent=2))
-    print(f"wrote {out_dir}")
+    (staging / "manifest.json").write_text(json.dumps(manifest, indent=2))
+    final = root / name
+    if final.exists():
+        shutil.rmtree(final)
+    staging.rename(final)
+    _write_active(root, name)
+    print(f"wrote {final}")

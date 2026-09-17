@@ -23,8 +23,10 @@ class Settings(BaseSettings):
     cors_origins: str = "http://localhost:3000,http://127.0.0.1:3000"
     session_cookie: str = "scanapp_session"
     session_ttl_days: int = 30
+    store_captures: bool = True
+    review_token: str = ""
 
-    ranking_version: str = "rank-v2"
+    ranking_version: str = "rank-v3"
     ocr_version: str = "rapidocr-ppocrv6-small"
     model_name: str = "dinov2-small"
 
@@ -51,6 +53,10 @@ class Settings(BaseSettings):
     @property
     def images_dir(self) -> Path:
         return self.data_dir / "reference-images"
+
+    @property
+    def review_dir(self) -> Path:
+        return self.data_dir / "review"
 
     @property
     def dinov2_path(self) -> Path:
