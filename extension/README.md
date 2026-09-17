@@ -1,8 +1,8 @@
 # Scanapp Cardmarket helper (Chrome)
 
-Your PC Chrome opens the Cardmarket product page after someone taps **Open on Cardmarket** in Scanapp. The extension reads the first three listings (NM/EX/…) and saves them to the local API.
+Your PC Chrome does not need to stay open. A scan queues the product URL. Whenever this Chrome profile is running, the helper drains the queue, reads the first listings (NM/EX/…), and saves them. Until then the app shows TCGdex From/Trend/7-day.
 
-It does not bypass Cloudflare. It uses the tab you already have (or opens one).
+It does not bypass Cloudflare. It uses a real tab in your profile.
 
 ## Install
 
@@ -26,10 +26,9 @@ chrome.storage.local.set({ apiBase: "https://staging-scan.auctaro.com" })
 
 ## Use
 
-1. Scan a card in Scanapp (phone or this PC)
-2. Tap **Open on Cardmarket** — that queues a job
-3. This Chrome profile picks up the job, loads the Singles page, writes prices
-4. The scan result polls and shows the three listings
+1. Scan a card in Scanapp (phone or this PC). Guide prices show immediately.
+2. Open this Chrome profile when you can — it does not need to stay open all day
+3. The helper writes live listings; the next scan of that card shows them
 
 If Chrome has been idle, click the Scanapp helper icon in the toolbar to wake it.
 

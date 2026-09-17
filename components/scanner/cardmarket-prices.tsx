@@ -38,7 +38,7 @@ export function CardmarketPrices({
       <p className="text-muted-foreground mb-2 text-xs">
         {waiting
           ? prices?.length
-            ? "Guide prices — fetching live Cardmarket listings…"
+            ? "Guide prices — fetching live listings…"
             : "Fetching live Cardmarket listings…"
           : "Cardmarket prices"}
       </p>
@@ -99,6 +99,10 @@ export function useCardmarketListings(
           return;
         }
         if (payload.status === "failed" || payload.status === "done") {
+          setWaiting(false);
+          return;
+        }
+        if (payload.helper_online === false) {
           setWaiting(false);
           return;
         }

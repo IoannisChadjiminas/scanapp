@@ -7,6 +7,7 @@ from app.cardmarket import (
     claim_job,
     complete_job,
     enqueue_job,
+    helper_is_online,
     is_job_url,
     job_by_id,
     latest_job_status,
@@ -14,6 +15,7 @@ from app.cardmarket import (
     retry_or_fail_job,
     save_snapshot,
     snapshot_prices,
+    touch_helper,
 )
 
 router = APIRouter()
@@ -46,6 +48,7 @@ class PriceResponse(BaseModel):
     url: str | None = None
     prices: list[PriceItem] = Field(default_factory=list)
     status: str | None = None
+    helper_online: bool = False
 
 
 @router.post("/cardmarket/jobs", response_model=JobResponse)
@@ -63,6 +66,12 @@ def next_job(request: Request) -> JobResponse | Response:
     if job is None:
         return Response(status_code=204)
     return JobResponse(id=job["id"], url=job["url"], card_id=job["card_id"] or "")
+
+
+@router.post("/cardmarket/helper/ping")
+def ping_helper(request: Request) -> dict[str, bool]:
+    touch_helper(request.app.state.dbs.catalog)
+    return {"online": True}
 
 
 @router.post("/cardmarket/offers")
@@ -91,7 +100,12 @@ def save_offers(payload: OfferPayload, request: Request) -> PriceResponse:
             job_url = str(row["url"] or "")
             if job_url == key or job_url == url:
                 complete_job(catalog, str(row["id"]))
-    return PriceResponse(url=key, prices=[PriceItem.model_validate(item) for item in prices], status="done")
+    return PriceResponse(
+        url=key,
+        prices=[PriceItem.model_validate(item) for item in prices],
+        status="done",
+        helper_online=True,
+    )
 
 
 @router.post("/cardmarket/jobs/{job_id}/fail")
@@ -108,9 +122,11 @@ def get_prices(
     request: Request, url: str = Query(min_length=8, max_length=500)
 ) -> PriceResponse:
     key = normalize_product_url(url)
-    prices = snapshot_prices(request.app.state.dbs.catalog, key)
+    catalog = request.app.state.dbs.catalog
+    prices = snapshot_prices(catalog, key)
     return PriceResponse(
         url=key,
         prices=[PriceItem.model_validate(item) for item in prices],
-        status=latest_job_status(request.app.state.dbs.catalog, key),
+        status=latest_job_status(catalog, key),
+        helper_online=helper_is_online(catalog),
     )

@@ -100,8 +100,10 @@ export const api = {
       body: JSON.stringify({ url, card_id: cardId ?? null }),
     }),
   cardmarketPrices: (url: string, signal?: AbortSignal) =>
-    request<{ url: string | null; prices: CardmarketPrice[]; status?: string | null }>(
-      `/api/v1/cardmarket/prices?url=${encodeURIComponent(url)}`,
-      { signal },
-    ),
+    request<{
+      url: string | null;
+      prices: CardmarketPrice[];
+      status?: string | null;
+      helper_online?: boolean;
+    }>(`/api/v1/cardmarket/prices?url=${encodeURIComponent(url)}`, { signal }),
 };

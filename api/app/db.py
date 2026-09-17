@@ -68,6 +68,10 @@ def init_catalog(conn: sqlite3.Connection) -> None:
         );
         CREATE INDEX IF NOT EXISTS idx_cardmarket_jobs_status
             ON cardmarket_jobs(status, created_at);
+        CREATE TABLE IF NOT EXISTS cardmarket_helper (
+            id INTEGER PRIMARY KEY CHECK (id = 1),
+            last_seen TEXT NOT NULL
+        );
         """
     )
     job_columns = {row[1] for row in conn.execute("PRAGMA table_info(cardmarket_jobs)")}

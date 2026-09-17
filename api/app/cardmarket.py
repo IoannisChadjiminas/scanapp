@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import calendar
 import json
 import os
 import re
@@ -305,14 +306,10 @@ def _settle_stale_jobs(conn: sqlite3.Connection) -> None:
     conn.execute(
         """
         UPDATE cardmarket_jobs
-        SET status = CASE
-                WHEN COALESCE(attempts, 0) >= ? THEN 'failed'
-                ELSE 'pending'
-            END,
-            updated_at = ?
+        SET status = 'pending', updated_at = ?
         WHERE status = 'claimed' AND updated_at < ?
         """,
-        (_MAX_JOB_ATTEMPTS, now, cutoff),
+        (now, cutoff),
     )
 
 
@@ -334,11 +331,7 @@ def claim_job(conn: sqlite3.Connection) -> dict[str, str] | None:
         conn.commit()
         return None
     conn.execute(
-        """
-        UPDATE cardmarket_jobs
-        SET status = 'claimed', updated_at = ?, attempts = COALESCE(attempts, 0) + 1
-        WHERE id = ?
-        """,
+        "UPDATE cardmarket_jobs SET status = 'claimed', updated_at = ? WHERE id = ?",
         (datetime_now(), row["id"]),
     )
     conn.commit()
@@ -382,16 +375,54 @@ def retry_or_fail_job(conn: sqlite3.Connection, job_id: str) -> str:
     job = job_by_id(conn, job_id)
     if job is None:
         return "failed"
-    attempts = int(job.get("attempts") or 0)
+    attempts = int(job.get("attempts") or 0) + 1
     if attempts >= _MAX_JOB_ATTEMPTS:
-        complete_job(conn, job_id, "failed")
+        conn.execute(
+            """
+            UPDATE cardmarket_jobs
+            SET status = 'failed', attempts = ?, updated_at = ?
+            WHERE id = ?
+            """,
+            (attempts, datetime_now(), job_id),
+        )
+        conn.commit()
         return "failed"
     conn.execute(
-        "UPDATE cardmarket_jobs SET status = 'pending', updated_at = ? WHERE id = ?",
-        (datetime_now(), job_id),
+        """
+        UPDATE cardmarket_jobs
+        SET status = 'pending', attempts = ?, updated_at = ?
+        WHERE id = ?
+        """,
+        (attempts, datetime_now(), job_id),
     )
     conn.commit()
     return "pending"
+
+
+def touch_helper(conn: sqlite3.Connection) -> None:
+    conn.execute(
+        """
+        INSERT INTO cardmarket_helper (id, last_seen)
+        VALUES (1, ?)
+        ON CONFLICT(id) DO UPDATE SET last_seen = excluded.last_seen
+        """,
+        (datetime_now(),),
+    )
+    conn.commit()
+
+
+def helper_is_online(conn: sqlite3.Connection, *, within_seconds: int = 120) -> bool:
+    row = conn.execute(
+        "SELECT last_seen FROM cardmarket_helper WHERE id = 1"
+    ).fetchone()
+    if row is None:
+        return False
+    try:
+        last = time.strptime(str(row["last_seen"]), "%Y-%m-%dT%H:%M:%SZ")
+    except (TypeError, ValueError):
+        return False
+    age = time.time() - calendar.timegm(last)
+    return 0 <= age <= within_seconds
 
 
 def latest_job_status(conn: sqlite3.Connection, url: str | None) -> str | None:

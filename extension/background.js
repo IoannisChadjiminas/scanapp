@@ -17,6 +17,11 @@ function normalizeUrl(url) {
   }
 }
 
+async function pingHelper() {
+  const base = await apiBase();
+  await fetch(`${base}/api/v1/cardmarket/helper/ping`, { method: "POST" });
+}
+
 async function nextJob() {
   const base = await apiBase();
   const response = await fetch(`${base}/api/v1/cardmarket/jobs/next`);
@@ -67,6 +72,7 @@ let activeJobId = null;
 
 async function poll() {
   try {
+    await pingHelper();
     const job = await nextJob();
     if (!job?.url) {
       return;

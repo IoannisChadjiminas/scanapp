@@ -238,6 +238,44 @@ def test_job_retries_up_to_three_times(tmp_path: Path) -> None:
     assert claim_job(conn) is None
 
 
+def test_stale_claim_does_not_burn_retries(tmp_path: Path) -> None:
+    from app.cardmarket import claim_job, enqueue_job
+
+    conn = connect(tmp_path / "catalog.sqlite")
+    init_catalog(conn)
+    job_id = enqueue_job(
+        conn,
+        "https://www.cardmarket.com/en/Pokemon/Products/Singles/Tag-Bolt/Gengar-Mimikyu-GX-V2-sm9102",
+        "extra-gengar",
+    )
+    first = claim_job(conn)
+    assert first is not None
+    conn.execute(
+        "UPDATE cardmarket_jobs SET updated_at = '2020-01-01T00:00:00Z' WHERE id = ?",
+        (job_id,),
+    )
+    conn.commit()
+    again = claim_job(conn)
+    assert again is not None
+    assert again["id"] == job_id
+    row = conn.execute(
+        "SELECT status, attempts FROM cardmarket_jobs WHERE id = ?", (job_id,)
+    ).fetchone()
+    assert row is not None
+    assert row["status"] == "claimed"
+    assert int(row["attempts"] or 0) == 0
+
+
+def test_helper_online_after_ping(tmp_path: Path) -> None:
+    from app.cardmarket import helper_is_online, touch_helper
+
+    conn = connect(tmp_path / "catalog.sqlite")
+    init_catalog(conn)
+    assert helper_is_online(conn) is False
+    touch_helper(conn)
+    assert helper_is_online(conn) is True
+
+
 def test_prices_for_row_prefers_snapshot(tmp_path: Path) -> None:
     from app.cardmarket import prices_for_row, save_snapshot
 
