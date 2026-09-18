@@ -256,19 +256,37 @@ export function createWorker({
     if (message.requestId !== job.requestId || message.jobId !== job.id) {
       return { ok: false, reason: "stale-message" };
     }
-    if (sender?.tab?.id && sessionState.helperTabId && sender.tab.id !== sessionState.helperTabId) {
+    const senderUrl = normalizeUrl(message.url || sender?.tab?.url || "");
+    const fromHelper =
+      sender?.tab?.id && sessionState.helperTabId && sender.tab.id === sessionState.helperTabId;
+    const fromProduct = Boolean(sender?.tab?.id && finalUrlAllowed(job.url, senderUrl));
+    if (sender?.tab?.id && sessionState.helperTabId && !fromHelper && !fromProduct) {
       return { ok: false, reason: "wrong-tab" };
     }
     if (
+      !fromProduct &&
       sessionState.helperDocumentId &&
       sender?.documentId &&
       sender.documentId !== sessionState.helperDocumentId
     ) {
       return { ok: false, reason: "wrong-document" };
     }
-    const finalUrl = normalizeUrl(message.url || sender?.tab?.url || "");
+    const finalUrl = senderUrl || normalizeUrl(message.url || "");
     const kind = classifyUrl(finalUrl);
     if (kind === "login" || kind === "challenge" || message.outcome === "challenge") {
+      const storedJob = await readStore(local, ["currentJob"]);
+      const current = storedJob.currentJob || job;
+      if (!current.focusedForChallenge && message.outcome === "challenge") {
+        const tab = sender?.tab?.id ? sender.tab : await helperTab();
+        if (tab?.id && tabs.update) {
+          await tabs.update(tab.id, { active: true });
+          await patchLocal({
+            currentJob: { ...current, focusedForChallenge: true, loadStartedAt: now(), phase: "challenge" },
+          });
+          await scheduleWait(2000);
+          return { ok: false, reason: "challenge-focus" };
+        }
+      }
       await request("/cardmarket/helper/fail", {
         method: "POST",
         body: {
@@ -321,6 +339,10 @@ export function createWorker({
     };
     await patchLocal({ pendingResult: pending, activity: "saving" });
     await uploadPending();
+    const quiet = await helperTab();
+    if (quiet?.id && tabs.update) {
+      await tabs.update(quiet.id, { active: false });
+    }
     return { ok: true };
   }
 
@@ -349,17 +371,51 @@ export function createWorker({
     }
   }
 
+  async function findOpenProductTab(target) {
+    if (typeof tabs.query !== "function") {
+      return null;
+    }
+    let found = [];
+    try {
+      found = await tabs.query({
+        url: ["https://www.cardmarket.com/*", "https://cardmarket.com/*"],
+      });
+    } catch {
+      return null;
+    }
+    return (
+      found.find((tab) => {
+        const href = tab.url || "";
+        return normalizeUrl(href) === normalizeUrl(target) || finalUrlAllowed(target, href);
+      }) || null
+    );
+  }
+
+  async function adoptTab(tab) {
+    if (!tab?.id) {
+      return;
+    }
+    await writeStore(session, {
+      helperTabId: tab.id,
+      helperDocumentId: tab.documentId || null,
+    });
+    await patchLocal({ helperTabClosed: false });
+  }
+
   async function loadJob(job) {
     await publish({ activity: "fetching", currentCard: job.card_id || job.url });
-    let tab = await helperTab();
     const target = job.url;
     const stored = await readStore(local, ["lastNavigationAt", "helperTabClosed", "paused"]);
     if (stored.helperTabClosed && stored.paused) {
       await publish({ activity: "needs_attention", attention: "Helper tab closed" });
       return;
     }
+    let tab = (await helperTab()) || (await findOpenProductTab(target));
+    if (tab) {
+      await adoptTab(tab);
+    }
     if (!tab) {
-      tab = await createHelperTab(target, { active: false });
+      tab = await createHelperTab(target, { active: true });
       await patchLocal({ lastNavigationAt: now(), currentJob: { ...job, phase: "loading", loadStartedAt: now() } });
       await scheduleWait(PAGE_DEADLINE_MS);
       return;
@@ -373,7 +429,7 @@ export function createWorker({
         await scheduleWait(wait);
         return;
       }
-      await tabs.update(tab.id, { url: target, active: false });
+      await tabs.update(tab.id, { url: target, active: true });
       await patchLocal({
         lastNavigationAt: now(),
         currentJob: { ...job, phase: "loading", loadStartedAt: now() },
@@ -391,6 +447,14 @@ export function createWorker({
       return;
     }
     if (kind === "login" || kind === "challenge") {
+      if (!job.focusedForChallenge) {
+        await tabs.update(tab.id, { active: true });
+        await patchLocal({
+          currentJob: { ...job, focusedForChallenge: true, loadStartedAt: now(), phase: "challenge" },
+        });
+        await scheduleWait(2000);
+        return;
+      }
       await bindExtract({ type: "extract-result", requestId: job.requestId, jobId: job.id, outcome: "challenge", url: currentUrl }, { tab });
       return;
     }
@@ -409,6 +473,14 @@ export function createWorker({
     const result = await extractFromTab(tab, job);
     if (result?.outcome) {
       await bindExtract({ type: "extract-result", ...result, requestId: job.requestId, jobId: job.id }, { tab, documentId: tab.documentId });
+      return;
+    }
+    if (!job.focusedForChallenge) {
+      await tabs.update(tab.id, { active: true });
+      await patchLocal({
+        currentJob: { ...job, focusedForChallenge: true, loadStartedAt: now(), phase: "extracting" },
+      });
+      await scheduleWait(2000);
       return;
     }
     if (now() - (job.loadStartedAt || now()) > PAGE_DEADLINE_MS) {
@@ -616,6 +688,8 @@ export function createWorker({
     const allowed =
       kind === "pokemontcg" ||
       kind === "product" ||
+      kind === "challenge" ||
+      kind === "login" ||
       (expected === "pokemontcg" && kind === "product");
     if (info.url && !allowed && kind !== "invalid") {
       await abandonHelperTab("Helper tab navigated away");

@@ -111,6 +111,9 @@ function createHarness({ extract } = {}) {
       }
       return tab;
     },
+    async query() {
+      return [...tabs.values()];
+    },
     async update(id, props) {
       const tab = tabs.get(id);
       Object.assign(tab, props);
@@ -168,11 +171,14 @@ test("overlapping wake events claim only one job", async () => {
   assert.equal(claims.length, 1);
 });
 
-test("helper tab stays in the background", async () => {
+test("helper opens its own tab, then backgrounds it after extract", async () => {
   const { worker, createdTabs, activeTab } = createHarness();
   await worker.wake("alarm");
+  assert.equal(createdTabs.length, 1);
+  assert.equal(createdTabs[0].active, true);
+  assert.equal(activeTab(), createdTabs[0].id);
+  await worker.wake("alarm");
   assert.equal(createdTabs[0].active, false);
-  assert.equal(activeTab(), 99);
 });
 
 test("delayed extract from another card is rejected", async () => {
@@ -306,8 +312,20 @@ test("loading failure returns the popup to idle", async () => {
   await worker.wake("alarm");
   advance(61_000);
   await worker.wake("alarm");
+  advance(61_000);
+  await worker.wake("alarm");
   const stored = await local.get(["activity", "currentCard", "recentFailures"]);
   assert.equal(stored.activity, "idle");
   assert.equal(stored.currentCard, "");
   assert.equal(stored.recentFailures[0].reason, "loading");
+});
+
+test("uses an already open product tab instead of creating one", async () => {
+  const { worker, createdTabs, tabs, session, completes } = createHarness();
+  tabs.set(50, { id: 50, url: GENGAR, documentId: "doc-50" });
+  await worker.wake("alarm");
+  assert.equal(createdTabs.length, 0);
+  const stored = await session.get("helperTabId");
+  assert.equal(stored.helperTabId, 50);
+  assert.equal(completes.length, 1);
 });

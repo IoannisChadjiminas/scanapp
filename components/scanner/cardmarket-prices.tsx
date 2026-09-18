@@ -58,17 +58,23 @@ function statusMessage(payload: CardmarketPriceResponse, hasLive: boolean) {
   if (hasLive) {
     return formatObserved(payload.observed_at) ?? "Cardmarket prices";
   }
+  if (Array.isArray(payload.prices) && payload.prices.length) {
+    return "Cardmarket guide prices";
+  }
+  if (payload.status === "failed") {
+    return "Could not read Cardmarket listings";
+  }
+  if (payload.status === "done") {
+    return "No listings on Cardmarket";
+  }
   const queued = payload.status === "pending" || payload.status === "claimed";
-  if (queued && payload.helper_online === false) {
+  if (!queued) {
+    return null;
+  }
+  if (payload.helper_online === false) {
     return "Queued — helper offline";
   }
-  if (queued || payload.helper_ready) {
-    return "Fetching offers";
-  }
-  if (queued) {
-    return "Queued — helper offline";
-  }
-  return null;
+  return "Fetching offers";
 }
 
 export function CardmarketPrices({

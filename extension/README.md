@@ -48,7 +48,7 @@ Pause survives Chrome restarts. It stops new claims immediately. A collected res
 
 ## Behaviour
 
-- One helper tab, reused, created inactive
+- One helper tab, created automatically. You do not open Cardmarket. The tab may come to the front so Cloudflare can finish, then it goes to the background.
 - One serialized worker; overlapping alarms, popup clicks, and page messages cannot claim two jobs
 - State is persisted (settings, pause, current job, claim, unsaved result). Service worker timers are not trusted for recovery
 - After a Chrome restart, tab IDs are discarded and ownership is established again
@@ -80,7 +80,7 @@ The old four-second poller and focus-stealing product tabs are gone.
 ## Troubleshooting
 
 - **Authentication required:** paste a fresh token from `python -m app.helper_credential`
-- **Repeated `loading` failures / Fetching with no card:** reload the unpacked extension (0.2.1+). The helper tab is reused after the service worker sleeps; then click **Open helper tab** so Cardmarket can finish login or a challenge
+- **Repeated `loading` failures / Fetching with no card:** reload the unpacked extension (0.2.3+). The helper opens its own Cardmarket tab; you do not need a product window open.
 - **Helper tab closed / navigated away:** click **Open helper tab**, then **Resume**
 - **Cardmarket needs attention:** solve login or the browser challenge in the helper tab, then **Resume**
 - Phone and PC must share the same API. For local Docker, the phone has to reach this machine, not only `127.0.0.1` on the phone

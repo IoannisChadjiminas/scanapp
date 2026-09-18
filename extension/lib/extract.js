@@ -34,7 +34,7 @@ export function classifyPage({
 
 export function collectPage(root, href, title) {
   const prices = extractPrices(root);
-  const articleRowCount = root.querySelectorAll?.(".article-row")?.length ?? 0;
+  const articleRowCount = root.querySelectorAll?.(".article-row, tr.article")?.length ?? 0;
   const classified = classifyPage({
     url: href,
     title,

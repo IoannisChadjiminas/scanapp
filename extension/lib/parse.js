@@ -31,14 +31,39 @@ export function parseAmount(text) {
   return Math.round(amount * 100) / 100;
 }
 
-export function extractPrices(root) {
+const CONDITION_RE = /^(NM|M|EX|GD|LP|PL|PO|SS|MT|Near Mint|Excellent)$/i;
+
+function conditionLabel(row) {
+  const nodes = row.querySelectorAll?.(".article-condition, [class*='condition'], .badge") ?? [];
+  for (const node of nodes) {
+    const text = (node.textContent || "").trim().replace(/\s+/g, " ");
+    if (text && CONDITION_RE.test(text.split(/\s/)[0] || text)) {
+      return text.split(/\s/)[0];
+    }
+  }
+  const fallback = (row.querySelector?.(".article-condition")?.textContent || "").trim();
+  return fallback;
+}
+
+function offerNode(row) {
+  const offer = row.querySelector?.(".col-offer, .price-container, [class*='col-offer']");
+  if (!offer) {
+    return null;
+  }
+  if (offer.closest?.(".mobile-offer-container")) {
+    return null;
+  }
+  return offer;
+}
+
+function extractRowPrices(root) {
   const prices = [];
   const seen = new Set();
-  const rows = root.querySelectorAll?.(".article-row") ?? [];
+  const rows = root.querySelectorAll?.(".article-row, tr.article") ?? [];
   for (const row of rows) {
-    const label = (row.querySelector(".article-condition")?.textContent || "").trim();
-    const offer = row.querySelector(".col-offer");
-    if (!offer || offer.closest(".mobile-offer-container")) {
+    const label = conditionLabel(row);
+    const offer = offerNode(row);
+    if (!offer) {
       continue;
     }
     const amount = parseAmount(offer.textContent || "");
@@ -56,6 +81,33 @@ export function extractPrices(root) {
     }
   }
   return prices;
+}
+
+export function extractGuidePrices(root) {
+  const text = `${root.body?.innerText || root.textContent || ""}`;
+  const specs = [
+    { re: /(?:^|\n)\s*From\s+([\d.,]+)\s*€/i, label: "From" },
+    { re: /Price Trend\s+([\d.,]+)\s*€/i, label: "Trend" },
+    { re: /7-days? average price\s+([\d.,]+)\s*€/i, label: "7-day" },
+  ];
+  const prices = [];
+  for (const spec of specs) {
+    const match = text.match(spec.re);
+    if (!match) {
+      continue;
+    }
+    const amount = parseAmount(`${match[1]} €`);
+    if (amount == null) {
+      continue;
+    }
+    prices.push({ label: spec.label, amount, currency: "EUR" });
+  }
+  return prices;
+}
+
+export function extractPrices(root) {
+  const rows = extractRowPrices(root);
+  return rows.length ? rows : extractGuidePrices(root);
 }
 
 export function hasEmptyState(root) {
