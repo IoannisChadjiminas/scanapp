@@ -167,7 +167,7 @@ export function ScannerApp() {
               ? "More than one print could match. Choose the correct card."
               : "Not a match.",
       );
-      if (result.status === "matched") {
+      if (result.status === "matched" || result.status === "uncertain") {
         const top = result.suggestions[0];
         queueCardmarketLookup(top?.cardmarket_url, top?.card_id);
       }

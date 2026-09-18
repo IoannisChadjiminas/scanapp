@@ -53,6 +53,17 @@ function statusLabel(status: ScanStatus) {
   return "Not a match";
 }
 
+function OfferBlock({ card }: { card: Candidate }) {
+  const listings = useCardmarketListings(card.cardmarket_url, card.cardmarket_prices);
+  return (
+    <CardmarketPrices
+      prices={listings.prices}
+      waiting={listings.waiting}
+      message={listings.message}
+    />
+  );
+}
+
 export function Suggestions({
   status,
   message,
@@ -66,11 +77,6 @@ export function Suggestions({
   const matched = status === "matched" && top;
   const uncertain = status === "uncertain" && top;
   const notAMatch = status === "no_match";
-  const listings = useCardmarketListings(
-    top?.cardmarket_url,
-    top?.cardmarket_prices,
-  );
-
   return (
     <div className="flex flex-col gap-4">
       <div className="flex items-center justify-between gap-3">
@@ -99,11 +105,7 @@ export function Suggestions({
               alt={`${top.name} from ${top.set_name}`}
               className="mx-auto max-h-72 w-auto rounded-md"
             />
-            <CardmarketPrices
-              prices={listings.prices}
-              waiting={listings.waiting}
-              message={listings.message}
-            />
+            <OfferBlock card={top} />
           </CardContent>
           <CardFooter className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:justify-end">
             {top.cardmarket_url ? (
@@ -157,7 +159,9 @@ export function Suggestions({
                   alt={`${card.name} from ${card.set_name}`}
                   className="mx-auto max-h-48 w-auto rounded-md"
                 />
-                {card.cardmarket_url ? null : (
+                {card.cardmarket_url ? (
+                  <OfferBlock card={card} />
+                ) : (
                   <p className="text-muted-foreground mt-2 text-xs">
                     Cardmarket link unavailable.
                   </p>
@@ -209,11 +213,7 @@ export function Suggestions({
                 {top.name} · {top.set_name} #{top.collector_number}
                 {top.language ? ` · ${languageLabel(top.language)}` : ""}
               </p>
-              <CardmarketPrices
-                prices={listings.prices}
-                waiting={listings.waiting}
-                message={listings.message}
-              />
+              <OfferBlock card={top} />
               {top.cardmarket_url ? (
                 <CardmarketOpen
                   url={top.cardmarket_url}
