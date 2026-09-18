@@ -6,17 +6,14 @@ Visual identification experiment for **English Pokémon cards**. The browser UI 
 
 ```bash
 cp .env.example .env
-docker compose --profile tools run --build --rm bootstrap
 docker compose up --build -d
 ```
 
 Open [http://localhost:8080](http://localhost:8080).
 
+Catalogue download, embeddings, and extra-card import are **not** part of this app. They live in `catalogue/` and run separately (`compose.catalogue.yaml`), once per new set. See `catalogue/README.md`.
+
 Later starts: `docker compose up -d`. `docker compose down` keeps catalogue and vector volumes.
-
-Bootstrap is resumable. The first run needs internet access; recognition then uses local artifacts under the `scanapp-data` volume.
-
-Default catalogue import is a few English sets (`base1,sv01,swsh3`). Set `CATALOGUE_SETS=all` in `.env` for the full English catalogue.
 
 ## Layout
 
@@ -24,13 +21,13 @@ Default catalogue import is a few English sets (`base1,sv01,swsh3`). Set `CATALO
 |---|---|
 | `app/`, `components/` | Next.js App Router UI (static export) |
 | `api/app/` | FastAPI recognition API |
-| `api/bootstrap/` | Model export, TCGdex import, embeddings |
+| `catalogue/` | One-off set download, vectors, TCGdex URLs, extra photos, offload |
 | `api/eval/` | Accuracy harness and optional Tesseract comparison |
 | `datasets/review/` | Saved scan photos, sidecars, and `SUMMARY.md` for failure review |
-| `docker/` | API, web, bootstrap images and Caddyfiles |
+| `docker/` | API and web images, Caddyfiles |
 | `extension/` | Chrome helper: reads Cardmarket listings into the local API |
 
-Runtime containers do not include Node.js, PyTorch, or PaddlePaddle. Bootstrap is the tools image.
+Runtime containers do not include Node.js, PyTorch, or PaddlePaddle. Those are only in the catalogue builder image.
 
 ## API
 
@@ -64,7 +61,7 @@ PYTHONPATH=api python -c "from app.main import app; import json; print(json.dump
 
 ## Dokploy public URL
 
-Use `compose.dokploy.yaml` only. Do not deploy `compose.override.yaml` or `compose.prod.yaml`. Attach the domain to service `web`, port `80`. After the first deploy, run bootstrap once so the catalogue volume is filled.
+Use `compose.dokploy.yaml` only. Do not deploy `compose.override.yaml` or `compose.prod.yaml`. Attach the domain to service `web`, port `80`. Fill the catalogue volume from a local builder run (`./scripts/offload-local.sh`); see `catalogue/README.md`.
 
 `npm run dev` only serves the UI on [http://localhost:3000](http://localhost:3000). It does not start FastAPI. Without the API you will see **Recognition API is not running**.
 

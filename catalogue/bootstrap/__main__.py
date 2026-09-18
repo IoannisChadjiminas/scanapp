@@ -1,13 +1,12 @@
 from __future__ import annotations
 
-import json
 import os
 from pathlib import Path
 
 from bootstrap.catalogue import import_catalogue
 from bootstrap.dinov2_export import export_dinov2
 from bootstrap.download import download_rapidocr
-from bootstrap.embeddings import build_embeddings
+from bootstrap.embeddings import build_embeddings, read_model_revision
 from bootstrap.extra import import_extra_cards
 
 
@@ -15,11 +14,12 @@ def _truthy(name: str) -> bool:
     return os.environ.get(name, "").strip().lower() in {"1", "true", "yes"}
 
 
+def _sets(raw: str) -> set[str]:
+    return {item.strip() for item in raw.split(",") if item.strip()}
+
+
 def _existing_revision(data_dir: Path) -> str:
-    manifest = data_dir / "vectors" / "pad" / "manifest.json"
-    if not manifest.is_file():
-        raise SystemExit("No existing pad snapshot. Run a full bootstrap first.")
-    return str(json.loads(manifest.read_text())["model_revision"])
+    return read_model_revision(data_dir)
 
 
 def main() -> None:
@@ -27,10 +27,15 @@ def main() -> None:
     models_dir = data_dir / "models"
     models_dir.mkdir(parents=True, exist_ok=True)
     extras_only = _truthy("BOOTSTRAP_EXTRAS_ONLY")
+    add_sets = _sets(os.environ.get("BOOTSTRAP_ADD_SETS", ""))
 
     if extras_only:
         print("== extra cards only")
         import_extra_cards(data_dir)
+        revision = _existing_revision(data_dir)
+    elif add_sets:
+        print(f"== add sets {', '.join(sorted(add_sets))}")
+        import_catalogue(data_dir, replace=False, sets=add_sets)
         revision = _existing_revision(data_dir)
     else:
         print("== models")

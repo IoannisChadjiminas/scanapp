@@ -112,7 +112,7 @@ def load_snapshot(settings: Settings) -> ArtifactSnapshot:
         conn = connect(catalog_path)
         present = {
             str(row["id"])
-            for row in conn.execute("SELECT id FROM cards WHERE has_image = 1")
+            for row in conn.execute("SELECT id FROM cards")
         }
         conn.close()
         missing = [str(card_id) for card_id in card_ids.tolist() if str(card_id) not in present]

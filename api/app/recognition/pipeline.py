@@ -10,6 +10,7 @@ from typing import Any
 import numpy as np
 
 from app.config import Settings
+from app.card_images import display_image_url
 from app.cardmarket import snapshot_prices, url_for_row
 from app.db import coverage_payload
 from app.recognition.captures import save_scan_capture
@@ -32,8 +33,8 @@ def _now() -> str:
     return datetime.now(timezone.utc).isoformat()
 
 
-def _card_image_url(card_id: str) -> str:
-    return f"/api/v1/cards/{card_id}/image"
+def _card_image_url(row: Any) -> str:
+    return display_image_url(row) or f"/api/v1/cards/{row['id']}/image"
 
 
 def _lookup_cards(conn: sqlite3.Connection, card_ids: list[str]) -> dict[str, sqlite3.Row]:
@@ -122,7 +123,7 @@ def recognize_bytes(
                 "name": row["name"],
                 "set_name": row["set_name"],
                 "collector_number": row["collector_number"],
-                "image_url": _card_image_url(card_id),
+                "image_url": _card_image_url(row),
                 "visual_score": float(score),
                 "combined_score": float(score),
                 "ocr_consistent": None,

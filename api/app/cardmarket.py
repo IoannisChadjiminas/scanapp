@@ -620,6 +620,116 @@ def import_expansion_products(
     }
 
 
+def expansion_imports_dir(data_dir: Path) -> Path:
+    return Path(data_dir) / "expansion-imports"
+
+
+def ingest_expansion_dumps(conn: sqlite3.Connection, data_dir: Path) -> int:
+    dump_dir = expansion_imports_dir(data_dir)
+    if not dump_dir.is_dir():
+        return 0
+    added = 0
+    for path in sorted(dump_dir.glob("*.json")):
+        try:
+            payload = json.loads(path.read_text())
+        except (OSError, json.JSONDecodeError):
+            continue
+        if not isinstance(payload, dict):
+            continue
+        page_url = str(payload.get("page_url") or "")
+        source = str(payload.get("source") or "page")
+        if source not in {"page", "crawl"}:
+            source = "page"
+        expansion = str(payload.get("expansion") or _expansion_from_url(page_url))
+        imported_at = str(payload.get("imported_at") or datetime_now())
+        for item in payload.get("products") or []:
+            if isinstance(item, dict):
+                raw = item.get("url")
+                name = str(item.get("name") or "")
+            else:
+                raw = item
+                name = ""
+            product = normalize_product_url(str(raw or ""))
+            if not product or not is_verified_singles_url(product):
+                continue
+            if not expansion:
+                expansion = _expansion_from_url(product)
+            cursor = conn.execute(
+                """
+                INSERT INTO cardmarket_expansion_products (
+                    url, expansion, name, source, page_url, card_id, matched, imported_at
+                ) VALUES (?, ?, ?, ?, ?, NULL, 0, ?)
+                ON CONFLICT(url) DO NOTHING
+                """,
+                (
+                    product,
+                    expansion,
+                    name,
+                    source,
+                    normalize_product_url(page_url) or page_url,
+                    imported_at,
+                ),
+            )
+            added += int(cursor.rowcount or 0)
+    return added
+
+
+def link_stored_expansion_products(
+    conn: sqlite3.Connection, data_dir: Path
+) -> dict[str, int]:
+    rows = conn.execute(
+        """
+        SELECT url, name
+        FROM cardmarket_expansion_products
+        WHERE matched = 0 OR card_id IS NULL OR card_id = ''
+        ORDER BY url
+        """
+    ).fetchall()
+    linked = 0
+    unmatched = 0
+    for row in rows:
+        url = str(row["url"] or "")
+        hit = _unique_card_for_product(conn, url, str(row["name"] or ""))
+        if hit is None:
+            unmatched += 1
+            continue
+        card_id = str(hit["id"])
+        map_card_product(
+            conn,
+            data_dir,
+            card_id,
+            url,
+            provenance="helper-expansion",
+            commit=False,
+        )
+        conn.execute(
+            """
+            UPDATE cardmarket_expansion_products
+            SET card_id = ?, matched = 1
+            WHERE url = ?
+            """,
+            (card_id, url),
+        )
+        linked += 1
+    return {"linked": linked, "unmatched": unmatched}
+
+
+def apply_cardmarket_links(
+    conn: sqlite3.Connection, data_dir: Path
+) -> dict[str, int]:
+    """Write helper maps and stored set-list URLs onto catalogue cards."""
+    dumps = ingest_expansion_dumps(conn, data_dir)
+    maps = apply_helper_maps(conn, data_dir)
+    expansion = link_stored_expansion_products(conn, data_dir)
+    conn.commit()
+    return {
+        "dumps": dumps,
+        "helper_maps": maps,
+        "expansion_linked": expansion["linked"],
+        "expansion_unmatched": expansion["unmatched"],
+    }
+
+
 def _decode_prices(raw: Any) -> list[dict[str, Any]]:
     try:
         payload = json.loads(raw) if isinstance(raw, str) else raw

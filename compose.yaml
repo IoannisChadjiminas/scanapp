@@ -48,28 +48,6 @@ services:
     environment:
       SITE_ADDRESS: ${SITE_ADDRESS:-:80}
 
-  bootstrap:
-    profiles: ["tools"]
-    build:
-      context: .
-      dockerfile: docker/bootstrap.Dockerfile
-    image: scanapp-bootstrap:local
-    environment:
-      DATA_DIR: /data
-      PREPROCESS_CONFIG: ${PREPROCESS_CONFIG:-pad}
-      CATALOGUE_SETS: ${CATALOGUE_SETS:-all}
-      TCGDEX_IMAGE_QUALITY: ${TCGDEX_IMAGE_QUALITY:-high}
-      TCGDEX_LANGUAGE: ${TCGDEX_LANGUAGE:-en}
-      TCGDEX_LANGUAGES: ${TCGDEX_LANGUAGES:-en,ja,zh-cn,zh-tw}
-      BOOTSTRAP_CONCURRENCY: ${BOOTSTRAP_CONCURRENCY:-8}
-      BOOTSTRAP_EXTRAS_ONLY: ${BOOTSTRAP_EXTRAS_ONLY:-false}
-      EXTRA_CARDS_DIR: /extra-cards
-      HF_HUB_DISABLE_TELEMETRY: "1"
-      OMP_NUM_THREADS: ${OMP_NUM_THREADS:-1}
-    volumes:
-      - scanapp-data:/data
-      - ./extra-cards:/extra-cards:ro
-
 volumes:
   scanapp-data:
   scanapp-tmp:

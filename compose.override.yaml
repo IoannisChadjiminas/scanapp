@@ -12,6 +12,3 @@ services:
       - ./docker/Caddyfile.local:/etc/caddy/Caddyfile:ro
     environment:
       LAN_HTTPS: ${LAN_HTTPS:-false}
-
-  bootstrap:
-    init: true

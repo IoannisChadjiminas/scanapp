@@ -16,6 +16,21 @@ from app.recognition.embed import DinoEmbedder
 from bootstrap.pins import DINOV2_DIM, DINOV2_FILENAME
 
 
+def read_model_revision(data_dir: Path) -> str:
+    for candidate in (
+        data_dir / "vectors" / "pad" / "ACTIVE",
+        data_dir / "vectors" / "pad" / "manifest.json",
+    ):
+        if candidate.name == "ACTIVE" and candidate.is_file():
+            bundle = data_dir / "vectors" / "pad" / candidate.read_text().strip()
+            manifest = bundle / "manifest.json"
+            if manifest.is_file():
+                return str(json.loads(manifest.read_text())["model_revision"])
+        if candidate.name == "manifest.json" and candidate.is_file():
+            return str(json.loads(candidate.read_text())["model_revision"])
+    raise SystemExit("No existing pad snapshot. Run a full bootstrap first.")
+
+
 def reference_fingerprint(rows: list) -> str:
     digest = hashlib.sha256()
     for row in rows:

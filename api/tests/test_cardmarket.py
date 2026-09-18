@@ -523,3 +523,52 @@ def test_expansion_import_links_unique_name_and_number(tmp_path: Path) -> None:
     dumps = list((tmp_path / "expansion-imports").glob("*.json"))
     assert dumps
 
+
+def test_relink_writes_url_after_catalogue_card_exists(tmp_path: Path) -> None:
+    from app.cardmarket import apply_cardmarket_links, url_for_row
+    from app.db import connect, init_catalog
+
+    conn = connect(tmp_path / "catalog.sqlite")
+    init_catalog(conn)
+    product = (
+        "https://www.cardmarket.com/en/Pokemon/Products/Singles/"
+        "Pokemon-Trading-Card-Game-Classic-Charizard-Ho-Oh-ex-Deck/Pikachu-CLC008"
+    )
+    dump_dir = tmp_path / "expansion-imports"
+    dump_dir.mkdir()
+    (dump_dir / "classic-page.json").write_text(
+        json.dumps(
+            {
+                "page_url": (
+                    "https://www.cardmarket.com/en/Pokemon/Products/Singles/"
+                    "Pokemon-Trading-Card-Game-Classic-Charizard-Ho-Oh-ex-Deck"
+                ),
+                "source": "page",
+                "expansion": "Pokemon-Trading-Card-Game-Classic-Charizard-Ho-Oh-ex-Deck",
+                "products": [{"url": product, "name": "Pikachu"}],
+            }
+        )
+    )
+    first = apply_cardmarket_links(conn, tmp_path)
+    assert first["dumps"] == 1
+    assert first["expansion_linked"] == 0
+    conn.execute(
+        """
+        INSERT INTO cards (
+            id, provider_id, name, set_id, set_name, collector_number,
+            language, variants_json, has_image
+        ) VALUES (
+            'extra-clc008', 'extra-clc008', 'Pikachu', 'clc',
+            'Pokemon Trading Card Game Classic Charizard Ho-Oh ex Deck',
+            '008/034', 'en', '{}', 1
+        )
+        """
+    )
+    conn.commit()
+    second = apply_cardmarket_links(conn, tmp_path)
+    assert second["expansion_linked"] == 1
+    row = conn.execute("SELECT * FROM cards WHERE id = 'extra-clc008'").fetchone()
+    assert url_for_row(row) == product
+    maps = json.loads((tmp_path / "cardmarket-maps.json").read_text())
+    assert maps["cards"]["extra-clc008"]["cardmarket_url"] == product
+

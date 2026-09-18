@@ -1,0 +1,26 @@
+# One-off catalogue builder. Not started by `docker compose up`.
+# Shares the `scanapp-data` volume with the local API when run from this repo.
+
+services:
+  catalogue:
+    build:
+      context: .
+      dockerfile: catalogue/Dockerfile
+    image: scanapp-catalogue:local
+    environment:
+      DATA_DIR: /data
+      TCGDEX_IMAGE_QUALITY: ${TCGDEX_IMAGE_QUALITY:-high}
+      TCGDEX_LANGUAGE: ${TCGDEX_LANGUAGE:-en}
+      TCGDEX_LANGUAGES: ${TCGDEX_LANGUAGES:-en,ja,zh-cn,zh-tw}
+      CATALOGUE_SETS: ${CATALOGUE_SETS:-base1,sv01,swsh3}
+      BOOTSTRAP_CONCURRENCY: ${BOOTSTRAP_CONCURRENCY:-8}
+      EXTRA_CARDS_DIR: /extra-cards
+      HF_HUB_DISABLE_TELEMETRY: "1"
+      OMP_NUM_THREADS: ${OMP_NUM_THREADS:-1}
+    volumes:
+      - scanapp-data:/data
+      - ./extra-cards:/extra-cards:ro
+      - ./exports:/exports
+
+volumes:
+  scanapp-data:

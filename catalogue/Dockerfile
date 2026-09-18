@@ -28,13 +28,12 @@ RUN pip install --no-cache-dir -r /app/requirements.txt \
         --extra-index-url https://download.pytorch.org/whl/cpu
 
 COPY api/app /app/app
-COPY api/bootstrap /app/bootstrap
-COPY api/eval /app/eval
-
+COPY catalogue/bootstrap /app/bootstrap
 COPY extra-cards /extra-cards
 ENV EXTRA_CARDS_DIR=/extra-cards
 
-RUN mkdir -p /data
+RUN mkdir -p /data /exports
 WORKDIR /app
 
-ENTRYPOINT ["python", "-m", "bootstrap"]
+ENTRYPOINT ["python"]
+CMD ["-m", "bootstrap.build", "--help"]

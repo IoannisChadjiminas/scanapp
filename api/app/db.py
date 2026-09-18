@@ -58,6 +58,7 @@ def init_catalog(conn: sqlite3.Connection) -> None:
             "cardmarket_verified": "INTEGER NOT NULL DEFAULT 0",
             "cardmarket_provenance": "TEXT",
             "cardmarket_verified_at": "TEXT",
+            "remote_image_url": "TEXT",
         },
     )
     conn.execute(
@@ -256,8 +257,10 @@ class Databases:
         self.results = connect(settings.results_sqlite)
         init_catalog(self.catalog)
         init_results(self.results)
+        from app.card_images import backfill_remote_image_urls
         from app.cardmarket import sync_cardmarket_links
 
+        backfill_remote_image_urls(self.catalog, settings.data_dir)
         sync_cardmarket_links(settings.data_dir, self.catalog)
 
     def close(self) -> None:

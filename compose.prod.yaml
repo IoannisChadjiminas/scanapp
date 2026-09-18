@@ -25,10 +25,6 @@ services:
     environment:
       SITE_ADDRESS: ${PUBLIC_HOST:?PUBLIC_HOST is required}
 
-  bootstrap:
-    profiles: ["tools"]
-    image: ${BOOTSTRAP_IMAGE:-scanapp-bootstrap:prod}
-
 volumes:
   caddy-data:
   caddy-config:
