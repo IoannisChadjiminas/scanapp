@@ -1,4 +1,5 @@
 const PRODUCT_PATH = /^\/[a-z]{2}\/Pokemon\/Products\/Singles\/[^/]+\/[^/]+$/i;
+const EXPANSION_PATH = /^\/[a-z]{2}\/Pokemon\/Products\/Singles\/[^/]+$/i;
 
 export function normalizeUrl(url) {
   try {
@@ -50,6 +51,9 @@ export function classifyUrl(url) {
   }
   if (PRODUCT_PATH.test(path)) {
     return "product";
+  }
+  if (EXPANSION_PATH.test(path)) {
+    return "expansion";
   }
   return "other";
 }

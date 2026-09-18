@@ -9,6 +9,9 @@ export const PAGE_DEADLINE_MS = 60_000;
 export const FETCH_TIMEOUT_MS = 8_000;
 export const CLAIM_LIFETIME_MS = 180_000;
 export const MAX_RECENT_FAILURES = 5;
+export const MAX_EXPANSION_PAGES = 80;
+export const MAX_EXPANSION_PRODUCTS = 5_000;
+export const EXPANSION_PAGE_MS = 2_000;
 export const SERVERS = {
   local: "http://127.0.0.1:8000",
   staging: "https://staging-scan.auctaro.com",

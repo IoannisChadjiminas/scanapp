@@ -8,8 +8,14 @@ from fastapi import APIRouter, Header, HTTPException, Query, Request
 from fastapi.responses import StreamingResponse
 from pydantic import BaseModel, Field
 
-from app.cardmarket import is_job_url, normalize_product_url
-from app.cardmarket_events import wait_for_product
+from app.cardmarket import (
+    MappingError,
+    import_expansion_products,
+    is_job_url,
+    map_card_product,
+    normalize_product_url,
+)
+from app.cardmarket_events import notify_product, wait_for_product
 from app.cardmarket_queue import (
     AuthError,
     QueueError,
@@ -68,6 +74,23 @@ class CompleteRequest(BaseModel):
 class ClaimRequest(BaseModel):
     job_id: str | None = None
     claim_token: str | None = None
+
+
+class MapRequest(BaseModel):
+    url: str
+    card_id: str
+    cardmarket_id: int | None = None
+
+
+class ExpansionProduct(BaseModel):
+    url: str
+    name: str = ""
+
+
+class ExpansionImportRequest(BaseModel):
+    page_url: str
+    products: list[ExpansionProduct] = Field(default_factory=list)
+    source: str = "page"
 
 
 class ClaimActionRequest(BaseModel):
@@ -208,6 +231,49 @@ def helper_claim(
         counts = queue_counts(catalog)
         return _price_response({"status": "idle", **counts})
     return _job_response(job)
+
+
+@router.post("/cardmarket/helper/map")
+def helper_map(
+    payload: MapRequest,
+    request: Request,
+    authorization: str | None = Header(default=None),
+) -> dict[str, Any]:
+    catalog = request.app.state.dbs.catalog
+    _helper(catalog, authorization)
+    try:
+        mapped = map_card_product(
+            catalog,
+            request.app.state.settings.data_dir,
+            payload.card_id,
+            payload.url,
+            payload.cardmarket_id,
+        )
+    except MappingError as exc:
+        raise HTTPException(status_code=exc.status_code, detail=exc.detail) from exc
+    notify_product(mapped.get("url"))
+    return mapped
+
+
+@router.post("/cardmarket/helper/expansion-import")
+def helper_expansion_import(
+    payload: ExpansionImportRequest,
+    request: Request,
+    authorization: str | None = Header(default=None),
+) -> dict[str, Any]:
+    catalog = request.app.state.dbs.catalog
+    _helper(catalog, authorization)
+    source = payload.source if payload.source in {"page", "crawl"} else "page"
+    result = import_expansion_products(
+        catalog,
+        request.app.state.settings.data_dir,
+        page_url=payload.page_url,
+        products=[item.model_dump() for item in payload.products],
+        source=source,
+    )
+    for item in result.get("links") or []:
+        notify_product(item.get("url"))
+    return result
 
 
 @router.post("/cardmarket/helper/renew", response_model=JobResponse)

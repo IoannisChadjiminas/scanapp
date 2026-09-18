@@ -45,7 +45,7 @@ function jsonResponse(payload, status = 200) {
   };
 }
 
-function createHarness({ extract, scripting, claimJobs } = {}) {
+function createHarness({ extract, scripting, claimJobs, expansionExtract } = {}) {
   const local = memoryStore({
     apiBase: "http://127.0.0.1:8000",
     helperToken: "helper.token",
@@ -58,6 +58,7 @@ function createHarness({ extract, scripting, claimJobs } = {}) {
   const completes = [];
   const createdTabs = [];
   const fails = [];
+  const expansionImports = [];
   let claimIndex = 0;
   const fetchImpl = async (url, init = {}) => {
     const path = new URL(url).pathname;
@@ -98,6 +99,26 @@ function createHarness({ extract, scripting, claimJobs } = {}) {
     if (path.endsWith("/cardmarket/helper/release")) {
       return jsonResponse({ status: "pending" });
     }
+    if (path.endsWith("/cardmarket/helper/map")) {
+      return jsonResponse({
+        ok: true,
+        card_id: body.card_id,
+        url: body.url,
+        name: "Gengar",
+        verified: true,
+      });
+    }
+    if (path.endsWith("/cardmarket/helper/expansion-import")) {
+      expansionImports.push(body);
+      const count = Array.isArray(body.products) ? body.products.length : 0;
+      return jsonResponse({
+        stored: count,
+        linked: 0,
+        unmatched: count,
+        products: count,
+        source: body.source,
+      });
+    }
     return jsonResponse({ detail: "missing" }, 404);
   };
   const updates = [];
@@ -119,8 +140,15 @@ function createHarness({ extract, scripting, claimJobs } = {}) {
       }
       return tab;
     },
-    async query() {
-      return [...tabs.values()];
+    async query(filter = {}) {
+      let list = [...tabs.values()];
+      if (filter.active) {
+        const focused = list.filter((tab) => tab.active || tab.id === activeTab);
+        if (focused.length) {
+          list = focused;
+        }
+      }
+      return list;
     },
     async update(id, props) {
       const tab = tabs.get(id);
@@ -135,6 +163,10 @@ function createHarness({ extract, scripting, claimJobs } = {}) {
       if (options?.documentId && extract?.requireNoDocumentId) {
         throw new Error("no receiver");
       }
+      if (message?.type === "extract-expansion" && expansionExtract) {
+        const tab = tabs.get(_id);
+        return expansionExtract(tab);
+      }
       if (extract) {
         return extract(message);
       }
@@ -148,15 +180,31 @@ function createHarness({ extract, scripting, claimJobs } = {}) {
       };
     },
   };
+  const scriptApi =
+    scripting ||
+    (expansionExtract
+      ? {
+          executeScript: async ({ files, target } = {}) => {
+            if (files?.[0] === "expansion-extract.js") {
+              const tab = tabs.get(target.tabId);
+              return [{ result: expansionExtract(tab) }];
+            }
+            return [{ result: null }];
+          },
+        }
+      : scripting);
   const worker = createWorker({
     local,
     session,
     fetchImpl,
     tabs: tabApi,
-    scripting,
+    scripting: scriptApi,
     alarms: { create: async () => undefined },
     now: () => clock,
     randomId: () => "req-1",
+    wait: async (ms) => {
+      clock += ms;
+    },
   });
   return {
     worker,
@@ -168,6 +216,7 @@ function createHarness({ extract, scripting, claimJobs } = {}) {
     createdTabs,
     tabs,
     updates,
+    expansionImports,
     advance: (ms) => {
       clock += ms;
     },
@@ -447,6 +496,69 @@ test("navigates the helper tab to the newly scanned card", async () => {
   assert.equal(tabs.get(7).url, GENGAR);
   assert.equal(
     updates.some((item) => item.url === GENGAR && item.active === true),
+    true,
+  );
+});
+
+test("saves the open product URL for the current scan", async () => {
+  const { worker, local } = createHarness();
+  await local.set({ lastCardId: "extra-gengar", lastCardLabel: "extra-gengar" });
+  const mapped = await worker.handleMessage({ type: "map-url", url: GENGAR });
+  assert.equal(mapped.ok, true);
+  assert.equal(mapped.card_id, "extra-gengar");
+  assert.equal(mapped.url, GENGAR);
+});
+
+test("imports only the current set-list page", async () => {
+  const page = "https://www.cardmarket.com/en/Pokemon/Products/Singles/Tag-Bolt";
+  const { worker, tabs, expansionImports, createdTabs } = createHarness({
+    expansionExtract: () => ({
+      pageUrl: page,
+      products: [{ url: GENGAR, name: "Gengar & Mimikyu GX" }],
+      nextPage: `${page}?site=2`,
+    }),
+  });
+  tabs.set(9, { id: 9, url: page, active: true, documentId: "doc-9" });
+  const status = await worker.handleMessage({ type: "import-expansion-page" });
+  assert.equal(expansionImports.length, 1);
+  assert.equal(expansionImports[0].source, "page");
+  assert.equal(expansionImports[0].products[0].url, GENGAR);
+  assert.equal(createdTabs.length, 0);
+  assert.equal(tabs.get(9).url, page);
+  assert.equal(status.expansionBusy, false);
+  assert.match(status.expansionNote, /Stored 1/);
+});
+
+test("test crawler stores every page in the open set", async () => {
+  const page = "https://www.cardmarket.com/en/Pokemon/Products/Singles/Tag-Bolt";
+  const { worker, tabs, expansionImports, createdTabs, updates } = createHarness({
+    expansionExtract: (tab) => {
+      const href = tab?.url || page;
+      if (String(href).includes("site=2")) {
+        return {
+          pageUrl: href,
+          products: [{ url: PIKACHU, name: "Pikachu" }],
+          nextPage: null,
+        };
+      }
+      return {
+        pageUrl: href,
+        products: [{ url: GENGAR, name: "Gengar & Mimikyu GX" }],
+        nextPage: `${page}?site=2`,
+      };
+    },
+  });
+  tabs.set(9, { id: 9, url: page, active: true, documentId: "doc-9" });
+  await worker.handleMessage({ type: "import-expansion-set" });
+  assert.equal(expansionImports.length, 2);
+  assert.equal(expansionImports[0].source, "crawl");
+  assert.equal(expansionImports[1].source, "crawl");
+  assert.equal(expansionImports[0].products[0].url, GENGAR);
+  assert.equal(expansionImports[1].products[0].url, PIKACHU);
+  assert.equal(createdTabs.length, 0);
+  assert.equal(tabs.get(9).url, `${page}?site=2`);
+  assert.equal(
+    updates.some((item) => item.url === `${page}?site=2` && item.active === true),
     true,
   );
 });

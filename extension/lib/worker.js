@@ -1,8 +1,11 @@
 import {
   DEFAULT_API,
+  EXPANSION_PAGE_MS,
   FETCH_TIMEOUT_MS,
   IDLE_ALARM,
   IDLE_PERIOD_MINUTES,
+  MAX_EXPANSION_PAGES,
+  MAX_EXPANSION_PRODUCTS,
   MAX_RECENT_FAILURES,
   NAV_SPACING_MS,
   PAGE_DEADLINE_MS,
@@ -10,6 +13,17 @@ import {
   WAIT_ALARM,
 } from "./constants.js";
 import { classifyUrl, finalUrlAllowed, normalizeUrl, productIdentity } from "./url.js";
+
+function expansionPageKey(url) {
+  try {
+    const parsed = new URL(url);
+    parsed.hash = "";
+    parsed.pathname = parsed.pathname.replace(/\/$/, "");
+    return parsed.toString();
+  } catch {
+    return String(url || "");
+  }
+}
 
 export async function extractInPage(requestId, jobId) {
   const { extractJob } = await import(chrome.runtime.getURL("lib/extract.js"));
@@ -34,6 +48,7 @@ export function createWorker({
   scripting,
   now = () => Date.now(),
   randomId = () => `${now()}-${Math.random().toString(16).slice(2)}`,
+  wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms)),
 } = {}) {
   let chain = Promise.resolve();
 
@@ -508,7 +523,10 @@ export function createWorker({
       await publish({ activity: (await readStore(local, ["attention"])).attention ? "needs_attention" : "paused" });
       return;
     }
-    const stored = await readStore(local, ["currentJob"]);
+    if ((await readStore(local, ["expansionBusy"])).expansionBusy) {
+      return;
+    }
+    const stored = await readStore(local, ["currentJob", "lastCardId", "lastCardLabel"]);
     let job = stored.currentJob;
     let claimed;
     try {
@@ -546,8 +564,197 @@ export function createWorker({
       }).catch(() => undefined);
       job = { ...job, ...claimed, claimToken: claimed.claim_token || job.claimToken };
     }
-    await patchLocal({ currentJob: job, currentCard: job.card_id || job.url });
+    await patchLocal({
+      currentJob: job,
+      currentCard: job.card_id || job.url,
+      lastCardId: job.card_id || stored.lastCardId,
+      lastCardLabel: job.card_id || stored.lastCardLabel,
+    });
     await loadJob(job);
+  }
+
+  async function mapStatus() {
+    const stored = await readStore(local, ["currentJob", "lastCardId", "lastCardLabel"]);
+    const job = stored.currentJob;
+    const cardId = String(job?.card_id || stored.lastCardId || "");
+    return {
+      cardId,
+      cardLabel: String(job?.card_id || stored.lastCardLabel || cardId),
+    };
+  }
+
+  async function mapCurrentUrl(url, cardId) {
+    const stored = await mapStatus();
+    const targetId = String(cardId || stored.cardId || "");
+    if (!targetId) {
+      const error = new Error("Scan a card first so the helper knows which print to link");
+      error.code = "http";
+      throw error;
+    }
+    return request("/cardmarket/helper/map", {
+      method: "POST",
+      body: { url, card_id: targetId },
+    });
+  }
+
+  async function extractExpansionFromTab(tab) {
+    if (!tab?.id) {
+      return null;
+    }
+    if (scripting?.executeScript) {
+      try {
+        const injected = await scripting.executeScript({
+          target: { tabId: tab.id },
+          files: ["expansion-extract.js"],
+        });
+        const payload = Array.isArray(injected) ? injected[0]?.result : injected?.result;
+        if (payload?.products) {
+          return payload;
+        }
+      } catch {
+        /* fall through */
+      }
+    }
+    if (!tabs.sendMessage) {
+      return null;
+    }
+    try {
+      return await tabs.sendMessage(
+        tab.id,
+        { type: "extract-expansion" },
+        tab.documentId ? { documentId: tab.documentId } : undefined,
+      );
+    } catch {
+      try {
+        return await tabs.sendMessage(tab.id, { type: "extract-expansion" });
+      } catch {
+        return null;
+      }
+    }
+  }
+
+  async function activeExpansionTab() {
+    if (typeof tabs.query !== "function") {
+      return null;
+    }
+    const matches = (tab) => classifyUrl(tab?.url || "") === "expansion";
+    try {
+      const focused = await tabs.query({
+        active: true,
+        lastFocusedWindow: true,
+      });
+      const current = focused.find(matches);
+      if (current) {
+        return current;
+      }
+    } catch {
+      /* some test harnesses ignore query filters */
+    }
+    try {
+      const found = await tabs.query({
+        url: ["https://www.cardmarket.com/*", "https://cardmarket.com/*"],
+      });
+      return found.find(matches) || null;
+    } catch {
+      return null;
+    }
+  }
+
+  async function waitForExpansionPage(tabId) {
+    const started = now();
+    while (now() - started < PAGE_DEADLINE_MS) {
+      let tab;
+      try {
+        tab = await tabs.get(tabId);
+      } catch {
+        return null;
+      }
+      const kind = classifyUrl(tab.url || "");
+      if (kind === "login" || kind === "challenge") {
+        return tab;
+      }
+      if ((!tab.status || tab.status === "complete") && kind === "expansion") {
+        return tab;
+      }
+      await wait(250);
+    }
+    try {
+      return await tabs.get(tabId);
+    } catch {
+      return null;
+    }
+  }
+
+  async function importExpansion({ crawl = false } = {}) {
+    const tab = await activeExpansionTab();
+    if (!tab?.id) {
+      const error = new Error("Open a Cardmarket set list in this window first");
+      error.code = "http";
+      throw error;
+    }
+    await patchLocal({
+      expansionBusy: true,
+      activity: crawl ? "crawling-set" : "importing-page",
+      expansionNote: crawl ? "Crawling set…" : "Importing this page…",
+    });
+    const seen = new Set();
+    let pages = 0;
+    let lastResult = {
+      stored: 0,
+      linked: 0,
+      unmatched: 0,
+      products: 0,
+      source: crawl ? "crawl" : "page",
+    };
+    try {
+      let current = tab;
+      while (pages < MAX_EXPANSION_PAGES && seen.size < MAX_EXPANSION_PRODUCTS) {
+        pages += 1;
+        const snap = await extractExpansionFromTab(current);
+        const products = Array.isArray(snap?.products) ? snap.products : [];
+        const pageUrl = snap?.pageUrl || current.url;
+        lastResult = await request("/cardmarket/helper/expansion-import", {
+          method: "POST",
+          body: {
+            page_url: pageUrl,
+            products,
+            source: crawl ? "crawl" : "page",
+          },
+        });
+        for (const item of products) {
+          if (item?.url) {
+            seen.add(item.url);
+          }
+        }
+        const note = `Stored ${lastResult.stored ?? seen.size} URLs · linked ${lastResult.linked ?? 0} · unmatched ${lastResult.unmatched ?? 0}`;
+        await patchLocal({
+          lastExpansionImport: { ...lastResult, pages, productsSeen: seen.size },
+          expansionNote: note,
+        });
+        if (!crawl) {
+          return lastResult;
+        }
+        const next = snap?.nextPage;
+        if (!next || expansionPageKey(next) === expansionPageKey(current.url || pageUrl)) {
+          break;
+        }
+        await tabs.update(current.id, { url: next, active: true });
+        current = (await waitForExpansionPage(current.id)) || (await tabs.get(current.id));
+        const kind = classifyUrl(current?.url || "");
+        if (kind !== "expansion") {
+          lastResult = { ...lastResult, stopped: kind || "navigation" };
+          await patchLocal({
+            lastExpansionImport: { ...lastResult, pages, productsSeen: seen.size },
+            expansionNote: `Stopped after ${pages} page(s): ${kind || "page changed"}`,
+          });
+          break;
+        }
+        await wait(EXPANSION_PAGE_MS);
+      }
+      return lastResult;
+    } finally {
+      await patchLocal({ expansionBusy: false, activity: "idle" });
+    }
   }
 
   async function openHelperTab() {
@@ -621,6 +828,30 @@ export function createWorker({
       }
       return snapshot();
     }
+    if (message?.type === "map-url") {
+      try {
+        const mapped = await mapCurrentUrl(message.url, message.cardId);
+        return { ok: true, ...mapped };
+      } catch (error) {
+        return { ok: false, error: String(error?.message || error) };
+      }
+    }
+    if (message?.type === "import-expansion-page" || message?.type === "import-expansion-set") {
+      try {
+        await importExpansion({
+          crawl: message.type === "import-expansion-set",
+        });
+        return snapshot();
+      } catch (error) {
+        const note = String(error?.message || error);
+        await patchLocal({
+          expansionBusy: false,
+          activity: "idle",
+          expansionNote: note,
+        });
+        return { ...(await snapshot()), error: note };
+      }
+    }
     return undefined;
   }
 
@@ -662,6 +893,12 @@ export function createWorker({
     },
     handleMessage(message, sender) {
       if (message?.type === "get-status") {
+        return snapshot();
+      }
+      if (message?.type === "map-status") {
+        return mapStatus();
+      }
+      if (message?.type === "expansion-status") {
         return snapshot();
       }
       return enqueue(() => onMessage(message, sender));

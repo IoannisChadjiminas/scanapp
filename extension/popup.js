@@ -7,6 +7,9 @@ const queuedEl = document.getElementById("queued");
 const successEl = document.getElementById("success");
 const failuresEl = document.getElementById("failures");
 const pauseBtn = document.getElementById("pause");
+const importPageBtn = document.getElementById("import-page");
+const importSetBtn = document.getElementById("import-set");
+const expansionNoteEl = document.getElementById("expansion-note");
 const serverEl = document.getElementById("server");
 const customWrap = document.getElementById("custom-wrap");
 const customUrl = document.getElementById("custom-url");
@@ -28,6 +31,12 @@ function activityLabel(value) {
   }
   if (value === "waiting_for_tab") {
     return "waiting for Cardmarket tab";
+  }
+  if (value === "importing-page") {
+    return "importing this set page";
+  }
+  if (value === "crawling-set") {
+    return "crawling whole set";
   }
   return value || "idle";
 }
@@ -57,6 +66,9 @@ function render(status) {
     ? `Recent failures: ${failures.map((item) => item.reason).join(", ")}`
     : "No recent failures";
   pauseBtn.textContent = status.paused ? "Resume" : "Pause";
+  expansionNoteEl.textContent = status.expansionNote || "No set import yet";
+  importPageBtn.disabled = Boolean(status.expansionBusy);
+  importSetBtn.disabled = Boolean(status.expansionBusy);
   const apiBase = String(status.apiBase || DEFAULT_API).replace(/\/$/, "");
   if (apiBase === SERVERS.local || apiBase === SERVERS.staging) {
     serverEl.value = apiBase;
@@ -80,13 +92,18 @@ async function refresh(message) {
     const status = await send(message);
     if (status?.error && !status.connection) {
       connectionEl.textContent = `Connection: disconnected (${status.error})`;
-      return;
+      if (status.expansionNote) {
+        expansionNoteEl.textContent = status.expansionNote;
+      }
+      return status;
     }
     if (status) {
       render(status);
     }
+    return status;
   } catch (error) {
     connectionEl.textContent = `Connection: disconnected (${error instanceof Error ? error.message : error})`;
+    return { error: error instanceof Error ? error.message : String(error) };
   }
 }
 
@@ -102,6 +119,14 @@ document.getElementById("check").addEventListener("click", () => {
 });
 document.getElementById("open-tab").addEventListener("click", () => {
   void refresh({ type: "open-helper-tab" });
+});
+document.getElementById("import-page").addEventListener("click", () => {
+  expansionNoteEl.textContent = "Importing this page…";
+  void refresh({ type: "import-expansion-page" });
+});
+document.getElementById("import-set").addEventListener("click", () => {
+  expansionNoteEl.textContent = "Crawling set…";
+  void refresh({ type: "import-expansion-set" });
 });
 document.getElementById("settings").addEventListener("submit", (event) => {
   event.preventDefault();

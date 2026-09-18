@@ -381,3 +381,145 @@ def test_job_url_accepts_pokemontcg_price_link() -> None:
         "https://www.cardmarket.com/en/Pokemon/Products/Search?searchString=Blaziken"
     )
 
+
+def test_helper_map_saves_verified_singles_url(tmp_path: Path) -> None:
+    from app.cardmarket import map_card_product, url_for_row
+    from app.db import connect, init_catalog
+
+    conn = connect(tmp_path / "catalog.sqlite")
+    init_catalog(conn)
+    conn.execute(
+        """
+        INSERT INTO cards (
+            id, provider_id, name, set_id, set_name, collector_number,
+            language, variants_json, has_image
+        ) VALUES (
+            'extra-lugia-v-326-s-p', 'extra-lugia-v-326-s-p', 'Lugia V', 's-p',
+            'SWSH Promo', '324/S-P', 'ja', '{}', 1
+        )
+        """
+    )
+    conn.commit()
+    url = (
+        "https://www.cardmarket.com/en/Pokemon/Products/Singles/"
+        "SWSH-Promos/Lugia-V-sP324?utm_source=x"
+    )
+    mapped = map_card_product(conn, tmp_path, "extra-lugia-v-326-s-p", url)
+    assert mapped["verified"] is True
+    assert mapped["url"].endswith("/Lugia-V-sP324")
+    row = conn.execute(
+        "SELECT * FROM cards WHERE id = 'extra-lugia-v-326-s-p'"
+    ).fetchone()
+    assert url_for_row(row) == mapped["url"]
+    assert row["cardmarket_provenance"] == "helper-map"
+
+
+def test_helper_map_rejects_search_and_unknown_card(tmp_path: Path) -> None:
+    from app.cardmarket import MappingError, map_card_product
+    from app.db import connect, init_catalog
+
+    conn = connect(tmp_path / "catalog.sqlite")
+    init_catalog(conn)
+    conn.execute(
+        """
+        INSERT INTO cards (
+            id, provider_id, name, set_id, set_name, collector_number,
+            language, variants_json, has_image
+        ) VALUES (
+            'extra-lugia-v-326-s-p', 'extra-lugia-v-326-s-p', 'Lugia V', 's-p',
+            'SWSH Promo', '324/S-P', 'ja', '{}', 1
+        )
+        """
+    )
+    conn.commit()
+    try:
+        map_card_product(
+            conn,
+            tmp_path,
+            "extra-lugia-v-326-s-p",
+            "https://www.cardmarket.com/en/Pokemon/Products/Search?searchString=Lugia",
+        )
+        raise AssertionError("search URL must not map")
+    except MappingError as exc:
+        assert exc.status_code == 400
+    try:
+        map_card_product(
+            conn,
+            tmp_path,
+            "missing-card",
+            "https://www.cardmarket.com/en/Pokemon/Products/Singles/SWSH-Promos/Lugia-V-sP324",
+        )
+        raise AssertionError("unknown card must not map")
+    except MappingError as exc:
+        assert exc.status_code == 404
+
+
+def test_job_url_rejects_set_list() -> None:
+    from app.cardmarket_queue import classify_url
+
+    set_list = "https://www.cardmarket.com/en/Pokemon/Products/Singles/Tag-Bolt"
+    assert classify_url(set_list) == "expansion"
+    assert classify_url(f"{set_list}?site=2") == "expansion"
+    assert not is_job_url(set_list)
+    assert is_job_url(
+        "https://www.cardmarket.com/en/Pokemon/Products/Singles/Tag-Bolt/Gengar-Mimikyu-GX-V2-sm9102"
+    )
+
+
+def test_expansion_import_links_unique_name_and_number(tmp_path: Path) -> None:
+    from app.cardmarket import import_expansion_products, url_for_row
+    from app.db import connect, init_catalog
+
+    conn = connect(tmp_path / "catalog.sqlite")
+    init_catalog(conn)
+    conn.execute(
+        """
+        INSERT INTO cards (
+            id, provider_id, name, set_id, set_name, collector_number,
+            language, variants_json, has_image
+        ) VALUES
+        (
+            'extra-clc008', 'extra-clc008', 'Pikachu', 'clc',
+            'Pokemon Trading Card Game Classic Charizard Ho-Oh ex Deck',
+            '008/034', 'en', '{}', 1
+        ),
+        (
+            'extra-gengar', 'extra-gengar', 'Gengar & Mimikyu GX', 'sm9',
+            'Tag Bolt', '103/095', 'ja', '{}', 1
+        )
+        """
+    )
+    conn.commit()
+    pikachu = (
+        "https://www.cardmarket.com/en/Pokemon/Products/Singles/"
+        "Pokemon-Trading-Card-Game-Classic-Charizard-Ho-Oh-ex-Deck/Pikachu-CLC008"
+    )
+    gengar = (
+        "https://www.cardmarket.com/en/Pokemon/Products/Singles/"
+        "Tag-Bolt/Gengar-Mimikyu-GX-V2-sm9102"
+    )
+    result = import_expansion_products(
+        conn,
+        tmp_path,
+        page_url="https://www.cardmarket.com/en/Pokemon/Products/Singles/Tag-Bolt",
+        products=[
+            {"url": pikachu, "name": "Pikachu"},
+            {"url": gengar, "name": "Gengar & Mimikyu GX"},
+        ],
+        source="page",
+    )
+    assert result["stored"] == 2
+    assert result["linked"] == 1
+    assert result["unmatched"] == 1
+    assert result["links"][0]["card_id"] == "extra-clc008"
+    assert gengar in result["unmatched_urls"]
+    pikachu_row = conn.execute("SELECT * FROM cards WHERE id = 'extra-clc008'").fetchone()
+    gengar_row = conn.execute("SELECT * FROM cards WHERE id = 'extra-gengar'").fetchone()
+    assert url_for_row(pikachu_row) == pikachu
+    assert pikachu_row["cardmarket_provenance"] == "helper-expansion"
+    assert url_for_row(gengar_row) is None
+    stored = conn.execute("SELECT url, matched FROM cardmarket_expansion_products ORDER BY url").fetchall()
+    assert {row["url"]: row["matched"] for row in stored}[gengar] == 0
+    dumps = list((tmp_path / "expansion-imports").glob("*.json"))
+    assert dumps
+

@@ -82,7 +82,7 @@ def is_verified_singles_url(url: str | None) -> bool:
     path = urlparse(raw).path
     if host not in {"www.cardmarket.com", "cardmarket.com"}:
         return False
-    return "/Products/Singles/" in path and path.rstrip("/").count("/") >= 5
+    return "/Products/Singles/" in path and path.rstrip("/").count("/") >= 6
 
 
 @dataclass(frozen=True)
@@ -306,6 +306,318 @@ def is_job_url(url: str | None) -> bool:
         and bits[3].lower() == "singles"
         and bool(bits[4] and bits[5])
     )
+
+
+def is_expansion_list_url(url: str | None) -> bool:
+    raw = (url or "").strip()
+    if not raw:
+        return False
+    parts = urlparse(raw)
+    host = (parts.netloc or "").lower()
+    if host not in {"www.cardmarket.com", "cardmarket.com"}:
+        return False
+    bits = [bit for bit in (parts.path or "").split("/") if bit]
+    return (
+        len(bits) == 5
+        and bits[1].lower() == "pokemon"
+        and bits[2].lower() == "products"
+        and bits[3].lower() == "singles"
+        and bool(bits[4])
+    )
+
+
+class MappingError(Exception):
+    def __init__(self, detail: str, status_code: int = 400) -> None:
+        super().__init__(detail)
+        self.detail = detail
+        self.status_code = status_code
+
+
+def helper_maps_path(data_dir: Path) -> Path:
+    return Path(data_dir) / "cardmarket-maps.json"
+
+
+def _read_helper_maps(data_dir: Path) -> dict[str, dict[str, Any]]:
+    path = helper_maps_path(data_dir)
+    if not path.is_file():
+        return {}
+    try:
+        payload = json.loads(path.read_text())
+    except (OSError, json.JSONDecodeError):
+        return {}
+    cards = payload.get("cards") if isinstance(payload, dict) else None
+    if not isinstance(cards, dict):
+        return {}
+    return {
+        str(card_id): item
+        for card_id, item in cards.items()
+        if isinstance(item, dict)
+    }
+
+
+def _write_helper_maps(data_dir: Path, cards: dict[str, dict[str, Any]]) -> None:
+    path = helper_maps_path(data_dir)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    tmp = path.with_name(f".{path.name}.{os.getpid()}.tmp")
+    tmp.write_text(json.dumps({"cards": cards}, indent=2) + "\n")
+    tmp.replace(path)
+
+
+def apply_helper_maps(conn: sqlite3.Connection, data_dir: Path) -> int:
+    updated = 0
+    for card_id, item in _read_helper_maps(data_dir).items():
+        url = str(item.get("cardmarket_url") or item.get("url") or "")
+        if not is_verified_singles_url(url):
+            continue
+        mapping = CardmarketMapping(
+            product_id=parse_product_id(item.get("cardmarket_id")),
+            url=normalize_product_url(url) or url,
+            verified=True,
+            provenance=str(item.get("provenance") or "helper-map"),
+            verified_at=str(item.get("verified_at") or datetime_now()),
+        )
+        cursor = conn.execute(
+            """
+            UPDATE cards
+            SET cardmarket_id = COALESCE(?, cardmarket_id),
+                cardmarket_url = ?,
+                cardmarket_verified = 1,
+                cardmarket_provenance = ?,
+                cardmarket_verified_at = ?
+            WHERE id = ?
+            """,
+            (
+                mapping.product_id,
+                mapping.url,
+                mapping.provenance,
+                mapping.verified_at,
+                card_id,
+            ),
+        )
+        updated += int(cursor.rowcount or 0)
+    return updated
+
+
+def map_card_product(
+    conn: sqlite3.Connection,
+    data_dir: Path,
+    card_id: str,
+    url: str,
+    product_id: object = None,
+    *,
+    provenance: str = "helper-map",
+    commit: bool = True,
+) -> dict[str, Any]:
+    key = (card_id or "").strip()
+    product = normalize_product_url(url)
+    if not key:
+        raise MappingError("Need a catalogue card id")
+    if not is_verified_singles_url(product):
+        raise MappingError("Need a Cardmarket Singles product URL")
+    row = conn.execute("SELECT * FROM cards WHERE id = ?", (key,)).fetchone()
+    if row is None:
+        raise MappingError("Unknown card", status_code=404)
+    mapping = CardmarketMapping(
+        product_id=parse_product_id(product_id) or parse_product_id(row["cardmarket_id"]),
+        url=product,
+        verified=True,
+        provenance=provenance or "helper-map",
+        verified_at=datetime_now(),
+    )
+    conn.execute(
+        """
+        UPDATE cards
+        SET cardmarket_id = COALESCE(?, cardmarket_id),
+            cardmarket_url = ?,
+            cardmarket_verified = 1,
+            cardmarket_provenance = ?,
+            cardmarket_verified_at = ?
+        WHERE id = ?
+        """,
+        (
+            mapping.product_id,
+            mapping.url,
+            mapping.provenance,
+            mapping.verified_at,
+            key,
+        ),
+    )
+    stored = _read_helper_maps(data_dir)
+    stored[key] = {
+        "card_id": key,
+        "cardmarket_url": mapping.url,
+        "cardmarket_id": mapping.product_id,
+        "verified_at": mapping.verified_at,
+        "provenance": mapping.provenance,
+    }
+    _write_helper_maps(data_dir, stored)
+    if commit:
+        conn.commit()
+    return {
+        "card_id": key,
+        "name": str(row["name"] or ""),
+        "url": mapping.url,
+        "cardmarket_id": mapping.product_id,
+        "verified": True,
+        "provenance": mapping.provenance,
+    }
+
+
+def _expansion_from_url(url: str | None) -> str:
+    parts = urlparse(url or "")
+    bits = [bit for bit in (parts.path or "").split("/") if bit]
+    if len(bits) >= 5:
+        return bits[4]
+    return ""
+
+
+def _unique_card_for_product(
+    conn: sqlite3.Connection, url: str, name_hint: str = ""
+) -> sqlite3.Row | None:
+    product = normalize_product_url(url) or url
+    if not is_verified_singles_url(product):
+        return None
+    coded = singles_code_and_number(product)
+    if not coded:
+        return None
+    _code, number = coded
+    parts = urlparse(product)
+    bits = [bit for bit in (parts.path or "").split("/") if bit]
+    expansion_slug = bits[-2].lower() if len(bits) >= 2 else ""
+    product_slug = bits[-1].lower() if bits else ""
+    if not product_slug or not number:
+        return None
+    hits: list[sqlite3.Row] = []
+    rows = conn.execute(
+        """
+        SELECT * FROM cards
+        WHERE cardmarket_verified = 0
+           OR cardmarket_url IS NULL
+           OR cardmarket_url = ''
+        """
+    ).fetchall()
+    for row in rows:
+        card_name = cardmarket_slug(str(row["name"] or "")).lower()
+        if not card_name or card_name not in product_slug:
+            continue
+        card_number = collector_digits(str(row["collector_number"] or "")).lstrip("0") or "0"
+        slug_number = str(number).lstrip("0") or "0"
+        if card_number != slug_number:
+            continue
+        set_slug = cardmarket_slug(str(row["set_name"] or "")).lower()
+        if (
+            set_slug
+            and expansion_slug
+            and set_slug != expansion_slug
+            and set_slug not in expansion_slug
+            and expansion_slug not in set_slug
+        ):
+            continue
+        hits.append(row)
+    if len(hits) != 1:
+        return None
+    return hits[0]
+
+
+def import_expansion_products(
+    conn: sqlite3.Connection,
+    data_dir: Path,
+    *,
+    page_url: str,
+    products: list[dict[str, Any]],
+    source: str = "page",
+) -> dict[str, Any]:
+    stamp = datetime_now()
+    expansion = _expansion_from_url(page_url)
+    stored_n = 0
+    linked: list[dict[str, str]] = []
+    unmatched: list[str] = []
+    seen: set[str] = set()
+    for item in products:
+        raw = item.get("url") if isinstance(item, dict) else item
+        name = str(item.get("name") or "") if isinstance(item, dict) else ""
+        product = normalize_product_url(str(raw or ""))
+        if not product or product in seen or not is_verified_singles_url(product):
+            continue
+        seen.add(product)
+        if not expansion:
+            expansion = _expansion_from_url(product)
+        row = _unique_card_for_product(conn, product, name)
+        card_id = str(row["id"]) if row is not None else None
+        matched = 0
+        if row is not None:
+            map_card_product(
+                conn,
+                data_dir,
+                card_id or "",
+                product,
+                provenance="helper-expansion",
+                commit=False,
+            )
+            matched = 1
+            linked.append({"card_id": card_id or "", "url": product})
+        else:
+            unmatched.append(product)
+        conn.execute(
+            """
+            INSERT INTO cardmarket_expansion_products (
+                url, expansion, name, source, page_url, card_id, matched, imported_at
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+            ON CONFLICT(url) DO UPDATE SET
+                expansion = excluded.expansion,
+                name = COALESCE(excluded.name, cardmarket_expansion_products.name),
+                source = excluded.source,
+                page_url = excluded.page_url,
+                card_id = COALESCE(excluded.card_id, cardmarket_expansion_products.card_id),
+                matched = CASE
+                    WHEN excluded.matched > cardmarket_expansion_products.matched
+                    THEN excluded.matched
+                    ELSE cardmarket_expansion_products.matched
+                END,
+                imported_at = excluded.imported_at
+            """,
+            (
+                product,
+                expansion,
+                name,
+                source if source in {"page", "crawl"} else "page",
+                normalize_product_url(page_url) or page_url,
+                card_id,
+                matched,
+                stamp,
+            ),
+        )
+        stored_n += 1
+    conn.commit()
+    dump_dir = Path(data_dir) / "expansion-imports"
+    dump_dir.mkdir(parents=True, exist_ok=True)
+    dump_path = dump_dir / f"{expansion or 'set'}-{source}-{stamp.replace(':', '').replace('+', '')}.json"
+    dump_path.write_text(
+        json.dumps(
+            {
+                "page_url": page_url,
+                "source": source,
+                "expansion": expansion,
+                "imported_at": stamp,
+                "products": list(seen),
+                "linked": linked,
+                "unmatched": unmatched,
+            },
+            indent=2,
+        )
+        + "\n"
+    )
+    return {
+        "expansion": expansion,
+        "source": source,
+        "products": len(seen),
+        "stored": stored_n,
+        "linked": len(linked),
+        "unmatched": len(unmatched),
+        "links": linked,
+        "unmatched_urls": unmatched[:20],
+        "dump": str(dump_path),
+    }
 
 
 def _decode_prices(raw: Any) -> list[dict[str, Any]]:
@@ -638,6 +950,7 @@ def sync_cardmarket_links(data_dir: Path, conn: sqlite3.Connection) -> int:
 
     extra_dir = Path(os.environ.get("EXTRA_CARDS_DIR", "/extra-cards"))
     updated += apply_extra_manifest(conn, extra_dir)
+    updated += apply_helper_maps(conn, data_dir)
     conn.commit()
     return updated
 

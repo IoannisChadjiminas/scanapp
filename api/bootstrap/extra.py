@@ -5,7 +5,7 @@ import os
 import shutil
 from pathlib import Path
 
-from app.cardmarket import mapping_from_manifest
+from app.cardmarket import apply_helper_maps, mapping_from_manifest
 from app.db import connect, coverage, coverage_by_language, init_catalog
 
 
@@ -100,6 +100,7 @@ def import_extra_cards(data_dir: Path) -> int:
         imported += 1
         print(f"  extra {card_id} {card.get('name')}")
 
+    apply_helper_maps(conn, data_dir)
     conn.commit()
     cards_n, indexed, missing = coverage(conn)
     languages = {

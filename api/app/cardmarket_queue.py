@@ -104,8 +104,23 @@ def classify_url(url: str | None) -> str:
         return "search"
     if "/products/singles/" in lowered:
         bits = [bit for bit in path.split("/") if bit]
-        if len(bits) >= 5 and bits[-2] and bits[-1]:
+        if (
+            len(bits) >= 6
+            and bits[1].lower() == "pokemon"
+            and bits[2].lower() == "products"
+            and bits[3].lower() == "singles"
+            and bits[-2]
+            and bits[-1]
+        ):
             return "product"
+        if (
+            len(bits) == 5
+            and bits[1].lower() == "pokemon"
+            and bits[2].lower() == "products"
+            and bits[3].lower() == "singles"
+            and bits[4]
+        ):
+            return "expansion"
         return "invalid"
     return "other"
 
