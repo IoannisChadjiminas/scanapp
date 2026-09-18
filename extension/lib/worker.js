@@ -9,6 +9,8 @@ import {
   EXPANSION_READ_MIN_MS,
   EXPANSION_SET_MAX_MS,
   EXPANSION_SET_MIN_MS,
+  EXPANSION_SETTLE_MAX_MS,
+  EXPANSION_SETTLE_MIN_MS,
   EXPANSION_THINK_MAX_MS,
   EXPANSION_THINK_MIN_MS,
   FETCH_TIMEOUT_MS,
@@ -865,6 +867,13 @@ export function createWorker({
         lastResult = { ...lastResult, stopped: classifyUrl(current?.url || "") || "navigation" };
         break;
       }
+      await humanPause(EXPANSION_SETTLE_MIN_MS, EXPANSION_SETTLE_MAX_MS);
+      current = (await tabs.get(current.id)) || current;
+      const settled = tabBlockReason(current);
+      if (settled) {
+        lastResult = { ...lastResult, stopped: settled };
+        break;
+      }
     }
     return { lastResult, pages, current };
   }
@@ -1080,6 +1089,13 @@ export function createWorker({
         if (!tabBlockReason(current) && classifyUrl(current?.url || "") !== "expansion" && target.url) {
           await tabs.update(current.id, { url: target.url, active: true });
           current = (await waitForExpansionPage(current.id)) || (await tabs.get(current.id));
+        }
+        await humanPause(EXPANSION_SETTLE_MIN_MS, EXPANSION_SETTLE_MAX_MS);
+        current = (await tabs.get(current.id)) || current;
+        if ((await settings()).paused) {
+          await pauseAllExpansions({ reason: "paused", index, targets, totals, label });
+          halted = true;
+          break;
         }
         const blocked = tabBlockReason(current);
         if (shouldPauseCrawl(blocked)) {
