@@ -691,6 +691,54 @@ test("Cloudflare pauses all-expansions and Continue resumes the same set", async
   assert.match(continued.expansionNote, /All sets/);
 });
 
+test("Import all starts from the first set after a pause", async () => {
+  const index = "https://www.cardmarket.com/en/Pokemon/Products/Singles";
+  const first = "https://www.cardmarket.com/en/Pokemon/Products/Singles/151";
+  const second = "https://www.cardmarket.com/en/Pokemon/Products/Singles/Tag-Bolt";
+  let blockTagBolt = true;
+  const { worker, tabs, expansionImports } = createHarness({
+    expansionExtract: (tab) => {
+      const href = tab?.url || index;
+      if (href === index || href.endsWith("/Singles")) {
+        return {
+          pageUrl: href,
+          products: [],
+          expansions: [
+            { id: "2770", url: first, name: "151" },
+            { id: "1234", url: second, name: "Tag Bolt" },
+          ],
+        };
+      }
+      if (String(href).includes("151")) {
+        return {
+          pageUrl: href,
+          products: [{ url: `${first}/Bulbasaur-V1-MEW001`, name: "Bulbasaur" }],
+          nextPage: null,
+          expansions: [],
+        };
+      }
+      if (blockTagBolt) {
+        return { pageUrl: href, products: [], nextPage: null, expansions: [], challenge: true };
+      }
+      return {
+        pageUrl: href,
+        products: [{ url: GENGAR, name: "Gengar & Mimikyu GX" }],
+        nextPage: null,
+        expansions: [],
+      };
+    },
+  });
+  tabs.set(9, { id: 9, url: index, active: true, documentId: "doc-9" });
+  await worker.handleMessage({ type: "import-expansion-all" });
+  assert.equal(expansionImports.length, 1);
+  blockTagBolt = false;
+  const restarted = await worker.handleMessage({ type: "import-expansion-all" });
+  assert.equal(expansionImports.length, 3);
+  assert.equal(expansionImports[1].products[0].url.includes("Bulbasaur"), true);
+  assert.equal(expansionImports[2].products[0].url, GENGAR);
+  assert.match(restarted.expansionNote, /All sets/);
+});
+
 test("startup unsticks a hung all-expansions crawl at the current set", async () => {
   const { worker, local } = createHarness();
   await local.set({

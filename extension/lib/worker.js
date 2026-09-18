@@ -966,7 +966,7 @@ export function createWorker({
     });
   }
 
-  async function importAllExpansions() {
+  async function importAllExpansions({ resume: resumeFromCheckpoint = false } = {}) {
     const tab = await activeCardmarketTab(["singles-index", "expansion"]);
     if (!tab?.id) {
       const error = new Error(
@@ -976,16 +976,17 @@ export function createWorker({
       throw error;
     }
     const previous = await readStore(local, ["expansionResume"]);
-    const resume =
+    const saved =
       previous.expansionResume && typeof previous.expansionResume === "object"
         ? previous.expansionResume
         : null;
+    const resume = resumeFromCheckpoint ? saved : null;
     await patchLocal({
       paused: false,
       expansionBusy: true,
       activity: "crawling-all-sets",
       attention: null,
-      expansionNote: resume ? "Continuing expansions…" : "Opening Expansion dropdown…",
+      expansionNote: resume ? "Continuing from where it left off…" : "Starting from the first expansion…",
     });
     const seen = new Set();
     const totals = {
@@ -1010,6 +1011,9 @@ export function createWorker({
         }
         targets = targets.filter((item) => item?.id || classifyUrl(item?.url || "") === "expansion");
         targets = targets.slice(0, MAX_EXPANSIONS);
+        if (!targets.length && saved?.targets?.length) {
+          targets = saved.targets.slice(0, MAX_EXPANSIONS);
+        }
       }
       if (!targets.length) {
         const error = new Error(
@@ -1020,6 +1024,9 @@ export function createWorker({
       }
       if (resume && resume.index != null && !resume.targets?.length) {
         startIndex = Math.min(Math.max(Number(resume.index) || 0, 0), targets.length);
+      }
+      if (!resumeFromCheckpoint) {
+        startIndex = 0;
       }
       await patchLocal({
         expansionResume: {
@@ -1199,7 +1206,7 @@ export function createWorker({
     }
     await patchLocal({ helperTabClosed: false, attention: null, activity: "idle" });
     if (stored.expansionResume && (stored.expansionResume.targets?.length || stored.expansionResume.index != null)) {
-      await importAllExpansions();
+      await importAllExpansions({ resume: true });
       return;
     }
     await tick();
