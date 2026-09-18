@@ -857,7 +857,7 @@ test("Cloudflare tick auto-resumes without pressing Continue", async () => {
   blockTagBolt = false;
   const tab = { id: 9, url: second, active: true, documentId: "doc-9", title: "Tag Bolt", status: "complete" };
   tabs.set(9, tab);
-  await worker.tabUpdated(9, { status: "complete", title: "Tag Bolt" }, tab);
+  await worker.handleMessage({ type: "poll" });
   const pages = productPages(expansionImports);
   assert.equal(pages.length, 2);
   assert.equal(pages[1].products[0].url, GENGAR);

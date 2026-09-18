@@ -122,10 +122,21 @@ export function hasEmptyState(root) {
   );
 }
 
+export function challengeTitle(title) {
+  const text = String(title || "").toLowerCase();
+  return (
+    text.includes("just a moment") ||
+    text.includes("einen moment") ||
+    text.includes("attention required") ||
+    text.includes("checking your browser") ||
+    text.includes("verify you are human") ||
+    (text.includes("cloudflare") && !text.includes("cardmarket"))
+  );
+}
+
 export function hasChallenge(root, url = "", title = "") {
-  const haystack = `${url} ${title} ${root.body?.innerText || ""}`.toLowerCase();
   if (root.querySelector?.("#challenge-form, .cf-turnstile, #cf-challenge, input[name='cf-turnstile-response']")) {
     return true;
   }
-  return haystack.includes("just a moment") || haystack.includes("attention required") || haystack.includes("cloudflare");
+  return challengeTitle(title);
 }

@@ -1,4 +1,6 @@
 import {
+  CHALLENGE_WATCH_MS,
+  CHALLENGE_WATCH_TICKS,
   DEFAULT_API,
   DEFAULT_PACE,
   FETCH_TIMEOUT_MS,
@@ -14,6 +16,7 @@ import {
   PARSER_VERSION,
   WAIT_ALARM,
 } from "./constants.js";
+import { challengeTitle } from "./parse.js";
 import { classifyUrl, finalUrlAllowed, normalizeUrl, productIdentity } from "./url.js";
 import { expansionDrive } from "./expansion-drive.js";
 
@@ -87,14 +90,7 @@ function tabBlockReason(tab, snap) {
     return kind;
   }
   const title = String(tab?.title || "").toLowerCase();
-  if (
-    title.includes("just a moment") ||
-    title.includes("einen moment") ||
-    title.includes("attention required") ||
-    title.includes("cloudflare") ||
-    title.includes("checking your browser") ||
-    title.includes("verify you are human")
-  ) {
+  if (challengeTitle(title)) {
     return "challenge";
   }
   return null;
@@ -643,6 +639,12 @@ export function createWorker({
   async function tick() {
     await ensureAlarms();
     const { helperToken, paused, apiBase } = await settings();
+    if (paused) {
+      const resumed = await maybeResumeFromOpenTabs();
+      if (resumed) {
+        return;
+      }
+    }
     if (!helperToken) {
       await publish({ connection: "authentication_required", activity: "idle" });
       return;
@@ -1098,6 +1100,7 @@ export function createWorker({
       await notifyPhone(
         `Cloudflare on ${label}. Tick the box on the Mac. The crawl continues once the page loads.`,
       );
+      void watchPausedChallenge(tabId);
     }
   }
 
@@ -1530,14 +1533,67 @@ export function createWorker({
     return undefined;
   }
 
+  async function liveTabState(tab) {
+    const fallback = { title: tab?.title || "", url: tab?.url || "", ready: false, cf: false };
+    if (!tab?.id || typeof scripting?.executeScript !== "function") {
+      return fallback;
+    }
+    try {
+      const injected = await withTimeout(
+        scripting.executeScript({
+          target: { tabId: tab.id },
+          func: () => ({
+            title: document.title || "",
+            url: location.href || "",
+            cf: Boolean(
+              document.querySelector(
+                "#challenge-form, .cf-turnstile, #cf-challenge, input[name='cf-turnstile-response']",
+              ),
+            ),
+            ready: Boolean(
+              document.querySelector(
+                'select[name="idExpansion"], select#idExpansion, table.table, .table-body',
+              ),
+            ),
+          }),
+        }),
+        2_500,
+      );
+      const result = Array.isArray(injected) ? injected[0]?.result : injected?.result;
+      if (!result) {
+        return fallback;
+      }
+      return {
+        title: result.title || fallback.title,
+        url: result.url || fallback.url,
+        ready: Boolean(result.ready),
+        cf: Boolean(result.cf),
+      };
+    } catch {
+      return fallback;
+    }
+  }
+
   async function challengePageCleared(tab) {
-    if (!tab?.url) {
+    if (!tab?.url && !tab?.id) {
       return false;
     }
-    if (tabBlockReason(tab)) {
+    const live = await liveTabState(tab);
+    const title = String(live.title || tab?.title || "").trim();
+    const url = live.url || tab?.url || "";
+    if (challengeTitle(title) || live.cf) {
       return false;
     }
-    const kind = classifyUrl(tab.url);
+    if (live.ready && url) {
+      return true;
+    }
+    if (!title) {
+      return false;
+    }
+    if (tabBlockReason({ ...tab, title, url })) {
+      return false;
+    }
+    const kind = classifyUrl(url);
     return kind === "expansion" || kind === "singles-index";
   }
 
@@ -1555,6 +1611,50 @@ export function createWorker({
     await patchLocal({ expansionNote: "Cloudflare passed — continuing the crawl…" });
     await setPaused(false);
     return true;
+  }
+
+  async function maybeResumeFromOpenTabs() {
+    const stored = await readStore(local, ["paused", "expansionBusy", "expansionResume"]);
+    if (!stored.paused || stored.expansionBusy || stored.expansionResume?.reason !== "challenge") {
+      return false;
+    }
+    let found = [];
+    try {
+      found = await tabs.query({
+        url: ["https://www.cardmarket.com/*", "https://cardmarket.com/*"],
+      });
+    } catch {
+      found = [];
+    }
+    for (const tab of found || []) {
+      if (await maybeResumeAfterChallenge(tab)) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  async function watchPausedChallenge(tabId) {
+    for (let step = 0; step < CHALLENGE_WATCH_TICKS; step += 1) {
+      await wait(CHALLENGE_WATCH_MS);
+      const stored = await readStore(local, ["paused", "expansionBusy", "expansionResume"]);
+      if (!stored.paused || stored.expansionBusy || stored.expansionResume?.reason !== "challenge") {
+        return;
+      }
+      if (tabId) {
+        try {
+          const tab = await tabs.get(tabId);
+          if (await maybeResumeAfterChallenge(tab)) {
+            return;
+          }
+        } catch {
+          /* tab closed */
+        }
+      }
+      if (await maybeResumeFromOpenTabs()) {
+        return;
+      }
+    }
   }
 
   async function onTabRemoved(tabId) {
