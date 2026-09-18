@@ -209,7 +209,7 @@ export function createWorker({
       /* ignore */
     }
     await rememberFailure(reason);
-    await patchLocal({ currentJob: null, currentCard: "" });
+    await patchLocal({ currentJob: null, currentCard: "", activity: "idle" });
   }
 
   async function uploadPending() {
@@ -285,6 +285,14 @@ export function createWorker({
       });
       return { ok: false, reason: "challenge" };
     }
+    if (message.outcome === "loading" || kind === "pokemontcg") {
+      if (now() - (job.loadStartedAt || now()) > PAGE_DEADLINE_MS) {
+        await failCurrent("loading");
+        return { ok: false, reason: "loading" };
+      }
+      await scheduleWait(1000);
+      return { ok: false, reason: "loading" };
+    }
     if (message.outcome === "wrong_product" || kind === "search" || !finalUrlAllowed(job.url, finalUrl)) {
       await failCurrent("wrong_product", true);
       return { ok: false, reason: "wrong-product" };
@@ -320,19 +328,24 @@ export function createWorker({
     if (!tabs.sendMessage || !tab?.id) {
       return null;
     }
+    const message = {
+      type: "extract",
+      requestId: job.requestId,
+      jobId: job.id,
+      expectedUrl: job.url,
+    };
     try {
       return await tabs.sendMessage(
         tab.id,
-        {
-          type: "extract",
-          requestId: job.requestId,
-          jobId: job.id,
-          expectedUrl: job.url,
-        },
+        message,
         tab.documentId ? { documentId: tab.documentId } : undefined,
       );
     } catch {
-      return null;
+      try {
+        return await tabs.sendMessage(tab.id, message);
+      } catch {
+        return null;
+      }
     }
   }
 
@@ -353,7 +366,7 @@ export function createWorker({
     }
     const currentUrl = tab.url || "";
     const alreadyThere =
-      normalizeUrl(currentUrl) === normalizeUrl(target) || classifyUrl(currentUrl) === "product";
+      normalizeUrl(currentUrl) === normalizeUrl(target) || finalUrlAllowed(target, currentUrl);
     if (!alreadyThere) {
       const wait = (stored.lastNavigationAt || 0) + NAV_SPACING_MS - now();
       if (wait > 0) {
@@ -369,6 +382,14 @@ export function createWorker({
       return;
     }
     const kind = classifyUrl(currentUrl);
+    if (kind === "invalid") {
+      if (now() - (job.loadStartedAt || now()) > PAGE_DEADLINE_MS) {
+        await failCurrent("loading");
+        return;
+      }
+      await scheduleWait(1000);
+      return;
+    }
     if (kind === "login" || kind === "challenge") {
       await bindExtract({ type: "extract-result", requestId: job.requestId, jobId: job.id, outcome: "challenge", url: currentUrl }, { tab });
       return;

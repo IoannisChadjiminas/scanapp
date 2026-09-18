@@ -80,6 +80,7 @@ The old four-second poller and focus-stealing product tabs are gone.
 ## Troubleshooting
 
 - **Authentication required:** paste a fresh token from `python -m app.helper_credential`
+- **Repeated `loading` failures / Fetching with no card:** reload the unpacked extension (0.2.1+). The helper tab is reused after the service worker sleeps; then click **Open helper tab** so Cardmarket can finish login or a challenge
 - **Helper tab closed / navigated away:** click **Open helper tab**, then **Resume**
 - **Cardmarket needs attention:** solve login or the browser challenge in the helper tab, then **Resume**
 - Phone and PC must share the same API. For local Docker, the phone has to reach this machine, not only `127.0.0.1` on the phone

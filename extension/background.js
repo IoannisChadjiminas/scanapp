@@ -34,4 +34,4 @@ chrome.tabs.onUpdated.addListener((tabId, info, tab) => {
 });
 
 void worker.installAlarms();
-wake("startup");
+wake("init");

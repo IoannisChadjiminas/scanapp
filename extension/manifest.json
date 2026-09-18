@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Scanapp Cardmarket helper",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "Quiet background helper that fetches Cardmarket listings for Scanapp, one card at a time.",
   "action": {
     "default_title": "Scanapp Cardmarket helper",
@@ -15,6 +15,7 @@
     "http://localhost:8080/*",
     "https://staging-scan.auctaro.com/*",
     "https://www.cardmarket.com/*",
+    "https://cardmarket.com/*",
     "https://prices.pokemontcg.io/*"
   ],
   "background": {
@@ -24,9 +25,8 @@
   "content_scripts": [
     {
       "matches": [
-        "https://www.cardmarket.com/*/Pokemon/Products/Singles/*",
-        "https://www.cardmarket.com/*/Pokemon/Products/Search*",
-        "https://www.cardmarket.com/*/Login*"
+        "https://www.cardmarket.com/*",
+        "https://cardmarket.com/*"
       ],
       "js": ["content.js"],
       "type": "module",

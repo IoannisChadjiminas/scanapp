@@ -92,6 +92,8 @@ function createHarness({ extract } = {}) {
     }
     return jsonResponse({ detail: "missing" }, 404);
   };
+  const updates = [];
+  let clock = 1_000_000;
   const tabApi = {
     async create({ url, active }) {
       const tab = { id: tabSeq++, url, active: Boolean(active), documentId: `doc-${tabSeq}` };
@@ -112,12 +114,16 @@ function createHarness({ extract } = {}) {
     async update(id, props) {
       const tab = tabs.get(id);
       Object.assign(tab, props);
+      updates.push({ id, ...props });
       if (props.active) {
         activeTab = id;
       }
       return tab;
     },
-    async sendMessage(_id, message) {
+    async sendMessage(_id, message, options) {
+      if (options?.documentId && extract?.requireNoDocumentId) {
+        throw new Error("no receiver");
+      }
       if (extract) {
         return extract(message);
       }
@@ -137,10 +143,23 @@ function createHarness({ extract } = {}) {
     fetchImpl,
     tabs: tabApi,
     alarms: { create: async () => undefined },
-    now: () => 1_000_000,
+    now: () => clock,
     randomId: () => "req-1",
   });
-  return { worker, local, session, claims, completes, createdTabs, tabs, activeTab: () => activeTab };
+  return {
+    worker,
+    local,
+    session,
+    claims,
+    completes,
+    createdTabs,
+    tabs,
+    updates,
+    advance: (ms) => {
+      clock += ms;
+    },
+    activeTab: () => activeTab,
+  };
 }
 
 test("overlapping wake events claim only one job", async () => {
@@ -237,4 +256,58 @@ test("status snapshot is not blocked by a hung API", async () => {
   const status = await worker.handleMessage({ type: "get-status" });
   assert.equal(status.helperToken, "helper.token");
   assert.equal(status.apiBase, "https://staging-scan.auctaro.com");
+});
+
+test("service worker init keeps the helper tab", async () => {
+  const { worker, createdTabs, session } = createHarness();
+  await worker.wake("alarm");
+  assert.equal(createdTabs.length, 1);
+  const tabId = createdTabs[0].id;
+  await worker.wake("init");
+  const stored = await session.get("helperTabId");
+  assert.equal(stored.helperTabId, tabId);
+  assert.equal(createdTabs.length, 1);
+});
+
+test("a different product page is not treated as already loaded", async () => {
+  const { worker, createdTabs, updates, advance } = createHarness();
+  await worker.wake("alarm");
+  createdTabs[0].url = PIKACHU;
+  advance(30_000);
+  await worker.wake("alarm");
+  assert.equal(updates.at(-1)?.url, GENGAR);
+});
+
+test("extract retries without documentId", async () => {
+  const { worker, completes } = createHarness({
+    extract: Object.assign(
+      async () => ({
+        outcome: "offers",
+        url: GENGAR,
+        prices: [{ label: "NM", amount: 10, currency: "EUR" }],
+        observedAt: "2026-09-17T12:00:00Z",
+        parserVersion: "offers-v1",
+        sampledOfferCount: 1,
+      }),
+      { requireNoDocumentId: true },
+    ),
+  });
+  await worker.wake("alarm");
+  await worker.wake("alarm");
+  assert.equal(completes.length, 1);
+});
+
+test("loading failure returns the popup to idle", async () => {
+  const { worker, local, advance } = createHarness({
+    extract: async () => {
+      throw new Error("no receiver");
+    },
+  });
+  await worker.wake("alarm");
+  advance(61_000);
+  await worker.wake("alarm");
+  const stored = await local.get(["activity", "currentCard", "recentFailures"]);
+  assert.equal(stored.activity, "idle");
+  assert.equal(stored.currentCard, "");
+  assert.equal(stored.recentFailures[0].reason, "loading");
 });
