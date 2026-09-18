@@ -6,6 +6,7 @@ const worker = createWorker({
   session: chrome.storage.session,
   fetchImpl: fetch.bind(globalThis),
   tabs: chrome.tabs,
+  scripting: chrome.scripting,
   alarms: chrome.alarms,
   now: () => Date.now(),
   randomId: () => crypto.randomUUID(),
@@ -15,10 +16,43 @@ function wake(reason) {
   void worker.wake(reason);
 }
 
-chrome.runtime.onInstalled.addListener(() => wake("installed"));
-chrome.runtime.onStartup.addListener(() => wake("startup"));
+async function ensureOffscreen() {
+  if (!chrome.offscreen?.createDocument || !chrome.runtime.getContexts) {
+    return;
+  }
+  const existing = await chrome.runtime.getContexts({
+    contextTypes: ["OFFSCREEN_DOCUMENT"],
+  });
+  if (existing.length) {
+    return;
+  }
+  try {
+    await chrome.offscreen.createDocument({
+      url: "offscreen.html",
+      reasons: ["WORKERS"],
+      justification:
+        "Poll Scanapp for new Cardmarket jobs without waiting for Chrome's 30-second alarm limit.",
+    });
+  } catch {
+    // Already open, or this Chrome build rejected the offscreen document.
+  }
+}
+
+chrome.runtime.onInstalled.addListener(() => {
+  void ensureOffscreen();
+  wake("installed");
+});
+chrome.runtime.onStartup.addListener(() => {
+  void ensureOffscreen();
+  wake("startup");
+});
 chrome.alarms.onAlarm.addListener((alarm) => {
   wake(alarm?.name || IDLE_ALARM);
+});
+chrome.runtime.onConnect.addListener((port) => {
+  if (port.name === "keepalive") {
+    wake("poll");
+  }
 });
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   worker.handleMessage(message, sender).then(sendResponse, (error) => {
@@ -34,4 +68,5 @@ chrome.tabs.onUpdated.addListener((tabId, info, tab) => {
 });
 
 void worker.installAlarms();
+void ensureOffscreen();
 wake("init");

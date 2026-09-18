@@ -48,7 +48,7 @@ Pause survives Chrome restarts. It stops new claims immediately. A collected res
 
 ## Behaviour
 
-- One helper tab, opened automatically in the **foreground** (not in the background). Cloudflare blocks hidden tabs. You do not need to press Open on Cardmarket.
+- One helper tab, opened automatically in the **foreground** as soon as a scan queues a job (about one second, not Chrome’s 30-second alarm). Cloudflare blocks hidden tabs. You do not need to press Open on Cardmarket.
 - One serialized worker; overlapping alarms, popup clicks, and page messages cannot claim two jobs
 - State is persisted (settings, pause, current job, claim, unsaved result). Service worker timers are not trusted for recovery
 - After a Chrome restart, tab IDs are discarded and ownership is established again
@@ -80,10 +80,11 @@ The old four-second poller and focus-stealing product tabs are gone.
 ## Troubleshooting
 
 - **Authentication required:** paste a fresh token from `python -m app.helper_credential`
-- **Repeated `loading` failures:** reload the unpacked extension (0.2.5+). The helper opens Cardmarket in the front. Complete Cloudflare/login in that tab if asked.
+- **Tab opens late / not at all:** reload the unpacked extension (0.2.7+). Chrome otherwise only wakes the helper every 30 seconds.
+- **Site says “Could not read Cardmarket listings” while a tab is open:** reload the extension (0.2.7+), then scan again. The site used to freeze on an old failed job.
 - **Helper tab closed / navigated away:** click **Open helper tab**, then **Resume**
 - **Cardmarket needs attention:** solve login or the browser challenge in the helper tab, then **Resume**
-- Phone and PC must share the same API. For local Docker, the phone has to reach this machine, not only `127.0.0.1` on the phone
+- Phone and PC must share the same API. If you scan on `http://localhost:8080`, the helper server must be **Local Docker**, not Staging.
 
 ## Tests
 

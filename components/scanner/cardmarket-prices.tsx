@@ -48,7 +48,11 @@ function formatObserved(iso: string | null | undefined) {
   return `Offers checked ${hours} hours ago`;
 }
 
-function statusMessage(payload: CardmarketPriceResponse, hasLive: boolean) {
+function statusMessage(
+  payload: CardmarketPriceResponse,
+  hasLive: boolean,
+  waiting: boolean,
+) {
   if (payload.helper_attention) {
     return "Cardmarket needs attention";
   }
@@ -61,20 +65,34 @@ function statusMessage(payload: CardmarketPriceResponse, hasLive: boolean) {
   if (Array.isArray(payload.prices) && payload.prices.length) {
     return "Cardmarket guide prices";
   }
-  if (payload.status === "failed") {
-    return "Could not read Cardmarket listings";
-  }
   if (payload.status === "done") {
     return "No listings on Cardmarket";
-  }
-  const queued = payload.status === "pending" || payload.status === "claimed";
-  if (!queued) {
-    return null;
   }
   if (payload.helper_online === false) {
     return "Queued — helper offline";
   }
-  return "Fetching offers";
+  if (payload.status === "failed" && !waiting) {
+    return "Could not read Cardmarket listings";
+  }
+  if (
+    payload.status === "pending" ||
+    payload.status === "claimed" ||
+    payload.status === "failed" ||
+    waiting
+  ) {
+    return "Fetching offers";
+  }
+  return null;
+}
+
+function stillWaitingForOffers(payload: CardmarketPriceResponse, live: boolean) {
+  if (live || payload.status === "done") {
+    return false;
+  }
+  if (payload.helper_attention || payload.helper_paused || payload.helper_online === false) {
+    return false;
+  }
+  return true;
 }
 
 export function CardmarketPrices({
@@ -145,6 +163,7 @@ export function useCardmarketListings(
     let stopped = false;
     let attempts = 0;
     setWaiting(true);
+    setMessage("Fetching offers");
 
     const tick = async () => {
       attempts += 1;
@@ -157,17 +176,20 @@ export function useCardmarketListings(
         if (payload.prices.length) {
           setPrices(payload.prices);
         }
-        const nextMessage = statusMessage(payload, live);
-        setMessage(nextMessage);
-        if (live || payload.status === "failed" || payload.status === "done") {
-          setWaiting(false);
-          return;
-        }
-        if (payload.helper_attention || payload.helper_paused || payload.helper_online === false) {
-          setWaiting(false);
+        const keepGoing = stillWaitingForOffers(payload, live) && attempts < 45;
+        setWaiting(keepGoing);
+        setMessage(statusMessage(payload, live, keepGoing));
+        if (!keepGoing) {
           return;
         }
       } catch {
+        if (stopped) {
+          return;
+        }
+        if (attempts < 45) {
+          window.setTimeout(tick, 2000);
+          return;
+        }
         setWaiting(false);
         setMessage("Queued — helper offline");
         return;
@@ -175,13 +197,16 @@ export function useCardmarketListings(
       if (stopped) {
         return;
       }
-      if (attempts >= 20) {
-        setWaiting(false);
-        return;
-      }
       window.setTimeout(tick, 2000);
     };
-    void tick();
+    void api
+      .enqueueCardmarketJob(url)
+      .catch(() => undefined)
+      .then(() => {
+        if (!stopped) {
+          return tick();
+        }
+      });
     return () => {
       stopped = true;
     };

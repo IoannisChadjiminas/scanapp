@@ -783,6 +783,18 @@ def latest_job_status(conn: sqlite3.Connection, url: str | None) -> str | None:
     key = normalize_product_url(url)
     if not key:
         return None
+    active = conn.execute(
+        """
+        SELECT status FROM cardmarket_jobs
+        WHERE url = ?
+          AND status IN ('pending', 'claimed')
+        ORDER BY updated_at DESC
+        LIMIT 1
+        """,
+        (key,),
+    ).fetchone()
+    if active is not None:
+        return str(active["status"] or "") or None
     row = conn.execute(
         """
         SELECT status FROM cardmarket_jobs

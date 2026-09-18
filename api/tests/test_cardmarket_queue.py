@@ -177,6 +177,32 @@ def test_retry_limit_then_stop(tmp_path):
     assert claim_job(conn, helper_id) is None
 
 
+def test_prices_status_prefers_active_job_over_failed(tmp_path):
+    conn = _catalog(tmp_path)
+    helper_id, _ = issue_helper_credential(conn)
+    enqueue_job(conn, GENGAR, "gengar")
+    for index in range(3):
+        job = claim_job(conn, helper_id)
+        assert job is not None
+        status = retry_or_fail_job(
+            conn,
+            job["id"],
+            helper_id=helper_id,
+            claim_token=job["claim_token"],
+            reason="parser",
+        )
+        if index < 2:
+            assert status == "pending"
+            conn.execute(
+                "UPDATE cardmarket_jobs SET next_attempt_at = '2020-01-01T00:00:00Z' WHERE id = ?",
+                (job["id"],),
+            )
+            conn.commit()
+    assert prices_payload(conn, GENGAR)["status"] == "failed"
+    enqueue_job(conn, GENGAR, "gengar")
+    assert prices_payload(conn, GENGAR)["status"] == "pending"
+
+
 def test_complete_rollback_leaves_claim(tmp_path):
     conn = _catalog(tmp_path)
     helper_id, _ = issue_helper_credential(conn)

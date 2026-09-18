@@ -1,13 +1,13 @@
 {
   "manifest_version": 3,
   "name": "Scanapp Cardmarket helper",
-  "version": "0.2.5",
+  "version": "0.2.7",
   "description": "Quiet background helper that fetches Cardmarket listings for Scanapp, one card at a time.",
   "action": {
     "default_title": "Scanapp Cardmarket helper",
     "default_popup": "popup.html"
   },
-  "permissions": ["alarms", "storage", "tabs"],
+  "permissions": ["alarms", "offscreen", "scripting", "storage", "tabs"],
   "host_permissions": [
     "http://127.0.0.1:8000/*",
     "http://localhost:8000/*",
@@ -31,6 +31,12 @@
       "js": ["content.js"],
       "type": "module",
       "run_at": "document_idle"
+    }
+  ],
+  "web_accessible_resources": [
+    {
+      "resources": ["lib/*.js"],
+      "matches": ["https://www.cardmarket.com/*", "https://cardmarket.com/*"]
     }
   ]
 }

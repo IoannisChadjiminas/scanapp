@@ -106,11 +106,13 @@ export const api = {
     ),
 };
 
-export function queueCardmarketLookup(url?: string | null, cardId?: string) {
+export async function queueCardmarketLookup(url?: string | null, cardId?: string) {
   if (!url) {
     return;
   }
-  void api.enqueueCardmarketJob(url, cardId).catch(() => {
+  try {
+    await api.enqueueCardmarketJob(url, cardId);
+  } catch {
     /* listing fetch must not block recognition */
-  });
+  }
 }

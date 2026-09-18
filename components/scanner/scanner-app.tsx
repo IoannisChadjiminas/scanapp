@@ -156,6 +156,10 @@ export function ScannerApp() {
     setError(null);
     try {
       const result = await api.scan(blob, { skip_detect: "true", language }, controller.signal);
+      if (result.status === "matched" || result.status === "uncertain") {
+        const top = result.suggestions[0];
+        await queueCardmarketLookup(top?.cardmarket_url, top?.card_id);
+      }
       setScan(result);
       setStage("result");
       setStatusText(
@@ -167,10 +171,6 @@ export function ScannerApp() {
               ? "More than one print could match. Choose the correct card."
               : "Not a match.",
       );
-      if (result.status === "matched" || result.status === "uncertain") {
-        const top = result.suggestions[0];
-        queueCardmarketLookup(top?.cardmarket_url, top?.card_id);
-      }
       await refreshResults();
     } catch (cause) {
       if (cause instanceof DOMException && cause.name === "AbortError") {
@@ -191,7 +191,7 @@ export function ScannerApp() {
       if (action !== "reject") {
         const selected =
           scan.suggestions.find((item) => item.card_id === cardId) ?? scan.suggestions[0];
-        queueCardmarketLookup(selected?.cardmarket_url, cardId || selected?.card_id);
+        await queueCardmarketLookup(selected?.cardmarket_url, cardId || selected?.card_id);
       }
       await refreshResults();
       setStatusText(

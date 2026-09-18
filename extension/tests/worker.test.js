@@ -45,7 +45,7 @@ function jsonResponse(payload, status = 200) {
   };
 }
 
-function createHarness({ extract } = {}) {
+function createHarness({ extract, scripting } = {}) {
   const local = memoryStore({
     apiBase: "http://127.0.0.1:8000",
     helperToken: "helper.token",
@@ -57,6 +57,7 @@ function createHarness({ extract } = {}) {
   const claims = [];
   const completes = [];
   const createdTabs = [];
+  const fails = [];
   const fetchImpl = async (url, init = {}) => {
     const path = new URL(url).pathname;
     const body = init.body ? JSON.parse(init.body) : {};
@@ -87,7 +88,11 @@ function createHarness({ extract } = {}) {
       completes.push(body);
       return jsonResponse({ status: "done", prices: body.prices || [], idempotent: completes.length > 1 });
     }
-    if (path.endsWith("/cardmarket/helper/release") || path.endsWith("/cardmarket/helper/fail")) {
+    if (path.endsWith("/cardmarket/helper/fail")) {
+      fails.push(body);
+      return jsonResponse({ status: "pending" });
+    }
+    if (path.endsWith("/cardmarket/helper/release")) {
       return jsonResponse({ status: "pending" });
     }
     return jsonResponse({ detail: "missing" }, 404);
@@ -145,6 +150,7 @@ function createHarness({ extract } = {}) {
     session,
     fetchImpl,
     tabs: tabApi,
+    scripting,
     alarms: { create: async () => undefined },
     now: () => clock,
     randomId: () => "req-1",
@@ -155,6 +161,7 @@ function createHarness({ extract } = {}) {
     session,
     claims,
     completes,
+    fails,
     createdTabs,
     tabs,
     updates,
@@ -171,6 +178,16 @@ test("overlapping wake events claim only one job", async () => {
   assert.equal(claims.length, 1);
 });
 
+test("opens the claimed product immediately even after a recent navigation", async () => {
+  const { worker, session, local, tabs, updates, createdTabs } = createHarness();
+  tabs.set(7, { id: 7, url: PIKACHU, documentId: "doc-7" });
+  await session.set({ helperTabId: 7 });
+  await local.set({ lastNavigationAt: 1_000_000 });
+  await worker.handleMessage({ type: "poll" });
+  assert.equal(createdTabs.length, 0);
+  assert.equal(updates.some((item) => item.url === GENGAR && item.active === true), true);
+});
+
 test("opens Cardmarket in the foreground by itself", async () => {
   const { worker, createdTabs, activeTab } = createHarness();
   await worker.wake("alarm");
@@ -178,6 +195,34 @@ test("opens Cardmarket in the foreground by itself", async () => {
   assert.equal(createdTabs[0].active, true);
   assert.equal(createdTabs[0].url, GENGAR);
   assert.equal(activeTab(), createdTabs[0].id);
+});
+
+test("unrecognized extract waits instead of failing", async () => {
+  const { worker, fails } = createHarness({
+    extract: async () => ({
+      outcome: "unrecognized",
+      url: GENGAR,
+      prices: [],
+    }),
+  });
+  await worker.wake("alarm");
+  await worker.wake("alarm");
+  assert.equal(fails.length, 0);
+});
+
+test("parser fail waits until the page deadline", async () => {
+  const { worker, fails, advance } = createHarness({
+    extract: async () => ({
+      outcome: "unrecognized",
+      url: GENGAR,
+      prices: [],
+    }),
+  });
+  await worker.wake("alarm");
+  advance(61_000);
+  await worker.wake("alarm");
+  assert.equal(fails.length, 1);
+  assert.equal(fails[0].reason, "parser");
 });
 
 test("delayed extract from another card is rejected", async () => {
@@ -319,6 +364,33 @@ test("reads listings after a product tab opens", async () => {
   tabs.set(50, tab);
   await worker.tabUpdated(50, { status: "complete", url: GENGAR }, tab);
   assert.equal(completes.length, 1);
+});
+
+test("reads listings through injected extract", async () => {
+  const { worker, completes, createdTabs } = createHarness({
+    extract: async () => {
+      throw new Error("content script missing");
+    },
+    scripting: {
+      executeScript: async () => [
+        {
+          result: {
+            outcome: "offers",
+            url: GENGAR,
+            prices: [{ label: "NM", amount: 4, currency: "EUR" }],
+            observedAt: "2026-09-18T07:00:00Z",
+            parserVersion: "offers-v1",
+            sampledOfferCount: 1,
+          },
+        },
+      ],
+    },
+  });
+  await worker.wake("alarm");
+  const tab = createdTabs[0];
+  await worker.tabUpdated(tab.id, { status: "complete", url: GENGAR }, tab);
+  assert.equal(completes.length, 1);
+  assert.equal(completes[0].prices[0].amount, 4);
 });
 
 test("uses an already open product tab instead of creating one", async () => {

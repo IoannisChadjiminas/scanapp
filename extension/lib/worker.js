@@ -11,6 +11,11 @@ import {
 } from "./constants.js";
 import { classifyUrl, finalUrlAllowed, normalizeUrl } from "./url.js";
 
+export async function extractInPage(requestId, jobId) {
+  const { extractJob } = await import(chrome.runtime.getURL("lib/extract.js"));
+  return extractJob(requestId, jobId);
+}
+
 async function readStore(store, keys) {
   const result = await store.get(keys);
   return result || {};
@@ -26,6 +31,7 @@ export function createWorker({
   fetchImpl,
   tabs,
   alarms,
+  scripting,
   now = () => Date.now(),
   randomId = () => `${now()}-${Math.random().toString(16).slice(2)}`,
 } = {}) {
@@ -286,16 +292,15 @@ export function createWorker({
       await failCurrent("wrong_product", true);
       return { ok: false, reason: "wrong-product" };
     }
-    if (message.outcome === "unrecognized") {
-      await failCurrent("parser", false);
-      await scheduleWait(NAV_SPACING_MS);
-      return { ok: false, reason: "parser" };
-    }
     const empty = message.outcome === "empty";
     const prices = Array.isArray(message.prices) ? message.prices : [];
-    if (!empty && !prices.length) {
-      await failCurrent("parser", false);
-      return { ok: false, reason: "parser" };
+    if (message.outcome === "unrecognized" || (!empty && !prices.length)) {
+      if (now() - (job.loadStartedAt || now()) >= PAGE_DEADLINE_MS) {
+        await failCurrent("parser", false);
+        return { ok: false, reason: "parser" };
+      }
+      await scheduleWait(1000);
+      return { ok: false, reason: "loading" };
     }
     const pending = {
       job_id: job.id,
@@ -314,7 +319,7 @@ export function createWorker({
   }
 
   async function extractFromTab(tab, job) {
-    if (!tabs.sendMessage || !tab?.id) {
+    if (!tab?.id) {
       return null;
     }
     const message = {
@@ -323,6 +328,24 @@ export function createWorker({
       jobId: job.id,
       expectedUrl: job.url,
     };
+    if (scripting?.executeScript) {
+      try {
+        const injected = await scripting.executeScript({
+          target: { tabId: tab.id },
+          func: extractInPage,
+          args: [job.requestId, job.id],
+        });
+        const payload = Array.isArray(injected) ? injected[0]?.result : injected?.result;
+        if (payload?.outcome) {
+          return payload;
+        }
+      } catch {
+        /* fall through to the content-script message */
+      }
+    }
+    if (!tabs.sendMessage) {
+      return null;
+    }
     try {
       return await tabs.sendMessage(
         tab.id,
@@ -392,12 +415,6 @@ export function createWorker({
     const alreadyThere =
       normalizeUrl(currentUrl) === normalizeUrl(target) || finalUrlAllowed(target, currentUrl);
     if (!alreadyThere) {
-      const stored = await readStore(local, ["lastNavigationAt"]);
-      const wait = (stored.lastNavigationAt || 0) + NAV_SPACING_MS - now();
-      if (wait > 0) {
-        await scheduleWait(wait);
-        return;
-      }
       await tabs.update(tab.id, { url: target, active: true });
       await patchLocal({
         lastNavigationAt: now(),
@@ -572,7 +589,7 @@ export function createWorker({
       await setPaused(false);
       return snapshot();
     }
-    if (message?.type === "check-connection") {
+    if (message?.type === "poll" || message?.type === "check-connection") {
       await tick();
       return snapshot();
     }

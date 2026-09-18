@@ -24,10 +24,11 @@
     </div>
     <form id="settings">
       <h2>Settings</h2>
+      <p class="muted">Use the same server as the Scanapp you scan on. Local Docker is this PC; Staging is staging-scan.auctaro.com.</p>
       <label>
         Scanapp server
         <select id="server">
-          <option value="http://127.0.0.1:8000">Local development</option>
+          <option value="http://127.0.0.1:8000">Local Docker (this PC)</option>
           <option value="https://staging-scan.auctaro.com">Staging</option>
           <option value="custom">Custom…</option>
         </select>

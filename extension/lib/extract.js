@@ -53,6 +53,17 @@ export function collectPage(root, href, title) {
   };
 }
 
+export async function extractJob(requestId, jobId, root = document, href = window.location.href, title = document.title) {
+  const result = await waitForPage(root, href, title);
+  return {
+    type: "extract-result",
+    requestId,
+    jobId,
+    ...result,
+    url: href,
+  };
+}
+
 export function waitForPage(root, href, title, { timeoutMs = 15_000, intervalMs = 300 } = {}) {
   return new Promise((resolve) => {
     const started = Date.now();
