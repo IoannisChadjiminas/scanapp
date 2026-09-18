@@ -65,7 +65,7 @@ export function productIdentity(url) {
   }
   const path = new URL(url).pathname.replace(/\/$/, "");
   const slug = path.split("/").pop() || "";
-  const match = slug.match(/-([A-Za-z]+)(\d+)$/);
+    const match = slug.match(/-([A-Za-z]+)(\d+)$/);
   if (!match) {
     const bits = path.split("/").filter(Boolean);
     return `path:${bits.at(-2)?.toLowerCase()}/${bits.at(-1)?.toLowerCase()}`;

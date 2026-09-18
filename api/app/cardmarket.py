@@ -287,10 +287,25 @@ def normalize_product_url(url: str | None) -> str | None:
 
 
 def is_job_url(url: str | None) -> bool:
-    raw = (url or "").lower()
-    if "prices.pokemontcg.io/cardmarket/" in raw:
+    raw = (url or "").strip()
+    if not raw:
+        return False
+    lowered = raw.lower()
+    if "prices.pokemontcg.io/cardmarket/" in lowered:
         return True
-    return singles_code_and_number(url) is not None
+    parts = urlparse(raw)
+    host = (parts.netloc or "").lower()
+    if host not in {"www.cardmarket.com", "cardmarket.com"}:
+        return False
+    bits = [bit for bit in (parts.path or "").split("/") if bit]
+    if len(bits) < 6:
+        return False
+    return (
+        bits[1].lower() == "pokemon"
+        and bits[2].lower() == "products"
+        and bits[3].lower() == "singles"
+        and bool(bits[4] and bits[5])
+    )
 
 
 def _decode_prices(raw: Any) -> list[dict[str, Any]]:

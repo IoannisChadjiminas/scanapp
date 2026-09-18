@@ -24,6 +24,12 @@ test("keeps listing filters out of the identity", () => {
     minCondition: "NM",
   });
   assert.equal(productIdentity(GENGAR), "singles:sm9102");
+  assert.equal(
+    classifyUrl(
+      "https://www.cardmarket.com/en/Pokemon/Products/Singles/VMAX-Climax/Blaziken-VMAX-V2-s8b217",
+    ),
+    "product",
+  );
 });
 
 test("redirect from pokemontcg is allowed only onto a product page", () => {

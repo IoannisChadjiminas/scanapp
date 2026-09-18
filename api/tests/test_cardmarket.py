@@ -8,6 +8,7 @@ from app.cardmarket import (
     cardmarket_singles_url,
     extract_cardmarket_id,
     fields_from_payload,
+    is_job_url,
     prices_from_market,
     singles_code_and_number,
     sync_cardmarket_links,
@@ -212,6 +213,11 @@ def test_price_targets_prefer_singles_slug() -> None:
     assert singles_code_and_number(
         "https://www.cardmarket.com/en/Pokemon/Products/Singles/Tag-Bolt/Gengar-Mimikyu-GX-V2-sm9102"
     ) == ("sm9", "102")
+    blaziken = (
+        "https://www.cardmarket.com/en/Pokemon/Products/Singles/"
+        "VMAX-Climax/Blaziken-VMAX-V2-s8b217"
+    )
+    assert is_job_url(blaziken)
     targets = tcgdex_price_targets(
         {
             "id": "extra-gengar-mimikyu-gx-103-095",
@@ -363,9 +369,15 @@ def test_job_url_accepts_pokemontcg_price_link() -> None:
     assert is_job_url(
         "https://www.cardmarket.com/en/Pokemon/Products/Singles/Tag-Bolt/Gengar-Mimikyu-GX-V2-sm9102"
     )
+    assert is_job_url(
+        "https://www.cardmarket.com/en/Pokemon/Products/Singles/VMAX-Climax/Blaziken-VMAX-V2-s8b217"
+    )
+    assert is_job_url(
+        "https://www.cardmarket.com/en/Pokemon/Products/Singles/McDonalds-Collection-2022/Pikachu"
+    )
     assert is_job_url("https://prices.pokemontcg.io/cardmarket/base1-4")
     assert not is_job_url("https://www.cardmarket.com/en/Pokemon/Cards")
     assert not is_job_url(
-        "https://www.cardmarket.com/en/Pokemon/Products/Singles/McDonalds-Collection-2022/Pikachu"
+        "https://www.cardmarket.com/en/Pokemon/Products/Search?searchString=Blaziken"
     )
 
