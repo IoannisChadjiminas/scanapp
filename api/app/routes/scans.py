@@ -148,7 +148,7 @@ async def session_results(request: Request, response: Response) -> dict:
     results: list[SessionResult] = []
     for row in rows:
         ranking = json.loads(row["combined_ranking_json"] or "[]")
-        suggestions = [Candidate.model_validate(item) for item in ranking[:3]]
+        suggestions = [Candidate.model_validate(item) for item in ranking[:1]]
         results.append(
             SessionResult(
                 scan_id=row["id"],

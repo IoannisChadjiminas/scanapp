@@ -76,13 +76,17 @@ def main() -> None:
         latencies.append(elapsed)
         predicted = [c.card_id for c in result.suggestions]
         stored = dbs.results.execute(
-            "SELECT visual_ranking_json FROM scans WHERE id = ?",
+            "SELECT visual_ranking_json, combined_ranking_json FROM scans WHERE id = ?",
             (result.id,),
         ).fetchone()
         retrieved = [
             str(row.get("card_id") or "")
             for row in json.loads(stored["visual_ranking_json"] or "[]")
         ][:20]
+        ranked = [
+            str(row.get("card_id") or "")
+            for row in json.loads(stored["combined_ranking_json"] or "[]")
+        ]
         truth = item.get("card_id") or ""
         unknown = bool(item.get("unknown")) or truth in {"", "unknown"}
         status = result.status.value
@@ -95,7 +99,7 @@ def main() -> None:
         else:
             if predicted and predicted[0] == truth:
                 top1 += 1
-            if truth in predicted:
+            if truth in ranked[:3]:
                 top3 += 1
             if truth in retrieved:
                 recall20 += 1

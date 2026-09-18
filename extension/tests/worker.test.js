@@ -45,7 +45,7 @@ function jsonResponse(payload, status = 200) {
   };
 }
 
-function createHarness({ extract, scripting } = {}) {
+function createHarness({ extract, scripting, claimJobs } = {}) {
   const local = memoryStore({
     apiBase: "http://127.0.0.1:8000",
     helperToken: "helper.token",
@@ -58,6 +58,7 @@ function createHarness({ extract, scripting } = {}) {
   const completes = [];
   const createdTabs = [];
   const fails = [];
+  let claimIndex = 0;
   const fetchImpl = async (url, init = {}) => {
     const path = new URL(url).pathname;
     const body = init.body ? JSON.parse(init.body) : {};
@@ -65,11 +66,13 @@ function createHarness({ extract, scripting } = {}) {
       return jsonResponse({ queued: 1, helper_ready: true, helper_online: true });
     }
     if (path.endsWith("/cardmarket/helper/claim")) {
-      if (!body.job_id) {
-        if (claims.length) {
-          return jsonResponse({ status: "idle", queued: 0 });
-        }
+      if (!body.job_id && !claims.length) {
         claims.push(body);
+      }
+      if (claimJobs?.length) {
+        const payload = claimJobs[Math.min(claimIndex, claimJobs.length - 1)];
+        claimIndex += 1;
+        return jsonResponse(payload);
       }
       return jsonResponse({
         id: "job-1",
@@ -406,4 +409,44 @@ test("uses an already open product tab instead of creating one", async () => {
   const stored = await session.get("helperTabId");
   assert.equal(stored.helperTabId, 50);
   assert.equal(completes.length, 1);
+});
+
+test("navigates the helper tab to the newly scanned card", async () => {
+  const { worker, session, tabs, updates } = createHarness({
+    extract: async () => ({
+      outcome: "unrecognized",
+      url: PIKACHU,
+      prices: [],
+    }),
+    claimJobs: [
+      {
+        id: "job-old",
+        url: PIKACHU,
+        card_id: "pikachu",
+        claim_token: "claim-old",
+        claim_expires_at: "2099-01-01T00:00:00Z",
+        product_identity: "singles:clc008",
+        status: "claimed",
+      },
+      {
+        id: "job-new",
+        url: GENGAR,
+        card_id: "gengar",
+        claim_token: "claim-new",
+        claim_expires_at: "2099-01-01T00:00:00Z",
+        product_identity: "singles:sm9102",
+        status: "claimed",
+      },
+    ],
+  });
+  tabs.set(7, { id: 7, url: PIKACHU, documentId: "doc-7" });
+  await session.set({ helperTabId: 7 });
+  await worker.wake("alarm");
+  assert.equal(tabs.get(7).url, PIKACHU);
+  await worker.wake("alarm");
+  assert.equal(tabs.get(7).url, GENGAR);
+  assert.equal(
+    updates.some((item) => item.url === GENGAR && item.active === true),
+    true,
+  );
 });

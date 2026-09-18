@@ -9,7 +9,7 @@ import {
   PARSER_VERSION,
   WAIT_ALARM,
 } from "./constants.js";
-import { classifyUrl, finalUrlAllowed, normalizeUrl } from "./url.js";
+import { classifyUrl, finalUrlAllowed, normalizeUrl, productIdentity } from "./url.js";
 
 export async function extractInPage(requestId, jobId) {
   const { extractJob } = await import(chrome.runtime.getURL("lib/extract.js"));
@@ -388,7 +388,12 @@ export function createWorker({
     return (
       found.find((tab) => {
         const href = tab.url || "";
-        return normalizeUrl(href) === normalizeUrl(target) || finalUrlAllowed(target, href);
+        if (normalizeUrl(href) === normalizeUrl(target)) {
+          return true;
+        }
+        const expected = productIdentity(target);
+        const actual = productIdentity(href);
+        return Boolean(expected) && expected === actual;
       }) || null
     );
   }
@@ -407,7 +412,11 @@ export function createWorker({
   async function loadJob(job) {
     const target = job.url;
     await publish({ activity: "fetching", currentCard: job.card_id || job.url });
-    let tab = await findOpenProductTab(target);
+    const expectedIdentity = job.productIdentity || productIdentity(target);
+    let tab = null;
+    if (!String(expectedIdentity || "").startsWith("pokemontcg:")) {
+      tab = await findOpenProductTab(target);
+    }
     if (!tab) {
       tab = await helperTab();
     }
@@ -415,24 +424,28 @@ export function createWorker({
       tab = await createHelperTab(target, { active: true });
       await patchLocal({
         lastNavigationAt: now(),
-        currentJob: { ...job, phase: "loading", loadStartedAt: now() },
+        currentJob: { ...job, phase: "loading", loadStartedAt: now(), navigatedTo: target },
       });
       return;
     }
     await adoptTab(tab);
-    if (tab.id && tabs.update) {
-      await tabs.update(tab.id, { active: true });
-    }
     const currentUrl = tab.url || "";
     const alreadyThere =
-      normalizeUrl(currentUrl) === normalizeUrl(target) || finalUrlAllowed(target, currentUrl);
+      normalizeUrl(currentUrl) === normalizeUrl(target) ||
+      (Boolean(productIdentity(target)) && productIdentity(target) === productIdentity(currentUrl)) ||
+      (String(expectedIdentity || "").startsWith("pokemontcg:") &&
+        classifyUrl(currentUrl) === "product" &&
+        job.navigatedTo === target);
     if (!alreadyThere) {
       await tabs.update(tab.id, { url: target, active: true });
       await patchLocal({
         lastNavigationAt: now(),
-        currentJob: { ...job, phase: "loading", loadStartedAt: now() },
+        currentJob: { ...job, phase: "loading", loadStartedAt: now(), navigatedTo: target },
       });
       return;
+    }
+    if (tab.id && tabs.update) {
+      await tabs.update(tab.id, { active: true });
     }
     const kind = classifyUrl(currentUrl);
     if (kind === "login" || kind === "challenge") {
@@ -497,38 +510,22 @@ export function createWorker({
     }
     const stored = await readStore(local, ["currentJob"]);
     let job = stored.currentJob;
-    if (job?.id && job.claimToken) {
-      try {
-        const recovered = await request("/cardmarket/helper/claim", {
-          method: "POST",
-          body: { job_id: job.id, claim_token: job.claimToken },
-        });
-        if (!recovered?.id || recovered.id !== job.id) {
-          await patchLocal({ currentJob: null, pendingResult: null });
-          job = null;
-        } else {
-          await request("/cardmarket/helper/renew", {
-            method: "POST",
-            body: { job_id: job.id, claim_token: job.claimToken },
-          }).catch(() => undefined);
-          job = { ...job, ...recovered, claimToken: recovered.claim_token || job.claimToken };
-          await patchLocal({ currentJob: job, currentCard: job.card_id || job.url });
-        }
-      } catch (error) {
-        if (error.code === "claim") {
-          await patchLocal({ currentJob: null, pendingResult: null });
-          job = null;
-        } else {
-          return;
-        }
-      }
-    }
-    if (!job) {
-      const claimed = await request("/cardmarket/helper/claim", { method: "POST", body: {} });
-      if (!claimed?.id || claimed.status === "idle") {
-        await publish({ activity: "idle", currentCard: "", queued: claimed?.queued || 0 });
+    let claimed;
+    try {
+      claimed = await request("/cardmarket/helper/claim", { method: "POST", body: {} });
+    } catch (error) {
+      if (error.code === "claim") {
+        await patchLocal({ currentJob: null, pendingResult: null });
         return;
       }
+      return;
+    }
+    if (!claimed?.id || claimed.status === "idle") {
+      await patchLocal({ currentJob: null, pendingResult: null });
+      await publish({ activity: "idle", currentCard: "", queued: claimed?.queued || 0 });
+      return;
+    }
+    if (!job || job.id !== claimed.id) {
       job = {
         id: claimed.id,
         url: claimed.url,
@@ -542,8 +539,14 @@ export function createWorker({
         phase: "claimed",
         loadStartedAt: now(),
       };
-      await patchLocal({ currentJob: job, currentCard: job.card_id || job.url });
+    } else {
+      await request("/cardmarket/helper/renew", {
+        method: "POST",
+        body: { job_id: job.id, claim_token: job.claimToken },
+      }).catch(() => undefined);
+      job = { ...job, ...claimed, claimToken: claimed.claim_token || job.claimToken };
     }
+    await patchLocal({ currentJob: job, currentCard: job.card_id || job.url });
     await loadJob(job);
   }
 

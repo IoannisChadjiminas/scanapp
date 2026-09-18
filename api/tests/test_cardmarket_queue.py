@@ -14,6 +14,7 @@ from app.cardmarket_queue import (
     claim_job,
     complete_job,
     enqueue_job,
+    identities_compatible,
     immediate_transaction,
     issue_helper_credential,
     prices_payload,
@@ -374,6 +375,48 @@ def test_wait_for_product_wakes_on_notify():
         bind_loop(None)
 
     asyncio.run(main())
+
+
+def test_claim_prefers_the_newest_pending_job(tmp_path):
+    conn = _catalog(tmp_path)
+    helper_id, _ = issue_helper_credential(conn)
+    first_id = enqueue_job(conn, GENGAR, "gengar")
+    second_id = enqueue_job(conn, PIKACHU, "pikachu")
+    claimed = claim_job(conn, helper_id)
+    assert claimed is not None
+    assert claimed["id"] == second_id
+    assert claimed["url"] == PIKACHU
+    leftover = conn.execute(
+        "SELECT status FROM cardmarket_jobs WHERE id = ?",
+        (first_id,),
+    ).fetchone()
+    assert leftover["status"] == "pending"
+
+
+def test_claim_switches_to_a_newer_scan(tmp_path):
+    conn = _catalog(tmp_path)
+    helper_id, _ = issue_helper_credential(conn)
+    first_id = enqueue_job(conn, GENGAR, "gengar")
+    first = claim_job(conn, helper_id)
+    assert first is not None
+    assert first["id"] == first_id
+    second_id = enqueue_job(conn, PIKACHU, "pikachu")
+    switched = claim_job(conn, helper_id)
+    assert switched is not None
+    assert switched["id"] == second_id
+    parked = conn.execute(
+        "SELECT status, helper_id FROM cardmarket_jobs WHERE id = ?",
+        (first_id,),
+    ).fetchone()
+    assert parked["status"] == "pending"
+    assert parked["helper_id"] is None
+
+
+def test_empty_identity_does_not_match_another_product():
+    assert identities_compatible(None, "singles:clc008") is False
+    assert identities_compatible("", "path:tag-bolt/gengar") is False
+    assert identities_compatible("singles:sm9102", "singles:clc008") is False
+    assert identities_compatible("singles:sm9102", "singles:sm9102") is True
 
 
 def test_price_events_stream_after_complete(tmp_path):

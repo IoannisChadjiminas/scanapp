@@ -80,10 +80,10 @@ export function productIdentity(url) {
 }
 
 export function identitiesCompatible(expected, actual) {
-  if (!actual) {
+  if (!expected || !actual) {
     return false;
   }
-  if (!expected || String(expected).startsWith("pokemontcg:")) {
+  if (String(expected).startsWith("pokemontcg:")) {
     return String(actual).startsWith("singles:") || String(actual).startsWith("path:");
   }
   return expected === actual;

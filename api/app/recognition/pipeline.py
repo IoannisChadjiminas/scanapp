@@ -160,7 +160,7 @@ def recognize_bytes(
         min_gap=settings.threshold_min_gap,
         retake=retake,
     )
-    top3 = combined[:3]
+    shown = combined[:1]
     timings["total_ms"] = (time.perf_counter() - started) * 1000
 
     message = None
@@ -182,17 +182,19 @@ def recognize_bytes(
         )
     elif status == "matched":
         message = "This is the most likely match."
-        if combined and not combined[0].get("cardmarket_url"):
+        if shown and not shown[0].get("cardmarket_url"):
             message = "This is the most likely match. Cardmarket link unavailable."
     elif status == "uncertain":
-        message = "More than one print could match. Choose the correct card."
+        message = "Closest print. Confirm if this is the card."
+        if shown and not shown[0].get("cardmarket_url"):
+            message = "Closest print. Cardmarket link unavailable."
     elif status in {"no_match"}:
         message = "This photograph did not match a catalogue card."
     if not detected and not skip_detect and status != "retake":
         extra = " Automatic card detection was unreliable; using the provided crop."
         message = (message or "") + extra
 
-    suggestions = [Candidate.model_validate(item) for item in top3]
+    suggestions = [Candidate.model_validate(item) for item in shown]
     scan_id = str(uuid.uuid4())
     created_at = _now()
     versions = runtime.versions()
@@ -270,7 +272,7 @@ def recognize_bytes(
                     "too_blurry": too_blurry,
                 },
                 ocr=ocr_payload,
-                predicted=top3,
+                predicted=shown,
                 visual=visual,
                 timings=timings,
                 versions=versions,

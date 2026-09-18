@@ -4,6 +4,7 @@ import test from "node:test";
 import {
   classifyUrl,
   finalUrlAllowed,
+  identitiesCompatible,
   listingFilters,
   productIdentity,
 } from "../lib/url.js";
@@ -44,4 +45,11 @@ test("redirect from pokemontcg is allowed only onto a product page", () => {
     ),
     false,
   );
+});
+
+test("missing identity does not match another product", () => {
+  assert.equal(identitiesCompatible("", "singles:clc008"), false);
+  assert.equal(identitiesCompatible(null, "path:tag-bolt/gengar"), false);
+  assert.equal(identitiesCompatible("singles:sm9102", "singles:clc008"), false);
+  assert.equal(identitiesCompatible("singles:sm9102", "singles:sm9102"), true);
 });

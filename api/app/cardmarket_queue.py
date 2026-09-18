@@ -128,9 +128,9 @@ def product_identity_from_url(url: str | None) -> str | None:
 
 
 def identities_compatible(expected: str | None, actual: str | None) -> bool:
-    if not actual:
+    if not expected or not actual:
         return False
-    if not expected or expected.startswith("pokemontcg:"):
+    if expected.startswith("pokemontcg:"):
         return actual.startswith("singles:") or actual.startswith("path:")
     return expected == actual
 
@@ -373,7 +373,8 @@ def queue_counts(conn: sqlite3.Connection) -> dict[str, int]:
 def _active_claim_for_helper(conn: sqlite3.Connection, helper_id: str) -> sqlite3.Row | None:
     return conn.execute(
         """
-        SELECT * FROM cardmarket_jobs
+        SELECT rowid AS queue_row, *
+        FROM cardmarket_jobs
         WHERE helper_id = ? AND status = 'claimed'
         ORDER BY updated_at DESC
         LIMIT 1
@@ -382,47 +383,84 @@ def _active_claim_for_helper(conn: sqlite3.Connection, helper_id: str) -> sqlite
     ).fetchone()
 
 
+def _newest_pending_job(conn: sqlite3.Connection, now: str) -> sqlite3.Row | None:
+    return conn.execute(
+        """
+        SELECT rowid AS queue_row, *
+        FROM cardmarket_jobs
+        WHERE status = 'pending'
+          AND (next_attempt_at IS NULL OR next_attempt_at <= ?)
+        ORDER BY created_at DESC, queue_row DESC
+        LIMIT 1
+        """,
+        (now,),
+    ).fetchone()
+
+
+def _job_is_newer(candidate: sqlite3.Row, current: sqlite3.Row) -> bool:
+    created = str(candidate["created_at"] or "")
+    current_created = str(current["created_at"] or "")
+    if created != current_created:
+        return created > current_created
+    return int(candidate["queue_row"] or 0) > int(_row_get(current, "queue_row", 0) or 0)
+
+
+def _take_pending_job(
+    conn: sqlite3.Connection, helper_id: str, row: sqlite3.Row, now: str
+) -> dict[str, Any] | None:
+    token = str(uuid.uuid4())
+    expires = _iso_offset(CLAIM_LIFETIME_SECONDS)
+    conn.execute(
+        """
+        UPDATE cardmarket_jobs
+        SET status = 'claimed',
+            helper_id = ?,
+            claim_token = ?,
+            claim_expires_at = ?,
+            updated_at = ?,
+            failure_reason = NULL
+        WHERE id = ? AND status = 'pending'
+        """,
+        (helper_id, token, expires, now, row["id"]),
+    )
+    claimed = conn.execute(
+        "SELECT * FROM cardmarket_jobs WHERE id = ?",
+        (row["id"],),
+    ).fetchone()
+    return job_from_row(claimed) if claimed is not None else None
+
+
 def claim_job(conn: sqlite3.Connection, helper_id: str) -> dict[str, Any] | None:
+    parked_url = None
     with immediate_transaction(conn):
         now = datetime_now()
         settle_expired_claims(conn, now)
         active = _active_claim_for_helper(conn, helper_id)
-        if active is not None:
-            job = job_from_row(active)
-        else:
-            row = conn.execute(
+        newest = _newest_pending_job(conn, now)
+        if active is not None and newest is not None and _job_is_newer(newest, active):
+            parked_url = str(active["url"] or "")
+            conn.execute(
                 """
-                SELECT * FROM cardmarket_jobs
-                WHERE status = 'pending'
-                  AND (next_attempt_at IS NULL OR next_attempt_at <= ?)
-                ORDER BY created_at
-                LIMIT 1
+                UPDATE cardmarket_jobs
+                SET status = 'pending',
+                    helper_id = NULL,
+                    claim_token = NULL,
+                    claim_expires_at = NULL,
+                    updated_at = ?,
+                    next_attempt_at = ?
+                WHERE id = ?
                 """,
-                (now,),
-            ).fetchone()
-            if row is None:
-                job = None
-            else:
-                token = str(uuid.uuid4())
-                expires = _iso_offset(CLAIM_LIFETIME_SECONDS)
-                conn.execute(
-                    """
-                    UPDATE cardmarket_jobs
-                    SET status = 'claimed',
-                        helper_id = ?,
-                        claim_token = ?,
-                        claim_expires_at = ?,
-                        updated_at = ?,
-                        failure_reason = NULL
-                    WHERE id = ? AND status = 'pending'
-                    """,
-                    (helper_id, token, expires, now, row["id"]),
-                )
-                claimed = conn.execute(
-                    "SELECT * FROM cardmarket_jobs WHERE id = ?",
-                    (row["id"],),
-                ).fetchone()
-                job = job_from_row(claimed) if claimed is not None else None
+                (now, now, active["id"]),
+            )
+            job = _take_pending_job(conn, helper_id, newest, now)
+        elif active is not None:
+            job = job_from_row(active)
+        elif newest is None:
+            job = None
+        else:
+            job = _take_pending_job(conn, helper_id, newest, now)
+    if parked_url:
+        _notify_job_url(parked_url)
     if job is not None:
         _notify_job_url(job.get("url"))
     return job

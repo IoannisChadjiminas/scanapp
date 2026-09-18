@@ -199,8 +199,9 @@ def helper_claim(
     helper = _helper(catalog, authorization)
     body = payload or ClaimRequest()
     try:
-        recovered = recover_job(catalog, helper["helper_id"], body.job_id, body.claim_token)
-        job = recovered or claim_job(catalog, helper["helper_id"])
+        job = claim_job(catalog, helper["helper_id"])
+        if job is None:
+            job = recover_job(catalog, helper["helper_id"], body.job_id, body.claim_token)
     except QueueError as exc:
         _raise_queue(exc)
     if job is None:

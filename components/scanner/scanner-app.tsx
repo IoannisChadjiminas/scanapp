@@ -157,13 +157,8 @@ export function ScannerApp() {
     try {
       const result = await api.scan(blob, { skip_detect: "true", language }, controller.signal);
       if (result.status === "matched" || result.status === "uncertain") {
-        const cards =
-          result.status === "matched"
-            ? result.suggestions.slice(0, 1)
-            : result.suggestions.slice(0, 4);
-        for (const card of cards) {
-          await queueCardmarketLookup(card.cardmarket_url, card.card_id);
-        }
+        const card = result.suggestions[0];
+        await queueCardmarketLookup(card?.cardmarket_url, card?.card_id);
       }
       setScan(result);
       setStage("result");
@@ -173,7 +168,7 @@ export function ScannerApp() {
           : result.status === "matched"
             ? "Most likely card is ready."
             : result.status === "uncertain"
-              ? "More than one print could match. Choose the correct card."
+              ? "Closest print is ready."
               : "Not a match.",
       );
       await refreshResults();
