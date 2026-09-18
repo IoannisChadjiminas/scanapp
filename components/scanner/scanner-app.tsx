@@ -157,8 +157,13 @@ export function ScannerApp() {
     try {
       const result = await api.scan(blob, { skip_detect: "true", language }, controller.signal);
       if (result.status === "matched" || result.status === "uncertain") {
-        const top = result.suggestions[0];
-        await queueCardmarketLookup(top?.cardmarket_url, top?.card_id);
+        const cards =
+          result.status === "matched"
+            ? result.suggestions.slice(0, 1)
+            : result.suggestions.slice(0, 4);
+        for (const card of cards) {
+          await queueCardmarketLookup(card.cardmarket_url, card.card_id);
+        }
       }
       setScan(result);
       setStage("result");
