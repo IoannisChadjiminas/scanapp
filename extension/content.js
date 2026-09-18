@@ -1,4 +1,5 @@
 import { waitForPage } from "./lib/extract.js";
+import { hasChallenge } from "./lib/parse.js";
 import { classifyUrl } from "./lib/url.js";
 
 chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
@@ -26,6 +27,18 @@ chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
 
 function send(message) {
   return chrome.runtime.sendMessage(message);
+}
+
+function notifyIfChallengeCleared() {
+  const href = window.location.href;
+  const kind = classifyUrl(href);
+  if (kind !== "expansion" && kind !== "singles-index") {
+    return;
+  }
+  if (hasChallenge(document, href, document.title)) {
+    return;
+  }
+  void send({ type: "page-cleared" });
 }
 
 function mountMapButton() {
@@ -105,7 +118,11 @@ function mountMapButton() {
 }
 
 if (document.readyState === "loading") {
-  document.addEventListener("DOMContentLoaded", mountMapButton, { once: true });
+  document.addEventListener("DOMContentLoaded", () => {
+    notifyIfChallengeCleared();
+    mountMapButton();
+  }, { once: true });
 } else {
+  notifyIfChallengeCleared();
   mountMapButton();
 }

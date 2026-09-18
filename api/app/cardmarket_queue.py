@@ -98,8 +98,6 @@ def classify_url(url: str | None) -> str:
     lowered = path.lower()
     if "/login" in lowered or lowered.endswith("/signin"):
         return "login"
-    if "challenge" in lowered or "/captcha" in lowered:
-        return "challenge"
     if "/products/search" in lowered or lowered.endswith("/cards"):
         return "search"
     if "/products/singles/" in lowered:
@@ -122,6 +120,8 @@ def classify_url(url: str | None) -> str:
         ):
             return "expansion"
         return "invalid"
+    if "/cdn-cgi/" in lowered or "/captcha" in lowered:
+        return "challenge"
     return "other"
 
 

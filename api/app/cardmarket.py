@@ -617,7 +617,10 @@ def mark_expansion_complete(
 ) -> dict[str, Any]:
     slug = str(expansion or "").strip() or _expansion_from_url(page_url)
     ident = str(expansion_id or "").strip()
+    url_slug = _expansion_from_url(page_url)
     _touch_expansion_crawl(conn, expansion=slug, expansion_id=ident, complete=True)
+    if url_slug and url_slug != slug:
+        _touch_expansion_crawl(conn, expansion=url_slug, expansion_id=ident, complete=True)
     conn.commit()
     return {
         "expansion": slug,

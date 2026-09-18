@@ -714,6 +714,49 @@ test("all-expansions crawler skips sets already imported", async () => {
   assert.match(status.expansionNote, /All sets/);
 });
 
+test("Import all jumps to the first unfinished set", async () => {
+  const index = "https://www.cardmarket.com/en/Pokemon/Products/Singles";
+  const first = "https://www.cardmarket.com/en/Pokemon/Products/Singles/151";
+  const second = "https://www.cardmarket.com/en/Pokemon/Products/Singles/Tag-Bolt";
+  const third = "https://www.cardmarket.com/en/Pokemon/Products/Singles/World-Champions-Pack";
+  const opened = [];
+  const { worker, tabs, expansionImports } = createHarness({
+    expansionCrawls: [
+      { complete: true, expansion: "151", expansion_id: "2770" },
+      { complete: true, expansion: "Tag Bolt", expansion_id: "1234" },
+    ],
+    expansionExtract: (tab) => {
+      const href = tab?.url || index;
+      opened.push(href);
+      if (href === index || href.endsWith("/Singles")) {
+        return {
+          pageUrl: href,
+          products: [],
+          expansions: [
+            { id: "2770", url: first, name: "151" },
+            { id: "1234", url: second, name: "Tag Bolt" },
+            { id: "9999", url: third, name: "World Champions Pack" },
+          ],
+        };
+      }
+      return {
+        pageUrl: href,
+        products: [{ url: `${href}/Pikachu-V4`, name: "Pikachu" }],
+        nextPage: null,
+        expansions: [],
+      };
+    },
+  });
+  tabs.set(9, { id: 9, url: index, active: true, documentId: "doc-9" });
+  const status = await worker.handleMessage({ type: "import-expansion-all" });
+  const productImports = expansionImports.filter((item) => Array.isArray(item.products) && item.products.length);
+  assert.equal(productImports.length, 1);
+  assert.equal(productImports[0].products[0].url.includes("World-Champions-Pack"), true);
+  assert.equal(opened.some((href) => href.includes("/151")), false);
+  assert.equal(opened.some((href) => href.includes("Tag-Bolt")), false);
+  assert.match(status.expansionNote, /All sets/);
+});
+
 test("Cloudflare pauses all-expansions and Continue resumes the same set", async () => {
   const index = "https://www.cardmarket.com/en/Pokemon/Products/Singles";
   const first = "https://www.cardmarket.com/en/Pokemon/Products/Singles/151";
@@ -769,6 +812,76 @@ test("Cloudflare pauses all-expansions and Continue resumes the same set", async
   const stored = await local.get("expansionResume");
   assert.equal(stored.expansionResume, null);
   assert.match(continued.expansionNote, /All sets/);
+});
+
+test("Cloudflare tick auto-resumes without pressing Continue", async () => {
+  const index = "https://www.cardmarket.com/en/Pokemon/Products/Singles";
+  const first = "https://www.cardmarket.com/en/Pokemon/Products/Singles/151";
+  const second = "https://www.cardmarket.com/en/Pokemon/Products/Singles/Tag-Bolt";
+  let blockTagBolt = true;
+  const { worker, tabs, expansionImports, local } = createHarness({
+    expansionExtract: (tab) => {
+      const href = tab?.url || index;
+      if (href === index || href.endsWith("/Singles")) {
+        return {
+          pageUrl: href,
+          products: [],
+          expansions: [
+            { id: "2770", url: first, name: "151" },
+            { id: "1234", url: second, name: "Tag Bolt" },
+          ],
+        };
+      }
+      if (String(href).includes("151")) {
+        return {
+          pageUrl: href,
+          products: [{ url: `${first}/Bulbasaur-V1-MEW001`, name: "Bulbasaur" }],
+          nextPage: null,
+          expansions: [],
+        };
+      }
+      if (blockTagBolt) {
+        return { pageUrl: href, products: [], nextPage: null, expansions: [], challenge: true };
+      }
+      return {
+        pageUrl: href,
+        products: [{ url: GENGAR, name: "Gengar & Mimikyu GX" }],
+        nextPage: null,
+        expansions: [],
+      };
+    },
+  });
+  tabs.set(9, { id: 9, url: index, active: true, documentId: "doc-9", title: "Singles" });
+  await worker.handleMessage({ type: "import-expansion-all" });
+  assert.equal(productPages(expansionImports).length, 1);
+  blockTagBolt = false;
+  const tab = { id: 9, url: second, active: true, documentId: "doc-9", title: "Tag Bolt", status: "complete" };
+  tabs.set(9, tab);
+  await worker.tabUpdated(9, { status: "complete", title: "Tag Bolt" }, tab);
+  const pages = productPages(expansionImports);
+  assert.equal(pages.length, 2);
+  assert.equal(pages[1].products[0].url, GENGAR);
+  const stored = await local.get(["paused", "expansionResume"]);
+  assert.equal(stored.paused, false);
+  assert.equal(stored.expansionResume, null);
+});
+
+test("manual Pause does not auto-resume when a set page finishes loading", async () => {
+  const index = "https://www.cardmarket.com/en/Pokemon/Products/Singles";
+  const { worker, tabs, local } = createHarness();
+  tabs.set(9, { id: 9, url: index, active: true, documentId: "doc-9", title: "Singles", status: "complete" });
+  await local.set({
+    paused: true,
+    expansionResume: { index: 2, targets: [{ id: "1", url: index, name: "151" }], reason: "paused" },
+  });
+  await worker.tabUpdated(
+    9,
+    { status: "complete" },
+    { id: 9, url: index, title: "Singles", status: "complete" },
+  );
+  const stored = await local.get(["paused", "expansionResume"]);
+  assert.equal(stored.paused, true);
+  assert.equal(stored.expansionResume.reason, "paused");
 });
 
 test("sends an ntfy ping when Cloudflare pauses", async () => {

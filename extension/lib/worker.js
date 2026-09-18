@@ -62,6 +62,11 @@ function crawlAlreadyDone(target, crawls) {
   });
 }
 
+function firstUnfinishedIndex(targets, crawls) {
+  const index = (targets || []).findIndex((target) => !crawlAlreadyDone(target, crawls));
+  return index === -1 ? (targets || []).length : index;
+}
+
 function expansionPageKey(url) {
   try {
     const parsed = new URL(url);
@@ -1058,7 +1063,7 @@ export function createWorker({
       (challenge ? " (Cloudflare)" : "") +
       `. Kept ${totals.stored} stored URLs. ` +
       (challenge
-        ? "The Cardmarket tab is in front — tick the box, then press Continue."
+        ? "The Cardmarket tab is in front — tick the box. The crawl continues once the page loads. Continue still works if it does not."
         : "Press Continue to keep going.");
     if (tabId) {
       try {
@@ -1084,12 +1089,14 @@ export function createWorker({
         unmatched: totals.unmatched,
       },
       expansionNote: note,
-      attention: challenge ? "Tick Cloudflare in the Cardmarket tab, then press Continue" : "Press Continue",
+      attention: challenge
+        ? "Tick Cloudflare in the Cardmarket tab. The crawl continues after the page loads."
+        : "Press Continue",
       activity: "paused",
     });
     if (challenge) {
       await notifyPhone(
-        `Cloudflare on ${label}. Tick the box on the Mac, then press Continue in the helper.`,
+        `Cloudflare on ${label}. Tick the box on the Mac. The crawl continues once the page loads.`,
       );
     }
   }
@@ -1123,7 +1130,7 @@ export function createWorker({
       expansionBusy: true,
       activity: "crawling-all-sets",
       attention: null,
-      expansionNote: resume ? "Continuing from where it left off…" : "Starting from the first expansion…",
+      expansionNote: resume ? "Continuing from where it left off…" : "Checking already imported sets…",
     });
     const seen = new Set();
     const totals = {
@@ -1165,7 +1172,11 @@ export function createWorker({
       if (!resumeFromCheckpoint) {
         startIndex = 0;
       }
-      const crawls = await loadImportedCrawls();
+      let crawls = await loadImportedCrawls();
+      if (!resumeFromCheckpoint) {
+        startIndex = firstUnfinishedIndex(targets, crawls);
+      }
+      const resumeLabel = targets[startIndex]?.name || targets[startIndex]?.id || targets[startIndex]?.url;
       await patchLocal({
         expansionResume: {
           index: startIndex,
@@ -1173,6 +1184,9 @@ export function createWorker({
           totals: { stored: totals.stored, linked: totals.linked, unmatched: totals.unmatched },
           reason: "running",
         },
+        expansionNote: startIndex
+          ? `Skipping ${startIndex} already imported · resuming at ${resumeLabel || "the next set"}`
+          : "Starting from the first expansion…",
       });
       let current = tab;
       let halted = false;
@@ -1194,6 +1208,10 @@ export function createWorker({
         }
         const target = targets[index];
         const label = target.name || target.id || target.url;
+        const latestCrawls = await loadImportedCrawls();
+        if (latestCrawls.length) {
+          crawls = latestCrawls;
+        }
         if (!(resumeFromCheckpoint && index === startIndex) && crawlAlreadyDone(target, crawls)) {
           await patchLocal({
             expansionNote: `Skipping ${label} (already imported) · ${index + 1}/${targets.length}`,
@@ -1435,6 +1453,10 @@ export function createWorker({
     if (message?.type === "extract-result") {
       return bindExtract(message, sender);
     }
+    if (message?.type === "page-cleared") {
+      await maybeResumeAfterChallenge(sender?.tab || {});
+      return snapshot();
+    }
     if (message?.type === "get-status") {
       return snapshot();
     }
@@ -1508,6 +1530,33 @@ export function createWorker({
     return undefined;
   }
 
+  async function challengePageCleared(tab) {
+    if (!tab?.url) {
+      return false;
+    }
+    if (tabBlockReason(tab)) {
+      return false;
+    }
+    const kind = classifyUrl(tab.url);
+    return kind === "expansion" || kind === "singles-index";
+  }
+
+  async function maybeResumeAfterChallenge(tab) {
+    const stored = await readStore(local, ["paused", "expansionBusy", "expansionResume"]);
+    if (!stored.paused || stored.expansionBusy) {
+      return false;
+    }
+    if (stored.expansionResume?.reason !== "challenge") {
+      return false;
+    }
+    if (!(await challengePageCleared(tab))) {
+      return false;
+    }
+    await patchLocal({ expansionNote: "Cloudflare passed — continuing the crawl…" });
+    await setPaused(false);
+    return true;
+  }
+
   async function onTabRemoved(tabId) {
     const stored = await readStore(session, ["helperTabId"]);
     if (stored.helperTabId !== tabId) {
@@ -1518,7 +1567,14 @@ export function createWorker({
 
   async function onTabUpdated(tabId, info, tab) {
     const url = tab?.url || info.url;
-    const localState = await readStore(local, ["currentJob", "paused"]);
+    const merged = { ...tab, id: tabId, url, title: tab?.title || info.title };
+    const localState = await readStore(local, ["currentJob", "paused", "expansionResume"]);
+    if (localState.paused && localState.expansionResume?.reason === "challenge") {
+      if (!info.status || info.status === "complete" || info.title) {
+        await maybeResumeAfterChallenge(merged);
+      }
+      return;
+    }
     const job = localState.currentJob;
     if (!job || localState.paused || !url) {
       return;

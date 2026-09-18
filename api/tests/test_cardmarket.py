@@ -460,6 +460,19 @@ def test_job_url_rejects_set_list() -> None:
     set_list = "https://www.cardmarket.com/en/Pokemon/Products/Singles/Tag-Bolt"
     assert classify_url(set_list) == "expansion"
     assert classify_url(f"{set_list}?site=2") == "expansion"
+    assert (
+        classify_url(
+            "https://www.cardmarket.com/en/Pokemon/Products/Singles/Challenge-from-the-Darkness"
+        )
+        == "expansion"
+    )
+    assert (
+        classify_url(
+            "https://www.cardmarket.com/en/Pokemon/Products/Singles/"
+            "Challenge-from-the-Darkness/Pikachu-V4"
+        )
+        == "product"
+    )
     assert not is_job_url(set_list)
     assert is_job_url(
         "https://www.cardmarket.com/en/Pokemon/Products/Singles/Tag-Bolt/Gengar-Mimikyu-GX-V2-sm9102"
@@ -540,11 +553,25 @@ def test_marks_and_lists_completed_expansion_crawls(tmp_path: Path) -> None:
         products=[{"url": product, "name": "Bulbasaur"}],
         source="crawl",
     )
-    mark_expansion_complete(conn, expansion="151", expansion_id="2770")
+    mark_expansion_complete(
+        conn,
+        expansion="151",
+        expansion_id="2770",
+        page_url="https://www.cardmarket.com/en/Pokemon/Products/Singles/151",
+    )
+    mark_expansion_complete(
+        conn,
+        expansion="Battle Party Set",
+        expansion_id="6549",
+        page_url="https://www.cardmarket.com/en/Pokemon/Products/Singles/Battle-Party-Set",
+    )
     rows = list_expansion_crawls(conn)
     keys = {row["key"] for row in rows}
     assert "151" in keys
     assert "2770" in keys
+    assert "Battle Party Set" in keys
+    assert "Battle-Party-Set" in keys
+    assert "6549" in keys
     assert all(row["complete"] for row in rows)
 
 

@@ -44,12 +44,6 @@ export function classifyUrl(url) {
   if (lowered.includes("/login") || lowered.endsWith("/signin")) {
     return "login";
   }
-  if (lowered.includes("challenge") || lowered.includes("/captcha")) {
-    return "challenge";
-  }
-  if (lowered.includes("/products/search") || lowered.endsWith("/cards")) {
-    return "search";
-  }
   if (PRODUCT_PATH.test(path)) {
     return "product";
   }
@@ -62,6 +56,12 @@ export function classifyUrl(url) {
       return "expansion";
     }
     return "singles-index";
+  }
+  if (lowered.includes("/cdn-cgi/") || lowered.includes("/captcha")) {
+    return "challenge";
+  }
+  if (lowered.includes("/products/search") || lowered.endsWith("/cards")) {
+    return "search";
   }
   return "other";
 }

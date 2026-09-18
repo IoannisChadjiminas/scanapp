@@ -54,12 +54,14 @@ function scanappCollectCardmarket() {
       kind = "invalid";
     } else if (lowered.includes("/login") || lowered.endsWith("/signin")) {
       kind = "login";
-    } else if (lowered.includes("challenge") || lowered.includes("/captcha")) {
+    } else if (/^\/[a-z]{2}\/Pokemon\/Products\/Singles\/[^/]+\/[^/]+$/i.test(path)) {
+      kind = "product";
+    } else if (/^\/[a-z]{2}\/Pokemon\/Products\/Singles\/[^/]+$/i.test(path)) {
+      kind = "expansion";
+    } else if (lowered.includes("/cdn-cgi/") || lowered.includes("/captcha")) {
       kind = "challenge";
     } else if (lowered.includes("/products/search") || lowered.endsWith("/cards")) {
       kind = "search";
-    } else if (/^\/[a-z]{2}\/Pokemon\/Products\/Singles\/[^/]+\/[^/]+$/i.test(path)) {
-      kind = "product";
     }
   } catch {
     kind = "invalid";

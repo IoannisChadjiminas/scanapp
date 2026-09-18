@@ -30,6 +30,20 @@ test("classifies product, search, login, catalogue, and set-list links", () => {
   assert.equal(classifyUrl("https://prices.pokemontcg.io/cardmarket/base1-4"), "pokemontcg");
   assert.equal(classifyUrl("https://www.cardmarket.com/en/Pokemon/Products/Search?searchString=x"), "search");
   assert.equal(classifyUrl("https://www.cardmarket.com/en/Login"), "login");
+  assert.equal(
+    classifyUrl("https://www.cardmarket.com/en/Pokemon/Products/Singles/Challenge-from-the-Darkness"),
+    "expansion",
+  );
+  assert.equal(
+    classifyUrl(
+      "https://www.cardmarket.com/en/Pokemon/Products/Singles/Challenge-from-the-Darkness/Pikachu-V4",
+    ),
+    "product",
+  );
+  assert.equal(
+    classifyUrl("https://www.cardmarket.com/cdn-cgi/challenge-platform/foo"),
+    "challenge",
+  );
   assert.equal(classifyUrl("http://www.cardmarket.com/en/Pokemon/Products/Singles/Tag-Bolt/Gengar-Mimikyu-GX-V2-sm9102"), "invalid");
 });
 
