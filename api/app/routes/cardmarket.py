@@ -1,11 +1,15 @@
 from __future__ import annotations
 
+import json
+import time
 from typing import Any
 
 from fastapi import APIRouter, Header, HTTPException, Query, Request
+from fastapi.responses import StreamingResponse
 from pydantic import BaseModel, Field
 
 from app.cardmarket import is_job_url, normalize_product_url
+from app.cardmarket_events import wait_for_product
 from app.cardmarket_queue import (
     AuthError,
     QueueError,
@@ -350,8 +354,44 @@ def helper_status(
     return _price_response(state)
 
 
+GUIDE_LABELS = frozenset({"From", "Trend", "7-day"})
+
+
+def _payload_is_live(payload: dict[str, Any]) -> bool:
+    prices = payload.get("prices") or []
+    return bool(prices) and not all(str(item.get("label") or "") in GUIDE_LABELS for item in prices)
+
+
 @router.get("/cardmarket/prices", response_model=PriceResponse)
 def get_prices(
     request: Request, url: str = Query(min_length=8, max_length=500)
 ) -> PriceResponse:
     return _price_response(prices_payload(request.app.state.dbs.catalog, url))
+
+
+@router.get("/cardmarket/prices/events")
+async def price_events(
+    request: Request, url: str = Query(min_length=8, max_length=500)
+) -> StreamingResponse:
+    catalog = request.app.state.dbs.catalog
+
+    async def events():
+        deadline = time.monotonic() + 15 * 60
+        while True:
+            if await request.is_disconnected() or time.monotonic() > deadline:
+                break
+            payload = prices_payload(catalog, url)
+            yield f"data: {json.dumps(payload)}\n\n"
+            if _payload_is_live(payload) or payload.get("status") == "done":
+                break
+            await wait_for_product(url, timeout=20.0)
+
+    return StreamingResponse(
+        events(),
+        media_type="text/event-stream",
+        headers={
+            "Cache-Control": "no-cache, no-transform",
+            "Connection": "keep-alive",
+            "X-Accel-Buffering": "no",
+        },
+    )

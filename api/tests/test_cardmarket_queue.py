@@ -358,3 +358,59 @@ def test_immediate_transaction_rolls_back(tmp_path):
         pass
     row = conn.execute("SELECT status FROM cardmarket_jobs").fetchone()
     assert row["status"] == "pending"
+
+
+def test_wait_for_product_wakes_on_notify():
+    import asyncio
+
+    from app.cardmarket_events import bind_loop, notify_product, wait_for_product
+
+    async def main():
+        bind_loop(asyncio.get_running_loop())
+        task = asyncio.create_task(wait_for_product(GENGAR, 2.0))
+        await asyncio.sleep(0.05)
+        notify_product(GENGAR)
+        assert await task is True
+        bind_loop(None)
+
+    asyncio.run(main())
+
+
+def test_price_events_stream_after_complete(tmp_path):
+    fastapi = pytest.importorskip("fastapi")
+    from fastapi.testclient import TestClient
+
+    from app.routes.cardmarket import router
+
+    conn = _catalog(tmp_path)
+    helper_id, token = issue_helper_credential(conn)
+    app = fastapi.FastAPI()
+    app.include_router(router, prefix="/api/v1")
+    app.state.dbs = SimpleNamespace(catalog=conn)
+    client = TestClient(app)
+    headers = {"Authorization": f"Bearer {token}"}
+    client.post("/api/v1/cardmarket/jobs", json={"url": GENGAR, "card_id": "gengar"})
+    job = client.post("/api/v1/cardmarket/helper/claim", headers=headers).json()
+    completed = client.post(
+        "/api/v1/cardmarket/helper/complete",
+        headers=headers,
+        json={
+            "job_id": job["id"],
+            "claim_token": job["claim_token"],
+            "submission_id": "stream-1",
+            "url": GENGAR,
+            "prices": OFFERS,
+            "parser_version": "offers-v1",
+            "sampled_offer_count": 1,
+        },
+    )
+    assert completed.status_code == 200
+    with client.stream("GET", "/api/v1/cardmarket/prices/events", params={"url": GENGAR}) as response:
+        assert response.status_code == 200
+        text = ""
+        for line in response.iter_lines():
+            text += f"{line}\n"
+            if str(line).startswith("data:"):
+                break
+    assert "12.5" in text
+    assert "NM" in text

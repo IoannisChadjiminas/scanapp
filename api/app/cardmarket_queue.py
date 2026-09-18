@@ -314,19 +314,27 @@ def enqueue_job(
             (key, encoded),
         ).fetchone()
         if existing:
-            return str(existing["id"])
-        job_id = str(uuid.uuid4())
-        now = datetime_now()
-        conn.execute(
-            """
-            INSERT INTO cardmarket_jobs (
-                id, url, card_id, status, created_at, updated_at, attempts,
-                filters_json, product_identity, next_attempt_at
-            ) VALUES (?, ?, ?, 'pending', ?, ?, 0, ?, ?, ?)
-            """,
-            (job_id, key, card_id or "", now, now, encoded, identity, now),
-        )
-        return job_id
+            job_id = str(existing["id"])
+        else:
+            job_id = str(uuid.uuid4())
+            now = datetime_now()
+            conn.execute(
+                """
+                INSERT INTO cardmarket_jobs (
+                    id, url, card_id, status, created_at, updated_at, attempts,
+                    filters_json, product_identity, next_attempt_at
+                ) VALUES (?, ?, ?, 'pending', ?, ?, 0, ?, ?, ?)
+                """,
+                (job_id, key, card_id or "", now, now, encoded, identity, now),
+            )
+    _notify_job_url(key)
+    return job_id
+
+
+def _notify_job_url(url: str | None) -> None:
+    from app.cardmarket_events import notify_product
+
+    notify_product(url)
 
 
 def job_by_id(conn: sqlite3.Connection, job_id: str) -> dict[str, Any] | None:
@@ -380,39 +388,44 @@ def claim_job(conn: sqlite3.Connection, helper_id: str) -> dict[str, Any] | None
         settle_expired_claims(conn, now)
         active = _active_claim_for_helper(conn, helper_id)
         if active is not None:
-            return job_from_row(active)
-        row = conn.execute(
-            """
-            SELECT * FROM cardmarket_jobs
-            WHERE status = 'pending'
-              AND (next_attempt_at IS NULL OR next_attempt_at <= ?)
-            ORDER BY created_at
-            LIMIT 1
-            """,
-            (now,),
-        ).fetchone()
-        if row is None:
-            return None
-        token = str(uuid.uuid4())
-        expires = _iso_offset(CLAIM_LIFETIME_SECONDS)
-        conn.execute(
-            """
-            UPDATE cardmarket_jobs
-            SET status = 'claimed',
-                helper_id = ?,
-                claim_token = ?,
-                claim_expires_at = ?,
-                updated_at = ?,
-                failure_reason = NULL
-            WHERE id = ? AND status = 'pending'
-            """,
-            (helper_id, token, expires, now, row["id"]),
-        )
-        claimed = conn.execute(
-            "SELECT * FROM cardmarket_jobs WHERE id = ?",
-            (row["id"],),
-        ).fetchone()
-        return job_from_row(claimed) if claimed is not None else None
+            job = job_from_row(active)
+        else:
+            row = conn.execute(
+                """
+                SELECT * FROM cardmarket_jobs
+                WHERE status = 'pending'
+                  AND (next_attempt_at IS NULL OR next_attempt_at <= ?)
+                ORDER BY created_at
+                LIMIT 1
+                """,
+                (now,),
+            ).fetchone()
+            if row is None:
+                job = None
+            else:
+                token = str(uuid.uuid4())
+                expires = _iso_offset(CLAIM_LIFETIME_SECONDS)
+                conn.execute(
+                    """
+                    UPDATE cardmarket_jobs
+                    SET status = 'claimed',
+                        helper_id = ?,
+                        claim_token = ?,
+                        claim_expires_at = ?,
+                        updated_at = ?,
+                        failure_reason = NULL
+                    WHERE id = ? AND status = 'pending'
+                    """,
+                    (helper_id, token, expires, now, row["id"]),
+                )
+                claimed = conn.execute(
+                    "SELECT * FROM cardmarket_jobs WHERE id = ?",
+                    (row["id"],),
+                ).fetchone()
+                job = job_from_row(claimed) if claimed is not None else None
+    if job is not None:
+        _notify_job_url(job.get("url"))
+    return job
 
 
 def _require_claim(
@@ -547,7 +560,7 @@ def complete_job(
         job = job_from_row(row)
         if job["status"] == "done" and job["submission_id"] == submission_id:
             record = snapshot_record(conn, job["url"]) or snapshot_record(conn, final_url)
-            return {
+            result = {
                 "url": (record or {}).get("url") or job["url"],
                 "prices": (record or {}).get("prices") or [],
                 "status": "done",
@@ -555,51 +568,55 @@ def complete_job(
                 "sampled_offer_count": (record or {}).get("sampled_offer_count"),
                 "idempotent": True,
             }
-        if not product_url_matches_job(job["url"], final_url):
-            raise WrongProduct("Wrong product")
-        if not prices and not empty:
-            raise QueueError("Need at least one price or an explicit empty observation")
-        stamp = observed_at or datetime_now()
-        parser = parser_version or PARSER_VERSION
-        sampled = sampled_offer_count if sampled_offer_count is not None else len(prices)
-        urls = [job["url"]]
-        if final_url not in urls:
-            urls.append(final_url)
-        saved = final_url
-        for target in urls:
-            saved = write_snapshot(
-                conn,
-                target,
-                prices,
-                observed_at=stamp,
-                parser_version=parser,
-                sampled_offer_count=sampled,
-                submission_id=submission_id,
-                allow_empty=empty,
-                commit=False,
+        else:
+            if not product_url_matches_job(job["url"], final_url):
+                raise WrongProduct("Wrong product")
+            if not prices and not empty:
+                raise QueueError("Need at least one price or an explicit empty observation")
+            stamp = observed_at or datetime_now()
+            parser = parser_version or PARSER_VERSION
+            sampled = sampled_offer_count if sampled_offer_count is not None else len(prices)
+            urls = [job["url"]]
+            if final_url not in urls:
+                urls.append(final_url)
+            saved = final_url
+            for target in urls:
+                saved = write_snapshot(
+                    conn,
+                    target,
+                    prices,
+                    observed_at=stamp,
+                    parser_version=parser,
+                    sampled_offer_count=sampled,
+                    submission_id=submission_id,
+                    allow_empty=empty,
+                    commit=False,
+                )
+            now = datetime_now()
+            conn.execute(
+                """
+                UPDATE cardmarket_jobs
+                SET status = 'done',
+                    updated_at = ?,
+                    submission_id = ?,
+                    observed_at = ?,
+                    failure_reason = NULL,
+                    claim_expires_at = NULL
+                WHERE id = ?
+                """,
+                (now, submission_id, stamp, job_id),
             )
-        now = datetime_now()
-        conn.execute(
-            """
-            UPDATE cardmarket_jobs
-            SET status = 'done',
-                updated_at = ?,
-                submission_id = ?,
-                observed_at = ?,
-                failure_reason = NULL,
-                claim_expires_at = NULL
-            WHERE id = ?
-            """,
-            (now, submission_id, stamp, job_id),
-        )
-        return {
-            "url": saved,
-            "prices": prices,
-            "status": "done",
-            "observed_at": stamp,
-            "sampled_offer_count": sampled,
-            "idempotent": False,
-        }
+            result = {
+                "url": saved,
+                "prices": prices,
+                "status": "done",
+                "observed_at": stamp,
+                "sampled_offer_count": sampled,
+                "idempotent": False,
+            }
+    _notify_job_url(job["url"] if job else None)
+    _notify_job_url(final_url)
+    return result
 
 
 def retry_or_fail_job(
@@ -611,6 +628,7 @@ def retry_or_fail_job(
     reason: str | None = None,
     terminal: bool = False,
 ) -> str:
+    product_url = None
     with immediate_transaction(conn):
         if helper_id and claim_token:
             row = _require_claim(conn, job_id, helper_id, claim_token)
@@ -622,6 +640,7 @@ def retry_or_fail_job(
             if fetched is None:
                 return "failed"
             row = fetched
+        product_url = str(row["url"] or "")
         attempts = int(_row_get(row, "attempts", 0) or 0) + 1
         now = datetime_now()
         if terminal or attempts >= MAX_JOB_ATTEMPTS:
@@ -639,24 +658,27 @@ def retry_or_fail_job(
                 """,
                 (attempts, now, reason, job_id),
             )
-            return "failed"
-        delay = RETRY_DELAYS_SECONDS[min(attempts, len(RETRY_DELAYS_SECONDS)) - 1]
-        conn.execute(
-            """
-            UPDATE cardmarket_jobs
-            SET status = 'pending',
-                attempts = ?,
-                updated_at = ?,
-                helper_id = NULL,
-                claim_token = NULL,
-                claim_expires_at = NULL,
-                next_attempt_at = ?,
-                failure_reason = ?
-            WHERE id = ?
-            """,
-            (attempts, now, _iso_offset(delay), reason, job_id),
-        )
-        return "pending"
+            status = "failed"
+        else:
+            delay = RETRY_DELAYS_SECONDS[min(attempts, len(RETRY_DELAYS_SECONDS)) - 1]
+            conn.execute(
+                """
+                UPDATE cardmarket_jobs
+                SET status = 'pending',
+                    attempts = ?,
+                    updated_at = ?,
+                    helper_id = NULL,
+                    claim_token = NULL,
+                    claim_expires_at = NULL,
+                    next_attempt_at = ?,
+                    failure_reason = ?
+                WHERE id = ?
+                """,
+                (attempts, now, _iso_offset(delay), reason, job_id),
+            )
+            status = "pending"
+    _notify_job_url(product_url)
+    return status
 
 
 def complete_job_status(conn: sqlite3.Connection, job_id: str, status: str = "done") -> None:

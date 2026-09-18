@@ -86,13 +86,7 @@ function statusMessage(
 }
 
 function stillWaitingForOffers(payload: CardmarketPriceResponse, live: boolean) {
-  if (live || payload.status === "done") {
-    return false;
-  }
-  if (payload.helper_attention || payload.helper_paused || payload.helper_online === false) {
-    return false;
-  }
-  return true;
+  return !live && payload.status !== "done";
 }
 
 export function CardmarketPrices({
@@ -161,54 +155,118 @@ export function useCardmarketListings(
       return;
     }
     let stopped = false;
-    let attempts = 0;
+    let finished = false;
+    let timer: number | undefined;
+    let source: EventSource | null = null;
     setWaiting(true);
     setMessage("Fetching offers");
 
-    const tick = async () => {
-      attempts += 1;
-      try {
-        const payload = await api.cardmarketPrices(url);
-        if (stopped) {
-          return;
+    const apply = (payload: CardmarketPriceResponse) => {
+      const live = payload.prices.length > 0 && !isGuideOnly(payload.prices);
+      if (payload.prices.length) {
+        setPrices(payload.prices);
+      }
+      const keepGoing = stillWaitingForOffers(payload, live);
+      setWaiting(keepGoing);
+      setMessage(statusMessage(payload, live, keepGoing));
+      if (!keepGoing) {
+        finished = true;
+        source?.close();
+        source = null;
+        if (timer !== undefined) {
+          window.clearInterval(timer);
+          timer = undefined;
         }
-        const live = payload.prices.length > 0 && !isGuideOnly(payload.prices);
-        if (payload.prices.length) {
-          setPrices(payload.prices);
-        }
-        const keepGoing = stillWaitingForOffers(payload, live) && attempts < 45;
-        setWaiting(keepGoing);
-        setMessage(statusMessage(payload, live, keepGoing));
-        if (!keepGoing) {
-          return;
-        }
-      } catch {
-        if (stopped) {
-          return;
-        }
-        if (attempts < 45) {
-          window.setTimeout(tick, 2000);
-          return;
-        }
-        setWaiting(false);
-        setMessage("Queued — helper offline");
+      }
+      return keepGoing;
+    };
+
+    const poll = async () => {
+      if (stopped || finished) {
         return;
       }
+      try {
+        const payload = await api.cardmarketPrices(url);
+        if (!stopped) {
+          apply(payload);
+        }
+      } catch {
+        if (!stopped && !finished) {
+          setMessage("Queued — helper offline");
+        }
+      }
+    };
+
+    const startPolling = () => {
+      if (stopped || finished || timer !== undefined) {
+        return;
+      }
+      timer = window.setInterval(() => {
+        void poll();
+      }, 2000);
+      void poll();
+    };
+
+    const startEvents = () => {
+      if (stopped || finished || typeof EventSource === "undefined") {
+        startPolling();
+        return;
+      }
+      source?.close();
+      source = new EventSource(api.cardmarketPriceEventsUrl(url), { withCredentials: true });
+      source.onmessage = (event) => {
+        if (stopped || finished) {
+          return;
+        }
+        try {
+          apply(JSON.parse(event.data) as CardmarketPriceResponse);
+        } catch {
+          /* ignore a malformed frame */
+        }
+      };
+      source.onerror = () => {
+        if (stopped || finished) {
+          return;
+        }
+        source?.close();
+        source = null;
+        startPolling();
+      };
+    };
+
+    const start = async () => {
+      await api.enqueueCardmarketJob(url).catch(() => undefined);
       if (stopped) {
         return;
       }
-      window.setTimeout(tick, 2000);
+      await poll();
+      if (stopped || finished) {
+        return;
+      }
+      startEvents();
     };
-    void api
-      .enqueueCardmarketJob(url)
-      .catch(() => undefined)
-      .then(() => {
-        if (!stopped) {
-          return tick();
-        }
-      });
+
+    const onVisible = () => {
+      if (document.visibilityState !== "visible" || stopped || finished) {
+        return;
+      }
+      void poll();
+      if (source == null && timer === undefined) {
+        startEvents();
+      }
+    };
+    document.addEventListener("visibilitychange", onVisible);
+    window.addEventListener("focus", onVisible);
+    void start();
+
     return () => {
       stopped = true;
+      source?.close();
+      if (timer !== undefined) {
+        window.clearInterval(timer);
+      }
+      document.removeEventListener("visibilitychange", onVisible);
+      window.removeEventListener("focus", onVisible);
     };
   }, [url]);
 

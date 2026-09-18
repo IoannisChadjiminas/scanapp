@@ -8,6 +8,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.admission import ScanLimiter
+from app.cardmarket_events import bind_loop
 from app.config import get_settings
 from app.db import Databases
 from app.recognition.runtime import Runtime
@@ -34,9 +35,11 @@ async def lifespan(app: FastAPI):
     app.state.executor = ThreadPoolExecutor(max_workers=1, thread_name_prefix="scan")
     app.state.image_executor = ThreadPoolExecutor(max_workers=2, thread_name_prefix="image")
     app.state.loop = asyncio.get_running_loop()
+    bind_loop(app.state.loop)
     try:
         yield
     finally:
+        bind_loop(None)
         app.state.executor.shutdown(wait=False, cancel_futures=True)
         app.state.image_executor.shutdown(wait=False, cancel_futures=True)
         dbs.close()

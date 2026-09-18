@@ -61,6 +61,7 @@ services:
       - traefik.http.routers.scanapp.entrypoints=web
       - traefik.http.routers.scanapp.service=scanapp
       - traefik.http.services.scanapp.loadbalancer.server.port=80
+      - traefik.http.services.scanapp.loadbalancer.responseforwarding.flushinterval=1ms
       - traefik.http.routers.scanapp-secure.rule=Host(`staging-scan.auctaro.com`)
       - traefik.http.routers.scanapp-secure.entrypoints=websecure
       - traefik.http.routers.scanapp-secure.tls=true

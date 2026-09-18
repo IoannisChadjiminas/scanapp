@@ -104,6 +104,8 @@ export const api = {
       `/api/v1/cardmarket/prices?url=${encodeURIComponent(url)}`,
       { signal },
     ),
+  cardmarketPriceEventsUrl: (url: string) =>
+    `${API_BASE}/api/v1/cardmarket/prices/events?url=${encodeURIComponent(url)}`,
 };
 
 export async function queueCardmarketLookup(url?: string | null, cardId?: string) {
