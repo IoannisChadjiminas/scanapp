@@ -26,6 +26,9 @@ function activityLabel(value) {
   if (value === "needs_attention") {
     return "needs attention";
   }
+  if (value === "waiting_for_tab") {
+    return "waiting for Cardmarket tab";
+  }
   return value || "idle";
 }
 

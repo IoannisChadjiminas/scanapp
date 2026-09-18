@@ -171,14 +171,13 @@ test("overlapping wake events claim only one job", async () => {
   assert.equal(claims.length, 1);
 });
 
-test("helper opens its own tab, then backgrounds it after extract", async () => {
+test("opens Cardmarket in the foreground by itself", async () => {
   const { worker, createdTabs, activeTab } = createHarness();
   await worker.wake("alarm");
   assert.equal(createdTabs.length, 1);
   assert.equal(createdTabs[0].active, true);
+  assert.equal(createdTabs[0].url, GENGAR);
   assert.equal(activeTab(), createdTabs[0].id);
-  await worker.wake("alarm");
-  assert.equal(createdTabs[0].active, false);
 });
 
 test("delayed extract from another card is rejected", async () => {
@@ -229,16 +228,13 @@ test("pause persists and stops new claims", async () => {
   assert.equal(stored.paused, true);
 });
 
-test("closing the helper tab pauses instead of reopening it", async () => {
-  const { worker, createdTabs, local } = createHarness();
+test("closing a product tab does not pause the helper", async () => {
+  const { worker, tabs, local } = createHarness();
+  tabs.set(50, { id: 50, url: GENGAR, documentId: "doc-50" });
   await worker.wake("alarm");
-  await worker.tabRemoved(createdTabs[0].id);
+  await worker.tabRemoved(50);
   const stored = await local.get(["paused", "attention"]);
-  assert.equal(stored.paused, true);
-  assert.equal(stored.attention, "Helper tab closed");
-  const before = createdTabs.length;
-  await worker.wake("alarm");
-  assert.equal(createdTabs.length, before);
+  assert.equal(Boolean(stored.paused), false);
 });
 
 test("status snapshot is not blocked by a hung API", async () => {
@@ -264,28 +260,26 @@ test("status snapshot is not blocked by a hung API", async () => {
   assert.equal(status.apiBase, "https://staging-scan.auctaro.com");
 });
 
-test("service worker init keeps the helper tab", async () => {
-  const { worker, createdTabs, session } = createHarness();
+test("service worker init can open a foreground helper tab", async () => {
+  const { worker, createdTabs } = createHarness();
   await worker.wake("alarm");
-  assert.equal(createdTabs.length, 1);
-  const tabId = createdTabs[0].id;
   await worker.wake("init");
-  const stored = await session.get("helperTabId");
-  assert.equal(stored.helperTabId, tabId);
   assert.equal(createdTabs.length, 1);
+  assert.equal(createdTabs[0].active, true);
 });
 
-test("a different product page is not treated as already loaded", async () => {
-  const { worker, createdTabs, updates, advance } = createHarness();
+test("does not rewrite a different product tab", async () => {
+  const { worker, tabs, createdTabs } = createHarness();
+  tabs.set(50, { id: 50, url: PIKACHU, documentId: "doc-50" });
   await worker.wake("alarm");
-  createdTabs[0].url = PIKACHU;
-  advance(30_000);
-  await worker.wake("alarm");
-  assert.equal(updates.at(-1)?.url, GENGAR);
+  assert.equal(tabs.get(50).url, PIKACHU);
+  assert.equal(createdTabs.length, 1);
+  assert.equal(createdTabs[0].url, GENGAR);
+  assert.equal(createdTabs[0].active, true);
 });
 
 test("extract retries without documentId", async () => {
-  const { worker, completes } = createHarness({
+  const { worker, tabs, completes } = createHarness({
     extract: Object.assign(
       async () => ({
         outcome: "offers",
@@ -298,26 +292,33 @@ test("extract retries without documentId", async () => {
       { requireNoDocumentId: true },
     ),
   });
-  await worker.wake("alarm");
+  tabs.set(50, { id: 50, url: GENGAR, documentId: "doc-50" });
   await worker.wake("alarm");
   assert.equal(completes.length, 1);
 });
 
-test("loading failure returns the popup to idle", async () => {
-  const { worker, local, advance } = createHarness({
+test("waits on the foreground tab when extract is not ready", async () => {
+  const { worker, createdTabs, local } = createHarness({
     extract: async () => {
       throw new Error("no receiver");
     },
   });
   await worker.wake("alarm");
-  advance(61_000);
+  const stored = await local.get(["activity", "recentFailures"]);
+  assert.equal(createdTabs.length, 1);
+  assert.equal(createdTabs[0].active, true);
+  assert.equal(stored.activity, "fetching");
+  assert.equal(Array.isArray(stored.recentFailures) ? stored.recentFailures.length : 0, 0);
+});
+
+test("reads listings after a product tab opens", async () => {
+  const { worker, tabs, completes } = createHarness();
   await worker.wake("alarm");
-  advance(61_000);
-  await worker.wake("alarm");
-  const stored = await local.get(["activity", "currentCard", "recentFailures"]);
-  assert.equal(stored.activity, "idle");
-  assert.equal(stored.currentCard, "");
-  assert.equal(stored.recentFailures[0].reason, "loading");
+  assert.equal(completes.length, 0);
+  const tab = { id: 50, url: GENGAR, documentId: "doc-50" };
+  tabs.set(50, tab);
+  await worker.tabUpdated(50, { status: "complete", url: GENGAR }, tab);
+  assert.equal(completes.length, 1);
 });
 
 test("uses an already open product tab instead of creating one", async () => {

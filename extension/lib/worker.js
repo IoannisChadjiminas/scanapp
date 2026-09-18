@@ -274,40 +274,11 @@ export function createWorker({
     const finalUrl = senderUrl || normalizeUrl(message.url || "");
     const kind = classifyUrl(finalUrl);
     if (kind === "login" || kind === "challenge" || message.outcome === "challenge") {
-      const storedJob = await readStore(local, ["currentJob"]);
-      const current = storedJob.currentJob || job;
-      if (!current.focusedForChallenge && message.outcome === "challenge") {
-        const tab = sender?.tab?.id ? sender.tab : await helperTab();
-        if (tab?.id && tabs.update) {
-          await tabs.update(tab.id, { active: true });
-          await patchLocal({
-            currentJob: { ...current, focusedForChallenge: true, loadStartedAt: now(), phase: "challenge" },
-          });
-          await scheduleWait(2000);
-          return { ok: false, reason: "challenge-focus" };
-        }
-      }
-      await request("/cardmarket/helper/fail", {
-        method: "POST",
-        body: {
-          job_id: job.id,
-          claim_token: job.claimToken,
-          reason: "challenge",
-        },
-      }).catch(() => undefined);
-      await patchLocal({
-        paused: true,
-        attention: "Cardmarket needs attention",
-        activity: "needs_attention",
-        currentJob: job,
-      });
+      await publish({ activity: "waiting_for_tab", currentCard: job.card_id || job.url });
+      await scheduleWait(2000);
       return { ok: false, reason: "challenge" };
     }
     if (message.outcome === "loading" || kind === "pokemontcg") {
-      if (now() - (job.loadStartedAt || now()) > PAGE_DEADLINE_MS) {
-        await failCurrent("loading");
-        return { ok: false, reason: "loading" };
-      }
       await scheduleWait(1000);
       return { ok: false, reason: "loading" };
     }
@@ -339,10 +310,6 @@ export function createWorker({
     };
     await patchLocal({ pendingResult: pending, activity: "saving" });
     await uploadPending();
-    const quiet = await helperTab();
-    if (quiet?.id && tabs.update) {
-      await tabs.update(quiet.id, { active: false });
-    }
     return { ok: true };
   }
 
@@ -403,27 +370,29 @@ export function createWorker({
   }
 
   async function loadJob(job) {
-    await publish({ activity: "fetching", currentCard: job.card_id || job.url });
     const target = job.url;
-    const stored = await readStore(local, ["lastNavigationAt", "helperTabClosed", "paused"]);
-    if (stored.helperTabClosed && stored.paused) {
-      await publish({ activity: "needs_attention", attention: "Helper tab closed" });
-      return;
-    }
-    let tab = (await helperTab()) || (await findOpenProductTab(target));
-    if (tab) {
-      await adoptTab(tab);
+    await publish({ activity: "fetching", currentCard: job.card_id || job.url });
+    let tab = await findOpenProductTab(target);
+    if (!tab) {
+      tab = await helperTab();
     }
     if (!tab) {
       tab = await createHelperTab(target, { active: true });
-      await patchLocal({ lastNavigationAt: now(), currentJob: { ...job, phase: "loading", loadStartedAt: now() } });
-      await scheduleWait(PAGE_DEADLINE_MS);
+      await patchLocal({
+        lastNavigationAt: now(),
+        currentJob: { ...job, phase: "loading", loadStartedAt: now() },
+      });
       return;
+    }
+    await adoptTab(tab);
+    if (tab.id && tabs.update) {
+      await tabs.update(tab.id, { active: true });
     }
     const currentUrl = tab.url || "";
     const alreadyThere =
       normalizeUrl(currentUrl) === normalizeUrl(target) || finalUrlAllowed(target, currentUrl);
     if (!alreadyThere) {
+      const stored = await readStore(local, ["lastNavigationAt"]);
       const wait = (stored.lastNavigationAt || 0) + NAV_SPACING_MS - now();
       if (wait > 0) {
         await scheduleWait(wait);
@@ -434,57 +403,27 @@ export function createWorker({
         lastNavigationAt: now(),
         currentJob: { ...job, phase: "loading", loadStartedAt: now() },
       });
-      await scheduleWait(PAGE_DEADLINE_MS);
       return;
     }
     const kind = classifyUrl(currentUrl);
-    if (kind === "invalid") {
-      if (now() - (job.loadStartedAt || now()) > PAGE_DEADLINE_MS) {
-        await failCurrent("loading");
-        return;
-      }
-      await scheduleWait(1000);
-      return;
-    }
     if (kind === "login" || kind === "challenge") {
-      if (!job.focusedForChallenge) {
-        await tabs.update(tab.id, { active: true });
-        await patchLocal({
-          currentJob: { ...job, focusedForChallenge: true, loadStartedAt: now(), phase: "challenge" },
-        });
-        await scheduleWait(2000);
-        return;
-      }
-      await bindExtract({ type: "extract-result", requestId: job.requestId, jobId: job.id, outcome: "challenge", url: currentUrl }, { tab });
+      await publish({
+        activity: "waiting_for_tab",
+        currentCard: job.card_id || job.url,
+      });
+      await scheduleWait(2000);
       return;
     }
-    if (kind === "search" || kind === "other") {
-      await bindExtract({ type: "extract-result", requestId: job.requestId, jobId: job.id, outcome: "wrong_product", url: currentUrl }, { tab });
-      return;
-    }
-    if (kind === "pokemontcg") {
-      if (now() - (job.loadStartedAt || now()) > PAGE_DEADLINE_MS) {
-        await failCurrent("loading");
-        return;
-      }
+    if (kind !== "product") {
       await scheduleWait(1000);
       return;
     }
     const result = await extractFromTab(tab, job);
     if (result?.outcome) {
-      await bindExtract({ type: "extract-result", ...result, requestId: job.requestId, jobId: job.id }, { tab, documentId: tab.documentId });
-      return;
-    }
-    if (!job.focusedForChallenge) {
-      await tabs.update(tab.id, { active: true });
-      await patchLocal({
-        currentJob: { ...job, focusedForChallenge: true, loadStartedAt: now(), phase: "extracting" },
-      });
-      await scheduleWait(2000);
-      return;
-    }
-    if (now() - (job.loadStartedAt || now()) > PAGE_DEADLINE_MS) {
-      await failCurrent("loading");
+      await bindExtract(
+        { type: "extract-result", ...result, requestId: job.requestId, jobId: job.id },
+        { tab, documentId: tab.documentId },
+      );
       return;
     }
     await patchLocal({ currentJob: { ...job, phase: "extracting" } });
@@ -658,45 +597,24 @@ export function createWorker({
     if (stored.helperTabId !== tabId) {
       return;
     }
-    const localState = await readStore(local, ["currentJob", "paused"]);
     await writeStore(session, { helperTabId: null, helperDocumentId: null });
-    if (localState.currentJob && !localState.paused) {
-      await abandonHelperTab("Helper tab closed");
-      await releaseCurrent("closed_tab");
-    }
   }
 
   async function onTabUpdated(tabId, info, tab) {
-    const stored = await readStore(session, ["helperTabId"]);
-    if (stored.helperTabId !== tabId) {
+    const url = tab?.url || info.url;
+    const localState = await readStore(local, ["currentJob", "paused"]);
+    const job = localState.currentJob;
+    if (!job || localState.paused || !url) {
+      return;
+    }
+    if (!(finalUrlAllowed(job.url, url) || normalizeUrl(url) === normalizeUrl(job.url))) {
       return;
     }
     if (tab?.documentId) {
       await writeStore(session, { helperDocumentId: tab.documentId });
     }
-    const localState = await readStore(local, ["currentJob", "paused"]);
-    const job = localState.currentJob;
-    if (!job || localState.paused) {
-      return;
-    }
-    const url = tab?.url || info.url;
-    if (!url) {
-      return;
-    }
-    const kind = classifyUrl(url);
-    const expected = classifyUrl(job.url);
-    const allowed =
-      kind === "pokemontcg" ||
-      kind === "product" ||
-      kind === "challenge" ||
-      kind === "login" ||
-      (expected === "pokemontcg" && kind === "product");
-    if (info.url && !allowed && kind !== "invalid") {
-      await abandonHelperTab("Helper tab navigated away");
-      await releaseCurrent("navigated_away");
-      return;
-    }
-    if (info.status === "complete" || kind === "product") {
+    await adoptTab({ id: tabId, documentId: tab?.documentId });
+    if (info.status === "complete" || classifyUrl(url) === "product") {
       await tick();
     }
   }

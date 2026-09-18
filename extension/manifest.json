@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Scanapp Cardmarket helper",
-  "version": "0.2.3",
+  "version": "0.2.5",
   "description": "Quiet background helper that fetches Cardmarket listings for Scanapp, one card at a time.",
   "action": {
     "default_title": "Scanapp Cardmarket helper",

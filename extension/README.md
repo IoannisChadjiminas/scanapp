@@ -48,14 +48,14 @@ Pause survives Chrome restarts. It stops new claims immediately. A collected res
 
 ## Behaviour
 
-- One helper tab, created automatically. You do not open Cardmarket. The tab may come to the front so Cloudflare can finish, then it goes to the background.
+- One helper tab, opened automatically in the **foreground** (not in the background). Cloudflare blocks hidden tabs. You do not need to press Open on Cardmarket.
 - One serialized worker; overlapping alarms, popup clicks, and page messages cannot claim two jobs
 - State is persisted (settings, pause, current job, claim, unsaved result). Service worker timers are not trusted for recovery
 - After a Chrome restart, tab IDs are discarded and ownership is established again
 - Results are bound to the helper tab, document, extraction request, and product URL. Delayed messages from another card are dropped
 - Redirects from `prices.pokemontcg.io` are tracked. Search, login, or a different product cannot complete the job
 - Empty listings are stored only when the page explicitly has no articles
-- Closing the helper tab, or navigating it elsewhere, pauses with a clear reason instead of reopening it
+- Closing the helper tab does not stop the queue; the next alarm opens Cardmarket in the foreground again if a job is still claimed
 
 Scheduling targets (Chrome may delay background work):
 
@@ -80,7 +80,7 @@ The old four-second poller and focus-stealing product tabs are gone.
 ## Troubleshooting
 
 - **Authentication required:** paste a fresh token from `python -m app.helper_credential`
-- **Repeated `loading` failures / Fetching with no card:** reload the unpacked extension (0.2.3+). The helper opens its own Cardmarket tab; you do not need a product window open.
+- **Repeated `loading` failures:** reload the unpacked extension (0.2.5+). The helper opens Cardmarket in the front. Complete Cloudflare/login in that tab if asked.
 - **Helper tab closed / navigated away:** click **Open helper tab**, then **Resume**
 - **Cardmarket needs attention:** solve login or the browser challenge in the helper tab, then **Resume**
 - Phone and PC must share the same API. For local Docker, the phone has to reach this machine, not only `127.0.0.1` on the phone
