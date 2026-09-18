@@ -112,7 +112,14 @@ export function createWorker({
     }
     const payload = await response.json().catch(() => ({}));
     if (!response.ok) {
-      const error = new Error(payload.detail || `http ${response.status}`);
+      let detail = payload.detail || `http ${response.status}`;
+      if (Array.isArray(detail)) {
+        detail = detail.map((item) => item?.msg || JSON.stringify(item)).join("; ");
+      }
+      if (response.status === 404 && String(path).includes("expansion-import")) {
+        detail = `This Scanapp server (${apiBase}) does not have set import yet. Switch the helper to Local Docker.`;
+      }
+      const error = new Error(detail);
       error.code = response.status === 409 ? "claim" : "http";
       error.status = response.status;
       error.payload = payload;
