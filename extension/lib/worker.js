@@ -332,6 +332,18 @@ export function createWorker({
       try {
         const injected = await scripting.executeScript({
           target: { tabId: tab.id },
+          files: ["inject-extract.js"],
+        });
+        const payload = Array.isArray(injected) ? injected[0]?.result : injected?.result;
+        if (payload?.outcome) {
+          return payload;
+        }
+      } catch {
+        /* fall through */
+      }
+      try {
+        const injected = await scripting.executeScript({
+          target: { tabId: tab.id },
           func: extractInPage,
           args: [job.requestId, job.id],
         });

@@ -81,7 +81,7 @@ The old four-second poller and focus-stealing product tabs are gone.
 
 - **Authentication required:** paste a fresh token from `python -m app.helper_credential`
 - **Tab opens late / not at all:** reload the unpacked extension (0.2.7+). Chrome otherwise only wakes the helper every 30 seconds.
-- **Site says “Could not read Cardmarket listings” while a tab is open:** reload the extension (0.2.7+), then scan again. The site used to freeze on an old failed job.
+- **Site stuck on Fetching offers:** reload the unpacked extension (0.2.8+). The helper now reads the Cardmarket tab directly. Keep that tab in front until prices appear.
 - **Helper tab closed / navigated away:** click **Open helper tab**, then **Resume**
 - **Cardmarket needs attention:** solve login or the browser challenge in the helper tab, then **Resume**
 - Phone and PC must share the same API. If you scan on `http://localhost:8080`, the helper server must be **Local Docker**, not Staging.

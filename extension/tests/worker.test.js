@@ -372,18 +372,23 @@ test("reads listings through injected extract", async () => {
       throw new Error("content script missing");
     },
     scripting: {
-      executeScript: async () => [
-        {
-          result: {
-            outcome: "offers",
-            url: GENGAR,
-            prices: [{ label: "NM", amount: 4, currency: "EUR" }],
-            observedAt: "2026-09-18T07:00:00Z",
-            parserVersion: "offers-v1",
-            sampledOfferCount: 1,
-          },
-        },
-      ],
+      executeScript: async ({ files } = {}) => {
+        if (files?.[0] === "inject-extract.js") {
+          return [
+            {
+              result: {
+                outcome: "offers",
+                url: GENGAR,
+                prices: [{ label: "NM", amount: 4, currency: "EUR" }],
+                observedAt: "2026-09-18T07:00:00Z",
+                parserVersion: "offers-v1",
+                sampledOfferCount: 1,
+              },
+            },
+          ];
+        }
+        return [{ result: null }];
+      },
     },
   });
   await worker.wake("alarm");
