@@ -20,6 +20,7 @@ export const DEFAULT_API = SERVERS.local;
 export const STORAGE_KEYS = [
   "apiBase",
   "helperToken",
+  "helperTokens",
   "paused",
   "currentJob",
   "pendingResult",

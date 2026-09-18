@@ -562,3 +562,25 @@ test("test crawler stores every page in the open set", async () => {
     true,
   );
 });
+
+test("keeps a helper token per Scanapp server", async () => {
+  const { worker, local } = createHarness();
+  await worker.handleMessage({
+    type: "set-settings",
+    apiBase: "http://127.0.0.1:8000",
+    helperToken: "local-token",
+  });
+  await worker.handleMessage({
+    type: "set-settings",
+    apiBase: "https://staging-scan.auctaro.com",
+    helperToken: "staging-token",
+  });
+  let stored = await local.get(["apiBase", "helperToken", "helperTokens"]);
+  assert.equal(stored.apiBase, "https://staging-scan.auctaro.com");
+  assert.equal(stored.helperToken, "staging-token");
+  await worker.handleMessage({ type: "set-settings", apiBase: "http://127.0.0.1:8000" });
+  stored = await local.get(["apiBase", "helperToken", "helperTokens"]);
+  assert.equal(stored.apiBase, "http://127.0.0.1:8000");
+  assert.equal(stored.helperToken, "local-token");
+  assert.equal(stored.helperTokens["https://staging-scan.auctaro.com"], "staging-token");
+});

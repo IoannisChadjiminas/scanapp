@@ -79,7 +79,9 @@ function render(status) {
     customUrl.value = apiBase;
   }
   if (status.helperToken) {
-    tokenEl.placeholder = "Credential saved";
+    tokenEl.placeholder = "Saved for this server";
+  } else {
+    tokenEl.placeholder = "Paste helper token";
   }
 }
 

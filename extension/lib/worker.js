@@ -62,10 +62,17 @@ export function createWorker({
   }
 
   async function settings() {
-    const stored = await readStore(local, ["apiBase", "helperToken", "paused"]);
+    const stored = await readStore(local, ["apiBase", "helperToken", "helperTokens", "paused"]);
+    const apiBase = String(stored.apiBase || DEFAULT_API).replace(/\/$/, "");
+    const byServer =
+      stored.helperTokens && typeof stored.helperTokens === "object" ? { ...stored.helperTokens } : {};
+    if (stored.helperToken && !byServer[apiBase]) {
+      byServer[apiBase] = String(stored.helperToken);
+      await writeStore(local, { helperTokens: byServer });
+    }
     return {
-      apiBase: String(stored.apiBase || DEFAULT_API).replace(/\/$/, ""),
-      helperToken: String(stored.helperToken || ""),
+      apiBase,
+      helperToken: String(byServer[apiBase] || stored.helperToken || ""),
       paused: Boolean(stored.paused),
     };
   }
@@ -794,12 +801,31 @@ export function createWorker({
 
   async function changeServer(apiBase) {
     await releaseCurrent("server-change");
-    await patchLocal({ apiBase: String(apiBase || DEFAULT_API).replace(/\/$/, ""), currentJob: null, pendingResult: null });
+    const next = String(apiBase || DEFAULT_API).replace(/\/$/, "");
+    const stored = await readStore(local, ["helperTokens", "helperToken"]);
+    const byServer =
+      stored.helperTokens && typeof stored.helperTokens === "object" ? { ...stored.helperTokens } : {};
+    await patchLocal({
+      apiBase: next,
+      helperToken: String(byServer[next] || ""),
+      currentJob: null,
+      pendingResult: null,
+    });
     await tick();
   }
 
   async function changeToken(helperToken) {
-    await patchLocal({ helperToken: String(helperToken || "") });
+    const { apiBase } = await settings();
+    const stored = await readStore(local, ["helperTokens"]);
+    const byServer =
+      stored.helperTokens && typeof stored.helperTokens === "object" ? { ...stored.helperTokens } : {};
+    const token = String(helperToken || "");
+    if (token) {
+      byServer[apiBase] = token;
+    } else {
+      delete byServer[apiBase];
+    }
+    await patchLocal({ helperToken: token, helperTokens: byServer });
     await tick();
   }
 

@@ -37,9 +37,29 @@ docker compose restart api
 English 151 is `sv03.5`. Japanese/Chinese IDs are different; pass the TCGdex id for that language, or use `--sets all` again.
 
 ```bash
-docker compose -f compose.catalogue.yaml run --rm --build catalogue \
-  -m bootstrap.build --sets sv03.5 --languages en,ja,zh-cn,zh-tw --skip-models
+./scripts/catalogue-add-set.sh sv03.5
 docker compose restart api
+```
+
+## 151 (local download through staging)
+
+```bash
+./scripts/catalogue-151.sh
+```
+
+Downloads English 151, waits for Chrome helper Import/Save on local `http://localhost:8080`, writes Cardmarket URLs, packs the tar, copies it to `auctaro-staging`, applies it, and restarts the staging API.
+
+151 already downloaded and imported locally:
+
+```bash
+./scripts/catalogue-151.sh --link-offload
+```
+
+Download only, or pack without SSH:
+
+```bash
+./scripts/catalogue-151.sh --download-only
+./scripts/catalogue-151.sh --local-only
 ```
 
 ## Cardmarket URLs (local, then offload)
@@ -77,3 +97,15 @@ docker compose restart api
 ```
 
 Then copy `exports/scanapp-index.tar` to the server and apply (see the script output). Official set webps are not in the tar; thumbnails use TCGdex URLs. Extra-card photos, Cardmarket maps, and stored set-list URLs are included.
+
+End-to-end from this machine (SSH host `auctaro-staging`):
+
+```bash
+./scripts/offload-to-staging.sh
+```
+
+On the server only, after the tar is in `exports/`:
+
+```bash
+./scripts/offload-apply.sh
+```

@@ -16,21 +16,21 @@ Existing `apiBase` values are kept. New installs can pick **Local development** 
 
 Write routes require a revocable credential.
 
-On the API host:
+On the local API:
 
 ```bash
-docker compose exec api python -m app.helper_credential
+./scripts/helper-token.sh
 ```
 
-Dokploy/Hetzner, from the API container:
+On staging (`auctaro-staging`):
 
 ```bash
-python -m app.helper_credential
+./scripts/helper-token.sh staging
 ```
 
-Paste the printed token once in the popup. It is stored only in extension storage and is never sent to content scripts, URLs, or logs.
+Paste the printed token once in the popup while that server is selected. Local Docker and Staging keep **separate** saved credentials in the extension (reload unpacked helper 0.2.13+). Leave the field blank when switching if that server is already saved. It is stored only in extension storage and is never sent to content scripts, URLs, or logs.
 
-Rotate or revoke with `--helper-id` / `--revoke HELPER_ID`.
+Rotate or revoke with `--helper-id` / `--revoke HELPER_ID` inside the same `python -m app.helper_credential` command.
 
 ## Popup
 
