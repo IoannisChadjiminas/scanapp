@@ -1036,10 +1036,9 @@ export function createWorker({
     }
   }
 
-  async function openExpansionInTab(tab, target, { forceUrl = false } = {}) {
-    const blocked = tabBlockReason(tab);
+  async function openExpansionInTab(tab, target) {
     const nextUrl = target?.url;
-    if ((forceUrl || blocked || !target?.id) && nextUrl) {
+    if (nextUrl) {
       const same = expansionPageKey(tab?.url || "") === expansionPageKey(nextUrl);
       if (same && typeof tabs.reload === "function") {
         await tabs.reload(tab.id);
@@ -1048,14 +1047,11 @@ export function createWorker({
       }
       return;
     }
-    const applied = await driveExpansion(tab.id, "apply", {
-      id: target.id,
-      name: target.name,
-      url: target.url,
+    await driveExpansion(tab.id, "apply", {
+      id: target?.id,
+      name: target?.name,
+      url: target?.url,
     });
-    if (!applied?.ok && nextUrl) {
-      await tabs.update(tab.id, { url: nextUrl, active: true });
-    }
   }
 
   async function pauseAllExpansions({ reason, index, targets, totals, label, tabId }) {
@@ -1148,10 +1144,14 @@ export function createWorker({
         targets = resume.targets.slice(0, MAX_EXPANSIONS);
         startIndex = Math.min(Math.max(Number(resume.index) || 0, 0), targets.length);
       } else {
-        await driveExpansion(tab.id, "open");
-        await humanPause("think");
         let listed = await driveExpansion(tab.id, "list");
         targets = Array.isArray(listed?.expansions) ? listed.expansions : [];
+        if (!targets.length) {
+          await driveExpansion(tab.id, "open");
+          await humanPause("think");
+          listed = await driveExpansion(tab.id, "list");
+          targets = Array.isArray(listed?.expansions) ? listed.expansions : [];
+        }
         if (!targets.length) {
           const snap = await extractExpansionFromTab(tab);
           targets = Array.isArray(snap?.expansions) ? snap.expansions : [];
@@ -1245,9 +1245,7 @@ export function createWorker({
           halted = true;
           break;
         }
-        await openExpansionInTab(current, target, {
-          forceUrl: resumeFromCheckpoint && index === startIndex,
-        });
+        await openExpansionInTab(current, target);
         current = (await waitForExpansionPage(current.id)) || (await tabs.get(current.id));
         if ((await settings()).paused) {
           await pauseAllExpansions({ reason: "paused", index, targets, totals, label, tabId: current.id });
