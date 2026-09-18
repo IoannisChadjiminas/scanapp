@@ -519,6 +519,118 @@ def _unique_card_for_product(
     return hits[0]
 
 
+def _touch_expansion_crawl(
+    conn: sqlite3.Connection,
+    *,
+    expansion: str = "",
+    expansion_id: str = "",
+    complete: bool = False,
+) -> None:
+    slug = str(expansion or "").strip()
+    ident = str(expansion_id or "").strip()
+    keys = [key for key in (ident, slug) if key]
+    if not keys:
+        return
+    stamp = datetime_now()
+    products = 0
+    if slug:
+        row = conn.execute(
+            "SELECT COUNT(*) AS n FROM cardmarket_expansion_products WHERE expansion = ?",
+            (slug,),
+        ).fetchone()
+        products = int(row["n"] if row is not None else 0)
+    for key in keys:
+        conn.execute(
+            """
+            INSERT INTO cardmarket_expansion_crawls (
+                key, expansion, expansion_id, products, complete, updated_at
+            ) VALUES (?, ?, ?, ?, ?, ?)
+            ON CONFLICT(key) DO UPDATE SET
+                expansion = COALESCE(NULLIF(excluded.expansion, ''), cardmarket_expansion_crawls.expansion),
+                expansion_id = COALESCE(NULLIF(excluded.expansion_id, ''), cardmarket_expansion_crawls.expansion_id),
+                products = MAX(cardmarket_expansion_crawls.products, excluded.products),
+                complete = CASE
+                    WHEN excluded.complete > 0 THEN 1
+                    ELSE cardmarket_expansion_crawls.complete
+                END,
+                updated_at = excluded.updated_at
+            """,
+            (key, slug, ident, products, 1 if complete else 0, stamp),
+        )
+
+
+def _backfill_expansion_crawls(conn: sqlite3.Connection) -> None:
+    grouped = conn.execute(
+        """
+        SELECT expansion, COUNT(*) AS products, MAX(rowid) AS last_row
+        FROM cardmarket_expansion_products
+        WHERE expansion IS NOT NULL AND TRIM(expansion) != ''
+        GROUP BY expansion
+        """
+    ).fetchall()
+    if not grouped:
+        return
+    latest = max(grouped, key=lambda row: int(row["last_row"] or 0))
+    latest_slug = str(latest["expansion"] or "")
+    for row in grouped:
+        slug = str(row["expansion"] or "")
+        if not slug:
+            continue
+        marked = conn.execute(
+            "SELECT complete FROM cardmarket_expansion_crawls WHERE key = ?",
+            (slug,),
+        ).fetchone()
+        already_done = bool(marked["complete"]) if marked is not None else False
+        done = already_done or slug != latest_slug
+        _touch_expansion_crawl(conn, expansion=slug, complete=done)
+    conn.commit()
+
+
+def list_expansion_crawls(conn: sqlite3.Connection) -> list[dict[str, Any]]:
+    _backfill_expansion_crawls(conn)
+    rows = conn.execute(
+        """
+        SELECT key, expansion, expansion_id, products, complete, updated_at
+        FROM cardmarket_expansion_crawls
+        ORDER BY updated_at DESC
+        """
+    ).fetchall()
+    return [
+        {
+            "key": str(row["key"] or ""),
+            "expansion": str(row["expansion"] or ""),
+            "expansion_id": str(row["expansion_id"] or ""),
+            "products": int(row["products"] or 0),
+            "complete": bool(row["complete"]),
+            "updated_at": str(row["updated_at"] or ""),
+        }
+        for row in rows
+    ]
+
+
+def mark_expansion_complete(
+    conn: sqlite3.Connection,
+    *,
+    expansion: str = "",
+    expansion_id: str = "",
+    page_url: str = "",
+) -> dict[str, Any]:
+    slug = str(expansion or "").strip() or _expansion_from_url(page_url)
+    ident = str(expansion_id or "").strip()
+    _touch_expansion_crawl(conn, expansion=slug, expansion_id=ident, complete=True)
+    conn.commit()
+    return {
+        "expansion": slug,
+        "expansion_id": ident,
+        "complete": True,
+        "stored": 0,
+        "linked": 0,
+        "unmatched": 0,
+        "products": 0,
+        "source": "crawl",
+    }
+
+
 def import_expansion_products(
     conn: sqlite3.Connection,
     data_dir: Path,
@@ -588,6 +700,7 @@ def import_expansion_products(
             ),
         )
         stored_n += 1
+    _touch_expansion_crawl(conn, expansion=expansion or "", complete=False)
     conn.commit()
     dump_dir = Path(data_dir) / "expansion-imports"
     dump_dir.mkdir(parents=True, exist_ok=True)

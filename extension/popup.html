@@ -24,7 +24,7 @@
     </div>
     <section>
       <h2>Test import</h2>
-      <p class="muted">Use Local Docker. Stay on Cardmarket Singles. Import all expansions always starts from the first set. Continue picks up the paused set. It waits between pages so it looks more like browsing. Cloudflare can still appear at random — pass it, then press Continue. Pages already stored stay.</p>
+      <p class="muted">Use Local Docker. Stay on Cardmarket Singles. Import all expansions skips sets that already have stored URLs, except the last set in progress. Continue retries the paused set. Tick Cloudflare yourself, then press Continue.</p>
       <p id="expansion-note" class="muted">No set import yet</p>
       <div class="actions">
         <button id="import-page" type="button">Import this set page</button>
@@ -48,9 +48,23 @@
         <input id="custom-url" type="url" placeholder="https://scan.example.com" />
       </label>
       <label>
+        Crawl speed
+        <select id="pace">
+          <option value="fast">Fast (no extra waits)</option>
+          <option value="medium">Medium</option>
+          <option value="slow">Slow (more random waits)</option>
+        </select>
+      </label>
+      <label>
         Helper credential
         <input id="token" type="password" autocomplete="off" />
       </label>
+      <label>
+        Phone alerts (ntfy topic)
+        <input id="ntfy-topic" autocomplete="off" placeholder="secret-topic-name" />
+      </label>
+      <p class="muted">Install the ntfy app on your phone, subscribe to the same topic, then Save. You get a ping when Cloudflare pauses the crawl. Use a long random name, not a guessable word.</p>
+      <button id="notify-test" type="button">Send test ping</button>
       <button type="submit">Save settings</button>
     </form>
     <script src="popup.js" type="module"></script>

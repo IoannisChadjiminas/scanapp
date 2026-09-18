@@ -12,20 +12,66 @@ export const MAX_RECENT_FAILURES = 5;
 export const MAX_EXPANSION_PAGES = 80;
 export const MAX_EXPANSION_PRODUCTS = 5_000;
 export const MAX_EXPANSIONS = 2_000;
-export const EXPANSION_PAGE_MS = 2_000;
-export const EXPANSION_READ_MIN_MS = 1_500;
-export const EXPANSION_READ_MAX_MS = 4_000;
-export const EXPANSION_PAGE_MIN_MS = 4_000;
-export const EXPANSION_PAGE_MAX_MS = 10_000;
-export const EXPANSION_SET_MIN_MS = 8_000;
-export const EXPANSION_SET_MAX_MS = 18_000;
-export const EXPANSION_THINK_MIN_MS = 800;
-export const EXPANSION_THINK_MAX_MS = 2_800;
-export const EXPANSION_SETTLE_MIN_MS = 2_000;
-export const EXPANSION_SETTLE_MAX_MS = 5_000;
-export const EXPANSION_BREAK_EVERY = 6;
-export const EXPANSION_BREAK_MIN_MS = 20_000;
-export const EXPANSION_BREAK_MAX_MS = 45_000;
+export const DEFAULT_PACE = "fast";
+export const PACE_PROFILES = {
+  fast: {
+    readMin: 0,
+    readMax: 0,
+    pageMin: 0,
+    pageMax: 0,
+    setMin: 0,
+    setMax: 0,
+    thinkMin: 0,
+    thinkMax: 0,
+    settleMin: 0,
+    settleMax: 0,
+    breakEveryMin: 4,
+    breakEveryMax: 11,
+    breakMin: 0,
+    breakMax: 0,
+    hesitateChance: 0,
+    hesitateMin: 0,
+    hesitateMax: 0,
+  },
+  medium: {
+    readMin: 1_200,
+    readMax: 4_000,
+    pageMin: 3_000,
+    pageMax: 8_000,
+    setMin: 6_000,
+    setMax: 14_000,
+    thinkMin: 600,
+    thinkMax: 2_200,
+    settleMin: 1_500,
+    settleMax: 4_500,
+    breakEveryMin: 5,
+    breakEveryMax: 10,
+    breakMin: 15_000,
+    breakMax: 45_000,
+    hesitateChance: 0.08,
+    hesitateMin: 3_000,
+    hesitateMax: 12_000,
+  },
+  slow: {
+    readMin: 2_500,
+    readMax: 8_000,
+    pageMin: 6_000,
+    pageMax: 16_000,
+    setMin: 12_000,
+    setMax: 28_000,
+    thinkMin: 1_200,
+    thinkMax: 4_500,
+    settleMin: 3_000,
+    settleMax: 9_000,
+    breakEveryMin: 4,
+    breakEveryMax: 11,
+    breakMin: 35_000,
+    breakMax: 90_000,
+    hesitateChance: 0.16,
+    hesitateMin: 6_000,
+    hesitateMax: 24_000,
+  },
+};
 export const SERVERS = {
   local: "http://127.0.0.1:8000",
   staging: "https://staging-scan.auctaro.com",
@@ -49,4 +95,6 @@ export const STORAGE_KEYS = [
   "attention",
   "helperTabClosed",
   "expansionResume",
+  "ntfyTopic",
+  "expansionPace",
 ];

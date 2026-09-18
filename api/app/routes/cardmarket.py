@@ -12,7 +12,9 @@ from app.cardmarket import (
     MappingError,
     import_expansion_products,
     is_job_url,
+    list_expansion_crawls,
     map_card_product,
+    mark_expansion_complete,
     normalize_product_url,
 )
 from app.cardmarket_events import notify_product, wait_for_product
@@ -88,9 +90,12 @@ class ExpansionProduct(BaseModel):
 
 
 class ExpansionImportRequest(BaseModel):
-    page_url: str
+    page_url: str = ""
     products: list[ExpansionProduct] = Field(default_factory=list)
     source: str = "page"
+    complete: bool = False
+    expansion_id: str = ""
+    expansion: str = ""
 
 
 class ClaimActionRequest(BaseModel):
@@ -255,6 +260,16 @@ def helper_map(
     return mapped
 
 
+@router.get("/cardmarket/helper/expansion-crawls")
+def helper_expansion_crawls(
+    request: Request,
+    authorization: str | None = Header(default=None),
+) -> dict[str, Any]:
+    catalog = request.app.state.dbs.catalog
+    _helper(catalog, authorization)
+    return {"expansions": list_expansion_crawls(catalog)}
+
+
 @router.post("/cardmarket/helper/expansion-import")
 def helper_expansion_import(
     payload: ExpansionImportRequest,
@@ -263,6 +278,13 @@ def helper_expansion_import(
 ) -> dict[str, Any]:
     catalog = request.app.state.dbs.catalog
     _helper(catalog, authorization)
+    if payload.complete and not payload.products:
+        return mark_expansion_complete(
+            catalog,
+            expansion=payload.expansion,
+            expansion_id=payload.expansion_id,
+            page_url=payload.page_url,
+        )
     source = payload.source if payload.source in {"page", "crawl"} else "page"
     result = import_expansion_products(
         catalog,
@@ -271,6 +293,14 @@ def helper_expansion_import(
         products=[item.model_dump() for item in payload.products],
         source=source,
     )
+    if payload.complete:
+        mark_expansion_complete(
+            catalog,
+            expansion=payload.expansion or str(result.get("expansion") or ""),
+            expansion_id=payload.expansion_id,
+            page_url=payload.page_url,
+        )
+        result["complete"] = True
     for item in result.get("links") or []:
         notify_product(item.get("url"))
     return result

@@ -15,6 +15,8 @@ const serverEl = document.getElementById("server");
 const customWrap = document.getElementById("custom-wrap");
 const customUrl = document.getElementById("custom-url");
 const tokenEl = document.getElementById("token");
+const ntfyEl = document.getElementById("ntfy-topic");
+const paceEl = document.getElementById("pace");
 
 function connectionLabel(value) {
   if (value === "connected") {
@@ -88,6 +90,12 @@ function render(status) {
   } else {
     tokenEl.placeholder = "Paste helper token";
   }
+  if (status.ntfyTopic) {
+    ntfyEl.placeholder = "Saved — type a new topic to replace";
+  } else {
+    ntfyEl.placeholder = "secret-topic-name";
+  }
+  paceEl.value = status.expansionPace === "slow" || status.expansionPace === "medium" ? status.expansionPace : "fast";
 }
 
 async function send(message) {
@@ -146,6 +154,12 @@ document.getElementById("import-all").addEventListener("click", () => {
   expansionNoteEl.textContent = "Crawling all expansions…";
   void refresh({ type: "import-expansion-all" });
 });
+paceEl.addEventListener("change", () => {
+  void refresh({ type: "set-settings", expansionPace: paceEl.value });
+});
+document.getElementById("notify-test").addEventListener("click", () => {
+  void refresh({ type: "notify-test" });
+});
 document.getElementById("settings").addEventListener("submit", (event) => {
   event.preventDefault();
   const apiBase = serverEl.value === "custom" ? customUrl.value : serverEl.value;
@@ -153,8 +167,11 @@ document.getElementById("settings").addEventListener("submit", (event) => {
     type: "set-settings",
     apiBase,
     helperToken: tokenEl.value || undefined,
+    ntfyTopic: ntfyEl.value.trim() || undefined,
+    expansionPace: paceEl.value,
   }).then(() => {
     tokenEl.value = "";
+    ntfyEl.value = "";
   });
 });
 

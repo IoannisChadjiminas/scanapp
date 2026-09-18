@@ -45,7 +45,7 @@ function jsonResponse(payload, status = 200) {
   };
 }
 
-function createHarness({ extract, scripting, claimJobs, expansionExtract } = {}) {
+function createHarness({ extract, scripting, claimJobs, expansionExtract, expansionCrawls } = {}) {
   const local = memoryStore({
     apiBase: "http://127.0.0.1:8000",
     helperToken: "helper.token",
@@ -59,8 +59,14 @@ function createHarness({ extract, scripting, claimJobs, expansionExtract } = {})
   const createdTabs = [];
   const fails = [];
   const expansionImports = [];
+  const ntfyPosts = [];
+  const crawls = [...(expansionCrawls || [])];
   let claimIndex = 0;
   const fetchImpl = async (url, init = {}) => {
+    if (String(url).includes("ntfy.sh")) {
+      ntfyPosts.push({ url, body: init.body, headers: init.headers });
+      return jsonResponse({ id: "ok" });
+    }
     const path = new URL(url).pathname;
     const body = init.body ? JSON.parse(init.body) : {};
     if (path.endsWith("/cardmarket/helper/status")) {
@@ -108,8 +114,19 @@ function createHarness({ extract, scripting, claimJobs, expansionExtract } = {})
         verified: true,
       });
     }
+    if (path.endsWith("/cardmarket/helper/expansion-crawls")) {
+      return jsonResponse({ expansions: crawls });
+    }
     if (path.endsWith("/cardmarket/helper/expansion-import")) {
       expansionImports.push(body);
+      if (body.complete) {
+        crawls.push({
+          complete: true,
+          expansion: body.expansion,
+          expansion_id: body.expansion_id,
+          key: body.expansion_id || body.expansion,
+        });
+      }
       const count = Array.isArray(body.products) ? body.products.length : 0;
       return jsonResponse({
         stored: count,
@@ -157,6 +174,16 @@ function createHarness({ extract, scripting, claimJobs, expansionExtract } = {})
       if (props.active) {
         activeTab = id;
       }
+      return tab;
+    },
+    async reload(id) {
+      const tab = tabs.get(id);
+      if (!tab) {
+        throw new Error("missing tab");
+      }
+      updates.push({ id, reload: true, url: tab.url, active: true });
+      tab.active = true;
+      activeTab = id;
       return tab;
     },
     async sendMessage(_id, message, options) {
@@ -238,11 +265,16 @@ function createHarness({ extract, scripting, claimJobs, expansionExtract } = {})
     tabs,
     updates,
     expansionImports,
+    ntfyPosts,
     advance: (ms) => {
       clock += ms;
     },
     activeTab: () => activeTab,
   };
+}
+
+function productPages(imports) {
+  return imports.filter((item) => Array.isArray(item.products) && item.products.length);
 }
 
 test("overlapping wake events claim only one job", async () => {
@@ -619,17 +651,64 @@ test("all-expansions crawler visits each set then stores URLs", async () => {
   });
   tabs.set(9, { id: 9, url: index, active: true, documentId: "doc-9" });
   const status = await worker.handleMessage({ type: "import-expansion-all" });
-  assert.equal(expansionImports.length, 2);
-  assert.equal(expansionImports[0].source, "crawl");
-  assert.equal(expansionImports[1].source, "crawl");
-  assert.equal(expansionImports[0].products[0].url.includes("Bulbasaur"), true);
-  assert.equal(expansionImports[1].products[0].url, GENGAR);
+  const pages = productPages(expansionImports);
+  assert.equal(pages.length, 2);
+  assert.equal(pages[0].source, "crawl");
+  assert.equal(pages[1].source, "crawl");
+  assert.equal(pages[0].products[0].url.includes("Bulbasaur"), true);
+  assert.equal(pages[1].products[0].url, GENGAR);
   assert.equal(
     updates.some((item) => item.url === first && item.active === true),
     true,
   );
   assert.equal(
     updates.some((item) => item.url === second && item.active === true),
+    true,
+  );
+  assert.match(status.expansionNote, /All sets/);
+});
+
+test("all-expansions crawler skips sets already imported", async () => {
+  const index = "https://www.cardmarket.com/en/Pokemon/Products/Singles";
+  const first = "https://www.cardmarket.com/en/Pokemon/Products/Singles/151";
+  const second = "https://www.cardmarket.com/en/Pokemon/Products/Singles/Tag-Bolt";
+  const { worker, tabs, expansionImports } = createHarness({
+    expansionCrawls: [{ complete: true, expansion: "151", expansion_id: "2770" }],
+    expansionExtract: (tab) => {
+      const href = tab?.url || index;
+      if (href === index || href.endsWith("/Singles")) {
+        return {
+          pageUrl: href,
+          products: [],
+          expansions: [
+            { id: "2770", url: first, name: "151" },
+            { id: "1234", url: second, name: "Tag Bolt" },
+          ],
+        };
+      }
+      if (String(href).includes("151")) {
+        return {
+          pageUrl: href,
+          products: [{ url: `${first}/Bulbasaur-V1-MEW001`, name: "Bulbasaur" }],
+          nextPage: null,
+          expansions: [],
+        };
+      }
+      return {
+        pageUrl: href,
+        products: [{ url: GENGAR, name: "Gengar & Mimikyu GX" }],
+        nextPage: null,
+        expansions: [],
+      };
+    },
+  });
+  tabs.set(9, { id: 9, url: index, active: true, documentId: "doc-9" });
+  const status = await worker.handleMessage({ type: "import-expansion-all" });
+  const productImports = expansionImports.filter((item) => Array.isArray(item.products) && item.products.length);
+  assert.equal(productImports.length, 1);
+  assert.equal(productImports[0].products[0].url, GENGAR);
+  assert.equal(
+    expansionImports.some((item) => item.complete && item.expansion_id === "1234"),
     true,
   );
   assert.match(status.expansionNote, /All sets/);
@@ -674,7 +753,7 @@ test("Cloudflare pauses all-expansions and Continue resumes the same set", async
   });
   tabs.set(9, { id: 9, url: index, active: true, documentId: "doc-9" });
   const pausedStatus = await worker.handleMessage({ type: "import-expansion-all" });
-  assert.equal(expansionImports.length, 1);
+  assert.equal(productPages(expansionImports).length, 1);
   assert.equal(expansionImports[0].products[0].url.includes("Bulbasaur"), true);
   assert.equal(pausedStatus.paused, true);
   assert.equal(pausedStatus.expansionResume.index, 1);
@@ -683,12 +762,49 @@ test("Cloudflare pauses all-expansions and Continue resumes the same set", async
 
   blockTagBolt = false;
   const continued = await worker.handleMessage({ type: "resume" });
-  assert.equal(expansionImports.length, 2);
-  assert.equal(expansionImports[1].products[0].url, GENGAR);
+  const pages = productPages(expansionImports);
+  assert.equal(pages.length, 2);
+  assert.equal(pages[1].products[0].url, GENGAR);
   assert.equal(continued.paused, false);
   const stored = await local.get("expansionResume");
   assert.equal(stored.expansionResume, null);
   assert.match(continued.expansionNote, /All sets/);
+});
+
+test("sends an ntfy ping when Cloudflare pauses", async () => {
+  const index = "https://www.cardmarket.com/en/Pokemon/Products/Singles";
+  const first = "https://www.cardmarket.com/en/Pokemon/Products/Singles/151";
+  const second = "https://www.cardmarket.com/en/Pokemon/Products/Singles/Tag-Bolt";
+  const { worker, tabs, ntfyPosts, local } = createHarness({
+    expansionExtract: (tab) => {
+      const href = tab?.url || index;
+      if (href === index || href.endsWith("/Singles")) {
+        return {
+          pageUrl: href,
+          products: [],
+          expansions: [
+            { id: "2770", url: first, name: "151" },
+            { id: "1234", url: second, name: "Tag Bolt" },
+          ],
+        };
+      }
+      if (String(href).includes("151")) {
+        return {
+          pageUrl: href,
+          products: [{ url: `${first}/Bulbasaur-V1-MEW001`, name: "Bulbasaur" }],
+          nextPage: null,
+          expansions: [],
+        };
+      }
+      return { pageUrl: href, products: [], nextPage: null, expansions: [], challenge: true };
+    },
+  });
+  await local.set({ ntfyTopic: "scanapp-cf-alerts-test" });
+  tabs.set(9, { id: 9, url: index, active: true, documentId: "doc-9" });
+  await worker.handleMessage({ type: "import-expansion-all" });
+  assert.equal(ntfyPosts.length, 1);
+  assert.match(ntfyPosts[0].url, /ntfy\.sh\/scanapp-cf-alerts-test/);
+  assert.match(String(ntfyPosts[0].body), /Cloudflare/);
 });
 
 test("Import all starts from the first set after a pause", async () => {
@@ -730,12 +846,13 @@ test("Import all starts from the first set after a pause", async () => {
   });
   tabs.set(9, { id: 9, url: index, active: true, documentId: "doc-9" });
   await worker.handleMessage({ type: "import-expansion-all" });
-  assert.equal(expansionImports.length, 1);
+  assert.equal(productPages(expansionImports).length, 1);
   blockTagBolt = false;
   const restarted = await worker.handleMessage({ type: "import-expansion-all" });
-  assert.equal(expansionImports.length, 3);
-  assert.equal(expansionImports[1].products[0].url.includes("Bulbasaur"), true);
-  assert.equal(expansionImports[2].products[0].url, GENGAR);
+  const pages = productPages(expansionImports);
+  assert.equal(pages.length, 2);
+  assert.equal(pages[0].products[0].url.includes("Bulbasaur"), true);
+  assert.equal(pages[1].products[0].url, GENGAR);
   assert.match(restarted.expansionNote, /All sets/);
 });
 
@@ -780,4 +897,17 @@ test("keeps a helper token per Scanapp server", async () => {
   assert.equal(stored.apiBase, "http://127.0.0.1:8000");
   assert.equal(stored.helperToken, "local-token");
   assert.equal(stored.helperTokens["https://staging-scan.auctaro.com"], "staging-token");
+});
+
+test("saves crawl pace fast medium and slow", async () => {
+  const { worker, local } = createHarness();
+  await worker.handleMessage({ type: "set-settings", expansionPace: "slow" });
+  let stored = await local.get("expansionPace");
+  assert.equal(stored.expansionPace, "slow");
+  await worker.handleMessage({ type: "set-settings", expansionPace: "medium" });
+  stored = await local.get("expansionPace");
+  assert.equal(stored.expansionPace, "medium");
+  await worker.handleMessage({ type: "set-settings", expansionPace: "fast" });
+  stored = await local.get("expansionPace");
+  assert.equal(stored.expansionPace, "fast");
 });

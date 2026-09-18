@@ -121,6 +121,14 @@ def init_catalog(conn: sqlite3.Connection) -> None:
         );
         CREATE INDEX IF NOT EXISTS idx_expansion_products_expansion
             ON cardmarket_expansion_products(expansion);
+        CREATE TABLE IF NOT EXISTS cardmarket_expansion_crawls (
+            key TEXT PRIMARY KEY,
+            expansion TEXT,
+            expansion_id TEXT,
+            products INTEGER NOT NULL DEFAULT 0,
+            complete INTEGER NOT NULL DEFAULT 0,
+            updated_at TEXT NOT NULL
+        );
         """
     )
     _add_columns(

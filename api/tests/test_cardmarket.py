@@ -524,6 +524,61 @@ def test_expansion_import_links_unique_name_and_number(tmp_path: Path) -> None:
     assert dumps
 
 
+def test_marks_and_lists_completed_expansion_crawls(tmp_path: Path) -> None:
+    from app.cardmarket import import_expansion_products, list_expansion_crawls, mark_expansion_complete
+    from app.db import connect, init_catalog
+
+    conn = connect(tmp_path / "catalog.sqlite")
+    init_catalog(conn)
+    product = (
+        "https://www.cardmarket.com/en/Pokemon/Products/Singles/151/Bulbasaur-V1-MEW001"
+    )
+    import_expansion_products(
+        conn,
+        tmp_path,
+        page_url="https://www.cardmarket.com/en/Pokemon/Products/Singles/151",
+        products=[{"url": product, "name": "Bulbasaur"}],
+        source="crawl",
+    )
+    mark_expansion_complete(conn, expansion="151", expansion_id="2770")
+    rows = list_expansion_crawls(conn)
+    keys = {row["key"] for row in rows}
+    assert "151" in keys
+    assert "2770" in keys
+    assert all(row["complete"] for row in rows)
+
+
+def test_backfill_marks_older_stored_sets_complete(tmp_path: Path) -> None:
+    from app.cardmarket import import_expansion_products, list_expansion_crawls
+    from app.db import connect, init_catalog
+
+    conn = connect(tmp_path / "catalog.sqlite")
+    init_catalog(conn)
+    first = "https://www.cardmarket.com/en/Pokemon/Products/Singles/151/Bulbasaur-V1-MEW001"
+    second = (
+        "https://www.cardmarket.com/en/Pokemon/Products/Singles/"
+        "Cyber-Judge/Pikachu-V4"
+    )
+    import_expansion_products(
+        conn,
+        tmp_path,
+        page_url="https://www.cardmarket.com/en/Pokemon/Products/Singles/151",
+        products=[{"url": first, "name": "Bulbasaur"}],
+        source="crawl",
+    )
+    import_expansion_products(
+        conn,
+        tmp_path,
+        page_url="https://www.cardmarket.com/en/Pokemon/Products/Singles/Cyber-Judge",
+        products=[{"url": second, "name": "Pikachu"}],
+        source="crawl",
+    )
+    rows = {row["expansion"]: row for row in list_expansion_crawls(conn)}
+    assert rows["151"]["complete"] is True
+    assert rows["151"]["products"] >= 1
+    assert rows["Cyber-Judge"]["complete"] is False
+
+
 def test_relink_writes_url_after_catalogue_card_exists(tmp_path: Path) -> None:
     from app.cardmarket import apply_cardmarket_links, url_for_row
     from app.db import connect, init_catalog
