@@ -98,6 +98,42 @@ def test_gengar_extra_uses_explicit_tag_bolt_url() -> None:
     assert url.endswith("/Gengar-Mimikyu-GX-V2-sm9102")
 
 
+def test_extra_manifest_verified_singles_urls() -> None:
+    from app.cardmarket import is_verified_singles_url, mapping_from_manifest
+
+    manifest_path = Path(__file__).resolve().parents[2] / "extra-cards" / "manifest.json"
+    cards = json.loads(manifest_path.read_text())["cards"]
+    expected = {
+        "extra-blaziken-vmax-217-184": (
+            "/VMAX-Climax/Blaziken-VMAX-V2-s8b217"
+        ),
+        "extra-charmander-001-032": (
+            "/Pokemon-Card-Game-Classic-Charizard-Ho-Oh-ex-Deck/Charmander-CLL001"
+        ),
+        "extra-gengar-mimikyu-gx-103-095": (
+            "/Tag-Bolt/Gengar-Mimikyu-GX-V2-sm9102"
+        ),
+        "extra-pikachu-mcdonalds-2022-008-015": (
+            "/McDonalds-Collection-2022/Pikachu-MCD227"
+        ),
+        "extra-pikachu-classic-clc008": (
+            "/Pokemon-Trading-Card-Game-Classic-Charizard-Ho-Oh-ex-Deck/Pikachu-CLC008"
+        ),
+    }
+    by_id = {card["id"]: card for card in cards}
+    assert by_id["extra-lugia-v-326-s-p"]["collector_number"] == "324/S-P"
+    assert by_id["extra-m-tyranitar-ex-089-081"]["set_id"] == "xy7"
+    for card_id, suffix in expected.items():
+        mapping = mapping_from_manifest(by_id[card_id])
+        assert mapping.verified
+        assert mapping.url.endswith(suffix)
+        assert is_verified_singles_url(mapping.url)
+    for card_id in ("extra-lugia-v-326-s-p", "extra-m-tyranitar-ex-089-081"):
+        mapping = mapping_from_manifest(by_id[card_id])
+        assert mapping.url is None
+        assert mapping.verified is False
+
+
 def test_url_for_row_prefers_stored_product_page(tmp_path: Path) -> None:
     conn = connect(tmp_path / "catalog.sqlite")
     init_catalog(conn)

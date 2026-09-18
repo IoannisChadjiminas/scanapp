@@ -264,11 +264,13 @@ def decide_status(
     min_visual: float,
     min_gap: float,
     retake: bool,
+    min_visual_ocr: float | None = None,
 ) -> str:
     if retake:
         return "retake"
     if not suggestions:
         return "no_match"
+    ocr_floor = min_visual if min_visual_ocr is None else min_visual_ocr
     top = suggestions[0]
     visual_lead = max(suggestions, key=lambda row: float(row["visual_score"]))
     if visual_lead.get("collector_conflict") or top.get("collector_conflict"):
@@ -295,4 +297,13 @@ def decide_status(
             return "matched"
         if others:
             return "uncertain"
+    if (
+        top.get("ocr_consistent") is True
+        and visual_lead.get("card_id") == top.get("card_id")
+        and float(top["visual_score"]) >= ocr_floor
+        and (second <= 0.0 or gap >= min_gap)
+    ):
+        if not enable_matched:
+            return "uncertain"
+        return "matched"
     return "no_match"

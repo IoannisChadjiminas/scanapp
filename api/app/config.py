@@ -26,7 +26,7 @@ class Settings(BaseSettings):
     store_captures: bool = True
     review_token: str = ""
 
-    ranking_version: str = "rank-v3"
+    ranking_version: str = "rank-v4"
     ocr_version: str = "rapidocr-ppocrv6-small"
     model_name: str = "dinov2-small"
 
@@ -67,6 +67,7 @@ class Settings(BaseSettings):
         return [item.strip() for item in self.cors_origins.split(",") if item.strip()]
 
     threshold_min_visual: float = Field(default=0.78)
+    threshold_min_visual_ocr: float = Field(default=0.70)
     threshold_min_gap: float = Field(default=0.04)
     threshold_blur: float = Field(default=28.0)
     threshold_min_side: int = Field(default=180)

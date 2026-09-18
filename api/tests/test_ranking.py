@@ -77,6 +77,74 @@ def test_no_match_when_visual_is_low() -> None:
     assert status == "no_match"
 
 
+def test_ocr_consistent_leader_matches_below_visual_bar() -> None:
+    suggestions = [
+        _card("gengar", "Gengar & Mimikyu GX", "103/095", 0.73, "ja"),
+        _card("tyranitar", "M Tyranitar EX", "089/081", 0.65, "ja"),
+    ]
+    suggestions[0]["ocr_consistent"] = True
+    suggestions[1]["ocr_consistent"] = False
+    status = decide_status(
+        suggestions,
+        enable_matched=True,
+        min_visual=0.78,
+        min_visual_ocr=0.70,
+        min_gap=0.04,
+        retake=False,
+    )
+    assert status == "matched"
+
+
+def test_ocr_does_not_rescue_weak_or_tied_visual() -> None:
+    no_ocr = [
+        _card("gengar", "Gengar & Mimikyu GX", "103/095", 0.73, "ja"),
+        _card("tyranitar", "M Tyranitar EX", "089/081", 0.65, "ja"),
+    ]
+    assert (
+        decide_status(
+            no_ocr,
+            enable_matched=True,
+            min_visual=0.78,
+            min_visual_ocr=0.70,
+            min_gap=0.04,
+            retake=False,
+        )
+        == "no_match"
+    )
+    weak = [
+        _card("gengar", "Gengar & Mimikyu GX", "103/095", 0.62, "ja"),
+        _card("tyranitar", "M Tyranitar EX", "089/081", 0.50, "ja"),
+    ]
+    weak[0]["ocr_consistent"] = True
+    assert (
+        decide_status(
+            weak,
+            enable_matched=True,
+            min_visual=0.78,
+            min_visual_ocr=0.70,
+            min_gap=0.04,
+            retake=False,
+        )
+        == "no_match"
+    )
+    tied = [
+        _card("gengar", "Gengar & Mimikyu GX", "103/095", 0.73, "ja"),
+        _card("other", "Gengar & Mimikyu GX", "038/095", 0.72, "ja"),
+    ]
+    tied[0]["ocr_consistent"] = True
+    assert (
+        decide_status(
+            tied,
+            enable_matched=True,
+            min_visual=0.78,
+            min_visual_ocr=0.70,
+            min_gap=0.04,
+            retake=False,
+        )
+        == "no_match"
+    )
+
+
 def test_no_match_when_gap_is_small() -> None:
     suggestions = [
         _card("a", "Switch", "95", 0.88),

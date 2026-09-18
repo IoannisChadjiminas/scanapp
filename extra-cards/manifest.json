@@ -10,6 +10,9 @@
       "category": "Pokemon",
       "rarity": "SSR",
       "cardmarket_id": 587015,
+      "cardmarket_expansion": "VMAX-Climax",
+      "cardmarket_set_code": "s8b",
+      "cardmarket_url": "https://www.cardmarket.com/en/Pokemon/Products/Singles/VMAX-Climax/Blaziken-VMAX-V2-s8b217",
       "file": "blaziken-vmax.jpg"
     },
     {
@@ -17,7 +20,7 @@
       "name": "Lugia V",
       "set_id": "s-p",
       "set_name": "SWSH Promo",
-      "collector_number": "326/S-P",
+      "collector_number": "324/S-P",
       "language": "ja",
       "category": "Pokemon",
       "rarity": "Promo",
@@ -26,12 +29,15 @@
     {
       "id": "extra-charmander-001-032",
       "name": "Charmander",
-      "set_id": "cl",
+      "set_id": "cll",
       "set_name": "Pokémon Card Game Classic",
       "collector_number": "001/032",
       "language": "ja",
       "category": "Pokemon",
       "rarity": "Common",
+      "cardmarket_expansion": "Pokemon-Card-Game-Classic-Charizard-Ho-Oh-ex-Deck",
+      "cardmarket_set_code": "CLL",
+      "cardmarket_url": "https://www.cardmarket.com/en/Pokemon/Products/Singles/Pokemon-Card-Game-Classic-Charizard-Ho-Oh-ex-Deck/Charmander-CLL001",
       "file": "charmander-001-032.jpg"
     },
     {
@@ -52,8 +58,8 @@
     {
       "id": "extra-m-tyranitar-ex-089-081",
       "name": "M Tyranitar EX",
-      "set_id": "xy9",
-      "set_name": "Rage of the Broken Heavens",
+      "set_id": "xy7",
+      "set_name": "Bandit Ring",
       "collector_number": "089/081",
       "language": "ja",
       "category": "Pokemon",
@@ -69,7 +75,9 @@
       "language": "en",
       "category": "Pokemon",
       "rarity": "Promo",
-      "cardmarket_url": "https://prices.pokemontcg.io/cardmarket/mcd22-7",
+      "cardmarket_expansion": "McDonalds-Collection-2022",
+      "cardmarket_set_code": "MCD22",
+      "cardmarket_url": "https://www.cardmarket.com/en/Pokemon/Products/Singles/McDonalds-Collection-2022/Pikachu-MCD227",
       "file": "pikachu-mcdonalds-2022.jpg"
     },
     {

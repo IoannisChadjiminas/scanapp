@@ -52,3 +52,16 @@ def test_import_extra_cards(tmp_path: Path, monkeypatch) -> None:
     assert int(row["cardmarket_verified"] or 0) == 0
     assert row["cardmarket_provenance"] == "generated-singles"
     assert url_for_row(row) is None
+
+
+def test_extra_manifest_lugia_number_and_mcdonalds_image() -> None:
+    root = Path(__file__).resolve().parents[2] / "extra-cards"
+    cards = json.loads((root / "manifest.json").read_text())["cards"]
+    by_id = {card["id"]: card for card in cards}
+    assert by_id["extra-lugia-v-326-s-p"]["collector_number"] == "324/S-P"
+    mcdonalds = root / by_id["extra-pikachu-mcdonalds-2022-008-015"]["file"]
+    classic = root / by_id["extra-pikachu-classic-clc008"]["file"]
+    assert mcdonalds.is_file()
+    assert classic.is_file()
+    assert mcdonalds.read_bytes() != classic.read_bytes()
+    assert mcdonalds.stat().st_size > 80_000

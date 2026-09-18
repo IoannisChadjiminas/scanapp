@@ -156,6 +156,7 @@ def recognize_bytes(
         combined,
         enable_matched=settings.enable_matched,
         min_visual=settings.threshold_min_visual,
+        min_visual_ocr=settings.threshold_min_visual_ocr,
         min_gap=settings.threshold_min_gap,
         retake=retake,
     )

@@ -90,5 +90,6 @@ class Runtime:
         return {
             "enable_matched": self.settings.enable_matched,
             "min_visual": self.settings.threshold_min_visual,
+            "min_visual_ocr": self.settings.threshold_min_visual_ocr,
             "min_gap": self.settings.threshold_min_gap,
         }
