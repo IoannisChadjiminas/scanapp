@@ -1,5 +1,6 @@
 const PRODUCT_PATH = /^\/[a-z]{2}\/Pokemon\/Products\/Singles\/[^/]+\/[^/]+$/i;
 const EXPANSION_PATH = /^\/[a-z]{2}\/Pokemon\/Products\/Singles\/[^/]+$/i;
+const SINGLES_ROOT = /^\/[a-z]{2}\/Pokemon\/Products\/Singles$/i;
 
 export function normalizeUrl(url) {
   try {
@@ -54,6 +55,13 @@ export function classifyUrl(url) {
   }
   if (EXPANSION_PATH.test(path)) {
     return "expansion";
+  }
+  if (SINGLES_ROOT.test(path)) {
+    const expansionId = parsed.searchParams.get("idExpansion");
+    if (expansionId && !/^(all|-1|0)?$/i.test(expansionId)) {
+      return "expansion";
+    }
+    return "singles-index";
   }
   return "other";
 }

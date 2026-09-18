@@ -22,6 +22,11 @@ test("classifies product, search, login, catalogue, and set-list links", () => {
     classifyUrl("https://www.cardmarket.com/en/Pokemon/Products/Singles/Tag-Bolt?site=2"),
     "expansion",
   );
+  assert.equal(classifyUrl("https://www.cardmarket.com/en/Pokemon/Products/Singles"), "singles-index");
+  assert.equal(
+    classifyUrl("https://www.cardmarket.com/en/Pokemon/Products/Singles?idExpansion=2770"),
+    "expansion",
+  );
   assert.equal(classifyUrl("https://prices.pokemontcg.io/cardmarket/base1-4"), "pokemontcg");
   assert.equal(classifyUrl("https://www.cardmarket.com/en/Pokemon/Products/Search?searchString=x"), "search");
   assert.equal(classifyUrl("https://www.cardmarket.com/en/Login"), "login");

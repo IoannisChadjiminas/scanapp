@@ -16,13 +16,13 @@ That downloads models, the default small English sets (`base1`, `sv01`, `swsh3`)
 
 Hours of download + embedding, and a lot of local disk for the webps used to build vectors. Japanese and Traditional/Simplified Chinese use different TCGdex set IDs than English; `--sets all` walks every set in each language.
 
-Keep the catalogue you already have (151, extras, helper maps) and add every other set:
+Keep the catalogue you already have (151, extras, helper maps) and add every other set, then match stored Cardmarket URLs and push staging:
 
 ```bash
-docker compose -f compose.catalogue.yaml run --rm --build catalogue \
-  -m bootstrap.build --sets all --languages en,ja,zh-cn,zh-tw --skip-models --extras
-docker compose restart api
+./scripts/catalogue-all.sh
 ```
+
+Pack without SSH: `./scripts/catalogue-all.sh --local-only`.
 
 Wipe and rebuild from scratch (re-imports extras afterwards):
 

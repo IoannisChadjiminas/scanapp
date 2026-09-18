@@ -184,7 +184,28 @@ function createHarness({ extract, scripting, claimJobs, expansionExtract } = {})
     scripting ||
     (expansionExtract
       ? {
-          executeScript: async ({ files, target } = {}) => {
+          executeScript: async ({ files, target, func, args } = {}) => {
+            if (typeof func === "function") {
+              const action = args?.[0];
+              const payload = args?.[1] || {};
+              const tab = tabs.get(target.tabId);
+              if (action === "open") {
+                return [{ result: { ok: true, method: "select" } }];
+              }
+              if (action === "list") {
+                const snap = expansionExtract?.(tab) || {};
+                return [{ result: { expansions: snap.expansions || [], method: "select" } }];
+              }
+              if (action === "apply") {
+                const next = payload.url;
+                if (next && tab) {
+                  Object.assign(tab, { url: next, active: true });
+                  updates.push({ id: tab.id, url: next, active: true });
+                }
+                return [{ result: { ok: true, method: "form" } }];
+              }
+              return [{ result: null }];
+            }
             if (files?.[0] === "expansion-extract.js") {
               const tab = tabs.get(target.tabId);
               return [{ result: expansionExtract(tab) }];
@@ -561,6 +582,134 @@ test("test crawler stores every page in the open set", async () => {
     updates.some((item) => item.url === `${page}?site=2` && item.active === true),
     true,
   );
+});
+
+test("all-expansions crawler visits each set then stores URLs", async () => {
+  const index = "https://www.cardmarket.com/en/Pokemon/Products/Singles";
+  const first = "https://www.cardmarket.com/en/Pokemon/Products/Singles/151";
+  const second = "https://www.cardmarket.com/en/Pokemon/Products/Singles/Tag-Bolt";
+  const { worker, tabs, expansionImports, updates } = createHarness({
+    expansionExtract: (tab) => {
+      const href = tab?.url || index;
+      if (href === index || href.endsWith("/Singles")) {
+        return {
+          pageUrl: href,
+          products: [],
+          expansions: [
+            { id: "2770", url: first, name: "151" },
+            { id: "1234", url: second, name: "Tag Bolt" },
+          ],
+        };
+      }
+      if (String(href).includes("151")) {
+        return {
+          pageUrl: href,
+          products: [{ url: `${first}/Bulbasaur-V1-MEW001`, name: "Bulbasaur" }],
+          nextPage: null,
+          expansions: [],
+        };
+      }
+      return {
+        pageUrl: href,
+        products: [{ url: GENGAR, name: "Gengar & Mimikyu GX" }],
+        nextPage: null,
+        expansions: [],
+      };
+    },
+  });
+  tabs.set(9, { id: 9, url: index, active: true, documentId: "doc-9" });
+  const status = await worker.handleMessage({ type: "import-expansion-all" });
+  assert.equal(expansionImports.length, 2);
+  assert.equal(expansionImports[0].source, "crawl");
+  assert.equal(expansionImports[1].source, "crawl");
+  assert.equal(expansionImports[0].products[0].url.includes("Bulbasaur"), true);
+  assert.equal(expansionImports[1].products[0].url, GENGAR);
+  assert.equal(
+    updates.some((item) => item.url === first && item.active === true),
+    true,
+  );
+  assert.equal(
+    updates.some((item) => item.url === second && item.active === true),
+    true,
+  );
+  assert.match(status.expansionNote, /All sets/);
+});
+
+test("Cloudflare pauses all-expansions and Continue resumes the same set", async () => {
+  const index = "https://www.cardmarket.com/en/Pokemon/Products/Singles";
+  const first = "https://www.cardmarket.com/en/Pokemon/Products/Singles/151";
+  const second = "https://www.cardmarket.com/en/Pokemon/Products/Singles/Tag-Bolt";
+  let blockTagBolt = true;
+  const { worker, tabs, expansionImports, local } = createHarness({
+    expansionExtract: (tab) => {
+      const href = tab?.url || index;
+      if (href === index || href.endsWith("/Singles")) {
+        return {
+          pageUrl: href,
+          products: [],
+          expansions: [
+            { id: "2770", url: first, name: "151" },
+            { id: "1234", url: second, name: "Tag Bolt" },
+          ],
+        };
+      }
+      if (String(href).includes("151")) {
+        return {
+          pageUrl: href,
+          products: [{ url: `${first}/Bulbasaur-V1-MEW001`, name: "Bulbasaur" }],
+          nextPage: null,
+          expansions: [],
+        };
+      }
+      if (blockTagBolt) {
+        return { pageUrl: href, products: [], nextPage: null, expansions: [], challenge: true };
+      }
+      return {
+        pageUrl: href,
+        products: [{ url: GENGAR, name: "Gengar & Mimikyu GX" }],
+        nextPage: null,
+        expansions: [],
+      };
+    },
+  });
+  tabs.set(9, { id: 9, url: index, active: true, documentId: "doc-9" });
+  const pausedStatus = await worker.handleMessage({ type: "import-expansion-all" });
+  assert.equal(expansionImports.length, 1);
+  assert.equal(expansionImports[0].products[0].url.includes("Bulbasaur"), true);
+  assert.equal(pausedStatus.paused, true);
+  assert.equal(pausedStatus.expansionResume.index, 1);
+  assert.match(pausedStatus.expansionNote, /Continue/);
+  assert.doesNotMatch(pausedStatus.expansionNote, /All sets/);
+
+  blockTagBolt = false;
+  const continued = await worker.handleMessage({ type: "resume" });
+  assert.equal(expansionImports.length, 2);
+  assert.equal(expansionImports[1].products[0].url, GENGAR);
+  assert.equal(continued.paused, false);
+  const stored = await local.get("expansionResume");
+  assert.equal(stored.expansionResume, null);
+  assert.match(continued.expansionNote, /All sets/);
+});
+
+test("startup unsticks a hung all-expansions crawl at the current set", async () => {
+  const { worker, local } = createHarness();
+  await local.set({
+    expansionBusy: true,
+    activity: "crawling-all-sets",
+    lastExpansionImport: {
+      expansionIndex: 130,
+      stored: 5402,
+      linked: 101,
+      unmatched: 5301,
+    },
+    expansionNote: "Set 130/781: Cyber Judge · stored 5402",
+  });
+  await worker.wake("startup");
+  const stored = await local.get(["expansionBusy", "paused", "expansionResume", "expansionNote"]);
+  assert.equal(stored.expansionBusy, false);
+  assert.equal(stored.paused, true);
+  assert.equal(stored.expansionResume.index, 129);
+  assert.match(stored.expansionNote, /Continue/);
 });
 
 test("keeps a helper token per Scanapp server", async () => {

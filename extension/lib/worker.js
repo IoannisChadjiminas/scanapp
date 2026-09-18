@@ -1,11 +1,22 @@
 import {
   DEFAULT_API,
-  EXPANSION_PAGE_MS,
+  EXPANSION_BREAK_EVERY,
+  EXPANSION_BREAK_MAX_MS,
+  EXPANSION_BREAK_MIN_MS,
+  EXPANSION_PAGE_MAX_MS,
+  EXPANSION_PAGE_MIN_MS,
+  EXPANSION_READ_MAX_MS,
+  EXPANSION_READ_MIN_MS,
+  EXPANSION_SET_MAX_MS,
+  EXPANSION_SET_MIN_MS,
+  EXPANSION_THINK_MAX_MS,
+  EXPANSION_THINK_MIN_MS,
   FETCH_TIMEOUT_MS,
   IDLE_ALARM,
   IDLE_PERIOD_MINUTES,
   MAX_EXPANSION_PAGES,
   MAX_EXPANSION_PRODUCTS,
+  MAX_EXPANSIONS,
   MAX_RECENT_FAILURES,
   NAV_SPACING_MS,
   PAGE_DEADLINE_MS,
@@ -13,6 +24,7 @@ import {
   WAIT_ALARM,
 } from "./constants.js";
 import { classifyUrl, finalUrlAllowed, normalizeUrl, productIdentity } from "./url.js";
+import { expansionDrive } from "./expansion-drive.js";
 
 function expansionPageKey(url) {
   try {
@@ -23,6 +35,55 @@ function expansionPageKey(url) {
   } catch {
     return String(url || "");
   }
+}
+
+function tabBlockReason(tab, snap) {
+  if (snap?.challenge) {
+    return "challenge";
+  }
+  const kind = classifyUrl(tab?.url || "");
+  if (kind === "login" || kind === "challenge") {
+    return kind;
+  }
+  const title = String(tab?.title || "").toLowerCase();
+  if (
+    title.includes("just a moment") ||
+    title.includes("einen moment") ||
+    title.includes("attention required") ||
+    title.includes("cloudflare") ||
+    title.includes("checking your browser") ||
+    title.includes("verify you are human")
+  ) {
+    return "challenge";
+  }
+  return null;
+}
+
+function shouldPauseCrawl(reason) {
+  return reason === "challenge" || reason === "login" || reason === "paused";
+}
+
+function withTimeout(promise, ms) {
+  return new Promise((resolve, reject) => {
+    const timer = setTimeout(() => {
+      const error = new Error("timeout");
+      error.code = "timeout";
+      reject(error);
+    }, ms);
+    if (typeof timer === "object" && typeof timer.unref === "function") {
+      timer.unref();
+    }
+    promise.then(
+      (value) => {
+        clearTimeout(timer);
+        resolve(value);
+      },
+      (error) => {
+        clearTimeout(timer);
+        reject(error);
+      },
+    );
+  });
 }
 
 export async function extractInPage(requestId, jobId) {
@@ -47,6 +108,7 @@ export function createWorker({
   alarms,
   scripting,
   now = () => Date.now(),
+  random = Math.random,
   randomId = () => `${now()}-${Math.random().toString(16).slice(2)}`,
   wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms)),
 } = {}) {
@@ -75,6 +137,24 @@ export function createWorker({
       helperToken: String(byServer[apiBase] || stored.helperToken || ""),
       paused: Boolean(stored.paused),
     };
+  }
+
+  function jitter(min, max) {
+    const lo = Math.min(min, max);
+    const hi = Math.max(min, max);
+    return Math.round(lo + random() * (hi - lo));
+  }
+
+  async function humanPause(min, max) {
+    let left = jitter(min, max);
+    while (left > 0) {
+      if ((await settings()).paused) {
+        return;
+      }
+      const slice = Math.min(left, 250);
+      await wait(slice);
+      left -= slice;
+    }
   }
 
   async function request(path, { method = "GET", body } = {}) {
@@ -615,43 +695,59 @@ export function createWorker({
     if (!tab?.id) {
       return null;
     }
+    const fallbackChallenge = { challenge: true, products: [], expansions: [], nextPage: null };
     if (scripting?.executeScript) {
       try {
-        const injected = await scripting.executeScript({
-          target: { tabId: tab.id },
-          files: ["expansion-extract.js"],
-        });
+        const injected = await withTimeout(
+          scripting.executeScript({
+            target: { tabId: tab.id },
+            files: ["expansion-extract.js"],
+          }),
+          FETCH_TIMEOUT_MS,
+        );
         const payload = Array.isArray(injected) ? injected[0]?.result : injected?.result;
-        if (payload?.products) {
+        if (payload?.challenge || (payload && (payload.products || payload.expansions))) {
           return payload;
         }
       } catch {
         /* fall through */
       }
     }
-    if (!tabs.sendMessage) {
-      return null;
-    }
-    try {
-      return await tabs.sendMessage(
-        tab.id,
-        { type: "extract-expansion" },
-        tab.documentId ? { documentId: tab.documentId } : undefined,
-      );
-    } catch {
+    if (tabs.sendMessage) {
       try {
-        return await tabs.sendMessage(tab.id, { type: "extract-expansion" });
+        const payload = await withTimeout(
+          tabs.sendMessage(
+            tab.id,
+            { type: "extract-expansion" },
+            tab.documentId ? { documentId: tab.documentId } : undefined,
+          ),
+          FETCH_TIMEOUT_MS,
+        );
+        if (payload) {
+          return payload;
+        }
       } catch {
-        return null;
+        try {
+          const payload = await withTimeout(
+            tabs.sendMessage(tab.id, { type: "extract-expansion" }),
+            FETCH_TIMEOUT_MS,
+          );
+          if (payload) {
+            return payload;
+          }
+        } catch {
+          /* challenge fallback */
+        }
       }
     }
+    return fallbackChallenge;
   }
 
-  async function activeExpansionTab() {
+  async function activeCardmarketTab(kinds) {
     if (typeof tabs.query !== "function") {
       return null;
     }
-    const matches = (tab) => classifyUrl(tab?.url || "") === "expansion";
+    const matches = (tab) => kinds.includes(classifyUrl(tab?.url || ""));
     try {
       const focused = await tabs.query({
         active: true,
@@ -683,10 +779,10 @@ export function createWorker({
       } catch {
         return null;
       }
-      const kind = classifyUrl(tab.url || "");
-      if (kind === "login" || kind === "challenge") {
+      if (tabBlockReason(tab) || (await settings()).paused) {
         return tab;
       }
+      const kind = classifyUrl(tab.url || "");
       if ((!tab.status || tab.status === "complete") && kind === "expansion") {
         return tab;
       }
@@ -699,10 +795,123 @@ export function createWorker({
     }
   }
 
+  async function crawlExpansionPages(tab, { crawl, seen, totals }) {
+    let current = tab;
+    let pages = 0;
+    let lastResult = {
+      stored: 0,
+      linked: 0,
+      unmatched: 0,
+      products: 0,
+      source: crawl ? "crawl" : "page",
+    };
+    while (pages < MAX_EXPANSION_PAGES && seen.size < MAX_EXPANSION_PRODUCTS) {
+      if ((await settings()).paused) {
+        lastResult = { ...lastResult, stopped: "paused" };
+        break;
+      }
+      if (crawl) {
+        await humanPause(EXPANSION_READ_MIN_MS, EXPANSION_READ_MAX_MS);
+        if ((await settings()).paused) {
+          lastResult = { ...lastResult, stopped: "paused" };
+          break;
+        }
+      }
+      pages += 1;
+      const snap = await extractExpansionFromTab(current);
+      const blocked = tabBlockReason(current, snap);
+      if (blocked) {
+        lastResult = { ...lastResult, stopped: blocked };
+        break;
+      }
+      const products = Array.isArray(snap?.products) ? snap.products : [];
+      const pageUrl = snap?.pageUrl || current.url;
+      lastResult = await request("/cardmarket/helper/expansion-import", {
+        method: "POST",
+        body: {
+          page_url: pageUrl,
+          products,
+          source: crawl ? "crawl" : "page",
+        },
+      });
+      totals.stored += Number(lastResult.stored || 0);
+      totals.linked += Number(lastResult.linked || 0);
+      totals.unmatched += Number(lastResult.unmatched || 0);
+      for (const item of products) {
+        if (item?.url) {
+          seen.add(item.url);
+        }
+      }
+      if (!crawl) {
+        return { lastResult, pages, current };
+      }
+      const next = snap?.nextPage;
+      if (!next || expansionPageKey(next) === expansionPageKey(current.url || pageUrl)) {
+        break;
+      }
+      await humanPause(EXPANSION_PAGE_MIN_MS, EXPANSION_PAGE_MAX_MS);
+      if ((await settings()).paused) {
+        lastResult = { ...lastResult, stopped: "paused" };
+        break;
+      }
+      await tabs.update(current.id, { url: next, active: true });
+      current = (await waitForExpansionPage(current.id)) || (await tabs.get(current.id));
+      const nextBlock = tabBlockReason(current);
+      if (nextBlock) {
+        lastResult = { ...lastResult, stopped: nextBlock };
+        break;
+      }
+      if (classifyUrl(current?.url || "") !== "expansion") {
+        lastResult = { ...lastResult, stopped: classifyUrl(current?.url || "") || "navigation" };
+        break;
+      }
+    }
+    return { lastResult, pages, current };
+  }
+
+  async function driveExpansion(tabId, action, payload) {
+    if (!tabId || !scripting?.executeScript) {
+      return null;
+    }
+    try {
+      const injected = await withTimeout(
+        scripting.executeScript({
+          target: { tabId },
+          world: "MAIN",
+          func: expansionDrive,
+          args: [action, payload || {}],
+        }),
+        FETCH_TIMEOUT_MS,
+      );
+      return Array.isArray(injected) ? injected[0]?.result : injected?.result;
+    } catch {
+      try {
+        const injected = await withTimeout(
+          scripting.executeScript({
+            target: { tabId },
+            func: expansionDrive,
+            args: [action, payload || {}],
+          }),
+          FETCH_TIMEOUT_MS,
+        );
+        return Array.isArray(injected) ? injected[0]?.result : injected?.result;
+      } catch {
+        return null;
+      }
+    }
+  }
+
   async function importExpansion({ crawl = false } = {}) {
-    const tab = await activeExpansionTab();
+    const tab = await activeCardmarketTab(["expansion", "singles-index"]);
     if (!tab?.id) {
       const error = new Error("Open a Cardmarket set list in this window first");
+      error.code = "http";
+      throw error;
+    }
+    if (classifyUrl(tab.url || "") === "singles-index") {
+      const error = new Error(
+        "This is the All Singles page. Pick one expansion in the dropdown, or use Import all expansions.",
+      );
       error.code = "http";
       throw error;
     }
@@ -712,63 +921,256 @@ export function createWorker({
       expansionNote: crawl ? "Crawling set…" : "Importing this page…",
     });
     const seen = new Set();
-    let pages = 0;
-    let lastResult = {
-      stored: 0,
-      linked: 0,
-      unmatched: 0,
-      products: 0,
-      source: crawl ? "crawl" : "page",
-    };
+    const totals = { stored: 0, linked: 0, unmatched: 0 };
     try {
-      let current = tab;
-      while (pages < MAX_EXPANSION_PAGES && seen.size < MAX_EXPANSION_PRODUCTS) {
-        pages += 1;
-        const snap = await extractExpansionFromTab(current);
-        const products = Array.isArray(snap?.products) ? snap.products : [];
-        const pageUrl = snap?.pageUrl || current.url;
-        lastResult = await request("/cardmarket/helper/expansion-import", {
-          method: "POST",
-          body: {
-            page_url: pageUrl,
-            products,
-            source: crawl ? "crawl" : "page",
-          },
-        });
-        for (const item of products) {
-          if (item?.url) {
-            seen.add(item.url);
-          }
-        }
-        const note = `Stored ${lastResult.stored ?? seen.size} URLs · linked ${lastResult.linked ?? 0} · unmatched ${lastResult.unmatched ?? 0}`;
-        await patchLocal({
-          lastExpansionImport: { ...lastResult, pages, productsSeen: seen.size },
-          expansionNote: note,
-        });
-        if (!crawl) {
-          return lastResult;
-        }
-        const next = snap?.nextPage;
-        if (!next || expansionPageKey(next) === expansionPageKey(current.url || pageUrl)) {
-          break;
-        }
-        await tabs.update(current.id, { url: next, active: true });
-        current = (await waitForExpansionPage(current.id)) || (await tabs.get(current.id));
-        const kind = classifyUrl(current?.url || "");
-        if (kind !== "expansion") {
-          lastResult = { ...lastResult, stopped: kind || "navigation" };
-          await patchLocal({
-            lastExpansionImport: { ...lastResult, pages, productsSeen: seen.size },
-            expansionNote: `Stopped after ${pages} page(s): ${kind || "page changed"}`,
-          });
-          break;
-        }
-        await wait(EXPANSION_PAGE_MS);
-      }
+      const { lastResult, pages } = await crawlExpansionPages(tab, { crawl, seen, totals });
+      const stopped = shouldPauseCrawl(lastResult.stopped);
+      const note = stopped
+        ? `Paused (${lastResult.stopped}). Kept ${totals.stored} stored URLs. Pass Cloudflare, then import this set again.`
+        : `Stored ${lastResult.stored ?? seen.size} URLs · linked ${lastResult.linked ?? 0} · unmatched ${lastResult.unmatched ?? 0}`;
+      await patchLocal({
+        lastExpansionImport: { ...lastResult, pages, productsSeen: seen.size },
+        expansionNote: note,
+        ...(stopped ? { paused: true, activity: "paused" } : {}),
+      });
       return lastResult;
     } finally {
       await patchLocal({ expansionBusy: false, activity: "idle" });
     }
+  }
+
+  async function pauseAllExpansions({ reason, index, targets, totals, label }) {
+    const note =
+      `Paused at set ${index + 1}/${targets.length}: ${label}` +
+      (reason === "paused" ? "" : " (Cloudflare)") +
+      `. Kept ${totals.stored} stored URLs. Pass it, then press Continue.`;
+    await patchLocal({
+      paused: true,
+      expansionResume: {
+        index,
+        targets,
+        totals: { stored: totals.stored, linked: totals.linked, unmatched: totals.unmatched },
+        reason,
+      },
+      lastExpansionImport: {
+        stopped: reason,
+        expansions: targets.length,
+        expansionIndex: index + 1,
+        stored: totals.stored,
+        linked: totals.linked,
+        unmatched: totals.unmatched,
+      },
+      expansionNote: note,
+      attention: "Pass Cloudflare, then press Continue",
+      activity: "paused",
+    });
+  }
+
+  async function importAllExpansions() {
+    const tab = await activeCardmarketTab(["singles-index", "expansion"]);
+    if (!tab?.id) {
+      const error = new Error(
+        "Open Cardmarket Singles first (the page with the Expansion dropdown).",
+      );
+      error.code = "http";
+      throw error;
+    }
+    const previous = await readStore(local, ["expansionResume"]);
+    const resume =
+      previous.expansionResume && typeof previous.expansionResume === "object"
+        ? previous.expansionResume
+        : null;
+    await patchLocal({
+      paused: false,
+      expansionBusy: true,
+      activity: "crawling-all-sets",
+      attention: null,
+      expansionNote: resume ? "Continuing expansions…" : "Opening Expansion dropdown…",
+    });
+    const seen = new Set();
+    const totals = {
+      stored: Number(resume?.totals?.stored) || 0,
+      linked: Number(resume?.totals?.linked) || 0,
+      unmatched: Number(resume?.totals?.unmatched) || 0,
+    };
+    try {
+      let targets = [];
+      let startIndex = 0;
+      if (resume?.targets?.length) {
+        targets = resume.targets.slice(0, MAX_EXPANSIONS);
+        startIndex = Math.min(Math.max(Number(resume.index) || 0, 0), targets.length);
+      } else {
+        await driveExpansion(tab.id, "open");
+        await humanPause(EXPANSION_THINK_MIN_MS, EXPANSION_THINK_MAX_MS);
+        let listed = await driveExpansion(tab.id, "list");
+        targets = Array.isArray(listed?.expansions) ? listed.expansions : [];
+        if (!targets.length) {
+          const snap = await extractExpansionFromTab(tab);
+          targets = Array.isArray(snap?.expansions) ? snap.expansions : [];
+        }
+        targets = targets.filter((item) => item?.id || classifyUrl(item?.url || "") === "expansion");
+        targets = targets.slice(0, MAX_EXPANSIONS);
+      }
+      if (!targets.length) {
+        const error = new Error(
+          "No expansions found in the filter. Open the Expansion dropdown, then try Import all expansions again.",
+        );
+        error.code = "http";
+        throw error;
+      }
+      if (resume && resume.index != null && !resume.targets?.length) {
+        startIndex = Math.min(Math.max(Number(resume.index) || 0, 0), targets.length);
+      }
+      await patchLocal({
+        expansionResume: {
+          index: startIndex,
+          targets,
+          totals: { stored: totals.stored, linked: totals.linked, unmatched: totals.unmatched },
+          reason: "running",
+        },
+      });
+      let current = tab;
+      let halted = false;
+      for (let index = startIndex; index < targets.length; index += 1) {
+        if ((await settings()).paused) {
+          const target = targets[index];
+          await pauseAllExpansions({
+            reason: "paused",
+            index,
+            targets,
+            totals,
+            label: target.name || target.id || target.url,
+          });
+          halted = true;
+          break;
+        }
+        const target = targets[index];
+        const label = target.name || target.id || target.url;
+        await patchLocal({
+          expansionNote: `Set ${index + 1}/${targets.length}: ${label}`,
+          activity: "crawling-all-sets",
+        });
+        await humanPause(EXPANSION_THINK_MIN_MS, EXPANSION_THINK_MAX_MS);
+        if ((await settings()).paused) {
+          await pauseAllExpansions({ reason: "paused", index, targets, totals, label });
+          halted = true;
+          break;
+        }
+        const applied = await driveExpansion(current.id, "apply", {
+          id: target.id,
+          name: target.name,
+          url: target.url,
+        });
+        if (!applied?.ok && target.url) {
+          await tabs.update(current.id, { url: target.url, active: true });
+        }
+        current = (await waitForExpansionPage(current.id)) || (await tabs.get(current.id));
+        if ((await settings()).paused) {
+          await pauseAllExpansions({ reason: "paused", index, targets, totals, label });
+          halted = true;
+          break;
+        }
+        if (!tabBlockReason(current) && classifyUrl(current?.url || "") !== "expansion" && target.url) {
+          await tabs.update(current.id, { url: target.url, active: true });
+          current = (await waitForExpansionPage(current.id)) || (await tabs.get(current.id));
+        }
+        const blocked = tabBlockReason(current);
+        if (shouldPauseCrawl(blocked)) {
+          await pauseAllExpansions({ reason: blocked, index, targets, totals, label });
+          halted = true;
+          break;
+        }
+        if (classifyUrl(current?.url || "") !== "expansion") {
+          continue;
+        }
+        const crawled = await crawlExpansionPages(current, { crawl: true, seen, totals });
+        current = crawled.current || current;
+        if (shouldPauseCrawl(crawled.lastResult?.stopped)) {
+          await pauseAllExpansions({
+            reason: crawled.lastResult.stopped,
+            index,
+            targets,
+            totals,
+            label,
+          });
+          halted = true;
+          break;
+        }
+        await patchLocal({
+          lastExpansionImport: {
+            ...crawled.lastResult,
+            expansions: targets.length,
+            expansionIndex: index + 1,
+            productsSeen: seen.size,
+          },
+          expansionResume: {
+            index: index + 1,
+            targets,
+            totals: { stored: totals.stored, linked: totals.linked, unmatched: totals.unmatched },
+            reason: "running",
+          },
+          expansionNote:
+            `Set ${index + 1}/${targets.length}: ${label} · stored ${totals.stored} · ` +
+            `linked ${totals.linked} · unmatched ${totals.unmatched}`,
+        });
+        if (index + 1 < targets.length) {
+          const finished = index + 1;
+          if (finished % EXPANSION_BREAK_EVERY === 0) {
+            await patchLocal({
+              expansionNote: `Short browse pause after ${finished} sets · stored ${totals.stored} URLs.`,
+            });
+            await humanPause(EXPANSION_BREAK_MIN_MS, EXPANSION_BREAK_MAX_MS);
+          } else {
+            await humanPause(EXPANSION_SET_MIN_MS, EXPANSION_SET_MAX_MS);
+          }
+        }
+      }
+      if (!halted) {
+        await patchLocal({
+          expansionResume: null,
+          expansionNote:
+            `All sets: stored ${totals.stored} URLs · linked ${totals.linked} · unmatched ${totals.unmatched}. ` +
+            "Then run ./scripts/catalogue-all.sh to download scans and match remaining URLs.",
+        });
+      }
+      return totals;
+    } finally {
+      await patchLocal({ expansionBusy: false, activity: (await settings()).paused ? "paused" : "idle" });
+    }
+  }
+
+  async function recoverStuckExpansion() {
+    const stored = await readStore(local, [
+      "expansionBusy",
+      "expansionResume",
+      "lastExpansionImport",
+    ]);
+    if (!stored.expansionBusy) {
+      return;
+    }
+    const last = stored.lastExpansionImport || {};
+    const resume =
+      stored.expansionResume && typeof stored.expansionResume === "object" ? stored.expansionResume : {};
+    const index = Number.isFinite(Number(resume.index))
+      ? Number(resume.index)
+      : Math.max((Number(last.expansionIndex) || 1) - 1, 0);
+    await patchLocal({
+      expansionBusy: false,
+      paused: true,
+      activity: "paused",
+      attention: "Pass Cloudflare, then press Continue",
+      expansionResume: {
+        index,
+        targets: Array.isArray(resume.targets) ? resume.targets : null,
+        totals: {
+          stored: Number(resume.totals?.stored ?? last.stored) || 0,
+          linked: Number(resume.totals?.linked ?? last.linked) || 0,
+          unmatched: Number(resume.totals?.unmatched ?? last.unmatched) || 0,
+        },
+        reason: resume.reason || "challenge",
+      },
+      expansionNote: `Paused at set ${index + 1}. Pass Cloudflare, then press Continue. Kept stored URLs.`,
+    });
   }
 
   async function openHelperTab() {
@@ -784,9 +1186,9 @@ export function createWorker({
   }
 
   async function setPaused(paused) {
-    await patchLocal({ paused, attention: paused ? (await readStore(local, ["attention"])).attention : null });
+    const stored = await readStore(local, ["attention", "pendingResult", "currentJob", "expansionResume"]);
+    await patchLocal({ paused, attention: paused ? stored.attention : null });
     if (paused) {
-      const stored = await readStore(local, ["pendingResult", "currentJob"]);
       if (stored.pendingResult) {
         await uploadPending();
       } else if (stored.currentJob?.phase === "loading") {
@@ -796,6 +1198,10 @@ export function createWorker({
       return;
     }
     await patchLocal({ helperTabClosed: false, attention: null, activity: "idle" });
+    if (stored.expansionResume && (stored.expansionResume.targets?.length || stored.expansionResume.index != null)) {
+      await importAllExpansions();
+      return;
+    }
     await tick();
   }
 
@@ -869,11 +1275,19 @@ export function createWorker({
         return { ok: false, error: String(error?.message || error) };
       }
     }
-    if (message?.type === "import-expansion-page" || message?.type === "import-expansion-set") {
+    if (
+      message?.type === "import-expansion-page" ||
+      message?.type === "import-expansion-set" ||
+      message?.type === "import-expansion-all"
+    ) {
       try {
-        await importExpansion({
-          crawl: message.type === "import-expansion-set",
-        });
+        if (message.type === "import-expansion-all") {
+          await importAllExpansions();
+        } else {
+          await importExpansion({
+            crawl: message.type === "import-expansion-set",
+          });
+        }
         return snapshot();
       } catch (error) {
         const note = String(error?.message || error);
@@ -921,6 +1335,7 @@ export function createWorker({
         if (reason === "startup") {
           await writeStore(session, { helperTabId: null, helperDocumentId: null });
         }
+        await recoverStuckExpansion();
         await tick();
       });
     },
@@ -933,6 +1348,16 @@ export function createWorker({
       }
       if (message?.type === "expansion-status") {
         return snapshot();
+      }
+      if (message?.type === "pause") {
+        return (async () => {
+          await patchLocal({
+            paused: true,
+            activity: "paused",
+            attention: "Pass Cloudflare, then press Continue",
+          });
+          return snapshot();
+        })();
       }
       return enqueue(() => onMessage(message, sender));
     },

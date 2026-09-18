@@ -24,11 +24,12 @@
     </div>
     <section>
       <h2>Test import</h2>
-      <p class="muted">Open a Cardmarket set list first. Use Local Docker for this test — Staging does not have the import API yet. Page import stores that page only; the crawler pages through the same tab for the whole set.</p>
+      <p class="muted">Use Local Docker. Stay on Cardmarket Singles. Import all expansions opens the Expansion dropdown, selects each set, and submits the filter. It pauses between pages and sets on purpose so it looks more like browsing. If Cloudflare appears, pass it, then press Continue — pages already stored stay.</p>
       <p id="expansion-note" class="muted">No set import yet</p>
       <div class="actions">
         <button id="import-page" type="button">Import this set page</button>
         <button id="import-set" type="button">Import whole set (test crawler)</button>
+        <button id="import-all" type="button">Import all expansions</button>
       </div>
     </section>
     <form id="settings">

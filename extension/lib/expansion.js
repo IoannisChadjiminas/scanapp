@@ -1,3 +1,4 @@
+import { hasChallenge } from "./parse.js";
 import { classifyUrl, normalizeUrl } from "./url.js";
 
 export function asProductUrl(href, pageUrl) {
@@ -10,6 +11,100 @@ export function asProductUrl(href, pageUrl) {
   } catch {
     return null;
   }
+}
+
+function skipExpansionLabel(text, value) {
+  const label = String(text || "").trim().toLowerCase();
+  const raw = String(value || "").trim().toLowerCase();
+  return (!label && !raw) || label === "all" || raw === "all" || raw === "-1" || raw === "0";
+}
+
+export function expansionStartUrl(value, text, pageUrl) {
+  let origin;
+  try {
+    origin = new URL(pageUrl);
+  } catch {
+    return null;
+  }
+  const locale = origin.pathname.split("/").filter(Boolean)[0] || "en";
+  const raw = String(value || "").trim();
+  const label = String(text || "").trim();
+  if (skipExpansionLabel(label, raw) || !/^\d+$/.test(raw)) {
+    return null;
+  }
+  const url = new URL(`/${locale}/Pokemon/Products/Singles`, origin.origin);
+  url.searchParams.set("idExpansion", raw);
+  return url.toString();
+}
+
+function expansionKey(url) {
+  try {
+    const parsed = new URL(url);
+    parsed.hash = "";
+    parsed.pathname = parsed.pathname.replace(/\/$/, "");
+    parsed.searchParams.delete("site");
+    return `${parsed.pathname}?${parsed.searchParams.get("idExpansion") || ""}`;
+  } catch {
+    return String(url || "");
+  }
+}
+
+function isExpansionSelect(node) {
+  const ident = [
+    node?.name,
+    node?.id,
+    node?.getAttribute?.("name"),
+    node?.getAttribute?.("id"),
+  ]
+    .filter(Boolean)
+    .join(" ")
+    .toLowerCase();
+  return ident.includes("xpansion");
+}
+
+export function collectExpansionTargets(root, pageUrl) {
+  const found = new Map();
+  const add = (url, name, id = "") => {
+    if (!url || classifyUrl(url) !== "expansion") {
+      return;
+    }
+    const key = expansionKey(url);
+    if (!found.has(key)) {
+      found.set(key, { url, name: String(name || "").trim(), id: String(id || "") });
+    }
+  };
+  const selects = root?.querySelectorAll?.("select") || [];
+  for (const select of selects) {
+    if (!isExpansionSelect(select)) {
+      continue;
+    }
+    const options = Array.from(select.options || select.querySelectorAll?.("option") || []);
+    for (const opt of options) {
+      const value = String(opt.value || opt.getAttribute?.("value") || "").trim();
+      const name = String(opt.textContent || opt.label || opt.getAttribute?.("label") || "")
+        .trim()
+        .replace(/\s+/g, " ");
+      const built = expansionStartUrl(value, name, pageUrl);
+      if (built) {
+        add(built, name, value);
+      }
+    }
+  }
+  const nodes = root?.querySelectorAll?.('[role="option"], [data-expansion-id]') || [];
+  for (const node of nodes) {
+    const value = String(
+      node.getAttribute?.("data-value") ||
+        node.getAttribute?.("data-expansion-id") ||
+        node.value ||
+        "",
+    ).trim();
+    const name = String(node.textContent || "").trim().replace(/\s+/g, " ");
+    const built = expansionStartUrl(value, name, pageUrl);
+    if (built) {
+      add(built, name, value);
+    }
+  }
+  return [...found.values()];
 }
 
 export function nextExpansionPage(candidates, pageUrl) {
@@ -46,7 +141,7 @@ export function nextExpansionPage(candidates, pageUrl) {
   return null;
 }
 
-export function collectExpansionSnapshot(root, pageUrl) {
+export function collectExpansionSnapshot(root, pageUrl, title = "") {
   const products = [];
   const seen = new Set();
   const anchors = root?.querySelectorAll?.("a[href]") || [];
@@ -76,5 +171,7 @@ export function collectExpansionSnapshot(root, pageUrl) {
     pageUrl,
     products,
     nextPage: nextExpansionPage(candidates, pageUrl),
+    expansions: collectExpansionTargets(root, pageUrl),
+    challenge: hasChallenge(root, pageUrl, title),
   };
 }

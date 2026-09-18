@@ -1,5 +1,15 @@
 function scanappCollectExpansion() {
   const pageUrl = window.location.href;
+  const title = document.title || "";
+  const challengeText = `${title} ${document.body?.innerText || ""}`.toLowerCase();
+  const challenge = Boolean(
+    document.querySelector(
+      "#challenge-form, .cf-turnstile, #cf-challenge, input[name='cf-turnstile-response']",
+    ),
+  ) ||
+    challengeText.includes("just a moment") ||
+    challengeText.includes("attention required") ||
+    challengeText.includes("cloudflare");
   const PRODUCT = /^\/[a-z]{2}\/Pokemon\/Products\/Singles\/[^/]+\/[^/]+$/i;
   const products = [];
   const seen = new Set();
@@ -61,7 +71,35 @@ function scanappCollectExpansion() {
       break;
     }
   }
-  return { pageUrl, products, nextPage };
+  const expansions = [];
+  const expansionSeen = new Set();
+  const origin = new URL(pageUrl);
+  const locale = origin.pathname.split("/").filter(Boolean)[0] || "en";
+  const addExpansion = (id, name) => {
+    if (!/^\d+$/.test(String(id || ""))) {
+      return;
+    }
+    const url = `${origin.origin}/${locale}/Pokemon/Products/Singles?idExpansion=${id}`;
+    if (expansionSeen.has(url)) {
+      return;
+    }
+    expansionSeen.add(url);
+    expansions.push({ id: String(id), url, name: String(name || "").trim() });
+  };
+  const selects = document.querySelectorAll(
+    'select[name="idExpansion"], select#idExpansion, select[name*="xpansion" i], select[id*="xpansion" i]',
+  );
+  for (const select of selects) {
+    for (const opt of Array.from(select.options || [])) {
+      const value = String(opt.value || "").trim();
+      const name = String(opt.textContent || "").trim().replace(/\s+/g, " ");
+      if (!value || value === "-1" || value === "0" || name.toLowerCase() === "all") {
+        continue;
+      }
+      addExpansion(value, name);
+    }
+  }
+  return { pageUrl, products, nextPage, expansions, challenge };
 }
 
 scanappCollectExpansion();

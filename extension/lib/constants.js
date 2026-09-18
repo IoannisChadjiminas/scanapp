@@ -11,7 +11,19 @@ export const CLAIM_LIFETIME_MS = 180_000;
 export const MAX_RECENT_FAILURES = 5;
 export const MAX_EXPANSION_PAGES = 80;
 export const MAX_EXPANSION_PRODUCTS = 5_000;
+export const MAX_EXPANSIONS = 2_000;
 export const EXPANSION_PAGE_MS = 2_000;
+export const EXPANSION_READ_MIN_MS = 800;
+export const EXPANSION_READ_MAX_MS = 2_200;
+export const EXPANSION_PAGE_MIN_MS = 2_400;
+export const EXPANSION_PAGE_MAX_MS = 6_500;
+export const EXPANSION_SET_MIN_MS = 4_000;
+export const EXPANSION_SET_MAX_MS = 9_500;
+export const EXPANSION_THINK_MIN_MS = 500;
+export const EXPANSION_THINK_MAX_MS = 1_600;
+export const EXPANSION_BREAK_EVERY = 9;
+export const EXPANSION_BREAK_MIN_MS = 12_000;
+export const EXPANSION_BREAK_MAX_MS = 28_000;
 export const SERVERS = {
   local: "http://127.0.0.1:8000",
   staging: "https://staging-scan.auctaro.com",
@@ -34,4 +46,5 @@ export const STORAGE_KEYS = [
   "queued",
   "attention",
   "helperTabClosed",
+  "expansionResume",
 ];

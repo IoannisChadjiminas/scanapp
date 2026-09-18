@@ -9,6 +9,7 @@ const failuresEl = document.getElementById("failures");
 const pauseBtn = document.getElementById("pause");
 const importPageBtn = document.getElementById("import-page");
 const importSetBtn = document.getElementById("import-set");
+const importAllBtn = document.getElementById("import-all");
 const expansionNoteEl = document.getElementById("expansion-note");
 const serverEl = document.getElementById("server");
 const customWrap = document.getElementById("custom-wrap");
@@ -38,6 +39,9 @@ function activityLabel(value) {
   if (value === "crawling-set") {
     return "crawling whole set";
   }
+  if (value === "crawling-all-sets") {
+    return "crawling all expansions";
+  }
   return value || "idle";
 }
 
@@ -65,10 +69,11 @@ function render(status) {
   failuresEl.textContent = failures.length
     ? `Recent failures: ${failures.map((item) => item.reason).join(", ")}`
     : "No recent failures";
-  pauseBtn.textContent = status.paused ? "Resume" : "Pause";
+  pauseBtn.textContent = status.paused || status.expansionResume ? "Continue" : "Pause";
   expansionNoteEl.textContent = status.expansionNote || "No set import yet";
   importPageBtn.disabled = Boolean(status.expansionBusy);
   importSetBtn.disabled = Boolean(status.expansionBusy);
+  importAllBtn.disabled = Boolean(status.expansionBusy);
   const apiBase = String(status.apiBase || DEFAULT_API).replace(/\/$/, "");
   if (apiBase === SERVERS.local || apiBase === SERVERS.staging) {
     serverEl.value = apiBase;
@@ -114,7 +119,14 @@ serverEl.addEventListener("change", () => {
 });
 
 pauseBtn.addEventListener("click", () => {
-  void refresh({ type: pauseBtn.textContent === "Resume" ? "resume" : "pause" });
+  const resume = pauseBtn.textContent === "Resume" || pauseBtn.textContent === "Continue";
+  void refresh({ type: resume ? "resume" : "pause" }).then((status) => {
+    if (status?.expansionBusy || status?.expansionResume) {
+      window.setTimeout(() => {
+        void refresh({ type: "get-status" });
+      }, 1000);
+    }
+  });
 });
 document.getElementById("check").addEventListener("click", () => {
   void refresh({ type: "check-connection" });
@@ -129,6 +141,10 @@ document.getElementById("import-page").addEventListener("click", () => {
 document.getElementById("import-set").addEventListener("click", () => {
   expansionNoteEl.textContent = "Crawling set…";
   void refresh({ type: "import-expansion-set" });
+});
+document.getElementById("import-all").addEventListener("click", () => {
+  expansionNoteEl.textContent = "Crawling all expansions…";
+  void refresh({ type: "import-expansion-all" });
 });
 document.getElementById("settings").addEventListener("submit", (event) => {
   event.preventDefault();

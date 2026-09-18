@@ -4,7 +4,7 @@ import { classifyUrl } from "./lib/url.js";
 chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
   if (message?.type === "extract-expansion") {
     import(chrome.runtime.getURL("lib/expansion.js")).then(({ collectExpansionSnapshot }) => {
-      sendResponse(collectExpansionSnapshot(document, window.location.href));
+      sendResponse(collectExpansionSnapshot(document, window.location.href, document.title));
     });
     return true;
   }
