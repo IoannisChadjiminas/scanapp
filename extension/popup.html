@@ -24,7 +24,7 @@
     </div>
     <section>
       <h2>Test import</h2>
-      <p class="muted">Use Local Docker. Stay on Cardmarket Singles. Import all reads the Expansion list once, then opens each set by URL in this tab (no dropdown clicking). Tick Cloudflare yourself; the crawl continues when that page loads. Continue is a backup.</p>
+      <p class="muted">Use Local Docker. Stay on Cardmarket Singles. Import all reads the Expansion list once, then opens each set by URL. Import whole set overwrites only the open set. Tick Cloudflare yourself; the crawl continues when that page loads.</p>
       <p id="expansion-note" class="muted">No set import yet</p>
       <div class="actions">
         <button id="import-page" type="button">Import this set page</button>
@@ -51,8 +51,7 @@
         Crawl speed
         <select id="pace">
           <option value="fast">Fast (no extra waits)</option>
-          <option value="medium">Medium</option>
-          <option value="slow">Slow (more random waits)</option>
+          <option value="between">Between (medium–slow waits)</option>
         </select>
       </label>
       <label>

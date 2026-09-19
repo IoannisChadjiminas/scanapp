@@ -603,11 +603,16 @@ test("test crawler stores every page in the open set", async () => {
   });
   tabs.set(9, { id: 9, url: page, active: true, documentId: "doc-9" });
   await worker.handleMessage({ type: "import-expansion-set" });
-  assert.equal(expansionImports.length, 2);
-  assert.equal(expansionImports[0].source, "crawl");
-  assert.equal(expansionImports[1].source, "crawl");
-  assert.equal(expansionImports[0].products[0].url, GENGAR);
-  assert.equal(expansionImports[1].products[0].url, PIKACHU);
+  const pageImports = expansionImports.filter((item) => Array.isArray(item.products) && item.products.length && !item.replace);
+  assert.equal(pageImports.length, 2);
+  assert.equal(pageImports[0].source, "crawl");
+  assert.equal(pageImports[1].source, "crawl");
+  assert.equal(pageImports[0].products[0].url, GENGAR);
+  assert.equal(pageImports[1].products[0].url, PIKACHU);
+  const replaced = expansionImports.filter((item) => item.replace);
+  assert.equal(replaced.length, 1);
+  assert.equal(replaced[0].complete, true);
+  assert.equal(replaced[0].products.length, 2);
   assert.equal(createdTabs.length, 0);
   assert.equal(tabs.get(9).url, `${page}?site=2`);
   assert.equal(
@@ -1012,14 +1017,17 @@ test("keeps a helper token per Scanapp server", async () => {
   assert.equal(stored.helperTokens["https://staging-scan.auctaro.com"], "staging-token");
 });
 
-test("saves crawl pace fast medium and slow", async () => {
+test("saves crawl pace fast and between", async () => {
   const { worker, local } = createHarness();
   await worker.handleMessage({ type: "set-settings", expansionPace: "slow" });
   let stored = await local.get("expansionPace");
-  assert.equal(stored.expansionPace, "slow");
+  assert.equal(stored.expansionPace, "between");
   await worker.handleMessage({ type: "set-settings", expansionPace: "medium" });
   stored = await local.get("expansionPace");
-  assert.equal(stored.expansionPace, "medium");
+  assert.equal(stored.expansionPace, "between");
+  await worker.handleMessage({ type: "set-settings", expansionPace: "between" });
+  stored = await local.get("expansionPace");
+  assert.equal(stored.expansionPace, "between");
   await worker.handleMessage({ type: "set-settings", expansionPace: "fast" });
   stored = await local.get("expansionPace");
   assert.equal(stored.expansionPace, "fast");

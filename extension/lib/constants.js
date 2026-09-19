@@ -15,6 +15,12 @@ export const MAX_EXPANSION_PAGES = 80;
 export const MAX_EXPANSION_PRODUCTS = 5_000;
 export const MAX_EXPANSIONS = 2_000;
 export const DEFAULT_PACE = "fast";
+export function normalizePace(name) {
+  if (name === "between" || name === "medium" || name === "slow") {
+    return "between";
+  }
+  return "fast";
+}
 export const PACE_PROFILES = {
   fast: {
     readMin: 0,
@@ -35,43 +41,24 @@ export const PACE_PROFILES = {
     hesitateMin: 0,
     hesitateMax: 0,
   },
-  medium: {
-    readMin: 1_200,
-    readMax: 4_000,
-    pageMin: 3_000,
-    pageMax: 8_000,
-    setMin: 6_000,
-    setMax: 14_000,
-    thinkMin: 600,
-    thinkMax: 2_200,
-    settleMin: 1_500,
-    settleMax: 4_500,
+  between: {
+    readMin: 1_800,
+    readMax: 6_000,
+    pageMin: 4_500,
+    pageMax: 12_000,
+    setMin: 9_000,
+    setMax: 21_000,
+    thinkMin: 900,
+    thinkMax: 3_400,
+    settleMin: 2_200,
+    settleMax: 6_800,
     breakEveryMin: 5,
     breakEveryMax: 10,
-    breakMin: 15_000,
-    breakMax: 45_000,
-    hesitateChance: 0.08,
-    hesitateMin: 3_000,
-    hesitateMax: 12_000,
-  },
-  slow: {
-    readMin: 2_500,
-    readMax: 8_000,
-    pageMin: 6_000,
-    pageMax: 16_000,
-    setMin: 12_000,
-    setMax: 28_000,
-    thinkMin: 1_200,
-    thinkMax: 4_500,
-    settleMin: 3_000,
-    settleMax: 9_000,
-    breakEveryMin: 4,
-    breakEveryMax: 11,
-    breakMin: 35_000,
-    breakMax: 90_000,
-    hesitateChance: 0.16,
-    hesitateMin: 6_000,
-    hesitateMax: 24_000,
+    breakMin: 25_000,
+    breakMax: 68_000,
+    hesitateChance: 0.12,
+    hesitateMin: 4_500,
+    hesitateMax: 18_000,
   },
 };
 export const SERVERS = {

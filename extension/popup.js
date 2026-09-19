@@ -1,4 +1,4 @@
-import { DEFAULT_API, SERVERS } from "./lib/constants.js";
+import { DEFAULT_API, SERVERS, normalizePace } from "./lib/constants.js";
 
 const connectionEl = document.getElementById("connection");
 const activityEl = document.getElementById("activity");
@@ -95,7 +95,7 @@ function render(status) {
   } else {
     ntfyEl.placeholder = "secret-topic-name";
   }
-  paceEl.value = status.expansionPace === "slow" || status.expansionPace === "medium" ? status.expansionPace : "fast";
+  paceEl.value = normalizePace(status.expansionPace);
 }
 
 async function send(message) {

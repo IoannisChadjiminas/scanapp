@@ -94,6 +94,7 @@ class ExpansionImportRequest(BaseModel):
     products: list[ExpansionProduct] = Field(default_factory=list)
     source: str = "page"
     complete: bool = False
+    replace: bool = False
     expansion_id: str = ""
     expansion: str = ""
 
@@ -292,6 +293,7 @@ def helper_expansion_import(
         page_url=payload.page_url,
         products=[item.model_dump() for item in payload.products],
         source=source,
+        replace=payload.replace,
     )
     if payload.complete:
         mark_expansion_complete(

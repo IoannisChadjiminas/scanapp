@@ -641,6 +641,7 @@ def import_expansion_products(
     page_url: str,
     products: list[dict[str, Any]],
     source: str = "page",
+    replace: bool = False,
 ) -> dict[str, Any]:
     stamp = datetime_now()
     expansion = _expansion_from_url(page_url)
@@ -703,7 +704,17 @@ def import_expansion_products(
             ),
         )
         stored_n += 1
-    _touch_expansion_crawl(conn, expansion=expansion or "", complete=False)
+    removed = 0
+    if replace and expansion and seen:
+        for row in conn.execute(
+            "SELECT url FROM cardmarket_expansion_products WHERE expansion = ?",
+            (expansion,),
+        ).fetchall():
+            url = str(row["url"] or "")
+            if url and url not in seen:
+                conn.execute("DELETE FROM cardmarket_expansion_products WHERE url = ?", (url,))
+                removed += 1
+    _touch_expansion_crawl(conn, expansion=expansion or "", complete=bool(replace and seen))
     conn.commit()
     dump_dir = Path(data_dir) / "expansion-imports"
     dump_dir.mkdir(parents=True, exist_ok=True)
@@ -732,6 +743,8 @@ def import_expansion_products(
         "unmatched": len(unmatched),
         "links": linked,
         "unmatched_urls": unmatched[:20],
+        "removed": removed,
+        "replaced": bool(replace and seen),
         "dump": str(dump_path),
     }
 

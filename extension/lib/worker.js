@@ -15,6 +15,7 @@ import {
   PAGE_DEADLINE_MS,
   PARSER_VERSION,
   WAIT_ALARM,
+  normalizePace,
 } from "./constants.js";
 import { challengeTitle } from "./parse.js";
 import { classifyUrl, finalUrlAllowed, normalizeUrl, productIdentity } from "./url.js";
@@ -173,15 +174,12 @@ export function createWorker({
       apiBase,
       helperToken: String(byServer[apiBase] || stored.helperToken || ""),
       paused: Boolean(stored.paused),
-      expansionPace:
-        stored.expansionPace === "slow" || stored.expansionPace === "medium"
-          ? stored.expansionPace
-          : DEFAULT_PACE,
+      expansionPace: normalizePace(stored.expansionPace),
     };
   }
 
   function paceProfile(name) {
-    return PACE_PROFILES[name] || PACE_PROFILES[DEFAULT_PACE];
+    return PACE_PROFILES[normalizePace(name)] || PACE_PROFILES[DEFAULT_PACE];
   }
 
   function jitter(min, max) {
@@ -993,9 +991,24 @@ export function createWorker({
     try {
       const { lastResult, pages } = await crawlExpansionPages(tab, { crawl, seen, totals });
       const stopped = shouldPauseCrawl(lastResult.stopped);
+      if (crawl && !stopped && seen.size) {
+        const replaced = await request("/cardmarket/helper/expansion-import", {
+          method: "POST",
+          body: {
+            page_url: tab.url || "",
+            products: [...seen].map((url) => ({ url })),
+            source: "crawl",
+            complete: true,
+            replace: true,
+          },
+        });
+        Object.assign(lastResult, replaced);
+      }
       const note = stopped
         ? `Paused (${lastResult.stopped}). Kept ${totals.stored} stored URLs. Pass Cloudflare, then import this set again.`
-        : `Stored ${lastResult.stored ?? seen.size} URLs · linked ${lastResult.linked ?? 0} · unmatched ${lastResult.unmatched ?? 0}`;
+        : crawl
+          ? `Replaced this set with ${seen.size} URLs · linked ${lastResult.linked ?? totals.linked} · unmatched ${lastResult.unmatched ?? totals.unmatched}`
+          : `Stored ${lastResult.stored ?? seen.size} URLs · linked ${lastResult.linked ?? 0} · unmatched ${lastResult.unmatched ?? 0}`;
       await patchLocal({
         lastExpansionImport: { ...lastResult, pages, productsSeen: seen.size },
         expansionNote: note,
@@ -1487,8 +1500,8 @@ export function createWorker({
       if (message.ntfyTopic != null && String(message.ntfyTopic).trim()) {
         await patchLocal({ ntfyTopic: String(message.ntfyTopic).trim() });
       }
-      if (message.expansionPace === "fast" || message.expansionPace === "medium" || message.expansionPace === "slow") {
-        await patchLocal({ expansionPace: message.expansionPace });
+      if (message.expansionPace != null) {
+        await patchLocal({ expansionPace: normalizePace(message.expansionPace) });
       }
       return snapshot();
     }

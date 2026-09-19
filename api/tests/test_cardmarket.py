@@ -606,6 +606,53 @@ def test_backfill_marks_older_stored_sets_complete(tmp_path: Path) -> None:
     assert rows["Cyber-Judge"]["complete"] is False
 
 
+def test_replace_overwrites_only_that_expansion(tmp_path: Path) -> None:
+    from app.cardmarket import import_expansion_products
+    from app.db import connect, init_catalog
+
+    conn = connect(tmp_path / "catalog.sqlite")
+    init_catalog(conn)
+    keep = "https://www.cardmarket.com/en/Pokemon/Products/Singles/151/Bulbasaur-V1-MEW001"
+    drop = "https://www.cardmarket.com/en/Pokemon/Products/Singles/151/Old-Card-MEW999"
+    other = "https://www.cardmarket.com/en/Pokemon/Products/Singles/Cyber-Judge/Pikachu-V4"
+    import_expansion_products(
+        conn,
+        tmp_path,
+        page_url="https://www.cardmarket.com/en/Pokemon/Products/Singles/151",
+        products=[{"url": keep, "name": "Bulbasaur"}, {"url": drop, "name": "Old"}],
+        source="crawl",
+    )
+    import_expansion_products(
+        conn,
+        tmp_path,
+        page_url="https://www.cardmarket.com/en/Pokemon/Products/Singles/Cyber-Judge",
+        products=[{"url": other, "name": "Pikachu"}],
+        source="crawl",
+    )
+    result = import_expansion_products(
+        conn,
+        tmp_path,
+        page_url="https://www.cardmarket.com/en/Pokemon/Products/Singles/151",
+        products=[{"url": keep, "name": "Bulbasaur"}],
+        source="crawl",
+        replace=True,
+    )
+    urls = {
+        row["url"]
+        for row in conn.execute("SELECT url FROM cardmarket_expansion_products").fetchall()
+    }
+    assert keep in urls
+    assert drop not in urls
+    assert other in urls
+    assert result["removed"] == 1
+    assert result["replaced"] is True
+    crawl = conn.execute(
+        "SELECT complete FROM cardmarket_expansion_crawls WHERE key = '151'"
+    ).fetchone()
+    assert crawl is not None
+    assert crawl["complete"] == 1
+
+
 def test_relink_writes_url_after_catalogue_card_exists(tmp_path: Path) -> None:
     from app.cardmarket import apply_cardmarket_links, url_for_row
     from app.db import connect, init_catalog
