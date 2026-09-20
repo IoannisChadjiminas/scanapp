@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Scanapp Cardmarket helper",
-  "version": "0.2.35",
+  "version": "0.2.45",
   "description": "Quiet background helper that fetches Cardmarket listings for Scanapp, one card at a time.",
   "action": {
     "default_title": "Scanapp Cardmarket helper",
@@ -16,6 +16,9 @@
     "https://staging-scan.auctaro.com/*",
     "https://www.cardmarket.com/*",
     "https://cardmarket.com/*",
+    "https://*.cardmarket.com/*",
+    "https://product-images.s3.cardmarket.com/*",
+    "https://static.cardmarket.com/*",
     "https://prices.pokemontcg.io/*",
     "https://ntfy.sh/*"
   ],

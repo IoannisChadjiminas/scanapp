@@ -59,8 +59,12 @@ def test_extra_manifest_lugia_number_and_mcdonalds_image() -> None:
     cards = json.loads((root / "manifest.json").read_text())["cards"]
     by_id = {card["id"]: card for card in cards}
     assert by_id["extra-lugia-v-326-s-p"]["collector_number"] == "324/S-P"
+    assert by_id["extra-mew-ex-205-metal"]["variant_label"] == "UPC metal"
+    assert by_id["extra-mew-ex-205-metal"]["cardmarket_url"].endswith("Mew-ex-V4-MEW205")
+    metal = root / by_id["extra-mew-ex-205-metal"]["file"]
     mcdonalds = root / by_id["extra-pikachu-mcdonalds-2022-008-015"]["file"]
     classic = root / by_id["extra-pikachu-classic-clc008"]["file"]
+    assert metal.is_file()
     assert mcdonalds.is_file()
     assert classic.is_file()
     assert mcdonalds.read_bytes() != classic.read_bytes()

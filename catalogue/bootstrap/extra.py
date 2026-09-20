@@ -43,6 +43,9 @@ def import_extra_cards(data_dir: Path) -> int:
         card_id = str(card["id"])
         language = card.get("language") or "en"
         mapping = mapping_from_manifest(card)
+        variants_payload = card.get("variants") if isinstance(card.get("variants"), dict) else {}
+        if card.get("variant_label"):
+            variants_payload = {**variants_payload, "variant_label": card["variant_label"]}
         conn.execute(
             """
             INSERT INTO cards (
@@ -50,7 +53,7 @@ def import_extra_cards(data_dir: Path) -> int:
                 language, category, rarity, illustrator, variants_json,
                 image_path, has_image, cardmarket_id, cardmarket_url,
                 cardmarket_verified, cardmarket_provenance, cardmarket_verified_at
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, '{}', ?, 1, ?, ?, ?, ?, ?)
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 1, ?, ?, ?, ?, ?)
             ON CONFLICT(id) DO UPDATE SET
                 provider_id = excluded.provider_id,
                 name = excluded.name,
@@ -60,6 +63,8 @@ def import_extra_cards(data_dir: Path) -> int:
                 language = excluded.language,
                 category = excluded.category,
                 rarity = excluded.rarity,
+                illustrator = excluded.illustrator,
+                variants_json = excluded.variants_json,
                 image_path = excluded.image_path,
                 has_image = 1,
                 cardmarket_id = excluded.cardmarket_id,
@@ -79,6 +84,7 @@ def import_extra_cards(data_dir: Path) -> int:
                 card.get("category"),
                 card.get("rarity"),
                 card.get("illustrator"),
+                json.dumps(variants_payload),
                 str(dest),
                 mapping.product_id,
                 mapping.url,

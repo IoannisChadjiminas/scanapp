@@ -38,9 +38,11 @@ function scanappCollectCardmarket() {
   const text = `${root.body?.innerText || root.textContent || ""}`;
   const haystack = `${href} ${title} ${text}`.toLowerCase();
   const challenge =
-    Boolean(root.querySelector("#challenge-form, .cf-turnstile, #cf-challenge, input[name='cf-turnstile-response']")) ||
+    Boolean(root.querySelector("#challenge-form, .cf-turnstile, #cf-challenge, input[name='cf-turnstile-response'], iframe[src*='challenges.cloudflare.com'], iframe[src*='turnstile'], #challenge-running, .cf-browser-verification, #cf-chl-widget")) ||
     haystack.includes("just a moment") ||
     haystack.includes("attention required") ||
+    haystack.includes("verify you are human") ||
+    haystack.includes("checking your browser") ||
     haystack.includes("cloudflare");
   let kind = "other";
   try {

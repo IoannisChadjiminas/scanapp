@@ -93,6 +93,21 @@
       "cardmarket_set_code": "CLC",
       "cardmarket_url": "https://www.cardmarket.com/en/Pokemon/Products/Singles/Pokemon-Trading-Card-Game-Classic-Charizard-Ho-Oh-ex-Deck/Pikachu-CLC008",
       "file": "pikachu-classic-clc008.jpg"
+    },
+    {
+      "id": "extra-mew-ex-205-metal",
+      "name": "Mew ex",
+      "set_id": "sv03.5-upc",
+      "set_name": "151 Ultra-Premium Collection",
+      "collector_number": "205",
+      "language": "en",
+      "category": "Pokemon",
+      "rarity": "Hyper rare",
+      "variant_label": "UPC metal",
+      "cardmarket_expansion": "151",
+      "cardmarket_set_code": "MEW",
+      "cardmarket_url": "https://www.cardmarket.com/en/Pokemon/Products/Singles/151/Mew-ex-V4-MEW205",
+      "file": "mew-ex-205-metal.webp"
     }
   ]
 }

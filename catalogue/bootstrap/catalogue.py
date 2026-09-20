@@ -2,8 +2,10 @@ from __future__ import annotations
 
 import json
 import os
+import time
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from pathlib import Path
+from urllib.parse import quote
 
 import httpx
 
@@ -11,6 +13,8 @@ from app.cardmarket import apply_cardmarket_links, mapping_from_payload
 from app.db import connect, coverage, coverage_by_language, init_catalog
 from bootstrap.download import download_file
 from bootstrap.pins import TCGDEX_BASE
+
+_RETRY_STATUSES = {429, 500, 502, 503, 504}
 
 
 def _sets_filter() -> set[str] | None:
@@ -218,6 +222,48 @@ def _get_json(client: httpx.Client, url: str) -> dict | list | None:
     return response.json()
 
 
+def card_detail_url(language: str, card_id: str) -> str:
+    return f"{TCGDEX_BASE}/{language}/cards/{quote(str(card_id), safe='')}"
+
+
+def fetch_card_detail(
+    card_id: str,
+    language: str,
+    *,
+    client: httpx.Client,
+    retries: int = 4,
+) -> dict | None:
+    """Load one TCGdex card. Skip 404s (broken list ids like exu-?). Retry blips."""
+    url = card_detail_url(language, card_id)
+    delay = 1.0
+    last_error: Exception | None = None
+    for _ in range(max(retries, 1)):
+        try:
+            response = client.get(url)
+        except httpx.RequestError as exc:
+            last_error = exc
+            time.sleep(delay)
+            delay = min(delay * 2, 16)
+            continue
+        if response.status_code == 404:
+            print(f"  skip missing {language}:{card_id}")
+            return None
+        if response.status_code in _RETRY_STATUSES:
+            last_error = httpx.HTTPStatusError(
+                f"{response.status_code} {url}",
+                request=response.request,
+                response=response,
+            )
+            time.sleep(delay)
+            delay = min(delay * 2, 16)
+            continue
+        response.raise_for_status()
+        body = response.json()
+        return body if isinstance(body, dict) else None
+    print(f"  skip failed {language}:{card_id}: {last_error}")
+    return None
+
+
 def _briefs_for_language(
     client: httpx.Client,
     language: str,
@@ -282,27 +328,40 @@ def import_catalogue(
                 per_language[language] = 0
                 continue
 
-            def load_card(brief: dict, lang: str = language) -> dict:
-                card_id = brief["id"]
+            def load_card(brief: dict, lang: str = language) -> dict | None:
+                card_id = str(brief.get("id") or "")
+                if not card_id:
+                    return None
                 cache_path = cache_dir / lang / f"{card_id}.json"
                 cache_path.parent.mkdir(parents=True, exist_ok=True)
                 if cache_path.exists():
-                    return json.loads(cache_path.read_text())
-                with httpx.Client(timeout=60.0, follow_redirects=True) as inner:
-                    payload = inner.get(f"{TCGDEX_BASE}/{lang}/cards/{card_id}")
-                    payload.raise_for_status()
-                    body = payload.json()
+                    try:
+                        cached = json.loads(cache_path.read_text())
+                    except json.JSONDecodeError:
+                        cache_path.unlink(missing_ok=True)
+                    else:
+                        return cached if isinstance(cached, dict) else None
+                body = fetch_card_detail(card_id, lang, client=client)
+                if body is None:
+                    return None
                 cache_path.write_text(json.dumps(body))
                 return body
 
             print(f"  enrich {len(briefs)} cards")
             cards: list[dict] = []
+            skipped = 0
             with ThreadPoolExecutor(max_workers=concurrency) as pool:
                 futures = [pool.submit(load_card, brief) for brief in briefs]
                 for index, future in enumerate(as_completed(futures), start=1):
-                    cards.append(future.result())
+                    card = future.result()
+                    if card is None:
+                        skipped += 1
+                    else:
+                        cards.append(card)
                     if index % 50 == 0:
                         print(f"  details {language} {index}/{len(briefs)}")
+            if skipped:
+                print(f"  skipped {skipped} missing {language} details")
 
             print(f"  download {language} reference images")
             lang_dir = images_dir / language
@@ -317,7 +376,7 @@ def import_catalogue(
                     card["_image_path"] = None
                     continue
                 try:
-                    download_file(url, dest)
+                    download_file(url, dest, client=client)
                     card["_image_path"] = str(dest)
                     total_indexed += 1
                 except Exception as exc:  # noqa: BLE001

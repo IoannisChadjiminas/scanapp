@@ -11,7 +11,7 @@ import numpy as np
 
 from app.config import Settings
 from app.card_images import display_image_url
-from app.cardmarket import snapshot_prices, url_for_row
+from app.cardmarket import apply_variants_to_candidate, grouped_expansion_skus, snapshot_prices, url_for_row
 from app.db import coverage_payload
 from app.recognition.captures import save_scan_capture
 from app.recognition.detect import detect_and_rectify
@@ -149,9 +149,14 @@ def recognize_bytes(
         detected_languages=rank_languages,
     )
     mark = time.perf_counter()
+    sku_groups = grouped_expansion_skus(catalog)
+    for item in combined:
+        apply_variants_to_candidate(catalog, item, groups=sku_groups)
     if combined:
         live_url = combined[0].get("cardmarket_url")
-        combined[0]["cardmarket_prices"] = snapshot_prices(catalog, live_url)
+        combined[0]["cardmarket_prices"] = (
+            snapshot_prices(catalog, live_url) if live_url else []
+        )
     timings["cardmarket_ms"] = (time.perf_counter() - mark) * 1000
     status = decide_status(
         combined,
@@ -183,11 +188,19 @@ def recognize_bytes(
         )
     elif status == "matched":
         message = "This is the most likely match."
-        if shown and not shown[0].get("cardmarket_url"):
+        if shown and shown[0].get("cardmarket_variants"):
+            message = (
+                "This print has more than one Cardmarket listing. Choose yours."
+            )
+        elif shown and not shown[0].get("cardmarket_url"):
             message = "This is the most likely match. Cardmarket link unavailable."
     elif status == "uncertain":
         message = "Closest print. Confirm if this is the card."
-        if shown and not shown[0].get("cardmarket_url"):
+        if shown and shown[0].get("cardmarket_variants"):
+            message = (
+                "Closest print. This Cardmarket listing has more than one SKU. Choose yours."
+            )
+        elif shown and not shown[0].get("cardmarket_url"):
             message = "Closest print. Cardmarket link unavailable."
     elif status in {"no_match"}:
         message = "This photograph did not match a catalogue card."

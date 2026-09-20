@@ -13,9 +13,11 @@ from app.cardmarket import (
     import_expansion_products,
     is_job_url,
     list_expansion_crawls,
+    list_unmatched_products,
     map_card_product,
     mark_expansion_complete,
     normalize_product_url,
+    store_unmatched_product_image,
 )
 from app.cardmarket_events import notify_product, wait_for_product
 from app.cardmarket_queue import (
@@ -82,6 +84,14 @@ class MapRequest(BaseModel):
     url: str
     card_id: str
     cardmarket_id: int | None = None
+
+
+class UnmatchedImageRequest(BaseModel):
+    url: str
+    name: str = ""
+    image_url: str
+    image_base64: str = ""
+    mime: str = "image/jpeg"
 
 
 class ExpansionProduct(BaseModel):
@@ -259,6 +269,39 @@ def helper_map(
         raise HTTPException(status_code=exc.status_code, detail=exc.detail) from exc
     notify_product(mapped.get("url"))
     return mapped
+
+
+@router.post("/cardmarket/helper/unmatched-image")
+def helper_unmatched_image(
+    payload: UnmatchedImageRequest,
+    request: Request,
+    authorization: str | None = Header(default=None),
+) -> dict[str, Any]:
+    catalog = request.app.state.dbs.catalog
+    _helper(catalog, authorization)
+    try:
+        result = store_unmatched_product_image(
+            catalog,
+            request.app.state.settings.data_dir,
+            url=payload.url,
+            image_url=payload.image_url,
+            name=payload.name,
+        )
+    except MappingError as exc:
+        raise HTTPException(status_code=exc.status_code, detail=exc.detail) from exc
+    return result
+
+
+@router.get("/cardmarket/helper/unmatched-products")
+def helper_unmatched_products(
+    request: Request,
+    authorization: str | None = Header(default=None),
+    after: str = Query(default=""),
+    limit: int = Query(default=50, ge=1, le=200),
+) -> dict[str, Any]:
+    catalog = request.app.state.dbs.catalog
+    _helper(catalog, authorization)
+    return list_unmatched_products(catalog, after=after, limit=limit)
 
 
 @router.get("/cardmarket/helper/expansion-crawls")

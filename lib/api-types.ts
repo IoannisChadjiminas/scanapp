@@ -20,6 +20,13 @@ export type CardmarketPriceResponse = {
   queued?: number | null;
 };
 
+export type CardmarketVariant = {
+  url: string;
+  slug?: string;
+  label?: string;
+  card_id?: string | null;
+};
+
 export type Candidate = {
   card_id: string;
   name: string;
@@ -32,6 +39,7 @@ export type Candidate = {
   language?: string;
   cardmarket_url?: string | null;
   cardmarket_prices?: CardmarketPrice[];
+  cardmarket_variants?: CardmarketVariant[];
 };
 
 export type Coverage = {

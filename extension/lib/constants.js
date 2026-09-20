@@ -14,6 +14,7 @@ export const MAX_RECENT_FAILURES = 5;
 export const MAX_EXPANSION_PAGES = 80;
 export const MAX_EXPANSION_PRODUCTS = 5_000;
 export const MAX_EXPANSIONS = 2_000;
+export const UNMATCHED_IMAGE_BATCH = 1;
 export const DEFAULT_PACE = "fast";
 export function normalizePace(name) {
   if (name === "between" || name === "medium" || name === "slow") {
@@ -86,4 +87,5 @@ export const STORAGE_KEYS = [
   "expansionResume",
   "ntfyTopic",
   "expansionPace",
+  "saveUnmatchedImage",
 ];

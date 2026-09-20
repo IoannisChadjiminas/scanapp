@@ -53,6 +53,12 @@ test("keeps listing filters out of the identity", () => {
   });
   assert.equal(productIdentity(GENGAR), "singles:sm9102");
   assert.equal(
+    productIdentity(
+      "https://www.cardmarket.com/en/Pokemon/Products/Singles/30th-Celebration/Mewtwo-ex-V1-30C064",
+    ),
+    "singles:30c64",
+  );
+  assert.equal(
     classifyUrl(
       "https://www.cardmarket.com/en/Pokemon/Products/Singles/VMAX-Climax/Blaziken-VMAX-V2-s8b217",
     ),

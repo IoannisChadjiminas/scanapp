@@ -1,8 +1,8 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 
-import { parseAmount, extractPrices } from "../lib/parse.js";
-import { classifyPage } from "../lib/extract.js";
+import { parseAmount, extractPrices, hasChallenge } from "../lib/parse.js";
+import { classifyPage, isCardmarketListingImageUrl, productImageSrc } from "../lib/extract.js";
 
 test("parses supported Cardmarket amounts and rejects invalid ones", () => {
   assert.equal(parseAmount("1,50 €"), 1.5);
@@ -52,4 +52,94 @@ test("missing selectors are not treated as no offers", () => {
     }).outcome,
     "challenge",
   );
+});
+
+test("reads the Cardmarket product image from og:image", () => {
+  const root = {
+    querySelector(sel) {
+      if (sel === 'meta[property="og:image"]') {
+        return { content: "https://static.cardmarket.com/img/gengar.jpg" };
+      }
+      return null;
+    },
+  };
+  assert.equal(productImageSrc(root), "https://static.cardmarket.com/img/gengar.jpg");
+});
+
+test("reads the visible Cardmarket card image from img.is-front", () => {
+  const src = "https://product-images.s3.cardmarket.com/51/MEW/733658/733658.jpg";
+  const img = { currentSrc: src, src, getAttribute: () => src };
+  const root = {
+    querySelector(sel) {
+      if (String(sel).includes("img.is-front") || String(sel).includes(".card-image img")) {
+        return img;
+      }
+      if (sel === 'meta[property="og:image"]') {
+        return { content: "https://static.cardmarket.com/img/ignored.jpg" };
+      }
+      return null;
+    },
+  };
+  assert.equal(productImageSrc(root), src);
+});
+
+test("prefers the main product image over a smaller gallery thumb", () => {
+  const thumb = "https://product-images.s3.cardmarket.com/51/s8a/577378/577378.jpg";
+  const main = "https://product-images.s3.cardmarket.com/51/s8a/577379/577379.jpg";
+  const thumbImg = {
+    currentSrc: thumb,
+    src: thumb,
+    naturalWidth: 40,
+    naturalHeight: 40,
+    width: 40,
+    height: 40,
+    complete: true,
+    className: "is-front",
+    classList: { contains: (name) => name === "is-front" },
+    closest: () => null,
+    getAttribute: () => thumb,
+  };
+  const mainImg = {
+    currentSrc: main,
+    src: main,
+    naturalWidth: 300,
+    naturalHeight: 420,
+    width: 300,
+    height: 420,
+    complete: true,
+    className: "is-front",
+    classList: { contains: (name) => name === "is-front" },
+    closest: (sel) => (String(sel).includes("#image") ? {} : null),
+    getAttribute: () => main,
+  };
+  const root = {
+    querySelectorAll() {
+      return [thumbImg, mainImg];
+    },
+    querySelector() {
+      return thumbImg;
+    },
+  };
+  assert.equal(productImageSrc(root), main);
+});
+
+test("detects a Turnstile iframe as Cloudflare", () => {
+  const root = {
+    querySelector(sel) {
+      if (String(sel).includes("challenges.cloudflare.com") || String(sel).includes("turnstile")) {
+        return { src: "https://challenges.cloudflare.com/cdn-cgi/challenge-platform/turnstile" };
+      }
+      return null;
+    },
+  };
+  assert.equal(hasChallenge(root, "https://www.cardmarket.com/en/Pokemon/Products/Singles/151/Abra-V1-MEW063", "Abra"), true);
+});
+
+test("accepts Cardmarket listing image hosts and rejects logos", () => {
+  assert.equal(
+    isCardmarketListingImageUrl("https://product-images.s3.cardmarket.com/51/10M/566543/566543.jpg"),
+    true,
+  );
+  assert.equal(isCardmarketListingImageUrl("https://static.cardmarket.com/img/cardmarket-logo.png"), false);
+  assert.equal(isCardmarketListingImageUrl("https://example.com/566543.jpg"), false);
 });

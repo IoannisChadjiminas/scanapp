@@ -122,6 +122,18 @@ export function hasEmptyState(root) {
   );
 }
 
+export const CHALLENGE_SELECTOR = [
+  "#challenge-form",
+  ".cf-turnstile",
+  "#cf-challenge",
+  "input[name='cf-turnstile-response']",
+  "iframe[src*='challenges.cloudflare.com']",
+  "iframe[src*='turnstile']",
+  "#challenge-running",
+  ".cf-browser-verification",
+  "#cf-chl-widget",
+].join(", ");
+
 export function challengeTitle(title) {
   const text = String(title || "").toLowerCase();
   return (
@@ -134,9 +146,26 @@ export function challengeTitle(title) {
   );
 }
 
-export function hasChallenge(root, url = "", title = "") {
-  if (root.querySelector?.("#challenge-form, .cf-turnstile, #cf-challenge, input[name='cf-turnstile-response']")) {
+export function challengeSignals({ title = "", url = "", hasChallengeNode = false, text = "" } = {}) {
+  if (hasChallengeNode || challengeTitle(title)) {
     return true;
   }
-  return challengeTitle(title);
+  const href = String(url || "").toLowerCase();
+  if (href.includes("/cdn-cgi/") || href.includes("challenges.cloudflare")) {
+    return true;
+  }
+  const hay = `${title} ${text}`.toLowerCase();
+  return (
+    hay.includes("just a moment") ||
+    hay.includes("einen moment") ||
+    hay.includes("attention required") ||
+    hay.includes("verify you are human") ||
+    hay.includes("checking your browser")
+  );
+}
+
+export function hasChallenge(root, url = "", title = "") {
+  const node = Boolean(root.querySelector?.(CHALLENGE_SELECTOR));
+  const text = String(root.body?.innerText || root.textContent || "").slice(0, 2_000);
+  return challengeSignals({ title, url, hasChallengeNode: node, text });
 }

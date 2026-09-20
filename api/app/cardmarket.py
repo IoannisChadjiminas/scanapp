@@ -12,7 +12,47 @@ from typing import Any
 from urllib.parse import quote_plus, urlparse, urlunparse
 
 _PRODUCT_SLUG_RE = re.compile(r"/Products/Singles/[^/]+/([^/?#]+)", re.I)
-_SLUG_CODE_RE = re.compile(r"-([A-Za-z]+)(\d+)$")
+_SLUG_CODE_RE = re.compile(r"-([A-Za-z0-9]*[A-Za-z])(\d+)$")
+PROMO_SLUG_CODES = (
+    "XYPR",
+    "SWSH",
+    "SM-P",
+    "SV-P",
+    "XY-P",
+    "SVP",
+    "S-P",
+    "M-P",
+)
+_PROMO_SLUG_RE = re.compile(
+    r"-(" + "|".join(re.escape(code) for code in PROMO_SLUG_CODES) + r")(\d+)$",
+    re.I,
+)
+_PRICE_TAIL_RE = re.compile(r"From\s+[\d.,]+\s*€.*$", re.I)
+_LATIN_SLUG_RE = re.compile(r"[a-z0-9]+")
+_PROTECTED_PROVENANCE = {"helper-map", "manifest-url"}
+_WEAK_LATIN_NAME_SLUGS = frozenset(
+    {"ex", "gx", "v", "vmax", "vstar", "lv", "lvx", "break", "tag"}
+)
+_LOCALIZED_EXPANSION_RE = re.compile(
+    r"(?:"
+    r"-idth|"
+    r"-jp|"
+    r"-ja|"
+    r"-indonesian(?:-promos)?|"
+    r"-simplified-chinese(?:-promos?)?|"
+    r"-traditional-chinese(?:-promos?)?"
+    r")$",
+    re.I,
+)
+_PROMO_SET_EXPANSIONS = {
+    "swshp": {"swsh-black-star-promos"},
+    "s-p": {"sword-shield-promos"},
+    "svp": {"svp-black-star-promos", "sv-black-star-promos"},
+    "smp": {"sm-black-star-promos"},
+    "xyp": {"xy-black-star-promos"},
+    "sv-p": {"sv-promos", "scarlet-violet-promos"},
+    "m-p": {"m-p-promos", "mega-promos"},
+}
 
 CARDMARKET_LOCALES = {"en", "de", "fr", "es", "it"}
 LANGUAGE_DIRS = {"en", "ja", "zh-cn", "zh-tw", "ko", "fr", "de", "es", "it", "pt"}
@@ -463,6 +503,222 @@ def map_card_product(
     }
 
 
+def is_official_catalogue_id(card_id: str) -> bool:
+    ident = str(card_id or "")
+    return ":" in ident and not ident.startswith(("extra-", "cm-"))
+
+
+def official_cover_for_listing(
+    conn: sqlite3.Connection, url: str, name: str = ""
+) -> sqlite3.Row | None:
+    """Official TCGdex print that already covers this Cardmarket SKU (including V2 siblings)."""
+    product = normalize_product_url(url) or url
+    if not is_verified_singles_url(product):
+        return None
+    owner = conn.execute(
+        """
+        SELECT * FROM cards
+        WHERE cardmarket_url = ?
+        """,
+        (product,),
+    ).fetchone()
+    if owner is not None and is_official_catalogue_id(str(owner["id"])):
+        return owner
+    coded = singles_code_and_number(product)
+    expansion = _expansion_from_url(product)
+    if coded and expansion:
+        _code, number = coded
+        slug_number = str(number).lstrip("0") or "0"
+        padded = slug_number.zfill(3)
+        rows = conn.execute(
+            """
+            SELECT * FROM cards
+            WHERE (has_image = 1 OR remote_image_url LIKE 'https://%')
+              AND (
+                collector_number = ?
+                OR collector_number = ?
+                OR collector_number LIKE ?
+                OR collector_number LIKE ?
+              )
+            """,
+            (slug_number, padded, f"{slug_number}/%", f"{padded}/%"),
+        ).fetchall()
+        hits: list[sqlite3.Row] = []
+        for row in rows:
+            if not is_official_catalogue_id(str(row["id"])):
+                continue
+            if not set_fits_expansion(
+                str(row["set_id"] or ""),
+                str(row["set_name"] or ""),
+                expansion,
+            ):
+                continue
+            hits.append(row)
+        if len(hits) == 1:
+            return hits[0]
+        if len(hits) > 1:
+            named = [
+                row
+                for row in hits
+                if name_fits_product_slug(
+                    latin_name_slug(str(row["name"] or "")),
+                    product_slug(product).lower(),
+                )
+            ]
+            if len(named) == 1:
+                return named[0]
+            if named:
+                return named[0]
+            return hits[0]
+    unique = _unique_card_for_product(conn, product, name)
+    if unique is not None and is_official_catalogue_id(str(unique["id"])):
+        return unique
+    return None
+
+
+def unmatched_listing_id(url: str) -> str:
+    slug = product_slug(url).lower()
+    safe = re.sub(r"[^a-z0-9._-]+", "-", slug).strip("-") or "listing"
+    return f"cm-{safe[:96]}"
+
+
+def _listing_image_host_ok(src: str) -> bool:
+    host = urlparse(src).netloc.lower()
+    return host.endswith("cardmarket.com") or host.endswith(".cardmarket.com")
+
+
+def save_listing_image_url(conn: sqlite3.Connection, url: str, image_url: str) -> str:
+    product = normalize_product_url(url) or url
+    src = str(image_url or "").strip()
+    if not src or not _listing_image_host_ok(src):
+        return ""
+    conn.execute(
+        """
+        UPDATE cardmarket_expansion_products
+        SET listing_image_url = ?
+        WHERE url = ?
+        """,
+        (src, product),
+    )
+    return src
+
+
+def store_unmatched_product_image(
+    conn: sqlite3.Connection,
+    data_dir: Path,
+    *,
+    url: str,
+    image_url: str,
+    name: str = "",
+) -> dict[str, Any]:
+    """Store the Cardmarket listing image URL next to the product URL. No image file."""
+    del data_dir
+    product = normalize_product_url(url)
+    if not is_verified_singles_url(product):
+        raise MappingError("Need a Cardmarket Singles product URL")
+    src = str(image_url or "").strip()
+    if not src or not _listing_image_host_ok(src):
+        raise MappingError("Need a Cardmarket listing image URL")
+    expansion = _expansion_from_url(product)
+    label = (name or "").strip()
+    stamp = datetime_now()
+    conn.execute(
+        """
+        INSERT INTO cardmarket_expansion_products (
+            url, expansion, name, source, page_url, card_id, matched,
+            imported_at, listing_image_url
+        ) VALUES (?, ?, ?, 'helper-image', ?, NULL, 0, ?, ?)
+        ON CONFLICT(url) DO UPDATE SET
+            listing_image_url = excluded.listing_image_url,
+            name = CASE
+                WHEN excluded.name != '' THEN excluded.name
+                ELSE cardmarket_expansion_products.name
+            END
+        """,
+        (product, expansion, label, product, stamp, src),
+    )
+    conn.commit()
+    return {
+        "stored": True,
+        "reason": "url",
+        "url": product,
+        "image_url": src,
+    }
+
+
+def list_unmatched_products(
+    conn: sqlite3.Connection,
+    *,
+    after: str = "",
+    limit: int = 50,
+) -> dict[str, Any]:
+    """Page Cardmarket URLs that still need a listing image URL (not official TCGdex)."""
+    limit = min(max(int(limit or 50), 1), 200)
+    cursor = str(after or "")
+    total_row = conn.execute(
+        """
+        SELECT COUNT(*) AS n
+        FROM cardmarket_expansion_products
+        WHERE (matched = 0 OR card_id IS NULL OR card_id = '')
+          AND IFNULL(listing_image_url, '') = ''
+        """
+    ).fetchone()
+    total = int(total_row["n"] if total_row is not None else 0)
+    products: list[dict[str, str]] = []
+    examined = cursor
+    scanned = 0
+    exhausted = False
+    max_scan = 2000
+    while len(products) < limit and scanned < max_scan:
+        take = min(80, max_scan - scanned)
+        rows = conn.execute(
+            """
+            SELECT url, name, expansion
+            FROM cardmarket_expansion_products
+            WHERE (matched = 0 OR card_id IS NULL OR card_id = '')
+              AND IFNULL(listing_image_url, '') = ''
+              AND url > ?
+              AND url NOT IN (
+                SELECT cardmarket_url FROM cards
+                WHERE cardmarket_url IS NOT NULL AND cardmarket_url != ''
+              )
+            ORDER BY url
+            LIMIT ?
+            """,
+            (examined, take),
+        ).fetchall()
+        if not rows:
+            exhausted = True
+            break
+        for row in rows:
+            scanned += 1
+            url = normalize_product_url(str(row["url"] or "")) or str(row["url"] or "")
+            examined = url or str(row["url"] or examined)
+            if not is_verified_singles_url(url):
+                continue
+            if official_cover_for_listing(conn, url, str(row["name"] or "")) is not None:
+                continue
+            products.append(
+                {
+                    "url": url,
+                    "name": str(row["name"] or ""),
+                    "expansion": str(row["expansion"] or ""),
+                }
+            )
+            if len(products) >= limit:
+                break
+        if len(rows) < take:
+            exhausted = True
+            break
+    return {
+        "total": total,
+        "after": cursor,
+        "examined": examined,
+        "has_more": not exhausted,
+        "products": products,
+    }
+
+
 def _expansion_from_url(url: str | None) -> str:
     parts = urlparse(url or "")
     bits = [bit for bit in (parts.path or "").split("/") if bit]
@@ -471,23 +727,366 @@ def _expansion_from_url(url: str | None) -> str:
     return ""
 
 
-def _unique_card_for_product(
-    conn: sqlite3.Connection, url: str, name_hint: str = ""
-) -> sqlite3.Row | None:
+def product_slug(url: str | None) -> str:
+    parts = urlparse(url or "")
+    bits = [bit for bit in (parts.path or "").split("/") if bit]
+    return bits[-1] if bits else ""
+
+
+def set_fits_expansion(
+    set_id: str,
+    set_name: str,
+    expansion: str,
+    *,
+    strict: bool = False,
+) -> bool:
+    exp = (expansion or "").lower()
+    set_slug = cardmarket_slug(set_name or "").lower()
+    if not exp:
+        return False
+    if _LOCALIZED_EXPANSION_RE.search(exp) and set_slug != exp:
+        return False
+    if set_slug == exp:
+        return True
+    allowed = _PROMO_SET_EXPANSIONS.get((set_id or "").lower())
+    if allowed and exp in allowed:
+        return True
+    if strict:
+        return False
+    if set_slug and (set_slug in exp or exp in set_slug):
+        return True
+    return False
+
+
+def latin_name_slug(name: str) -> str | None:
+    """Name slug usable for unique-link. CJK leftovers like 'ex'/'vmax' are ignored."""
+    slug = cardmarket_slug(name).lower()
+    if not slug:
+        return None
+    letters = "".join(_LATIN_SLUG_RE.findall(slug))
+    if len(letters) < 3:
+        return None
+    if slug in _WEAK_LATIN_NAME_SLUGS or letters in _WEAK_LATIN_NAME_SLUGS:
+        return None
+    return slug
+
+
+def name_fits_product_slug(name_slug: str | None, product_path: str) -> bool:
+    """True when the card name is a hyphen-bounded token in the listing slug."""
+    if not name_slug or not product_path:
+        return False
+    return f"-{name_slug}-" in f"-{product_path.lower()}-"
+
+
+def product_sku_key(url: str | None) -> tuple[str, str, str] | None:
     product = normalize_product_url(url) or url
     if not is_verified_singles_url(product):
         return None
     coded = singles_code_and_number(product)
-    if not coded:
+    expansion = _expansion_from_url(product)
+    if not coded or not expansion:
         return None
-    _code, number = coded
-    parts = urlparse(product)
-    bits = [bit for bit in (parts.path or "").split("/") if bit]
-    expansion_slug = bits[-2].lower() if len(bits) >= 2 else ""
-    product_slug = bits[-1].lower() if bits else ""
-    if not product_slug or not number:
+    code, number = coded
+    return expansion.lower(), code.upper(), str(number)
+
+
+def clean_product_label(name: str, url: str) -> str:
+    text = _PRICE_TAIL_RE.sub("", name or "").strip()
+    slug = product_slug(url)
+    if text and slug and slug.lower() not in text.lower().replace(" ", "-"):
+        return f"{text} ({slug})"
+    return text or slug
+
+
+def grouped_expansion_skus(
+    conn: sqlite3.Connection,
+) -> dict[tuple[str, str, str], list[sqlite3.Row]]:
+    groups: dict[tuple[str, str, str], list[sqlite3.Row]] = {}
+    rows = conn.execute(
+        """
+        SELECT url, name, expansion, card_id, matched
+        FROM cardmarket_expansion_products
+        ORDER BY url
+        """
+    ).fetchall()
+    for row in rows:
+        key = product_sku_key(str(row["url"] or ""))
+        if key is None:
+            continue
+        groups.setdefault(key, []).append(row)
+    return groups
+
+
+def ambiguous_sku_keys(
+    conn: sqlite3.Connection,
+) -> set[tuple[str, str, str]]:
+    return {key for key, rows in grouped_expansion_skus(conn).items() if len(rows) >= 2}
+
+
+def _variant_label_from_card(row: sqlite3.Row | None) -> str | None:
+    if row is None:
         return None
-    hits: list[sqlite3.Row] = []
+    raw = row["variants_json"] if "variants_json" in row.keys() else ""
+    try:
+        payload = json.loads(raw or "{}")
+    except (TypeError, json.JSONDecodeError):
+        return None
+    if not isinstance(payload, dict):
+        return None
+    label = str(payload.get("variant_label") or "").strip()
+    return label or None
+
+
+def variants_for_key(
+    conn: sqlite3.Connection,
+    key: tuple[str, str, str],
+    *,
+    groups: dict[tuple[str, str, str], list[sqlite3.Row]] | None = None,
+    owners: dict[str, sqlite3.Row] | None = None,
+) -> list[dict[str, Any]]:
+    grouped = groups if groups is not None else grouped_expansion_skus(conn)
+    if owners is None:
+        owners = {
+            str(row["cardmarket_url"] or ""): row
+            for row in conn.execute(
+                """
+                SELECT id, variants_json, cardmarket_url
+                FROM cards
+                WHERE cardmarket_url IS NOT NULL AND TRIM(cardmarket_url) != ''
+                """
+            ).fetchall()
+        }
+    variants: list[dict[str, Any]] = []
+    for row in grouped.get(key, []):
+        url = str(row["url"] or "")
+        owner = owners.get(url)
+        label = _variant_label_from_card(owner) or clean_product_label(
+            str(row["name"] or ""), url
+        )
+        variants.append(
+            {
+                "url": url,
+                "slug": product_slug(url),
+                "label": label,
+                "card_id": str(owner["id"]) if owner is not None else None,
+            }
+        )
+    return variants
+
+
+def _card_owners(conn: sqlite3.Connection) -> dict[str, sqlite3.Row]:
+    return {
+        str(row["cardmarket_url"] or ""): row
+        for row in conn.execute(
+            """
+            SELECT id, variants_json, cardmarket_url
+            FROM cards
+            WHERE cardmarket_url IS NOT NULL AND TRIM(cardmarket_url) != ''
+            """
+        ).fetchall()
+    }
+
+
+def variants_for_row(
+    conn: sqlite3.Connection,
+    row: Any,
+    *,
+    groups: dict[tuple[str, str, str], list[sqlite3.Row]] | None = None,
+    owners: dict[str, sqlite3.Row] | None = None,
+) -> list[dict[str, Any]]:
+    grouped = groups if groups is not None else grouped_expansion_skus(conn)
+    owned = owners if owners is not None else _card_owners(conn)
+    stored = mapping_from_row(row).url
+    if stored:
+        key = product_sku_key(stored)
+        if key is not None:
+            variants = variants_for_key(conn, key, groups=grouped, owners=owned)
+            return variants if len(variants) >= 2 else []
+    name_slug = latin_name_slug(str(_row_value(row, "name") or ""))
+    number = collector_digits(str(_row_value(row, "collector_number") or "")).lstrip(
+        "0"
+    ) or "0"
+    set_id = str(_row_value(row, "set_id") or "")
+    set_name = str(_row_value(row, "set_name") or "")
+    if not name_slug:
+        return []
+    found: list[tuple[str, str, str]] = []
+    for key, products in grouped.items():
+        expansion, _code, sku_number = key
+        if sku_number != number or not set_fits_expansion(set_id, set_name, expansion):
+            continue
+        if any(
+            name_fits_product_slug(
+                name_slug, product_slug(str(item["url"] or "")).lower()
+            )
+            for item in products
+        ):
+            found.append(key)
+    if len(found) != 1:
+        return []
+    variants = variants_for_key(conn, found[0], groups=grouped, owners=owned)
+    return variants if len(variants) >= 2 else []
+
+
+def apply_variants_to_candidate(
+    conn: sqlite3.Connection,
+    item: dict[str, Any],
+    *,
+    groups: dict[tuple[str, str, str], list[sqlite3.Row]] | None = None,
+    owners: dict[str, sqlite3.Row] | None = None,
+) -> None:
+    card_id = str(item.get("card_id") or "")
+    row = conn.execute("SELECT * FROM cards WHERE id = ?", (card_id,)).fetchone()
+    variants = (
+        variants_for_row(conn, row, groups=groups, owners=owners)
+        if row is not None
+        else []
+    )
+    item["cardmarket_variants"] = variants
+    if len(variants) >= 2:
+        item["cardmarket_url"] = None
+        item["cardmarket_prices"] = []
+
+
+def _clear_auto_product_url(conn: sqlite3.Connection, card_id: str, url: str) -> None:
+    conn.execute(
+        """
+        UPDATE cards
+        SET cardmarket_url = NULL,
+            cardmarket_verified = 0,
+            cardmarket_provenance = NULL,
+            cardmarket_verified_at = NULL
+        WHERE id = ?
+        """,
+        (card_id,),
+    )
+    conn.execute(
+        """
+        UPDATE cardmarket_expansion_products
+        SET card_id = NULL, matched = 0
+        WHERE url = ?
+        """,
+        (url,),
+    )
+
+
+def clear_ambiguous_auto_links(conn: sqlite3.Connection) -> int:
+    """Drop helper-expansion URLs when that SKU identity has 2+ Cardmarket products."""
+    ambiguous = ambiguous_sku_keys(conn)
+    if not ambiguous:
+        return 0
+    cleared = 0
+    rows = conn.execute(
+        """
+        SELECT id, cardmarket_url, cardmarket_provenance
+        FROM cards
+        WHERE cardmarket_url IS NOT NULL AND TRIM(cardmarket_url) != ''
+        """
+    ).fetchall()
+    for row in rows:
+        url = str(row["cardmarket_url"] or "")
+        key = product_sku_key(url)
+        provenance = str(row["cardmarket_provenance"] or "")
+        if key not in ambiguous or provenance in _PROTECTED_PROVENANCE:
+            continue
+        _clear_auto_product_url(conn, str(row["id"]), url)
+        cleared += 1
+    return cleared
+
+
+def clear_mismatched_auto_links(conn: sqlite3.Connection) -> int:
+    """Drop helper-expansion URLs that are a different language set or a wrong name."""
+    cleared = 0
+    rows = conn.execute(
+        """
+        SELECT id, name, set_id, set_name, cardmarket_url, cardmarket_provenance
+        FROM cards
+        WHERE cardmarket_url IS NOT NULL AND TRIM(cardmarket_url) != ''
+        """
+    ).fetchall()
+    for row in rows:
+        provenance = str(row["cardmarket_provenance"] or "")
+        if provenance in _PROTECTED_PROVENANCE or provenance != "helper-expansion":
+            continue
+        url = str(row["cardmarket_url"] or "")
+        expansion = _expansion_from_url(url)
+        name_ok = name_fits_product_slug(
+            latin_name_slug(str(row["name"] or "")),
+            product_slug(url),
+        )
+        set_ok = set_fits_expansion(
+            str(row["set_id"] or ""),
+            str(row["set_name"] or ""),
+            expansion,
+        )
+        if name_ok and set_ok:
+            continue
+        _clear_auto_product_url(conn, str(row["id"]), url)
+        cleared += 1
+    return cleared
+
+
+def resolve_variant_choice(
+    conn: sqlite3.Connection,
+    data_dir: Path,
+    *,
+    scanned_card_id: str,
+    url: str,
+) -> dict[str, Any]:
+    """Map a user-picked listing onto the owning extra, or Save onto the scanned print.
+
+    If several SKUs share the identity and none is owned yet, store the choice on the
+    scan only so a metal/UPC listing cannot overwrite the pack print.
+    """
+    product = normalize_product_url(url) or url
+    if not is_verified_singles_url(product):
+        raise MappingError("Need a Cardmarket Singles product URL")
+    owner = conn.execute(
+        """
+        SELECT id FROM cards
+        WHERE cardmarket_url = ?
+        """,
+        (product,),
+    ).fetchone()
+    if owner is not None:
+        return {
+            "card_id": str(owner["id"]),
+            "url": product,
+            "mapped": False,
+        }
+    key = product_sku_key(product)
+    grouped = grouped_expansion_skus(conn)
+    group = grouped.get(key, []) if key is not None else []
+    owners = _card_owners(conn)
+    sibling_owned = any(
+        owners.get(str(row["url"] or "")) is not None
+        and str(row["url"] or "") != product
+        for row in group
+    )
+    if len(group) >= 2 and not sibling_owned:
+        return {
+            "card_id": scanned_card_id,
+            "url": product,
+            "mapped": False,
+        }
+    mapped = map_card_product(
+        conn,
+        data_dir,
+        scanned_card_id,
+        product,
+        provenance="helper-map",
+    )
+    return {
+        "card_id": str(mapped["card_id"]),
+        "url": product,
+        "mapped": True,
+    }
+
+
+def unmatched_cards_by_collector(
+    conn: sqlite3.Connection,
+) -> dict[str, list[sqlite3.Row]]:
+    grouped: dict[str, list[sqlite3.Row]] = {}
     rows = conn.execute(
         """
         SELECT * FROM cards
@@ -497,20 +1096,146 @@ def _unique_card_for_product(
         """
     ).fetchall()
     for row in rows:
-        card_name = cardmarket_slug(str(row["name"] or "")).lower()
-        if not card_name or card_name not in product_slug:
+        number = collector_digits(str(row["collector_number"] or "")).lstrip("0") or "0"
+        grouped.setdefault(number, []).append(row)
+    return grouped
+
+
+def unmatched_cards_by_name(
+    conn: sqlite3.Connection,
+) -> dict[str, list[sqlite3.Row]]:
+    grouped: dict[str, list[sqlite3.Row]] = {}
+    rows = conn.execute(
+        """
+        SELECT * FROM cards
+        WHERE cardmarket_verified = 0
+           OR cardmarket_url IS NULL
+           OR cardmarket_url = ''
+        """
+    ).fetchall()
+    for row in rows:
+        name = latin_name_slug(str(row["name"] or ""))
+        if name:
+            grouped.setdefault(name, []).append(row)
+    return grouped
+
+
+def _drop_indexed_card(
+    cards_by_number: dict[str, list[sqlite3.Row]], card_id: str, number: str
+) -> None:
+    bucket = cards_by_number.get(number)
+    if not bucket:
+        return
+    cards_by_number[number] = [row for row in bucket if str(row["id"]) != card_id]
+
+
+def _drop_indexed_name(
+    cards_by_name: dict[str, list[sqlite3.Row]], card_id: str, name_slug: str | None
+) -> None:
+    if not name_slug:
+        return
+    bucket = cards_by_name.get(name_slug)
+    if not bucket:
+        return
+    cards_by_name[name_slug] = [row for row in bucket if str(row["id"]) != card_id]
+
+
+def _unique_card_for_uncoded_product(
+    conn: sqlite3.Connection,
+    product: str,
+    *,
+    cards_by_name: dict[str, list[sqlite3.Row]] | None = None,
+) -> sqlite3.Row | None:
+    expansion_slug = _expansion_from_url(product).lower()
+    path = product_slug(product).lower()
+    if not expansion_slug or not path or latin_name_slug(path) != path:
+        return None
+    if cards_by_name is not None:
+        rows = cards_by_name.get(path, [])
+    else:
+        rows = [
+            row
+            for row in conn.execute(
+                """
+                SELECT * FROM cards
+                WHERE cardmarket_verified = 0
+                   OR cardmarket_url IS NULL
+                   OR cardmarket_url = ''
+                """
+            ).fetchall()
+            if latin_name_slug(str(row["name"] or "")) == path
+        ]
+    hits = [
+        row
+        for row in rows
+        if set_fits_expansion(
+            str(row["set_id"] or ""),
+            str(row["set_name"] or ""),
+            expansion_slug,
+            strict=True,
+        )
+    ]
+    if len(hits) != 1:
+        return None
+    return hits[0]
+
+
+def _unique_card_for_product(
+    conn: sqlite3.Connection,
+    url: str,
+    name_hint: str = "",
+    *,
+    groups: dict[tuple[str, str, str], list[sqlite3.Row]] | None = None,
+    cards_by_number: dict[str, list[sqlite3.Row]] | None = None,
+    cards_by_name: dict[str, list[sqlite3.Row]] | None = None,
+) -> sqlite3.Row | None:
+    del name_hint
+    product = normalize_product_url(url) or url
+    if not is_verified_singles_url(product):
+        return None
+    key = product_sku_key(product)
+    if key is None:
+        return _unique_card_for_uncoded_product(
+            conn, product, cards_by_name=cards_by_name
+        )
+    grouped = groups if groups is not None else grouped_expansion_skus(conn)
+    if len(grouped.get(key, [])) >= 2:
+        return None
+    coded = singles_code_and_number(product)
+    if not coded:
+        return None
+    _code, number = coded
+    expansion_slug = key[0]
+    product_path = product_slug(product).lower()
+    slug_number = str(number).lstrip("0") or "0"
+    if not product_path or not slug_number:
+        return None
+    hits: list[sqlite3.Row] = []
+    rows = (
+        cards_by_number.get(slug_number, [])
+        if cards_by_number is not None
+        else conn.execute(
+            """
+            SELECT * FROM cards
+            WHERE cardmarket_verified = 0
+               OR cardmarket_url IS NULL
+               OR cardmarket_url = ''
+            """
+        ).fetchall()
+    )
+    for row in rows:
+        card_name = latin_name_slug(str(row["name"] or ""))
+        if not name_fits_product_slug(card_name, product_path):
             continue
-        card_number = collector_digits(str(row["collector_number"] or "")).lstrip("0") or "0"
-        slug_number = str(number).lstrip("0") or "0"
+        card_number = collector_digits(str(row["collector_number"] or "")).lstrip(
+            "0"
+        ) or "0"
         if card_number != slug_number:
             continue
-        set_slug = cardmarket_slug(str(row["set_name"] or "")).lower()
-        if (
-            set_slug
-            and expansion_slug
-            and set_slug != expansion_slug
-            and set_slug not in expansion_slug
-            and expansion_slug not in set_slug
+        if not set_fits_expansion(
+            str(row["set_id"] or ""),
+            str(row["set_name"] or ""),
+            expansion_slug,
         ):
             continue
         hits.append(row)
@@ -715,6 +1440,7 @@ def import_expansion_products(
                 conn.execute("DELETE FROM cardmarket_expansion_products WHERE url = ?", (url,))
                 removed += 1
     _touch_expansion_crawl(conn, expansion=expansion or "", complete=bool(replace and seen))
+    clear_ambiguous_auto_links(conn)
     conn.commit()
     dump_dir = Path(data_dir) / "expansion-imports"
     dump_dir.mkdir(parents=True, exist_ok=True)
@@ -804,8 +1530,12 @@ def ingest_expansion_dumps(conn: sqlite3.Connection, data_dir: Path) -> int:
 
 
 def link_stored_expansion_products(
-    conn: sqlite3.Connection, data_dir: Path
+    conn: sqlite3.Connection,
+    data_dir: Path,
+    *,
+    codes: set[str] | frozenset[str] | None = None,
 ) -> dict[str, int]:
+    wanted = {code.upper() for code in codes} if codes is not None else None
     rows = conn.execute(
         """
         SELECT url, name
@@ -814,11 +1544,41 @@ def link_stored_expansion_products(
         ORDER BY url
         """
     ).fetchall()
+    print(f"unique-link unmatched products {len(rows)}", flush=True)
+    groups = grouped_expansion_skus(conn)
+    cards_by_number = unmatched_cards_by_collector(conn)
+    cards_by_name = unmatched_cards_by_name(conn)
     linked = 0
     unmatched = 0
+    skipped_variants = 0
+    considered = 0
     for row in rows:
         url = str(row["url"] or "")
-        hit = _unique_card_for_product(conn, url, str(row["name"] or ""))
+        coded = singles_code_and_number(url)
+        if wanted is not None and (
+            coded is None or coded[0].upper() not in wanted
+        ):
+            continue
+        considered += 1
+        if considered == 1 or considered % 2000 == 0:
+            print(
+                f"  {considered} considered, linked {linked}, "
+                f"variant-sku skipped {skipped_variants}",
+                flush=True,
+            )
+        key = product_sku_key(url)
+        if key is not None and len(groups.get(key, [])) >= 2:
+            skipped_variants += 1
+            unmatched += 1
+            continue
+        hit = _unique_card_for_product(
+            conn,
+            url,
+            str(row["name"] or ""),
+            groups=groups,
+            cards_by_number=cards_by_number,
+            cards_by_name=cards_by_name,
+        )
         if hit is None:
             unmatched += 1
             continue
@@ -839,23 +1599,47 @@ def link_stored_expansion_products(
             """,
             (card_id, url),
         )
+        number = coded[1] if coded else collector_digits(
+            str(hit["collector_number"] or "")
+        )
+        _drop_indexed_card(cards_by_number, card_id, str(number).lstrip("0") or "0")
+        _drop_indexed_name(cards_by_name, card_id, latin_name_slug(str(hit["name"] or "")))
         linked += 1
-    return {"linked": linked, "unmatched": unmatched}
+    print(
+        f"  done considered {considered}, linked {linked}, "
+        f"variant-sku skipped {skipped_variants}",
+        flush=True,
+    )
+    return {
+        "linked": linked,
+        "unmatched": unmatched,
+        "skipped_variants": skipped_variants,
+        "considered": considered,
+    }
 
 
 def apply_cardmarket_links(
-    conn: sqlite3.Connection, data_dir: Path
+    conn: sqlite3.Connection,
+    data_dir: Path,
+    *,
+    codes: set[str] | frozenset[str] | None = None,
 ) -> dict[str, int]:
     """Write helper maps and stored set-list URLs onto catalogue cards."""
     dumps = ingest_expansion_dumps(conn, data_dir)
     maps = apply_helper_maps(conn, data_dir)
-    expansion = link_stored_expansion_products(conn, data_dir)
+    mismatched = clear_mismatched_auto_links(conn)
+    expansion = link_stored_expansion_products(conn, data_dir, codes=codes)
+    cleared = clear_ambiguous_auto_links(conn)
     conn.commit()
     return {
         "dumps": dumps,
         "helper_maps": maps,
         "expansion_linked": expansion["linked"],
         "expansion_unmatched": expansion["unmatched"],
+        "skipped_variants": expansion["skipped_variants"],
+        "considered": expansion["considered"],
+        "mismatched_cleared": mismatched,
+        "ambiguous_cleared": cleared,
     }
 
 
@@ -1005,7 +1789,8 @@ def singles_code_and_number(url: str | None) -> tuple[str, str] | None:
     if not match:
         return None
     slug = match.group(1)
-    coded = _SLUG_CODE_RE.search(slug)
+    promo = _PROMO_SLUG_RE.search(slug)
+    coded = promo or _SLUG_CODE_RE.search(slug)
     if not coded:
         return None
     letters, digits = coded.group(1), coded.group(2)

@@ -10,6 +10,7 @@ import {
   MAX_EXPANSION_PRODUCTS,
   MAX_EXPANSIONS,
   MAX_RECENT_FAILURES,
+  UNMATCHED_IMAGE_BATCH,
   NAV_SPACING_MS,
   PACE_PROFILES,
   PAGE_DEADLINE_MS,
@@ -17,7 +18,8 @@ import {
   WAIT_ALARM,
   normalizePace,
 } from "./constants.js";
-import { challengeTitle } from "./parse.js";
+import { CHALLENGE_SELECTOR, challengeTitle } from "./parse.js";
+import { isCardmarketListingImageUrl } from "./extract.js";
 import { classifyUrl, finalUrlAllowed, normalizeUrl, productIdentity } from "./url.js";
 import { expansionDrive } from "./expansion-drive.js";
 
@@ -162,7 +164,14 @@ export function createWorker({
   }
 
   async function settings() {
-    const stored = await readStore(local, ["apiBase", "helperToken", "helperTokens", "paused", "expansionPace"]);
+    const stored = await readStore(local, [
+      "apiBase",
+      "helperToken",
+      "helperTokens",
+      "paused",
+      "expansionPace",
+      "saveUnmatchedImage",
+    ]);
     const apiBase = String(stored.apiBase || DEFAULT_API).replace(/\/$/, "");
     const byServer =
       stored.helperTokens && typeof stored.helperTokens === "object" ? { ...stored.helperTokens } : {};
@@ -175,6 +184,7 @@ export function createWorker({
       helperToken: String(byServer[apiBase] || stored.helperToken || ""),
       paused: Boolean(stored.paused),
       expansionPace: normalizePace(stored.expansionPace),
+      saveUnmatchedImage: Boolean(stored.saveUnmatchedImage),
     };
   }
 
@@ -210,7 +220,7 @@ export function createWorker({
     }
   }
 
-  async function request(path, { method = "GET", body } = {}) {
+  async function request(path, { method = "GET", body, timeoutMs } = {}) {
     const { apiBase, helperToken } = await settings();
     if (!helperToken) {
       const error = new Error("authentication required");
@@ -222,7 +232,7 @@ export function createWorker({
       headers["Content-Type"] = "application/json";
     }
     const controller = new AbortController();
-    const timer = setTimeout(() => controller.abort(), FETCH_TIMEOUT_MS);
+    const timer = setTimeout(() => controller.abort(), timeoutMs || FETCH_TIMEOUT_MS);
     if (typeof timer === "object" && typeof timer.unref === "function") {
       timer.unref();
     }
@@ -258,6 +268,9 @@ export function createWorker({
       }
       if (response.status === 404 && String(path).includes("expansion-import")) {
         detail = `This Scanapp server (${apiBase}) does not have set import yet. Switch the helper to Local Docker.`;
+      }
+      if (response.status === 404 && String(path).includes("unmatched-products")) {
+        detail = `This Scanapp server (${apiBase}) does not list unmatched Cardmarket URLs yet. Switch the helper to Local Docker.`;
       }
       const error = new Error(detail);
       error.code = response.status === 409 ? "claim" : "http";
@@ -730,9 +743,11 @@ export function createWorker({
     const stored = await readStore(local, ["currentJob", "lastCardId", "lastCardLabel"]);
     const job = stored.currentJob;
     const cardId = String(job?.card_id || stored.lastCardId || "");
+    const settingsState = await settings();
     return {
       cardId,
       cardLabel: String(job?.card_id || stored.lastCardLabel || cardId),
+      saveUnmatchedImage: Boolean(settingsState.saveUnmatchedImage),
     };
   }
 
@@ -747,6 +762,148 @@ export function createWorker({
     return request("/cardmarket/helper/map", {
       method: "POST",
       body: { url, card_id: targetId },
+    });
+  }
+
+  function inspectProductPage(selector) {
+    const title = document.title || "";
+    const href = location.href || "";
+    const text = String(document.body?.innerText || "").slice(0, 2_000).toLowerCase();
+    const cf = Boolean(
+      document.querySelector(selector) ||
+        title.toLowerCase().includes("just a moment") ||
+        title.toLowerCase().includes("einen moment") ||
+        title.toLowerCase().includes("attention required") ||
+        title.toLowerCase().includes("verify you are human") ||
+        title.toLowerCase().includes("checking your browser") ||
+        text.includes("just a moment") ||
+        text.includes("verify you are human") ||
+        text.includes("checking your browser"),
+    );
+    const nodes = document.querySelectorAll(
+      "img.is-front, .card-image img.is-front, #image img.is-front, #image img, .card-image img, img[itemprop='image']",
+    );
+    let best = null;
+    for (const img of nodes) {
+      const src = String(img.currentSrc || img.src || "");
+      const host = (() => {
+        try {
+          return new URL(src).hostname.toLowerCase();
+        } catch {
+          return "";
+        }
+      })();
+      if (
+        !host.endsWith("product-images.s3.cardmarket.com") &&
+        host !== "product-images.s3.cardmarket.com" &&
+        host !== "static.cardmarket.com" &&
+        !host.endsWith(".static.cardmarket.com")
+      ) {
+        continue;
+      }
+      if (/logo|favicon|icon|placeholder|sprite/i.test(src)) {
+        continue;
+      }
+      const width = Number(img.naturalWidth || img.width || 0);
+      const height = Number(img.naturalHeight || img.height || 0);
+      const isFront = img.classList?.contains("is-front");
+      const inMain = Boolean(img.closest("#image, .card-image, .is-product-image, .image"));
+      const score = (inMain ? 1_000_000_000 : 0) + (isFront ? 100_000_000 : 0) + width * height;
+      if (!best || score > best.score) {
+        best = { src, ready: Boolean(img.complete && width >= 80), score };
+      }
+    }
+    return {
+      title,
+      url: href,
+      cf,
+      listingSrc: best?.src || "",
+      listingReady: Boolean(best?.ready),
+      hasListingImage: Boolean(best?.src),
+      ready: Boolean(
+        document.querySelector(
+          'select[name="idExpansion"], select#idExpansion, table.table, .table-body, img.is-front, #image img',
+        ),
+      ),
+    };
+  }
+
+  async function extractProductImageFromTab(tab) {
+    if (tab?.id && tabs.sendMessage) {
+      try {
+        const captured = await withTimeout(
+          tabs.sendMessage(tab.id, { type: "extract-product-image" }),
+          FETCH_TIMEOUT_MS,
+        );
+        if (captured?.challenge || captured?.dataUrl || captured?.src) {
+          return captured;
+        }
+      } catch {
+        /* content script may not be ready after navigation */
+      }
+    }
+    if (!tab?.id || typeof scripting?.executeScript !== "function") {
+      return { challenge: true, src: "", dataUrl: "" };
+    }
+    try {
+      const injected = await withTimeout(
+        scripting.executeScript({
+          target: { tabId: tab.id },
+          args: [CHALLENGE_SELECTOR],
+          func: inspectProductPage,
+        }),
+        FETCH_TIMEOUT_MS,
+      );
+      const payload = Array.isArray(injected) ? injected[0]?.result : injected?.result;
+      if (!payload) {
+        return { challenge: true, src: "", dataUrl: "" };
+      }
+      return {
+        challenge: Boolean(payload.cf || payload.challenge),
+        src: String(payload.listingSrc || payload.src || ""),
+        dataUrl: String(payload.dataUrl || ""),
+      };
+    } catch {
+      return { challenge: true, src: "", dataUrl: "" };
+    }
+  }
+
+  async function captureListingImage() {
+    const tab = await helperTab();
+    const live = await liveTabState(tab);
+    const blocked = tabBlockReason(
+      { ...tab, title: live.title || tab?.title, url: live.url || tab?.url },
+      { challenge: live.cf },
+    );
+    if (shouldPauseCrawl(blocked)) {
+      const error = new Error("Cloudflare");
+      error.code = "challenge";
+      throw error;
+    }
+    const captured = await extractProductImageFromTab(tab);
+    if (!captured || captured.challenge) {
+      const error = new Error("Cloudflare");
+      error.code = "challenge";
+      throw error;
+    }
+    const src = String(captured.src || "");
+    if (!src || !isCardmarketListingImageUrl(src)) {
+      const error = new Error("No listing image URL on this Cardmarket page");
+      error.code = "http";
+      throw error;
+    }
+    return { src };
+  }
+
+  async function saveUnmatchedListingImage(url, name) {
+    const captured = await captureListingImage();
+    return request("/cardmarket/helper/unmatched-image", {
+      method: "POST",
+      body: {
+        url,
+        name: name || "",
+        image_url: captured.src,
+      },
     });
   }
 
@@ -844,6 +1001,56 @@ export function createWorker({
       const kind = classifyUrl(tab.url || "");
       if ((!tab.status || tab.status === "complete") && kind === "expansion") {
         return tab;
+      }
+      await wait(250);
+    }
+    try {
+      return await tabs.get(tabId);
+    } catch {
+      return null;
+    }
+  }
+
+  async function waitForProductPage(tabId, { expectUrl = "", previousSrc = "" } = {}) {
+    const started = now();
+    const wanted = normalizeUrl(expectUrl);
+    const previous = String(previousSrc || "");
+    while (now() - started < PAGE_DEADLINE_MS) {
+      let tab;
+      try {
+        tab = await tabs.get(tabId);
+      } catch {
+        return null;
+      }
+      const live = await liveTabState(tab);
+      const merged = {
+        ...tab,
+        title: live.title || tab?.title,
+        url: live.url || tab?.url,
+      };
+      if (tabBlockReason(merged, { challenge: live.cf }) || (await settings()).paused) {
+        return merged;
+      }
+      const kind = classifyUrl(merged.url || "");
+      if (wanted && normalizeUrl(merged.url || "") !== wanted) {
+        await wait(250);
+        continue;
+      }
+      if ((!tab.status || tab.status === "complete") && kind === "product") {
+        if (live.cf || live.inspected === false) {
+          return merged;
+        }
+        const src = String(live.listingSrc || "");
+        if (src && previous && src === previous) {
+          await wait(250);
+          continue;
+        }
+        if (src && (live.listingReady || !previous)) {
+          return merged;
+        }
+        if (!previous && live.hasListingImage) {
+          return merged;
+        }
       }
       await wait(250);
     }
@@ -1122,6 +1329,269 @@ export function createWorker({
     }
   }
 
+  async function loadUnmatchedProducts(after) {
+    const query = new URLSearchParams();
+    if (after) {
+      query.set("after", after);
+    }
+    query.set("limit", String(UNMATCHED_IMAGE_BATCH));
+    return request(`/cardmarket/helper/unmatched-products?${query.toString()}`, {
+      timeoutMs: 30_000,
+    });
+  }
+
+  async function pauseUnmatchedImages({ reason, after, totals, label, tabId }) {
+    const challenge = reason === "challenge" || reason === "login";
+    const note =
+      `Paused unmatched listing images at ${label}` +
+      (challenge ? " (Cloudflare)" : "") +
+      `. Stored ${totals.stored} · skipped ${totals.skipped} · failed ${totals.failed}. ` +
+      (challenge
+        ? "The Cardmarket tab is in front — tick the box. The crawl continues once the page loads. Continue still works if it does not."
+        : "Press Continue to keep going.");
+    if (tabId) {
+      try {
+        await tabs.update(tabId, { active: true });
+      } catch {
+        /* tab may already be gone */
+      }
+    }
+    await patchLocal({
+      paused: true,
+      expansionResume: {
+        kind: "unmatched-images",
+        after,
+        totals: {
+          stored: totals.stored,
+          skipped: totals.skipped,
+          failed: totals.failed,
+        },
+        reason,
+      },
+      expansionNote: note,
+      attention: challenge
+        ? "Tick Cloudflare in the Cardmarket tab. The crawl continues after the page loads."
+        : "Press Continue",
+      activity: "paused",
+    });
+    if (challenge) {
+      await notifyPhone(
+        `Cloudflare on unmatched listing ${label}. Tick the box on the Mac. The crawl continues once the page loads.`,
+      );
+      void watchPausedChallenge(tabId);
+    }
+  }
+
+  async function bindHelperTab(tab) {
+    if (!tab?.id) {
+      return tab;
+    }
+    await writeStore(session, {
+      helperTabId: tab.id,
+      helperDocumentId: tab.documentId || null,
+    });
+    return tab;
+  }
+
+  async function importUnmatchedImages({ resume: resumeFromCheckpoint = false } = {}) {
+    const previous = await readStore(local, ["expansionBusy", "expansionResume"]);
+    if (previous.expansionBusy) {
+      const error = new Error("A Cardmarket crawl is already running.");
+      error.code = "http";
+      throw error;
+    }
+    const saved =
+      previous.expansionResume && typeof previous.expansionResume === "object"
+        ? previous.expansionResume
+        : null;
+    if (
+      !resumeFromCheckpoint &&
+      saved &&
+      saved.kind !== "unmatched-images" &&
+      (saved.targets?.length || saved.index != null)
+    ) {
+      const error = new Error(
+        "An expansion crawl is paused. Press Continue for that crawl first.",
+      );
+      error.code = "http";
+      throw error;
+    }
+    const resume = saved?.kind === "unmatched-images" ? saved : null;
+    let after = resume?.after || "";
+    const totals = {
+      stored: Number(resume?.totals?.stored) || 0,
+      skipped: Number(resume?.totals?.skipped) || 0,
+      failed: Number(resume?.totals?.failed) || 0,
+    };
+    await patchLocal({
+      paused: false,
+      expansionBusy: true,
+      activity: "crawling-unmatched-images",
+      attention: null,
+      expansionNote: resume
+        ? "Continuing unmatched listing images…"
+        : "Loading unmatched Cardmarket URLs…",
+    });
+    try {
+      let current =
+        (await helperTab()) ||
+        (await activeCardmarketTab(["product", "expansion", "singles-index"]));
+      if (current?.id) {
+        current = await bindHelperTab(current);
+      }
+      let halted = false;
+      let previousListingSrc = "";
+      while (!halted) {
+        if ((await settings()).paused) {
+          await pauseUnmatchedImages({
+            reason: "paused",
+            after,
+            totals,
+            label: after || "start",
+            tabId: current?.id,
+          });
+          halted = true;
+          break;
+        }
+        const batch = await loadUnmatchedProducts(after);
+        const products = Array.isArray(batch?.products) ? batch.products : [];
+        const remaining = Number(batch?.total) || 0;
+        if (!products.length) {
+          const examined = String(batch?.examined || "");
+          if (batch?.has_more && examined && examined !== after) {
+            after = examined;
+            continue;
+          }
+          await patchLocal({
+            expansionResume: null,
+            expansionNote:
+              `Unmatched listing image URLs done. Stored ${totals.stored} · skipped ${totals.skipped} · failed ${totals.failed}` +
+              (remaining ? ` · ${remaining} still unmatched.` : "."),
+          });
+          break;
+        }
+        if (!current?.id) {
+          current = await createHelperTab(products[0].url, { active: true });
+        }
+        for (const item of products) {
+          if ((await settings()).paused) {
+            await pauseUnmatchedImages({
+              reason: "paused",
+              after,
+              totals,
+              label: item.name || item.url,
+              tabId: current.id,
+            });
+            halted = true;
+            break;
+          }
+          const label = item.name || item.url;
+          const visited = totals.stored + totals.skipped + totals.failed + 1;
+          await patchLocal({
+            activity: "crawling-unmatched-images",
+            expansionNote: `Unmatched listing ${visited} · ${remaining} still unmatched: ${label}`,
+            expansionResume: {
+              kind: "unmatched-images",
+              after,
+              totals: { stored: totals.stored, skipped: totals.skipped, failed: totals.failed },
+              reason: "running",
+            },
+          });
+          await humanPause("think");
+          if ((await settings()).paused) {
+            await pauseUnmatchedImages({
+              reason: "paused",
+              after,
+              totals,
+              label,
+              tabId: current.id,
+            });
+            halted = true;
+            break;
+          }
+          const here = normalizeUrl(current.url || "");
+          const target = normalizeUrl(item.url);
+          if (here !== target) {
+            await tabs.update(current.id, { url: item.url, active: true });
+          } else {
+            await tabs.update(current.id, { active: true });
+          }
+          current = (await waitForProductPage(current.id, {
+            expectUrl: item.url,
+            previousSrc: previousListingSrc,
+          })) || (await tabs.get(current.id));
+          current = await bindHelperTab(current);
+          await humanPause("settle");
+          if ((await settings()).paused) {
+            await pauseUnmatchedImages({
+              reason: "paused",
+              after,
+              totals,
+              label,
+              tabId: current.id,
+            });
+            halted = true;
+            break;
+          }
+          const live = await liveTabState(current);
+          const blocked = tabBlockReason(
+            { ...current, title: live.title || current?.title, url: live.url || current?.url },
+            { challenge: live.cf },
+          );
+          if (shouldPauseCrawl(blocked)) {
+            await pauseUnmatchedImages({
+              reason: blocked,
+              after,
+              totals,
+              label,
+              tabId: current.id,
+            });
+            halted = true;
+            break;
+          }
+          if (classifyUrl((live.url || current?.url) || "") !== "product") {
+            totals.failed += 1;
+            after = item.url;
+            continue;
+          }
+          try {
+            const result = await saveUnmatchedListingImage(item.url, item.name || "");
+            if (result?.image_url) {
+              previousListingSrc = String(result.image_url);
+            }
+            if (result?.stored) {
+              totals.stored += 1;
+            } else {
+              totals.skipped += 1;
+            }
+          } catch (error) {
+            if (error?.code === "challenge" || error?.code === "login") {
+              await pauseUnmatchedImages({
+                reason: error.code,
+                after,
+                totals,
+                label,
+                tabId: current.id,
+              });
+              halted = true;
+              break;
+            }
+            totals.failed += 1;
+          }
+          after = item.url;
+          await humanPause("page");
+          break;
+        }
+      }
+      return totals;
+    } finally {
+      await patchLocal({
+        expansionBusy: false,
+        activity: (await settings()).paused ? "paused" : "idle",
+      });
+    }
+  }
+
   async function importAllExpansions({ resume: resumeFromCheckpoint = false } = {}) {
     const tab = await activeCardmarketTab(["singles-index", "expansion"]);
     if (!tab?.id) {
@@ -1136,6 +1606,13 @@ export function createWorker({
       previous.expansionResume && typeof previous.expansionResume === "object"
         ? previous.expansionResume
         : null;
+    if (!resumeFromCheckpoint && saved?.kind === "unmatched-images") {
+      const error = new Error(
+        "Unmatched listing-image crawl is paused. Press Continue for that crawl first.",
+      );
+      error.code = "http";
+      throw error;
+    }
     const resume = resumeFromCheckpoint ? saved : null;
     await patchLocal({
       paused: false,
@@ -1379,6 +1856,26 @@ export function createWorker({
     const last = stored.lastExpansionImport || {};
     const resume =
       stored.expansionResume && typeof stored.expansionResume === "object" ? stored.expansionResume : {};
+    if (resume.kind === "unmatched-images") {
+      await patchLocal({
+        expansionBusy: false,
+        paused: true,
+        activity: "paused",
+        attention: "Pass Cloudflare, then press Continue",
+        expansionResume: {
+          kind: "unmatched-images",
+          after: resume.after || "",
+          totals: {
+            stored: Number(resume.totals?.stored) || 0,
+            skipped: Number(resume.totals?.skipped) || 0,
+            failed: Number(resume.totals?.failed) || 0,
+          },
+          reason: resume.reason || "challenge",
+        },
+        expansionNote: `Paused unmatched listing images after ${resume.after || "start"}. Pass Cloudflare, then press Continue.`,
+      });
+      return;
+    }
     const index = Number.isFinite(Number(resume.index))
       ? Number(resume.index)
       : Math.max((Number(last.expansionIndex) || 1) - 1, 0);
@@ -1426,6 +1923,10 @@ export function createWorker({
       return;
     }
     await patchLocal({ helperTabClosed: false, attention: null, activity: "idle" });
+    if (stored.expansionResume?.kind === "unmatched-images") {
+      await importUnmatchedImages({ resume: true });
+      return;
+    }
     if (stored.expansionResume && (stored.expansionResume.targets?.length || stored.expansionResume.index != null)) {
       await importAllExpansions({ resume: true });
       return;
@@ -1503,6 +2004,9 @@ export function createWorker({
       if (message.expansionPace != null) {
         await patchLocal({ expansionPace: normalizePace(message.expansionPace) });
       }
+      if (message.saveUnmatchedImage != null) {
+        await patchLocal({ saveUnmatchedImage: Boolean(message.saveUnmatchedImage) });
+      }
       return snapshot();
     }
     if (message?.type === "notify-test") {
@@ -1517,13 +2021,27 @@ export function createWorker({
         return { ok: false, error: String(error?.message || error) };
       }
     }
+    if (message?.type === "save-unmatched-image") {
+      try {
+        const stored = await saveUnmatchedListingImage(message.url, message.name);
+        return { ok: true, ...stored };
+      } catch (error) {
+        return { ok: false, error: String(error?.message || error) };
+      }
+    }
     if (
       message?.type === "import-expansion-page" ||
       message?.type === "import-expansion-set" ||
-      message?.type === "import-expansion-all"
+      message?.type === "import-expansion-all" ||
+      message?.type === "import-unmatched-images"
     ) {
       try {
-        if (message.type === "import-expansion-all") {
+        if (message.type === "import-unmatched-images") {
+          if ((await readStore(local, ["expansionBusy"])).expansionBusy) {
+            return snapshot();
+          }
+          await importUnmatchedImages();
+        } else if (message.type === "import-expansion-all") {
           await importAllExpansions();
         } else {
           await importExpansion({
@@ -1545,7 +2063,14 @@ export function createWorker({
   }
 
   async function liveTabState(tab) {
-    const fallback = { title: tab?.title || "", url: tab?.url || "", ready: false, cf: false };
+    const fallback = {
+      title: tab?.title || "",
+      url: tab?.url || "",
+      ready: false,
+      cf: false,
+      hasListingImage: false,
+      inspected: false,
+    };
     if (!tab?.id || typeof scripting?.executeScript !== "function") {
       return fallback;
     }
@@ -1553,20 +2078,8 @@ export function createWorker({
       const injected = await withTimeout(
         scripting.executeScript({
           target: { tabId: tab.id },
-          func: () => ({
-            title: document.title || "",
-            url: location.href || "",
-            cf: Boolean(
-              document.querySelector(
-                "#challenge-form, .cf-turnstile, #cf-challenge, input[name='cf-turnstile-response']",
-              ),
-            ),
-            ready: Boolean(
-              document.querySelector(
-                'select[name="idExpansion"], select#idExpansion, table.table, .table-body',
-              ),
-            ),
-          }),
+          args: [CHALLENGE_SELECTOR],
+          func: inspectProductPage,
         }),
         2_500,
       );
@@ -1579,9 +2092,13 @@ export function createWorker({
         url: result.url || fallback.url,
         ready: Boolean(result.ready),
         cf: Boolean(result.cf),
+        hasListingImage: Boolean(result.hasListingImage || result.listingSrc),
+        listingSrc: String(result.listingSrc || ""),
+        listingReady: Boolean(result.listingReady),
+        inspected: true,
       };
     } catch {
-      return fallback;
+      return { ...fallback, cf: true };
     }
   }
 
@@ -1605,6 +2122,10 @@ export function createWorker({
       return false;
     }
     const kind = classifyUrl(url);
+    const resumeKind = (await readStore(local, ["expansionResume"])).expansionResume?.kind;
+    if (resumeKind === "unmatched-images") {
+      return kind === "product" && Boolean(live.hasListingImage) && !live.cf;
+    }
     return kind === "expansion" || kind === "singles-index";
   }
 

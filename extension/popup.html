@@ -24,12 +24,13 @@
     </div>
     <section>
       <h2>Test import</h2>
-      <p class="muted">Use Local Docker. Stay on Cardmarket Singles. Import all reads the Expansion list once, then opens each set by URL. Import whole set overwrites only the open set. Tick Cloudflare yourself; the crawl continues when that page loads.</p>
+      <p class="muted">Use Local Docker. Stay on one Cardmarket tab. Iterate unmatched listing images opens one Singles product at a time and saves the product URL plus img.is-front image URL (no photo file). Boosters are skipped. If Cloudflare appears, tick the box in that tab; the crawl continues on the same card, then the next.</p>
       <p id="expansion-note" class="muted">No set import yet</p>
       <div class="actions">
         <button id="import-page" type="button">Import this set page</button>
         <button id="import-set" type="button">Import whole set (test crawler)</button>
         <button id="import-all" type="button">Import all expansions</button>
+        <button id="import-unmatched-images" type="button">Iterate unmatched listing images</button>
       </div>
     </section>
     <form id="settings">
@@ -53,6 +54,10 @@
           <option value="fast">Fast (no extra waits)</option>
           <option value="between">Between (medium–slow waits)</option>
         </select>
+      </label>
+      <label>
+        <input id="save-unmatched-image" type="checkbox" />
+        Save the listing image URL with the product URL when this print is unmatched
       </label>
       <label>
         Helper credential

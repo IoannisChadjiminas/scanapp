@@ -27,6 +27,13 @@ class CardmarketPrice(BaseModel):
     currency: str = "EUR"
 
 
+class CardmarketVariant(BaseModel):
+    url: str
+    slug: str = ""
+    label: str = ""
+    card_id: str | None = None
+
+
 class Candidate(BaseModel):
     card_id: str
     name: str
@@ -39,6 +46,7 @@ class Candidate(BaseModel):
     language: str = ""
     cardmarket_url: str | None = None
     cardmarket_prices: list[CardmarketPrice] = Field(default_factory=list)
+    cardmarket_variants: list[CardmarketVariant] = Field(default_factory=list)
 
 
 class OcrEvidence(BaseModel):
@@ -97,6 +105,7 @@ class ScanResponse(BaseModel):
 class FeedbackRequest(BaseModel):
     action: FeedbackAction
     card_id: str | None = None
+    cardmarket_url: str | None = None
 
 
 class FeedbackResponse(BaseModel):

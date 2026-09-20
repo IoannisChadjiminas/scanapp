@@ -1,5 +1,7 @@
 "use client";
 
+import { useState } from "react";
+
 import { Badge } from "@/components/ui/badge";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { cn } from "cn";
@@ -19,7 +21,7 @@ import {
   EmptyTitle,
 } from "@/components/ui/empty";
 import { assetUrl } from "@/lib/api";
-import type { Candidate, ScanStatus } from "@/lib/api-types";
+import type { Candidate, CardmarketVariant, ScanStatus } from "@/lib/api-types";
 import { languageLabel } from "@/lib/languages";
 import { CardmarketOpen } from "@/components/scanner/cardmarket-open";
 import {
@@ -31,7 +33,7 @@ type SuggestionsProps = {
   status: ScanStatus;
   message: string | null;
   suggestions: Candidate[];
-  onConfirm: (cardId: string) => void;
+  onConfirm: (cardId: string, cardmarketUrl?: string | null) => void;
   onChooseAnother: () => void;
   onReject: () => void;
   onScanAgain: () => void;
@@ -53,14 +55,57 @@ function statusLabel(status: ScanStatus) {
   return "Not a match";
 }
 
-function OfferBlock({ card }: { card: Candidate }) {
-  const listings = useCardmarketListings(card.cardmarket_url, card.cardmarket_prices);
+function OfferBlock({
+  url,
+  prices,
+}: {
+  url?: string | null;
+  prices?: Candidate["cardmarket_prices"];
+}) {
+  const listings = useCardmarketListings(url, prices);
   return (
     <CardmarketPrices
       prices={listings.prices}
       waiting={listings.waiting}
       message={listings.message}
     />
+  );
+}
+
+function VariantPicker({
+  variants,
+  selected,
+  onSelect,
+}: {
+  variants: CardmarketVariant[];
+  selected: CardmarketVariant | null;
+  onSelect: (variant: CardmarketVariant) => void;
+}) {
+  return (
+    <div className="mt-3 flex flex-col gap-2">
+      <p className="text-sm font-medium">Which Cardmarket listing is this?</p>
+      {variants.map((variant) => {
+        const active = selected?.url === variant.url;
+        return (
+          <button
+            key={variant.url}
+            type="button"
+            onClick={() => onSelect(variant)}
+            className={cn(
+              "rounded-md border px-3 py-2 text-left text-sm",
+              active ? "border-primary bg-primary/5" : "border-border",
+            )}
+          >
+            <span className="font-medium">{variant.label || variant.slug}</span>
+            {variant.slug ? (
+              <span className="text-muted-foreground mt-0.5 block text-xs">
+                {variant.slug}
+              </span>
+            ) : null}
+          </button>
+        );
+      })}
+    </div>
   );
 }
 
@@ -74,8 +119,15 @@ export function Suggestions({
   onScanAgain,
 }: SuggestionsProps) {
   const top = suggestions[0];
+  const variants = top?.cardmarket_variants ?? [];
+  const needsChoice = variants.length >= 2;
+  const [selected, setSelected] = useState<CardmarketVariant | null>(null);
   const showCard = Boolean(top) && (status === "matched" || status === "uncertain");
   const notAMatch = status === "no_match";
+  const listingUrl = needsChoice ? selected?.url : top?.cardmarket_url;
+  const listingCardId = needsChoice
+    ? selected?.card_id || top?.card_id
+    : top?.card_id;
   return (
     <div className="flex flex-col gap-4">
       <div className="flex items-center justify-between gap-3">
@@ -104,13 +156,20 @@ export function Suggestions({
               alt={`${top.name} from ${top.set_name}`}
               className="mx-auto max-h-72 w-auto rounded-md"
             />
-            <OfferBlock card={top} />
+            {needsChoice ? (
+              <VariantPicker
+                variants={variants}
+                selected={selected}
+                onSelect={setSelected}
+              />
+            ) : null}
+            <OfferBlock url={listingUrl} prices={needsChoice ? [] : top.cardmarket_prices} />
           </CardContent>
           <CardFooter className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:justify-end">
-            {top.cardmarket_url ? (
+            {listingUrl ? (
               <CardmarketOpen
-                url={top.cardmarket_url}
-                cardId={top.card_id}
+                url={listingUrl}
+                cardId={listingCardId}
                 className={cn(
                   buttonVariants({ variant: "outline" }),
                   "h-11 min-h-11 w-full gap-2 sm:w-auto",
@@ -118,7 +177,9 @@ export function Suggestions({
               />
             ) : (
               <p className="text-muted-foreground w-full text-sm">
-                Cardmarket link unavailable.
+                {needsChoice
+                  ? "Choose a listing to open Cardmarket."
+                  : "Cardmarket link unavailable."}
               </p>
             )}
             <Button
@@ -132,7 +193,13 @@ export function Suggestions({
             <Button
               type="button"
               className="h-11 min-h-11 w-full sm:w-auto"
-              onClick={() => onConfirm(top.card_id)}
+              disabled={needsChoice && !selected}
+              onClick={() =>
+                onConfirm(
+                  selected?.card_id || top.card_id,
+                  selected?.url ?? top.cardmarket_url,
+                )
+              }
             >
               This is the card
             </Button>
@@ -162,7 +229,7 @@ export function Suggestions({
                 {top.name} · {top.set_name} #{top.collector_number}
                 {top.language ? ` · ${languageLabel(top.language)}` : ""}
               </p>
-              <OfferBlock card={top} />
+              <OfferBlock url={top.cardmarket_url} prices={top.cardmarket_prices} />
               {top.cardmarket_url ? (
                 <CardmarketOpen
                   url={top.cardmarket_url}

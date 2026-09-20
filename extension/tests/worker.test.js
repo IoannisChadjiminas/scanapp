@@ -45,7 +45,7 @@ function jsonResponse(payload, status = 200) {
   };
 }
 
-function createHarness({ extract, scripting, claimJobs, expansionExtract, expansionCrawls } = {}) {
+function createHarness({ extract, scripting, claimJobs, expansionExtract, expansionCrawls, unmatchedProducts, onTabUpdate, productImage, tabState } = {}) {
   const local = memoryStore({
     apiBase: "http://127.0.0.1:8000",
     helperToken: "helper.token",
@@ -66,6 +66,13 @@ function createHarness({ extract, scripting, claimJobs, expansionExtract, expans
     if (String(url).includes("ntfy.sh")) {
       ntfyPosts.push({ url, body: init.body, headers: init.headers });
       return jsonResponse({ id: "ok" });
+    }
+    if (String(url).includes("product-images.s3.cardmarket.com") || String(url).includes("static.cardmarket.com")) {
+      return {
+        ok: true,
+        status: 200,
+        arrayBuffer: async () => new Uint8Array([255, 216, 255, 217]).buffer,
+      };
     }
     const path = new URL(url).pathname;
     const body = init.body ? JSON.parse(init.body) : {};
@@ -112,6 +119,28 @@ function createHarness({ extract, scripting, claimJobs, expansionExtract, expans
         url: body.url,
         name: "Gengar",
         verified: true,
+      });
+    }
+    if (path.endsWith("/cardmarket/helper/unmatched-image")) {
+      expansionImports.push({ unmatchedImage: body });
+      return jsonResponse({
+        stored: true,
+        reason: "url",
+        url: body.url,
+        name: "Gengar",
+        image_url: body.image_url || "",
+      });
+    }
+    if (path.endsWith("/cardmarket/helper/unmatched-products")) {
+      const parsed = new URL(url);
+      const after = parsed.searchParams.get("after") || "";
+      const limit = Math.max(Number(parsed.searchParams.get("limit") || 1), 1);
+      const all = unmatchedProducts || [];
+      const items = all.filter((item) => String(item.url) > after);
+      return jsonResponse({
+        total: all.length,
+        after,
+        products: items.slice(0, limit),
       });
     }
     if (path.endsWith("/cardmarket/helper/expansion-crawls")) {
@@ -170,6 +199,9 @@ function createHarness({ extract, scripting, claimJobs, expansionExtract, expans
     async update(id, props) {
       const tab = tabs.get(id);
       Object.assign(tab, props);
+      if (typeof onTabUpdate === "function") {
+        onTabUpdate(tab, props);
+      }
       updates.push({ id, ...props });
       if (props.active) {
         activeTab = id;
@@ -193,6 +225,14 @@ function createHarness({ extract, scripting, claimJobs, expansionExtract, expans
       if (message?.type === "extract-expansion" && expansionExtract) {
         const tab = tabs.get(_id);
         return expansionExtract(tab);
+      }
+      if (message?.type === "extract-product-image") {
+        const tab = tabs.get(_id);
+        if (typeof productImage === "function") {
+          return productImage(tab);
+        }
+        const slug = String(tab?.url || GENGAR).split("/").pop() || "card";
+        return { src: `https://product-images.s3.cardmarket.com/1/${slug}/${slug}.jpg` };
       }
       if (extract) {
         return extract(message);
@@ -240,7 +280,14 @@ function createHarness({ extract, scripting, claimJobs, expansionExtract, expans
             return [{ result: null }];
           },
         }
-      : scripting);
+      : tabState
+        ? {
+            executeScript: async ({ target } = {}) => {
+              const tab = tabs.get(target?.tabId);
+              return [{ result: tabState(tab) }];
+            },
+          }
+        : scripting);
   const worker = createWorker({
     local,
     session,
@@ -1031,4 +1078,249 @@ test("saves crawl pace fast and between", async () => {
   await worker.handleMessage({ type: "set-settings", expansionPace: "fast" });
   stored = await local.get("expansionPace");
   assert.equal(stored.expansionPace, "fast");
+});
+
+test("saves unmatched listing image from the open product tab", async () => {
+  const { worker, session, tabs, expansionImports } = createHarness();
+  await worker.handleMessage({ type: "set-settings", saveUnmatchedImage: true });
+  const status = await worker.handleMessage({ type: "map-status" });
+  assert.equal(status.saveUnmatchedImage, true);
+  tabs.set(7, { id: 7, url: GENGAR, documentId: "doc-7" });
+  await session.set({ helperTabId: 7 });
+  const result = await worker.handleMessage({
+    type: "save-unmatched-image",
+    url: GENGAR,
+    name: "Gengar",
+  });
+  assert.equal(result.ok, true);
+  assert.equal(result.stored, true);
+  assert.equal(expansionImports[0].unmatchedImage.url, GENGAR);
+});
+
+test("saves unmatched listing image from img.is-front S3 URL", async () => {
+  const src = "https://product-images.s3.cardmarket.com/51/MEW/733658/733658.jpg";
+  const product =
+    "https://www.cardmarket.com/en/Pokemon/Products/Singles/151/Abra-V1-MEW063";
+  const { worker, session, tabs, expansionImports } = createHarness({
+    productImage: () => ({ src, dataUrl: "" }),
+  });
+  tabs.set(7, { id: 7, url: product, documentId: "doc-7" });
+  await session.set({ helperTabId: 7 });
+  const result = await worker.handleMessage({
+    type: "save-unmatched-image",
+    url: product,
+    name: "Abra",
+  });
+  assert.equal(result.ok, true);
+  assert.equal(result.stored, true);
+  assert.equal(expansionImports[0].unmatchedImage.url, product);
+  assert.equal(expansionImports[0].unmatchedImage.image_url, src);
+  assert.equal(expansionImports[0].unmatchedImage.image_base64, undefined);
+});
+
+test("iterates unmatched Cardmarket URLs in the helper tab", async () => {
+  const first = PIKACHU;
+  const second = GENGAR;
+  const { worker, session, tabs, updates, expansionImports, createdTabs } = createHarness({
+    unmatchedProducts: [
+      { url: first, name: "Pikachu", expansion: "Classic" },
+      { url: second, name: "Gengar", expansion: "Tag-Bolt" },
+    ],
+  });
+  tabs.set(7, {
+    id: 7,
+    url: "https://www.cardmarket.com/en/Pokemon/Products/Singles",
+    documentId: "doc-7",
+    active: true,
+  });
+  await session.set({ helperTabId: 7 });
+  const status = await worker.handleMessage({ type: "import-unmatched-images" });
+  assert.equal(createdTabs.length, 0);
+  assert.equal(updates.some((item) => item.url === first && item.active === true), true);
+  assert.equal(updates.some((item) => item.url === second && item.active === true), true);
+  const saved = expansionImports.filter((item) => item.unmatchedImage);
+  assert.equal(saved.length, 2);
+  assert.equal(saved[0].unmatchedImage.url, first);
+  assert.equal(saved[1].unmatchedImage.url, second);
+  assert.match(status.expansionNote, /Unmatched listing image URLs done/);
+  assert.match(status.expansionNote, /Stored 2/);
+});
+
+test("waits for the product image to change before saving the next listing URL", async () => {
+  const first = PIKACHU;
+  const second = GENGAR;
+  const previousSrc = "https://product-images.s3.cardmarket.com/51/s8a/577378/577378.jpg";
+  const nextSrc = "https://product-images.s3.cardmarket.com/51/s8a/577379/577379.jpg";
+  let gengarTicks = 0;
+  const { worker, session, tabs, expansionImports } = createHarness({
+    unmatchedProducts: [
+      { url: first, name: "Yveltal", expansion: "25th" },
+      { url: second, name: "Cosmog", expansion: "25th" },
+    ],
+    productImage(tab) {
+      const next = String(tab?.url || "").includes("Gengar");
+      return { src: next && gengarTicks > 3 ? nextSrc : previousSrc };
+    },
+    tabState(tab) {
+      const next = String(tab?.url || "").includes("Gengar");
+      if (next) {
+        gengarTicks += 1;
+      }
+      const src = next && gengarTicks > 3 ? nextSrc : previousSrc;
+      return {
+        title: tab?.title || "Card",
+        url: tab?.url || "",
+        cf: false,
+        hasListingImage: true,
+        listingSrc: src,
+        listingReady: true,
+        ready: true,
+      };
+    },
+  });
+  tabs.set(7, {
+    id: 7,
+    url: "https://www.cardmarket.com/en/Pokemon/Products/Singles",
+    documentId: "doc-7",
+    active: true,
+  });
+  await session.set({ helperTabId: 7 });
+  await worker.handleMessage({ type: "import-unmatched-images" });
+  const saved = expansionImports.filter((item) => item.unmatchedImage);
+  assert.equal(saved.length, 2);
+  assert.equal(saved[0].unmatchedImage.image_url, previousSrc);
+  assert.equal(saved[1].unmatchedImage.image_url, nextSrc);
+});
+
+test("Cloudflare pauses unmatched listing images and Continue resumes the same URL", async () => {
+  const first = PIKACHU;
+  const second = GENGAR;
+  let blockGengar = true;
+  const { worker, session, tabs, expansionImports, local, ntfyPosts, createdTabs } = createHarness({
+    unmatchedProducts: [
+      { url: first, name: "Pikachu", expansion: "Classic" },
+      { url: second, name: "Gengar", expansion: "Tag-Bolt" },
+    ],
+    productImage(tab) {
+      if (blockGengar && String(tab?.url || "").includes("Gengar")) {
+        return { challenge: true };
+      }
+      return { src: "https://product-images.s3.cardmarket.com/1/gengar/gengar.jpg" };
+    },
+  });
+  tabs.set(7, {
+    id: 7,
+    url: "https://www.cardmarket.com/en/Pokemon/Products/Singles",
+    documentId: "doc-7",
+    active: true,
+    title: "Singles",
+  });
+  await session.set({ helperTabId: 7 });
+  await local.set({ ntfyTopic: "secret-topic-name" });
+  const pausedStatus = await worker.handleMessage({ type: "import-unmatched-images" });
+  const saved = expansionImports.filter((item) => item.unmatchedImage);
+  assert.equal(saved.length, 1);
+  assert.equal(saved[0].unmatchedImage.url, first);
+  assert.equal(createdTabs.length, 0);
+  assert.equal(pausedStatus.paused, true);
+  assert.equal(pausedStatus.expansionResume.kind, "unmatched-images");
+  assert.equal(pausedStatus.expansionResume.after, first);
+  assert.equal(pausedStatus.expansionResume.reason, "challenge");
+  assert.match(pausedStatus.expansionNote, /Cloudflare/);
+  assert.match(String(ntfyPosts[0]?.body || ""), /Cloudflare/);
+
+  blockGengar = false;
+  tabs.set(7, { ...tabs.get(7), title: "Gengar", url: second });
+  const continued = await worker.handleMessage({ type: "resume" });
+  const allSaved = expansionImports.filter((item) => item.unmatchedImage);
+  assert.equal(allSaved.length, 2);
+  assert.equal(allSaved[1].unmatchedImage.url, second);
+  assert.equal(continued.paused, false);
+  const stored = await local.get("expansionResume");
+  assert.equal(stored.expansionResume, null);
+  assert.match(continued.expansionNote, /Unmatched listing image URLs done/);
+});
+
+test("Turnstile overlay on a product page pauses unmatched listing images", async () => {
+  const first = PIKACHU;
+  const second = GENGAR;
+  const src = "https://product-images.s3.cardmarket.com/1/gengar/gengar.jpg";
+  const { worker, session, tabs, expansionImports, local } = createHarness({
+    unmatchedProducts: [
+      { url: first, name: "Pikachu", expansion: "Classic" },
+      { url: second, name: "Gengar", expansion: "Tag-Bolt" },
+    ],
+    productImage: () => ({ src }),
+    tabState(tab) {
+      const blocked = String(tab?.url || "").includes("Gengar");
+      return {
+        title: blocked ? "Just a moment..." : tab?.title || "Card",
+        url: tab?.url || "",
+        cf: blocked,
+        hasListingImage: true,
+        ready: !blocked,
+      };
+    },
+  });
+  tabs.set(7, {
+    id: 7,
+    url: "https://www.cardmarket.com/en/Pokemon/Products/Singles",
+    documentId: "doc-7",
+    active: true,
+    title: "Singles",
+  });
+  await session.set({ helperTabId: 7 });
+  const pausedStatus = await worker.handleMessage({ type: "import-unmatched-images" });
+  const saved = expansionImports.filter((item) => item.unmatchedImage);
+  assert.equal(saved.length, 1);
+  assert.equal(saved[0].unmatchedImage.url, first);
+  assert.equal(pausedStatus.paused, true);
+  assert.equal(pausedStatus.expansionResume.reason, "challenge");
+  assert.match(pausedStatus.expansionNote, /Cloudflare/);
+  const stored = await local.get("expansionResume");
+  assert.equal(stored.expansionResume.after, first);
+});
+
+test("Cloudflare product URL does not auto-resume unmatched listing images", async () => {
+  const first = PIKACHU;
+  const second = GENGAR;
+  const src = "https://product-images.s3.cardmarket.com/1/gengar/gengar.jpg";
+  const { worker, session, tabs, expansionImports } = createHarness({
+    unmatchedProducts: [
+      { url: first, name: "Pikachu", expansion: "Classic" },
+      { url: second, name: "Gengar", expansion: "Tag-Bolt" },
+    ],
+    productImage(tab) {
+      if (String(tab?.url || "").includes("Gengar")) {
+        return { challenge: true };
+      }
+      return { src };
+    },
+    tabState(tab) {
+      return {
+        title: tab?.title || "Card",
+        url: tab?.url || "",
+        cf: false,
+        hasListingImage: false,
+        ready: false,
+      };
+    },
+  });
+  tabs.set(7, {
+    id: 7,
+    url: "https://www.cardmarket.com/en/Pokemon/Products/Singles",
+    documentId: "doc-7",
+    active: true,
+    title: "Singles",
+  });
+  await session.set({ helperTabId: 7 });
+  const pausedStatus = await worker.handleMessage({ type: "import-unmatched-images" });
+  assert.equal(pausedStatus.paused, true);
+  tabs.set(7, { ...tabs.get(7), title: "Gengar", url: second, status: "complete" });
+  await worker.tabUpdated(7, { status: "complete", title: "Gengar" }, tabs.get(7));
+  const after = await worker.handleMessage({ type: "get-status" });
+  assert.equal(after.paused, true);
+  const saved = expansionImports.filter((item) => item.unmatchedImage);
+  assert.equal(saved.length, 1);
+  assert.equal(saved[0].unmatchedImage.url, first);
 });

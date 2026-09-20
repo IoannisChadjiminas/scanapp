@@ -157,6 +157,11 @@ def init_catalog(conn: sqlite3.Connection) -> None:
             "submission_id": "TEXT",
         },
     )
+    _add_columns(
+        conn,
+        "cardmarket_expansion_products",
+        {"listing_image_url": "TEXT"},
+    )
     conn.executescript(
         """
         CREATE INDEX IF NOT EXISTS idx_cardmarket_jobs_claim
@@ -207,6 +212,11 @@ def init_results(conn: sqlite3.Connection) -> None:
         );
         CREATE INDEX IF NOT EXISTS idx_scans_session ON scans(session_id, created_at);
         """
+    )
+    _add_columns(
+        conn,
+        "scans",
+        {"chosen_cardmarket_url": "TEXT"},
     )
     conn.commit()
 

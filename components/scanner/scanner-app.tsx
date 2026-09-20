@@ -158,7 +158,9 @@ export function ScannerApp() {
       const result = await api.scan(blob, { skip_detect: "true", language }, controller.signal);
       if (result.status === "matched" || result.status === "uncertain") {
         const card = result.suggestions[0];
-        await queueCardmarketLookup(card?.cardmarket_url, card?.card_id);
+        if (!card?.cardmarket_variants?.length) {
+          await queueCardmarketLookup(card?.cardmarket_url, card?.card_id);
+        }
       }
       setScan(result);
       setStage("result");
@@ -182,16 +184,18 @@ export function ScannerApp() {
     }
   }
 
-  async function sendFeedback(action: "confirm" | "correct" | "reject", cardId?: string) {
+  async function sendFeedback(
+    action: "confirm" | "correct" | "reject",
+    cardId?: string,
+    cardmarketUrl?: string | null,
+  ) {
     if (!scan) {
       return;
     }
     try {
-      await api.feedback(scan.id, action, cardId);
+      await api.feedback(scan.id, action, cardId, cardmarketUrl ?? undefined);
       if (action !== "reject") {
-        const selected =
-          scan.suggestions.find((item) => item.card_id === cardId) ?? scan.suggestions[0];
-        await queueCardmarketLookup(selected?.cardmarket_url, cardId || selected?.card_id);
+        await queueCardmarketLookup(cardmarketUrl, cardId);
       }
       await refreshResults();
       setStatusText(
@@ -382,7 +386,9 @@ export function ScannerApp() {
               status={scan.status}
               message={scan.message}
               suggestions={scan.suggestions}
-              onConfirm={(cardId) => void sendFeedback("confirm", cardId)}
+              onConfirm={(cardId, cardmarketUrl) =>
+                void sendFeedback("confirm", cardId, cardmarketUrl)
+              }
               onChooseAnother={() => setPickerOpen(true)}
               onReject={() => void sendFeedback("reject")}
               onScanAgain={resetToIdle}

@@ -4,11 +4,13 @@ function scanappCollectExpansion() {
   const challengeText = `${title} ${document.body?.innerText || ""}`.toLowerCase();
   const challenge = Boolean(
     document.querySelector(
-      "#challenge-form, .cf-turnstile, #cf-challenge, input[name='cf-turnstile-response']",
+      "#challenge-form, .cf-turnstile, #cf-challenge, input[name='cf-turnstile-response'], iframe[src*='challenges.cloudflare.com'], iframe[src*='turnstile'], #challenge-running, .cf-browser-verification, #cf-chl-widget",
     ),
   ) ||
     challengeText.includes("just a moment") ||
     challengeText.includes("attention required") ||
+    challengeText.includes("verify you are human") ||
+    challengeText.includes("checking your browser") ||
     challengeText.includes("cloudflare");
   const PRODUCT = /^\/[a-z]{2}\/Pokemon\/Products\/Singles\/[^/]+\/[^/]+$/i;
   const products = [];

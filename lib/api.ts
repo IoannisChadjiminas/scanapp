@@ -85,11 +85,15 @@ export const api = {
       }`,
       { signal },
     ),
-  feedback: (scanId: string, action: string, cardId?: string) =>
+  feedback: (scanId: string, action: string, cardId?: string, cardmarketUrl?: string) =>
     request(`/api/v1/scans/${scanId}/feedback`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ action, card_id: cardId ?? null }),
+      body: JSON.stringify({
+        action,
+        card_id: cardId ?? null,
+        cardmarket_url: cardmarketUrl ?? null,
+      }),
     }),
   sessionResults: (signal?: AbortSignal) =>
     request<SessionResultsResponse>("/api/v1/session/results", { signal }),

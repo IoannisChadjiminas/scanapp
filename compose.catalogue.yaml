@@ -19,6 +19,8 @@ services:
       OMP_NUM_THREADS: ${OMP_NUM_THREADS:-1}
     volumes:
       - scanapp-data:/data
+      - ./api/app:/app/app
+      - ./catalogue/bootstrap:/app/bootstrap
       - ./extra-cards:/extra-cards:ro
       - ./exports:/exports
 

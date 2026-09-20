@@ -120,6 +120,9 @@ def test_extra_manifest_verified_singles_urls() -> None:
         "extra-pikachu-classic-clc008": (
             "/Pokemon-Trading-Card-Game-Classic-Charizard-Ho-Oh-ex-Deck/Pikachu-CLC008"
         ),
+        "extra-mew-ex-205-metal": (
+            "/151/Mew-ex-V4-MEW205"
+        ),
     }
     by_id = {card["id"]: card for card in cards}
     assert by_id["extra-lugia-v-326-s-p"]["collector_number"] == "324/S-P"
@@ -700,4 +703,840 @@ def test_relink_writes_url_after_catalogue_card_exists(tmp_path: Path) -> None:
     assert url_for_row(row) == product
     maps = json.loads((tmp_path / "cardmarket-maps.json").read_text())
     assert maps["cards"]["extra-clc008"]["cardmarket_url"] == product
+
+
+MEW_V1 = "https://www.cardmarket.com/en/Pokemon/Products/Singles/151/Mew-ex-V1-MEW151"
+MEW_V2 = "https://www.cardmarket.com/en/Pokemon/Products/Singles/151/Mew-ex-V2-MEW193"
+MEW_V3 = "https://www.cardmarket.com/en/Pokemon/Products/Singles/151/Mew-ex-V3-MEW205"
+MEW_V4 = "https://www.cardmarket.com/en/Pokemon/Products/Singles/151/Mew-ex-V4-MEW205"
+MEW_V5 = "https://www.cardmarket.com/en/Pokemon/Products/Singles/151/Mew-ex-V5-MEW205"
+
+
+def _insert_card(conn, card_id, name, set_name, number, language="en", **extra):
+    conn.execute(
+        """
+        INSERT INTO cards (
+            id, provider_id, name, set_id, set_name, collector_number,
+            language, variants_json, has_image, cardmarket_url,
+            cardmarket_verified, cardmarket_provenance, cardmarket_verified_at
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, 1, ?, ?, ?, ?)
+        """,
+        (
+            card_id,
+            card_id,
+            name,
+            extra.get("set_id") or "sv03.5",
+            set_name,
+            number,
+            language,
+            extra.get("variants_json") or "{}",
+            extra.get("cardmarket_url"),
+            extra.get("verified", 0),
+            extra.get("provenance"),
+            extra.get("verified_at"),
+        ),
+    )
+
+
+def test_sku_groups_mew205_not_151_or_193() -> None:
+    from app.cardmarket import product_sku_key
+
+    assert product_sku_key(MEW_V3) == product_sku_key(MEW_V4) == product_sku_key(MEW_V5)
+    assert product_sku_key(MEW_V3) == ("151", "MEW", "205")
+    assert product_sku_key(MEW_V1) == ("151", "MEW", "151")
+    assert product_sku_key(MEW_V2) == ("151", "MEW", "193")
+
+
+def test_latin_name_slug_ignores_cjk_ex() -> None:
+    from app.cardmarket import latin_name_slug
+
+    assert latin_name_slug("ミュウex") is None
+    assert latin_name_slug("夢幻ex") is None
+    assert latin_name_slug("Mew ex") == "mew-ex"
+    assert latin_name_slug("焚焰蚣VMAX") is None
+    assert latin_name_slug("Gengar V") == "gengar-v"
+
+
+def test_localized_expansion_does_not_fit_english_set() -> None:
+    from app.cardmarket import name_fits_product_slug, set_fits_expansion
+
+    assert set_fits_expansion("30th", "30th Celebration", "30th-Celebration")
+    assert not set_fits_expansion("30th", "30th Celebration", "30th-Celebration-IDTH")
+    assert not set_fits_expansion("30th", "30th Celebration", "30th-Celebration-JP")
+    assert set_fits_expansion("ex6", "Hidden Legends", "ex-hidden-legends")
+    assert name_fits_product_slug("mew", "mew-30c065")
+    assert not name_fits_product_slug("mew", "mewtwo-ex-v1-ma6065")
+    assert name_fits_product_slug("mewtwo-ex", "mewtwo-ex-v1-30c064")
+
+
+def test_uncoded_fusion_strike_unique_name(tmp_path: Path) -> None:
+    from app.cardmarket import import_expansion_products, url_for_row
+
+    conn = connect(tmp_path / "catalog.sqlite")
+    init_catalog(conn)
+    _insert_card(
+        conn,
+        "en:swsh8-1",
+        "Caterpie",
+        "Fusion Strike",
+        "1",
+        set_id="swsh8",
+    )
+    _insert_card(
+        conn,
+        "en:swsh8-100",
+        "Pikachu",
+        "Fusion Strike",
+        "100",
+        set_id="swsh8",
+    )
+    _insert_card(
+        conn,
+        "en:swsh8-101",
+        "Pikachu",
+        "Fusion Strike",
+        "101",
+        set_id="swsh8",
+    )
+    conn.commit()
+    caterpie = (
+        "https://www.cardmarket.com/en/Pokemon/Products/Singles/Fusion-Strike/Caterpie"
+    )
+    pikachu = (
+        "https://www.cardmarket.com/en/Pokemon/Products/Singles/Fusion-Strike/Pikachu"
+    )
+    import_expansion_products(
+        conn,
+        tmp_path,
+        page_url="https://www.cardmarket.com/en/Pokemon/Products/Singles/Fusion-Strike",
+        products=[
+            {"url": caterpie, "name": "Caterpie"},
+            {"url": pikachu, "name": "Pikachu"},
+        ],
+        source="page",
+    )
+    bug = conn.execute("SELECT * FROM cards WHERE id = 'en:swsh8-1'").fetchone()
+    pika_a = conn.execute("SELECT * FROM cards WHERE id = 'en:swsh8-100'").fetchone()
+    pika_b = conn.execute("SELECT * FROM cards WHERE id = 'en:swsh8-101'").fetchone()
+    assert url_for_row(bug) == caterpie
+    assert url_for_row(pika_a) is None
+    assert url_for_row(pika_b) is None
+
+
+def test_unique_link_prefers_english_30c_over_idth(tmp_path: Path) -> None:
+    from app.cardmarket import apply_cardmarket_links, import_expansion_products, url_for_row
+
+    conn = connect(tmp_path / "catalog.sqlite")
+    init_catalog(conn)
+    _insert_card(
+        conn,
+        "en:30th-001",
+        "Exeggcute",
+        "30th Celebration",
+        "001",
+        set_id="30th",
+        cardmarket_url=(
+            "https://www.cardmarket.com/en/Pokemon/Products/Singles/"
+            "30th-Celebration-IDTH/Exeggcute-MA6001"
+        ),
+        provenance="helper-expansion",
+        verified=1,
+    )
+    _insert_card(
+        conn,
+        "en:30th-065",
+        "Mew",
+        "30th Celebration",
+        "065",
+        set_id="30th",
+        cardmarket_url=(
+            "https://www.cardmarket.com/en/Pokemon/Products/Singles/"
+            "30th-Celebration-IDTH/Mewtwo-ex-V1-MA6065"
+        ),
+        provenance="helper-expansion",
+        verified=1,
+    )
+    conn.commit()
+    idth = (
+        "https://www.cardmarket.com/en/Pokemon/Products/Singles/"
+        "30th-Celebration-IDTH/Exeggcute-MA6001"
+    )
+    idth_mew = (
+        "https://www.cardmarket.com/en/Pokemon/Products/Singles/"
+        "30th-Celebration-IDTH/Mewtwo-ex-V1-MA6065"
+    )
+    en_001 = (
+        "https://www.cardmarket.com/en/Pokemon/Products/Singles/"
+        "30th-Celebration/Exeggcute-30C001"
+    )
+    en_065 = (
+        "https://www.cardmarket.com/en/Pokemon/Products/Singles/"
+        "30th-Celebration/Mew-30C065"
+    )
+    import_expansion_products(
+        conn,
+        tmp_path,
+        page_url="https://www.cardmarket.com/en/Pokemon/Products/Singles/30th-Celebration-IDTH",
+        products=[
+            {"url": idth, "name": "Exeggcute (MA6 001)"},
+            {"url": idth_mew, "name": "Mewtwo ex (MA6 065)"},
+        ],
+        source="page",
+    )
+    import_expansion_products(
+        conn,
+        tmp_path,
+        page_url="https://www.cardmarket.com/en/Pokemon/Products/Singles/30th-Celebration",
+        products=[
+            {"url": en_001, "name": "Exeggcute (30C 001)"},
+            {"url": en_065, "name": "Mew (30C 065)"},
+        ],
+        source="page",
+    )
+    stats = apply_cardmarket_links(conn, tmp_path, codes={"30C"})
+    assert stats["mismatched_cleared"] >= 1
+    egg = conn.execute("SELECT * FROM cards WHERE id = 'en:30th-001'").fetchone()
+    mew = conn.execute("SELECT * FROM cards WHERE id = 'en:30th-065'").fetchone()
+    assert url_for_row(egg) == en_001
+    assert url_for_row(mew) == en_065
+
+
+def test_ambiguous_mew205_is_not_unique_linked(tmp_path: Path) -> None:
+    from app.cardmarket import (
+        apply_cardmarket_links,
+        import_expansion_products,
+        url_for_row,
+        variants_for_row,
+    )
+
+    conn = connect(tmp_path / "catalog.sqlite")
+    init_catalog(conn)
+    _insert_card(conn, "en:sv03.5-205", "Mew ex", "151", "205")
+    _insert_card(
+        conn,
+        "ja:SV2a-205",
+        "ミュウex",
+        "ポケモンカード151",
+        "205",
+        language="ja",
+        set_id="SV2a",
+    )
+    conn.commit()
+    import_expansion_products(
+        conn,
+        tmp_path,
+        page_url="https://www.cardmarket.com/en/Pokemon/Products/Singles/151",
+        products=[
+            {"url": MEW_V1, "name": "Mew ex (MEW 151)From 1,99 €"},
+            {"url": MEW_V2, "name": "Mew ex (MEW 193)From 14,90 €"},
+            {"url": MEW_V3, "name": "Mew ex (MEW 205)From 13,00 €"},
+            {"url": MEW_V4, "name": "Mew ex (MEW 205)From 10,00 €"},
+            {"url": MEW_V5, "name": "Mew ex (MEW 205)From 2.400,00 €"},
+        ],
+        source="page",
+    )
+    stats = apply_cardmarket_links(conn, tmp_path)
+    assert stats["ambiguous_cleared"] >= 0
+    paper = conn.execute("SELECT * FROM cards WHERE id = 'en:sv03.5-205'").fetchone()
+    ja = conn.execute("SELECT * FROM cards WHERE id = 'ja:SV2a-205'").fetchone()
+    assert url_for_row(paper) is None
+    assert url_for_row(ja) is None
+    variants = variants_for_row(conn, paper)
+    slugs = {item["slug"] for item in variants}
+    assert slugs == {
+        "Mew-ex-V3-MEW205",
+        "Mew-ex-V4-MEW205",
+        "Mew-ex-V5-MEW205",
+    }
+    assert "Mew-ex-V1-MEW151" not in slugs
+    assert variants_for_row(conn, ja) == []
+
+
+def test_clears_helper_expansion_but_keeps_manifest_url(tmp_path: Path) -> None:
+    from app.cardmarket import apply_cardmarket_links, import_expansion_products, url_for_row
+
+    conn = connect(tmp_path / "catalog.sqlite")
+    init_catalog(conn)
+    _insert_card(
+        conn,
+        "en:sv03.5-205",
+        "Mew ex",
+        "151",
+        "205",
+        cardmarket_url=MEW_V3,
+        verified=1,
+        provenance="helper-expansion",
+        verified_at="2026-09-19T00:00:00Z",
+    )
+    _insert_card(
+        conn,
+        "extra-mew-ex-205-metal",
+        "Mew ex",
+        "151 Ultra-Premium Collection",
+        "205",
+        cardmarket_url=MEW_V4,
+        verified=1,
+        provenance="manifest-url",
+        verified_at="2026-09-19T00:00:00Z",
+        variants_json='{"variant_label": "UPC metal"}',
+        set_id="sv03.5-upc",
+    )
+    conn.commit()
+    import_expansion_products(
+        conn,
+        tmp_path,
+        page_url="https://www.cardmarket.com/en/Pokemon/Products/Singles/151",
+        products=[
+            {"url": MEW_V3, "name": "Mew ex (MEW 205)"},
+            {"url": MEW_V4, "name": "Mew ex (MEW 205)"},
+            {"url": MEW_V5, "name": "Mew ex (MEW 205)"},
+        ],
+        source="page",
+    )
+    apply_cardmarket_links(conn, tmp_path)
+    paper = conn.execute("SELECT * FROM cards WHERE id = 'en:sv03.5-205'").fetchone()
+    metal = conn.execute(
+        "SELECT * FROM cards WHERE id = 'extra-mew-ex-205-metal'"
+    ).fetchone()
+    assert url_for_row(paper) is None
+    assert url_for_row(metal) == MEW_V4
+
+
+def test_apply_variants_nulls_url_when_ambiguous(tmp_path: Path) -> None:
+    from app.cardmarket import apply_variants_to_candidate, import_expansion_products
+
+    conn = connect(tmp_path / "catalog.sqlite")
+    init_catalog(conn)
+    _insert_card(conn, "en:sv03.5-205", "Mew ex", "151", "205")
+    conn.commit()
+    import_expansion_products(
+        conn,
+        tmp_path,
+        page_url="https://www.cardmarket.com/en/Pokemon/Products/Singles/151",
+        products=[
+            {"url": MEW_V3, "name": "Mew ex (MEW 205)"},
+            {"url": MEW_V4, "name": "Mew ex (MEW 205)"},
+            {"url": MEW_V5, "name": "Mew ex (MEW 205)"},
+        ],
+        source="page",
+    )
+    item = {
+        "card_id": "en:sv03.5-205",
+        "cardmarket_url": MEW_V3,
+        "cardmarket_prices": [{"label": "From", "amount": 13.0, "currency": "EUR"}],
+    }
+    apply_variants_to_candidate(conn, item)
+    assert item["cardmarket_url"] is None
+    assert item["cardmarket_prices"] == []
+    assert len(item["cardmarket_variants"]) == 3
+
+
+def test_resolve_variant_choice_uses_extra_owner(tmp_path: Path) -> None:
+    from app.cardmarket import resolve_variant_choice
+
+    conn = connect(tmp_path / "catalog.sqlite")
+    init_catalog(conn)
+    _insert_card(conn, "en:sv03.5-205", "Mew ex", "151", "205")
+    _insert_card(
+        conn,
+        "extra-mew-ex-205-metal",
+        "Mew ex",
+        "151",
+        "205",
+        cardmarket_url=MEW_V4,
+        verified=1,
+        provenance="manifest-url",
+        verified_at="2026-09-19T00:00:00Z",
+    )
+    conn.commit()
+    picked = resolve_variant_choice(
+        conn, tmp_path, scanned_card_id="en:sv03.5-205", url=MEW_V4
+    )
+    assert picked["card_id"] == "extra-mew-ex-205-metal"
+    assert picked["mapped"] is False
+    paper = conn.execute("SELECT cardmarket_url FROM cards WHERE id = 'en:sv03.5-205'").fetchone()
+    assert not paper["cardmarket_url"]
+
+
+def test_resolve_variant_choice_saves_unowned_onto_scanned(tmp_path: Path) -> None:
+    from app.cardmarket import resolve_variant_choice, url_for_row
+
+    conn = connect(tmp_path / "catalog.sqlite")
+    init_catalog(conn)
+    _insert_card(conn, "en:sv03.5-205", "Mew ex", "151", "205")
+    conn.commit()
+    picked = resolve_variant_choice(
+        conn, tmp_path, scanned_card_id="en:sv03.5-205", url=MEW_V3
+    )
+    assert picked["card_id"] == "en:sv03.5-205"
+    assert picked["mapped"] is True
+    row = conn.execute("SELECT * FROM cards WHERE id = 'en:sv03.5-205'").fetchone()
+    assert url_for_row(row) == MEW_V3
+    assert row["cardmarket_provenance"] == "helper-map"
+
+
+def test_ambiguous_pick_stays_on_scan_until_extra_owns_a_sku(tmp_path: Path) -> None:
+    from app.cardmarket import import_expansion_products, resolve_variant_choice, url_for_row
+
+    conn = connect(tmp_path / "catalog.sqlite")
+    init_catalog(conn)
+    _insert_card(conn, "en:sv03.5-205", "Mew ex", "151", "205")
+    conn.commit()
+    import_expansion_products(
+        conn,
+        tmp_path,
+        page_url="https://www.cardmarket.com/en/Pokemon/Products/Singles/151",
+        products=[
+            {"url": MEW_V3, "name": "Mew ex (MEW 205)"},
+            {"url": MEW_V4, "name": "Mew ex (MEW 205)"},
+            {"url": MEW_V5, "name": "Mew ex (MEW 205)"},
+        ],
+        source="page",
+    )
+    picked = resolve_variant_choice(
+        conn, tmp_path, scanned_card_id="en:sv03.5-205", url=MEW_V4
+    )
+    assert picked["mapped"] is False
+    paper = conn.execute("SELECT * FROM cards WHERE id = 'en:sv03.5-205'").fetchone()
+    assert url_for_row(paper) is None
+
+    _insert_card(
+        conn,
+        "extra-mew-ex-205-metal",
+        "Mew ex",
+        "151",
+        "205",
+        cardmarket_url=MEW_V4,
+        verified=1,
+        provenance="manifest-url",
+        verified_at="2026-09-19T00:00:00Z",
+    )
+    conn.commit()
+    metal = resolve_variant_choice(
+        conn, tmp_path, scanned_card_id="en:sv03.5-205", url=MEW_V4
+    )
+    assert metal["card_id"] == "extra-mew-ex-205-metal"
+    pack = resolve_variant_choice(
+        conn, tmp_path, scanned_card_id="en:sv03.5-205", url=MEW_V3
+    )
+    assert pack["mapped"] is True
+    assert pack["card_id"] == "en:sv03.5-205"
+    paper = conn.execute("SELECT * FROM cards WHERE id = 'en:sv03.5-205'").fetchone()
+    assert url_for_row(paper) == MEW_V3
+
+
+def test_promo_slug_parses_s_p_and_swsh() -> None:
+    from app.cardmarket import product_sku_key, singles_code_and_number
+
+    sp = (
+        "https://www.cardmarket.com/en/Pokemon/Products/Singles/"
+        "Sword-Shield-Promos/Lugia-V-S-P324"
+    )
+    swsh_v1 = (
+        "https://www.cardmarket.com/en/Pokemon/Products/Singles/"
+        "SWSH-Black-Star-Promos/Lugia-V-V1-SWSH301"
+    )
+    swsh_v2 = (
+        "https://www.cardmarket.com/en/Pokemon/Products/Singles/"
+        "SWSH-Black-Star-Promos/Lugia-V-V2-SWSH301"
+    )
+    sit = (
+        "https://www.cardmarket.com/en/Pokemon/Products/Singles/"
+        "Silver-Tempest/Lugia-V-V1-SIT138"
+    )
+    assert singles_code_and_number(sp) == ("S-P", "324")
+    assert product_sku_key(sp) == ("sword-shield-promos", "S-P", "324")
+    assert product_sku_key(swsh_v1) == product_sku_key(swsh_v2)
+    assert product_sku_key(swsh_v1) == ("swsh-black-star-promos", "SWSH", "301")
+    assert product_sku_key(sit) != product_sku_key(sp)
+    mega = (
+        "https://www.cardmarket.com/en/Pokemon/Products/Singles/"
+        "M-P-Promos/Pikachu-M-P020"
+    )
+    assert singles_code_and_number(mega) == ("M-P", "20")
+
+
+def test_slug_parses_digit_prefixed_set_code_30c() -> None:
+    from app.cardmarket import product_sku_key, singles_code_and_number
+
+    url = (
+        "https://www.cardmarket.com/en/Pokemon/Products/Singles/"
+        "30th-Celebration/Mewtwo-ex-V1-30C064"
+    )
+    assert singles_code_and_number(url) == ("30C", "64")
+    assert product_sku_key(url) == ("30th-celebration", "30C", "64")
+
+
+def test_unique_link_30c064_mewtwo_ex(tmp_path: Path) -> None:
+    from app.cardmarket import import_expansion_products, url_for_row
+
+    conn = connect(tmp_path / "catalog.sqlite")
+    init_catalog(conn)
+    _insert_card(
+        conn,
+        "en:30th-064",
+        "Mewtwo ex",
+        "30th Celebration",
+        "064",
+        set_id="30th",
+    )
+    conn.commit()
+    url = (
+        "https://www.cardmarket.com/en/Pokemon/Products/Singles/"
+        "30th-Celebration/Mewtwo-ex-V1-30C064"
+    )
+    import_expansion_products(
+        conn,
+        tmp_path,
+        page_url="https://www.cardmarket.com/en/Pokemon/Products/Singles/30th-Celebration",
+        products=[{"url": url, "name": "Mewtwo ex (30C 064)"}],
+        source="page",
+    )
+    row = conn.execute("SELECT * FROM cards WHERE id = 'en:30th-064'").fetchone()
+    assert url_for_row(row) == url
+
+
+def test_promo_unique_link_and_swsh301_variants(tmp_path: Path) -> None:
+    from app.cardmarket import import_expansion_products, url_for_row, variants_for_row
+
+    conn = connect(tmp_path / "catalog.sqlite")
+    init_catalog(conn)
+    _insert_card(
+        conn,
+        "extra-lugia-v-326-s-p",
+        "Lugia V",
+        "SWSH Promo",
+        "324/S-P",
+        language="ja",
+        set_id="s-p",
+    )
+    _insert_card(
+        conn,
+        "en:swshp-SWSH301",
+        "Lugia V",
+        "SWSH Black Star Promos",
+        "SWSH301",
+        set_id="swshp",
+    )
+    _insert_card(
+        conn,
+        "en:swsh12-138",
+        "Lugia V",
+        "Silver Tempest",
+        "138",
+        set_id="swsh12",
+    )
+    conn.commit()
+    sp = (
+        "https://www.cardmarket.com/en/Pokemon/Products/Singles/"
+        "Sword-Shield-Promos/Lugia-V-S-P324"
+    )
+    v1 = (
+        "https://www.cardmarket.com/en/Pokemon/Products/Singles/"
+        "SWSH-Black-Star-Promos/Lugia-V-V1-SWSH301"
+    )
+    v2 = (
+        "https://www.cardmarket.com/en/Pokemon/Products/Singles/"
+        "SWSH-Black-Star-Promos/Lugia-V-V2-SWSH301"
+    )
+    sit = (
+        "https://www.cardmarket.com/en/Pokemon/Products/Singles/"
+        "Silver-Tempest/Lugia-V-V1-SIT138"
+    )
+    import_expansion_products(
+        conn,
+        tmp_path,
+        page_url="https://www.cardmarket.com/en/Pokemon/Products/Singles/Sword-Shield-Promos",
+        products=[
+            {"url": sp, "name": "Lugia V (S-P 324)"},
+            {"url": v1, "name": "Lugia V (SWSH 301)"},
+            {"url": v2, "name": "Lugia V (SWSH 301)"},
+            {"url": sit, "name": "Lugia V (SIT 138)"},
+        ],
+        source="page",
+    )
+    extra = conn.execute(
+        "SELECT * FROM cards WHERE id = 'extra-lugia-v-326-s-p'"
+    ).fetchone()
+    promo = conn.execute(
+        "SELECT * FROM cards WHERE id = 'en:swshp-SWSH301'"
+    ).fetchone()
+    tempest = conn.execute(
+        "SELECT * FROM cards WHERE id = 'en:swsh12-138'"
+    ).fetchone()
+    assert url_for_row(extra) == sp
+    assert url_for_row(promo) is None
+    slugs = {item["slug"] for item in variants_for_row(conn, promo)}
+    assert slugs == {"Lugia-V-V1-SWSH301", "Lugia-V-V2-SWSH301"}
+    assert url_for_row(tempest) == sit
+    assert variants_for_row(conn, extra) == []
+    assert variants_for_row(conn, tempest) == []
+
+
+def test_link_promo_codes_skips_regular_set_sku(tmp_path: Path) -> None:
+    from app.cardmarket import apply_cardmarket_links, url_for_row
+
+    conn = connect(tmp_path / "catalog.sqlite")
+    init_catalog(conn)
+    _insert_card(
+        conn,
+        "extra-lugia-v-326-s-p",
+        "Lugia V",
+        "SWSH Promo",
+        "324/S-P",
+        language="ja",
+        set_id="s-p",
+    )
+    _insert_card(
+        conn,
+        "extra-clc008",
+        "Pikachu",
+        "Pokemon Trading Card Game Classic Charizard Ho-Oh ex Deck",
+        "008/034",
+        set_id="clc",
+    )
+    conn.commit()
+    dump_dir = tmp_path / "expansion-imports"
+    dump_dir.mkdir()
+    (dump_dir / "mix.json").write_text(
+        json.dumps(
+            {
+                "page_url": (
+                    "https://www.cardmarket.com/en/Pokemon/Products/Singles/"
+                    "Sword-Shield-Promos"
+                ),
+                "source": "page",
+                "products": [
+                    {
+                        "url": (
+                            "https://www.cardmarket.com/en/Pokemon/Products/"
+                            "Singles/Sword-Shield-Promos/Lugia-V-S-P324"
+                        ),
+                        "name": "Lugia V (S-P 324)",
+                    },
+                    {
+                        "url": (
+                            "https://www.cardmarket.com/en/Pokemon/Products/"
+                            "Singles/Pokemon-Trading-Card-Game-Classic-"
+                            "Charizard-Ho-Oh-ex-Deck/Pikachu-CLC008"
+                        ),
+                        "name": "Pikachu",
+                    },
+                ],
+            }
+        )
+    )
+    stats = apply_cardmarket_links(conn, tmp_path, codes={"S-P"})
+    extra = conn.execute(
+        "SELECT * FROM cards WHERE id = 'extra-lugia-v-326-s-p'"
+    ).fetchone()
+    classic = conn.execute(
+        "SELECT * FROM cards WHERE id = 'extra-clc008'"
+    ).fetchone()
+    assert stats["expansion_linked"] == 1
+    assert stats["considered"] == 1
+    assert url_for_row(extra) is not None
+    assert url_for_row(classic) is None
+
+
+def test_unmatched_listing_stores_image_url_not_file(tmp_path: Path) -> None:
+    from app.cardmarket import list_unmatched_products, store_unmatched_product_image
+
+    conn = connect(tmp_path / "catalog.sqlite")
+    init_catalog(conn)
+    official = (
+        "https://www.cardmarket.com/en/Pokemon/Products/Singles/"
+        "Silver-Tempest/Lugia-V-V1-SIT138"
+    )
+    unmatched = (
+        "https://www.cardmarket.com/en/Pokemon/Products/Singles/"
+        "Sword-Shield-Promos/Lugia-V-S-P324"
+    )
+    image_url = "https://product-images.s3.cardmarket.com/52/818570/818570.jpg"
+    _insert_card(
+        conn,
+        "en:swsh12-138",
+        "Lugia V",
+        "Silver Tempest",
+        "138",
+        set_id="swsh12",
+    )
+    conn.commit()
+    skip = store_unmatched_product_image(
+        conn, tmp_path, url=official, image_url=image_url, name="Lugia V"
+    )
+    assert skip["stored"] is True
+    assert skip["reason"] == "url"
+    assert skip["image_url"] == image_url
+    extras = conn.execute("SELECT id FROM cards WHERE id LIKE 'cm-%'").fetchall()
+    assert extras == []
+    stored = store_unmatched_product_image(
+        conn, tmp_path, url=unmatched, image_url=image_url, name="Lugia V"
+    )
+    assert stored["stored"] is True
+    assert stored["url"] == unmatched
+    extras = conn.execute("SELECT id FROM cards WHERE id LIKE 'cm-%'").fetchall()
+    assert extras == []
+    listed = conn.execute(
+        "SELECT listing_image_url, matched FROM cardmarket_expansion_products WHERE url = ?",
+        (unmatched,),
+    ).fetchone()
+    assert listed["listing_image_url"] == image_url
+    assert int(listed["matched"]) == 0
+    images = list((tmp_path / "reference-images").glob("*.jpg")) if (tmp_path / "reference-images").exists() else []
+    assert images == []
+    page = list_unmatched_products(conn)
+    assert unmatched not in [item["url"] for item in page["products"]]
+
+
+def test_listing_image_url_saved_on_existing_expansion_product(tmp_path: Path) -> None:
+    from app.cardmarket import store_unmatched_product_image, url_for_row
+
+    conn = connect(tmp_path / "catalog.sqlite")
+    init_catalog(conn)
+    v1 = (
+        "https://www.cardmarket.com/en/Pokemon/Products/Singles/"
+        "Fusion-Strike/Tsareena-V-V1"
+    )
+    _insert_card(
+        conn,
+        "en:swsh8-21",
+        "Tsareena V",
+        "Fusion Strike",
+        "21",
+        set_id="swsh8",
+    )
+    conn.execute(
+        """
+        INSERT INTO cardmarket_expansion_products (
+            url, expansion, name, source, page_url, card_id, matched, imported_at
+        ) VALUES (?, 'Fusion-Strike', 'Tsareena V', 'page', ?, NULL, 0, '2026-01-01T00:00:00Z')
+        """,
+        (v1, v1),
+    )
+    conn.commit()
+    image_url = "https://product-images.s3.cardmarket.com/52/818570/818570.jpg"
+    result = store_unmatched_product_image(
+        conn,
+        tmp_path,
+        url=v1,
+        name="Tsareena V",
+        image_url=image_url,
+    )
+    assert result["stored"] is True
+    assert result["reason"] == "url"
+    assert result["image_url"] == image_url
+    row = conn.execute("SELECT * FROM cards WHERE id = 'en:swsh8-21'").fetchone()
+    assert url_for_row(row) is None
+    listed = conn.execute(
+        "SELECT listing_image_url, matched, card_id, source FROM cardmarket_expansion_products WHERE url = ?",
+        (v1,),
+    ).fetchone()
+    assert listed["listing_image_url"] == image_url
+    assert int(listed["matched"]) == 0
+    assert listed["card_id"] is None
+    assert listed["source"] == "page"
+
+
+def test_list_unmatched_products_pages_after_cursor(tmp_path: Path) -> None:
+    from app.cardmarket import list_unmatched_products
+
+    conn = connect(tmp_path / "catalog.sqlite")
+    init_catalog(conn)
+    matched = (
+        "https://www.cardmarket.com/en/Pokemon/Products/Singles/"
+        "Tag-Bolt/Aaa-ABC001"
+    )
+    first = (
+        "https://www.cardmarket.com/en/Pokemon/Products/Singles/"
+        "Tag-Bolt/Gengar-Mimikyu-GX-V2-sm9102"
+    )
+    second = (
+        "https://www.cardmarket.com/en/Pokemon/Products/Singles/"
+        "Tag-Bolt/Zzz-ZZZ001"
+    )
+    conn.execute(
+        """
+        INSERT INTO cardmarket_expansion_products (
+            url, expansion, name, source, page_url, card_id, matched, imported_at
+        ) VALUES
+        (?, 'Tag-Bolt', 'Aaa', 'page', ?, 'en:abc-1', 1, '2026-09-19T00:00:00Z'),
+        (?, 'Tag-Bolt', 'Gengar', 'page', ?, NULL, 0, '2026-09-19T00:00:00Z'),
+        (?, 'Tag-Bolt', 'Zzz', 'page', ?, '', 0, '2026-09-19T00:00:00Z')
+        """,
+        (
+            matched,
+            matched,
+            first,
+            first,
+            second,
+            second,
+        ),
+    )
+    conn.commit()
+    page = list_unmatched_products(conn, limit=1)
+    assert page["total"] == 2
+    assert page["products"][0]["url"] == first
+    assert page["products"][0]["name"] == "Gengar"
+    next_page = list_unmatched_products(conn, after=first, limit=10)
+    assert [row["url"] for row in next_page["products"]] == [second]
+    assert list_unmatched_products(conn, after=second)["products"] == []
+    conn.execute(
+        """
+        UPDATE cardmarket_expansion_products
+        SET listing_image_url = ?
+        WHERE url = ?
+        """,
+        ("https://product-images.s3.cardmarket.com/1/gengar/gengar.jpg", first),
+    )
+    conn.commit()
+    skipped = list_unmatched_products(conn, limit=10)
+    assert skipped["total"] == 1
+    assert [row["url"] for row in skipped["products"]] == [second]
+
+
+def test_list_unmatched_products_skips_official_151_abra(tmp_path: Path) -> None:
+    from app.cardmarket import list_unmatched_products
+
+    conn = connect(tmp_path / "catalog.sqlite")
+    init_catalog(conn)
+    v1 = (
+        "https://www.cardmarket.com/en/Pokemon/Products/Singles/"
+        "151/Abra-V1-MEW063"
+    )
+    v2 = (
+        "https://www.cardmarket.com/en/Pokemon/Products/Singles/"
+        "151/Abra-V2-MEW063"
+    )
+    movie = (
+        "https://www.cardmarket.com/en/Pokemon/Products/Singles/"
+        "10th-Movie-Commemoration-Set/Alto-Mares-Latias"
+    )
+    _insert_card(
+        conn,
+        "en:sv03.5-063",
+        "Abra",
+        "151",
+        "063",
+        set_id="sv03.5",
+        cardmarket_url=v1,
+        provenance="helper-expansion",
+    )
+    conn.execute(
+        """
+        INSERT INTO cardmarket_expansion_products (
+            url, expansion, name, source, page_url, card_id, matched, imported_at
+        ) VALUES
+        (?, '151', 'Abra', 'page', ?, NULL, 0, '2026-09-19T00:00:00Z'),
+        (?, '151', 'Abra', 'page', ?, NULL, 0, '2026-09-19T00:00:00Z'),
+        (?, '10th-Movie-Commemoration-Set', 'Latias', 'page', ?, NULL, 0, '2026-09-19T00:00:00Z')
+        """,
+        (v1, v1, v2, v2, movie, movie),
+    )
+    conn.commit()
+    page = list_unmatched_products(conn, limit=10)
+    urls = [row["url"] for row in page["products"]]
+    assert v1 not in urls
+    assert v2 not in urls
+    assert urls == [movie]
 

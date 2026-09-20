@@ -5,6 +5,7 @@ import json
 
 from fastapi import APIRouter, Form, HTTPException, Request, Response, UploadFile
 
+from app.cardmarket import MappingError, resolve_variant_choice
 from app.db import coverage_payload
 from app.recognition.artifacts import ArtifactError
 from app.recognition.images import ImageError
@@ -96,6 +97,7 @@ async def scan_feedback(
     require_scan_owner(dbs, scan_id, session_id)
     confirmed = None
     rejected = 0
+    chosen_url = payload.cardmarket_url
     if payload.action == "confirm":
         confirmed = payload.card_id
         if not confirmed:
@@ -106,13 +108,26 @@ async def scan_feedback(
             raise HTTPException(status_code=400, detail="card_id is required to correct")
     elif payload.action == "reject":
         rejected = 1
+        chosen_url = None
+    if confirmed and payload.cardmarket_url:
+        try:
+            picked = resolve_variant_choice(
+                dbs.catalog,
+                settings.data_dir,
+                scanned_card_id=confirmed,
+                url=payload.cardmarket_url,
+            )
+        except MappingError as exc:
+            raise HTTPException(status_code=exc.status_code, detail=exc.detail) from exc
+        confirmed = str(picked["card_id"])
+        chosen_url = str(picked["url"])
     dbs.results.execute(
         """
         UPDATE scans
-        SET confirmed_card_id = ?, rejected = ?
+        SET confirmed_card_id = ?, rejected = ?, chosen_cardmarket_url = ?
         WHERE id = ?
         """,
-        (confirmed, rejected, scan_id),
+        (confirmed, rejected, chosen_url, scan_id),
     )
     dbs.results.commit()
     try:

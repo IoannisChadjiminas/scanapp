@@ -10,6 +10,7 @@ const pauseBtn = document.getElementById("pause");
 const importPageBtn = document.getElementById("import-page");
 const importSetBtn = document.getElementById("import-set");
 const importAllBtn = document.getElementById("import-all");
+const importUnmatchedBtn = document.getElementById("import-unmatched-images");
 const expansionNoteEl = document.getElementById("expansion-note");
 const serverEl = document.getElementById("server");
 const customWrap = document.getElementById("custom-wrap");
@@ -17,6 +18,7 @@ const customUrl = document.getElementById("custom-url");
 const tokenEl = document.getElementById("token");
 const ntfyEl = document.getElementById("ntfy-topic");
 const paceEl = document.getElementById("pace");
+const saveUnmatchedEl = document.getElementById("save-unmatched-image");
 
 function connectionLabel(value) {
   if (value === "connected") {
@@ -43,6 +45,9 @@ function activityLabel(value) {
   }
   if (value === "crawling-all-sets") {
     return "crawling all expansions";
+  }
+  if (value === "crawling-unmatched-images") {
+    return "saving unmatched listing images";
   }
   return value || "idle";
 }
@@ -76,6 +81,7 @@ function render(status) {
   importPageBtn.disabled = Boolean(status.expansionBusy);
   importSetBtn.disabled = Boolean(status.expansionBusy);
   importAllBtn.disabled = Boolean(status.expansionBusy);
+  importUnmatchedBtn.disabled = Boolean(status.expansionBusy);
   const apiBase = String(status.apiBase || DEFAULT_API).replace(/\/$/, "");
   if (apiBase === SERVERS.local || apiBase === SERVERS.staging) {
     serverEl.value = apiBase;
@@ -96,6 +102,7 @@ function render(status) {
     ntfyEl.placeholder = "secret-topic-name";
   }
   paceEl.value = normalizePace(status.expansionPace);
+  saveUnmatchedEl.checked = Boolean(status.saveUnmatchedImage);
 }
 
 async function send(message) {
@@ -154,8 +161,15 @@ document.getElementById("import-all").addEventListener("click", () => {
   expansionNoteEl.textContent = "Crawling all expansions…";
   void refresh({ type: "import-expansion-all" });
 });
+document.getElementById("import-unmatched-images").addEventListener("click", () => {
+  expansionNoteEl.textContent = "Iterating unmatched listing images…";
+  void refresh({ type: "import-unmatched-images" });
+});
 paceEl.addEventListener("change", () => {
   void refresh({ type: "set-settings", expansionPace: paceEl.value });
+});
+saveUnmatchedEl.addEventListener("change", () => {
+  void refresh({ type: "set-settings", saveUnmatchedImage: saveUnmatchedEl.checked });
 });
 document.getElementById("notify-test").addEventListener("click", () => {
   void refresh({ type: "notify-test" });
