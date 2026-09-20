@@ -14,6 +14,7 @@ from app.cardmarket_queue import (
     claim_job,
     complete_job,
     enqueue_job,
+    helper_public_state,
     identities_compatible,
     immediate_transaction,
     issue_helper_credential,
@@ -333,6 +334,27 @@ def test_helper_auth_and_http_flow(tmp_path):
     )
     assert status.json()["helper_ready"] is True
     assert authenticate_helper(conn, token)["helper_id"] == helper_id
+    assert status.json()["cdp_online"] is False
+
+
+def test_cdp_helper_is_preferred_online(tmp_path):
+    conn = _catalog(tmp_path)
+    ext_id, _ = issue_helper_credential(conn)
+    cdp_id, _ = issue_helper_credential(conn, "cdp")
+    update_helper_status(conn, cdp_id, ready=True, paused=False)
+    state = helper_public_state(conn)
+    assert state["cdp_online"] is True
+    assert state["cdp_ready"] is True
+    assert state["helper_online"] is True
+    conn.execute(
+        "UPDATE cardmarket_helpers SET last_seen = '2020-01-01T00:00:00Z' WHERE helper_id = ?",
+        (cdp_id,),
+    )
+    conn.commit()
+    update_helper_status(conn, ext_id, ready=True, paused=False)
+    state = helper_public_state(conn)
+    assert state["cdp_online"] is False
+    assert state["helper_online"] is True
 
 
 def test_recover_and_renew_claim(tmp_path):

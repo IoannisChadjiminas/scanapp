@@ -30,6 +30,10 @@ _PROMO_SLUG_RE = re.compile(
 _PRICE_TAIL_RE = re.compile(r"From\s+[\d.,]+\s*€.*$", re.I)
 _LATIN_SLUG_RE = re.compile(r"[a-z0-9]+")
 _PROTECTED_PROVENANCE = {"helper-map", "manifest-url"}
+JA_COLLECTOR_PROVENANCE = "ja-collector"
+_LISTING_SET_COLLECTOR_RE = re.compile(
+    r"\(([A-Za-z][A-Za-z0-9.\-]*)\s+([^)]+)\)"
+)
 _WEAK_LATIN_NAME_SLUGS = frozenset(
     {"ex", "gx", "v", "vmax", "vstar", "lv", "lvx", "break", "tag"}
 )
@@ -771,6 +775,21 @@ def latin_name_slug(name: str) -> str | None:
     return slug
 
 
+def listing_set_collector(name: str) -> tuple[str, str] | None:
+    """Set code and collector as written in a Cardmarket label, e.g. (s8a 014)."""
+    text = _PRICE_TAIL_RE.sub("", str(name or "")).strip()
+    match = None
+    for match in _LISTING_SET_COLLECTOR_RE.finditer(text):
+        pass
+    if match is None:
+        return None
+    set_id = match.group(1).strip()
+    collector = match.group(2).strip()
+    if not set_id or not collector:
+        return None
+    return set_id, collector
+
+
 def name_fits_product_slug(name_slug: str | None, product_path: str) -> bool:
     """True when the card name is a hyphen-bounded token in the listing slug."""
     if not name_slug or not product_path:
@@ -987,7 +1006,11 @@ def clear_ambiguous_auto_links(conn: sqlite3.Connection) -> int:
         url = str(row["cardmarket_url"] or "")
         key = product_sku_key(url)
         provenance = str(row["cardmarket_provenance"] or "")
-        if key not in ambiguous or provenance in _PROTECTED_PROVENANCE:
+        if (
+            key not in ambiguous
+            or provenance in _PROTECTED_PROVENANCE
+            or provenance == JA_COLLECTOR_PROVENANCE
+        ):
             continue
         _clear_auto_product_url(conn, str(row["id"]), url)
         cleared += 1
@@ -1006,7 +1029,11 @@ def clear_mismatched_auto_links(conn: sqlite3.Connection) -> int:
     ).fetchall()
     for row in rows:
         provenance = str(row["cardmarket_provenance"] or "")
-        if provenance in _PROTECTED_PROVENANCE or provenance != "helper-expansion":
+        if (
+            provenance in _PROTECTED_PROVENANCE
+            or provenance == JA_COLLECTOR_PROVENANCE
+            or provenance != "helper-expansion"
+        ):
             continue
         url = str(row["cardmarket_url"] or "")
         expansion = _expansion_from_url(url)
@@ -1618,6 +1645,123 @@ def link_stored_expansion_products(
     }
 
 
+def link_japanese_listing_codes(
+    conn: sqlite3.Connection,
+    data_dir: Path,
+) -> dict[str, int]:
+    """Attach unique (set collector) Singles URLs to Japanese prints only."""
+    ja_by_key: dict[tuple[str, str], list[sqlite3.Row]] = {}
+    rows = conn.execute(
+        """
+        SELECT id, name, set_id, collector_number, language,
+               cardmarket_url, cardmarket_provenance, cardmarket_verified
+        FROM cards
+        WHERE language = 'ja' AND id LIKE 'ja:%'
+        """
+    ).fetchall()
+    for row in rows:
+        set_id = str(row["set_id"] or "").strip()
+        collector = str(row["collector_number"] or "").strip()
+        if not set_id or not collector:
+            continue
+        ja_by_key.setdefault((set_id.lower(), collector), []).append(row)
+
+    products_by_key: dict[tuple[str, str], list[sqlite3.Row]] = {}
+    products = conn.execute(
+        """
+        SELECT url, name, card_id, matched
+        FROM cardmarket_expansion_products
+        WHERE matched = 0 OR card_id IS NULL OR card_id = ''
+        ORDER BY url
+        """
+    ).fetchall()
+    skipped = 0
+    for product in products:
+        url = str(product["url"] or "")
+        if not is_verified_singles_url(url):
+            skipped += 1
+            continue
+        parsed = listing_set_collector(str(product["name"] or ""))
+        if parsed is None:
+            skipped += 1
+            continue
+        set_id, collector = parsed
+        products_by_key.setdefault((set_id.lower(), collector), []).append(product)
+
+    linked = 0
+    replaced = 0
+    already = 0
+    ambiguous = 0
+    for key, candidates in products_by_key.items():
+        cards = ja_by_key.get(key, [])
+        if len(cards) != 1 or len(candidates) != 1:
+            if cards and candidates:
+                ambiguous += 1
+            continue
+        card = cards[0]
+        product = candidates[0]
+        url = normalize_product_url(str(product["url"] or "")) or str(product["url"] or "")
+        provenance = str(card["cardmarket_provenance"] or "")
+        if provenance in _PROTECTED_PROVENANCE:
+            skipped += 1
+            continue
+        current = str(card["cardmarket_url"] or "").strip()
+        if current == url:
+            conn.execute(
+                """
+                UPDATE cardmarket_expansion_products
+                SET card_id = ?, matched = 1
+                WHERE url = ?
+                """,
+                (str(card["id"]), url),
+            )
+            already += 1
+            continue
+        if current:
+            conn.execute(
+                """
+                UPDATE cardmarket_expansion_products
+                SET card_id = NULL, matched = 0
+                WHERE url = ?
+                  AND (card_id = ? OR card_id IS NULL OR card_id = '')
+                """,
+                (current, str(card["id"])),
+            )
+            replaced += 1
+        conn.execute(
+            """
+            UPDATE cards
+            SET cardmarket_url = ?,
+                cardmarket_verified = 1,
+                cardmarket_provenance = ?,
+                cardmarket_verified_at = ?
+            WHERE id = ?
+            """,
+            (url, JA_COLLECTOR_PROVENANCE, datetime_now(), str(card["id"])),
+        )
+        conn.execute(
+            """
+            UPDATE cardmarket_expansion_products
+            SET card_id = ?, matched = 1
+            WHERE url = ?
+            """,
+            (str(card["id"]), url),
+        )
+        linked += 1
+    print(
+        f"ja-collector linked {linked}, replaced {replaced}, "
+        f"already {already}, ambiguous {ambiguous}, skipped {skipped}",
+        flush=True,
+    )
+    return {
+        "linked": linked,
+        "replaced": replaced,
+        "already": already,
+        "ambiguous": ambiguous,
+        "skipped": skipped,
+    }
+
+
 def apply_cardmarket_links(
     conn: sqlite3.Connection,
     data_dir: Path,
@@ -1630,6 +1774,7 @@ def apply_cardmarket_links(
     mismatched = clear_mismatched_auto_links(conn)
     expansion = link_stored_expansion_products(conn, data_dir, codes=codes)
     cleared = clear_ambiguous_auto_links(conn)
+    ja_codes = link_japanese_listing_codes(conn, data_dir)
     conn.commit()
     return {
         "dumps": dumps,
@@ -1640,6 +1785,8 @@ def apply_cardmarket_links(
         "considered": expansion["considered"],
         "mismatched_cleared": mismatched,
         "ambiguous_cleared": cleared,
+        "ja_collector_linked": ja_codes["linked"],
+        "ja_collector_replaced": ja_codes["replaced"],
     }
 
 

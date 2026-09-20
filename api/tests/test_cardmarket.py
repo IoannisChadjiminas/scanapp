@@ -757,6 +757,325 @@ def test_latin_name_slug_ignores_cjk_ex() -> None:
     assert latin_name_slug("Gengar V") == "gengar-v"
 
 
+def _insert_product(conn, url, name, *, expansion=""):
+    conn.execute(
+        """
+        INSERT INTO cardmarket_expansion_products (
+            url, expansion, name, source, page_url, card_id, matched, imported_at
+        ) VALUES (?, ?, ?, 'test', '', NULL, 0, '2026-01-01')
+        """,
+        (url, expansion, name),
+    )
+
+
+def test_listing_set_collector_keeps_padding() -> None:
+    from app.cardmarket import listing_set_collector
+
+    assert listing_set_collector("Cosmog (s8a 014)From 0,02 €") == ("s8a", "014")
+    assert listing_set_collector(
+        "Arceus & Dialga & Palkia GX (sm12 065)From 13,50 €"
+    ) == ("sm12", "065")
+    assert listing_set_collector("Pikachu V (s8a-G 001)From 120,00 €") == (
+        "s8a-G",
+        "001",
+    )
+    assert listing_set_collector("Lunala (CEC 102)From 0,70 €") == ("CEC", "102")
+
+
+def test_japanese_collector_maps_ja_not_english_twin(tmp_path: Path) -> None:
+    from app.cardmarket import (
+        JA_COLLECTOR_PROVENANCE,
+        link_japanese_listing_codes,
+        url_for_row,
+    )
+
+    conn = connect(tmp_path / "catalog.sqlite")
+    init_catalog(conn)
+    _insert_card(
+        conn,
+        "ja:SM12-102",
+        "アーゴヨン&アクジキングGX",
+        "オルタージェネシス",
+        "102",
+        language="ja",
+        set_id="SM12",
+    )
+    _insert_card(
+        conn,
+        "en:sm12-102",
+        "Lunala",
+        "Cosmic Eclipse",
+        "102",
+        set_id="sm12",
+    )
+    gx = (
+        "https://www.cardmarket.com/en/Pokemon/Products/Singles/"
+        "Alter-Genesis/Naganadel-Guzzlord-GX-V3-sm12102"
+    )
+    lunala = (
+        "https://www.cardmarket.com/en/Pokemon/Products/Singles/"
+        "Cosmic-Eclipse/Lunala-V1-CEC102"
+    )
+    _insert_product(
+        conn, gx, "Naganadel & Guzzlord GX (sm12 102)From 49,99 €",
+        expansion="Alter-Genesis",
+    )
+    _insert_product(
+        conn, lunala, "Lunala (CEC 102)From 0,70 €", expansion="Cosmic-Eclipse"
+    )
+    conn.commit()
+    stats = link_japanese_listing_codes(conn, tmp_path)
+    conn.commit()
+    assert stats["linked"] == 1
+    ja = conn.execute("SELECT * FROM cards WHERE id = 'ja:SM12-102'").fetchone()
+    en = conn.execute("SELECT * FROM cards WHERE id = 'en:sm12-102'").fetchone()
+    assert url_for_row(ja) == gx
+    assert ja["cardmarket_provenance"] == JA_COLLECTOR_PROVENANCE
+    assert url_for_row(en) is None
+    assert conn.execute(
+        "SELECT card_id FROM cardmarket_expansion_products WHERE url = ?", (gx,)
+    ).fetchone()["card_id"] == "ja:SM12-102"
+
+
+def test_japanese_collector_keeps_celebrations_off_s8a(tmp_path: Path) -> None:
+    from app.cardmarket import link_japanese_listing_codes, url_for_row
+
+    conn = connect(tmp_path / "catalog.sqlite")
+    init_catalog(conn)
+    _insert_card(
+        conn,
+        "ja:S8a-014",
+        "Cosmog",
+        "25th アニバーサリーコレクション",
+        "014",
+        language="ja",
+        set_id="S8a",
+    )
+    _insert_card(
+        conn,
+        "en:cel25-13",
+        "Cosmog",
+        "Celebrations",
+        "13",
+        set_id="cel25",
+        cardmarket_url=(
+            "https://www.cardmarket.com/en/Pokemon/Products/Singles/Celebrations/Cosmog"
+        ),
+        provenance="helper-expansion",
+        verified=1,
+    )
+    twenty_fifth = (
+        "https://www.cardmarket.com/en/Pokemon/Products/Singles/"
+        "25th-Anniversary-Collection/Cosmog"
+    )
+    celebrations = (
+        "https://www.cardmarket.com/en/Pokemon/Products/Singles/Celebrations/Cosmog"
+    )
+    _insert_product(
+        conn, twenty_fifth, "Cosmog (s8a 014)From 0,02 €",
+        expansion="25th-Anniversary-Collection",
+    )
+    conn.execute(
+        """
+        INSERT INTO cardmarket_expansion_products (
+            url, expansion, name, source, page_url, card_id, matched, imported_at
+        ) VALUES (?, 'Celebrations', 'Cosmog (CEL 013)From 0,02 €',
+                  'test', '', 'en:cel25-13', 1, '2026-01-01')
+        """,
+        (celebrations,),
+    )
+    golden = (
+        "https://www.cardmarket.com/en/Pokemon/Products/Singles/"
+        "25th-Anniversary-Golden-Box/Pikachu-V-V1"
+    )
+    _insert_card(
+        conn,
+        "ja:S8a-001",
+        "Pikachu",
+        "25th アニバーサリーコレクション",
+        "001",
+        language="ja",
+        set_id="S8a",
+        cardmarket_url=golden,
+        provenance="helper-expansion",
+        verified=1,
+    )
+    _insert_product(
+        conn, golden, "Pikachu V (s8a-G 001)From 120,00 €",
+        expansion="25th-Anniversary-Golden-Box",
+    )
+    anniversary_pika = (
+        "https://www.cardmarket.com/en/Pokemon/Products/Singles/"
+        "25th-Anniversary-Collection/Pikachu"
+    )
+    _insert_product(
+        conn, anniversary_pika, "Pikachu (s8a 001)From 0,02 €",
+        expansion="25th-Anniversary-Collection",
+    )
+    araquanid = (
+        "https://www.cardmarket.com/en/Pokemon/Products/Singles/"
+        "Cosmic-Eclipse/Araquanid-CEC65"
+    )
+    _insert_card(
+        conn,
+        "ja:SM12-065",
+        "アルセウス&ディアルガ&パルキアGX",
+        "オルタージェネシス",
+        "065",
+        language="ja",
+        set_id="SM12",
+    )
+    _insert_card(
+        conn,
+        "en:sm12-65",
+        "Araquanid",
+        "Cosmic Eclipse",
+        "65",
+        set_id="sm12",
+        cardmarket_url=araquanid,
+        provenance="helper-expansion",
+        verified=1,
+    )
+    alter = (
+        "https://www.cardmarket.com/en/Pokemon/Products/Singles/"
+        "Alter-Genesis/Arceus-Dialga-Palkia-GX-V1-sm12065"
+    )
+    _insert_product(
+        conn, alter, "Arceus & Dialga & Palkia GX (sm12 065)From 13,50 €",
+        expansion="Alter-Genesis",
+    )
+    conn.commit()
+    link_japanese_listing_codes(conn, tmp_path)
+    conn.commit()
+    cosmog = conn.execute("SELECT * FROM cards WHERE id = 'ja:S8a-014'").fetchone()
+    celebrations_row = conn.execute(
+        "SELECT * FROM cards WHERE id = 'en:cel25-13'"
+    ).fetchone()
+    pikachu = conn.execute("SELECT * FROM cards WHERE id = 'ja:S8a-001'").fetchone()
+    ja_065 = conn.execute("SELECT * FROM cards WHERE id = 'ja:SM12-065'").fetchone()
+    en_65 = conn.execute("SELECT * FROM cards WHERE id = 'en:sm12-65'").fetchone()
+    assert url_for_row(cosmog) == twenty_fifth
+    assert url_for_row(celebrations_row) == celebrations
+    assert url_for_row(pikachu) == anniversary_pika
+    assert url_for_row(ja_065) == alter
+    assert url_for_row(en_65) == araquanid
+
+
+def test_japanese_collector_skips_protected_and_ambiguous(tmp_path: Path) -> None:
+    from app.cardmarket import link_japanese_listing_codes, url_for_row
+
+    conn = connect(tmp_path / "catalog.sqlite")
+    init_catalog(conn)
+    protected_url = (
+        "https://www.cardmarket.com/en/Pokemon/Products/Singles/"
+        "Tag-Bolt/Gengar-Mimikyu-GX-V2-sm9102"
+    )
+    _insert_card(
+        conn,
+        "ja:SM9-103",
+        "ゲンガー&ミミッキュGX",
+        "タッグボルト",
+        "103",
+        language="ja",
+        set_id="SM9",
+        cardmarket_url=protected_url,
+        provenance="manifest-url",
+        verified=1,
+    )
+    other = (
+        "https://www.cardmarket.com/en/Pokemon/Products/Singles/"
+        "Tag-Bolt/Gengar-Mimikyu-GX-V1-sm9103"
+    )
+    _insert_product(
+        conn, other, "Gengar & Mimikyu GX (sm9 103)From 1,00 €", expansion="Tag-Bolt"
+    )
+    v1 = (
+        "https://www.cardmarket.com/en/Pokemon/Products/Singles/"
+        "Alter-Genesis/Rowlet-V1"
+    )
+    v2 = (
+        "https://www.cardmarket.com/en/Pokemon/Products/Singles/"
+        "Alter-Genesis/Rowlet-V2"
+    )
+    _insert_card(
+        conn,
+        "ja:SM12-008",
+        "モクロー",
+        "オルタージェネシス",
+        "008",
+        language="ja",
+        set_id="SM12",
+    )
+    _insert_product(conn, v1, "Rowlet (sm12 008)From 0,02 €", expansion="Alter-Genesis")
+    _insert_product(conn, v2, "Rowlet (sm12 008)From 0,04 €", expansion="Alter-Genesis")
+    conn.commit()
+    stats = link_japanese_listing_codes(conn, tmp_path)
+    conn.commit()
+    assert stats["linked"] == 0
+    gengar = conn.execute("SELECT * FROM cards WHERE id = 'ja:SM9-103'").fetchone()
+    rowlet = conn.execute("SELECT * FROM cards WHERE id = 'ja:SM12-008'").fetchone()
+    assert url_for_row(gengar) == protected_url
+    assert url_for_row(rowlet) is None
+
+
+def test_japanese_collector_replace_does_not_unmatch_new_owner(tmp_path: Path) -> None:
+    from app.cardmarket import link_japanese_listing_codes, url_for_row
+
+    conn = connect(tmp_path / "catalog.sqlite")
+    init_catalog(conn)
+    metang = (
+        "https://www.cardmarket.com/en/Pokemon/Products/Singles/"
+        "Clash-of-the-Blue-Sky/Metang-PCG2043"
+    )
+    _insert_card(
+        conn,
+        "ja:PCG2-043",
+        "メタン",
+        "蒼空の激突",
+        "043",
+        language="ja",
+        set_id="PCG2",
+    )
+    _insert_card(
+        conn,
+        "ja:SM3N-043",
+        "ポリゴン2",
+        "光を喰らう闇",
+        "043",
+        language="ja",
+        set_id="SM3N",
+        cardmarket_url=metang,
+        provenance="helper-expansion",
+        verified=1,
+    )
+    correct = (
+        "https://www.cardmarket.com/en/Pokemon/Products/Singles/"
+        "To-Have-Seen-the-Battle-Rainbow/Porygon2-sm3n043"
+    )
+    _insert_product(
+        conn, metang, "Metang (PCG2 043)From 1,20 €", expansion="Clash-of-the-Blue-Sky"
+    )
+    _insert_product(
+        conn,
+        correct,
+        "Porygon2 (sm3n 043)From 0,02 €",
+        expansion="To-Have-Seen-the-Battle-Rainbow",
+    )
+    conn.commit()
+    link_japanese_listing_codes(conn, tmp_path)
+    conn.commit()
+    pcg = conn.execute("SELECT * FROM cards WHERE id = 'ja:PCG2-043'").fetchone()
+    sm = conn.execute("SELECT * FROM cards WHERE id = 'ja:SM3N-043'").fetchone()
+    assert url_for_row(pcg) == metang
+    assert url_for_row(sm) == correct
+    owned = conn.execute(
+        "SELECT card_id, matched FROM cardmarket_expansion_products WHERE url = ?",
+        (metang,),
+    ).fetchone()
+    assert owned["card_id"] == "ja:PCG2-043"
+    assert owned["matched"] == 1
+
+
 def test_localized_expansion_does_not_fit_english_set() -> None:
     from app.cardmarket import name_fits_product_slug, set_fits_expansion
 

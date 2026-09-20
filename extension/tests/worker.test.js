@@ -45,7 +45,7 @@ function jsonResponse(payload, status = 200) {
   };
 }
 
-function createHarness({ extract, scripting, claimJobs, expansionExtract, expansionCrawls, unmatchedProducts, onTabUpdate, productImage, tabState } = {}) {
+function createHarness({ extract, scripting, claimJobs, expansionExtract, expansionCrawls, unmatchedProducts, onTabUpdate, productImage, tabState, statusPayload } = {}) {
   const local = memoryStore({
     apiBase: "http://127.0.0.1:8000",
     helperToken: "helper.token",
@@ -77,7 +77,9 @@ function createHarness({ extract, scripting, claimJobs, expansionExtract, expans
     const path = new URL(url).pathname;
     const body = init.body ? JSON.parse(init.body) : {};
     if (path.endsWith("/cardmarket/helper/status")) {
-      return jsonResponse({ queued: 1, helper_ready: true, helper_online: true });
+      return jsonResponse(
+        statusPayload || { queued: 1, helper_ready: true, helper_online: true },
+      );
     }
     if (path.endsWith("/cardmarket/helper/claim")) {
       if (!body.job_id && !claims.length) {
@@ -323,6 +325,30 @@ function createHarness({ extract, scripting, claimJobs, expansionExtract, expans
 function productPages(imports) {
   return imports.filter((item) => Array.isArray(item.products) && item.products.length);
 }
+
+test("skips job claims while the CDP worker is online", async () => {
+  const { worker, createdTabs, claims } = createHarness({
+    statusPayload: {
+      queued: 1,
+      helper_ready: true,
+      helper_online: true,
+      cdp_online: true,
+    },
+    claimJobs: [
+      {
+        id: "job-cdp",
+        url: GENGAR,
+        card_id: "gengar",
+        claim_token: "claim-cdp",
+        claim_expires_at: "2099-01-01T00:00:00Z",
+        status: "claimed",
+      },
+    ],
+  });
+  await worker.wake("alarm");
+  assert.equal(claims.length, 0);
+  assert.equal(createdTabs.length, 0);
+});
 
 test("overlapping wake events claim only one job", async () => {
   const { worker, claims } = createHarness();

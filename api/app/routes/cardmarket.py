@@ -141,6 +141,8 @@ class PriceResponse(BaseModel):
     helper_ready: bool = False
     helper_paused: bool = False
     helper_attention: str | None = None
+    cdp_online: bool = False
+    cdp_ready: bool = False
     observed_at: str | None = None
     sampled_offer_count: int | None = None
     freshness: str | None = None
@@ -193,6 +195,8 @@ def _price_response(payload: dict[str, Any]) -> PriceResponse:
         helper_ready=bool(payload.get("helper_ready")),
         helper_paused=bool(payload.get("helper_paused")),
         helper_attention=payload.get("helper_attention"),
+        cdp_online=bool(payload.get("cdp_online")),
+        cdp_ready=bool(payload.get("cdp_ready")),
         observed_at=payload.get("observed_at"),
         sampled_offer_count=payload.get("sampled_offer_count"),
         freshness=payload.get("freshness"),

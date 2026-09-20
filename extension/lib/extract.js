@@ -1,4 +1,5 @@
 import { PARSER_VERSION } from "./constants.js";
+import { listingSrcOk, pickListingImage } from "./listing-image.js";
 import { extractPrices, hasChallenge, hasEmptyState } from "./parse.js";
 import { classifyUrl } from "./url.js";
 
@@ -14,7 +15,7 @@ const LISTING_IMAGE_SELECTOR = [
 
 export function listingImageNode(root) {
   const picked = mainListingImage(root);
-  return picked?.img || root.querySelector?.(LISTING_IMAGE_SELECTOR) || null;
+  return picked?.img || null;
 }
 
 export function listingImageNodes(root) {
@@ -26,27 +27,7 @@ export function listingImageNodes(root) {
 }
 
 export function isCardmarketListingImageUrl(src) {
-  try {
-    const parsed = new URL(src);
-    const host = parsed.hostname.toLowerCase();
-    const path = parsed.pathname.toLowerCase();
-    if (
-      host === "product-images.s3.cardmarket.com" ||
-      host.endsWith(".product-images.s3.cardmarket.com")
-    ) {
-      return true;
-    }
-    if (
-      (host === "static.cardmarket.com" || host.endsWith(".static.cardmarket.com")) &&
-      /\.(jpe?g|webp|png)$/.test(path) &&
-      !/logo|favicon|icon|placeholder|sprite/.test(path)
-    ) {
-      return true;
-    }
-    return false;
-  } catch {
-    return false;
-  }
+  return listingSrcOk(src);
 }
 
 export function imageSrc(img) {
@@ -54,31 +35,23 @@ export function imageSrc(img) {
 }
 
 export function mainListingImage(root) {
-  let best = null;
+  const wanted = pickListingImage(root, String(root?.location?.href || "")).listingSrc;
+  if (!wanted) {
+    return null;
+  }
   for (const img of listingImageNodes(root)) {
-    const src = imageSrc(img);
-    if (!src || !isCardmarketListingImageUrl(src)) {
-      continue;
-    }
-    const width = Number(img.naturalWidth || img.width || 0);
-    const height = Number(img.naturalHeight || img.height || 0);
-    const area = width * height;
-    const className = String(img.className || "");
-    const isFront = className.includes("is-front") || Boolean(img.classList?.contains?.("is-front"));
-    const inMain = Boolean(img.closest?.("#image, .card-image, .is-product-image, .image"));
-    const ready = Boolean((img.complete !== false) && width >= 80);
-    const score = (inMain ? 1_000_000_000 : 0) + (isFront ? 100_000_000 : 0) + area;
-    if (!best || score > best.score) {
-      best = { img, src, ready, score };
+    if (imageSrc(img) === wanted) {
+      const width = Number(img.naturalWidth || img.width || 0);
+      return { img, src: wanted, ready: Boolean((img.complete !== false) && width >= 80), score: 1 };
     }
   }
-  return best;
+  return { img: null, src: wanted, ready: true, score: 1 };
 }
 
 export function productImageSrc(root) {
-  const main = mainListingImage(root);
-  if (main?.src) {
-    return main.src;
+  const picked = pickListingImage(root, String(root?.location?.href || ""));
+  if (picked.listingSrc) {
+    return picked.listingSrc;
   }
   const og = root.querySelector?.('meta[property="og:image"]');
   return String(og?.content || og?.getAttribute?.("content") || "");

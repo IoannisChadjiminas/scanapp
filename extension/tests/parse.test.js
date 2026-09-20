@@ -68,10 +68,22 @@ test("reads the Cardmarket product image from og:image", () => {
 
 test("reads the visible Cardmarket card image from img.is-front", () => {
   const src = "https://product-images.s3.cardmarket.com/51/MEW/733658/733658.jpg";
-  const img = { currentSrc: src, src, getAttribute: () => src };
+  const img = {
+    currentSrc: src,
+    src,
+    naturalWidth: 300,
+    width: 300,
+    naturalHeight: 420,
+    height: 420,
+    complete: true,
+    className: "is-front",
+    classList: { contains: (name) => name === "is-front" },
+    getAttribute: () => src,
+    closest: (sel) => (String(sel).includes("#image") ? {} : null),
+  };
   const root = {
     querySelector(sel) {
-      if (String(sel).includes("img.is-front") || String(sel).includes(".card-image img")) {
+      if (String(sel).includes("img.is-front") || String(sel).includes(".card-image img") || String(sel).includes("#image img")) {
         return img;
       }
       if (sel === 'meta[property="og:image"]') {
@@ -81,6 +93,56 @@ test("reads the visible Cardmarket card image from img.is-front", () => {
     },
   };
   assert.equal(productImageSrc(root), src);
+});
+
+test("does not pick a previous-product gallery thumb", () => {
+  const neighbor = "https://product-images.s3.cardmarket.com/51/SV5s/890176/890176.jpg";
+  const main = "https://product-images.s3.cardmarket.com/51/SV5s/890177/890177.jpg";
+  const page = "https://www.cardmarket.com/en/Pokemon/Products/Singles/Ace-Paradox/Flutter-Mane-SV5s154";
+  const prev = "https://www.cardmarket.com/en/Pokemon/Products/Singles/Ace-Paradox/Cutiefly-SV5s153";
+  const thumbImg = {
+    currentSrc: neighbor,
+    src: neighbor,
+    naturalWidth: 255,
+    naturalHeight: 361,
+    width: 255,
+    height: 361,
+    complete: true,
+    className: "is-front",
+    classList: { contains: (name) => name === "is-front" },
+    closest: (sel) =>
+      String(sel).includes("a[href]")
+        ? { href: prev, getAttribute: (name) => (name === "href" ? prev : "") }
+        : null,
+    getAttribute: () => neighbor,
+  };
+  const mainImg = {
+    currentSrc: main,
+    src: main,
+    naturalWidth: 255,
+    naturalHeight: 361,
+    width: 255,
+    height: 361,
+    complete: true,
+    className: "is-front",
+    classList: { contains: (name) => name === "is-front" },
+    closest: (sel) => (String(sel).includes("#image") ? {} : null),
+    getAttribute: () => main,
+  };
+  const root = {
+    location: { href: page },
+    querySelector(sel) {
+      if (String(sel).includes("og:image")) {
+        return { content: main, getAttribute: (name) => (name === "content" ? main : "") };
+      }
+      if (String(sel).includes("idProduct")) {
+        return { value: "890177", getAttribute: () => "890177" };
+      }
+      return thumbImg;
+    },
+    querySelectorAll: () => [thumbImg, mainImg],
+  };
+  assert.equal(productImageSrc(root), main);
 });
 
 test("prefers the main product image over a smaller gallery thumb", () => {

@@ -660,6 +660,8 @@ export function createWorker({
       await publish({ connection: "authentication_required", activity: "idle" });
       return;
     }
+    let cdpOnline = false;
+    let queued = 0;
     try {
       const status = await request("/cardmarket/helper/status", {
         method: "POST",
@@ -670,9 +672,11 @@ export function createWorker({
           current_job_id: (await readStore(local, ["currentJob"])).currentJob?.id || null,
         },
       });
+      cdpOnline = Boolean(status.cdp_online);
+      queued = status.queued ?? status.pending ?? 0;
       await publish({
         connection: "connected",
-        queued: status.queued ?? status.pending ?? 0,
+        queued,
         helperReady: status.helper_ready,
       });
     } catch (error) {
@@ -694,6 +698,10 @@ export function createWorker({
     }
     const stored = await readStore(local, ["currentJob", "lastCardId", "lastCardLabel"]);
     let job = stored.currentJob;
+    if (cdpOnline && !job) {
+      await publish({ activity: "idle", queued });
+      return;
+    }
     let claimed;
     try {
       claimed = await request("/cardmarket/helper/claim", { method: "POST", body: {} });
@@ -780,46 +788,94 @@ export function createWorker({
         text.includes("verify you are human") ||
         text.includes("checking your browser"),
     );
+    const pagePath = (() => {
+      try {
+        return new URL(href).pathname.replace(/\/+$/, "").toLowerCase();
+      } catch {
+        return "";
+      }
+    })();
+    const listingOk = (src) => {
+      try {
+        const host = new URL(src, href).hostname.toLowerCase();
+        const path = new URL(src, href).pathname.toLowerCase();
+        if (/logo|favicon|icon|placeholder|sprite|notavailable/i.test(src)) {
+          return false;
+        }
+        if (host === "product-images.s3.cardmarket.com" || host.endsWith(".product-images.s3.cardmarket.com")) {
+          return true;
+        }
+        return (host === "static.cardmarket.com" || host.endsWith(".static.cardmarket.com")) && /\.(jpe?g|webp|png)$/.test(path);
+      } catch {
+        return false;
+      }
+    };
+    const s3Id = (src) => {
+      const match = String(src).match(/\/(\d+)\/\1\.(?:jpe?g|png|webp)(?:\?|$)/i);
+      return match ? match[1] : "";
+    };
+    const otherProduct = (img) => {
+      const anchor = img.closest?.("a[href]");
+      if (!anchor) {
+        return false;
+      }
+      const link = String(anchor.href || anchor.getAttribute?.("href") || "");
+      if (!/\/Products\//i.test(link)) {
+        return false;
+      }
+      try {
+        const linkPath = new URL(link, href).pathname.replace(/\/+$/, "").toLowerCase();
+        return Boolean(pagePath && linkPath && pagePath !== linkPath);
+      } catch {
+        return true;
+      }
+    };
+    const productIdRaw = String(
+      document.querySelector('input[name="idProduct"]')?.value ||
+        document.querySelector("input#idProduct")?.value ||
+        document.querySelector("[data-id-product]")?.getAttribute("data-id-product") ||
+        document.querySelector("[data-product-id]")?.getAttribute("data-product-id") ||
+        "",
+    ).trim();
+    const productId = /^\d{4,}$/.test(productIdRaw) ? productIdRaw : "";
+    const og = String(
+      document.querySelector('meta[property="og:image"]')?.content ||
+        document.querySelector('link[rel="image_src"]')?.href ||
+        "",
+    );
     const nodes = document.querySelectorAll(
       "img.is-front, .card-image img.is-front, #image img.is-front, #image img, .card-image img, img[itemprop='image']",
     );
-    let best = null;
+    let matched = null;
+    let bestMain = null;
     for (const img of nodes) {
       const src = String(img.currentSrc || img.src || "");
-      const host = (() => {
-        try {
-          return new URL(src).hostname.toLowerCase();
-        } catch {
-          return "";
-        }
-      })();
-      if (
-        !host.endsWith("product-images.s3.cardmarket.com") &&
-        host !== "product-images.s3.cardmarket.com" &&
-        host !== "static.cardmarket.com" &&
-        !host.endsWith(".static.cardmarket.com")
-      ) {
-        continue;
-      }
-      if (/logo|favicon|icon|placeholder|sprite/i.test(src)) {
+      if (!listingOk(src) || otherProduct(img)) {
         continue;
       }
       const width = Number(img.naturalWidth || img.width || 0);
       const height = Number(img.naturalHeight || img.height || 0);
       const isFront = img.classList?.contains("is-front");
-      const inMain = Boolean(img.closest("#image, .card-image, .is-product-image, .image"));
-      const score = (inMain ? 1_000_000_000 : 0) + (isFront ? 100_000_000 : 0) + width * height;
-      if (!best || score > best.score) {
-        best = { src, ready: Boolean(img.complete && width >= 80), score };
+      const inMain = Boolean(img.closest("#image, .card-image, .is-product-image, .product-image, .image-container, .image"));
+      const ready = Boolean(img.complete && width >= 80);
+      if (productId && s3Id(src) === productId) {
+        matched = { src, ready: ready || inMain };
+        break;
+      }
+      const score = (isFront ? 100_000_000 : 0) + width * height;
+      if (inMain && (!bestMain || score > bestMain.score)) {
+        bestMain = { src, ready, score };
       }
     }
+    const listingSrc = matched?.src || bestMain?.src || (listingOk(og) ? og : "") || "";
+    const listingReady = Boolean(matched?.ready || bestMain?.ready || (listingOk(og) && listingSrc === og));
     return {
       title,
       url: href,
       cf,
-      listingSrc: best?.src || "",
-      listingReady: Boolean(best?.ready),
-      hasListingImage: Boolean(best?.src),
+      listingSrc,
+      listingReady,
+      hasListingImage: Boolean(listingSrc),
       ready: Boolean(
         document.querySelector(
           'select[name="idExpansion"], select#idExpansion, table.table, .table-body, img.is-front, #image img',

@@ -21,3 +21,5 @@ DINOV2_FILENAME = "dinov2_small.onnx"
 DINOV2_INPUT_SIZE = 224
 DINOV2_DIM = 384
 TCGDEX_BASE = "https://api.tcgdex.net/v2"
+TCGDEX_ASSETS = "https://assets.tcgdex.net"
+TPC_BASE = "https://www.pokemon-card.com"

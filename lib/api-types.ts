@@ -14,6 +14,8 @@ export type CardmarketPriceResponse = {
   helper_ready?: boolean;
   helper_paused?: boolean;
   helper_attention?: string | null;
+  cdp_online?: boolean;
+  cdp_ready?: boolean;
   observed_at?: string | null;
   sampled_offer_count?: number | null;
   freshness?: string | null;

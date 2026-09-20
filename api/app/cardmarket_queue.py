@@ -35,6 +35,7 @@ LISTING_FILTER_KEYS = (
     "isFirstEd",
 )
 PARSER_VERSION = "offers-v1"
+CDP_HELPER_ID = "cdp"
 
 
 class QueueError(Exception):
@@ -57,6 +58,11 @@ class ClaimError(QueueError):
 
 class WrongProduct(QueueError):
     status_code = 422
+
+
+def is_cdp_helper(helper_id: str | None) -> bool:
+    raw = str(helper_id or "").strip().lower()
+    return raw == CDP_HELPER_ID or raw.startswith(f"{CDP_HELPER_ID}-")
 
 
 def hash_token(token: str) -> str:
@@ -841,11 +847,19 @@ def helper_public_state(conn: sqlite3.Connection) -> dict[str, Any]:
         (str(row["attention"]) for row in online_rows if row["attention"]),
         None,
     )
+    cdp_rows = [row for row in online_rows if is_cdp_helper(row["helper_id"])]
+    cdp_online = bool(cdp_rows)
+    cdp_ready = any(
+        int(row["ready"] or 0) and not int(row["paused"] or 0) and not row["attention"]
+        for row in cdp_rows
+    )
     return {
         "helper_online": online,
         "helper_ready": ready,
         "helper_paused": paused,
         "helper_attention": attention,
+        "cdp_online": cdp_online,
+        "cdp_ready": cdp_ready,
     }
 
 
