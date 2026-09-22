@@ -1018,6 +1018,82 @@ def test_japanese_collector_skips_protected_and_ambiguous(tmp_path: Path) -> Non
     assert url_for_row(rowlet) is None
 
 
+def test_glossary_and_listing_title() -> None:
+    from app.cardmarket import glossary_english_title, listing_product_title
+
+    assert glossary_english_title("基本闘エネルギー") == "basic fighting energy"
+    assert glossary_english_title("エネルギーシール") == "energy sticker"
+    assert glossary_english_title("セゴール") is None
+    assert listing_product_title("Victini ex (SV-P 052)From N/A") == "Victini ex"
+    assert listing_product_title("Double Dragon Energy (SV-P 142)From 6,49 €") == (
+        "Double Dragon Energy"
+    )
+
+
+def test_japanese_collector_picks_unique_listing_title(tmp_path: Path, monkeypatch) -> None:
+    from app.cardmarket import link_japanese_listing_codes, url_for_row
+
+    monkeypatch.setenv("JA_TITLE_POKEAPI", "0")
+
+    def fake_species(title: str) -> frozenset[str]:
+        key = title.casefold()
+        if key.startswith("arctibax"):
+            return frozenset({"セゴール"})
+        if key.startswith("victini"):
+            return frozenset({"ビクティニ"})
+        if key.startswith("noctowl"):
+            return frozenset({"ヨルノズク"})
+        if key.startswith("ditto"):
+            return frozenset({"メタモン"})
+        if key.startswith("bellibolt"):
+            return frozenset({"ハラバリー"})
+        return frozenset()
+
+    monkeypatch.setattr("app.cardmarket.ja_names_for_english_title", fake_species)
+    conn = connect(tmp_path / "catalog.sqlite")
+    init_catalog(conn)
+    fighting = (
+        "https://www.cardmarket.com/en/Pokemon/Products/Singles/"
+        "MEGA-Promos/Basic-Fighting-Energy-M-P040"
+    )
+    magikarp = (
+        "https://www.cardmarket.com/en/Pokemon/Products/Singles/"
+        "MEGA-Promos/Magikarp-M-P040"
+    )
+    arctibax = (
+        "https://www.cardmarket.com/en/Pokemon/Products/Singles/"
+        "Scarlet-Violet-Promos/Arctibax-SV-P051"
+    )
+    victini = (
+        "https://www.cardmarket.com/en/Pokemon/Products/Singles/"
+        "Scarlet-Violet-Promos/Victini-ex-SV-P051"
+    )
+    _insert_card(
+        conn, "ja:M-P-040", "基本闘エネルギー", "プロモ", "040",
+        language="ja", set_id="M-P",
+    )
+    _insert_product(conn, fighting, "Basic Fighting Energy (M-P 040)From 14,99 €")
+    _insert_product(conn, magikarp, "Magikarp (M-P 040)From 72,99 €")
+    _insert_card(
+        conn, "ja:SV-P-051", "セゴール", "プロモ", "051",
+        language="ja", set_id="SV-P",
+    )
+    _insert_product(conn, arctibax, "Arctibax (SV-P 051)From 0,50 €")
+    _insert_product(conn, victini, "Victini ex (SV-P 051)From 119,00 €")
+    conn.commit()
+    stats = link_japanese_listing_codes(conn, tmp_path)
+    conn.commit()
+    assert stats["title_linked"] == 2
+    energy = conn.execute("SELECT * FROM cards WHERE id = 'ja:M-P-040'").fetchone()
+    bax = conn.execute("SELECT * FROM cards WHERE id = 'ja:SV-P-051'").fetchone()
+    assert url_for_row(energy) == fighting
+    assert url_for_row(bax) == arctibax
+    assert conn.execute(
+        "SELECT matched FROM cardmarket_expansion_products WHERE url = ?",
+        (magikarp,),
+    ).fetchone()[0] == 0
+
+
 def test_japanese_collector_replace_does_not_unmatch_new_owner(tmp_path: Path) -> None:
     from app.cardmarket import link_japanese_listing_codes, url_for_row
 
@@ -1348,6 +1424,35 @@ def test_apply_variants_nulls_url_when_ambiguous(tmp_path: Path) -> None:
     assert item["cardmarket_url"] is None
     assert item["cardmarket_prices"] == []
     assert len(item["cardmarket_variants"]) == 3
+    tails = {variant["label"] for variant in item["cardmarket_variants"]}
+    assert tails == {
+        "Mew ex (V3-MEW205)",
+        "Mew ex (V4-MEW205)",
+        "Mew ex (V5-MEW205)",
+    }
+    from app.cardmarket import listing_choice_message
+    from app.schemas import Candidate
+
+    candidate = Candidate.model_validate(
+        {
+            "card_id": "en:sv03.5-205",
+            "name": "Mew ex",
+            "set_name": "151",
+            "collector_number": "205",
+            "image_url": "/api/v1/cards/en:sv03.5-205/image",
+            "visual_score": 0.9,
+            "combined_score": 0.9,
+            "ocr_consistent": True,
+            "cardmarket_url": item["cardmarket_url"],
+            "cardmarket_prices": item["cardmarket_prices"],
+            "cardmarket_variants": item["cardmarket_variants"],
+        }
+    )
+    assert candidate.cardmarket_url is None
+    assert len(candidate.cardmarket_variants) == 3
+    assert listing_choice_message("matched", item) == (
+        "This print is identified. Choose which Cardmarket listing."
+    )
 
 
 def test_resolve_variant_choice_uses_extra_owner(tmp_path: Path) -> None:

@@ -11,7 +11,13 @@ import numpy as np
 
 from app.config import Settings
 from app.card_images import display_image_url
-from app.cardmarket import apply_variants_to_candidate, grouped_expansion_skus, snapshot_prices, url_for_row
+from app.cardmarket import (
+    apply_variants_to_candidate,
+    grouped_expansion_skus,
+    listing_choice_message,
+    snapshot_prices,
+    url_for_row,
+)
 from app.db import coverage_payload
 from app.recognition.captures import save_scan_capture
 from app.recognition.detect import detect_and_rectify
@@ -187,21 +193,9 @@ def recognize_bytes(
             f"TCGDEX_LANGUAGES including {', '.join(decision.search)}."
         )
     elif status == "matched":
-        message = "This is the most likely match."
-        if shown and shown[0].get("cardmarket_variants"):
-            message = (
-                "This print has more than one Cardmarket listing. Choose yours."
-            )
-        elif shown and not shown[0].get("cardmarket_url"):
-            message = "This is the most likely match. Cardmarket link unavailable."
+        message = listing_choice_message("matched", shown[0] if shown else None)
     elif status == "uncertain":
-        message = "Closest print. Confirm if this is the card."
-        if shown and shown[0].get("cardmarket_variants"):
-            message = (
-                "Closest print. This Cardmarket listing has more than one SKU. Choose yours."
-            )
-        elif shown and not shown[0].get("cardmarket_url"):
-            message = "Closest print. Cardmarket link unavailable."
+        message = listing_choice_message("uncertain", shown[0] if shown else None)
     elif status in {"no_match"}:
         message = "This photograph did not match a catalogue card."
     if not detected and not skip_detect and status != "retake":

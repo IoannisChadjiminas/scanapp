@@ -128,9 +128,29 @@ Must have:
 
 - Add confirmed scans to **My singles**.
 - Quantity, condition (raw at least), language, notes.
-- Collection value from last known Cardmarket samples (stale is OK if labelled).
+- Home shows **owned cards**, each with a basis price and the move versus the latest Cardmarket sample (below).
 - Search / filter own cards.
 - Manual add when scan fails (search catalogue, pick print).
+
+### Home cards — paid price, or price when added
+
+Each owned card shows **one price**, and under it the **percent** move. Up arrow in green when it is higher, down arrow in red when it is lower. No arrow when there is no basis to compare. Quantity stays on the card; it does not change the shown unit price.
+
+**Now** is the average of the three cheapest Near Mint asking prices in the latest Cardmarket sample (shipping excluded). Fewer than three still average. Until a sample exists, show the price we already have (what they paid, the add-time price, or the price guide) with no arrow.
+
+Two bases. Never mix them on one card, and never call a market snapshot “what you paid.”
+
+| User did | Basis (frozen) | Label | Change |
+|---|---|---|---|
+| Entered what they paid | That amount, in EUR | Paid | Now − paid |
+| Skipped the paid price | Cardmarket price at the moment they added the card | Since added | Now − price when added |
+| Neither paid nor a sample at add time | None | — | Show **now** only. No arrow. Do not invent a baseline. |
+
+If we have no sample yet, the card shows the basis alone and no change.
+
+The paid field is optional on add. Skipping it is normal: we store the market price we had then and move on. Editing “paid” later replaces the basis; it does not rewrite history of “since added” unless they clear paid and we still have the original add-time sample.
+
+Collection total is the sum of each card’s **now** (or basis, if now is missing). Gain/loss is the sum of each card’s own change. A card with no basis does not contribute a fake gain.
 
 ### Phase 3 — Sell
 

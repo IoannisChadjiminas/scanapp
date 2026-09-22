@@ -4,7 +4,7 @@ import json
 import time
 from typing import Any
 
-from fastapi import APIRouter, Header, HTTPException, Query, Request
+from fastapi import APIRouter, Header, HTTPException, Query, Request, Response
 from fastapi.responses import StreamingResponse
 from pydantic import BaseModel, Field
 
@@ -12,6 +12,7 @@ from app.cardmarket import (
     MappingError,
     import_expansion_products,
     is_job_url,
+    is_verified_singles_url,
     list_expansion_crawls,
     list_unmatched_products,
     map_card_product,
@@ -20,6 +21,8 @@ from app.cardmarket import (
     store_unmatched_product_image,
 )
 from app.cardmarket_events import notify_product, wait_for_product
+from app.cardmarket_html import parse_cardmarket_html
+from app.session import get_or_create_session
 from app.cardmarket_queue import (
     AuthError,
     QueueError,
@@ -131,6 +134,28 @@ class HelperStatusRequest(BaseModel):
     current_card: str | None = None
     success: bool | None = None
     failure_reason: str | None = None
+
+
+class ParseOffer(BaseModel):
+    price: str
+    condition: str = ""
+    language: str = ""
+    variant: str = ""
+
+
+class ParseRequest(BaseModel):
+    url: str = Field(min_length=8, max_length=500)
+    html: str = Field(min_length=1, max_length=2_000_000)
+
+
+class ParseResponse(BaseModel):
+    url: str
+    blocked: bool = False
+    empty: bool = False
+    pending: bool = False
+    rows: list[ParseOffer] = Field(default_factory=list)
+    title: str = ""
+    parser: str = ""
 
 
 class PriceResponse(BaseModel):
@@ -506,6 +531,18 @@ GUIDE_LABELS = frozenset({"From", "Trend", "7-day"})
 def _payload_is_live(payload: dict[str, Any]) -> bool:
     prices = payload.get("prices") or []
     return bool(prices) and not all(str(item.get("label") or "") in GUIDE_LABELS for item in prices)
+
+
+@router.post("/cardmarket/parse", response_model=ParseResponse)
+def parse_cardmarket_page(
+    payload: ParseRequest, request: Request, response: Response
+) -> ParseResponse:
+    """Parse HTML the phone's WebView already loaded. Does not fetch the URL."""
+    settings = request.app.state.settings
+    get_or_create_session(request, response, request.app.state.dbs, settings)
+    if not is_verified_singles_url(payload.url):
+        raise HTTPException(status_code=400, detail="Cardmarket product URL required")
+    return ParseResponse.model_validate(parse_cardmarket_html(payload.url, payload.html))
 
 
 @router.get("/cardmarket/prices", response_model=PriceResponse)

@@ -1,0 +1,90 @@
+from app.cardmarket_html import parse_cardmarket_html
+
+URL = (
+    "https://www.cardmarket.com/en/Pokemon/Products/Singles/151/Bulbasaur-V1-MEW001"
+)
+
+
+def _page(body: str, title: str = "Bulbasaur") -> str:
+    return (
+        "<html><head><title>"
+        + title
+        + '</title><link rel="canonical" href="'
+        + URL
+        + '"></head><body>'
+        + body
+        + "</body></html>"
+    )
+
+
+def test_parses_visible_offer_rows():
+    html = _page(
+        """
+        <div class="article-row">
+          <span class="article-condition">NM English</span>
+          <span data-bs-original-title="English"></span>
+          <span title="Holo"></span>
+          <div class="col-offer">2,50 € + shipping</div>
+        </div>
+        <div class="article-row" style="display: none">
+          <span class="article-condition">EX</span>
+          <div class="price-container">9,00 €</div>
+        </div>
+        <div class="article-row">
+          <span class="badge">GD</span>
+          <div class="col-offer">1,10 €</div>
+        </div>
+        """
+    )
+    parsed = parse_cardmarket_html(URL, html)
+    assert parsed["blocked"] is False
+    assert parsed["empty"] is False
+    assert parsed["pending"] is False
+    assert parsed["url"] == URL
+    assert parsed["rows"] == [
+        {"price": "2,50 €", "condition": "NM", "language": "English", "variant": "Holo"},
+        {"price": "1,10 €", "condition": "GD", "language": "", "variant": ""},
+    ]
+    assert parsed["parser"] == "offers-html-v1"
+
+
+def test_challenge_html_is_blocked_without_rows():
+    html = _page(
+        '<div id="challenge-form">Just a moment...</div>',
+        title="Just a moment...",
+    )
+    parsed = parse_cardmarket_html(URL, html)
+    assert parsed["blocked"] is True
+    assert parsed["rows"] == []
+    assert parsed["url"] == URL
+
+
+def test_empty_listing_state():
+    html = _page('<div class="no-articles">There are currently no articles.</div>')
+    parsed = parse_cardmarket_html(URL, html)
+    assert parsed["empty"] is True
+    assert parsed["pending"] is False
+    assert parsed["rows"] == []
+
+
+def test_unloaded_table_stays_pending():
+    parsed = parse_cardmarket_html(URL, _page("<div>Loading</div>"))
+    assert parsed["pending"] is True
+    assert parsed["rows"] == []
+
+
+def test_canonical_for_another_product_is_not_this_page():
+    other = (
+        "https://www.cardmarket.com/en/Pokemon/Products/Singles/"
+        "151/Ivysaur-V1-MEW002"
+    )
+    html = (
+        '<html><head><link rel="canonical" href="'
+        + other
+        + '"></head><body>'
+        '<div class="article-row"><div class="col-offer">3,00 €</div></div>'
+        "</body></html>"
+    )
+    parsed = parse_cardmarket_html(URL, html)
+    assert parsed["url"] == other
+    assert parsed["rows"] == []

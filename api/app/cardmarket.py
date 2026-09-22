@@ -6,6 +6,8 @@ import re
 import sqlite3
 import time
 import unicodedata
+import urllib.error
+import urllib.request
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
@@ -28,7 +30,29 @@ _PROMO_SLUG_RE = re.compile(
     re.I,
 )
 _PRICE_TAIL_RE = re.compile(r"From\s+[\d.,]+\s*€.*$", re.I)
+_LISTING_FROM_TAIL_RE = re.compile(r"\s*From\s+.*$", re.I)
 _LATIN_SLUG_RE = re.compile(r"[a-z0-9]+")
+_SPECIES_SUFFIX_RE = re.compile(
+    r"\s+(ex|gx|v|vmax|vstar|v-union)\s*$",
+    re.I,
+)
+_JA_TITLE_GLOSSARY = (
+    ("エネルギー", "energy"),
+    ("フェアリー", "fairy"),
+    ("ドラゴン", "dragon"),
+    ("シール", "sticker"),
+    ("基本", "basic"),
+    ("草", "grass"),
+    ("炎", "fire"),
+    ("水", "water"),
+    ("雷", "lightning"),
+    ("超", "psychic"),
+    ("闘", "fighting"),
+    ("悪", "darkness"),
+    ("鋼", "metal"),
+)
+_POKEAPI_SKIP = ("energy", "sticker", "trainer")
+_species_ja_names: dict[str, frozenset[str]] = {}
 _PROTECTED_PROVENANCE = {"helper-map", "manifest-url"}
 JA_COLLECTOR_PROVENANCE = "ja-collector"
 _LISTING_SET_COLLECTOR_RE = re.compile(
@@ -790,6 +814,132 @@ def listing_set_collector(name: str) -> tuple[str, str] | None:
     return set_id, collector
 
 
+def listing_product_title(name: str) -> str:
+    """Cardmarket label without price tail or trailing (set collector)."""
+    text = _LISTING_FROM_TAIL_RE.sub("", str(name or "")).strip()
+    text = re.sub(r"\s*\([^)]*\)\s*$", "", text).strip()
+    return text
+
+
+def _title_key(value: str) -> str:
+    text = unicodedata.normalize("NFKC", str(value or ""))
+    text = text.replace("é", "e").replace("É", "E").casefold()
+    text = re.sub(r"[^a-z0-9]+", " ", text)
+    return re.sub(r"\s+", " ", text).strip()
+
+
+def glossary_english_title(ja_name: str) -> str | None:
+    """Translate TCG-only Japanese titles like 基本闘エネルギー → basic fighting energy."""
+    raw = str(ja_name or "").strip()
+    if not raw:
+        return None
+    index = 0
+    words: list[str] = []
+    while index < len(raw):
+        hit: tuple[str, str] | None = None
+        for token, english in sorted(_JA_TITLE_GLOSSARY, key=lambda item: -len(item[0])):
+            if raw.startswith(token, index):
+                hit = (token, english)
+                break
+        if hit is None:
+            return None
+        words.append(hit[1])
+        index += len(hit[0])
+    return " ".join(words) if words else None
+
+
+def _species_slug(title: str) -> str:
+    text = _SPECIES_SUFFIX_RE.sub("", listing_product_title(title) or title).strip()
+    text = text.casefold().replace(".", "").replace("'", "")
+    text = re.sub(r"\s+", "-", text)
+    return re.sub(r"[^a-z0-9-]", "", text)
+
+
+def ja_names_for_english_title(title: str) -> frozenset[str]:
+    """Japanese Pokédex names for an English Cardmarket title, via PokéAPI."""
+    if os.environ.get("JA_TITLE_POKEAPI", "1").strip().lower() in {"0", "false", "no"}:
+        return frozenset()
+    slug = _species_slug(title)
+    if not slug or any(part in slug for part in _POKEAPI_SKIP):
+        return frozenset()
+    cached = _species_ja_names.get(slug)
+    if cached is not None:
+        return cached
+    names: frozenset[str] = frozenset()
+    url = f"https://pokeapi.co/api/v2/pokemon-species/{slug}"
+    try:
+        request = urllib.request.Request(url, headers={"User-Agent": "scanapp-catalogue/1.0"})
+        with urllib.request.urlopen(request, timeout=12) as response:
+            payload = json.loads(response.read().decode("utf-8"))
+        names = frozenset(
+            str(item.get("name") or "").strip()
+            for item in (payload.get("names") or [])
+            if str(item.get("name") or "").strip()
+        )
+    except (urllib.error.URLError, TimeoutError, json.JSONDecodeError, OSError, ValueError):
+        names = frozenset()
+    _species_ja_names[slug] = names
+    return names
+
+
+def ja_listing_title_aliases(conn: sqlite3.Connection) -> dict[str, set[str]]:
+    """English Cardmarket titles already attached to Japanese catalogue names."""
+    aliases: dict[str, set[str]] = {}
+    rows = conn.execute(
+        """
+        SELECT c.name AS ja_name, p.name AS listing
+        FROM cards c
+        JOIN cardmarket_expansion_products p ON p.url = c.cardmarket_url
+        WHERE c.language = 'ja'
+          AND c.id LIKE 'ja:%'
+          AND IFNULL(c.cardmarket_url, '') != ''
+        """
+    ).fetchall()
+    for row in rows:
+        ja_name = str(row["ja_name"] or "").strip()
+        title = listing_product_title(str(row["listing"] or ""))
+        if ja_name and title:
+            aliases.setdefault(ja_name, set()).add(title)
+    return aliases
+
+
+def pick_ja_listing_by_title(
+    card_name: str,
+    products: list,
+    aliases: dict[str, set[str]],
+):
+    """Pick the unique Cardmarket title that matches this Japanese print."""
+    wanted = str(card_name or "").strip()
+    if not wanted or len(products) < 2:
+        return None
+    accepted = {_title_key(item) for item in aliases.get(wanted, set())}
+    accepted.add(_title_key(wanted))
+    gloss = glossary_english_title(wanted)
+    if gloss:
+        accepted.add(_title_key(gloss))
+    accepted.discard("")
+    matches = []
+    for product in products:
+        title = listing_product_title(str(product["name"] or ""))
+        key = _title_key(title)
+        if key and key in accepted:
+            matches.append(product)
+            continue
+        if wanted in ja_names_for_english_title(title):
+            matches.append(product)
+    unique = []
+    seen: set[str] = set()
+    for product in matches:
+        url = str(product["url"] or "")
+        if not url or url in seen:
+            continue
+        seen.add(url)
+        unique.append(product)
+    if len(unique) != 1:
+        return None
+    return unique[0]
+
+
 def name_fits_product_slug(name_slug: str | None, product_path: str) -> bool:
     """True when the card name is a hyphen-bounded token in the listing slug."""
     if not name_slug or not product_path:
@@ -809,12 +959,39 @@ def product_sku_key(url: str | None) -> tuple[str, str, str] | None:
     return expansion.lower(), code.upper(), str(number)
 
 
-def clean_product_label(name: str, url: str) -> str:
-    text = _PRICE_TAIL_RE.sub("", name or "").strip()
+_VARIANT_TAIL_RE = re.compile(r"(?:^|-)(V\d+-[A-Za-z0-9]+)$")
+
+
+def variant_slug_tail(url: str) -> str:
+    """Distinguishing slug ending, e.g. Mew-ex-V3-MEW205 → V3-MEW205."""
     slug = product_slug(url)
-    if text and slug and slug.lower() not in text.lower().replace(" ", "-"):
-        return f"{text} ({slug})"
-    return text or slug
+    match = _VARIANT_TAIL_RE.search(slug)
+    return match.group(1) if match else slug
+
+
+def clean_product_label(name: str, url: str) -> str:
+    text = listing_product_title(name)
+    tail = variant_slug_tail(url)
+    if text and tail and tail.lower() not in text.lower().replace(" ", "-"):
+        return f"{text} ({tail})"
+    return text or tail
+
+
+def listing_choice_message(status: str, candidate: dict[str, Any] | None) -> str:
+    """Copy for a matched or uncertain print, including a required SKU choice."""
+    item = candidate or {}
+    variants = item.get("cardmarket_variants") or []
+    if len(variants) >= 2:
+        if status == "uncertain":
+            return "Closest print is identified. Choose which Cardmarket listing."
+        return "This print is identified. Choose which Cardmarket listing."
+    if not item.get("cardmarket_url"):
+        if status == "uncertain":
+            return "Closest print. Cardmarket link unavailable."
+        return "This is the most likely match. Cardmarket link unavailable."
+    if status == "uncertain":
+        return "Closest print. Confirm if this is the card."
+    return "This is the most likely match."
 
 
 def grouped_expansion_skus(
@@ -1688,24 +1865,43 @@ def link_japanese_listing_codes(
         set_id, collector = parsed
         products_by_key.setdefault((set_id.lower(), collector), []).append(product)
 
+    aliases = ja_listing_title_aliases(conn)
     linked = 0
     replaced = 0
     already = 0
     ambiguous = 0
+    title_linked = 0
     for key, candidates in products_by_key.items():
         cards = ja_by_key.get(key, [])
-        if len(cards) != 1 or len(candidates) != 1:
+        if len(cards) != 1:
             if cards and candidates:
                 ambiguous += 1
             continue
         card = cards[0]
-        product = candidates[0]
+        used_title = False
+        if len(candidates) == 1:
+            product = candidates[0]
+        else:
+            product = pick_ja_listing_by_title(
+                str(card["name"] or ""), candidates, aliases
+            )
+            if product is None:
+                ambiguous += 1
+                continue
+            used_title = True
         url = normalize_product_url(str(product["url"] or "")) or str(product["url"] or "")
         provenance = str(card["cardmarket_provenance"] or "")
         if provenance in _PROTECTED_PROVENANCE:
             skipped += 1
             continue
         current = str(card["cardmarket_url"] or "").strip()
+        if (
+            provenance == JA_COLLECTOR_PROVENANCE
+            and current
+            and current != url
+        ):
+            skipped += 1
+            continue
         if current == url:
             conn.execute(
                 """
@@ -1748,9 +1944,12 @@ def link_japanese_listing_codes(
             (str(card["id"]), url),
         )
         linked += 1
+        if used_title:
+            title_linked += 1
     print(
         f"ja-collector linked {linked}, replaced {replaced}, "
-        f"already {already}, ambiguous {ambiguous}, skipped {skipped}",
+        f"already {already}, ambiguous {ambiguous}, skipped {skipped}, "
+        f"title-matched {title_linked}",
         flush=True,
     )
     return {
@@ -1759,6 +1958,7 @@ def link_japanese_listing_codes(
         "already": already,
         "ambiguous": ambiguous,
         "skipped": skipped,
+        "title_linked": title_linked,
     }
 
 
