@@ -30,8 +30,10 @@ from app.cardmarket_queue import (
     claim_job,
     complete_job,
     enqueue_job,
+    event_should_stop,
     prices_payload,
     queue_counts,
+    remember_phone_offers,
     recover_job,
     release_job,
     renew_claim,
@@ -158,6 +160,10 @@ class ParseResponse(BaseModel):
     parser: str = ""
 
 
+class BatchPriceRequest(BaseModel):
+    urls: list[str] = Field(default_factory=list, max_length=100)
+
+
 class PriceResponse(BaseModel):
     url: str | None = None
     prices: list[PriceItem] = Field(default_factory=list)
@@ -176,6 +182,13 @@ class PriceResponse(BaseModel):
     claimed: int | None = None
     helper_id: str | None = None
     idempotent: bool | None = None
+
+
+class BatchPriceResponse(BaseModel):
+    helper_online: bool = False
+    helper_ready: bool = False
+    helper_paused: bool = False
+    items: list[PriceResponse] = Field(default_factory=list)
 
 
 def _bearer_token(authorization: str | None) -> str | None:
@@ -525,14 +538,6 @@ def helper_status(
     return _price_response(state)
 
 
-GUIDE_LABELS = frozenset({"From", "Trend", "7-day"})
-
-
-def _payload_is_live(payload: dict[str, Any]) -> bool:
-    prices = payload.get("prices") or []
-    return bool(prices) and not all(str(item.get("label") or "") in GUIDE_LABELS for item in prices)
-
-
 @router.post("/cardmarket/parse", response_model=ParseResponse)
 def parse_cardmarket_page(
     payload: ParseRequest, request: Request, response: Response
@@ -542,7 +547,14 @@ def parse_cardmarket_page(
     get_or_create_session(request, response, request.app.state.dbs, settings)
     if not is_verified_singles_url(payload.url):
         raise HTTPException(status_code=400, detail="Cardmarket product URL required")
-    return ParseResponse.model_validate(parse_cardmarket_html(payload.url, payload.html))
+    parsed = parse_cardmarket_html(payload.url, payload.html)
+    if parsed.get("rows") and not parsed.get("blocked") and not parsed.get("empty"):
+        remember_phone_offers(
+            request.app.state.dbs.catalog,
+            payload.url,
+            list(parsed["rows"]),
+        )
+    return ParseResponse.model_validate(parsed)
 
 
 @router.get("/cardmarket/prices", response_model=PriceResponse)
@@ -552,9 +564,31 @@ def get_prices(
     return _price_response(prices_payload(request.app.state.dbs.catalog, url))
 
 
+@router.post("/cardmarket/prices/batch", response_model=BatchPriceResponse)
+def get_prices_batch(payload: BatchPriceRequest, request: Request) -> BatchPriceResponse:
+    conn = request.app.state.dbs.catalog
+    seen: set[str] = set()
+    items: list[PriceResponse] = []
+    for url in payload.urls:
+        key = normalize_product_url(url)
+        if not key or key in seen or not is_verified_singles_url(key):
+            continue
+        seen.add(key)
+        items.append(_price_response(prices_payload(conn, key)))
+    state = items[0] if items else _price_response(prices_payload(conn, None))
+    return BatchPriceResponse(
+        helper_online=state.helper_online,
+        helper_ready=state.helper_ready,
+        helper_paused=state.helper_paused,
+        items=items,
+    )
+
+
 @router.get("/cardmarket/prices/events")
 async def price_events(
-    request: Request, url: str = Query(min_length=8, max_length=500)
+    request: Request,
+    url: str = Query(min_length=8, max_length=500),
+    since: str | None = Query(default=None, max_length=40),
 ) -> StreamingResponse:
     catalog = request.app.state.dbs.catalog
 
@@ -565,7 +599,7 @@ async def price_events(
                 break
             payload = prices_payload(catalog, url)
             yield f"data: {json.dumps(payload)}\n\n"
-            if _payload_is_live(payload) or payload.get("status") == "done":
+            if event_should_stop(payload, since):
                 break
             await wait_for_product(url, timeout=20.0)
 

@@ -4,6 +4,7 @@ import calendar
 import hashlib
 import hmac
 import json
+import re
 import secrets
 import sqlite3
 import time
@@ -35,7 +36,14 @@ LISTING_FILTER_KEYS = (
     "isFirstEd",
 )
 PARSER_VERSION = "offers-v1"
+PHONE_PARSER_VERSION = "phone-offers-v1"
 CDP_HELPER_ID = "cdp"
+FRESH_SECONDS = 15 * 60
+_GUIDE_LABELS = frozenset({"From", "Trend", "7-day"})
+_EURO_RE = re.compile(
+    r"^(?:€|EUR)?(\d{1,3}(?:\.\d{3})+,\d{2}|\d{1,3}(?:,\d{3})+\.\d{2}|\d+[.,]\d{2})(?:€|EUR)?$",
+    re.IGNORECASE,
+)
 
 
 class QueueError(Exception):
@@ -356,6 +364,109 @@ def _notify_job_url(url: str | None) -> None:
     from app.cardmarket_events import notify_product
 
     notify_product(url)
+
+
+def parse_euro_offer(value: str) -> float | None:
+    text = re.sub(r"\s", "", value or "")
+    if "€" not in text and "EUR" not in text.upper():
+        return None
+    match = _EURO_RE.fullmatch(text)
+    if match is None:
+        return None
+    number = match.group(1)
+    decimal = "," if number.rfind(",") > number.rfind(".") else "."
+    number = number.replace("." if decimal == "," else ",", "")
+    number = number.replace(",", ".")
+    try:
+        amount = float(number)
+    except ValueError:
+        return None
+    if amount <= 0 or amount > 1_000_000:
+        return None
+    return amount
+
+
+def rows_to_prices(rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    prices: list[dict[str, Any]] = []
+    for row in rows:
+        amount = parse_euro_offer(str(row.get("price") or ""))
+        if amount is None:
+            continue
+        labels = []
+        for field in ("condition", "language", "variant"):
+            label = str(row.get(field) or "").strip()
+            if label and len(label) <= 60 and not any(ord(ch) < 32 for ch in label):
+                labels.append(label)
+        prices.append(
+            {"label": " · ".join(labels), "amount": amount, "currency": "EUR"}
+        )
+    return prices
+
+
+def _same_prices(existing: list[dict[str, Any]], prices: list[dict[str, Any]]) -> bool:
+    def key(item: dict[str, Any]) -> tuple[str, float, str]:
+        return (
+            str(item.get("label") or ""),
+            round(float(item.get("amount") or 0), 2),
+            str(item.get("currency") or "EUR"),
+        )
+
+    return [key(item) for item in existing] == [key(item) for item in prices]
+
+
+def remember_phone_offers(
+    conn: sqlite3.Connection, url: str, rows: list[dict[str, Any]]
+) -> bool:
+    """Store a phone offer table when it is new or the fresh window has passed.
+
+    Challenge pages, empty tables, and an unchanged sample inside the fresh
+    window leave ``observed_at`` alone.
+    """
+    prices = rows_to_prices(rows)
+    if not prices:
+        return False
+    key = normalize_product_url(url)
+    if not key:
+        return False
+    existing = snapshot_record(conn, key)
+    existing_prices = list((existing or {}).get("prices") or [])
+    observed = (existing or {}).get("observed_at") or (existing or {}).get("fetched_at")
+    age = _age_seconds(str(observed or ""))
+    if _same_prices(existing_prices, prices) and age is not None and age <= FRESH_SECONDS:
+        return False
+    write_snapshot(
+        conn,
+        key,
+        prices,
+        parser_version=PHONE_PARSER_VERSION,
+        sampled_offer_count=len(prices),
+    )
+    _notify_job_url(key)
+    return True
+
+
+def _stamp_epoch(stamp: str | None) -> float | None:
+    if not stamp:
+        return None
+    age = _age_seconds(str(stamp))
+    if age is None:
+        return None
+    return time.time() - age
+
+
+def event_should_stop(payload: dict[str, Any], since: str | None) -> bool:
+    """End a price stream once the sample the caller is waiting for arrives."""
+    if since:
+        if str(payload.get("status") or "") == "failed":
+            return True
+        observed = _stamp_epoch(str(payload.get("observed_at") or ""))
+        start = _stamp_epoch(since)
+        return observed is not None and start is not None and observed > start
+    prices = payload.get("prices") or []
+    live = bool(prices) and not all(
+        str(item.get("label") or "") in _GUIDE_LABELS for item in prices
+    )
+    return live or payload.get("status") == "done"
 
 
 def job_by_id(conn: sqlite3.Connection, job_id: str) -> dict[str, Any] | None:
@@ -909,7 +1020,7 @@ def prices_payload(conn: sqlite3.Connection, url: str | None) -> dict[str, Any]:
         age = _age_seconds(str(observed or ""))
         if age is None:
             freshness = "live"
-        elif age <= 15 * 60:
+        elif age <= FRESH_SECONDS:
             freshness = "fresh"
         else:
             freshness = "stale"

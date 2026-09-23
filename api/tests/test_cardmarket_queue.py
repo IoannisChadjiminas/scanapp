@@ -18,8 +18,10 @@ from app.cardmarket_queue import (
     identities_compatible,
     immediate_transaction,
     issue_helper_credential,
+    event_should_stop,
     prices_payload,
     recover_job,
+    remember_phone_offers,
     release_job,
     renew_claim,
     retry_or_fail_job,
@@ -479,3 +481,93 @@ def test_price_events_stream_after_complete(tmp_path):
                 break
     assert "12.5" in text
     assert "NM" in text
+
+
+def test_phone_offer_skips_unchanged_fresh_sample(tmp_path):
+    conn = _catalog(tmp_path)
+    write_snapshot(conn, GENGAR, OFFERS)
+    stored = remember_phone_offers(
+        conn,
+        GENGAR,
+        [{"price": "12,50 €", "condition": "NM"}],
+    )
+    assert stored is False
+
+
+def test_phone_offer_refreshes_unchanged_stale_sample(tmp_path):
+    conn = _catalog(tmp_path)
+    write_snapshot(conn, GENGAR, OFFERS)
+    key = prices_payload(conn, GENGAR)["url"]
+    conn.execute(
+        "UPDATE cardmarket_snapshots SET observed_at = '2020-01-01T00:00:00Z' WHERE url = ?",
+        (key,),
+    )
+    conn.commit()
+    assert remember_phone_offers(
+        conn,
+        GENGAR,
+        [{"price": "12,50 €", "condition": "NM"}],
+    )
+    payload = prices_payload(conn, GENGAR)
+    assert payload["freshness"] == "fresh"
+    assert payload["observed_at"] != "2020-01-01T00:00:00Z"
+    assert payload["prices"] == OFFERS
+
+
+def test_phone_offer_stores_a_new_sample(tmp_path):
+    conn = _catalog(tmp_path)
+    assert remember_phone_offers(
+        conn,
+        GENGAR,
+        [{"price": "2,50 €", "condition": "NM", "language": "English"}],
+    )
+    payload = prices_payload(conn, GENGAR)
+    assert payload["prices"] == [
+        {"label": "NM · English", "amount": 2.5, "currency": "EUR"}
+    ]
+    assert payload["freshness"] == "fresh"
+
+
+def test_event_stops_for_a_newer_observation_or_failure():
+    same = {
+        "observed_at": "2020-01-01T00:00:00Z",
+        "status": "done",
+        "prices": OFFERS,
+    }
+    newer = {
+        "observed_at": "2020-01-01T00:00:01Z",
+        "status": "done",
+        "prices": OFFERS,
+    }
+    failed = {
+        "observed_at": "2020-01-01T00:00:00Z",
+        "status": "failed",
+        "prices": [],
+    }
+    assert event_should_stop(same, "2020-01-01T00:00:00Z") is False
+    assert event_should_stop(newer, "2020-01-01T00:00:00Z") is True
+    assert event_should_stop(failed, "2020-01-01T00:00:00Z") is True
+    assert event_should_stop(same, None) is True
+
+
+def test_price_batch_returns_each_product_once(tmp_path):
+    fastapi = pytest.importorskip("fastapi")
+    from fastapi.testclient import TestClient
+
+    from app.routes.cardmarket import router
+
+    conn = _catalog(tmp_path)
+    write_snapshot(conn, GENGAR, OFFERS)
+    app = fastapi.FastAPI()
+    app.include_router(router, prefix="/api/v1")
+    app.state.dbs = SimpleNamespace(catalog=conn)
+    client = TestClient(app)
+    response = client.post(
+        "/api/v1/cardmarket/prices/batch",
+        json={"urls": [GENGAR, PIKACHU, GENGAR, "https://example.com/nope"]},
+    )
+    assert response.status_code == 200
+    body = response.json()
+    assert len(body["items"]) == 2
+    assert body["items"][0]["prices"][0]["amount"] == 12.5
+    assert body["items"][1]["prices"] == []
