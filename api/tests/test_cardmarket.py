@@ -17,6 +17,7 @@ from app.cardmarket import (
     url_from_manifest_card,
 )
 from app.db import connect, init_catalog
+from app.config import get_settings
 
 
 def test_extract_id_from_pricing() -> None:
@@ -237,7 +238,8 @@ def test_price_targets_prefer_singles_slug() -> None:
     assert targets[0] == ("ja", "sm9-102")
 
 
-def test_normalize_and_snapshot_roundtrip(tmp_path: Path) -> None:
+def test_normalize_and_snapshot_roundtrip(tmp_path: Path, monkeypatch) -> None:
+    monkeypatch.setattr(get_settings(), "cardmarket_helper_enabled", True)
     from app.cardmarket import (
         normalize_product_url,
         save_snapshot,
@@ -266,7 +268,8 @@ def test_normalize_and_snapshot_roundtrip(tmp_path: Path) -> None:
     assert snapshot_prices(conn, key) == prices
 
 
-def test_job_retries_up_to_three_times(tmp_path: Path) -> None:
+def test_job_retries_up_to_three_times(tmp_path: Path, monkeypatch) -> None:
+    monkeypatch.setattr(get_settings(), "cardmarket_helper_enabled", True)
     from app.cardmarket_queue import claim_job, enqueue_job, retry_or_fail_job
 
     conn = connect(tmp_path / "catalog.sqlite")
@@ -308,7 +311,8 @@ def test_job_retries_up_to_three_times(tmp_path: Path) -> None:
     assert claim_job(conn, helper) is None
 
 
-def test_stale_claim_does_not_burn_retries(tmp_path: Path) -> None:
+def test_stale_claim_does_not_burn_retries(tmp_path: Path, monkeypatch) -> None:
+    monkeypatch.setattr(get_settings(), "cardmarket_helper_enabled", True)
     from app.cardmarket_queue import claim_job, enqueue_job
 
     conn = connect(tmp_path / "catalog.sqlite")
@@ -337,7 +341,8 @@ def test_stale_claim_does_not_burn_retries(tmp_path: Path) -> None:
     assert row["helper_id"] == "helper-b"
 
 
-def test_helper_online_after_ping(tmp_path: Path) -> None:
+def test_helper_online_after_ping(tmp_path: Path, monkeypatch) -> None:
+    monkeypatch.setattr(get_settings(), "cardmarket_helper_enabled", True)
     from app.cardmarket_queue import helper_is_online, issue_helper_credential, update_helper_status
 
     conn = connect(tmp_path / "catalog.sqlite")
@@ -1963,4 +1968,3 @@ def test_list_unmatched_products_skips_official_151_abra(tmp_path: Path) -> None
     assert v1 not in urls
     assert v2 not in urls
     assert urls == [movie]
-

@@ -28,6 +28,7 @@ from app.cardmarket_queue import (
     update_helper_status,
 )
 from app.db import connect, init_catalog
+from app.config import Settings, get_settings
 
 GENGAR = (
     "https://www.cardmarket.com/en/Pokemon/Products/Singles/"
@@ -38,6 +39,79 @@ PIKACHU = (
     "Pokemon-Trading-Card-Game-Classic-Charizard-Ho-Oh-ex-Deck/Pikachu-CLC008"
 )
 OFFERS = [{"label": "NM", "amount": 12.5, "currency": "EUR"}]
+
+
+@pytest.fixture(autouse=True)
+def enable_pc_helper_for_queue_tests(monkeypatch):
+    monkeypatch.setattr(get_settings(), "cardmarket_helper_enabled", True)
+
+
+def test_pc_helper_is_disabled_by_default(monkeypatch):
+    monkeypatch.delenv("CARDMARKET_HELPER_ENABLED", raising=False)
+    assert Settings(_env_file=None).cardmarket_helper_enabled is False
+
+
+def test_disabling_pc_helper_blocks_prices_and_keeps_phone_available(tmp_path, monkeypatch):
+    from fastapi import FastAPI
+    from fastapi.testclient import TestClient
+    from app.routes.cardmarket import router
+
+    conn = _catalog(tmp_path)
+    helper_id, token = issue_helper_credential(conn, "cdp-pc")
+    update_helper_status(conn, helper_id, ready=True)
+    enqueue_job(conn, GENGAR)
+    job = claim_job(conn, helper_id)
+    write_snapshot(conn, GENGAR, OFFERS)
+    settings = get_settings()
+    monkeypatch.setattr(settings, "cardmarket_helper_enabled", False)
+    app = FastAPI()
+    app.include_router(router, prefix="/api/v1")
+    app.state.dbs = SimpleNamespace(catalog=conn)
+    client = TestClient(app)
+    headers = {"Authorization": f"Bearer {token}"}
+    claim = {"job_id": job["id"], "claim_token": job["claim_token"]}
+
+    snapshot = client.get("/api/v1/cardmarket/prices", params={"url": GENGAR}).json()
+    assert snapshot["prices"] == OFFERS
+    assert snapshot["status"] is None
+    assert not snapshot["helper_ready"] and not snapshot["cdp_ready"]
+    assert not snapshot["helper_online"]
+    assert client.post("/api/v1/cardmarket/jobs", json={"url": GENGAR}).status_code == 503
+    recovered = client.post("/api/v1/cardmarket/helper/claim", json=claim, headers=headers)
+    assert recovered.json()["status"] == "idle"
+    assert client.post("/api/v1/cardmarket/helper/renew", json=claim, headers=headers).status_code == 503
+    completed = client.post(
+        "/api/v1/cardmarket/helper/complete",
+        json={**claim, "url": GENGAR, "prices": [], "empty": True, "submission_id": "disabled"},
+        headers=headers,
+    )
+    assert completed.status_code == 503
+    assert prices_payload(conn, GENGAR)["prices"] == OFFERS
+    assert remember_phone_offers(conn, GENGAR, [{"price": "2,50 €", "condition": "NM"}])
+    assert prices_payload(conn, GENGAR)["prices"][0]["amount"] == 2.5
+
+    monkeypatch.setattr(settings, "cardmarket_helper_enabled", True)
+    assert helper_public_state(conn)["helper_ready"] is True
+    assert recover_job(conn, helper_id, job["id"], job["claim_token"])["id"] == job["id"]
+
+
+def test_proxy_can_take_over_disabled_pc_claim(tmp_path, monkeypatch):
+    from app.cardmarket_queue import claim_proxy_job, complete_proxy_job
+
+    conn = _catalog(tmp_path)
+    helper_id, _ = issue_helper_credential(conn)
+    job_id = enqueue_job(conn, GENGAR)
+    previous = claim_job(conn, helper_id)
+    monkeypatch.setattr(get_settings(), "cardmarket_helper_enabled", False)
+    assert enqueue_job(conn, GENGAR, tier="proxy") == job_id
+    job = claim_proxy_job(conn)
+    assert job["id"] == job_id
+    assert job["claim_token"] != previous["claim_token"]
+    assert prices_payload(conn, GENGAR)["status"] == "claimed"
+    result = complete_proxy_job(
+        conn, job_id, job["claim_token"], url=GENGAR, prices=OFFERS, submission_id="proxy"
+    )
+    assert result["prices"] == OFFERS
 
 
 def _catalog(tmp_path):

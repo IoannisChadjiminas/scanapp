@@ -23,6 +23,7 @@ from app.cardmarket import (
     snapshot_record,
     write_snapshot,
 )
+from app.config import get_settings
 
 CLAIM_LIFETIME_SECONDS = 180
 HELPER_ONLINE_SECONDS = 120
@@ -328,6 +329,8 @@ def enqueue_job(
     filters: dict[str, str] | None = None,
     tier: str = "free",
 ) -> str:
+    if tier == "free" and not get_settings().cardmarket_helper_enabled:
+        raise QueueError("PC price helper is disabled", status_code=503)
     key, parsed = split_url_and_filters(url)
     if not key or not is_job_url(key):
         raise QueueError("Need a Cardmarket product URL")
@@ -337,7 +340,7 @@ def enqueue_job(
     with immediate_transaction(conn):
         existing = conn.execute(
             """
-            SELECT id FROM cardmarket_jobs
+            SELECT id, tier FROM cardmarket_jobs
             WHERE url = ?
               AND COALESCE(filters_json, '{}') = ?
               AND status IN ('pending', 'claimed')
@@ -349,6 +352,16 @@ def enqueue_job(
         if existing:
             job_id = str(existing["id"])
             if tier == "proxy":
+                if existing["tier"] != "proxy" and not get_settings().cardmarket_helper_enabled:
+                    conn.execute(
+                        """
+                        UPDATE cardmarket_jobs SET status = 'pending', helper_id = NULL,
+                            claim_token = NULL, claim_expires_at = NULL,
+                            attempts = 0, next_attempt_at = NULL
+                        WHERE id = ?
+                        """,
+                        (job_id,),
+                    )
                 conn.execute(
                     "UPDATE cardmarket_jobs SET tier = 'proxy', updated_at = ? WHERE id = ?",
                     (datetime_now(), job_id),
@@ -589,6 +602,8 @@ def _take_pending_job(
 
 
 def claim_job(conn: sqlite3.Connection, helper_id: str) -> dict[str, Any] | None:
+    if not get_settings().cardmarket_helper_enabled:
+        return None
     parked_url = None
     with immediate_transaction(conn):
         now = datetime_now()
@@ -661,6 +676,8 @@ def _require_claim(
 def recover_job(
     conn: sqlite3.Connection, helper_id: str, job_id: str | None, claim_token: str | None
 ) -> dict[str, Any] | None:
+    if not get_settings().cardmarket_helper_enabled:
+        return None
     with immediate_transaction(conn):
         now = datetime_now()
         settle_expired_claims(conn, now)
@@ -978,7 +995,10 @@ def _age_seconds(stamp: str | None) -> float | None:
 
 
 def helper_public_state(conn: sqlite3.Connection) -> dict[str, Any]:
-    rows = conn.execute("SELECT * FROM cardmarket_helpers").fetchall()
+    rows = (
+        conn.execute("SELECT * FROM cardmarket_helpers").fetchall()
+        if get_settings().cardmarket_helper_enabled else []
+    )
     online_rows = []
     for row in rows:
         age = _age_seconds(str(row["last_seen"] or ""))
@@ -1020,16 +1040,18 @@ def latest_job_status(conn: sqlite3.Connection, url: str | None) -> str | None:
     if not key:
         return None
     encoded = _filters_json(filters)
+    helpers_enabled = get_settings().cardmarket_helper_enabled
     active = conn.execute(
         """
         SELECT status FROM cardmarket_jobs
         WHERE url = ?
           AND COALESCE(filters_json, '{}') = ?
+          AND (? OR COALESCE(tier, 'free') = 'proxy')
           AND status IN ('pending', 'claimed')
         ORDER BY updated_at DESC
         LIMIT 1
         """,
-        (key, encoded),
+        (key, encoded, helpers_enabled),
     ).fetchone()
     if active is not None:
         return str(active["status"] or "") or None
@@ -1038,10 +1060,11 @@ def latest_job_status(conn: sqlite3.Connection, url: str | None) -> str | None:
         SELECT status FROM cardmarket_jobs
         WHERE url = ?
           AND COALESCE(filters_json, '{}') = ?
+          AND (? OR COALESCE(tier, 'free') = 'proxy')
         ORDER BY updated_at DESC
         LIMIT 1
         """,
-        (key, encoded),
+        (key, encoded, helpers_enabled),
     ).fetchone()
     if row is None:
         return None

@@ -31,6 +31,7 @@ from app.cardmarket_budget import (
     url_on_cooldown,
 )
 from app.session import client_ip, existing_session, get_or_create_session
+from app.config import get_settings
 from app.cardmarket_queue import (
     AuthError,
     QueueError,
@@ -418,6 +419,8 @@ def helper_renew(
 ) -> JobResponse:
     catalog = request.app.state.dbs.catalog
     helper = _helper(catalog, authorization)
+    if not get_settings().cardmarket_helper_enabled:
+        raise HTTPException(status_code=503, detail="PC price helper is disabled")
     try:
         job = renew_claim(catalog, helper["helper_id"], payload.job_id, payload.claim_token)
     except QueueError as exc:
@@ -433,6 +436,8 @@ def helper_complete(
 ) -> PriceResponse:
     catalog = request.app.state.dbs.catalog
     helper = _helper(catalog, authorization)
+    if not get_settings().cardmarket_helper_enabled:
+        raise HTTPException(status_code=503, detail="PC price helper is disabled")
     prices = [item.model_dump() for item in payload.prices[:8]]
     try:
         result = complete_job(

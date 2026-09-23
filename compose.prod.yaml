@@ -7,6 +7,7 @@ services:
     ports: []
     environment:
       ENABLE_MATCHED: ${ENABLE_MATCHED:-true}
+      CARDMARKET_HELPER_ENABLED: ${CARDMARKET_HELPER_ENABLED:-false}
     mem_limit: 1536m
     cpus: "1.5"
     pids_limit: 256

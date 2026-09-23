@@ -53,6 +53,13 @@ Runtime containers do not include Node.js, PyTorch, or PaddlePaddle. Those are o
 
 Helper write routes require `Authorization: Bearer <token>` from `python -m app.helper_credential`. Review routes accept the same helper token, or `REVIEW_TOKEN` (`Authorization: Bearer` or `X-Review-Token`). Frontend types live in `lib/api-types.ts`. The PC Chrome helper lives in `extension/` (`extension/README.md`). A confident match or confirmation queues the product; the helper reads listings in one background tab.
 
+PC extension and CDP helper price reads are temporarily disabled by default
+(`CARDMARKET_HELPER_ENABLED=false`). The API advertises them as unavailable,
+does not hand them jobs, and rejects renewals and price submissions. Stored
+prices, phone reads, and the separately configured paid scraper remain available.
+To restore PC reads, set `CARDMARKET_HELPER_ENABLED=true` in the API environment
+and restart/redeploy the API. No Flutter rebuild is needed.
+
 Regenerate the OpenAPI document with:
 
 ```bash

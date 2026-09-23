@@ -77,7 +77,8 @@ def test_one_empty_keeps_the_last_price_and_two_confirm_unlisted(tmp_path):
     assert cleared["prices"] == []
 
 
-def test_free_helpers_skip_proxy_jobs_and_bad_tokens_fail(tmp_path):
+def test_free_helpers_skip_proxy_jobs_and_bad_tokens_fail(tmp_path, monkeypatch):
+    monkeypatch.setattr(get_settings(), "cardmarket_helper_enabled", True)
     conn = _catalog(tmp_path)
     helper_id, _ = issue_helper_credential(conn)
     enqueue_job(conn, ENGLISH, tier="proxy")
