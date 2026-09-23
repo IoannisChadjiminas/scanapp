@@ -13,6 +13,27 @@ def _now() -> datetime:
     return datetime.now(timezone.utc)
 
 
+def client_ip(request: Request) -> str:
+    """First hop recorded by the trusted proxy, else the direct client."""
+    forwarded = request.headers.get("x-forwarded-for", "")
+    if forwarded:
+        return forwarded.split(",")[0].strip()[:80]
+    if request.client and request.client.host:
+        return request.client.host
+    return ""
+
+
+def existing_session(request: Request, dbs: Databases, settings: Settings) -> str | None:
+    """Return the caller's session. Never creates one."""
+    cookie = request.cookies.get(settings.session_cookie)
+    if not cookie:
+        return None
+    row = dbs.results.execute(
+        "SELECT id FROM sessions WHERE id = ?", (cookie,)
+    ).fetchone()
+    return cookie if row else None
+
+
 def get_or_create_session(
     request: Request,
     response: Response,
@@ -31,11 +52,26 @@ def get_or_create_session(
             )
             dbs.results.commit()
             return cookie
+    ip = client_ip(request)
+    cutoff = (_now() - timedelta(hours=1)).isoformat()
+    created = dbs.results.execute(
+        """
+        SELECT COUNT(*) AS n FROM session_creations
+        WHERE ip = ? AND created_at >= ?
+        """,
+        (ip, cutoff),
+    ).fetchone()
+    if int(created["n"] or 0) >= settings.session_create_hourly:
+        raise HTTPException(status_code=429, detail="Too many new sessions")
     session_id = str(uuid.uuid4())
     stamp = _now().isoformat()
     dbs.results.execute(
         "INSERT INTO sessions (id, created_at, last_seen) VALUES (?, ?, ?)",
         (session_id, stamp, stamp),
+    )
+    dbs.results.execute(
+        "INSERT INTO session_creations (ip, created_at) VALUES (?, ?)",
+        (ip, stamp),
     )
     dbs.results.commit()
     response.set_cookie(

@@ -145,6 +145,7 @@ def init_catalog(conn: sqlite3.Connection) -> None:
             "product_identity": "TEXT",
             "submission_id": "TEXT",
             "observed_at": "TEXT",
+            "tier": "TEXT NOT NULL DEFAULT 'free'",
         },
     )
     _add_columns(
@@ -156,6 +157,45 @@ def init_catalog(conn: sqlite3.Connection) -> None:
             "sampled_offer_count": "INTEGER",
             "submission_id": "TEXT",
         },
+    )
+    _migrate_snapshots(conn)
+    conn.executescript(
+        """
+        CREATE TABLE IF NOT EXISTS cardmarket_scrapes (
+            id TEXT PRIMARY KEY,
+            sample_key TEXT NOT NULL,
+            session_id TEXT,
+            ip TEXT,
+            state TEXT NOT NULL,
+            reserved_bytes INTEGER NOT NULL DEFAULT 0,
+            bytes INTEGER,
+            outcome TEXT,
+            elapsed_ms INTEGER,
+            created_at TEXT NOT NULL
+        );
+        CREATE INDEX IF NOT EXISTS idx_cardmarket_scrapes_day
+            ON cardmarket_scrapes(created_at, state);
+        CREATE TABLE IF NOT EXISTS cardmarket_phone_challenges (
+            id TEXT PRIMARY KEY,
+            session_id TEXT NOT NULL,
+            ip TEXT,
+            sample_key TEXT NOT NULL,
+            created_at TEXT NOT NULL
+        );
+        CREATE INDEX IF NOT EXISTS idx_phone_challenges_lookup
+            ON cardmarket_phone_challenges(session_id, sample_key, created_at);
+        CREATE TABLE IF NOT EXISTS cardmarket_escalations (
+            id TEXT PRIMARY KEY,
+            session_id TEXT NOT NULL,
+            ip TEXT,
+            sample_key TEXT NOT NULL,
+            created_at TEXT NOT NULL
+        );
+        CREATE INDEX IF NOT EXISTS idx_escalations_session
+            ON cardmarket_escalations(session_id, created_at);
+        CREATE INDEX IF NOT EXISTS idx_escalations_ip
+            ON cardmarket_escalations(ip, created_at);
+        """
     )
     _add_columns(
         conn,
@@ -173,6 +213,54 @@ def init_catalog(conn: sqlite3.Connection) -> None:
         """
     )
     conn.commit()
+
+
+def _migrate_snapshots(conn: sqlite3.Connection) -> None:
+    """Key snapshots by sample_key so filtered listings do not overwrite each other."""
+    info = list(conn.execute("PRAGMA table_info(cardmarket_snapshots)"))
+    columns = {row[1] for row in info}
+    primary = [row[1] for row in info if row[5]]
+    if "sample_key" in columns and primary == ["sample_key"]:
+        _add_columns(
+            conn,
+            "cardmarket_snapshots",
+            {
+                "empty_observed_at": "TEXT",
+                "empty_first_at": "TEXT",
+                "empty_source": "TEXT",
+                "empty_count": "INTEGER NOT NULL DEFAULT 0",
+            },
+        )
+        return
+    conn.executescript(
+        """
+        CREATE TABLE cardmarket_snapshots_next (
+            sample_key TEXT PRIMARY KEY,
+            url TEXT NOT NULL,
+            prices_json TEXT NOT NULL,
+            fetched_at TEXT NOT NULL,
+            observed_at TEXT,
+            parser_version TEXT,
+            sampled_offer_count INTEGER,
+            submission_id TEXT,
+            empty_observed_at TEXT,
+            empty_first_at TEXT,
+            empty_source TEXT,
+            empty_count INTEGER NOT NULL DEFAULT 0
+        );
+        INSERT INTO cardmarket_snapshots_next (
+            sample_key, url, prices_json, fetched_at, observed_at, parser_version,
+            sampled_offer_count, submission_id
+        )
+        SELECT url, url, prices_json, fetched_at, observed_at, parser_version,
+               sampled_offer_count, submission_id
+        FROM cardmarket_snapshots;
+        DROP TABLE cardmarket_snapshots;
+        ALTER TABLE cardmarket_snapshots_next RENAME TO cardmarket_snapshots;
+        CREATE INDEX IF NOT EXISTS idx_cardmarket_snapshots_url
+            ON cardmarket_snapshots(url);
+        """
+    )
 
 
 def _add_columns(conn: sqlite3.Connection, table: str, columns: dict[str, str]) -> None:
@@ -217,6 +305,21 @@ def init_results(conn: sqlite3.Connection) -> None:
         conn,
         "scans",
         {"chosen_cardmarket_url": "TEXT"},
+    )
+    conn.execute(
+        """
+        CREATE TABLE IF NOT EXISTS session_creations (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            ip TEXT NOT NULL,
+            created_at TEXT NOT NULL
+        )
+        """
+    )
+    conn.execute(
+        """
+        CREATE INDEX IF NOT EXISTS idx_session_creations_ip
+            ON session_creations(ip, created_at)
+        """
     )
     conn.commit()
 

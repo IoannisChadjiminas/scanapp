@@ -4,7 +4,7 @@ import asyncio
 import threading
 from typing import Any
 
-from app.cardmarket import normalize_product_url
+from app.cardmarket import sample_key
 
 _guard = threading.Lock()
 _waiters: dict[str, list[asyncio.Event]] = {}
@@ -16,8 +16,8 @@ def bind_loop(loop: asyncio.AbstractEventLoop | None) -> None:
     _loop = loop
 
 
-def notify_product(url: str | None) -> None:
-    key = normalize_product_url(url)
+def notify_product(url: str | None, filters: dict[str, str] | None = None) -> None:
+    key = sample_key(url, filters)
     if not key:
         return
     with _guard:
@@ -30,8 +30,10 @@ def notify_product(url: str | None) -> None:
             event.set()
 
 
-async def wait_for_product(url: str | None, timeout: float) -> bool:
-    key = normalize_product_url(url)
+async def wait_for_product(
+    url: str | None, timeout: float, filters: dict[str, str] | None = None
+) -> bool:
+    key = sample_key(url, filters)
     if not key:
         await asyncio.sleep(min(timeout, 1.0))
         return False

@@ -17,6 +17,7 @@ from app.cardmarket import (
     datetime_now,
     is_job_url,
     normalize_product_url,
+    sample_key,
     singles_code_and_number,
     snapshot_prices,
     snapshot_record,
@@ -37,6 +38,8 @@ LISTING_FILTER_KEYS = (
 )
 PARSER_VERSION = "offers-v1"
 PHONE_PARSER_VERSION = "phone-offers-v1"
+PROXY_PARSER_VERSION = "proxy-offers-v1"
+PROXY_WORKER_ID = "proxy"
 CDP_HELPER_ID = "cdp"
 FRESH_SECONDS = 15 * 60
 _GUIDE_LABELS = frozenset({"From", "Trend", "7-day"})
@@ -323,6 +326,7 @@ def enqueue_job(
     url: str,
     card_id: str | None = None,
     filters: dict[str, str] | None = None,
+    tier: str = "free",
 ) -> str:
     key, parsed = split_url_and_filters(url)
     if not key or not is_job_url(key):
@@ -344,6 +348,11 @@ def enqueue_job(
         ).fetchone()
         if existing:
             job_id = str(existing["id"])
+            if tier == "proxy":
+                conn.execute(
+                    "UPDATE cardmarket_jobs SET tier = 'proxy', updated_at = ? WHERE id = ?",
+                    (datetime_now(), job_id),
+                )
         else:
             job_id = str(uuid.uuid4())
             now = datetime_now()
@@ -351,19 +360,19 @@ def enqueue_job(
                 """
                 INSERT INTO cardmarket_jobs (
                     id, url, card_id, status, created_at, updated_at, attempts,
-                    filters_json, product_identity, next_attempt_at
-                ) VALUES (?, ?, ?, 'pending', ?, ?, 0, ?, ?, ?)
+                    filters_json, product_identity, next_attempt_at, tier
+                ) VALUES (?, ?, ?, 'pending', ?, ?, 0, ?, ?, ?, ?)
                 """,
-                (job_id, key, card_id or "", now, now, encoded, identity, now),
+                (job_id, key, card_id or "", now, now, encoded, identity, now, tier),
             )
-    _notify_job_url(key)
+    _notify_job_url(key, merged)
     return job_id
 
 
-def _notify_job_url(url: str | None) -> None:
+def _notify_job_url(url: str | None, filters: dict[str, str] | None = None) -> None:
     from app.cardmarket_events import notify_product
 
-    notify_product(url)
+    notify_product(url, filters)
 
 
 def parse_euro_offer(value: str) -> float | None:
@@ -415,7 +424,10 @@ def _same_prices(existing: list[dict[str, Any]], prices: list[dict[str, Any]]) -
 
 
 def remember_phone_offers(
-    conn: sqlite3.Connection, url: str, rows: list[dict[str, Any]]
+    conn: sqlite3.Connection,
+    url: str,
+    rows: list[dict[str, Any]],
+    parser_version: str | None = None,
 ) -> bool:
     """Store a phone offer table when it is new or the fresh window has passed.
 
@@ -425,10 +437,10 @@ def remember_phone_offers(
     prices = rows_to_prices(rows)
     if not prices:
         return False
-    key = normalize_product_url(url)
+    key = sample_key(url)
     if not key:
         return False
-    existing = snapshot_record(conn, key)
+    existing = snapshot_record(conn, url)
     existing_prices = list((existing or {}).get("prices") or [])
     observed = (existing or {}).get("observed_at") or (existing or {}).get("fetched_at")
     age = _age_seconds(str(observed or ""))
@@ -436,32 +448,45 @@ def remember_phone_offers(
         return False
     write_snapshot(
         conn,
-        key,
+        url,
         prices,
-        parser_version=PHONE_PARSER_VERSION,
+        parser_version=parser_version or PHONE_PARSER_VERSION,
         sampled_offer_count=len(prices),
     )
-    _notify_job_url(key)
+    _notify_job_url(url)
     return True
 
 
-def _stamp_epoch(stamp: str | None) -> float | None:
+def _stamp_epoch(stamp: str | None) -> int | None:
     if not stamp:
         return None
-    age = _age_seconds(str(stamp))
-    if age is None:
+    try:
+        return calendar.timegm(time.strptime(stamp, "%Y-%m-%dT%H:%M:%SZ"))
+    except (TypeError, ValueError):
         return None
-    return time.time() - age
 
 
 def event_should_stop(payload: dict[str, Any], since: str | None) -> bool:
-    """End a price stream once the sample the caller is waiting for arrives."""
+    """End a price stream once the sample the caller is waiting for arrives.
+
+    ``attempted_at`` is the last empty read. It stays newer than the price the
+    caller already has, so it must not close a job that is still pending or
+    claimed. A newer price, or a failed job, still ends the wait.
+    """
     if since:
-        if str(payload.get("status") or "") == "failed":
+        status = str(payload.get("status") or "")
+        if status == "failed":
             return True
-        observed = _stamp_epoch(str(payload.get("observed_at") or ""))
         start = _stamp_epoch(since)
-        return observed is not None and start is not None and observed > start
+        if start is None:
+            return False
+        observed = _stamp_epoch(str(payload.get("observed_at") or ""))
+        if observed is not None and observed > start:
+            return True
+        if status in {"pending", "claimed"}:
+            return False
+        attempted = _stamp_epoch(str(payload.get("attempted_at") or ""))
+        return attempted is not None and attempted > start
     prices = payload.get("prices") or []
     live = bool(prices) and not all(
         str(item.get("label") or "") in _GUIDE_LABELS for item in prices
@@ -521,6 +546,7 @@ def _newest_pending_job(conn: sqlite3.Connection, now: str) -> sqlite3.Row | Non
         SELECT rowid AS queue_row, *
         FROM cardmarket_jobs
         WHERE status = 'pending'
+          AND COALESCE(tier, 'free') != 'proxy'
           AND (next_attempt_at IS NULL OR next_attempt_at <= ?)
         ORDER BY created_at DESC, queue_row DESC
         LIMIT 1
@@ -594,7 +620,7 @@ def claim_job(conn: sqlite3.Connection, helper_id: str) -> dict[str, Any] | None
     if parked_url:
         _notify_job_url(parked_url)
     if job is not None:
-        _notify_job_url(job.get("url"))
+        _notify_job_url(job.get("url"), job.get("filters"))
     return job
 
 
@@ -676,10 +702,18 @@ def release_job(
     job_id: str,
     claim_token: str,
     reason: str | None = None,
+    *,
+    delay_seconds: float = 0,
 ) -> dict[str, Any]:
     with immediate_transaction(conn):
         row = _require_claim(conn, job_id, helper_id, claim_token)
         now = datetime_now()
+        if delay_seconds > 0:
+            next_at = time.strftime(
+                "%Y-%m-%dT%H:%M:%SZ", time.gmtime(time.time() + delay_seconds)
+            )
+        else:
+            next_at = now
         conn.execute(
             """
             UPDATE cardmarket_jobs
@@ -692,7 +726,7 @@ def release_job(
                 failure_reason = ?
             WHERE id = ?
             """,
-            (now, now, reason, row["id"]),
+            (now, next_at, reason, row["id"]),
         )
         return {"id": str(row["id"]), "status": "pending", "url": str(row["url"])}
 
@@ -729,9 +763,11 @@ def complete_job(
         )
         job = job_from_row(row)
         if job["status"] == "done" and job["submission_id"] == submission_id:
-            record = snapshot_record(conn, job["url"]) or snapshot_record(conn, final_url)
+            record = snapshot_record(conn, job["url"], job.get("filters"))
             result = {
-                "url": (record or {}).get("url") or job["url"],
+                "url": (record or {}).get("url")
+                or sample_key(job["url"], job.get("filters"))
+                or job["url"],
                 "prices": (record or {}).get("prices") or [],
                 "status": "done",
                 "observed_at": (record or {}).get("observed_at"),
@@ -755,11 +791,13 @@ def complete_job(
                     conn,
                     target,
                     prices,
+                    filters=job["filters"] if target == job["url"] else None,
                     observed_at=stamp,
                     parser_version=parser,
                     sampled_offer_count=sampled,
                     submission_id=submission_id,
                     allow_empty=empty,
+                    empty_source=parser,
                     commit=False,
                 )
             now = datetime_now()
@@ -784,7 +822,7 @@ def complete_job(
                 "sampled_offer_count": sampled,
                 "idempotent": False,
             }
-    _notify_job_url(job["url"] if job else None)
+    _notify_job_url(job["url"] if job else None, (job or {}).get("filters"))
     _notify_job_url(final_url)
     return result
 
@@ -811,6 +849,7 @@ def retry_or_fail_job(
                 return "failed"
             row = fetched
         product_url = str(row["url"] or "")
+        product_filters = _parse_filters(_row_get(row, "filters_json", "{}"))
         attempts = int(_row_get(row, "attempts", 0) or 0) + 1
         now = datetime_now()
         if terminal or attempts >= MAX_JOB_ATTEMPTS:
@@ -847,7 +886,7 @@ def retry_or_fail_job(
                 (attempts, now, _iso_offset(delay), reason, job_id),
             )
             status = "pending"
-    _notify_job_url(product_url)
+    _notify_job_url(product_url, product_filters)
     return status
 
 
@@ -932,13 +971,10 @@ def update_helper_status(
 
 
 def _age_seconds(stamp: str | None) -> float | None:
-    if not stamp:
+    epoch = _stamp_epoch(stamp)
+    if epoch is None:
         return None
-    try:
-        parsed = time.strptime(stamp, "%Y-%m-%dT%H:%M:%SZ")
-    except (TypeError, ValueError):
-        return None
-    return time.time() - calendar.timegm(parsed)
+    return time.time() - epoch
 
 
 def helper_public_state(conn: sqlite3.Connection) -> dict[str, Any]:
@@ -980,18 +1016,20 @@ def helper_is_online(conn: sqlite3.Connection, *, within_seconds: int = HELPER_O
 
 
 def latest_job_status(conn: sqlite3.Connection, url: str | None) -> str | None:
-    key = normalize_product_url(url)
+    key, filters = split_url_and_filters(url)
     if not key:
         return None
+    encoded = _filters_json(filters)
     active = conn.execute(
         """
         SELECT status FROM cardmarket_jobs
         WHERE url = ?
+          AND COALESCE(filters_json, '{}') = ?
           AND status IN ('pending', 'claimed')
         ORDER BY updated_at DESC
         LIMIT 1
         """,
-        (key,),
+        (key, encoded),
     ).fetchone()
     if active is not None:
         return str(active["status"] or "") or None
@@ -999,10 +1037,11 @@ def latest_job_status(conn: sqlite3.Connection, url: str | None) -> str | None:
         """
         SELECT status FROM cardmarket_jobs
         WHERE url = ?
+          AND COALESCE(filters_json, '{}') = ?
         ORDER BY updated_at DESC
         LIMIT 1
         """,
-        (key,),
+        (key, encoded),
     ).fetchone()
     if row is None:
         return None
@@ -1010,13 +1049,19 @@ def latest_job_status(conn: sqlite3.Connection, url: str | None) -> str | None:
 
 
 def prices_payload(conn: sqlite3.Connection, url: str | None) -> dict[str, Any]:
-    key = normalize_product_url(url)
-    record = snapshot_record(conn, key) if key else None
+    from app.cardmarket_budget import scraper_is_ready
+
+    sample = sample_key(url)
+    record = snapshot_record(conn, url) if sample else None
     state = helper_public_state(conn)
-    status = latest_job_status(conn, key)
+    status = latest_job_status(conn, url)
+    unlisted = bool((record or {}).get("unlisted"))
+    prices = [] if unlisted else list((record or {}).get("prices") or [])
     observed = (record or {}).get("observed_at") or (record or {}).get("fetched_at")
+    if unlisted or (not prices and (record or {}).get("empty_count")):
+        observed = (record or {}).get("empty_observed_at") or observed
     freshness = None
-    if record and (record.get("prices") or record.get("empty")):
+    if record and (prices or unlisted or record.get("empty")):
         age = _age_seconds(str(observed or ""))
         if age is None:
             freshness = "live"
@@ -1025,15 +1070,103 @@ def prices_payload(conn: sqlite3.Connection, url: str | None) -> dict[str, Any]:
         else:
             freshness = "stale"
     return {
-        "url": key,
-        "prices": (record or {}).get("prices") or [],
+        "url": sample,
+        "prices": prices,
         "status": status,
         "observed_at": observed,
         "sampled_offer_count": (record or {}).get("sampled_offer_count"),
         "freshness": freshness,
+        "unlisted": unlisted,
+        "attempted_at": (record or {}).get("empty_observed_at"),
+        "scraper_ready": scraper_is_ready(conn),
         **state,
     }
 
 
 def touch_helper(conn: sqlite3.Connection) -> None:
     update_helper_status(conn, "legacy", ready=False, paused=False)
+
+
+def claim_proxy_job(conn: sqlite3.Connection, worker_id: str = PROXY_WORKER_ID) -> dict[str, Any] | None:
+    with immediate_transaction(conn):
+        now = datetime_now()
+        settle_expired_claims(conn, now)
+        row = conn.execute(
+            """
+            SELECT rowid AS queue_row, *
+            FROM cardmarket_jobs
+            WHERE status = 'pending'
+              AND COALESCE(tier, 'free') = 'proxy'
+              AND (next_attempt_at IS NULL OR next_attempt_at <= ?)
+            ORDER BY created_at ASC, rowid ASC
+            LIMIT 1
+            """,
+            (now,),
+        ).fetchone()
+        if row is None:
+            return None
+        job = _take_pending_job(conn, worker_id, row, now)
+    if job is not None:
+        _notify_job_url(job.get("url"), job.get("filters"))
+    return job
+
+
+def renew_proxy_job(
+    conn: sqlite3.Connection, job_id: str, claim_token: str, worker_id: str = PROXY_WORKER_ID
+) -> dict[str, Any]:
+    return renew_claim(conn, worker_id, job_id, claim_token)
+
+
+def complete_proxy_job(
+    conn: sqlite3.Connection,
+    job_id: str,
+    claim_token: str,
+    *,
+    url: str,
+    prices: list[dict[str, Any]],
+    empty: bool = False,
+    submission_id: str,
+    observed_at: str | None = None,
+    worker_id: str = PROXY_WORKER_ID,
+    sampled_offer_count: int | None = None,
+) -> dict[str, Any]:
+    return complete_job(
+        conn,
+        worker_id,
+        job_id,
+        claim_token,
+        submission_id=submission_id,
+        url=url,
+        prices=prices,
+        empty=empty,
+        observed_at=observed_at,
+        parser_version=PROXY_PARSER_VERSION,
+        sampled_offer_count=sampled_offer_count,
+    )
+
+
+def fail_proxy_job(
+    conn: sqlite3.Connection,
+    job_id: str,
+    claim_token: str,
+    reason: str,
+    *,
+    terminal: bool = False,
+    worker_id: str = PROXY_WORKER_ID,
+) -> str:
+    return retry_or_fail_job(
+        conn,
+        job_id,
+        helper_id=worker_id,
+        claim_token=claim_token,
+        reason=reason,
+        terminal=terminal,
+    )
+
+
+def sample_is_fresh(conn: sqlite3.Connection, url: str) -> bool:
+    record = snapshot_record(conn, url)
+    if not record or record.get("unlisted") or not record.get("prices"):
+        return False
+    age = _age_seconds(str(record.get("observed_at") or ""))
+    return age is not None and 0 <= age <= FRESH_SECONDS

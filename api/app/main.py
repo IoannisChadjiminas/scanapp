@@ -9,6 +9,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from app.admission import ScanLimiter
 from app.cardmarket_events import bind_loop
+from app.cardmarket_scraper import ScraperWorker
 from app.config import get_settings
 from app.db import Databases
 from app.recognition.runtime import Runtime
@@ -36,9 +37,15 @@ async def lifespan(app: FastAPI):
     app.state.image_executor = ThreadPoolExecutor(max_workers=2, thread_name_prefix="image")
     app.state.loop = asyncio.get_running_loop()
     bind_loop(app.state.loop)
+    worker = ScraperWorker(settings) if settings.scraper_enabled else None
+    if worker is not None:
+        worker.start()
+    app.state.scraper_worker = worker
     try:
         yield
     finally:
+        if worker is not None:
+            worker.stop()
         bind_loop(None)
         app.state.executor.shutdown(wait=False, cancel_futures=True)
         app.state.image_executor.shutdown(wait=False, cancel_futures=True)

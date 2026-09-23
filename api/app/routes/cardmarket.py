@@ -22,7 +22,15 @@ from app.cardmarket import (
 )
 from app.cardmarket_events import notify_product, wait_for_product
 from app.cardmarket_html import parse_cardmarket_html
-from app.session import get_or_create_session
+from app.cardmarket import sample_key
+from app.cardmarket_budget import (
+    has_recent_challenge,
+    record_escalation,
+    record_phone_challenge,
+    scraper_is_ready,
+    url_on_cooldown,
+)
+from app.session import client_ip, existing_session, get_or_create_session
 from app.cardmarket_queue import (
     AuthError,
     QueueError,
@@ -177,6 +185,8 @@ class PriceResponse(BaseModel):
     observed_at: str | None = None
     sampled_offer_count: int | None = None
     freshness: str | None = None
+    unlisted: bool = False
+    scraper_ready: bool = False
     queued: int | None = None
     pending: int | None = None
     claimed: int | None = None
@@ -188,7 +198,12 @@ class BatchPriceResponse(BaseModel):
     helper_online: bool = False
     helper_ready: bool = False
     helper_paused: bool = False
+    scraper_ready: bool = False
     items: list[PriceResponse] = Field(default_factory=list)
+
+
+class EscalationRequest(BaseModel):
+    url: str
 
 
 def _bearer_token(authorization: str | None) -> str | None:
@@ -236,6 +251,8 @@ def _price_response(payload: dict[str, Any]) -> PriceResponse:
         cdp_online=bool(payload.get("cdp_online")),
         cdp_ready=bool(payload.get("cdp_ready")),
         observed_at=payload.get("observed_at"),
+        unlisted=bool(payload.get("unlisted")),
+        scraper_ready=bool(payload.get("scraper_ready")),
         sampled_offer_count=payload.get("sampled_offer_count"),
         freshness=payload.get("freshness"),
         queued=payload.get("queued"),
@@ -544,17 +561,53 @@ def parse_cardmarket_page(
 ) -> ParseResponse:
     """Parse HTML the phone's WebView already loaded. Does not fetch the URL."""
     settings = request.app.state.settings
-    get_or_create_session(request, response, request.app.state.dbs, settings)
+    session = get_or_create_session(request, response, request.app.state.dbs, settings)
     if not is_verified_singles_url(payload.url):
         raise HTTPException(status_code=400, detail="Cardmarket product URL required")
     parsed = parse_cardmarket_html(payload.url, payload.html)
-    if parsed.get("rows") and not parsed.get("blocked") and not parsed.get("empty"):
+    catalog = request.app.state.dbs.catalog
+    if parsed.get("blocked"):
+        record_phone_challenge(
+            catalog,
+            session_id=session,
+            ip=client_ip(request),
+            url=payload.url,
+        )
+    elif parsed.get("rows") and not parsed.get("empty"):
         remember_phone_offers(
-            request.app.state.dbs.catalog,
+            catalog,
             payload.url,
             list(parsed["rows"]),
         )
     return ParseResponse.model_validate(parsed)
+
+
+@router.post("/cardmarket/escalations", response_model=JobResponse)
+def escalate_price(payload: EscalationRequest, request: Request) -> JobResponse:
+    """Ask for a paid read after this session's phone hit a challenge."""
+    settings = request.app.state.settings
+    session_id = existing_session(request, request.app.state.dbs, settings)
+    if not session_id:
+        raise HTTPException(status_code=401, detail="Session required")
+    if not settings.scraper_enabled:
+        raise HTTPException(status_code=503, detail="Paid reads are off")
+    sample = sample_key(payload.url)
+    if not sample or not is_verified_singles_url(sample.split("?", 1)[0]):
+        raise HTTPException(status_code=400, detail="Need a Cardmarket product URL")
+    catalog = request.app.state.dbs.catalog
+    if not has_recent_challenge(catalog, session_id, payload.url):
+        raise HTTPException(status_code=403, detail="No recent phone challenge for this card")
+    if url_on_cooldown(catalog, payload.url):
+        raise HTTPException(status_code=429, detail="This card was tried recently")
+    if not scraper_is_ready(catalog):
+        raise HTTPException(status_code=429, detail="Paid read budget is exhausted")
+    ip = client_ip(request)
+    try:
+        record_escalation(catalog, session_id=session_id, ip=ip, url=payload.url)
+        job_id = enqueue_job(catalog, payload.url, tier="proxy")
+    except QueueError as exc:
+        _raise_queue(exc)
+    return JobResponse(id=job_id, url=sample, status="pending")
 
 
 @router.get("/cardmarket/prices", response_model=PriceResponse)
@@ -570,16 +623,18 @@ def get_prices_batch(payload: BatchPriceRequest, request: Request) -> BatchPrice
     seen: set[str] = set()
     items: list[PriceResponse] = []
     for url in payload.urls:
-        key = normalize_product_url(url)
-        if not key or key in seen or not is_verified_singles_url(key):
+        sample = sample_key(url)
+        product = (sample or "").split("?", 1)[0]
+        if not sample or sample in seen or not is_verified_singles_url(product):
             continue
-        seen.add(key)
-        items.append(_price_response(prices_payload(conn, key)))
+        seen.add(sample)
+        items.append(_price_response(prices_payload(conn, url)))
     state = items[0] if items else _price_response(prices_payload(conn, None))
     return BatchPriceResponse(
         helper_online=state.helper_online,
         helper_ready=state.helper_ready,
         helper_paused=state.helper_paused,
+        scraper_ready=state.scraper_ready,
         items=items,
     )
 

@@ -11,7 +11,7 @@ import urllib.request
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
-from urllib.parse import quote_plus, urlparse, urlunparse
+from urllib.parse import parse_qsl, quote_plus, urlencode, urlparse, urlunparse
 
 _PRODUCT_SLUG_RE = re.compile(r"/Products/Singles/[^/]+/([^/?#]+)", re.I)
 _SLUG_CODE_RE = re.compile(r"-([A-Za-z0-9]*[A-Za-z])(\d+)$")
@@ -1998,32 +1998,84 @@ def _decode_prices(raw: Any) -> list[dict[str, Any]]:
     return payload if isinstance(payload, list) else []
 
 
-def snapshot_record(conn: sqlite3.Connection, url: str | None) -> dict[str, Any] | None:
-    key = normalize_product_url(url)
+_SAMPLE_FILTERS = (
+    "isFirstEd",
+    "isReverseHolo",
+    "isSigned",
+    "language",
+    "minCondition",
+    "sellerCountry",
+)
+EMPTY_CONFIRM_SECONDS = 15 * 60
+
+
+def sample_key(url: str | None, filters: dict[str, str] | None = None) -> str | None:
+    """Product URL plus the listing filters that change the offer table.
+
+    Unfiltered requests stay on the bare URL, so an older snapshot is not
+    reused as a live price for a different language or condition.
+    """
+    base = normalize_product_url(url)
+    if not base:
+        return None
+    chosen: dict[str, str] = {}
+    for key, value in parse_qsl(urlparse(url or "").query, keep_blank_values=False):
+        if key in _SAMPLE_FILTERS and value:
+            chosen[key] = value
+    for key, value in (filters or {}).items():
+        text = str(value or "").strip()
+        if key in _SAMPLE_FILTERS and text:
+            chosen[key] = text
+    if not chosen:
+        return base
+    return f"{base}?{urlencode(sorted(chosen.items()))}"
+
+
+def snapshot_record(
+    conn: sqlite3.Connection,
+    url: str | None,
+    filters: dict[str, str] | None = None,
+) -> dict[str, Any] | None:
+    key = sample_key(url, filters)
     if not key:
         return None
     row = conn.execute(
-        "SELECT * FROM cardmarket_snapshots WHERE url = ?",
+        "SELECT * FROM cardmarket_snapshots WHERE sample_key = ?",
         (key,),
     ).fetchone()
     if row is None:
         return None
     keys = set(row.keys())
+
+    def text(column: str) -> str | None:
+        if column not in keys:
+            return None
+        value = str(row[column] or "")
+        return value or None
+
     prices = _decode_prices(row["prices_json"])
-    return {
+    empty_count = int(row["empty_count"] or 0) if "empty_count" in keys and row["empty_count"] is not None else 0
+    record = {
         "url": key,
+        "product_url": str(row["url"] or "") or key,
         "prices": prices,
         "fetched_at": str(row["fetched_at"] or "") or None,
-        "observed_at": str(row["observed_at"] or "") if "observed_at" in keys else None,
-        "parser_version": str(row["parser_version"] or "") if "parser_version" in keys else None,
+        "observed_at": text("observed_at"),
+        "parser_version": text("parser_version"),
         "sampled_offer_count": (
             int(row["sampled_offer_count"])
             if "sampled_offer_count" in keys and row["sampled_offer_count"] is not None
             else len(prices)
         ),
-        "submission_id": str(row["submission_id"] or "") if "submission_id" in keys else None,
-        "empty": not prices,
+        "submission_id": text("submission_id"),
+        "empty_observed_at": text("empty_observed_at"),
+        "empty_first_at": text("empty_first_at"),
+        "empty_source": text("empty_source"),
+        "empty_count": empty_count,
+        "empty": not prices and empty_count > 0,
     }
+    record["unlisted"] = empty_is_confirmed(record)
+    return record
 
 
 def snapshot_prices(conn: sqlite3.Connection, url: str | None) -> list[dict[str, Any]]:
@@ -2031,53 +2083,164 @@ def snapshot_prices(conn: sqlite3.Connection, url: str | None) -> list[dict[str,
     return list(record["prices"]) if record else []
 
 
+def _epoch(stamp: str | None) -> float | None:
+    if not stamp:
+        return None
+    try:
+        return float(time.mktime(time.strptime(stamp, "%Y-%m-%dT%H:%M:%SZ")))
+    except (TypeError, ValueError):
+        return None
+
+
+def empty_is_confirmed(record: dict[str, Any] | None) -> bool:
+    """Two empty reads, 15 minutes apart, both newer than the last price."""
+    if not record:
+        return False
+    count = int(record.get("empty_count") or 0)
+    first = _epoch(str(record.get("empty_first_at") or ""))
+    last = _epoch(str(record.get("empty_observed_at") or ""))
+    if count < 2 or first is None or last is None or last - first < EMPTY_CONFIRM_SECONDS:
+        return False
+    if record.get("prices"):
+        priced = _epoch(str(record.get("observed_at") or ""))
+        if priced is not None and priced >= last:
+            return False
+    return True
+
+
 def write_snapshot(
     conn: sqlite3.Connection,
     url: str,
     prices: list[dict[str, Any]],
     *,
+    filters: dict[str, str] | None = None,
     observed_at: str | None = None,
     parser_version: str | None = None,
     sampled_offer_count: int | None = None,
     submission_id: str | None = None,
     allow_empty: bool = False,
+    empty_source: str | None = None,
     commit: bool = True,
 ) -> str:
     if not prices and not allow_empty:
         raise ValueError("Need at least one price")
-    key = normalize_product_url(url) or url
+    key = sample_key(url, filters)
+    if not key:
+        raise ValueError("Need a Cardmarket URL")
+    product = normalize_product_url(url) or key.split("?", 1)[0]
     stamp = observed_at or datetime_now()
-    existing = snapshot_record(conn, key)
-    existing_observed = str((existing or {}).get("observed_at") or "")
-    if existing_observed and existing_observed > stamp:
-        return key
-    conn.execute(
-        """
-        INSERT INTO cardmarket_snapshots (
-            url, prices_json, fetched_at, observed_at, parser_version,
-            sampled_offer_count, submission_id
-        ) VALUES (?, ?, ?, ?, ?, ?, ?)
-        ON CONFLICT(url) DO UPDATE SET
-            prices_json = excluded.prices_json,
-            fetched_at = excluded.fetched_at,
-            observed_at = excluded.observed_at,
-            parser_version = excluded.parser_version,
-            sampled_offer_count = excluded.sampled_offer_count,
-            submission_id = excluded.submission_id
-        """,
-        (
-            key,
-            json.dumps(prices),
-            datetime_now(),
-            stamp,
-            parser_version,
-            sampled_offer_count if sampled_offer_count is not None else len(prices),
-            submission_id,
-        ),
-    )
+    existing = snapshot_record(conn, url, filters)
+    if prices:
+        existing_observed = str((existing or {}).get("observed_at") or "")
+        if existing_observed and existing_observed > stamp:
+            return key
+        conn.execute(
+            """
+            INSERT INTO cardmarket_snapshots (
+                sample_key, url, prices_json, fetched_at, observed_at, parser_version,
+                sampled_offer_count, submission_id, empty_count
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, 0)
+            ON CONFLICT(sample_key) DO UPDATE SET
+                url = excluded.url,
+                prices_json = excluded.prices_json,
+                fetched_at = excluded.fetched_at,
+                observed_at = excluded.observed_at,
+                parser_version = excluded.parser_version,
+                sampled_offer_count = excluded.sampled_offer_count,
+                submission_id = excluded.submission_id,
+                empty_observed_at = NULL,
+                empty_first_at = NULL,
+                empty_source = NULL,
+                empty_count = 0
+            """,
+            (
+                key,
+                product,
+                json.dumps(prices),
+                datetime_now(),
+                stamp,
+                parser_version,
+                sampled_offer_count if sampled_offer_count is not None else len(prices),
+                submission_id,
+            ),
+        )
+    else:
+        _write_empty_observation(
+            conn,
+            key=key,
+            product=product,
+            stamp=stamp,
+            source=empty_source or parser_version or "",
+            submission_id=submission_id,
+            existing=existing,
+        )
     if commit:
         conn.commit()
     return key
+
+
+def _write_empty_observation(
+    conn: sqlite3.Connection,
+    *,
+    key: str,
+    product: str,
+    stamp: str,
+    source: str,
+    submission_id: str | None,
+    existing: dict[str, Any] | None,
+) -> None:
+    """Record an empty listing without replacing a known price."""
+    priced_at = str((existing or {}).get("observed_at") or "") if (existing or {}).get("prices") else ""
+    if priced_at and priced_at > stamp:
+        return
+    previous_first = str((existing or {}).get("empty_first_at") or "")
+    streak_is_current = bool(previous_first) and (not priced_at or previous_first > priced_at)
+    if not streak_is_current:
+        first, count = stamp, 1
+    else:
+        first = previous_first
+        count = int((existing or {}).get("empty_count") or 1)
+        previous = _epoch(str((existing or {}).get("empty_observed_at") or first))
+        current = _epoch(stamp)
+        start = _epoch(first)
+        if (
+            previous is not None
+            and current is not None
+            and start is not None
+            and current > previous
+            and current - start >= EMPTY_CONFIRM_SECONDS
+            and current - previous >= EMPTY_CONFIRM_SECONDS
+        ):
+            count += 1
+    prices_json = json.dumps((existing or {}).get("prices") or [])
+    observed = (existing or {}).get("observed_at") if (existing or {}).get("prices") else None
+    conn.execute(
+        """
+        INSERT INTO cardmarket_snapshots (
+            sample_key, url, prices_json, fetched_at, observed_at,
+            empty_observed_at, empty_first_at, empty_source, empty_count, submission_id
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        ON CONFLICT(sample_key) DO UPDATE SET
+            fetched_at = excluded.fetched_at,
+            empty_observed_at = excluded.empty_observed_at,
+            empty_first_at = excluded.empty_first_at,
+            empty_source = excluded.empty_source,
+            empty_count = excluded.empty_count,
+            submission_id = COALESCE(excluded.submission_id, cardmarket_snapshots.submission_id)
+        """,
+        (
+            key,
+            product,
+            prices_json,
+            datetime_now(),
+            observed,
+            stamp,
+            first,
+            source,
+            count,
+            submission_id,
+        ),
+    )
 
 
 def save_snapshot(

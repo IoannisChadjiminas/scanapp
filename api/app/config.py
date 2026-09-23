@@ -25,6 +25,17 @@ class Settings(BaseSettings):
     session_ttl_days: int = 30
     store_captures: bool = True
     review_token: str = ""
+    session_create_hourly: int = 30
+    scraper_enabled: bool = False
+    scraper_url: str = ""
+    scraper_api_key: str = ""
+    scraper_session_hourly: int = 10
+    scraper_ip_hourly: int = 20
+    scraper_daily_pages: int = 50
+    scraper_daily_mb: int = 50
+    scraper_reserve_kb: int = 500
+    scraper_url_cooldown_s: int = 1800
+    scraper_attempt_seconds: int = 70
 
     ranking_version: str = "rank-v4"
     ocr_version: str = "rapidocr-ppocrv6-small"

@@ -20,6 +20,15 @@ services:
       SCAN_WAIT_LIMIT: ${SCAN_WAIT_LIMIT:-2}
       STORE_CAPTURES: ${STORE_CAPTURES:-true}
       REVIEW_TOKEN: ${REVIEW_TOKEN:-}
+      SCRAPER_ENABLED: ${SCRAPER_ENABLED:-false}
+      SCRAPER_URL: http://scraper:8000
+      SCRAPER_API_KEY: ${SCRAPER_API_KEY:-}
+      SCRAPER_SESSION_HOURLY: ${SCRAPER_SESSION_HOURLY:-10}
+      SCRAPER_IP_HOURLY: ${SCRAPER_IP_HOURLY:-20}
+      SCRAPER_DAILY_PAGES: ${SCRAPER_DAILY_PAGES:-50}
+      SCRAPER_DAILY_MB: ${SCRAPER_DAILY_MB:-50}
+      SCRAPER_RESERVE_KB: ${SCRAPER_RESERVE_KB:-500}
+      SCRAPER_URL_COOLDOWN_S: ${SCRAPER_URL_COOLDOWN_S:-1800}
     volumes:
       - scanapp-data:/data
       - scanapp-tmp:/tmp/scanapp
@@ -37,6 +46,37 @@ services:
       interval: 15s
       timeout: 5s
       retries: 10
+      start_period: 40s
+
+  scraper:
+    build:
+      context: .
+      dockerfile: docker/scraper.Dockerfile
+    restart: unless-stopped
+    init: true
+    shm_size: 1gb
+    mem_limit: 1536m
+    environment:
+      SCRAPER_API_KEY: ${SCRAPER_API_KEY:-}
+      PROXY_HOST: ${PROXY_HOST:-}
+      PROXY_USER: ${PROXY_USER:-}
+      PROXY_PASS: ${PROXY_PASS:-}
+      PROXY_USER_TEMPLATE: ${PROXY_USER_TEMPLATE:-}
+      PROXY_COUNTRY: ${PROXY_COUNTRY:-}
+      TZ: ${PROXY_TZ:-Europe/Berlin}
+    expose:
+      - "8000"
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "python",
+          "-c",
+          "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/health')",
+        ]
+      interval: 30s
+      timeout: 5s
+      retries: 5
       start_period: 40s
 
   web:

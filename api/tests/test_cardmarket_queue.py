@@ -550,6 +550,45 @@ def test_event_stops_for_a_newer_observation_or_failure():
     assert event_should_stop(same, None) is True
 
 
+@pytest.mark.parametrize("status", ["pending", "claimed"])
+def test_equal_observation_stays_open_despite_clock_jitter(monkeypatch, status):
+    ticks = iter([2_000_000_000.0, 2_000_000_000.001, 2_000_000_000.002, 2_000_000_000.004])
+    monkeypatch.setattr("app.cardmarket_queue.time.time", lambda: next(ticks))
+    stamp = "2020-01-01T00:00:00Z"
+    payload = {"observed_at": stamp, "status": status, "prices": OFFERS}
+    assert event_should_stop(payload, stamp) is False
+
+
+def test_pending_job_is_not_closed_by_an_older_empty(tmp_path):
+    older_empty = {
+        "observed_at": "2020-01-01T00:00:00Z",
+        "attempted_at": "2020-01-01T00:10:00Z",
+        "status": "pending",
+        "prices": OFFERS,
+    }
+    assert event_should_stop(older_empty, "2020-01-01T00:00:00Z") is False
+    assert event_should_stop({**older_empty, "status": "claimed"}, older_empty["observed_at"]) is False
+    assert event_should_stop({**older_empty, "status": "done"}, older_empty["observed_at"]) is True
+    priced = {**older_empty, "observed_at": "2020-01-01T00:11:00Z"}
+    assert event_should_stop(priced, "2020-01-01T00:00:00Z") is True
+
+    conn = _catalog(tmp_path)
+    write_snapshot(conn, GENGAR, OFFERS, observed_at="2020-01-01T00:00:00Z")
+    write_snapshot(
+        conn,
+        GENGAR,
+        [],
+        allow_empty=True,
+        observed_at="2020-01-01T00:10:00Z",
+        empty_source="proxy",
+    )
+    enqueue_job(conn, GENGAR, tier="proxy")
+    payload = prices_payload(conn, GENGAR)
+    assert payload["status"] == "pending"
+    assert payload["attempted_at"] > payload["observed_at"]
+    assert event_should_stop(payload, payload["observed_at"]) is False
+
+
 def test_price_batch_returns_each_product_once(tmp_path):
     fastapi = pytest.importorskip("fastapi")
     from fastapi.testclient import TestClient
