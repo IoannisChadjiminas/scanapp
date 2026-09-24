@@ -363,7 +363,9 @@ class ChromeSession:
 
     def probe(self) -> str:
         self.stage = "page_probe"
-        value = self._sb.execute_script(f"return {PROBE_JS}")
+        # CDP mode disconnects WebDriver. execute_script sits on that dead
+        # connection until the watchdog kills Chrome, so the click never runs.
+        value = self._sb.cdp.evaluate(PROBE_JS)
         return str(value or "pending")
 
     def solve_captcha(self) -> None:
@@ -375,16 +377,18 @@ class ChromeSession:
     def html(self) -> str:
         self.stage = "read_html"
         self._account_bytes()
-        return str(self._sb.get_page_source() or "")
+        return str(self._sb.cdp.get_page_source(include_shadow_dom=False) or "")
 
     def stop(self) -> None:
         try:
-            self._sb.execute_script("window.stop()")
+            self._sb.cdp.evaluate("window.stop()")
         except Exception:
             return
 
     def _account_bytes(self) -> None:
         """Sum CDP encodedDataLength when Chrome performance logs are enabled."""
+        if getattr(self._sb, "cdp", None) is not None:
+            return
         driver = getattr(self._sb, "driver", None)
         if driver is None:
             return
