@@ -584,11 +584,12 @@ def parse_cardmarket_page(
             ip=client_ip(request),
             url=payload.url,
         )
-    elif parsed.get("rows") and not parsed.get("empty"):
+    elif parsed.get("rows") or parsed.get("header"):
         remember_phone_offers(
             catalog,
             payload.url,
-            list(parsed["rows"]),
+            [] if parsed.get("empty") else list(parsed["rows"]),
+            header=parsed.get("header"),
         )
     return ParseResponse.model_validate(parsed)
 

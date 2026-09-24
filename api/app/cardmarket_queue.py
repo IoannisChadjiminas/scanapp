@@ -441,8 +441,28 @@ def rows_to_prices(rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
             label = str(row.get(field) or "").strip()
             if label and len(label) <= 60 and not any(ord(ch) < 32 for ch in label):
                 labels.append(label)
+        sales = str(row.get("sales") or "").strip()
+        if sales.isdigit():
+            labels.append(f"{sales} sales")
         prices.append(
             {"label": " · ".join(labels), "amount": amount, "currency": "EUR"}
+        )
+    return prices
+
+
+def header_prices(header: dict | None) -> list[dict[str, Any]]:
+    """Cardmarket's product-wide figures, used when a filtered page has no offers."""
+    prices: list[dict[str, Any]] = []
+    for label in ("From", "Trend", "7-day", "30-day"):
+        amount = (header or {}).get(label)
+        if isinstance(amount, (int, float)) and 0 < float(amount) <= 1_000_000:
+            prices.append(
+                {"label": label, "amount": float(amount), "currency": "EUR"}
+            )
+    available = (header or {}).get("Available")
+    if isinstance(available, int) and 0 <= available <= 1_000_000:
+        prices.append(
+            {"label": "Available", "amount": float(available), "currency": "EUR"}
         )
     return prices
 
@@ -463,13 +483,14 @@ def remember_phone_offers(
     url: str,
     rows: list[dict[str, Any]],
     parser_version: str | None = None,
+    header: dict | None = None,
 ) -> bool:
     """Store a phone offer table when it is new or the fresh window has passed.
 
     Challenge pages, empty tables, and an unchanged sample inside the fresh
     window leave ``observed_at`` alone.
     """
-    prices = rows_to_prices(rows)
+    prices = rows_to_prices(rows) + header_prices(header)
     if not prices:
         return False
     key = sample_key(url)

@@ -68,6 +68,21 @@ _CHALLENGE_RE = re.compile(
     r"checking your browser",
     re.IGNORECASE,
 )
+_SALES_RE = re.compile(
+    r"(\d+(?:[.,]\d+)?)\s*([kK])?\s+sales",
+    re.IGNORECASE,
+)
+_HEADER_MONEY = {
+    "From": re.compile(r"From\s*([0-9][0-9.\s]*,\d{2})\s*€", re.IGNORECASE),
+    "Trend": re.compile(r"Price Trend\s*([0-9][0-9.\s]*,\d{2})\s*€", re.IGNORECASE),
+    "7-day": re.compile(
+        r"7-days average price\s*([0-9][0-9.\s]*,\d{2})\s*€", re.IGNORECASE
+    ),
+    "30-day": re.compile(
+        r"30-days average price\s*([0-9][0-9.\s]*,\d{2})\s*€", re.IGNORECASE
+    ),
+}
+_AVAILABLE_RE = re.compile(r"Available items\s*(\d+)", re.IGNORECASE)
 
 
 class _Node:
@@ -286,16 +301,64 @@ def _rows(root: _Node) -> list[dict[str, str]]:
         if key in seen:
             continue
         seen.add(key)
-        found.append(
-            {
-                "price": price,
-                "condition": condition,
-                "language": language,
-                "variant": variant,
-            }
-        )
+        item = {
+            "price": price,
+            "condition": condition,
+            "language": language,
+            "variant": variant,
+        }
+        sales = _sales_count(row.text())
+        if sales is not None:
+            item["sales"] = str(sales)
+        found.append(item)
         if len(found) == MAX_ROWS:
             break
+    return found
+
+
+def _euro_amount(raw: str) -> float | None:
+    number = raw.replace(" ", "").replace("€", "")
+    if "," in number and "." in number:
+        if number.rfind(",") > number.rfind("."):
+            number = number.replace(".", "").replace(",", ".")
+        else:
+            number = number.replace(",", "")
+    else:
+        number = number.replace(",", ".")
+    try:
+        amount = float(number)
+    except ValueError:
+        return None
+    if amount <= 0 or amount > 1_000_000:
+        return None
+    return amount
+
+
+def _sales_count(text: str) -> int | None:
+    match = _SALES_RE.search(text)
+    if not match:
+        return None
+    number = float(match.group(1).replace(",", "."))
+    if match.group(2):
+        number *= 1000
+    count = int(round(number))
+    if count < 0 or count > 10_000_000:
+        return None
+    return count
+
+
+def _header(text: str) -> dict[str, float | int]:
+    found: dict[str, float | int] = {}
+    for label, pattern in _HEADER_MONEY.items():
+        match = pattern.search(text)
+        if not match:
+            continue
+        amount = _euro_amount(match.group(1))
+        if amount is not None:
+            found[label] = amount
+    available = _AVAILABLE_RE.search(text)
+    if available:
+        found["Available"] = int(available.group(1))
     return found
 
 
@@ -353,5 +416,6 @@ def parse_cardmarket_html(url: str, html: str) -> dict:
         "empty": empty,
         "pending": not rows and not empty,
         "rows": rows,
+        "header": _header(root.text()),
         "parser": PARSER_VERSION,
     }

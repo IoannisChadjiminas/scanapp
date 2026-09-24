@@ -24,6 +24,7 @@ from app.cardmarket_queue import (
     complete_proxy_job,
     fail_proxy_job,
     release_job,
+    header_prices,
     rows_to_prices,
     sample_is_fresh,
 )
@@ -182,7 +183,9 @@ class ScraperWorker:
         outcome = str(result.get("outcome") or "")
         log.info("paid result outcome=%s url=%s", outcome or "timeout", target)
         if outcome == "offers":
-            prices = rows_to_prices(list(result.get("rows") or []))
+            prices = rows_to_prices(list(result.get("rows") or [])) + header_prices(
+                result.get("header") if isinstance(result.get("header"), dict) else None
+            )
             if not prices:
                 self._fail(conn, job, "parser")
                 return
