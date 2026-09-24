@@ -31,6 +31,7 @@ services:
       SCRAPER_DAILY_MB: ${SCRAPER_DAILY_MB:-50}
       SCRAPER_RESERVE_KB: ${SCRAPER_RESERVE_KB:-500}
       SCRAPER_URL_COOLDOWN_S: ${SCRAPER_URL_COOLDOWN_S:-1800}
+      SCRAPER_ATTEMPT_SECONDS: ${SCRAPER_ATTEMPT_SECONDS:-90}
     volumes:
       - scanapp-data:/data
       - scanapp-tmp:/tmp/scanapp
@@ -66,6 +67,7 @@ services:
       PROXY_USER_TEMPLATE: ${PROXY_USER_TEMPLATE:-}
       PROXY_COUNTRY: ${PROXY_COUNTRY:-}
       TZ: ${PROXY_TZ:-Europe/Berlin}
+      SCRAPER_ATTEMPT_SECONDS: ${SCRAPER_ATTEMPT_SECONDS:-90}
     expose:
       - "8000"
     healthcheck:
