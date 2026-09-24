@@ -2,8 +2,12 @@
 
 from __future__ import annotations
 
+import json
 import os
+import urllib.request
 from urllib.parse import quote, unquote, urlparse
+
+EXIT_URL = "https://ipinfo.io/json"
 
 
 def proxy_server(session_id: str) -> str | None:
@@ -35,3 +39,13 @@ def seleniumbase_proxy(proxy_url: str | None) -> str | None:
     if user:
         return f"{user}@{host}{port}"
     return f"{host}{port}"
+
+
+def proxy_exit(proxy_url: str, timeout: float = 8.0) -> dict:
+    """Exit IP, country, and network of this sticky session, as a site sees it."""
+    opener = urllib.request.build_opener(
+        urllib.request.ProxyHandler({"http": proxy_url, "https": proxy_url})
+    )
+    with opener.open(EXIT_URL, timeout=timeout) as response:
+        body = json.loads(response.read(4096) or b"{}")
+    return {key: str(body.get(key) or "") for key in ("ip", "country", "org")}

@@ -22,7 +22,7 @@ sys.path.insert(0, str(API))
 
 from allow import cardmarket_product  # noqa: E402
 from browser import ATTEMPT_SECONDS, ChromeSession, reap_stale_browsers, run_attempt  # noqa: E402
-from proxy import proxy_server  # noqa: E402
+from proxy import proxy_exit, proxy_server  # noqa: E402
 from app.cardmarket_html import parse_cardmarket_html  # noqa: E402
 
 log = logging.getLogger("scraper")
@@ -85,6 +85,25 @@ def open_session(session_id: str) -> ChromeSession:
     return ChromeSession(proxy_server(session_id))
 
 
+def log_proxy_exit(session_id: str, proxy: str | None) -> None:
+    if not proxy:
+        return
+    started = time.time()
+    try:
+        exit_info = proxy_exit(proxy)
+    except Exception as exc:
+        log.info(
+            "proxy exit failed session=%s error=%s elapsed_ms=%s",
+            session_id, type(exc).__name__, int((time.time() - started) * 1000),
+        )
+        return
+    log.info(
+        "proxy exit session=%s ip=%s country=%s org=%s elapsed_ms=%s",
+        session_id, exit_info["ip"], exit_info["country"], exit_info["org"],
+        int((time.time() - started) * 1000),
+    )
+
+
 @app.get("/health")
 def health() -> dict:
     with _cooldown_lock:
@@ -114,6 +133,7 @@ def scrape(payload: ScrapeRequest, authorization: str | None = Header(default=No
     try:
         reap_stale_browsers(ATTEMPT_SECONDS + 15)
         session = open_session(payload.session_id)
+        log_proxy_exit(payload.session_id, session.proxy)
         log.info("scrape browser starting session=%s proxy_enabled=%s", payload.session_id, bool(session.proxy))
         result = run_attempt(session, payload.url, parse_html=parse_cardmarket_html)
     except Exception as exc:

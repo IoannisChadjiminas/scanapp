@@ -178,6 +178,8 @@ def chrome_launch_options(proxy: str | None) -> dict:
     options = {
         "uc": True,
         "xvfb": True,
+        "xvfb_metrics": "1920,1080",
+        "window_size": "1920,1080",
         "headed": True,
         "locale": "en",
         "log_cdp": True,

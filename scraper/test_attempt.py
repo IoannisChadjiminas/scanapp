@@ -115,6 +115,8 @@ def test_configured_proxy_is_passed_to_chrome(monkeypatch):
 
     options = chrome_launch_options(proxy_server("abc"))
     assert options["log_cdp"] is True
+    assert options["xvfb_metrics"] == "1920,1080"
+    assert options["window_size"] == "1920,1080"
     assert options["proxy"] == "login__cr.de;sessid.abc:secret@gw.dataimpulse.com:823"
     assert "proxy" not in chrome_launch_options(None)
 
