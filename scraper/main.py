@@ -22,7 +22,16 @@ sys.path.insert(0, str(HERE))
 sys.path.insert(0, str(API))
 
 from allow import cardmarket_product  # noqa: E402
-from browser import ATTEMPT_SECONDS, NET_LOG, ChromeSession, reap_stale_browsers, run_attempt  # noqa: E402
+from browser import (  # noqa: E402
+    ATTEMPT_SECONDS,
+    BROWSER_LIFETIME_S,
+    NET_LOG,
+    ChromeSession,
+    acquire_browser,
+    held_pids,
+    reap_stale_browsers,
+    run_attempt,
+)
 from proxy import proxy_direct, proxy_exit, proxy_server  # noqa: E402
 from app.cardmarket_html import parse_cardmarket_html  # noqa: E402
 
@@ -58,10 +67,10 @@ async def lifespan(app: FastAPI):
     log.info(
         "scraper config api_key_configured=%s proxy_host_configured=%s "
         "proxy_user_configured=%s proxy_password_configured=%s max_browsers=%s deadline_s=%s "
-        "direct_probe=%s net_log=%s",
+        "direct_probe=%s net_log=%s browser_lifetime_s=%s",
         bool(API_KEY), bool(os.environ.get("PROXY_HOST", "").strip()),
         bool(os.environ.get("PROXY_USER", "").strip()), bool(os.environ.get("PROXY_PASS")),
-        MAX_BROWSERS, ATTEMPT_SECONDS, DIRECT_PROBE, NET_LOG,
+        MAX_BROWSERS, ATTEMPT_SECONDS, DIRECT_PROBE, NET_LOG, BROWSER_LIFETIME_S,
     )
     yield
 
@@ -86,7 +95,7 @@ def _authorized(header: str | None) -> bool:
 
 
 def open_session(session_id: str) -> ChromeSession:
-    return ChromeSession(proxy_server(session_id))
+    return acquire_browser(proxy_server(session_id))
 
 
 def log_proxy_exit(session_id: str, proxy: str | None) -> None:
@@ -186,11 +195,14 @@ def scrape(payload: ScrapeRequest, authorization: str | None = Header(default=No
     log.info("scrape started session=%s", payload.session_id)
     session = None
     try:
-        reap_stale_browsers(ATTEMPT_SECONDS + 15)
+        reap_stale_browsers(ATTEMPT_SECONDS + 15, keep=held_pids())
         session = open_session(payload.session_id)
         log_proxy_exit(payload.session_id, session.proxy)
         log_cardmarket_direct(payload.session_id, session.proxy, payload.url)
-        log.info("scrape browser starting session=%s proxy_enabled=%s", payload.session_id, bool(session.proxy))
+        log.info(
+            "scrape browser starting session=%s proxy_enabled=%s reused=%s",
+            payload.session_id, bool(session.proxy), session.reused,
+        )
         result = run_attempt(session, payload.url, parse_html=parse_cardmarket_html)
     except Exception as exc:
         # Exception messages from browser/proxy libraries can contain credentials.

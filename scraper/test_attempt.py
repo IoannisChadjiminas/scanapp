@@ -122,6 +122,42 @@ def test_configured_proxy_is_passed_to_chrome(monkeypatch):
     assert options["chromium_arg"] == "--no-sandbox,--disable-dev-shm-usage"
 
 
+def test_second_card_loads_in_the_open_tab():
+    opened = []
+
+    class Cdp:
+        def get(self, url):
+            opened.append(url)
+
+    session = ChromeSession("http://sticky", net_log=False)
+    session._sb = SimpleNamespace(cdp=Cdp())
+    session._context = object()
+    session.open(URL)
+    assert opened == [URL]
+    assert session.reused
+    session.finish()
+    assert session.alive()
+    session.watchdog_aborted = True
+    session._context = None
+    session.finish()
+    assert session._sb is None
+
+
+def test_acquire_browser_reuses_the_live_window():
+    import browser as browser_mod
+
+    browser_mod._held = None
+    first = browser_mod.acquire_browser("http://one")
+    first._sb = SimpleNamespace(cdp=object())
+    second = browser_mod.acquire_browser("http://two")
+    assert second is first
+    assert second.reused
+    assert second.proxy == "http://one"
+    first._context = None
+    first.quit()
+    browser_mod._held = None
+
+
 def test_net_log_is_written_to_a_private_file_and_removed(tmp_path):
     from browser import chrome_launch_options
 

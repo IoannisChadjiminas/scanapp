@@ -52,6 +52,12 @@ PROBE_JS = r"""
 
 ATTEMPT_SECONDS = float(os.environ.get("SCRAPER_ATTEMPT_SECONDS", "25"))
 NET_LOG = os.environ.get("SCRAPER_NET_LOG", "true").strip().lower() not in {"0", "false", "no"}
+# DataImpulse keeps one sessid for about 30 minutes. The clearance cookie is
+# bound to that exit, so the window lives for the same stretch.
+BROWSER_LIFETIME_S = float(os.environ.get("SCRAPER_BROWSER_LIFETIME_S", "1800"))
+_held: ChromeSession | None = None
+_held_at = 0.0
+_held_lock = threading.Lock()
 TERMINAL = {"offers", "empty", "wrong_product", "rate_limited"}
 
 
@@ -67,19 +73,27 @@ class PageSession(Protocol):
     def quit(self) -> None: ...
 
 
-def reap_stale_browsers(max_age: float) -> None:
+def held_pids() -> list[int]:
+    with _held_lock:
+        if _held is None or _held._sb is None:
+            return []
+        return _process_tree(_held._sb)
+
+
+def reap_stale_browsers(max_age: float, keep: list[int] | None = None) -> None:
     """Kill Chrome processes this service started and then left behind."""
     try:
         import psutil
     except ImportError:
         return
+    spared = set(keep or [])
     now = time.time()
     try:
         children = psutil.Process().children(recursive=True)
     except Exception:
         return
     for child in children:
-        if "chrom" not in child.name().lower():
+        if child.pid in spared or "chrom" not in child.name().lower():
             continue
         try:
             if now - child.create_time() > max_age:
@@ -220,6 +234,7 @@ def run_attempt(session: PageSession, url: str, *, parse_html) -> dict:
     deadline = started + ATTEMPT_SECONDS
     outcome = "timeout"
     page = ""
+    failed = False
     stop = threading.Event()
     watcher = threading.Thread(
         target=_watch_attempt,
@@ -259,9 +274,14 @@ def run_attempt(session: PageSession, url: str, *, parse_html) -> dict:
                 session.stop()
         except _AttemptDeadline:
             pass
+        except Exception:
+            failed = True
+            raise
     finally:
         try:
-            session.quit()
+            keep = not failed and getattr(session, "alive", lambda: False)()
+            close = getattr(session, "finish", None) if keep else None
+            (close or session.quit)()
         except Exception:
             pass
         stop.set()
@@ -302,6 +322,7 @@ class ChromeSession:
         self.last_screenshot = b""
         self.stage = "created"
         self.watchdog_aborted = False
+        self.reused = False
         self._sb = None
         self._context = None
         self._net_dir = tempfile.mkdtemp(prefix="cm-netlog-") if net_log else None
@@ -344,9 +365,28 @@ class ChromeSession:
             except Exception:
                 return
 
+    def alive(self) -> bool:
+        return (
+            self._sb is not None
+            and not self.watchdog_aborted
+            and getattr(self._sb, "cdp", None) is not None
+        )
+
     def open(self, url: str) -> None:
+        self.bytes = 0
+        self.bytes_measured = False
+        self.last_title = ""
+        self.last_url = ""
+        self.last_screenshot = b""
+        self.watchdog_aborted = False
+        if self._sb is not None:
+            self.reused = True
+            self.stage = "cdp_navigation"
+            self._sb.cdp.get(url)
+            return
         from seleniumbase import SB
 
+        self.reused = False
         self.stage = "browser_start"
         self._context = SB(**chrome_launch_options(self.proxy, self._net_path))
         self._sb = self._context.__enter__()
@@ -417,6 +457,14 @@ class ChromeSession:
             return
         _kill_chrome_children()
 
+    def finish(self) -> None:
+        """Leave the window open. A dead browser is closed instead."""
+        self._account_bytes()
+        if not self.alive():
+            self.quit()
+            return
+        self._read_net_log(keep=True)
+
     def quit(self) -> None:
         self._account_bytes()
         pids = _process_tree(self._sb) if self._sb is not None else []
@@ -432,7 +480,7 @@ class ChromeSession:
             self._sb = None
             self._read_net_log()
 
-    def _read_net_log(self) -> None:
+    def _read_net_log(self, keep: bool = False) -> None:
         if not self._net_dir:
             return
         from netlog import read_net_log
@@ -440,5 +488,23 @@ class ChromeSession:
         try:
             self.net_summary = read_net_log(self._net_path)
         finally:
-            shutil.rmtree(self._net_dir, ignore_errors=True)
-            self._net_dir = None
+            if not keep:
+                shutil.rmtree(self._net_dir, ignore_errors=True)
+                self._net_dir = None
+
+
+def acquire_browser(proxy: str | None) -> ChromeSession:
+    """The one Chrome window. A later card is loaded in its open tab."""
+    global _held, _held_at
+    with _held_lock:
+        expired = _held is not None and time.time() - _held_at >= BROWSER_LIFETIME_S
+        if _held is not None and (expired or not _held.alive()):
+            _held.quit()
+            _held = None
+        if _held is None:
+            _held = ChromeSession(proxy)
+            _held.reused = False
+            _held_at = time.time()
+        else:
+            _held.reused = True
+        return _held

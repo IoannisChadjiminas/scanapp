@@ -18,9 +18,10 @@ URL = "https://www.cardmarket.com/en/Pokemon/Products/Singles/Base-Set/Pikachu"
 
 def test_scraper_logs_start_and_failure_without_credentials(monkeypatch, caplog):
     monkeypatch.setattr(service, "API_KEY", "test-secret")
-    monkeypatch.setattr(service, "reap_stale_browsers", lambda age: None)
+    monkeypatch.setattr(service, "reap_stale_browsers", lambda *args, **kwargs: None)
     monkeypatch.setattr(service, "open_session", lambda sid: SimpleNamespace(
         proxy="secret-proxy",
+        reused=False,
         stage="cdp_navigation",
         watchdog_aborted=True,
         net_summary={"www.cardmarket.com": {"tunnel": {"no reply": 2}}},
