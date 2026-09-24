@@ -13,6 +13,8 @@ spec = importlib.util.spec_from_file_location("scraper_service_logging_test", HE
 service = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(service)
 
+URL = "https://www.cardmarket.com/en/Pokemon/Products/Singles/Base-Set/Pikachu"
+
 
 def test_scraper_logs_start_and_failure_without_credentials(monkeypatch, caplog):
     monkeypatch.setattr(service, "API_KEY", "test-secret")
@@ -46,6 +48,64 @@ def test_proxy_exit_failure_logs_the_error_type_only(monkeypatch, caplog):
     with caplog.at_level(logging.INFO, logger="scraper"):
         service.log_proxy_exit("attempt-two", "http://login:secret-pass@gw.dataimpulse.com:823")
     assert "proxy exit failed session=attempt-two error=TimeoutError" in caplog.text
+    assert "secret-pass" not in caplog.text
+
+
+def test_cardmarket_direct_reports_a_cloudflare_challenge(monkeypatch):
+    import io
+    import urllib.error
+    from email.message import Message
+
+    import proxy
+
+    headers = Message()
+    headers["server"] = "cloudflare"
+    headers["cf-mitigated"] = "challenge"
+    seen = {}
+
+    class Opener:
+        def open(self, request, timeout):
+            seen["url"], seen["agent"] = request.full_url, request.get_header("User-agent")
+            raise urllib.error.HTTPError(
+                request.full_url, 403, "Forbidden", headers,
+                io.BytesIO(b"<html><head><title>Just a moment...</title></head></html>"),
+            )
+
+    monkeypatch.setattr(proxy.urllib.request, "build_opener", lambda handler: Opener())
+    page = proxy.proxy_direct("http://login:secret@gw.dataimpulse.com:823", URL)
+    assert page == {
+        "status": 403, "bytes": 57, "server": "cloudflare",
+        "cf_mitigated": "challenge", "title": "Just a moment...",
+    }
+    assert seen["url"] == URL
+    assert "Chrome/" in seen["agent"]
+
+
+def test_cardmarket_direct_logs_only_when_enabled(monkeypatch, caplog):
+    calls = []
+    monkeypatch.setattr(service, "proxy_direct", lambda proxy, url: calls.append(url) or {
+        "status": 403, "bytes": 57, "server": "cloudflare",
+        "cf_mitigated": "challenge", "title": "Just a moment...",
+    })
+    monkeypatch.setattr(service, "DIRECT_PROBE", False)
+    service.log_cardmarket_direct("attempt-three", "http://login:secret@gw", URL)
+    assert calls == []
+
+    monkeypatch.setattr(service, "DIRECT_PROBE", True)
+    with caplog.at_level(logging.INFO, logger="scraper"):
+        service.log_cardmarket_direct("attempt-three", "http://login:secret@gw", URL)
+    assert calls == [URL]
+    assert (
+        "cardmarket direct session=attempt-three status=403 server=cloudflare "
+        "cf_mitigated=challenge bytes=57 title='Just a moment...'"
+    ) in caplog.text
+
+    def stalled(proxy, url):
+        raise TimeoutError("http://login:secret-pass@gw.dataimpulse.com:823")
+    monkeypatch.setattr(service, "proxy_direct", stalled)
+    with caplog.at_level(logging.INFO, logger="scraper"):
+        service.log_cardmarket_direct("attempt-four", "http://login:secret-pass@gw", URL)
+    assert "cardmarket direct failed session=attempt-four error=TimeoutError" in caplog.text
     assert "secret-pass" not in caplog.text
 
 

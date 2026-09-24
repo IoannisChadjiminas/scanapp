@@ -22,7 +22,7 @@ sys.path.insert(0, str(API))
 
 from allow import cardmarket_product  # noqa: E402
 from browser import ATTEMPT_SECONDS, ChromeSession, reap_stale_browsers, run_attempt  # noqa: E402
-from proxy import proxy_exit, proxy_server  # noqa: E402
+from proxy import proxy_direct, proxy_exit, proxy_server  # noqa: E402
 from app.cardmarket_html import parse_cardmarket_html  # noqa: E402
 
 log = logging.getLogger("scraper")
@@ -48,16 +48,19 @@ _quiet_health_access()
 API_KEY = os.environ.get("SCRAPER_API_KEY", "")
 MAX_BROWSERS = max(1, int(os.environ.get("MAX_BROWSERS", "1")))
 COOLDOWN_SECONDS = float(os.environ.get("SCRAPER_RATE_LIMIT_S", "900"))
+# Costs one extra paid page load per attempt; leave off outside diagnosis.
+DIRECT_PROBE = os.environ.get("SCRAPER_DIRECT_PROBE", "").strip().lower() in {"1", "true", "yes"}
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     _quiet_health_access()
     log.info(
         "scraper config api_key_configured=%s proxy_host_configured=%s "
-        "proxy_user_configured=%s proxy_password_configured=%s max_browsers=%s deadline_s=%s",
+        "proxy_user_configured=%s proxy_password_configured=%s max_browsers=%s deadline_s=%s "
+        "direct_probe=%s",
         bool(API_KEY), bool(os.environ.get("PROXY_HOST", "").strip()),
         bool(os.environ.get("PROXY_USER", "").strip()), bool(os.environ.get("PROXY_PASS")),
-        MAX_BROWSERS, ATTEMPT_SECONDS,
+        MAX_BROWSERS, ATTEMPT_SECONDS, DIRECT_PROBE,
     )
     yield
 
@@ -104,6 +107,25 @@ def log_proxy_exit(session_id: str, proxy: str | None) -> None:
     )
 
 
+def log_cardmarket_direct(session_id: str, proxy: str | None, url: str) -> None:
+    if not DIRECT_PROBE or not proxy:
+        return
+    started = time.time()
+    try:
+        page = proxy_direct(proxy, url)
+    except Exception as exc:
+        log.info(
+            "cardmarket direct failed session=%s error=%s elapsed_ms=%s",
+            session_id, type(exc).__name__, int((time.time() - started) * 1000),
+        )
+        return
+    log.info(
+        "cardmarket direct session=%s status=%s server=%s cf_mitigated=%s bytes=%s title=%r elapsed_ms=%s",
+        session_id, page["status"], page["server"], page["cf_mitigated"] or "-",
+        page["bytes"], page["title"], int((time.time() - started) * 1000),
+    )
+
+
 @app.get("/health")
 def health() -> dict:
     with _cooldown_lock:
@@ -134,6 +156,7 @@ def scrape(payload: ScrapeRequest, authorization: str | None = Header(default=No
         reap_stale_browsers(ATTEMPT_SECONDS + 15)
         session = open_session(payload.session_id)
         log_proxy_exit(payload.session_id, session.proxy)
+        log_cardmarket_direct(payload.session_id, session.proxy, payload.url)
         log.info("scrape browser starting session=%s proxy_enabled=%s", payload.session_id, bool(session.proxy))
         result = run_attempt(session, payload.url, parse_html=parse_cardmarket_html)
     except Exception as exc:

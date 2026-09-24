@@ -216,7 +216,7 @@ class ScraperWorker:
             f"{self.settings.scraper_url.rstrip('/')}/scrape",
             json={"url": url, "session_id": str(uuid.uuid4())},
             headers={"Authorization": f"Bearer {self.settings.scraper_api_key}"},
-            timeout=self.settings.scraper_attempt_seconds + 15,
+            timeout=self.settings.scraper_attempt_seconds + 30,
         )
         if response.status_code == 503:
             raise httpx.HTTPStatusError(
