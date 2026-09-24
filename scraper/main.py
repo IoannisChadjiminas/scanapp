@@ -28,12 +28,30 @@ from app.cardmarket_html import parse_cardmarket_html  # noqa: E402
 log = logging.getLogger("scraper")
 logging.basicConfig(level=logging.INFO, format="%(message)s")
 
+
+class _SkipHealthAccess(logging.Filter):
+    def filter(self, record: logging.LogRecord) -> bool:
+        if isinstance(record.args, tuple) and len(record.args) >= 3:
+            path = str(record.args[2]).split("?", 1)[0]
+            return path != "/health"
+        return "GET /health " not in record.getMessage()
+
+
+def _quiet_health_access() -> None:
+    access = logging.getLogger("uvicorn.access")
+    if not any(isinstance(item, _SkipHealthAccess) for item in access.filters):
+        access.addFilter(_SkipHealthAccess())
+
+
+_quiet_health_access()
+
 API_KEY = os.environ.get("SCRAPER_API_KEY", "")
 MAX_BROWSERS = max(1, int(os.environ.get("MAX_BROWSERS", "1")))
 COOLDOWN_SECONDS = float(os.environ.get("SCRAPER_RATE_LIMIT_S", "900"))
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
+    _quiet_health_access()
     log.info(
         "scraper config api_key_configured=%s proxy_host_configured=%s "
         "proxy_user_configured=%s proxy_password_configured=%s max_browsers=%s deadline_s=%s",

@@ -10,6 +10,24 @@ from fastapi.middleware.cors import CORSMiddleware
 
 logging.basicConfig(level=logging.INFO, format="%(levelname)s %(name)s %(message)s")
 
+
+class _SkipHealthAccess(logging.Filter):
+    def filter(self, record: logging.LogRecord) -> bool:
+        if isinstance(record.args, tuple) and len(record.args) >= 3:
+            path = str(record.args[2]).split("?", 1)[0]
+            return path not in {"/health", "/api/v1/health"}
+        message = record.getMessage()
+        return "GET /health " not in message and "GET /api/v1/health " not in message
+
+
+def _quiet_health_access() -> None:
+    access = logging.getLogger("uvicorn.access")
+    if not any(isinstance(item, _SkipHealthAccess) for item in access.filters):
+        access.addFilter(_SkipHealthAccess())
+
+
+_quiet_health_access()
+
 from app.admission import ScanLimiter
 from app.cardmarket_events import bind_loop
 from app.cardmarket_scraper import ScraperWorker
@@ -26,6 +44,7 @@ from app.routes.scans import router as scans_router
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
+    _quiet_health_access()
     settings = get_settings()
     logging.getLogger("cardmarket.scraper").info(
         "price config webview_enabled=%s helper_enabled=%s scraper_enabled=%s "

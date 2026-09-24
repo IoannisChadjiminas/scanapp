@@ -14,6 +14,7 @@ RUN apt-get update \
         gnupg \
         tzdata \
         xvfb \
+        xauth \
         fonts-liberation \
         fonts-dejavu-core \
         fonts-freefont-ttf \
