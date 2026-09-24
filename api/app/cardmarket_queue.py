@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import calendar
 import hashlib
+import logging
 import hmac
 import json
 import re
@@ -25,6 +26,8 @@ from app.cardmarket import (
 )
 from app.config import get_settings
 
+log = logging.getLogger("cardmarket.prices")
+
 CLAIM_LIFETIME_SECONDS = 180
 HELPER_ONLINE_SECONDS = 120
 MAX_JOB_ATTEMPTS = 3
@@ -38,6 +41,25 @@ LISTING_FILTER_KEYS = (
     "isFirstEd",
 )
 PARSER_VERSION = "offers-v1"
+
+
+def price_source(parser_version: str | None, freshness: str | None) -> str:
+    """Where the number being served was produced.
+
+    A sample inside the fresh window is cache, whatever last wrote it.
+    """
+    if freshness == "fresh":
+        return "cache"
+    version = (parser_version or "").lower()
+    if version.startswith("phone"):
+        return "webview"
+    if version.startswith("proxy"):
+        return "paid"
+    if version:
+        return "helper"
+    return "none"
+
+
 PHONE_PARSER_VERSION = "phone-offers-v1"
 PROXY_PARSER_VERSION = "proxy-offers-v1"
 PROXY_WORKER_ID = "proxy"
@@ -459,13 +481,15 @@ def remember_phone_offers(
     age = _age_seconds(str(observed or ""))
     if _same_prices(existing_prices, prices) and age is not None and age <= FRESH_SECONDS:
         return False
+    version = parser_version or PHONE_PARSER_VERSION
     write_snapshot(
         conn,
         url,
         prices,
-        parser_version=parser_version or PHONE_PARSER_VERSION,
+        parser_version=version,
         sampled_offer_count=len(prices),
     )
+    log.info("price source=webview parser=%s offers=%s url=%s", version, len(prices), key)
     _notify_job_url(url)
     return True
 
@@ -817,6 +841,14 @@ def complete_job(
                     empty_source=parser,
                     commit=False,
                 )
+            log.info(
+                "price source=%s parser=%s offers=%s empty=%s url=%s",
+                price_source(parser, None),
+                parser,
+                len(prices),
+                empty,
+                saved,
+            )
             now = datetime_now()
             conn.execute(
                 """
@@ -903,6 +935,13 @@ def retry_or_fail_job(
                 (attempts, now, _iso_offset(delay), reason, job_id),
             )
             status = "pending"
+    log.info(
+        "job %s reason=%s attempt=%s url=%s",
+        status,
+        (reason or "none")[:80],
+        attempts,
+        product_url,
+    )
     _notify_job_url(product_url, product_filters)
     return status
 
@@ -1071,8 +1110,10 @@ def latest_job_status(conn: sqlite3.Connection, url: str | None) -> str | None:
     return str(row["status"] or "") or None
 
 
-def prices_payload(conn: sqlite3.Connection, url: str | None) -> dict[str, Any]:
-    from app.cardmarket_budget import scraper_is_ready
+def prices_payload(
+    conn: sqlite3.Connection, url: str | None, *, announce: bool = False
+) -> dict[str, Any]:
+    from app.cardmarket_budget import scraper_block_reason, scraper_is_ready, scraper_online
 
     sample = sample_key(url)
     record = snapshot_record(conn, url) if sample else None
@@ -1092,6 +1133,18 @@ def prices_payload(conn: sqlite3.Connection, url: str | None) -> dict[str, Any]:
             freshness = "fresh"
         else:
             freshness = "stale"
+    parser = (record or {}).get("parser_version")
+    if announce:
+        block = scraper_block_reason(conn)
+        log.info(
+            "price source=%s freshness=%s parser=%s scraper=%s reason=%s url=%s",
+            price_source(str(parser) if parser else None, freshness),
+            freshness or "none",
+            parser or "none",
+            "online" if scraper_online() else "offline",
+            block or "ready",
+            sample or "",
+        )
     return {
         "url": sample,
         "prices": prices,

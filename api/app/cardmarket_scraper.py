@@ -14,6 +14,7 @@ from app.cardmarket_budget import (
     cooldown_remaining,
     note_scraper_health,
     reconcile_attempt,
+    scraper_online,
     reserve_attempt,
 )
 from app.cardmarket_queue import (
@@ -77,8 +78,10 @@ class ScraperWorker:
 
     def _ping(self) -> None:
         url = self.settings.scraper_url.rstrip("/")
+        before = scraper_online()
         if not url:
             note_scraper_health(False)
+            self._log_online(before)
             return
         try:
             response = httpx.get(f"{url}/health", timeout=5)
@@ -91,6 +94,12 @@ class ScraperWorker:
             note_scraper_health(response.status_code == 200 and body.get("ok") is True, cooldown)
         except (httpx.HTTPError, ValueError, TypeError):
             note_scraper_health(False)
+        self._log_online(before)
+
+    def _log_online(self, before: bool) -> None:
+        online = scraper_online()
+        if online != before:
+            log.info("scraper %s", "online" if online else "offline")
 
     def _handle(self, conn, job: dict) -> None:
         target = sample_key(job.get("url"), job.get("filters")) or str(job.get("url") or "")
@@ -105,13 +114,20 @@ class ScraperWorker:
             reservation = reserve_attempt(
                 conn, sample=target, session_id="proxy", ip=""
             )
-        except QueueError:
+        except QueueError as exc:
+            log.info("paid failed reason=budget detail=%s url=%s", exc.detail, target)
             fail_proxy_job(conn, job["id"], job["claim_token"], "budget", terminal=True)
             return
         started = time.monotonic()
+        log.info("paid request url=%s", target)
         try:
             result = self._scrape(target)
         except httpx.HTTPStatusError as exc:
+            log.info(
+                "paid failed reason=http status=%s url=%s",
+                exc.response.status_code,
+                target,
+            )
             reconcile_attempt(
                 conn,
                 reservation,
@@ -125,7 +141,12 @@ class ScraperWorker:
                 return
             self._fail(conn, job, "http")
             return
-        except httpx.HTTPError:
+        except httpx.HTTPError as exc:
+            log.info(
+                "paid failed reason=unreachable error=%s url=%s",
+                type(exc).__name__,
+                target,
+            )
             reconcile_attempt(
                 conn,
                 reservation,
@@ -145,6 +166,7 @@ class ScraperWorker:
             elapsed_ms=int(result.get("elapsed_ms") or (time.monotonic() - started) * 1000),
         )
         outcome = str(result.get("outcome") or "")
+        log.info("paid result outcome=%s url=%s", outcome or "timeout", target)
         if outcome == "offers":
             prices = rows_to_prices(list(result.get("rows") or []))
             if not prices:
@@ -172,6 +194,7 @@ class ScraperWorker:
                 sampled_offer_count=0,
             )
             return
+        log.info("paid failed reason=%s url=%s", outcome or "timeout", target)
         self._fail(conn, job, outcome or "timeout")
 
     def _scrape(self, url: str) -> dict:

@@ -48,6 +48,37 @@ def test_parses_visible_offer_rows():
     assert parsed["parser"] == "offers-html-v1"
 
 
+def test_comment_and_quantity_counts_are_not_part_of_the_price():
+    html = _page(
+        """
+        <div class="article-row">
+          <span class="article-condition">NM</span>
+          <span data-bs-original-title="English"></span>
+          <div class="mobile-offer-container">
+            <a class="comments"><span class="badge">1</span></a>
+            <div class="price-container"><span>23,36 €</span></div>
+            <span class="item-count">12</span>
+          </div>
+        </div>
+        <div class="article-row">
+          <span class="article-condition">NM</span>
+          <div class="mobile-offer-container">
+            <span class="comments">8</span><span>24,98 €</span>
+          </div>
+        </div>
+        <div class="article-row">
+          <span class="article-condition">NM</span>
+          <div class="price-container d-none">99,00 €</div>
+          <div class="mobile-offer-container">
+            <span class="available">12</span><span>24,99 €</span>
+          </div>
+        </div>
+        """
+    )
+    parsed = parse_cardmarket_html(URL, html)
+    assert [row["price"] for row in parsed["rows"]] == ["23,36 €", "24,98 €", "24,99 €"]
+
+
 def test_challenge_html_is_blocked_without_rows():
     html = _page(
         '<div id="challenge-form">Just a moment...</div>',

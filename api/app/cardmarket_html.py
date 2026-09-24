@@ -57,6 +57,8 @@ _CHALLENGE_CLASSES = frozenset({"cf-turnstile", "cf-browser-verification"})
 _OFFER_CLASSES = frozenset(
     {"col-offer", "price-container", "mobile-offer-container", "listing-price"}
 )
+_PRICE_CLASSES = frozenset({"price-container", "listing-price"})
+_COUNT_CLASS_RE = re.compile(r"comment|quantity|item-count|available", re.IGNORECASE)
 _EMPTY_RE = re.compile(
     r"there are currently no articles|no articles available|there are no articles",
     re.IGNORECASE,
@@ -193,14 +195,47 @@ def _title(root: _Node) -> str:
     return ""
 
 
+def _count_node(node: _Node) -> bool:
+    return bool(_COUNT_CLASS_RE.search(node.attr("class")))
+
+
+def _price_text(node: _Node) -> str:
+    """Offer text without comment or quantity counts.
+
+    Those counts sit in the same cell as the ask. Joining their text nodes
+    without a gap turns 1 and 23,36 € into 123,36 €.
+    """
+    chunks: list[str] = []
+
+    def walk(current: _Node, *, root: bool) -> None:
+        if not root and _count_node(current):
+            return
+        chunks.extend(current.parts)
+        chunks.append(" ")
+        for child in current.children:
+            walk(child, root=False)
+
+    walk(node, root=True)
+    return re.sub(r"\s+", " ", "".join(chunks)).strip()
+
+
 def _offer_price(row: _Node) -> str | None:
     offers = [
         node
         for node in row.walk()
         if node is not row and node.classes() & _OFFER_CLASSES and not _hidden(node)
     ]
-    for offer in offers:
-        blob = offer.text()
+    innermost = [
+        node
+        for node in offers
+        if not any(other is not node and other in node.walk() for other in offers)
+    ]
+    ranked = sorted(
+        innermost or offers,
+        key=lambda node: 0 if node.classes() & _PRICE_CLASSES else 1,
+    )
+    for offer in ranked:
+        blob = _price_text(offer)
         asking = re.split(r"(?:\+|incl\.?|including)\s*ship", blob, maxsplit=1, flags=re.I)[0]
         match = _MONEY_RE.search(asking)
         if match:

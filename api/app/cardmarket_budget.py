@@ -67,20 +67,37 @@ def usage_today(conn: sqlite3.Connection) -> tuple[int, int]:
     return int(row["pages"] or 0), int(row["used"] or 0)
 
 
-def scraper_is_ready(conn: sqlite3.Connection) -> bool:
-    settings = get_settings()
-    if not settings.scraper_enabled or not settings.scraper_url or not settings.scraper_api_key:
-        return False
+def scraper_online() -> bool:
+    """The scraper container answered /health within the last 90 seconds."""
     with _health_lock:
-        fresh = _health["ok"] and time.time() - _health["checked_at"] <= 90
+        return bool(_health["ok"] and time.time() - _health["checked_at"] <= 90)
+
+
+def scraper_block_reason(conn: sqlite3.Connection) -> str | None:
+    """Why a paid read cannot start. None means the scraper may take a job."""
+    settings = get_settings()
+    if not settings.scraper_enabled:
+        return "disabled"
+    if not settings.scraper_url:
+        return "no-url"
+    if not settings.scraper_api_key:
+        return "no-key"
+    with _health_lock:
         cooling = time.time() < _health["cooldown_until"]
-    if not fresh or cooling:
-        return False
+    if not scraper_online():
+        return "no-health"
+    if cooling:
+        return "cooldown"
     pages, used = usage_today(conn)
-    return (
-        pages < settings.scraper_daily_pages
-        and used < settings.scraper_daily_mb * 1024 * 1024
-    )
+    if pages >= settings.scraper_daily_pages:
+        return "daily-pages"
+    if used >= settings.scraper_daily_mb * 1024 * 1024:
+        return "daily-mb"
+    return None
+
+
+def scraper_is_ready(conn: sqlite3.Connection) -> bool:
+    return scraper_block_reason(conn) is None
 
 
 def reserve_attempt(

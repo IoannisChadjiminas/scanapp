@@ -19,6 +19,7 @@ from app.cardmarket_queue import (
     immediate_transaction,
     issue_helper_credential,
     event_should_stop,
+    price_source,
     prices_payload,
     recover_job,
     remember_phone_offers,
@@ -684,3 +685,11 @@ def test_price_batch_returns_each_product_once(tmp_path):
     assert len(body["items"]) == 2
     assert body["items"][0]["prices"][0]["amount"] == 12.5
     assert body["items"][1]["prices"] == []
+
+
+def test_price_source_names_cache_webview_and_paid():
+    assert price_source("phone-offers-v1", "fresh") == "cache"
+    assert price_source("phone-offers-v1", "stale") == "webview"
+    assert price_source("proxy-offers-v1", "stale") == "paid"
+    assert price_source("offers-v1", "stale") == "helper"
+    assert price_source(None, None) == "none"

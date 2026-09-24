@@ -1,8 +1,11 @@
 from __future__ import annotations
 
 import json
+import logging
 import time
 from typing import Any
+
+log = logging.getLogger("cardmarket.prices")
 
 from fastapi import APIRouter, Header, HTTPException, Query, Request, Response
 from fastapi.responses import StreamingResponse
@@ -27,7 +30,7 @@ from app.cardmarket_budget import (
     has_recent_challenge,
     record_escalation,
     record_phone_challenge,
-    scraper_is_ready,
+    scraper_block_reason,
     url_on_cooldown,
 )
 from app.session import client_ip, existing_session, get_or_create_session
@@ -596,25 +599,34 @@ def escalate_price(payload: EscalationRequest, request: Request) -> JobResponse:
     settings = request.app.state.settings
     session_id = existing_session(request, request.app.state.dbs, settings)
     if not session_id:
+        log.info("escalate refused reason=no-session url=%s", payload.url)
         raise HTTPException(status_code=401, detail="Session required")
     if not settings.scraper_enabled:
+        log.info("escalate refused reason=disabled url=%s", payload.url)
         raise HTTPException(status_code=503, detail="Paid reads are off")
     sample = sample_key(payload.url)
     if not sample or not is_verified_singles_url(sample.split("?", 1)[0]):
+        log.info("escalate refused reason=bad-url url=%s", payload.url)
         raise HTTPException(status_code=400, detail="Need a Cardmarket product URL")
     catalog = request.app.state.dbs.catalog
     if settings.cardmarket_webview_enabled and not has_recent_challenge(catalog, session_id, payload.url):
+        log.info("escalate refused reason=no-challenge url=%s", sample)
         raise HTTPException(status_code=403, detail="No recent phone challenge for this card")
     if url_on_cooldown(catalog, payload.url):
+        log.info("escalate refused reason=cooldown url=%s", sample)
         raise HTTPException(status_code=429, detail="This card was tried recently")
-    if not scraper_is_ready(catalog):
+    block = scraper_block_reason(catalog)
+    if block:
+        log.info("escalate refused reason=%s url=%s", block, sample)
         raise HTTPException(status_code=429, detail="Paid read budget is exhausted")
     ip = client_ip(request)
     try:
         record_escalation(catalog, session_id=session_id, ip=ip, url=payload.url)
         job_id = enqueue_job(catalog, payload.url, tier="proxy")
     except QueueError as exc:
+        log.info("escalate refused reason=%s url=%s", exc.detail, sample)
         _raise_queue(exc)
+    log.info("escalate accepted source=paid job=%s url=%s", job_id, sample)
     return JobResponse(id=job_id, url=sample, status="pending")
 
 
@@ -622,7 +634,7 @@ def escalate_price(payload: EscalationRequest, request: Request) -> JobResponse:
 def get_prices(
     request: Request, url: str = Query(min_length=8, max_length=500)
 ) -> PriceResponse:
-    return _price_response(prices_payload(request.app.state.dbs.catalog, url))
+    return _price_response(prices_payload(request.app.state.dbs.catalog, url, announce=True))
 
 
 @router.post("/cardmarket/prices/batch", response_model=BatchPriceResponse)
@@ -636,7 +648,7 @@ def get_prices_batch(payload: BatchPriceRequest, request: Request) -> BatchPrice
         if not sample or sample in seen or not is_verified_singles_url(product):
             continue
         seen.add(sample)
-        items.append(_price_response(prices_payload(conn, url)))
+        items.append(_price_response(prices_payload(conn, url, announce=True)))
     state = items[0] if items else _price_response(prices_payload(conn, None))
     return BatchPriceResponse(
         webview_enabled=state.webview_enabled,
