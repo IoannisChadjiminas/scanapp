@@ -119,6 +119,23 @@ def test_configured_proxy_is_passed_to_chrome(monkeypatch):
     assert options["window_size"] == "1920,1080"
     assert options["proxy"] == "login__cr.de;sessid.abc:secret@gw.dataimpulse.com:823"
     assert "proxy" not in chrome_launch_options(None)
+    assert options["chromium_arg"] == "--no-sandbox,--disable-dev-shm-usage"
+
+
+def test_net_log_is_written_to_a_private_file_and_removed(tmp_path):
+    from browser import chrome_launch_options
+
+    args = chrome_launch_options(None, "/tmp/cm-netlog-x/net.json")["chromium_arg"].split(",")
+    assert "--log-net-log=/tmp/cm-netlog-x/net.json" in args
+    assert "--net-log-capture-mode=Default" in args
+
+    session = ChromeSession(None, net_log=True)
+    path = Path(session._net_path)
+    path.write_text('{"constants":{"logEventTypes":{},"netError":{}},\n"events": [\n')
+    session.quit()
+    assert session.net_summary == {}
+    assert not path.parent.exists()
+    assert ChromeSession(None, net_log=False)._net_path is None
 
 
 def test_deadline_aborts_a_stalled_call(monkeypatch):

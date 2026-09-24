@@ -69,6 +69,7 @@ services:
       TZ: ${PROXY_TZ:-Europe/Berlin}
       SCRAPER_ATTEMPT_SECONDS: ${SCRAPER_ATTEMPT_SECONDS:-90}
       SCRAPER_DIRECT_PROBE: ${SCRAPER_DIRECT_PROBE:-false}
+      SCRAPER_NET_LOG: ${SCRAPER_NET_LOG:-true}
     expose:
       - "8000"
     healthcheck:

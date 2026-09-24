@@ -21,7 +21,7 @@ sys.path.insert(0, str(HERE))
 sys.path.insert(0, str(API))
 
 from allow import cardmarket_product  # noqa: E402
-from browser import ATTEMPT_SECONDS, ChromeSession, reap_stale_browsers, run_attempt  # noqa: E402
+from browser import ATTEMPT_SECONDS, NET_LOG, ChromeSession, reap_stale_browsers, run_attempt  # noqa: E402
 from proxy import proxy_direct, proxy_exit, proxy_server  # noqa: E402
 from app.cardmarket_html import parse_cardmarket_html  # noqa: E402
 
@@ -57,10 +57,10 @@ async def lifespan(app: FastAPI):
     log.info(
         "scraper config api_key_configured=%s proxy_host_configured=%s "
         "proxy_user_configured=%s proxy_password_configured=%s max_browsers=%s deadline_s=%s "
-        "direct_probe=%s",
+        "direct_probe=%s net_log=%s",
         bool(API_KEY), bool(os.environ.get("PROXY_HOST", "").strip()),
         bool(os.environ.get("PROXY_USER", "").strip()), bool(os.environ.get("PROXY_PASS")),
-        MAX_BROWSERS, ATTEMPT_SECONDS, DIRECT_PROBE,
+        MAX_BROWSERS, ATTEMPT_SECONDS, DIRECT_PROBE, NET_LOG,
     )
     yield
 
@@ -104,6 +104,17 @@ def log_proxy_exit(session_id: str, proxy: str | None) -> None:
         "proxy exit session=%s ip=%s country=%s org=%s elapsed_ms=%s",
         session_id, exit_info["ip"], exit_info["country"], exit_info["org"],
         int((time.time() - started) * 1000),
+    )
+
+
+def log_chrome_net(session_id: str, session: object) -> None:
+    summary = getattr(session, "net_summary", None)
+    if summary is None:
+        return
+    log.info(
+        "chrome net session=%s %s",
+        session_id,
+        json.dumps(summary, ensure_ascii=False, sort_keys=True) if summary else "no cardmarket or cloudflare traffic",
     )
 
 
@@ -152,6 +163,7 @@ def scrape(payload: ScrapeRequest, authorization: str | None = Header(default=No
         raise HTTPException(status_code=503, detail="Busy", headers={"Retry-After": "5"})
     started = time.time()
     log.info("scrape started session=%s", payload.session_id)
+    session = None
     try:
         reap_stale_browsers(ATTEMPT_SECONDS + 15)
         session = open_session(payload.session_id)
@@ -165,6 +177,7 @@ def scrape(payload: ScrapeRequest, authorization: str | None = Header(default=No
         raise HTTPException(status_code=500, detail="Scrape attempt failed") from None
     finally:
         _slots.release()
+        log_chrome_net(payload.session_id, session)
     if result.get("outcome") == "rate_limited":
         log.info("scrape rate_limited session=%s cooldown_s=%s", payload.session_id, COOLDOWN_SECONDS)
         with _cooldown_lock:

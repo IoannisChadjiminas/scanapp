@@ -19,7 +19,10 @@ URL = "https://www.cardmarket.com/en/Pokemon/Products/Singles/Base-Set/Pikachu"
 def test_scraper_logs_start_and_failure_without_credentials(monkeypatch, caplog):
     monkeypatch.setattr(service, "API_KEY", "test-secret")
     monkeypatch.setattr(service, "reap_stale_browsers", lambda age: None)
-    monkeypatch.setattr(service, "open_session", lambda sid: SimpleNamespace(proxy="secret-proxy"))
+    monkeypatch.setattr(service, "open_session", lambda sid: SimpleNamespace(
+        proxy="secret-proxy",
+        net_summary={"www.cardmarket.com": {"tunnel": {"no reply": 2}}},
+    ))
     monkeypatch.setattr(
         service, "proxy_exit",
         lambda proxy: {"ip": "203.0.113.7", "country": "DE", "org": "AS3320 Deutsche Telekom AG"},
@@ -37,6 +40,9 @@ def test_scraper_logs_start_and_failure_without_credentials(monkeypatch, caplog)
     assert "scrape started session=attempt-one" in caplog.text
     assert "proxy exit session=attempt-one ip=203.0.113.7 country=DE org=AS3320 Deutsche Telekom AG" in caplog.text
     assert "error=RuntimeError" in caplog.text
+    assert (
+        'chrome net session=attempt-one {"www.cardmarket.com": {"tunnel": {"no reply": 2}}}'
+    ) in caplog.text
     assert "secret-proxy" not in caplog.text
     assert "test-secret" not in caplog.text
 

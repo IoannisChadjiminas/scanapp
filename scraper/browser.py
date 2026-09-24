@@ -8,6 +8,8 @@ from __future__ import annotations
 
 import json
 import os
+import shutil
+import tempfile
 import threading
 import time
 from typing import Protocol
@@ -49,6 +51,7 @@ PROBE_JS = r"""
 """
 
 ATTEMPT_SECONDS = float(os.environ.get("SCRAPER_ATTEMPT_SECONDS", "25"))
+NET_LOG = os.environ.get("SCRAPER_NET_LOG", "true").strip().lower() not in {"0", "false", "no"}
 TERMINAL = {"offers", "empty", "wrong_product", "rate_limited"}
 
 
@@ -171,10 +174,14 @@ def _watch_attempt(session: object, deadline: float, stop: threading.Event) -> N
             return
 
 
-def chrome_launch_options(proxy: str | None) -> dict:
+def chrome_launch_options(proxy: str | None, net_log: str | None = None) -> dict:
     """Headed UC Chrome. ``log_cdp`` turns on the performance log used for bytes."""
     from proxy import seleniumbase_proxy
 
+    args = ["--no-sandbox", "--disable-dev-shm-usage"]
+    if net_log:
+        # Default capture mode leaves credentials and cookies out of the file.
+        args += [f"--log-net-log={net_log}", "--net-log-capture-mode=Default"]
     options = {
         "uc": True,
         "xvfb": True,
@@ -183,7 +190,7 @@ def chrome_launch_options(proxy: str | None) -> dict:
         "headed": True,
         "locale": "en",
         "log_cdp": True,
-        "chromium_arg": "--no-sandbox,--disable-dev-shm-usage",
+        "chromium_arg": ",".join(args),
     }
     formatted = seleniumbase_proxy(proxy)
     if formatted:
@@ -268,17 +275,23 @@ def run_attempt(session: PageSession, url: str, *, parse_html) -> dict:
 class ChromeSession:
     """Headed undetected Chrome under Xvfb. Imported only when a real attempt runs."""
 
-    def __init__(self, proxy: str | None) -> None:
+    def __init__(self, proxy: str | None, net_log: bool = NET_LOG) -> None:
         self.proxy = proxy
         self.bytes = 0
         self.bytes_measured = False
+        self.net_summary: dict | None = None
         self._sb = None
         self._context = None
+        self._net_dir = tempfile.mkdtemp(prefix="cm-netlog-") if net_log else None
+
+    @property
+    def _net_path(self) -> str | None:
+        return os.path.join(self._net_dir, "net.json") if self._net_dir else None
 
     def open(self, url: str) -> None:
         from seleniumbase import SB
 
-        self._context = SB(**chrome_launch_options(self.proxy))
+        self._context = SB(**chrome_launch_options(self.proxy, self._net_path))
         self._sb = self._context.__enter__()
         self._sb.activate_cdp_mode(url)
 
@@ -351,3 +364,15 @@ class ChromeSession:
             # Keep the handle available to the watchdog until shutdown finishes.
             self._context = None
             self._sb = None
+            self._read_net_log()
+
+    def _read_net_log(self) -> None:
+        if not self._net_dir:
+            return
+        from netlog import read_net_log
+
+        try:
+            self.net_summary = read_net_log(self._net_path)
+        finally:
+            shutil.rmtree(self._net_dir, ignore_errors=True)
+            self._net_dir = None
