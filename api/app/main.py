@@ -27,6 +27,17 @@ from app.routes.scans import router as scans_router
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     settings = get_settings()
+    logging.getLogger("cardmarket.scraper").info(
+        "price config webview_enabled=%s helper_enabled=%s scraper_enabled=%s "
+        "scraper_url_configured=%s scraper_key_configured=%s daily_pages=%s daily_mb=%s",
+        settings.cardmarket_webview_enabled,
+        settings.cardmarket_helper_enabled,
+        settings.scraper_enabled,
+        bool(settings.scraper_url),
+        bool(settings.scraper_api_key),
+        settings.scraper_daily_pages,
+        settings.scraper_daily_mb,
+    )
     settings.tmp_dir.mkdir(parents=True, exist_ok=True)
     dbs = Databases(settings)
     runtime = Runtime(settings=settings)

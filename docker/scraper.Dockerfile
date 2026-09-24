@@ -33,8 +33,15 @@ RUN pip install --no-cache-dir -r /app/scraper/requirements.txt
 COPY scraper /app/scraper
 COPY api/app /app/api/app
 
+# SeleniumBase downloads the ChromeDriver that matches this image's Chrome into
+# its own package directory. Install it as root, then let the runtime user
+# replace the zip when Chrome's major version changes.
 RUN useradd --create-home --uid 10001 scraper \
-    && chown -R scraper:scraper /app
+    && drivers="$(python -c 'from pathlib import Path; import seleniumbase.drivers; print(Path(seleniumbase.drivers.__file__).parent)')" \
+    && major="$(google-chrome --version | awk '{print $3}' | cut -d. -f1)" \
+    && python -c "from seleniumbase.console_scripts import sb_install; sb_install.main(override='chromedriver ${major}', force_uc=True)" \
+    && chown -R scraper:scraper /app "$drivers" \
+    && chmod -R a+rwX "$drivers"
 USER scraper
 
 EXPOSE 8000

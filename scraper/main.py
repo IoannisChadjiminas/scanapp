@@ -10,6 +10,7 @@ import sys
 import threading
 import time
 from pathlib import Path
+from contextlib import asynccontextmanager
 
 from fastapi import FastAPI, Header, HTTPException
 from pydantic import BaseModel, Field
@@ -31,7 +32,19 @@ API_KEY = os.environ.get("SCRAPER_API_KEY", "")
 MAX_BROWSERS = max(1, int(os.environ.get("MAX_BROWSERS", "1")))
 COOLDOWN_SECONDS = float(os.environ.get("SCRAPER_RATE_LIMIT_S", "900"))
 
-app = FastAPI(title="Cardmarket scraper", docs_url=None, redoc_url=None)
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    log.info(
+        "scraper config api_key_configured=%s proxy_host_configured=%s "
+        "proxy_user_configured=%s proxy_password_configured=%s max_browsers=%s deadline_s=%s",
+        bool(API_KEY), bool(os.environ.get("PROXY_HOST", "").strip()),
+        bool(os.environ.get("PROXY_USER", "").strip()), bool(os.environ.get("PROXY_PASS")),
+        MAX_BROWSERS, ATTEMPT_SECONDS,
+    )
+    yield
+
+
+app = FastAPI(title="Cardmarket scraper", docs_url=None, redoc_url=None, lifespan=lifespan)
 _slots = threading.BoundedSemaphore(MAX_BROWSERS)
 _cooldown_until = 0.0
 _cooldown_lock = threading.Lock()
@@ -79,13 +92,20 @@ def scrape(payload: ScrapeRequest, authorization: str | None = Header(default=No
     if not _slots.acquire(timeout=30):
         raise HTTPException(status_code=503, detail="Busy", headers={"Retry-After": "5"})
     started = time.time()
+    log.info("scrape started session=%s", payload.session_id)
     try:
         reap_stale_browsers(ATTEMPT_SECONDS + 15)
         session = open_session(payload.session_id)
+        log.info("scrape browser starting session=%s proxy_enabled=%s", payload.session_id, bool(session.proxy))
         result = run_attempt(session, payload.url, parse_html=parse_cardmarket_html)
+    except Exception as exc:
+        # Exception messages from browser/proxy libraries can contain credentials.
+        log.error("scrape failed session=%s error=%s", payload.session_id, type(exc).__name__)
+        raise HTTPException(status_code=500, detail="Scrape attempt failed") from None
     finally:
         _slots.release()
     if result.get("outcome") == "rate_limited":
+        log.info("scrape rate_limited session=%s cooldown_s=%s", payload.session_id, COOLDOWN_SECONDS)
         with _cooldown_lock:
             _cooldown_until = time.time() + COOLDOWN_SECONDS
         raise HTTPException(

@@ -44,6 +44,21 @@ def _catalog(tmp_path):
     return conn
 
 
+def test_initial_scraper_health_failure_is_logged_once(monkeypatch, caplog):
+    import logging
+
+    worker = ScraperWorker(Settings(scraper_url="http://scraper:8000"))
+    def fail(*args, **kwargs):
+        raise httpx.ConnectError("secret-must-not-be-logged")
+    monkeypatch.setattr("app.cardmarket_scraper.httpx.get", fail)
+    note_scraper_health(False, 0)
+    with caplog.at_level(logging.INFO, logger="cardmarket.scraper"):
+        worker._ping()
+        worker._ping()
+    assert caplog.text.count("scraper health state=ConnectError") == 1
+    assert "secret-must-not-be-logged" not in caplog.text
+
+
 def _stamp(minutes: int) -> str:
     moment = datetime(2026, 1, 1, tzinfo=timezone.utc) + timedelta(minutes=minutes)
     return moment.strftime("%Y-%m-%dT%H:%M:%SZ")

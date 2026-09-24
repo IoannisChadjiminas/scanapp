@@ -38,8 +38,10 @@ class ScraperWorker:
         self.settings = settings
         self._stop = threading.Event()
         self._thread: threading.Thread | None = None
+        self._health_state: str | None = None
 
     def start(self) -> None:
+        log.info("paid worker starting")
         self._thread = threading.Thread(
             target=self._loop, name="cardmarket-proxy", daemon=True
         )
@@ -81,6 +83,7 @@ class ScraperWorker:
         before = scraper_online()
         if not url:
             note_scraper_health(False)
+            self._log_health("no-url")
             self._log_online(before)
             return
         try:
@@ -92,9 +95,19 @@ class ScraperWorker:
             if cooldown is not None:
                 cooldown = max(cooldown, cooldown_remaining() + time.time())
             note_scraper_health(response.status_code == 200 and body.get("ok") is True, cooldown)
-        except (httpx.HTTPError, ValueError, TypeError):
+            self._log_health(
+                "online" if response.status_code == 200 and body.get("ok") is True
+                else f"http-{response.status_code}-invalid-health"
+            )
+        except (httpx.HTTPError, ValueError, TypeError) as exc:
             note_scraper_health(False)
+            self._log_health(type(exc).__name__)
         self._log_online(before)
+
+    def _log_health(self, state: str) -> None:
+        if state != self._health_state:
+            log.info("scraper health state=%s", state)
+            self._health_state = state
 
     def _log_online(self, before: bool) -> None:
         online = scraper_online()
@@ -104,6 +117,7 @@ class ScraperWorker:
     def _handle(self, conn, job: dict) -> None:
         target = sample_key(job.get("url"), job.get("filters")) or str(job.get("url") or "")
         if sample_is_fresh(conn, target):
+            log.info("paid skipped reason=fresh-cache job=%s url=%s", job["id"], target)
             self._mark_done(conn, job)
             return
         remaining = cooldown_remaining()
