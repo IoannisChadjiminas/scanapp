@@ -27,6 +27,7 @@ class Settings(BaseSettings):
     review_token: str = ""
     session_create_hourly: int = 30
     cardmarket_helper_enabled: bool = False
+    cardmarket_webview_enabled: bool = True
     scraper_enabled: bool = False
     scraper_url: str = ""
     scraper_api_key: str = ""

@@ -60,6 +60,15 @@ prices, phone reads, and the separately configured paid scraper remain available
 To restore PC reads, set `CARDMARKET_HELPER_ENABLED=true` in the API environment
 and restart/redeploy the API. No Flutter rebuild is needed.
 
+Phone WebViews default to on (`CARDMARKET_WEBVIEW_ENABLED=true`). To test the paid
+scraper directly, set `CARDMARKET_WEBVIEW_ENABLED=false`, keep
+`CARDMARKET_HELPER_ENABLED=false`, and configure `SCRAPER_ENABLED=true` with the
+scraper credentials. Restart/redeploy the API. The updated Flutter app waits for
+this policy before opening a WebView and requests paid reads only for stale cards.
+Disabling WebViews removes the phone-challenge prerequisite; session validation,
+rate limits, cooldowns, scraper health, and spend caps still apply. Set it back to
+`true` to restore the WebView-first flow.
+
 Regenerate the OpenAPI document with:
 
 ```bash

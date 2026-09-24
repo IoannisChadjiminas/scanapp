@@ -1,6 +1,10 @@
 from datetime import datetime, timedelta, timezone
 
 import httpx
+import pytest
+from types import SimpleNamespace
+from fastapi import FastAPI
+from fastapi.testclient import TestClient
 
 from app.cardmarket import datetime_now, sample_key, write_snapshot
 from app.cardmarket_budget import (
@@ -22,8 +26,8 @@ from app.cardmarket_queue import (
     prices_payload,
 )
 from app.cardmarket_scraper import ScraperWorker
-from app.config import get_settings
-from app.db import connect, init_catalog
+from app.config import Settings, get_settings
+from app.db import connect, init_catalog, init_results
 
 PRODUCT = (
     "https://www.cardmarket.com/en/Pokemon/Products/Singles/"
@@ -43,6 +47,81 @@ def _catalog(tmp_path):
 def _stamp(minutes: int) -> str:
     moment = datetime(2026, 1, 1, tzinfo=timezone.utc) + timedelta(minutes=minutes)
     return moment.strftime("%Y-%m-%dT%H:%M:%SZ")
+
+
+@pytest.fixture
+def direct_scraper(tmp_path, monkeypatch):
+    from app.routes.cardmarket import router
+
+    settings = get_settings()
+    for key, value in {
+        "cardmarket_webview_enabled": False,
+        "scraper_enabled": True,
+        "scraper_url": "http://scraper",
+        "scraper_api_key": "test-key",
+        "scraper_daily_pages": 50,
+        "scraper_daily_mb": 50,
+        "scraper_session_hourly": 10,
+        "scraper_ip_hourly": 20,
+    }.items():
+        monkeypatch.setattr(settings, key, value)
+    catalog = _catalog(tmp_path)
+    results = connect(tmp_path / "results.sqlite")
+    init_results(results)
+    results.execute("INSERT INTO sessions VALUES ('session', ?, ?)", (datetime_now(), datetime_now()))
+    results.commit()
+    app = FastAPI()
+    app.include_router(router, prefix="/api/v1")
+    app.state.settings = settings
+    app.state.dbs = SimpleNamespace(catalog=catalog, results=results)
+    note_scraper_health(True, 0)
+    with TestClient(app) as client:
+        client.cookies.set(settings.session_cookie, "session")
+        yield client, catalog, settings
+    note_scraper_health(False, 0)
+    catalog.close()
+    results.close()
+
+
+def test_webviews_default_on_and_api_reports_disabled_policy(direct_scraper, monkeypatch):
+    client, catalog, settings = direct_scraper
+    monkeypatch.delenv("CARDMARKET_WEBVIEW_ENABLED", raising=False)
+    assert Settings(_env_file=None).cardmarket_webview_enabled is True
+    assert client.get("/api/v1/cardmarket/prices", params={"url": ENGLISH}).json()["webview_enabled"] is False
+    batch = client.post("/api/v1/cardmarket/prices/batch", json={"urls": [ENGLISH]}).json()
+    assert batch["webview_enabled"] is False
+    assert batch["items"][0]["webview_enabled"] is False
+    accepted = client.post("/api/v1/cardmarket/escalations", json={"url": ENGLISH})
+    assert accepted.status_code == 200
+    job = claim_proxy_job(catalog)
+    assert job["id"] == accepted.json()["id"]
+    monkeypatch.setattr(settings, "cardmarket_webview_enabled", True)
+    rejected = client.post("/api/v1/cardmarket/escalations", json={"url": GERMAN})
+    assert rejected.status_code == 403
+    record_phone_challenge(catalog, session_id="session", ip="testclient", url=GERMAN)
+    assert client.post("/api/v1/cardmarket/escalations", json={"url": GERMAN}).status_code == 200
+
+
+@pytest.mark.parametrize("restriction, expected", [
+    ("session", 401), ("enabled", 503), ("budget", 429), ("hourly", 429), ("cooldown", 429),
+])
+def test_direct_scraper_keeps_existing_limits(direct_scraper, monkeypatch, restriction, expected):
+    client, catalog, settings = direct_scraper
+    if restriction == "session":
+        client.cookies.clear()
+    elif restriction == "enabled":
+        monkeypatch.setattr(settings, "scraper_enabled", False)
+    elif restriction == "budget":
+        monkeypatch.setattr(settings, "scraper_daily_pages", 0)
+    elif restriction == "hourly":
+        monkeypatch.setattr(settings, "scraper_session_hourly", 0)
+    else:
+        from app.cardmarket_budget import reconcile_attempt
+        reservation = reserve_attempt(catalog, sample=sample_key(ENGLISH), session_id="session", ip="testclient")
+        reconcile_attempt(catalog, reservation, outcome="timeout", actual_bytes=0, elapsed_ms=1)
+    response = client.post("/api/v1/cardmarket/escalations", json={"url": ENGLISH})
+    assert response.status_code == expected
+    assert claim_proxy_job(catalog) is None
 
 
 def test_filtered_samples_do_not_overwrite_each_other(tmp_path):

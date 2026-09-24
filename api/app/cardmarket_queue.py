@@ -1102,6 +1102,7 @@ def prices_payload(conn: sqlite3.Connection, url: str | None) -> dict[str, Any]:
         "unlisted": unlisted,
         "attempted_at": (record or {}).get("empty_observed_at"),
         "scraper_ready": scraper_is_ready(conn),
+        "webview_enabled": get_settings().cardmarket_webview_enabled,
         **state,
     }
 

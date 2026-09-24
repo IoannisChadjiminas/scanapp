@@ -8,6 +8,7 @@ services:
     environment:
       ENABLE_MATCHED: ${ENABLE_MATCHED:-true}
       CARDMARKET_HELPER_ENABLED: ${CARDMARKET_HELPER_ENABLED:-false}
+      CARDMARKET_WEBVIEW_ENABLED: ${CARDMARKET_WEBVIEW_ENABLED:-true}
     mem_limit: 1536m
     cpus: "1.5"
     pids_limit: 256

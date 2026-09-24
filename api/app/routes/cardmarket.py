@@ -174,6 +174,7 @@ class BatchPriceRequest(BaseModel):
 
 
 class PriceResponse(BaseModel):
+    webview_enabled: bool = True
     url: str | None = None
     prices: list[PriceItem] = Field(default_factory=list)
     status: str | None = None
@@ -196,6 +197,7 @@ class PriceResponse(BaseModel):
 
 
 class BatchPriceResponse(BaseModel):
+    webview_enabled: bool = True
     helper_online: bool = False
     helper_ready: bool = False
     helper_paused: bool = False
@@ -242,6 +244,7 @@ def _job_response(job: dict[str, Any]) -> JobResponse:
 def _price_response(payload: dict[str, Any]) -> PriceResponse:
     prices = [PriceItem.model_validate(item) for item in payload.get("prices") or []]
     return PriceResponse(
+        webview_enabled=payload.get("webview_enabled", get_settings().cardmarket_webview_enabled),
         url=payload.get("url"),
         prices=prices,
         status=payload.get("status"),
@@ -589,7 +592,7 @@ def parse_cardmarket_page(
 
 @router.post("/cardmarket/escalations", response_model=JobResponse)
 def escalate_price(payload: EscalationRequest, request: Request) -> JobResponse:
-    """Ask for a paid read after this session's phone hit a challenge."""
+    """Ask for a paid read after a challenge, or when phone reads are disabled."""
     settings = request.app.state.settings
     session_id = existing_session(request, request.app.state.dbs, settings)
     if not session_id:
@@ -600,7 +603,7 @@ def escalate_price(payload: EscalationRequest, request: Request) -> JobResponse:
     if not sample or not is_verified_singles_url(sample.split("?", 1)[0]):
         raise HTTPException(status_code=400, detail="Need a Cardmarket product URL")
     catalog = request.app.state.dbs.catalog
-    if not has_recent_challenge(catalog, session_id, payload.url):
+    if settings.cardmarket_webview_enabled and not has_recent_challenge(catalog, session_id, payload.url):
         raise HTTPException(status_code=403, detail="No recent phone challenge for this card")
     if url_on_cooldown(catalog, payload.url):
         raise HTTPException(status_code=429, detail="This card was tried recently")
@@ -636,6 +639,7 @@ def get_prices_batch(payload: BatchPriceRequest, request: Request) -> BatchPrice
         items.append(_price_response(prices_payload(conn, url)))
     state = items[0] if items else _price_response(prices_payload(conn, None))
     return BatchPriceResponse(
+        webview_enabled=state.webview_enabled,
         helper_online=state.helper_online,
         helper_ready=state.helper_ready,
         helper_paused=state.helper_paused,
