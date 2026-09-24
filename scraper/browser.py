@@ -398,17 +398,23 @@ class ChromeSession:
         self._sb.activate_cdp_mode(url)
 
     def block_extra_resources(self) -> None:
-        driver = self._sb
+        import mycdp.network as network
+
+        self.stage = "resource_blocking"
+        # BaseCase.execute_cdp_cmd reconnects WebDriver. Keep these commands on
+        # the same CDP tab and event loop used by navigation and page probing.
+        cdp = self._sb.cdp
+        tab = cdp.get_active_tab()
+        loop = cdp.get_event_loop()
         try:
-            driver.execute_cdp_cmd("Network.enable", {})
-            driver.execute_cdp_cmd("Network.setBlockedURLs", {"urls": BLOCKED})
+            loop.run_until_complete(tab.send(network.enable()))
+            loop.run_until_complete(tab.send(network.set_blocked_urls(urls=BLOCKED)))
         except Exception:
             return
 
     def probe(self) -> str:
         self.stage = "page_probe"
-        # CDP mode disconnects WebDriver. execute_script sits on that dead
-        # connection until the watchdog kills Chrome, so the click never runs.
+        # Keep page reads on the existing CDP connection.
         value = self._sb.cdp.evaluate(PROBE_JS)
         return str(value or "pending")
 
