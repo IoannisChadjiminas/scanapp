@@ -89,6 +89,16 @@ def test_challenge_stays_on_the_same_proxy_then_reads_offers():
     assert session.quit_called
 
 
+def test_challenge_is_clicked_again_while_it_stays(monkeypatch):
+    monkeypatch.setattr("browser.ATTEMPT_SECONDS", 0.45)
+    monkeypatch.setattr("browser.CLICK_EVERY_S", 0.1)
+    session = Scripted(["challenge"] * 30, html="<html>challenge</html>")
+    result = run_attempt(session, URL, parse_html=_parse)
+    assert session.captcha >= 2
+    assert result["outcome"] == "challenge_unsolved"
+    assert result["rows"] == []
+
+
 def test_challenge_alone_does_not_finish_the_attempt(monkeypatch):
     monkeypatch.setattr("browser.ATTEMPT_SECONDS", 0.01)
     session = Scripted(["challenge", "challenge"], html="<html>challenge</html>")

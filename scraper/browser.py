@@ -51,6 +51,7 @@ PROBE_JS = r"""
 """
 
 ATTEMPT_SECONDS = float(os.environ.get("SCRAPER_ATTEMPT_SECONDS", "25"))
+CLICK_EVERY_S = float(os.environ.get("SCRAPER_CLICK_EVERY_S", "4"))
 NET_LOG = os.environ.get("SCRAPER_NET_LOG", "true").strip().lower() not in {"0", "false", "no"}
 # DataImpulse keeps one sessid for about 30 minutes. The clearance cookie is
 # bound to that exit, so the window lives for the same stretch.
@@ -253,21 +254,24 @@ def run_attempt(session: PageSession, url: str, *, parse_html) -> dict:
             session.open(url)
             _before_deadline(deadline)
             session.block_extra_resources()
-            solved = False
+            next_click = 0.0
             while time.monotonic() < deadline:
                 _before_deadline(deadline)
                 outcome = session.probe() or "pending"
                 if outcome in TERMINAL:
                     break
-                if outcome == "challenge" and not solved:
+                if outcome == "challenge" and time.monotonic() >= next_click:
                     _before_deadline(deadline)
                     session.solve_captcha()
-                    solved = True
+                    next_click = time.monotonic() + CLICK_EVERY_S
                     continue
                 remaining = deadline - time.monotonic()
                 if remaining <= 0:
                     break
-                time.sleep(min(0.25, remaining))
+                wait = min(0.25, remaining)
+                if outcome == "challenge":
+                    wait = min(wait, max(0.0, next_click - time.monotonic()))
+                time.sleep(wait)
             if time.monotonic() < deadline:
                 if outcome in {"offers", "empty", "wrong_product"}:
                     page = session.html() or ""
