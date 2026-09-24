@@ -9,6 +9,7 @@ import os
 import sys
 import threading
 import time
+import traceback
 from pathlib import Path
 from contextlib import asynccontextmanager
 
@@ -107,6 +108,26 @@ def log_proxy_exit(session_id: str, proxy: str | None) -> None:
     )
 
 
+def log_chrome_page(session_id: str, session: object) -> None:
+    title = str(getattr(session, "last_title", "") or "")
+    url = str(getattr(session, "last_url", "") or "")
+    shot = getattr(session, "last_screenshot", b"") or b""
+    if not title and not url and not shot:
+        return
+    path = ""
+    if shot:
+        path = f"/tmp/cardmarket-{session_id[:8]}.png"
+        try:
+            with open(path, "wb") as handle:
+                handle.write(shot)
+        except OSError:
+            path = ""
+    log.info(
+        "chrome page session=%s title=%r url=%s screenshot_bytes=%s path=%s",
+        session_id, title, url, len(shot), path or "-",
+    )
+
+
 def log_chrome_net(session_id: str, session: object) -> None:
     summary = getattr(session, "net_summary", None)
     if summary is None:
@@ -173,10 +194,23 @@ def scrape(payload: ScrapeRequest, authorization: str | None = Header(default=No
         result = run_attempt(session, payload.url, parse_html=parse_cardmarket_html)
     except Exception as exc:
         # Exception messages from browser/proxy libraries can contain credentials.
-        log.error("scrape failed session=%s error=%s", payload.session_id, type(exc).__name__)
+        # Frame locations identify the failing library without source lines or locals.
+        frames = traceback.extract_tb(exc.__traceback__)[-8:]
+        locations = " > ".join(
+            f"{Path(frame.filename).name}:{frame.lineno}:{frame.name}" for frame in frames
+        )
+        log.error(
+            "scrape failed session=%s error=%s module=%s stage=%s "
+            "watchdog_aborted=%s elapsed_ms=%s frames=%s",
+            payload.session_id, type(exc).__name__, type(exc).__module__,
+            getattr(session, "stage", "session_setup"),
+            getattr(session, "watchdog_aborted", False),
+            int((time.time() - started) * 1000), locations,
+        )
         raise HTTPException(status_code=500, detail="Scrape attempt failed") from None
     finally:
         _slots.release()
+        log_chrome_page(payload.session_id, session)
         log_chrome_net(payload.session_id, session)
     if result.get("outcome") == "rate_limited":
         log.info("scrape rate_limited session=%s cooldown_s=%s", payload.session_id, COOLDOWN_SECONDS)

@@ -198,6 +198,18 @@ def chrome_launch_options(proxy: str | None, net_log: str | None = None) -> dict
     return options
 
 
+def _sample_page(session: object, stop: threading.Event) -> None:
+    """Keep the latest title and screenshot while the page load is blocked."""
+    while not stop.wait(2.0):
+        capture = getattr(session, "capture_page", None)
+        if not callable(capture):
+            return
+        try:
+            capture()
+        except Exception:
+            continue
+
+
 def run_attempt(session: PageSession, url: str, *, parse_html) -> dict:
     """Drive one page. `parse_html(url, html)` returns the scanapp parser dict.
 
@@ -216,6 +228,10 @@ def run_attempt(session: PageSession, url: str, *, parse_html) -> dict:
         daemon=True,
     )
     watcher.start()
+    sampler = threading.Thread(
+        target=_sample_page, args=(session, stop), name="cardmarket-page-sample", daemon=True,
+    )
+    sampler.start()
     try:
         try:
             _before_deadline(deadline)
@@ -250,6 +266,7 @@ def run_attempt(session: PageSession, url: str, *, parse_html) -> dict:
             pass
         stop.set()
         watcher.join(timeout=2)
+        sampler.join(timeout=2)
     if outcome not in TERMINAL:
         outcome = "challenge_unsolved" if outcome == "challenge" else "timeout"
     parsed = parse_html(url, page) if page else {}
@@ -280,6 +297,11 @@ class ChromeSession:
         self.bytes = 0
         self.bytes_measured = False
         self.net_summary: dict | None = None
+        self.last_title = ""
+        self.last_url = ""
+        self.last_screenshot = b""
+        self.stage = "created"
+        self.watchdog_aborted = False
         self._sb = None
         self._context = None
         self._net_dir = tempfile.mkdtemp(prefix="cm-netlog-") if net_log else None
@@ -288,11 +310,47 @@ class ChromeSession:
     def _net_path(self) -> str | None:
         return os.path.join(self._net_dir, "net.json") if self._net_dir else None
 
+    def capture_page(self) -> None:
+        import psutil
+
+        from page_shot import capture_screenshot, chrome_pages, debug_port, page_target
+
+        port = None
+        try:
+            children = psutil.Process().children(recursive=True)
+        except Exception:
+            return
+        for child in children:
+            try:
+                port = debug_port(child.cmdline())
+            except Exception:
+                continue
+            if port:
+                break
+        if not port:
+            return
+        try:
+            target = page_target(chrome_pages(port))
+        except Exception:
+            return
+        if not target:
+            return
+        self.last_title = " ".join(str(target.get("title") or "").split())[:120]
+        self.last_url = str(target.get("url") or "")[:500]
+        socket_url = str(target.get("webSocketDebuggerUrl") or "")
+        if socket_url:
+            try:
+                self.last_screenshot = capture_screenshot(socket_url)
+            except Exception:
+                return
+
     def open(self, url: str) -> None:
         from seleniumbase import SB
 
+        self.stage = "browser_start"
         self._context = SB(**chrome_launch_options(self.proxy, self._net_path))
         self._sb = self._context.__enter__()
+        self.stage = "cdp_navigation"
         self._sb.activate_cdp_mode(url)
 
     def block_extra_resources(self) -> None:
@@ -304,15 +362,18 @@ class ChromeSession:
             return
 
     def probe(self) -> str:
+        self.stage = "page_probe"
         value = self._sb.execute_script(f"return {PROBE_JS}")
         return str(value or "pending")
 
     def solve_captcha(self) -> None:
+        self.stage = "challenge_interaction"
         click = getattr(self._sb, "uc_gui_click_captcha", None)
         if callable(click):
             click()
 
     def html(self) -> str:
+        self.stage = "read_html"
         self._account_bytes()
         return str(self._sb.get_page_source() or "")
 
@@ -345,6 +406,7 @@ class ChromeSession:
 
     def abort(self) -> None:
         """Unblock a stalled driver call by killing this attempt's Chrome."""
+        self.watchdog_aborted = True
         pids = _process_tree(self._sb) if self._sb is not None else []
         if pids:
             _kill_pids(pids)

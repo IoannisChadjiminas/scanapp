@@ -235,9 +235,11 @@ def test_abort_kills_separate_chrome_tree(chrome_processes, driver_state):
         processes.driver.service.process = None
     session = ChromeSession(None)
     session._sb = SimpleNamespace(driver=processes.driver)
+    assert not session.watchdog_aborted
 
     session.abort()
 
+    assert session.watchdog_aborted
     assert {201, 202} <= processes.killed
     if driver_state == "running":
         assert {101, 102} <= processes.killed
@@ -271,3 +273,22 @@ def test_watchdog_can_target_chrome_during_context_cleanup(monkeypatch, chrome_p
     assert session._sb is None
     assert session._context is None
     assert time.monotonic() - started < 2
+
+
+@pytest.mark.parametrize("failure_stage", ["browser_start", "cdp_navigation"])
+def test_open_preserves_failure_stage_for_diagnostics(monkeypatch, failure_stage):
+    class Context:
+        def __enter__(self):
+            if failure_stage == "browser_start":
+                raise RuntimeError("startup failed")
+            return SimpleNamespace(activate_cdp_mode=self.navigate)
+
+        def navigate(self, url):
+            raise RuntimeError("navigation failed")
+
+    monkeypatch.setitem(sys.modules, "seleniumbase", SimpleNamespace(SB=lambda **kwargs: Context()))
+    session = ChromeSession(None, net_log=False)
+    with pytest.raises(RuntimeError):
+        session.open(URL)
+    assert session.stage == failure_stage
+    assert not session.watchdog_aborted

@@ -21,6 +21,8 @@ def test_scraper_logs_start_and_failure_without_credentials(monkeypatch, caplog)
     monkeypatch.setattr(service, "reap_stale_browsers", lambda age: None)
     monkeypatch.setattr(service, "open_session", lambda sid: SimpleNamespace(
         proxy="secret-proxy",
+        stage="cdp_navigation",
+        watchdog_aborted=True,
         net_summary={"www.cardmarket.com": {"tunnel": {"no reply": 2}}},
     ))
     monkeypatch.setattr(
@@ -40,11 +42,30 @@ def test_scraper_logs_start_and_failure_without_credentials(monkeypatch, caplog)
     assert "scrape started session=attempt-one" in caplog.text
     assert "proxy exit session=attempt-one ip=203.0.113.7 country=DE org=AS3320 Deutsche Telekom AG" in caplog.text
     assert "error=RuntimeError" in caplog.text
+    assert "module=builtins stage=cdp_navigation watchdog_aborted=True elapsed_ms=" in caplog.text
+    assert "test_logging.py:" in caplog.text
+    assert ":fail" in caplog.text
     assert (
         'chrome net session=attempt-one {"www.cardmarket.com": {"tunnel": {"no reply": 2}}}'
     ) in caplog.text
     assert "secret-proxy" not in caplog.text
     assert "test-secret" not in caplog.text
+
+
+def test_chrome_page_logs_the_last_title_and_screenshot(caplog):
+    path = Path("/tmp/cardmarket-abcd1234.png")
+    path.unlink(missing_ok=True)
+    session = SimpleNamespace(
+        last_title="Just a moment...",
+        last_url="https://www.cardmarket.com/en",
+        last_screenshot=b"\x89PNG\r\n",
+    )
+    with caplog.at_level(logging.INFO, logger="scraper"):
+        service.log_chrome_page("abcd1234-rest", session)
+    assert "chrome page session=abcd1234-rest title='Just a moment...' url=https://www.cardmarket.com/en" in caplog.text
+    assert "screenshot_bytes=6 path=/tmp/cardmarket-abcd1234.png" in caplog.text
+    assert path.read_bytes() == b"\x89PNG\r\n"
+    path.unlink()
 
 
 def test_proxy_exit_failure_logs_the_error_type_only(monkeypatch, caplog):
