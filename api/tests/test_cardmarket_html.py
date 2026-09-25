@@ -141,7 +141,7 @@ def test_available_count_comes_from_the_page_not_the_sample():
         """
     )
     parsed = parse_cardmarket_html(URL, html)
-    assert len(parsed["rows"]) == 6
+    assert len(parsed["rows"]) == 7
     assert parsed["header"]["Available"] == 14
     assert parsed["header"]["From"] == 1
     assert parsed["header"]["Trend"] == 2.5

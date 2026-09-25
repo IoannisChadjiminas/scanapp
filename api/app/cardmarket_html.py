@@ -11,7 +11,7 @@ from html.parser import HTMLParser
 from urllib.parse import urlsplit
 
 PARSER_VERSION = "offers-html-v1"
-MAX_ROWS = 6
+MAX_ROWS = 50
 
 _VOID = frozenset(
     {
