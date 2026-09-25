@@ -2,10 +2,23 @@ from __future__ import annotations
 
 from fastapi import APIRouter, Request
 
+from pydantic import BaseModel
+
 from app.db import coverage_payload
 from app.schemas import HealthResponse
 
+
+class AppConfigResponse(BaseModel):
+    price_fresh_minutes: int
+
 router = APIRouter()
+
+
+@router.get("/config", response_model=AppConfigResponse)
+def app_config(request: Request) -> AppConfigResponse:
+    """Values the phone applies on the collection screen."""
+    minutes = int(request.app.state.settings.cardmarket_price_fresh_minutes)
+    return AppConfigResponse(price_fresh_minutes=max(1, min(minutes, 24 * 60)))
 
 
 @router.get("/health", response_model=HealthResponse)

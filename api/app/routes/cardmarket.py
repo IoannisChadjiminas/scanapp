@@ -600,7 +600,7 @@ def parse_cardmarket_page(
             ip=client_ip(request),
             url=payload.url,
         )
-    elif parsed.get("rows") or parsed.get("header"):
+    elif parsed.get("rows") or parsed.get("empty"):
         remember_phone_offers(
             catalog,
             payload.url,

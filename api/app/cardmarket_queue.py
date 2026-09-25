@@ -64,7 +64,10 @@ PHONE_PARSER_VERSION = "phone-offers-v1"
 PROXY_PARSER_VERSION = "proxy-offers-v1"
 PROXY_WORKER_ID = "proxy"
 CDP_HELPER_ID = "cdp"
-FRESH_SECONDS = 15 * 60
+def fresh_seconds() -> int:
+    """How long a stored price stays fresh. Set CARDMARKET_PRICE_FRESH_MINUTES."""
+    minutes = int(get_settings().cardmarket_price_fresh_minutes)
+    return max(1, min(minutes, 24 * 60)) * 60
 _GUIDE_LABELS = frozenset({"From", "Trend", "7-day"})
 _EURO_RE = re.compile(
     r"^(?:€|EUR)?(\d{1,3}(?:\.\d{3})+,\d{2}|\d{1,3}(?:,\d{3})+\.\d{2}|\d+[.,]\d{2})(?:€|EUR)?$",
@@ -527,7 +530,7 @@ def remember_phone_offers(
     existing_prices = list((existing or {}).get("prices") or [])
     observed = (existing or {}).get("observed_at") or (existing or {}).get("fetched_at")
     age = _age_seconds(str(observed or ""))
-    if _same_prices(existing_prices, prices) and age is not None and age <= FRESH_SECONDS:
+    if _same_prices(existing_prices, prices) and age is not None and age <= fresh_seconds():
         return False
     version = parser_version or PHONE_PARSER_VERSION
     write_snapshot(
@@ -1177,7 +1180,7 @@ def prices_payload(
         age = _age_seconds(str(observed or ""))
         if age is None:
             freshness = "live"
-        elif age <= FRESH_SECONDS:
+        elif age <= fresh_seconds():
             freshness = "fresh"
         else:
             freshness = "stale"
@@ -1295,4 +1298,4 @@ def sample_is_fresh(conn: sqlite3.Connection, url: str) -> bool:
     if not record or record.get("unlisted") or not record.get("prices"):
         return False
     age = _age_seconds(str(record.get("observed_at") or ""))
-    return age is not None and 0 <= age <= FRESH_SECONDS
+    return age is not None and 0 <= age <= fresh_seconds()

@@ -29,6 +29,7 @@ class Settings(BaseSettings):
     cardmarket_helper_enabled: bool = False
     cardmarket_webview_enabled: bool = True
     cardmarket_challenge_fallback_minutes: int = 10
+    cardmarket_price_fresh_minutes: int = 15
     scraper_enabled: bool = False
     scraper_url: str = ""
     scraper_api_key: str = ""
