@@ -111,6 +111,7 @@ def test_professional_power_seller_is_kept_on_the_listing():
           <span class="article-condition">NM</span>
           <span data-bs-original-title="Professional"></span>
           <span class="fonticon-powerseller" data-bs-original-title="Power Seller"></span>
+          <span data-bs-original-title="1.245 sales"></span>
           <div class="col-offer">2,50 €</div>
         </div>
         <div class="article-row">
@@ -122,7 +123,9 @@ def test_professional_power_seller_is_kept_on_the_listing():
     )
     rows = parse_cardmarket_html(URL, html)["rows"]
     assert rows[0]["seller"] == "Professional Power Seller"
-    assert "seller" not in rows[1]
+    assert rows[0]["sales"] == "1245"
+    assert rows[1]["seller"] == "Professional"
+    assert "sales" not in rows[1]
 
 
 def test_available_count_comes_from_the_page_not_the_sample():
@@ -145,6 +148,48 @@ def test_available_count_comes_from_the_page_not_the_sample():
     assert parsed["header"]["Available"] == 14
     assert parsed["header"]["From"] == 1
     assert parsed["header"]["Trend"] == 2.5
+
+
+def test_desktop_row_keeps_sales_professional_and_daily_averages():
+    html = _page(
+        """
+        <div id="articleRow2165455976" class="row g-0 article-row">
+          <div class="col-seller">
+            <span class="badge sell-count" data-bs-original-title="175&nbsp;Sales&nbsp;|&nbsp;204&nbsp;Available items">175</span>
+            <span class="fonticon-users-professional" data-bs-original-title="Professional"></span>
+          </div>
+          <a class="article-condition" data-bs-original-title="Near Mint"><span class="badge">NM</span></a>
+          <span class="icon" data-bs-original-title="Italian"></span>
+          <div class="price-container d-none d-md-flex"><span>0,95 €</span></div>
+          <div class="mobile-offer-container d-flex d-md-none">
+            <span class="item-count">2</span><span>0,95 €</span>
+          </div>
+        </div>
+        <div class="tab-pane d-none" id="tabContent-chart">
+          <script class="chart-init-script">
+            var chart = new Chart(ctx,{"type":"line","data":{"labels":["23.09.2026","24.09.2026"],"datasets":[{"label":"Avg. Sell Price","data":[2.91,2.58]}]}});
+          </script>
+        </div>
+        <script class="chart-init-script">
+          var chart = new Chart(ctx,{"type":"line","data":{"labels":["23.09.2026","24.09.2026"],"datasets":[{"label":"Avg. Sell Price","data":[2.91,2.58]}]}});
+        </script>
+        """
+    )
+    parsed = parse_cardmarket_html(URL, html)
+    assert parsed["rows"] == [
+        {
+            "price": "0,95 €",
+            "condition": "NM",
+            "language": "Italian",
+            "variant": "",
+            "sales": "175",
+            "seller": "Professional",
+        }
+    ]
+    assert parsed["chart"] == [
+        {"date": "24.09.2026", "price": 2.58},
+        {"date": "23.09.2026", "price": 2.91},
+    ]
 
 
 def test_canonical_for_another_product_is_not_this_page():

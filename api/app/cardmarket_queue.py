@@ -441,8 +441,9 @@ def rows_to_prices(rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
             label = str(row.get(field) or "").strip()
             if label and len(label) <= 60 and not any(ord(ch) < 32 for ch in label):
                 labels.append(label)
-        if str(row.get("seller") or "").strip() == "Professional Power Seller":
-            labels.append("Professional Power Seller")
+        seller = str(row.get("seller") or "").strip()
+        if seller in {"Professional", "Power Seller", "Professional Power Seller"}:
+            labels.append(seller)
         sales = str(row.get("sales") or "").strip()
         if sales.isdigit():
             labels.append(f"{sales} sales")
@@ -451,6 +452,26 @@ def rows_to_prices(rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
             labels.append(variant)
         prices.append(
             {"label": " · ".join(labels), "amount": amount, "currency": "EUR"}
+        )
+    return prices
+
+
+def chart_prices(chart: list | None) -> list[dict[str, Any]]:
+    """Daily average sell prices. The label keeps them out of the asking-price list."""
+    prices: list[dict[str, Any]] = []
+    for point in chart or []:
+        if not isinstance(point, dict):
+            continue
+        date = str(point.get("date") or "")
+        amount = point.get("price")
+        if not re.fullmatch(r"\d{2}\.\d{2}\.\d{4}", date):
+            continue
+        if isinstance(amount, bool) or not isinstance(amount, (int, float)):
+            continue
+        if not 0 < float(amount) <= 1_000_000:
+            continue
+        prices.append(
+            {"label": f"Avg {date}", "amount": float(amount), "currency": "EUR"}
         )
     return prices
 
@@ -489,13 +510,14 @@ def remember_phone_offers(
     rows: list[dict[str, Any]],
     parser_version: str | None = None,
     header: dict | None = None,
+    chart: list | None = None,
 ) -> bool:
     """Store a phone offer table when it is new or the fresh window has passed.
 
     Challenge pages, empty tables, and an unchanged sample inside the fresh
     window leave ``observed_at`` alone.
     """
-    prices = rows_to_prices(rows) + header_prices(header)
+    prices = rows_to_prices(rows) + header_prices(header) + chart_prices(chart)
     if not prices:
         return False
     key = sample_key(url)

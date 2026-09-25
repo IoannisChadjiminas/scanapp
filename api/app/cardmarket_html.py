@@ -7,6 +7,7 @@ Selector changes stay here so the app does not need a new release.
 from __future__ import annotations
 
 import re
+from datetime import datetime
 from html.parser import HTMLParser
 from urllib.parse import urlsplit
 
@@ -72,6 +73,16 @@ _SALES_RE = re.compile(
     r"(\d+(?:[.,]\d+)?)\s*([kK])?\s+sales",
     re.IGNORECASE,
 )
+_CHART_RE = re.compile(
+    r'"labels":\[((?:"\d{2}\.\d{2}\.\d{4}"(?:,\s*)?)+)\].*?'
+    r'"label":"Avg\. Sell Price","data":\[([0-9.,\s]+)\]',
+    re.DOTALL,
+)
+_SELLER_STATUSES = {
+    (True, True): "Professional Power Seller",
+    (True, False): "Professional",
+    (False, True): "Power Seller",
+}
 _HEADER_MONEY = {
     "From": re.compile(r"From\s*([0-9][0-9.\s]*,\d{2})\s*€", re.IGNORECASE),
     "Trend": re.compile(r"Price Trend\s*([0-9][0-9.\s]*,\d{2})\s*€", re.IGNORECASE),
@@ -140,9 +151,12 @@ class _Builder(HTMLParser):
                 return
 
     def handle_data(self, data: str) -> None:
-        if self.stack[-1].tag in _SKIP_TEXT:
+        node = self.stack[-1]
+        if node.tag in _SKIP_TEXT:
+            if node.tag == "script" and "chart-init-script" in node.classes():
+                node.parts.append(data)
             return
-        self.stack[-1].parts.append(data)
+        node.parts.append(data)
 
 
 def product_path(url: str | None) -> str | None:
@@ -297,21 +311,33 @@ def _rows(root: _Node) -> list[dict[str, str]]:
         variant = ", ".join(
             dict.fromkeys(value for value in labels if _VARIANT_RE.match(value))
         )
-        key = f"{price}|{condition}|{language}|{variant}"
-        if key in seen:
-            continue
-        seen.add(key)
         item = {
             "price": price,
             "condition": condition,
             "language": language,
             "variant": variant,
         }
-        sales = _sales_count(row.text())
+        sales = _sales_count([*labels, row.text()])
+        if sales is None:
+            sales = _sell_count_badge(row)
         if sales is not None:
             item["sales"] = str(sales)
-        if _professional_power_seller(row, labels):
-            item["seller"] = "Professional Power Seller"
+        seller = _seller_status(row, labels)
+        if seller:
+            item["seller"] = seller
+        key = row.attr("id") or "|".join(
+            (
+                price,
+                condition,
+                language,
+                variant,
+                item.get("sales", ""),
+                item.get("seller", ""),
+            )
+        )
+        if key in seen:
+            continue
+        seen.add(key)
         found.append(item)
         if len(found) == MAX_ROWS:
             break
@@ -336,8 +362,8 @@ def _euro_amount(raw: str) -> float | None:
     return amount
 
 
-def _professional_power_seller(row: _Node, labels: list[str]) -> bool:
-    """Both Cardmarket seller badges on this listing."""
+def _seller_status(row: _Node, labels: list[str]) -> str:
+    """The seller badges on this listing, each one on its own when only one is present."""
     titles = {value.strip().lower() for value in labels}
     professional = "professional" in titles
     power = "power seller" in titles or "powerseller" in titles
@@ -347,20 +373,58 @@ def _professional_power_seller(row: _Node, labels: list[str]) -> bool:
             professional = True
         if "power-seller" in classes or "powerseller" in classes:
             power = True
-    return professional and power
+    return _SELLER_STATUSES.get((professional, power), "")
 
 
-def _sales_count(text: str) -> int | None:
-    match = _SALES_RE.search(text)
-    if not match:
-        return None
-    number = float(match.group(1).replace(",", "."))
-    if match.group(2):
-        number *= 1000
-    count = int(round(number))
-    if count < 0 or count > 10_000_000:
-        return None
-    return count
+def _sell_count_badge(row: _Node) -> int | None:
+    for node in row.walk():
+        if "sell-count" not in node.classes():
+            continue
+        raw = re.sub(r"[^\d]", "", node.text())
+        if not raw:
+            continue
+        count = int(raw)
+        if 0 <= count <= 10_000_000:
+            return count
+    return None
+
+
+def _chart(root: _Node) -> list[dict[str, float | str]]:
+    """Daily average sell prices from the Chart.js script, newest first."""
+    for node in root.walk():
+        if node.tag != "script" or "chart-init-script" not in node.classes():
+            continue
+        match = _CHART_RE.search("".join(node.parts))
+        if not match:
+            continue
+        labels = re.findall(r"\d{2}\.\d{2}\.\d{4}", match.group(1))
+        values = [float(item) for item in re.findall(r"\d+(?:\.\d+)?", match.group(2))]
+        if not labels or len(labels) != len(values):
+            continue
+        points: list[tuple[datetime, str, float]] = []
+        for label, value in zip(labels, values):
+            if value <= 0 or value > 1_000_000:
+                continue
+            points.append((datetime.strptime(label, "%d.%m.%Y"), label, value))
+        points.sort(key=lambda item: item[0], reverse=True)
+        return [{"date": label, "price": value} for _, label, value in points]
+    return []
+
+
+def _sales_count(chunks: list[str]) -> int | None:
+    for text in chunks:
+        match = _SALES_RE.search(text)
+        if not match:
+            continue
+        raw = match.group(1)
+        if match.group(2):
+            number = float(raw.replace(",", ".")) * 1000
+        else:
+            number = float(re.sub(r"[.,]", "", raw))
+        count = int(round(number))
+        if 0 <= count <= 10_000_000:
+            return count
+    return None
 
 
 def _header(text: str) -> dict[str, float | int]:
@@ -433,5 +497,6 @@ def parse_cardmarket_html(url: str, html: str) -> dict:
         "pending": not rows and not empty,
         "rows": rows,
         "header": _header(root.text()),
+        "chart": _chart(root),
         "parser": PARSER_VERSION,
     }

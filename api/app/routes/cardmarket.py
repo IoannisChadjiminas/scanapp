@@ -161,6 +161,11 @@ class ParseOffer(BaseModel):
     seller: str = ""
 
 
+class ChartPoint(BaseModel):
+    date: str
+    price: float
+
+
 class ParseRequest(BaseModel):
     url: str = Field(min_length=8, max_length=500)
     html: str = Field(min_length=1, max_length=2_000_000)
@@ -173,6 +178,7 @@ class ParseResponse(BaseModel):
     pending: bool = False
     rows: list[ParseOffer] = Field(default_factory=list)
     header: dict[str, float | int] = Field(default_factory=dict)
+    chart: list[ChartPoint] = Field(default_factory=list)
     title: str = ""
     parser: str = ""
 
@@ -600,6 +606,7 @@ def parse_cardmarket_page(
             payload.url,
             [] if parsed.get("empty") else list(parsed["rows"]),
             header=parsed.get("header"),
+            chart=parsed.get("chart"),
         )
     return ParseResponse.model_validate(parsed)
 
