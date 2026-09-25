@@ -437,15 +437,18 @@ def rows_to_prices(rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
         if amount is None:
             continue
         labels = []
-        for field in ("condition", "language", "variant"):
+        for field in ("condition", "language"):
             label = str(row.get(field) or "").strip()
             if label and len(label) <= 60 and not any(ord(ch) < 32 for ch in label):
                 labels.append(label)
+        if str(row.get("seller") or "").strip() == "Professional Power Seller":
+            labels.append("Professional Power Seller")
         sales = str(row.get("sales") or "").strip()
         if sales.isdigit():
             labels.append(f"{sales} sales")
-        if str(row.get("seller") or "").strip() == "Professional Power Seller":
-            labels.append("Professional Power Seller")
+        variant = str(row.get("variant") or "").strip()
+        if variant and len(variant) <= 60 and not any(ord(ch) < 32 for ch in variant):
+            labels.append(variant)
         prices.append(
             {"label": " · ".join(labels), "amount": amount, "currency": "EUR"}
         )
