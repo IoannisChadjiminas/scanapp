@@ -1179,6 +1179,7 @@ def prices_payload(
         "attempted_at": (record or {}).get("empty_observed_at"),
         "scraper_ready": scraper_is_ready(conn),
         "webview_enabled": get_settings().cardmarket_webview_enabled,
+        "challenge_fallback_minutes": get_settings().cardmarket_challenge_fallback_minutes,
         **state,
     }
 

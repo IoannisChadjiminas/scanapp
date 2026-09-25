@@ -184,6 +184,10 @@ def init_catalog(conn: sqlite3.Connection) -> None:
         );
         CREATE INDEX IF NOT EXISTS idx_phone_challenges_lookup
             ON cardmarket_phone_challenges(session_id, sample_key, created_at);
+        CREATE TABLE IF NOT EXISTS cardmarket_session_fallback (
+            session_id TEXT PRIMARY KEY,
+            until_at TEXT NOT NULL
+        );
         CREATE TABLE IF NOT EXISTS cardmarket_escalations (
             id TEXT PRIMARY KEY,
             session_id TEXT NOT NULL,

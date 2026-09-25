@@ -28,6 +28,7 @@ class Settings(BaseSettings):
     session_create_hourly: int = 30
     cardmarket_helper_enabled: bool = False
     cardmarket_webview_enabled: bool = True
+    cardmarket_challenge_fallback_minutes: int = 10
     scraper_enabled: bool = False
     scraper_url: str = ""
     scraper_api_key: str = ""

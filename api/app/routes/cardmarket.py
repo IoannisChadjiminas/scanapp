@@ -27,7 +27,9 @@ from app.cardmarket_events import notify_product, wait_for_product
 from app.cardmarket_html import parse_cardmarket_html
 from app.cardmarket import sample_key
 from app.cardmarket_budget import (
+    begin_phone_scraper_fallback,
     has_recent_challenge,
+    phone_scraper_fallback_active,
     record_escalation,
     record_phone_challenge,
     scraper_block_reason,
@@ -195,6 +197,7 @@ class PriceResponse(BaseModel):
     freshness: str | None = None
     unlisted: bool = False
     scraper_ready: bool = False
+    challenge_fallback_minutes: int = 10
     queued: int | None = None
     pending: int | None = None
     claimed: int | None = None
@@ -263,6 +266,10 @@ def _price_response(payload: dict[str, Any]) -> PriceResponse:
         observed_at=payload.get("observed_at"),
         unlisted=bool(payload.get("unlisted")),
         scraper_ready=bool(payload.get("scraper_ready")),
+        challenge_fallback_minutes=int(
+            payload.get("challenge_fallback_minutes")
+            or get_settings().cardmarket_challenge_fallback_minutes
+        ),
         sampled_offer_count=payload.get("sampled_offer_count"),
         freshness=payload.get("freshness"),
         queued=payload.get("queued"),
@@ -597,6 +604,21 @@ def parse_cardmarket_page(
     return ParseResponse.model_validate(parsed)
 
 
+@router.post("/cardmarket/challenge-fallback")
+def challenge_fallback(request: Request) -> dict[str, str]:
+    """After a second failed check, this session uses the scraper for a while."""
+    settings = request.app.state.settings
+    session_id = existing_session(request, request.app.state.dbs, settings)
+    if not session_id:
+        raise HTTPException(status_code=401, detail="Session required")
+    until = begin_phone_scraper_fallback(
+        request.app.state.dbs.catalog,
+        session_id,
+        minutes=settings.cardmarket_challenge_fallback_minutes,
+    )
+    return {"until": until}
+
+
 @router.post("/cardmarket/escalations", response_model=JobResponse)
 def escalate_price(payload: EscalationRequest, request: Request) -> JobResponse:
     """Ask for a paid read after a challenge, or when phone reads are disabled."""
@@ -613,7 +635,9 @@ def escalate_price(payload: EscalationRequest, request: Request) -> JobResponse:
         log.info("escalate refused reason=bad-url url=%s", payload.url)
         raise HTTPException(status_code=400, detail="Need a Cardmarket product URL")
     catalog = request.app.state.dbs.catalog
-    if settings.cardmarket_webview_enabled and not has_recent_challenge(catalog, session_id, payload.url):
+    challenged = has_recent_challenge(catalog, session_id, payload.url)
+    fallback = phone_scraper_fallback_active(catalog, session_id)
+    if settings.cardmarket_webview_enabled and not challenged and not fallback:
         log.info("escalate refused reason=no-challenge url=%s", sample)
         raise HTTPException(status_code=403, detail="No recent phone challenge for this card")
     if url_on_cooldown(catalog, payload.url):

@@ -181,6 +181,36 @@ def record_phone_challenge(
     conn.commit()
 
 
+def begin_phone_scraper_fallback(
+    conn: sqlite3.Connection, session_id: str, *, minutes: int
+) -> str:
+    """Use the paid reader for this session until [minutes] from now."""
+    span = max(1, min(int(minutes), 24 * 60))
+    until = time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime(time.time() + span * 60))
+    conn.execute(
+        """
+        INSERT INTO cardmarket_session_fallback (session_id, until_at)
+        VALUES (?, ?)
+        ON CONFLICT(session_id) DO UPDATE SET until_at = excluded.until_at
+        """,
+        (session_id, until),
+    )
+    conn.commit()
+    return until
+
+
+def phone_scraper_fallback_active(conn: sqlite3.Connection, session_id: str) -> bool:
+    row = conn.execute(
+        """
+        SELECT 1 FROM cardmarket_session_fallback
+        WHERE session_id = ? AND until_at >= ?
+        LIMIT 1
+        """,
+        (session_id, time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())),
+    ).fetchone()
+    return row is not None
+
+
 def has_recent_challenge(conn: sqlite3.Connection, session_id: str, url: str) -> bool:
     sample = sample_key(url)
     if not sample:
