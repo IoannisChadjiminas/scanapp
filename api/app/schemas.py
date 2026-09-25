@@ -44,6 +44,7 @@ class Candidate(BaseModel):
     combined_score: float
     ocr_consistent: bool | None = None
     language: str = ""
+    rarity: str = ""
     cardmarket_url: str | None = None
     cardmarket_prices: list[CardmarketPrice] = Field(default_factory=list)
     cardmarket_variants: list[CardmarketVariant] = Field(default_factory=list)
@@ -121,6 +122,7 @@ class CardSummary(BaseModel):
     set_name: str
     collector_number: str
     language: str
+    rarity: str = ""
     has_image: bool
     image_url: str | None = None
     variants: dict[str, Any] = Field(default_factory=dict)

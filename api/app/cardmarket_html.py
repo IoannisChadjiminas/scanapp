@@ -310,6 +310,8 @@ def _rows(root: _Node) -> list[dict[str, str]]:
         sales = _sales_count(row.text())
         if sales is not None:
             item["sales"] = str(sales)
+        if _professional_power_seller(row, labels):
+            item["seller"] = "Professional Power Seller"
         found.append(item)
         if len(found) == MAX_ROWS:
             break
@@ -332,6 +334,20 @@ def _euro_amount(raw: str) -> float | None:
     if amount <= 0 or amount > 1_000_000:
         return None
     return amount
+
+
+def _professional_power_seller(row: _Node, labels: list[str]) -> bool:
+    """Both Cardmarket seller badges on this listing."""
+    titles = {value.strip().lower() for value in labels}
+    professional = "professional" in titles
+    power = "power seller" in titles or "powerseller" in titles
+    for node in row.walk():
+        classes = " ".join(node.classes()).lower()
+        if "professional" in classes:
+            professional = True
+        if "power-seller" in classes or "powerseller" in classes:
+            power = True
+    return professional and power
 
 
 def _sales_count(text: str) -> int | None:

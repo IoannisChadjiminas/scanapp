@@ -104,6 +104,49 @@ def test_unloaded_table_stays_pending():
     assert parsed["rows"] == []
 
 
+def test_professional_power_seller_is_kept_on_the_listing():
+    html = _page(
+        """
+        <div class="article-row">
+          <span class="article-condition">NM</span>
+          <span data-bs-original-title="Professional"></span>
+          <span class="fonticon-powerseller" data-bs-original-title="Power Seller"></span>
+          <div class="col-offer">2,50 €</div>
+        </div>
+        <div class="article-row">
+          <span class="article-condition">EX</span>
+          <span data-bs-original-title="Professional"></span>
+          <div class="col-offer">3,00 €</div>
+        </div>
+        """
+    )
+    rows = parse_cardmarket_html(URL, html)["rows"]
+    assert rows[0]["seller"] == "Professional Power Seller"
+    assert "seller" not in rows[1]
+
+
+def test_available_count_comes_from_the_page_not_the_sample():
+    rows = "\n".join(
+        f'<div class="article-row"><div class="col-offer">{index},00 €</div></div>'
+        for index in range(1, 8)
+    )
+    html = _page(
+        rows
+        + """
+        <dl>
+          <dt>Available items</dt><dd>14</dd>
+          <dt>From</dt><dd>1,00 €</dd>
+          <dt>Price Trend</dt><dd>2,50 €</dd>
+        </dl>
+        """
+    )
+    parsed = parse_cardmarket_html(URL, html)
+    assert len(parsed["rows"]) == 6
+    assert parsed["header"]["Available"] == 14
+    assert parsed["header"]["From"] == 1
+    assert parsed["header"]["Trend"] == 2.5
+
+
 def test_canonical_for_another_product_is_not_this_page():
     other = (
         "https://www.cardmarket.com/en/Pokemon/Products/Singles/"

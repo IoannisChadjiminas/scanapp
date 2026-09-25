@@ -134,6 +134,7 @@ def recognize_bytes(
                 "combined_score": float(score),
                 "ocr_consistent": None,
                 "language": str(row["language"] or ""),
+                "rarity": str(row["rarity"] or ""),
                 "cardmarket_url": url_for_row(row),
             }
         )

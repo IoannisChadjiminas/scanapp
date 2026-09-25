@@ -24,6 +24,7 @@ def _summary(row) -> CardSummary:  # noqa: ANN001
         set_name=row["set_name"],
         collector_number=row["collector_number"],
         language=row["language"],
+        rarity=str(row["rarity"] or ""),
         has_image=bool(image_url),
         image_url=image_url,
         variants=json.loads(row["variants_json"] or "{}"),

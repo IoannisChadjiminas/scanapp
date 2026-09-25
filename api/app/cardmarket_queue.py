@@ -444,6 +444,8 @@ def rows_to_prices(rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
         sales = str(row.get("sales") or "").strip()
         if sales.isdigit():
             labels.append(f"{sales} sales")
+        if str(row.get("seller") or "").strip() == "Professional Power Seller":
+            labels.append("Professional Power Seller")
         prices.append(
             {"label": " · ".join(labels), "amount": amount, "currency": "EUR"}
         )

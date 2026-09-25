@@ -155,6 +155,8 @@ class ParseOffer(BaseModel):
     condition: str = ""
     language: str = ""
     variant: str = ""
+    sales: str = ""
+    seller: str = ""
 
 
 class ParseRequest(BaseModel):
@@ -168,6 +170,7 @@ class ParseResponse(BaseModel):
     empty: bool = False
     pending: bool = False
     rows: list[ParseOffer] = Field(default_factory=list)
+    header: dict[str, float | int] = Field(default_factory=dict)
     title: str = ""
     parser: str = ""
 
