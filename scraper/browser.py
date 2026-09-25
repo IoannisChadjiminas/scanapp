@@ -299,11 +299,13 @@ def run_attempt(session: PageSession, url: str, *, parse_html) -> dict:
     if parsed.get("blocked") and outcome not in {"rate_limited", "wrong_product"}:
         outcome = "challenge_unsolved"
     rows = list(parsed.get("rows") or []) if outcome == "offers" else []
+    header = parsed.get("header") if isinstance(parsed.get("header"), dict) else {}
     return {
         "outcome": outcome if outcome != "challenge" else "challenge_unsolved",
         "url": str(parsed.get("url") or url),
         "title": str(parsed.get("title") or ""),
         "rows": rows,
+        "header": header,
         "bytes": (
             int(getattr(session, "bytes", 0) or 0)
             if getattr(session, "bytes_measured", True)

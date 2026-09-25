@@ -200,13 +200,16 @@ class ScraperWorker:
             )
             return
         if outcome == "empty":
+            general = header_prices(
+                result.get("header") if isinstance(result.get("header"), dict) else None
+            )
             complete_proxy_job(
                 conn,
                 job["id"],
                 job["claim_token"],
                 url=str(result.get("url") or target),
-                prices=[],
-                empty=True,
+                prices=general,
+                empty=not general,
                 submission_id=str(uuid.uuid4()),
                 sampled_offer_count=0,
             )
