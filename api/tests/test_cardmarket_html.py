@@ -156,6 +156,7 @@ def test_desktop_row_keeps_sales_professional_and_daily_averages():
         <div id="articleRow2165455976" class="row g-0 article-row">
           <div class="col-seller">
             <span class="badge sell-count" data-bs-original-title="175&nbsp;Sales&nbsp;|&nbsp;204&nbsp;Available items">175</span>
+            <span class="icon" data-bs-original-title="Item location: Italy"></span>
             <span class="fonticon-users-professional" data-bs-original-title="Professional"></span>
           </div>
           <a class="article-condition" data-bs-original-title="Near Mint"><span class="badge">NM</span></a>
@@ -184,6 +185,7 @@ def test_desktop_row_keeps_sales_professional_and_daily_averages():
             "variant": "",
             "sales": "175",
             "seller": "Professional",
+            "country": "Italy",
         }
     ]
     assert parsed["chart"] == [

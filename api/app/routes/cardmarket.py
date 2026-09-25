@@ -159,6 +159,7 @@ class ParseOffer(BaseModel):
     variant: str = ""
     sales: str = ""
     seller: str = ""
+    country: str = ""
 
 
 class ChartPoint(BaseModel):

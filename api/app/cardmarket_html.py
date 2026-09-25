@@ -94,6 +94,7 @@ _HEADER_MONEY = {
     ),
 }
 _AVAILABLE_RE = re.compile(r"Available items\s*(\d+)", re.IGNORECASE)
+_LOCATION_RE = re.compile(r"Item location:\s*(.+)", re.IGNORECASE)
 
 
 class _Node:
@@ -308,6 +309,12 @@ def _rows(root: _Node) -> list[dict[str, str]]:
         labels = [_label(node) for node in row.walk() if node is not row]
         labels = [value for value in labels if value]
         language = next((value for value in labels if _LANGUAGE_RE.match(value)), "")
+        country = ""
+        for value in labels:
+            located = _LOCATION_RE.match(value)
+            if located:
+                country = located.group(1).strip()
+                break
         variant = ", ".join(
             dict.fromkeys(value for value in labels if _VARIANT_RE.match(value))
         )
@@ -325,6 +332,8 @@ def _rows(root: _Node) -> list[dict[str, str]]:
         seller = _seller_status(row, labels)
         if seller:
             item["seller"] = seller
+        if country:
+            item["country"] = country
         key = row.attr("id") or "|".join(
             (
                 price,

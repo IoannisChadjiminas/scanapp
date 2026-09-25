@@ -440,7 +440,7 @@ def rows_to_prices(rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
         if amount is None:
             continue
         labels = []
-        for field in ("condition", "language"):
+        for field in ("condition", "language", "country"):
             label = str(row.get(field) or "").strip()
             if label and len(label) <= 60 and not any(ord(ch) < 32 for ch in label):
                 labels.append(label)
