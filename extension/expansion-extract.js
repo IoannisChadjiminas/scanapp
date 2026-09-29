@@ -41,9 +41,14 @@ function scanappCollectExpansion() {
       continue;
     }
     seen.add(url);
+    const img = node.querySelector?.("img") || node.closest?.("div")?.querySelector?.("img");
+    const image = img
+      ? String(img.getAttribute?.("data-echo") || img.currentSrc || img.src || "").split("?")[0]
+      : "";
     products.push({
       url,
       name: String(node.textContent || "").trim().replace(/\s+/g, " "),
+      image,
     });
   }
   let currentSite = 1;

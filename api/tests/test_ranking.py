@@ -311,6 +311,73 @@ def test_language_gap_uses_all_candidates() -> None:
     )
 
 
+def test_printed_number_lets_the_closer_image_win() -> None:
+    visual = [
+        _card("reprint", "Mew VMAX", "026", 1.0),
+        _card("original", "Mew VMAX", "114", 0.98),
+    ]
+    visual[0]["printed_collector_number"] = "114"
+    hits = [OcrHit(text="114/264", confidence=0.95, region="collector")]
+    ranked = rerank(
+        visual,
+        "Mew VMAX",
+        hits,
+        ocr_failed=False,
+        detected_languages=("en",),
+    )
+    assert ranked[0]["card_id"] == "reprint"
+    assert ranked[0]["collector_conflict"] is False
+    assert ranked[1]["collector_conflict"] is False
+
+
+def test_wide_visual_gap_beats_a_false_collector_hit() -> None:
+    visual = [
+        _card("celebi", "Shining Celebi", "024", 1.0),
+        _card("gengar", "Gengar", "018", 0.83),
+    ]
+    hits = [
+        OcrHit(text="18", confidence=0.9, region="collector"),
+        OcrHit(text="106/105", confidence=0.92, region="collector"),
+    ]
+    ranked = rerank(
+        visual,
+        "Shining Celebi",
+        hits,
+        ocr_failed=False,
+        detected_languages=("en",),
+    )
+    assert ranked[0]["card_id"] == "celebi"
+
+
+def test_same_name_reprint_keeps_closer_image() -> None:
+    visual = [
+        _card("reprint", "Darkrai & Cresselia LEGEND", "019", 1.0),
+        _card("original", "Darkrai & Cresselia LEGEND", "99", 0.93),
+    ]
+    hits = [OcrHit(text="99/102", confidence=0.92, region="collector")]
+    ranked = rerank(
+        visual,
+        "Darkrai & Cresselia LEGEND",
+        hits,
+        ocr_failed=False,
+        detected_languages=("en",),
+    )
+    assert ranked[0]["card_id"] == "reprint"
+    assert ranked[0]["collector_conflict"] is True
+    close = [
+        _card("reprint", "Darkrai & Cresselia LEGEND", "019", 0.94),
+        _card("original", "Darkrai & Cresselia LEGEND", "99", 0.93),
+    ]
+    tied = rerank(
+        close,
+        "Darkrai & Cresselia LEGEND",
+        hits,
+        ocr_failed=False,
+        detected_languages=("en",),
+    )
+    assert tied[0]["card_id"] == "original"
+
+
 def test_reliable_collector_conflict_is_uncertain() -> None:
     visual = [
         _card("gengar", "Gengar & Mimikyu GX", "103/095", 0.918, "ja"),

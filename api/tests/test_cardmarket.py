@@ -787,6 +787,67 @@ def test_listing_set_collector_keeps_padding() -> None:
     assert listing_set_collector("Lunala (CEC 102)From 0,70 €") == ("CEC", "102")
 
 
+def test_named_set_collector_ignores_padding_and_rejects_other_names(
+    tmp_path: Path,
+) -> None:
+    from app.cardmarket import (
+        SET_COLLECTOR_NAME_PROVENANCE,
+        link_named_set_collectors,
+        url_for_row,
+    )
+    from app.db import connect, init_catalog
+
+    conn = connect(tmp_path / "catalog.sqlite")
+    init_catalog(conn)
+    _insert_card(conn, "en:xy10-2", "Burmy", "Fates Collide", "2", set_id="xy10")
+    _insert_card(
+        conn, "en:xy10-56", "Tyranitar", "Fates Collide", "56", set_id="xy10"
+    )
+    japanese = (
+        "https://www.cardmarket.com/en/Pokemon/Products/Singles/"
+        "Awakening-Psychic-King/Burmy"
+    )
+    english = (
+        "https://www.cardmarket.com/en/Pokemon/Products/Singles/"
+        "Fates-Collide/Burmy"
+    )
+    aerodactyl = (
+        "https://www.cardmarket.com/en/Pokemon/Products/Singles/"
+        "Fates-Collide/Aerodactyl"
+    )
+    conn.executemany(
+        """
+        INSERT INTO cardmarket_expansion_products (
+            url, expansion, name, source, page_url, matched, imported_at
+        ) VALUES (?, ?, ?, 'crawl', '', 0, '2026-09-26T00:00:00Z')
+        """,
+        [
+            (japanese, "Awakening-Psychic-King", "Burmy (XY10 002)From 0,20 €"),
+            (english, "Fates-Collide", "Burmy (XY10 002)From 0,20 €"),
+            (aerodactyl, "Fates-Collide", "Aerodactyl (XY10 056)From 0,34 €"),
+        ],
+    )
+    conn.commit()
+    stats = link_named_set_collectors(conn)
+    conn.commit()
+    assert stats["linked"] == 1
+    assert stats["urls_written"] == 1
+    burmy_card = conn.execute("SELECT * FROM cards WHERE id = 'en:xy10-2'").fetchone()
+    tyranitar = conn.execute("SELECT * FROM cards WHERE id = 'en:xy10-56'").fetchone()
+    assert url_for_row(burmy_card) == english
+    assert burmy_card["cardmarket_provenance"] == SET_COLLECTOR_NAME_PROVENANCE
+    assert url_for_row(tyranitar) is None
+    rows = {
+        row["url"]: row["matched"]
+        for row in conn.execute(
+            "SELECT url, matched FROM cardmarket_expansion_products"
+        )
+    }
+    assert rows[english] == 1
+    assert rows[japanese] == 0
+    assert rows[aerodactyl] == 0
+
+
 def test_japanese_collector_maps_ja_not_english_twin(tmp_path: Path) -> None:
     from app.cardmarket import (
         JA_COLLECTOR_PROVENANCE,
@@ -1341,14 +1402,7 @@ def test_ambiguous_mew205_is_not_unique_linked(tmp_path: Path) -> None:
     ja = conn.execute("SELECT * FROM cards WHERE id = 'ja:SV2a-205'").fetchone()
     assert url_for_row(paper) is None
     assert url_for_row(ja) is None
-    variants = variants_for_row(conn, paper)
-    slugs = {item["slug"] for item in variants}
-    assert slugs == {
-        "Mew-ex-V3-MEW205",
-        "Mew-ex-V4-MEW205",
-        "Mew-ex-V5-MEW205",
-    }
-    assert "Mew-ex-V1-MEW151" not in slugs
+    assert variants_for_row(conn, paper) == []
     assert variants_for_row(conn, ja) == []
 
 
@@ -1402,7 +1456,7 @@ def test_clears_helper_expansion_but_keeps_manifest_url(tmp_path: Path) -> None:
     assert url_for_row(metal) == MEW_V4
 
 
-def test_apply_variants_nulls_url_when_ambiguous(tmp_path: Path) -> None:
+def test_apply_variants_ignores_unassigned_same_number(tmp_path: Path) -> None:
     from app.cardmarket import apply_variants_to_candidate, import_expansion_products
 
     conn = connect(tmp_path / "catalog.sqlite")
@@ -1426,15 +1480,9 @@ def test_apply_variants_nulls_url_when_ambiguous(tmp_path: Path) -> None:
         "cardmarket_prices": [{"label": "From", "amount": 13.0, "currency": "EUR"}],
     }
     apply_variants_to_candidate(conn, item)
-    assert item["cardmarket_url"] is None
-    assert item["cardmarket_prices"] == []
-    assert len(item["cardmarket_variants"]) == 3
-    tails = {variant["label"] for variant in item["cardmarket_variants"]}
-    assert tails == {
-        "Mew ex (V3-MEW205)",
-        "Mew ex (V4-MEW205)",
-        "Mew ex (V5-MEW205)",
-    }
+    assert item["cardmarket_url"] == MEW_V3
+    assert item["cardmarket_prices"] == [{"label": "From", "amount": 13.0, "currency": "EUR"}]
+    assert item["cardmarket_variants"] == []
     from app.cardmarket import listing_choice_message
     from app.schemas import Candidate
 
@@ -1453,11 +1501,231 @@ def test_apply_variants_nulls_url_when_ambiguous(tmp_path: Path) -> None:
             "cardmarket_variants": item["cardmarket_variants"],
         }
     )
-    assert candidate.cardmarket_url is None
-    assert len(candidate.cardmarket_variants) == 3
-    assert listing_choice_message("matched", item) == (
-        "This print is identified. Choose which Cardmarket listing."
+    assert candidate.cardmarket_url == MEW_V3
+    assert candidate.cardmarket_variants == []
+    assert listing_choice_message("matched", item) == "This is the most likely match."
+
+
+def test_apply_variants_keeps_url_when_finishes_belong_to_the_card(tmp_path: Path) -> None:
+    from app.cardmarket import apply_variants_to_candidate, clear_ambiguous_auto_links
+
+    conn = connect(tmp_path / "catalog.sqlite")
+    init_catalog(conn)
+    v1 = "https://www.cardmarket.com/en/Pokemon/Products/Singles/151/Abra-V1-MEW063"
+    v2 = "https://www.cardmarket.com/en/Pokemon/Products/Singles/151/Abra-V2-MEW063"
+    card_id = "en:sv03.5-063"
+    _insert_card(
+        conn,
+        card_id,
+        "Abra",
+        "151",
+        "063",
+        cardmarket_url=v1,
+        verified=1,
+        provenance="version-v1",
+        verified_at="2026-09-28T00:00:00Z",
     )
+    conn.executemany(
+        """
+        INSERT INTO cardmarket_expansion_products (
+            url, expansion, name, source, page_url, card_id, matched,
+            imported_at, listing_image_url
+        ) VALUES (?, '151', ?, 'test', ?, ?, 1, '2026-09-28T00:00:00Z', ?)
+        """,
+        [
+            (
+                v1,
+                "Abra (MEW 063)From 0,02 €",
+                v1,
+                card_id,
+                "https://product-images.s3.cardmarket.com/51/MEW/733658/733658.jpg",
+            ),
+            (
+                v2,
+                "Abra (MEW 063)From 0,02 €",
+                v2,
+                card_id,
+                "https://product-images.s3.cardmarket.com/51/MEW/720396/720396.jpg",
+            ),
+        ],
+    )
+    conn.commit()
+    assert clear_ambiguous_auto_links(conn) == 0
+    assert url_for_row(conn.execute("SELECT * FROM cards WHERE id = ?", (card_id,)).fetchone()) == v1
+    item = {
+        "card_id": card_id,
+        "cardmarket_url": v1,
+        "cardmarket_prices": [{"label": "From", "amount": 0.02, "currency": "EUR"}],
+    }
+    apply_variants_to_candidate(conn, item)
+    assert item["cardmarket_url"] == v1
+    assert item["cardmarket_prices"]
+    images = {variant["slug"]: variant["image"] for variant in item["cardmarket_variants"]}
+    assert set(images) == {"Abra-V1-MEW063", "Abra-V2-MEW063"}
+    assert images["Abra-V1-MEW063"].endswith("/733658.jpg")
+    assert images["Abra-V2-MEW063"].endswith("/720396.jpg")
+
+
+def test_additionals_listing_is_a_variant_with_metadata(tmp_path: Path) -> None:
+    from app.cardmarket import apply_variants_to_candidate, variants_for_row
+    from app.schemas import Candidate
+
+    conn = connect(tmp_path / "catalog.sqlite")
+    init_catalog(conn)
+    card_id = "en:sv10.5b-034"
+    additionals = (
+        "https://www.cardmarket.com/en/Pokemon/Products/Singles/"
+        "Black-Bolt-Additionals/Zekrom-ex-xBLK034"
+    )
+    main = (
+        "https://www.cardmarket.com/en/Pokemon/Products/Singles/"
+        "Black-Bolt/Zekrom-ex-V1-BLK033"
+    )
+    _insert_card(
+        conn,
+        card_id,
+        "Zekrom ex",
+        "Black Bolt",
+        "034",
+        set_id="sv10.5b",
+        cardmarket_url=additionals,
+        verified=1,
+        provenance="helper-expansion",
+        verified_at="2026-09-19T00:00:00Z",
+    )
+    conn.executemany(
+        """
+        INSERT INTO cardmarket_expansion_products (
+            url, expansion, name, source, page_url, card_id, matched, imported_at
+        ) VALUES (?, ?, ?, 'crawl', ?, ?, 1, '2026-09-28T00:00:00Z')
+        """,
+        [
+            (
+                additionals,
+                "Black-Bolt-Additionals",
+                "Zekrom ex (xBLK 034)From 1,15 €",
+                additionals,
+                card_id,
+            ),
+            (
+                main,
+                "Black-Bolt",
+                "Zekrom ex (BLK 034)From 0,08 €",
+                main,
+                card_id,
+            ),
+        ],
+    )
+    conn.commit()
+    row = conn.execute("SELECT * FROM cards WHERE id = ?", (card_id,)).fetchone()
+    variants = variants_for_row(conn, row)
+    by_code = {item["code"]: item for item in variants}
+    assert set(by_code) == {"xBLK", "BLK"}
+    assert by_code["xBLK"]["expansion"] == "Black Bolt: Additionals"
+    assert by_code["BLK"]["expansion"] == "Black Bolt"
+    assert by_code["xBLK"]["number"] == "034"
+    assert by_code["BLK"]["number"] == "034"
+    assert by_code["xBLK"]["price_text"] == "From 1,15 €"
+    assert by_code["BLK"]["price_text"] == "From 0,08 €"
+    assert by_code["BLK"]["card_id"] == card_id
+    item = {
+        "card_id": card_id,
+        "cardmarket_url": additionals,
+        "cardmarket_prices": [{"label": "From", "amount": 1.15, "currency": "EUR"}],
+    }
+    apply_variants_to_candidate(conn, item)
+    assert item["cardmarket_url"] == additionals
+    assert item["cardmarket_prices"]
+    candidate = Candidate.model_validate(
+        {
+            "card_id": card_id,
+            "name": "Zekrom ex",
+            "set_name": "Black Bolt",
+            "collector_number": "034",
+            "image_url": "/api/v1/cards/en:sv10.5b-034/image",
+            "visual_score": 0.9,
+            "combined_score": 0.9,
+            "ocr_consistent": True,
+            "cardmarket_url": item["cardmarket_url"],
+            "cardmarket_prices": item["cardmarket_prices"],
+            "cardmarket_variants": item["cardmarket_variants"],
+        }
+    )
+    assert candidate.cardmarket_url == additionals
+    assert len(candidate.cardmarket_variants) == 2
+    assert {variant.code for variant in candidate.cardmarket_variants} == {"xBLK", "BLK"}
+
+
+def test_pokeball_listing_keeps_original_and_includes_image(tmp_path: Path) -> None:
+    from app.cardmarket import apply_variants_to_candidate, variants_for_row
+
+    conn = connect(tmp_path / "catalog.sqlite")
+    init_catalog(conn)
+    card_id = "en:pl2-89"
+    original = (
+        "https://www.cardmarket.com/en/Pokemon/Products/Singles/"
+        "Rising-Rivals/Bebes-Search-V1-RR89"
+    )
+    pokeball = (
+        "https://www.cardmarket.com/en/Pokemon/Products/Singles/"
+        "Rising-Rivals/Bebes-Search-V2-RR109"
+    )
+    original_image = "https://product-images.s3.cardmarket.com/51/RR/278663/278663.jpg"
+    pokeball_image = "https://product-images.s3.cardmarket.com/51/RR/371553/371553.jpg"
+    _insert_card(
+        conn,
+        card_id,
+        "Bebe's Search",
+        "Rising Rivals",
+        "89",
+        set_id="pl2",
+        cardmarket_url=original,
+        verified=1,
+        provenance="helper-expansion",
+        verified_at="2026-09-19T00:00:00Z",
+    )
+    conn.executemany(
+        """
+        INSERT INTO cardmarket_expansion_products (
+            url, expansion, name, source, page_url, card_id, matched, imported_at,
+            listing_image_url
+        ) VALUES (?, ?, ?, 'crawl', ?, ?, 1, '2026-09-28T00:00:00Z', ?)
+        """,
+        [
+            (
+                original,
+                "Rising-Rivals",
+                "Bebe's Search (RR 89)From 0,02 €",
+                original,
+                card_id,
+                original_image,
+            ),
+            (
+                pokeball,
+                "Rising-Rivals",
+                "Bebe's Search (RR 89)From 0,40 €",
+                pokeball,
+                card_id,
+                pokeball_image,
+            ),
+        ],
+    )
+    conn.commit()
+    row = conn.execute("SELECT * FROM cards WHERE id = ?", (card_id,)).fetchone()
+    by_slug = {item["slug"]: item for item in variants_for_row(conn, row)}
+    assert set(by_slug) == {"Bebes-Search-V1-RR89", "Bebes-Search-V2-RR109"}
+    assert by_slug["Bebes-Search-V1-RR89"]["image"] == original_image
+    assert by_slug["Bebes-Search-V2-RR109"]["image"] == pokeball_image
+    assert by_slug["Bebes-Search-V2-RR109"]["number"] == "89"
+    assert by_slug["Bebes-Search-V2-RR109"]["price_text"] == "From 0,40 €"
+    item = {
+        "card_id": card_id,
+        "cardmarket_url": original,
+        "cardmarket_prices": [{"label": "From", "amount": 0.02, "currency": "EUR"}],
+    }
+    apply_variants_to_candidate(conn, item)
+    assert item["cardmarket_url"] == original
+    assert len(item["cardmarket_variants"]) == 2
 
 
 def test_resolve_variant_choice_uses_extra_owner(tmp_path: Path) -> None:
@@ -1695,8 +1963,7 @@ def test_promo_unique_link_and_swsh301_variants(tmp_path: Path) -> None:
     ).fetchone()
     assert url_for_row(extra) == sp
     assert url_for_row(promo) is None
-    slugs = {item["slug"] for item in variants_for_row(conn, promo)}
-    assert slugs == {"Lugia-V-V1-SWSH301", "Lugia-V-V2-SWSH301"}
+    assert variants_for_row(conn, promo) == []
     assert url_for_row(tempest) == sit
     assert variants_for_row(conn, extra) == []
     assert variants_for_row(conn, tempest) == []

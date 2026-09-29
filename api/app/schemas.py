@@ -32,6 +32,11 @@ class CardmarketVariant(BaseModel):
     slug: str = ""
     label: str = ""
     card_id: str | None = None
+    expansion: str = ""
+    code: str = ""
+    number: str = ""
+    price_text: str = ""
+    image: str = ""
 
 
 class Candidate(BaseModel):

@@ -27,6 +27,7 @@ export type CardmarketVariant = {
   slug?: string;
   label?: string;
   card_id?: string | null;
+  image?: string;
 };
 
 export type Candidate = {

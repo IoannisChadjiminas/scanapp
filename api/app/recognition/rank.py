@@ -127,7 +127,30 @@ def number_match(
     return False
 
 
-def _has_reliable_conflict(ocr_numbers: list[OcrHit] | list[str], collector_number: str) -> bool:
+def accepted_collector_numbers(item: dict[str, Any]) -> list[str]:
+    numbers = [str(item.get("collector_number") or "")]
+    printed = str(item.get("printed_collector_number") or "")
+    if printed and printed not in numbers:
+        numbers.append(printed)
+    return [number for number in numbers if number]
+
+
+def _match_any(
+    ocr_numbers: list[str] | list[OcrHit],
+    collector_numbers: list[str],
+) -> bool | None:
+    results = [number_match(ocr_numbers, number) for number in collector_numbers]
+    if any(result is True for result in results):
+        return True
+    if any(result is False for result in results):
+        return False
+    return None
+
+
+def _has_reliable_conflict(
+    ocr_numbers: list[OcrHit] | list[str],
+    collector_numbers: list[str],
+) -> bool:
     hits = [
         item
         for item in ocr_numbers
@@ -135,7 +158,7 @@ def _has_reliable_conflict(ocr_numbers: list[OcrHit] | list[str], collector_numb
     ]
     if not hits:
         return False
-    return number_match(hits, collector_number) is False
+    return _match_any(hits, collector_numbers) is False
 
 
 def rerank(
@@ -150,8 +173,9 @@ def rerank(
         combined = float(item["visual_score"])
         consistent: bool | None = None
         name_ok = name_match(ocr_name, item["name"])
-        number_ok = number_match(ocr_numbers, item["collector_number"])
-        collector_conflict = _has_reliable_conflict(ocr_numbers, item["collector_number"])
+        numbers = accepted_collector_numbers(item)
+        number_ok = _match_any(ocr_numbers, numbers)
+        collector_conflict = _has_reliable_conflict(ocr_numbers, numbers)
         language = str(item.get("language") or "")
         if detected_languages:
             if language in detected_languages:
@@ -175,9 +199,11 @@ def rerank(
             consistent = False if similar(ocr_name, item["name"]) < 0.4 else None
             if consistent is False:
                 combined -= 0.04
+        stored = dict(item)
+        stored.pop("printed_collector_number", None)
         ranked.append(
             {
-                **item,
+                **stored,
                 "combined_score": combined,
                 "ocr_consistent": consistent,
                 "collector_conflict": collector_conflict,
@@ -221,13 +247,29 @@ def _keep_visual_leader(
         return ranked
     visual = sorted(ranked, key=lambda row: float(row["visual_score"]), reverse=True)
     lead = visual[0]
-    if lead.get("collector_conflict"):
-        return ranked
     gap = float(lead["visual_score"]) - float(visual[1]["visual_score"])
+    # A wide gap is the picture itself. A small one can still be a false
+    # collector hit, such as "LV. 18" agreeing with catalogue number 018.
+    if lead.get("collector_conflict") and not _same_name_reprint(lead, visual[1]) and gap < 0.10:
+        return ranked
     if float(lead["visual_score"]) < min_visual or gap < min_gap:
         return ranked
     rest = [row for row in ranked if row["card_id"] != lead["card_id"]]
     return [lead, *rest]
+
+
+def _same_name_reprint(lead: dict[str, Any], other: dict[str, Any]) -> bool:
+    """A reprint often prints the original collector number.
+
+    That number agrees with the older print and conflicts with the reprint's
+    catalogue number, so it cannot separate the two. The closer image can.
+    """
+    name = lead.get("name")
+    return bool(
+        name
+        and name == other.get("name")
+        and (lead.get("language") or "") == (other.get("language") or "")
+    )
 
 
 def _visual_second(suggestions: list[dict[str, Any]], top_id: str) -> float:

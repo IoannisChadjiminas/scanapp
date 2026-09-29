@@ -165,6 +165,10 @@ document.getElementById("import-unmatched-images").addEventListener("click", () 
   expansionNoteEl.textContent = "Iterating unmatched listing images…";
   void refresh({ type: "import-unmatched-images" });
 });
+document.getElementById("collect-version-photos").addEventListener("click", () => {
+  expansionNoteEl.textContent = "Collecting version photos in this Chrome window…";
+  void refresh({ type: "collect-version-photos" });
+});
 paceEl.addEventListener("change", () => {
   void refresh({ type: "set-settings", expansionPace: paceEl.value });
 });

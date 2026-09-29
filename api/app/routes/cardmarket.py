@@ -7,8 +7,10 @@ from typing import Any
 
 log = logging.getLogger("cardmarket.prices")
 
+from pathlib import Path
+
 from fastapi import APIRouter, Header, HTTPException, Query, Request, Response
-from fastapi.responses import StreamingResponse
+from fastapi.responses import FileResponse, StreamingResponse
 from pydantic import BaseModel, Field
 
 from app.cardmarket import (
@@ -56,6 +58,18 @@ from app.cardmarket_queue import (
 )
 
 router = APIRouter()
+
+
+@router.get("/cardmarket/listing-images/{product_id}.jpg")
+def listing_image(product_id: str, request: Request) -> FileResponse:
+    """Cardmarket product photo saved for a variant. The image host blocks other sites."""
+    if not product_id.isdigit() or len(product_id) > 12:
+        raise HTTPException(status_code=404, detail="Listing image not found")
+    root = (Path(request.app.state.settings.data_dir) / "listing-images").resolve()
+    path = (root / f"{product_id}.jpg").resolve()
+    if path.parent != root or not path.is_file():
+        raise HTTPException(status_code=404, detail="Listing image not found")
+    return FileResponse(path, media_type="image/jpeg")
 
 
 class JobRequest(BaseModel):

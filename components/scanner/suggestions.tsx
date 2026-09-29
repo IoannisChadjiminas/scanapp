@@ -92,16 +92,26 @@ function VariantPicker({
             type="button"
             onClick={() => onSelect(variant)}
             className={cn(
-              "rounded-md border px-3 py-2 text-left text-sm",
+              "flex items-center gap-3 rounded-md border px-3 py-2 text-left text-sm",
               active ? "border-primary bg-primary/5" : "border-border",
             )}
           >
-            <span className="font-medium">{variant.label || variant.slug}</span>
-            {variant.slug ? (
-              <span className="text-muted-foreground mt-0.5 block text-xs">
-                {variant.slug}
-              </span>
+            {variant.image ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img
+                src={assetUrl(variant.image)}
+                alt=""
+                className="h-20 w-auto rounded"
+              />
             ) : null}
+            <span>
+              <span className="font-medium">{variant.label || variant.slug}</span>
+              {variant.slug ? (
+                <span className="text-muted-foreground mt-0.5 block text-xs">
+                  {variant.slug}
+                </span>
+              ) : null}
+            </span>
           </button>
         );
       })}

@@ -22,6 +22,7 @@ import { CHALLENGE_SELECTOR, challengeTitle } from "./parse.js";
 import { isCardmarketListingImageUrl } from "./extract.js";
 import { classifyUrl, finalUrlAllowed, normalizeUrl, productIdentity } from "./url.js";
 import { expansionDrive } from "./expansion-drive.js";
+import { VERSION_PHOTO_TARGETS } from "./version-photo-targets.js";
 
 function expansionCrawlSlug(value) {
   return String(value || "")
@@ -949,6 +950,112 @@ export function createWorker({
       throw error;
     }
     return { src };
+  }
+
+  async function saveKnownListingImage(url, name, imageUrl) {
+    const src = String(imageUrl || "").split("?")[0];
+    if (!isCardmarketListingImageUrl(src)) {
+      return null;
+    }
+    return request("/cardmarket/helper/unmatched-image", {
+      method: "POST",
+      body: {
+        url,
+        name: name || "",
+        image_url: src,
+      },
+    });
+  }
+
+  async function collectVersionPhotos() {
+    const groups = Object.entries(VERSION_PHOTO_TARGETS);
+    await patchLocal({
+      paused: false,
+      expansionBusy: true,
+      activity: "crawling-version-photos",
+      attention: null,
+      expansionNote: `Opening ${groups.length} sets in this Chrome window…`,
+    });
+    let saved = 0;
+    try {
+      let current = await helperTab();
+      if (!current?.id) {
+        current = await tabs.create({
+          url: "https://www.cardmarket.com/en/Pokemon/Products/Singles",
+          active: true,
+        });
+      }
+      current = await bindHelperTab(current);
+      for (const [expansion, urls] of groups) {
+        const wanted = new Set(urls.map((url) => normalizeUrl(url)));
+        for (let site = 1; site <= MAX_EXPANSION_PAGES && wanted.size; site += 1) {
+          if ((await settings()).paused) {
+            await patchLocal({
+              expansionBusy: false,
+              activity: "idle",
+              expansionNote: `Paused version photos at ${expansion}. ${saved} saved.`,
+            });
+            return;
+          }
+          const page = `https://www.cardmarket.com/en/Pokemon/Products/Singles/${expansion}?perSite=100&site=${site}`;
+          await tabs.update(current.id, { url: page, active: true });
+          current = (await waitForExpansionPage(current.id)) || (await tabs.get(current.id));
+          const blocked = tabBlockReason(current);
+          if (shouldPauseCrawl(blocked)) {
+            await patchLocal({
+              expansionBusy: false,
+              activity: "needs-attention",
+              attention: "cloudflare",
+              expansionNote: `Cloudflare on ${expansion}. Tick the box in this tab, then press Collect version photos again.`,
+            });
+            return;
+          }
+          await humanPause("settle");
+          const snap = await extractExpansionFromTab(current);
+          if (snap?.challenge || shouldPauseCrawl(tabBlockReason(current, snap))) {
+            await patchLocal({
+              expansionBusy: false,
+              activity: "needs-attention",
+              attention: "cloudflare",
+              expansionNote: `Cloudflare on ${expansion}. Tick the box in this tab, then press Collect version photos again.`,
+            });
+            return;
+          }
+          const products = Array.isArray(snap?.products) ? snap.products : [];
+          for (const item of products) {
+            const url = normalizeUrl(item?.url || "");
+            if (!wanted.has(url)) {
+              continue;
+            }
+            wanted.delete(url);
+            if (!item?.image) {
+              continue;
+            }
+            await saveKnownListingImage(url, item.name, item.image);
+            saved += 1;
+          }
+          await patchLocal({
+            expansionNote: `${expansion} page ${site} · ${saved} version photos saved`,
+          });
+          if (products.length < 100) {
+            break;
+          }
+          await humanPause("page");
+        }
+      }
+      await patchLocal({
+        expansionBusy: false,
+        activity: "idle",
+        attention: null,
+        expansionNote: `Version photos saved: ${saved}.`,
+      });
+    } catch (error) {
+      await patchLocal({
+        expansionBusy: false,
+        activity: "idle",
+        expansionNote: `Version photos stopped: ${String(error?.message || error)}`,
+      });
+    }
   }
 
   async function saveUnmatchedListingImage(url, name) {
@@ -2089,9 +2196,17 @@ export function createWorker({
       message?.type === "import-expansion-page" ||
       message?.type === "import-expansion-set" ||
       message?.type === "import-expansion-all" ||
-      message?.type === "import-unmatched-images"
+      message?.type === "import-unmatched-images" ||
+      message?.type === "collect-version-photos"
     ) {
       try {
+        if (message.type === "collect-version-photos") {
+          if ((await readStore(local, ["expansionBusy"])).expansionBusy) {
+            return snapshot();
+          }
+          await collectVersionPhotos();
+          return snapshot();
+        }
         if (message.type === "import-unmatched-images") {
           if ((await readStore(local, ["expansionBusy"])).expansionBusy) {
             return snapshot();

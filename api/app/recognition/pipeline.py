@@ -129,6 +129,11 @@ def recognize_bytes(
                 "name": row["name"],
                 "set_name": row["set_name"],
                 "collector_number": row["collector_number"],
+                "printed_collector_number": (
+                    str(row["printed_collector_number"] or "")
+                    if "printed_collector_number" in row.keys()
+                    else ""
+                ),
                 "image_url": _card_image_url(row),
                 "visual_score": float(score),
                 "combined_score": float(score),
