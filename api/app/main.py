@@ -7,6 +7,7 @@ from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
 
 logging.basicConfig(level=logging.INFO, format="%(levelname)s %(name)s %(message)s")
 
@@ -60,7 +61,7 @@ async def lifespan(app: FastAPI):
     settings.tmp_dir.mkdir(parents=True, exist_ok=True)
     dbs = Databases(settings)
     runtime = Runtime(settings=settings)
-    runtime.load()
+    runtime.load(dbs.cloud_snapshot)
     runtime.bind_card_languages(dbs.catalog)
     app.state.settings = settings
     app.state.dbs = dbs
@@ -101,6 +102,13 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+from app.planetscale import CatalogueReadOnly
+
+
+@app.exception_handler(CatalogueReadOnly)
+async def catalogue_read_only(request, exc):
+    return JSONResponse(status_code=409, content={"detail": str(exc)})
 
 app.include_router(health_router, prefix="/api/v1", tags=["health"])
 app.include_router(images_router, prefix="/api/v1", tags=["images"])

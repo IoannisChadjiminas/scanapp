@@ -3,7 +3,7 @@ from __future__ import annotations
 from functools import lru_cache
 from pathlib import Path
 
-from pydantic import Field
+from pydantic import Field, SecretStr
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -11,6 +11,10 @@ class Settings(BaseSettings):
     model_config = SettingsConfigDict(env_file=".env", extra="ignore")
 
     data_dir: Path = Path("/data")
+    catalogue_backend: str = "sqlite"
+    planetscale_database_url: SecretStr = SecretStr("")
+    planetscale_schema: str = "pokesingle_import_20261001"
+    planetscale_import_id: str = "PS-IMPORT-001-20261001"
     tmp_dir: Path = Path("/tmp/scanapp")
     preprocess_config: str = "pad"
     use_ocr: bool = True

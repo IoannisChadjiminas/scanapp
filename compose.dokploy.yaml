@@ -6,8 +6,16 @@ services:
       context: .
       dockerfile: docker/api.Dockerfile
     restart: unless-stopped
+    # Kept outside Dokploy's Git checkout so redeploys never overwrite the secret.
+    env_file:
+      - path: ${PLANETSCALE_ENV_FILE:-/etc/scanapp-staging/planetscale.env}
+        required: false
+        format: raw
     environment:
       DATA_DIR: /data
+      CATALOGUE_BACKEND: ${CATALOGUE_BACKEND:-planetscale}
+      PLANETSCALE_SCHEMA: ${PLANETSCALE_SCHEMA:-pokesingle_import_20261001}
+      PLANETSCALE_IMPORT_ID: ${PLANETSCALE_IMPORT_ID:-PS-IMPORT-001-20261001}
       TMP_DIR: /tmp/scanapp
       PREPROCESS_CONFIG: ${PREPROCESS_CONFIG:-pad}
       USE_OCR: ${USE_OCR:-true}

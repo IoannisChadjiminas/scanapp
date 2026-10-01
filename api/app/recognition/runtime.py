@@ -26,10 +26,10 @@ class Runtime:
     def ready(self) -> bool:
         return self.snapshot is not None and self.embedder is not None
 
-    def load(self) -> None:
+    def load(self, cloud_snapshot: ArtifactSnapshot | None = None) -> None:
         with self._lock:
             try:
-                snapshot = load_snapshot(self.settings)
+                snapshot = cloud_snapshot if cloud_snapshot is not None else load_snapshot(self.settings)
                 embedder = DinoEmbedder(
                     str(self.settings.dinov2_path),
                     self.settings.ort_intra_threads,

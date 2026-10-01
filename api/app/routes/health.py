@@ -39,4 +39,6 @@ def health(request: Request) -> HealthResponse:
         snapshot=settings.snapshot_name,
         coverage=coverage_model,
         detail=runtime.error,
+        catalogue_backend=settings.catalogue_backend,
+        catalogue_import_id=settings.planetscale_import_id if settings.catalogue_backend == "planetscale" else None,
     )

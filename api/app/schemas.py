@@ -85,6 +85,8 @@ class HealthResponse(BaseModel):
     snapshot: str
     coverage: Coverage | None = None
     detail: str | None = None
+    catalogue_backend: str = "sqlite"
+    catalogue_import_id: str | None = None
 
 
 class PrepareResponse(BaseModel):

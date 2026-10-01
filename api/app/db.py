@@ -7,9 +7,9 @@ from app.config import Settings
 from app.schemas import Coverage, LanguageCoverage
 
 
-def connect(path: Path) -> sqlite3.Connection:
+def connect(path: Path, *, factory=sqlite3.Connection) -> sqlite3.Connection:
     path.parent.mkdir(parents=True, exist_ok=True)
-    conn = sqlite3.connect(path, check_same_thread=False)
+    conn = sqlite3.connect(path, check_same_thread=False, factory=factory)
     conn.row_factory = sqlite3.Row
     conn.execute("PRAGMA journal_mode=WAL")
     conn.execute("PRAGMA foreign_keys=ON")
@@ -379,10 +379,25 @@ def coverage_payload(conn: sqlite3.Connection) -> Coverage:
 
 class Databases:
     def __init__(self, settings: Settings) -> None:
-        self.catalog = connect(settings.catalog_sqlite)
+        self.cloud_snapshot = None
+        if settings.catalogue_backend not in {"sqlite", "planetscale"}:
+            raise ValueError("Unsupported catalogue backend")
+        if settings.catalogue_backend == "planetscale":
+            from app.planetscale import CloudCatalogConnection
+            self.catalog = connect(settings.catalog_sqlite, factory=CloudCatalogConnection)
+        else:
+            self.catalog = connect(settings.catalog_sqlite)
         self.results = connect(settings.results_sqlite)
         init_catalog(self.catalog)
         init_results(self.results)
+        if settings.catalogue_backend == "planetscale":
+            from app.planetscale import load_cloud_catalogue
+            try:
+                self.cloud_snapshot = load_cloud_catalogue(settings, self.catalog)
+            except Exception:
+                self.close()
+                raise
+            return
         from app.card_images import backfill_remote_image_urls
         from app.cardmarket import sync_cardmarket_links
 

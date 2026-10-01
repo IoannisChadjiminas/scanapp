@@ -1448,6 +1448,14 @@ def resolve_variant_choice(
             "url": product,
             "mapped": False,
         }
+    if getattr(conn, "catalogue_readonly", False):
+        linked = conn.execute(
+            "SELECT card_id FROM cardmarket_expansion_products WHERE url = ? AND card_id = ? AND matched = 1",
+            (product, scanned_card_id),
+        ).fetchone()
+        if linked is None:
+            raise MappingError("Listing is not linked in the read-only catalogue", status_code=409)
+        return {"card_id": scanned_card_id, "url": product, "mapped": False}
     mapped = map_card_product(
         conn,
         data_dir,
@@ -2793,4 +2801,3 @@ def sync_cardmarket_links(data_dir: Path, conn: sqlite3.Connection) -> int:
     updated += apply_helper_maps(conn, data_dir)
     conn.commit()
     return updated
-
