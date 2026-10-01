@@ -4,6 +4,7 @@ from __future__ import annotations
 import hashlib
 import re
 import sqlite3
+import threading
 from urllib.parse import urlsplit
 
 import numpy as np
@@ -16,16 +17,87 @@ class CatalogueReadOnly(RuntimeError):
     pass
 
 
+class CloudCatalogCursor(sqlite3.Cursor):
+    def __del__(self):
+        # sqlite3 finalizes a cursor's last prepared statement during GC.
+        # Close under the same lock before its C destructor runs; otherwise
+        # even an apparently harmless temporary SELECT cursor can invert locks.
+        try:
+            self.close()
+        except (sqlite3.Error, AttributeError):
+            pass
+
+    def _run(self, method, *args, **kwargs):
+        # SQLite invokes the Python authorizer while holding its mutex. All
+        # entry points must acquire this Python lock first, avoiding a GIL /
+        # SQLite mutex inversion between API and recognition worker threads.
+        with self.connection._cache_lock:
+            try:
+                return method(*args, **kwargs)
+            except sqlite3.DatabaseError as exc:
+                if getattr(exc, "sqlite_errorcode", None) == sqlite3.SQLITE_AUTH or "cannot modify" in str(exc):
+                    raise CatalogueReadOnly("Catalogue is read-only; publish reviewed mapping changes separately.") from None
+                raise
+
+    def execute(self, *args, **kwargs):
+        return self._run(super().execute, *args, **kwargs)
+
+    def executemany(self, *args, **kwargs):
+        return self._run(super().executemany, *args, **kwargs)
+
+    def executescript(self, *args, **kwargs):
+        return self._run(super().executescript, *args, **kwargs)
+
+    def fetchone(self):
+        return self._run(super().fetchone)
+
+    def fetchall(self):
+        return self._run(super().fetchall)
+
+    def fetchmany(self, *args, **kwargs):
+        return self._run(super().fetchmany, *args, **kwargs)
+
+    def __next__(self):
+        return self._run(super().__next__)
+
+    def close(self):
+        return self._run(super().close)
+
+
 class CloudCatalogConnection(sqlite3.Connection):
     catalogue_readonly = True
 
+    def __init__(self, *args, **kwargs):
+        self._cache_lock = threading.RLock()
+        super().__init__(*args, **kwargs)
+
+    def cursor(self, factory=CloudCatalogCursor):
+        # Custom factories could silently bypass serialization.
+        if not issubclass(factory, CloudCatalogCursor):
+            raise TypeError("Cloud catalogue cursors must be serialized")
+        with self._cache_lock:
+            return super().cursor(factory)
+
     def execute(self, *args, **kwargs):
-        try:
-            return super().execute(*args, **kwargs)
-        except sqlite3.DatabaseError as exc:
-            if getattr(exc, "sqlite_errorcode", None) == sqlite3.SQLITE_AUTH or "cannot modify" in str(exc):
-                raise CatalogueReadOnly("Catalogue is read-only; publish reviewed mapping changes separately.") from None
-            raise
+        return self.cursor().execute(*args, **kwargs)
+
+    def executemany(self, *args, **kwargs):
+        return self.cursor().executemany(*args, **kwargs)
+
+    def executescript(self, *args, **kwargs):
+        return self.cursor().executescript(*args, **kwargs)
+
+    def commit(self):
+        with self._cache_lock:
+            return super().commit()
+
+    def rollback(self):
+        with self._cache_lock:
+            return super().rollback()
+
+    def close(self):
+        with self._cache_lock:
+            return super().close()
 
 
 def protect_catalogue(conn: sqlite3.Connection) -> None:

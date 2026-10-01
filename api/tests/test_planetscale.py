@@ -57,3 +57,44 @@ def test_operational_price_writes_still_persist(tmp_path):
     conn.close()
     original = connect(tmp_path / "catalog.sqlite")
     assert original.execute("SELECT fetched_at FROM cardmarket_snapshots WHERE sample_key='key'").fetchone()[0] == "now"
+
+
+def test_concurrent_authorizer_queries_do_not_deadlock():
+    # Bound the probe in another process: an SQLite/GIL inversion would prevent
+    # a thread-level timeout from acquiring the GIL to fail the test.
+    import subprocess
+    import sys
+    probe = """
+import sqlite3
+from concurrent.futures import ThreadPoolExecutor
+from app.planetscale import CloudCatalogConnection, protect_catalogue
+c=sqlite3.connect(':memory:',check_same_thread=False,factory=CloudCatalogConnection,cached_statements=0)
+c.execute('CREATE TABLE cards(id TEXT)')
+c.execute("INSERT INTO cards VALUES ('one')")
+protect_catalogue(c)
+def read(worker):
+ for i in range(300):
+  cursor=c.cursor()
+  cursor.execute('SELECT id FROM cards')
+  assert cursor.fetchone()[0]=='one'
+  cursor.close()
+  assert [r[0] for r in c.execute('SELECT id FROM cards')]==['one']
+ return worker
+with ThreadPoolExecutor(max_workers=6) as pool:
+ assert list(pool.map(read,range(6)))==list(range(6))
+c.close()
+"""
+    # Use this checkout, not an older /app copy baked into the test image.
+    subprocess.run([sys.executable, "-c", probe], check=True, timeout=15, cwd=Path(__file__).resolve().parents[1])
+
+
+@pytest.mark.parametrize("method", ["execute", "executemany", "executescript"])
+def test_cursor_write_paths_remain_protected(tmp_path, method):
+    conn = _cache(tmp_path)
+    cursor = conn.cursor()
+    args = ("DELETE FROM cloud.cards", []) if method == "executemany" else ("DELETE FROM cloud.cards",)
+    if method == "executemany":
+        args = ("DELETE FROM cloud.cards WHERE id=?", [("new",)])
+    with pytest.raises(CatalogueReadOnly):
+        getattr(cursor, method)(*args)
+    assert conn.execute("SELECT name FROM cards").fetchone()[0] == "Pikachu"

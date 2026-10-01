@@ -2,6 +2,10 @@ from __future__ import annotations
 
 import asyncio
 import logging
+import faulthandler
+import signal
+import time
+import uuid
 from concurrent.futures import ThreadPoolExecutor
 from contextlib import asynccontextmanager
 
@@ -46,6 +50,9 @@ from app.routes.scans import router as scans_router
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     _quiet_health_access()
+    if hasattr(faulthandler, "register") and hasattr(signal, "SIGUSR1"):
+        # Dumps stacks, not local variables or secrets, even if the GIL stalls.
+        faulthandler.register(signal.SIGUSR1, all_threads=True)
     settings = get_settings()
     logging.getLogger("cardmarket.scraper").info(
         "price config webview_enabled=%s helper_enabled=%s scraper_enabled=%s "
@@ -102,6 +109,28 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+
+@app.middleware("http")
+async def scan_diagnostics(request, call_next):
+    if request.method != "POST" or request.url.path != "/api/v1/scans":
+        return await call_next(request)
+    trace = request.headers.get("x-scan-trace", "")
+    if not trace or len(trace) > 64 or any(c not in "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ-_" for c in trace):
+        trace = str(uuid.uuid4())
+    logger = logging.getLogger("scan.diagnostics")
+    request.state.scan_trace = trace
+    started = time.perf_counter()
+    logger.info("request_start trace=%s", trace)
+    try:
+        response = await call_next(request)
+        response.headers["X-Scan-Trace"] = trace
+        logger.info("request_done trace=%s status=%s elapsed_ms=%.1f", trace, response.status_code, (time.perf_counter()-started)*1000)
+        return response
+    except Exception as exc:
+        # Never include exception text, request bodies, cookies or URLs.
+        logger.error("request_failed trace=%s error_type=%s elapsed_ms=%.1f", trace, type(exc).__name__, (time.perf_counter()-started)*1000)
+        raise
 
 from app.planetscale import CatalogueReadOnly
 

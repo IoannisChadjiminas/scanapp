@@ -20,6 +20,15 @@ FTS, mapping and variant logic. Every vector checksum and aggregate is checked,
 and original manifest ID order is preserved. Vector arrays remain in memory;
 old local catalogue rows and NPY bundles are not the recognition source.
 
+All shared cache entry points, including cursor reads and cleanup, are
+serialized with a reentrant lock. This prevents SQLite mutex/Python-authorizer
+lock inversion across API and scan worker threads while keeping write protection.
+
+Scan logs include a safe `X-Scan-Trace` correlation ID, upload byte count,
+response status and stage timings. No request bodies, images, OCR text or
+credentials are included. On Linux, `SIGUSR1` dumps thread stacks (not locals)
+to API stderr for diagnosing a stall before restarting the service.
+
 Restart the API to load a newly published snapshot, after explicitly updating
 `PLANETSCALE_IMPORT_ID` if appropriate. This is a pinned snapshot cache, not a
 live per-request database lookup. A cloud/model/checksum failure prevents startup;

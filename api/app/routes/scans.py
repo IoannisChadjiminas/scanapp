@@ -2,6 +2,8 @@ from __future__ import annotations
 
 import asyncio
 import json
+import logging
+import time
 
 from fastapi import APIRouter, Form, HTTPException, Request, Response, UploadFile
 
@@ -37,11 +39,15 @@ async def create_scan(
     language: str = Form(default="auto"),
 ) -> ScanResponse:
     settings = request.app.state.settings
+    started = time.perf_counter()
+    logger = logging.getLogger("scan.diagnostics")
+    trace = getattr(request.state, "scan_trace", "none")
     limiter = request.app.state.scan_limiter
     session_id = get_or_create_session(
         request, response, request.app.state.dbs, settings
     )
     data = await read_upload_limited(image, settings.max_upload_bytes)
+    logger.info("upload_read trace=%s bytes=%s elapsed_ms=%.1f", trace, len(data), (time.perf_counter()-started)*1000)
     acquired = await limiter.acquire()
     if not acquired:
         raise HTTPException(
@@ -69,7 +75,9 @@ async def create_scan(
             ),
         )
         try:
-            return await asyncio.shield(future)
+            result = await asyncio.shield(future)
+            logger.info("recognition_done trace=%s scan_id=%s status=%s timings_ms=%s", trace, result.id, result.status.value, result.timings_ms.model_dump() if hasattr(result.timings_ms, "model_dump") else result.timings_ms)
+            return result
         except asyncio.CancelledError:
             try:
                 await asyncio.shield(future)
