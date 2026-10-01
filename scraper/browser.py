@@ -306,6 +306,7 @@ def run_attempt(session: PageSession, url: str, *, parse_html) -> dict:
         "title": str(parsed.get("title") or ""),
         "rows": rows,
         "header": header,
+        "image": str(parsed.get("image") or ""),
         "bytes": (
             int(getattr(session, "bytes", 0) or 0)
             if getattr(session, "bytes_measured", True)

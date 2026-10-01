@@ -61,6 +61,8 @@ services:
     mem_limit: 1536m
     environment:
       SCRAPER_API_KEY: ${SCRAPER_API_KEY:-}
+      # false = direct connection. Unset uses the proxy only when PROXY_HOST/USER/PASS are set.
+      PROXY_ENABLED: ${PROXY_ENABLED:-}
       PROXY_HOST: ${PROXY_HOST:-}
       PROXY_USER: ${PROXY_USER:-}
       PROXY_PASS: ${PROXY_PASS:-}
@@ -68,6 +70,7 @@ services:
       PROXY_COUNTRY: ${PROXY_COUNTRY:-}
       TZ: ${PROXY_TZ:-Europe/Berlin}
       SCRAPER_ATTEMPT_SECONDS: ${SCRAPER_ATTEMPT_SECONDS:-90}
+      SCRAPER_PAGE_GAP_S: ${SCRAPER_PAGE_GAP_S:-15}
       SCRAPER_DIRECT_PROBE: ${SCRAPER_DIRECT_PROBE:-false}
       SCRAPER_NET_LOG: ${SCRAPER_NET_LOG:-true}
       SCRAPER_BROWSER_LIFETIME_S: ${SCRAPER_BROWSER_LIFETIME_S:-1800}

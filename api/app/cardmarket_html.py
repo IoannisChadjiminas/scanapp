@@ -205,6 +205,43 @@ def _challenge_node(node: _Node) -> bool:
     return False
 
 
+_PRODUCT_IMAGE_HOST = "product-images.s3.cardmarket.com"
+
+
+def _image_candidate(node: _Node) -> str:
+    for name in ("data-echo", "data-src", "src", "content"):
+        raw = node.attr(name).strip().split("?", 1)[0]
+        if _PRODUCT_IMAGE_HOST in raw:
+            return raw
+    return ""
+
+
+def _product_image(root: _Node) -> str:
+    """Cardmarket product photo. The browser may not paint it; the address is still in the HTML.
+
+    A three-slide viewer is previous, current, next. The current photo is the middle one.
+    """
+    slides: list[tuple[str, bool]] = []
+    og = ""
+    for node in root.walk():
+        if node.tag == "meta" and node.attr("property").lower() == "og:image":
+            og = _image_candidate(node) or og
+        elif node.tag == "img":
+            url = _image_candidate(node)
+            if url:
+                slides.append((url, "lazy" in node.classes()))
+    if og:
+        return og
+    if len(slides) == 1:
+        return slides[0][0]
+    if len(slides) >= 3:
+        return slides[1][0]
+    for url, lazy in slides:
+        if not lazy:
+            return url
+    return slides[0][0] if slides else ""
+
+
 def _canonical_url(root: _Node) -> str | None:
     for node in root.walk():
         if node.tag == "link" and "canonical" in node.attr("rel").lower():
@@ -507,5 +544,6 @@ def parse_cardmarket_html(url: str, html: str) -> dict:
         "rows": rows,
         "header": _header(root.text()),
         "chart": _chart(root),
+        "image": _product_image(root),
         "parser": PARSER_VERSION,
     }

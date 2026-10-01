@@ -194,6 +194,35 @@ def test_desktop_row_keeps_sales_professional_and_daily_averages():
     ]
 
 
+def test_product_image_prefers_the_cardmarket_photo():
+    html = _page(
+        """
+        <meta property="og:image" content="https://product-images.s3.cardmarket.com/51/L3/277778/277778.jpg?class=thumbnail">
+        <div id="image"><div class="slideshow">
+          <img class="lazy" data-echo="https://product-images.s3.cardmarket.com/51/L3/1/1.jpg">
+          <img src="https://product-images.s3.cardmarket.com/51/L3/277778/277778.jpg">
+          <img class="lazy" data-src="https://product-images.s3.cardmarket.com/51/L3/2/2.jpg">
+        </div></div>
+        <div class="article-row"><div class="col-offer">3,00 €</div></div>
+        """
+    )
+    assert parse_cardmarket_html(URL, html)["image"].endswith("/277778/277778.jpg")
+
+
+def test_three_slides_use_the_current_middle_photo():
+    html = _page(
+        """
+        <div id="image"><div class="slideshow">
+          <img class="lazy" src="https://product-images.s3.cardmarket.com/51/L3/1/1.jpg">
+          <img src="https://product-images.s3.cardmarket.com/51/L3/277778/277778.jpg">
+          <img class="lazy" src="https://product-images.s3.cardmarket.com/51/L3/2/2.jpg">
+        </div></div>
+        <div class="article-row"><div class="col-offer">3,00 €</div></div>
+        """
+    )
+    assert parse_cardmarket_html(URL, html)["image"].endswith("/277778/277778.jpg")
+
+
 def test_canonical_for_another_product_is_not_this_page():
     other = (
         "https://www.cardmarket.com/en/Pokemon/Products/Singles/"

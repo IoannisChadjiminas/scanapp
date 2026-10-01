@@ -32,7 +32,7 @@ from browser import (  # noqa: E402
     reap_stale_browsers,
     run_attempt,
 )
-from proxy import proxy_direct, proxy_exit, proxy_server  # noqa: E402
+from proxy import proxy_direct, proxy_enabled, proxy_exit, proxy_server  # noqa: E402
 from app.cardmarket_html import parse_cardmarket_html  # noqa: E402
 
 log = logging.getLogger("scraper")
@@ -58,6 +58,8 @@ _quiet_health_access()
 API_KEY = os.environ.get("SCRAPER_API_KEY", "")
 MAX_BROWSERS = max(1, int(os.environ.get("MAX_BROWSERS", "1")))
 COOLDOWN_SECONDS = float(os.environ.get("SCRAPER_RATE_LIMIT_S", "900"))
+# Pause after one Cardmarket page before the next one is opened.
+PAGE_GAP_S = max(0.0, float(os.environ.get("SCRAPER_PAGE_GAP_S", "15")))
 # Costs one extra paid page load per attempt; leave off outside diagnosis.
 DIRECT_PROBE = os.environ.get("SCRAPER_DIRECT_PROBE", "").strip().lower() in {"1", "true", "yes"}
 
@@ -65,12 +67,12 @@ DIRECT_PROBE = os.environ.get("SCRAPER_DIRECT_PROBE", "").strip().lower() in {"1
 async def lifespan(app: FastAPI):
     _quiet_health_access()
     log.info(
-        "scraper config api_key_configured=%s proxy_host_configured=%s "
+        "scraper config api_key_configured=%s proxy_enabled=%s proxy_host_configured=%s "
         "proxy_user_configured=%s proxy_password_configured=%s max_browsers=%s deadline_s=%s "
-        "direct_probe=%s net_log=%s browser_lifetime_s=%s",
-        bool(API_KEY), bool(os.environ.get("PROXY_HOST", "").strip()),
+        "direct_probe=%s net_log=%s browser_lifetime_s=%s page_gap_s=%s",
+        bool(API_KEY), proxy_enabled(), bool(os.environ.get("PROXY_HOST", "").strip()),
         bool(os.environ.get("PROXY_USER", "").strip()), bool(os.environ.get("PROXY_PASS")),
-        MAX_BROWSERS, ATTEMPT_SECONDS, DIRECT_PROBE, NET_LOG, BROWSER_LIFETIME_S,
+        MAX_BROWSERS, ATTEMPT_SECONDS, DIRECT_PROBE, NET_LOG, BROWSER_LIFETIME_S, PAGE_GAP_S,
     )
     yield
 
@@ -79,6 +81,25 @@ app = FastAPI(title="Cardmarket scraper", docs_url=None, redoc_url=None, lifespa
 _slots = threading.BoundedSemaphore(MAX_BROWSERS)
 _cooldown_until = 0.0
 _cooldown_lock = threading.Lock()
+_last_page_at = 0.0
+_gap_lock = threading.Lock()
+
+
+def wait_for_page_gap() -> None:
+    """Hold the next page until SCRAPER_PAGE_GAP_S has passed since the previous one."""
+    if PAGE_GAP_S <= 0:
+        return
+    with _gap_lock:
+        wait = _last_page_at + PAGE_GAP_S - time.time()
+    if wait > 0:
+        log.info("page gap sleep_s=%.1f", wait)
+        time.sleep(wait)
+
+
+def note_page_finished() -> None:
+    global _last_page_at
+    with _gap_lock:
+        _last_page_at = time.time()
 
 
 class ScrapeRequest(BaseModel):
@@ -189,6 +210,7 @@ def scrape(payload: ScrapeRequest, authorization: str | None = Header(default=No
             detail="Rate limited",
             headers={"Retry-After": str(int(left) + 1)},
         )
+    wait_for_page_gap()
     if not _slots.acquire(timeout=30):
         raise HTTPException(status_code=503, detail="Busy", headers={"Retry-After": "5"})
     started = time.time()
@@ -221,6 +243,7 @@ def scrape(payload: ScrapeRequest, authorization: str | None = Header(default=No
         )
         raise HTTPException(status_code=500, detail="Scrape attempt failed") from None
     finally:
+        note_page_finished()
         _slots.release()
         log_chrome_page(payload.session_id, session)
         log_chrome_net(payload.session_id, session)

@@ -53,6 +53,20 @@ def test_scraper_logs_start_and_failure_without_credentials(monkeypatch, caplog)
     assert "test-secret" not in caplog.text
 
 
+def test_page_gap_waits_only_the_time_still_remaining(monkeypatch):
+    monkeypatch.setattr(service, "PAGE_GAP_S", 15.0)
+    service._last_page_at = 1000.0
+    slept = []
+    monkeypatch.setattr(service.time, "time", lambda: 1006.0)
+    monkeypatch.setattr(service.time, "sleep", slept.append)
+    service.wait_for_page_gap()
+    assert slept == [9.0]
+
+    monkeypatch.setattr(service.time, "time", lambda: 1020.0)
+    service.wait_for_page_gap()
+    assert slept == [9.0]
+
+
 def test_chrome_page_logs_the_last_title_and_screenshot(caplog):
     path = Path("/tmp/cardmarket-abcd1234.png")
     path.unlink(missing_ok=True)

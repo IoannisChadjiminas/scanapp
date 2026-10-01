@@ -21,7 +21,26 @@ DIRECT_HEADERS = {
 _TITLE = re.compile(rb"<title[^>]*>(.*?)</title>", re.I | re.S)
 
 
+def proxy_enabled() -> bool:
+    """``PROXY_ENABLED=false`` forces a direct connection even when credentials are set.
+
+    Unset keeps the previous behaviour: a proxy is used only when host, user, and
+    password are all present.
+    """
+    flag = os.environ.get("PROXY_ENABLED", "").strip().lower()
+    if flag in {"0", "false", "no", "off"}:
+        return False
+    if flag in {"1", "true", "yes", "on"}:
+        return True
+    host = os.environ.get("PROXY_HOST", "").strip()
+    user = os.environ.get("PROXY_USER", "").strip()
+    password = os.environ.get("PROXY_PASS", "")
+    return bool(host and user and password)
+
+
 def proxy_server(session_id: str) -> str | None:
+    if not proxy_enabled():
+        return None
     host = os.environ.get("PROXY_HOST", "").strip()
     user = os.environ.get("PROXY_USER", "").strip()
     password = os.environ.get("PROXY_PASS", "")

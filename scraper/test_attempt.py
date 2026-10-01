@@ -115,7 +115,19 @@ def test_unmeasured_bytes_stay_unknown():
     assert result["bytes"] is None
 
 
+def test_proxy_enabled_false_ignores_credentials(monkeypatch):
+    monkeypatch.setenv("PROXY_ENABLED", "false")
+    monkeypatch.setenv("PROXY_HOST", "gw.dataimpulse.com:823")
+    monkeypatch.setenv("PROXY_USER", "login")
+    monkeypatch.setenv("PROXY_PASS", "secret")
+    monkeypatch.setenv("PROXY_COUNTRY", "de")
+    from proxy import proxy_server
+
+    assert proxy_server("abc") is None
+
+
 def test_configured_proxy_is_passed_to_chrome(monkeypatch):
+    monkeypatch.delenv("PROXY_ENABLED", raising=False)
     monkeypatch.setenv("PROXY_HOST", "gw.dataimpulse.com:823")
     monkeypatch.setenv("PROXY_USER", "login")
     monkeypatch.setenv("PROXY_PASS", "secret")
