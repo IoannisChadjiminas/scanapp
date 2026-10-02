@@ -75,7 +75,7 @@ class GradingEvidence(BaseModel):
     is_graded: bool | None = None
     grading_status: Literal["unknown", "graded", "authenticated_only", "ungraded"] = "unknown"
     company: Literal["psa", "beckett", "cgc", "tag", "ace", "ags"] | None = None
-    company_source: Literal["label_ocr", "verified_logo", "none"] = "none"
+    company_source: Literal["label_ocr", "label_ocr_fuzzy", "verified_logo", "none"] = "none"
     grade: float | None = Field(default=None, ge=1, le=10)
     condition_label: str | None = None
     subgrades: dict[str, float] = Field(default_factory=dict)

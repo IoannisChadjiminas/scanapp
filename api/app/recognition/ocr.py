@@ -307,6 +307,7 @@ class CardOcr:
         """
         from app.recognition.grading import (
             MIN_CONFIDENCE, NUMBER, LabelLine, _condition, _label_identity, _text, brand_company, has_label_context, parse_label,
+            recover_fuzzy_company,
         )
         from app.recognition.label_vision import contrast_label, grade_regions, label_panels, logo_company, logo_text_regions, text_label_panel
         from app.schemas import GradingEvidence
@@ -316,6 +317,7 @@ class CardOcr:
         # pixels before side rotations. Keep the same global bounded budget.
         angles = (0,90,270,180) if image.width > image.height else (0,180)
         observations, failed, calls = [], False, 0
+        fuzzy_views = []
         conflict_codes = {'conflicting_grading_companies','conflicting_overall_grades',
                           'conflicting_condition_labels','certification_number_ambiguous',
                           'condition_grade_contradiction'}
@@ -328,7 +330,14 @@ class CardOcr:
         def read(patch):
             nonlocal calls
             calls += 1
-            return self._grading_lines(patch)
+            lines = self._grading_lines(patch)
+            fuzzy_views.append(list(lines))
+            return lines
+
+        def finish(result):
+            # Fuzzy issuer evidence is applied only after the established
+            # literal/shape OCR path finishes; it cannot cause an early exit.
+            return recover_fuzzy_company(result, fuzzy_views)
 
         def read_tokens(patches):
             nonlocal calls
@@ -390,7 +399,7 @@ class CardOcr:
                 initial = parse_label(lines)
                 observations.append(initial)
                 if complete(initial) or conflict_codes.intersection(initial.warnings):
-                    return initial
+                    return finish(initial)
                 # Try the initial original-pixel glyph before rectification
                 # can lose its bounds. Two literal reads are still required;
                 # a condition descriptor never supplies a numeric grade.
@@ -398,7 +407,7 @@ class CardOcr:
                 numeric = recover_number(strip,lines,initial)
                 observations.append(numeric)
                 if complete(numeric) or conflict_codes.intersection(numeric.warnings):
-                    return numeric
+                    return finish(numeric)
                 strip_fraction = .36
                 identities = {_text(l.text) for l in lines if l.confidence is not None
                     and l.confidence >= MIN_CONFIDENCE and _label_identity(_text(l.text))}
@@ -410,7 +419,7 @@ class CardOcr:
                     candidate = reconcile(parse_label(wider),initial)
                     observations.append(candidate)
                     if complete(candidate) or conflict_codes.intersection(candidate.warnings):
-                        return candidate
+                        return finish(candidate)
                     lines,initial,strip_fraction = wider,candidate,.60
                 panels = label_panels(oriented)
                 text_panel = text_label_panel(oriented,lines,strip_fraction=strip_fraction)
@@ -448,7 +457,7 @@ class CardOcr:
                     result = reconcile(result,initial)
                     observations.append(result)
                     if complete(result) or conflict_codes.intersection(result.warnings):
-                        return result
+                        return finish(result)
                     if (result.company is None and has_label_context(panel_lines) and calls <= 6
                             and hasattr(getattr(self,'engine',None),'get_rec_res')):
                         issuer_regions = logo_text_regions(panel)
@@ -466,7 +475,7 @@ class CardOcr:
                         result = reconcile(parse_label(panel_lines,visual_company=logo[0] if logo else None),initial)
                         observations.append(result)
                         if complete(result) or conflict_codes.intersection(result.warnings):
-                            return result
+                            return finish(result)
                     # Retry only a supported brand or a structured label, not
                     # every raw-card rules panel. Keep observed digit boxes.
                     if calls < 10 and (has_label_context(panel_lines)
@@ -501,7 +510,7 @@ class CardOcr:
                         combined = reconcile(combined,initial)
                         observations.append(combined)
                         if complete(combined) or conflict_codes.intersection(combined.warnings):
-                            return combined
+                            return finish(combined)
                         result = combined
                     if (calls <= 7 and result.slab_detected and result.company and result.grade is None
                             and hasattr(getattr(self,'engine',None),'get_rec_res')):
@@ -526,7 +535,7 @@ class CardOcr:
                         combined = reconcile(combined,result)
                         observations.append(combined)
                         if complete(combined) or conflict_codes.intersection(combined.warnings):
-                            return combined
+                            return finish(combined)
                 # Preserve the original restricted logo-only retry when a
                 # contour cannot isolate the label. New digits cannot replace
                 # existing grades/certificates from an enlarged logo tile.
@@ -551,7 +560,7 @@ class CardOcr:
                         # A late logo-only attempt cannot erase a stronger
                         # same-frame panel read already collected above.
                         viable = [r for r in observations if r.slab_detected]
-                        return max(viable,key=lambda r:(complete(r),r.grade is not None,r.company is not None))
+                        return finish(max(viable,key=lambda r:(complete(r),r.grade is not None,r.company is not None)))
                 if initial.slab_detected:
                     break
             except Exception:  # noqa: BLE001 - failure must not affect card recognition
@@ -563,7 +572,7 @@ class CardOcr:
             result = max(viable,key=lambda r:(complete(r),r.grade is not None,r.company is not None))
             if failed:
                 result.warnings.append('grading_ocr_failed')
-            return result
+            return finish(result)
         return GradingEvidence(label_text=observations[0].label_text if observations else [],
             warnings=(['grading_ocr_failed'] if failed else
                       ['no_supported_grading_label_detected','ungraded_status_not_proven']))
