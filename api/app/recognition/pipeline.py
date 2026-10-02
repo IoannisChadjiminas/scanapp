@@ -275,6 +275,11 @@ def _recognize_bytes_once(
     if combined and not retake and verifier is not None and (
         float(combined[0]["visual_score"]) < settings.threshold_min_visual
         or not .62 <= ratio <= .80
+        # A high global score with weak OCR and close visual neighbours can
+        # still be unresolved. Verify geometry instead of lowering thresholds
+        # or requiring a missing title to become confident identity evidence.
+        or (name_confidence < .85 and len(combined) > 1
+            and float(combined[0]['visual_score']) - float(combined[1]['visual_score']) < settings.threshold_min_gap)
     ):
         references = []
         seen_printings = set()

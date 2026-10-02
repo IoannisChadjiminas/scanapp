@@ -66,9 +66,10 @@ NAME_BOILERPLATE = {
     "nmmint",
     "nmmt",
     "evolvesfrom",
+    "hp",
 }
 NAME_PREFIX_SKIP = ("evolves from", "put ")
-NAME_EXACT_SKIP = {"たね", "基本", "トレーナー", "エネルギー", "サポート", "グッズ", "スタジアム", "gx", "vmax", "vstar", "ex"}
+NAME_EXACT_SKIP = {"たね", "基本", "トレーナー", "トレーナーズ", "エネルギー", "サポート", "サボート", "グッズ", "スタジアム", "gx", "vmax", "vstar", "star", "ex"}
 STAGE_ONLY = {"gx", "vmax", "vstar", "ex"}
 
 
@@ -99,6 +100,10 @@ def pick_name_line(lines: list[str]) -> str | None:
         if any(lowered.startswith(prefix) for prefix in NAME_PREFIX_SKIP):
             continue
         compact = _compact_latin(text)
+        # Collector-only grading labels are not titles. Preserve actual names
+        # containing numbers (e.g. Porygon2), not standalone SKU identifiers.
+        if re.fullmatch(r'\s*#\s*[A-Za-z]{0,4}\d{1,4}\s*', text):
+            continue
         # HP, collector/copyright lines and grading labels are not card names.
         # Uncertain/missing names remain neutral rather than vetoing artwork.
         if not _has_cjk(text) and (
