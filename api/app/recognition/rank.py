@@ -17,6 +17,17 @@ COLLECTOR_PARTS_RE = re.compile(
     re.IGNORECASE,
 )
 RELIABLE_COLLECTOR_CONF = 0.55
+NON_COLLECTOR_NUMBER_RE = re.compile(
+    r"(?:[×x]\s*\d+|#\s*\d+|\b(?:HP|LV\.?|IV|STAGE)\s*\d+|\d+\s*HP\b)",
+    re.IGNORECASE,
+)
+# These are set abbreviations, not the distinct TG/GG/SM/SWSH collector
+# namespaces. Only remove a known code when it directly precedes a fraction.
+MODERN_SET_CODES = ('SVI', 'PAL', 'OBF', 'MEW', 'PAR', 'PAF', 'TEF',
+                    'TWM', 'SFA', 'SCR', 'SSP', 'PRE', 'JTG', 'DRI')
+# Boxed modern regulation marks can touch the numeric fraction in OCR. This
+# cleanup is OCR-only: catalogue IDs and real collector namespaces are intact.
+REGULATION_FRACTION_RE = re.compile(r'\b[D-J](?=\d{1,4}/\d{1,4}\b)', re.IGNORECASE)
 
 
 @dataclass(frozen=True)
@@ -77,11 +88,37 @@ def extract_collector_candidates(
         seen.add(token)
         found.append(OcrHit(text=token, confidence=item.confidence, region=item.region))
 
+    def tokens(text: str) -> list[str]:
+        # Bottom-of-card OCR also contains weakness, level and Pokedex text.
+        # Region/confidence alone cannot make those numbers collectors.
+        cleaned = NON_COLLECTOR_NUMBER_RE.sub(" ", text)
+        compact = cleaned.replace(' ','')
+        # Modern set/language codes abut a numeric fraction in OCR, e.g.
+        # PAL EN 269/193 or SV2a 173/165. They are not collector prefixes.
+        compact = re.sub(r'(?i)\b[A-Z]{2,6}(?:EN|JP|JA)(?=\d{1,4}/\d{1,4})','',compact)
+        compact = re.sub(r'(?i)\bSV\d+[A-Z]?(?=\d{1,4}/\d{1,4})','',compact)
+        compact = re.sub(r'(?i)\b(?:' + '|'.join(MODERN_SET_CODES) +
+                         r')(?:EN|E|N)?(?=\d{1,4}/\d{1,4})', '', compact)
+        # Japanese rarity follows the denominator without a space in OCR.
+        compact = re.sub(r'(?i)(/\d{1,4})(?:SAR|SR|AR|UR|RR|SSR|CHR|CSR)\b',
+                         r'\1', compact)
+        # "D 201/202" is regulation D + collector 201/202, not namespace D.
+        # Never strip arbitrary letters, multi-letter TG/GG/SM prefixes, or a
+        # bare promo number such as D201. Preserve the hit's actual confidence.
+        compact = REGULATION_FRACTION_RE.sub('', compact)
+        # An isolated alphanumeric Japanese set code (SV2a) must not become
+        # the synthetic collector SV2A. Preserve plain SV2 shiny-vault IDs.
+        if re.fullmatch(r'(?i)SV\d+[A-Z]', compact):
+            return []
+        return COLLECTOR_RE.findall(compact)
+
     for hit in hits or []:
-        for match in COLLECTOR_RE.findall(hit.text.replace(" ", "")):
+        if hit.region == "name":
+            continue
+        for match in tokens(hit.text):
             add(OcrHit(text=match, confidence=hit.confidence, region=hit.region))
     for line in lines:
-        for match in COLLECTOR_RE.findall(line.replace(" ", "")):
+        for match in tokens(line):
             add(OcrHit(text=match, region="unknown"))
     return found
 
@@ -89,6 +126,12 @@ def extract_collector_candidates(
 def name_match(ocr_name: str | None, card_name: str) -> bool:
     if not ocr_name:
         return False
+    # Catalogue listings append the depicted professor, but the printed title
+    # is still "Professor's Research". Do not generally strip parentheses:
+    # other cards can encode meaningful form/variant identity there.
+    professor = re.fullmatch(r"(?i)(professor['’]s\s+research)\s+\(professor\s+[^)]+\)",card_name)
+    if professor:
+        card_name = professor.group(1)
     score = similar(ocr_name, card_name)
     left = normalize_text(ocr_name)
     right = normalize_text(card_name)
@@ -127,6 +170,27 @@ def number_match(
     return False
 
 
+def number_matches_identifiers(hits: list[OcrHit] | list[str], identifiers: list[str]) -> bool | None:
+    """Prefer known printed denominators to incomplete catalogue aliases.
+
+    A bare catalogue ID (186) must not make 186/198 agree with a known printed
+    identifier 186/195. Unknown denominators remain unknown, not fabricated.
+    """
+    identifiers = [n for n in identifiers if parse_collector(n) is not None]
+    if not identifiers:
+        return None
+    results = []
+    structured = [n for n in identifiers if (p := parse_collector(n)) and p.denominator]
+    for hit in hits:
+        text = hit.text if isinstance(hit, OcrHit) else str(hit)
+        parsed = parse_collector(text)
+        if parsed is None:
+            continue
+        expected = structured if parsed.denominator and structured else identifiers
+        results.append(any(number_match([hit], n) is True for n in expected))
+    return any(results) if results else None
+
+
 def accepted_collector_numbers(item: dict[str, Any]) -> list[str]:
     numbers = [str(item.get("collector_number") or "")]
     printed = str(item.get("printed_collector_number") or "")
@@ -135,16 +199,33 @@ def accepted_collector_numbers(item: dict[str, Any]) -> list[str]:
     return [number for number in numbers if number]
 
 
+def artwork_evidence_compatible(item: dict[str, Any], *, ocr_name: str | None,
+                                name_confidence: float, numbers: list[OcrHit],
+                                languages: tuple[str, ...]) -> bool:
+    """Artwork rescue must not override strong, structured identity evidence.
+
+    Bare numbers in a misaligned bottom ROI (HP/weakness/attack costs) are not
+    printing proof. They can still lower ordinary ranking, but cannot veto
+    geometric artwork verification. Unknown evidence remains neutral.
+    """
+    if languages and item.get("language") not in languages:
+        return False
+    name = normalize_text(ocr_name)
+    min_name_length = 2 if any(ord(c) > 0x2E80 for c in name) else 4
+    if name_confidence >= .85 and len(name) >= min_name_length and not name_match(ocr_name, item["name"]):
+        return False
+    reliable = [h for h in numbers if h.region == "collector" and
+                h.confidence is not None and h.confidence >= .85 and
+                ("/" in h.text or any(c.isalpha() for c in h.text))]
+    expected = accepted_collector_numbers(item)
+    return not any(expected and number_matches_identifiers([h], expected) is False for h in reliable)
+
+
 def _match_any(
     ocr_numbers: list[str] | list[OcrHit],
     collector_numbers: list[str],
 ) -> bool | None:
-    results = [number_match(ocr_numbers, number) for number in collector_numbers]
-    if any(result is True for result in results):
-        return True
-    if any(result is False for result in results):
-        return False
-    return None
+    return number_matches_identifiers(ocr_numbers, collector_numbers)
 
 
 def _has_reliable_conflict(
@@ -167,7 +248,13 @@ def rerank(
     ocr_numbers: list[str] | list[OcrHit],
     ocr_failed: bool,
     detected_languages: tuple[str, ...] = (),
+    name_confidence: float | None = None,
+    require_confident_ocr: bool = False,
 ) -> list[dict[str, Any]]:
+    name_weight = (max(0.0, min(1.0, name_confidence or 0.0))
+                   if require_confident_ocr else 1.0)
+    known_numbers = [h for h in ocr_numbers if isinstance(h, OcrHit) and
+                     h.confidence is not None and h.region == "collector"]
     ranked: list[dict[str, Any]] = []
     for item in visual:
         combined = float(item["visual_score"])
@@ -175,7 +262,7 @@ def rerank(
         name_ok = name_match(ocr_name, item["name"])
         numbers = accepted_collector_numbers(item)
         number_ok = _match_any(ocr_numbers, numbers)
-        collector_conflict = _has_reliable_conflict(ocr_numbers, numbers)
+        collector_conflict = _has_reliable_conflict(known_numbers if require_confident_ocr else ocr_numbers, numbers)
         language = str(item.get("language") or "")
         if detected_languages:
             if language in detected_languages:
@@ -184,6 +271,25 @@ def rerank(
                 combined -= 0.04
         if ocr_failed:
             consistent = None
+        elif require_confident_ocr:
+            match_weight = max((max(0.0, min(1.0, h.confidence)) for h in known_numbers
+                                if _match_any([h], numbers) is True), default=0.0)
+            conflict_weight = max((max(0.0, min(1.0, h.confidence)) for h in known_numbers
+                                   if _match_any([h], numbers) is False), default=0.0)
+            combined += .08*match_weight - .12*conflict_weight
+            if collector_conflict:
+                combined -= .08*conflict_weight
+            if name_ok:
+                combined += .06*name_weight
+            elif ocr_name and similar(ocr_name, item["name"]) < .4:
+                combined -= .04*name_weight
+            if collector_conflict or (conflict_weight >= RELIABLE_COLLECTOR_CONF and
+                                      match_weight < RELIABLE_COLLECTOR_CONF):
+                consistent = False
+            elif match_weight >= RELIABLE_COLLECTOR_CONF or (name_ok and name_weight >= RELIABLE_COLLECTOR_CONF):
+                consistent = True
+            elif ocr_name and name_weight >= RELIABLE_COLLECTOR_CONF and similar(ocr_name, item["name"]) < .4:
+                consistent = False
         elif number_ok is False and ocr_numbers:
             consistent = False
             combined -= 0.12
@@ -192,26 +298,37 @@ def rerank(
         elif name_ok or number_ok is True:
             consistent = True
             if name_ok:
-                combined += 0.06
+                combined += 0.06 * name_weight
             if number_ok is True:
                 combined += 0.08
         elif ocr_name and not name_ok:
-            consistent = False if similar(ocr_name, item["name"]) < 0.4 else None
+            consistent = False if name_weight >= RELIABLE_COLLECTOR_CONF and similar(ocr_name, item["name"]) < 0.4 else None
             if consistent is False:
-                combined -= 0.04
+                combined -= 0.04 * name_weight
         stored = dict(item)
-        stored.pop("printed_collector_number", None)
+        language_conflict = bool(detected_languages and language and language not in detected_languages)
+        strong_name_conflict = bool(require_confident_ocr and name_weight >= .85
+            and len(normalize_text(ocr_name)) >= (2 if any(ord(c)>0x2E80 for c in normalize_text(ocr_name)) else 4)
+            and not name_ok and similar(ocr_name,item['name']) < .4)
+        if require_confident_ocr and (language_conflict or strong_name_conflict):
+            consistent = False
+        structured_conflict = any(h.region == 'collector' and h.confidence is not None
+            and h.confidence >= .85 and '/' in h.text
+            and _match_any([h], numbers) is False for h in known_numbers)
         ranked.append(
             {
                 **stored,
                 "combined_score": combined,
                 "ocr_consistent": consistent,
                 "collector_conflict": collector_conflict,
+                "structured_collector_conflict": structured_conflict,
+                "language_conflict": language_conflict,
+                "strong_name_conflict": strong_name_conflict,
             }
         )
     ranked.sort(key=lambda row: row["combined_score"], reverse=True)
     ranked = _prefer_language_print(ranked, detected_languages)
-    return _keep_visual_leader(ranked)
+    return _keep_visual_leader(ranked, languages=detected_languages)
 
 
 def _prefer_language_print(
@@ -242,12 +359,22 @@ def _keep_visual_leader(
     *,
     min_visual: float = 0.78,
     min_gap: float = 0.04,
+    languages: tuple[str, ...] = (),
 ) -> list[dict[str, Any]]:
     if len(ranked) < 2:
         return ranked
     visual = sorted(ranked, key=lambda row: float(row["visual_score"]), reverse=True)
     lead = visual[0]
+    if languages and lead.get('language') not in languages:
+        return ranked
     gap = float(lead["visual_score"]) - float(visual[1]["visual_score"])
+    # Same name is not proof of a reprint: e.g. a rainbow trainer can share art
+    # with its non-rainbow printing while having a different collector number.
+    # Do not reinstate an explicitly conflicting visual leader over OCR ranking.
+    if lead.get('structured_collector_conflict') and any(
+        not r.get('structured_collector_conflict') for r in ranked
+    ):
+        return ranked
     # A wide gap is the picture itself. A small one can still be a false
     # collector hit, such as "LV. 18" agreeing with catalogue number 018.
     if lead.get("collector_conflict") and not _same_name_reprint(lead, visual[1]) and gap < 0.10:
@@ -275,7 +402,7 @@ def _same_name_reprint(lead: dict[str, Any], other: dict[str, Any]) -> bool:
 def _visual_second(suggestions: list[dict[str, Any]], top_id: str) -> float:
     second = 0.0
     for row in sorted(suggestions, key=lambda item: float(item["visual_score"]), reverse=True):
-        if row["card_id"] != top_id:
+        if row["card_id"] != top_id and not row.get('language_conflict'):
             return float(row["visual_score"])
     return second
 
@@ -314,8 +441,10 @@ def decide_status(
         return "no_match"
     ocr_floor = min_visual if min_visual_ocr is None else min_visual_ocr
     top = suggestions[0]
-    visual_lead = max(suggestions, key=lambda row: float(row["visual_score"]))
-    if visual_lead.get("collector_conflict") or top.get("collector_conflict"):
+    compatible = [row for row in suggestions if not row.get('language_conflict')]
+    visual_lead = max(compatible or suggestions, key=lambda row: float(row["visual_score"]))
+    if (visual_lead.get("collector_conflict") or top.get("collector_conflict")
+        or top.get('structured_collector_conflict') or top.get('language_conflict') or top.get('strong_name_conflict')):
         return "uncertain"
     second = _visual_second(suggestions, top["card_id"])
     gap = float(top["visual_score"]) - second

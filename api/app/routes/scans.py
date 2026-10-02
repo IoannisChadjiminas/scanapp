@@ -7,12 +7,15 @@ import time
 
 from fastapi import APIRouter, Form, HTTPException, Request, Response, UploadFile
 
-from app.cardmarket import MappingError, resolve_variant_choice
+from app.cardmarket import (
+    MappingError, normalize_product_url, resolve_variant_choice, url_for_row, variants_for_row,
+)
 from app.db import coverage_payload
 from app.recognition.artifacts import ArtifactError
 from app.recognition.images import ImageError
 from app.recognition.captures import apply_feedback
 from app.recognition.pipeline import recognize_bytes
+from app.recognition.presentation import match_presentation
 from app.recognition.upload import read_upload_limited
 from app.schemas import (
     Candidate,
@@ -103,6 +106,22 @@ async def scan_feedback(
     dbs = request.app.state.dbs
     session_id = get_or_create_session(request, response, dbs, settings)
     require_scan_owner(dbs, scan_id, session_id)
+    saved_scan = dbs.results.execute("SELECT status, ocr_json, confirmed_card_id FROM scans WHERE id = ?", (scan_id,)).fetchone()
+    if payload.action == "confirm" and saved_scan["status"] in {"retake", "no_match", "failed"} and payload.card_id != saved_scan["confirmed_card_id"]:
+        raise HTTPException(status_code=409, detail="This scan has no verified suggestion. Retake or use manual correction.")
+    if payload.action == "confirm" and saved_scan["status"] == "printing_ambiguous":
+        review = json.loads(saved_scan["ocr_json"] or "{}").get("printing_review") or {}
+        offered = {r["card_id"] for r in review.get("plausible_printings", [])}
+        if saved_scan["confirmed_card_id"]:
+            offered.add(saved_scan["confirmed_card_id"])
+        if not payload.printing_selected or payload.card_id not in offered:
+            raise HTTPException(status_code=409, detail="Choose an offered printing explicitly, or use manual correction.")
+        if dbs.catalog.execute("SELECT 1 FROM cards WHERE id=?", (payload.card_id,)).fetchone() is None:
+            raise HTTPException(status_code=409, detail="The selected printing is no longer in this catalogue.")
+        selected_row = dbs.catalog.execute("SELECT * FROM cards WHERE id=?", (payload.card_id,)).fetchone()
+        finish_choices = variants_for_row(dbs.catalog, selected_row)
+        if len(finish_choices) >= 2 and not payload.cardmarket_url:
+            raise HTTPException(status_code=409, detail="Choose this printing's finish explicitly.")
     confirmed = None
     rejected = 0
     chosen_url = payload.cardmarket_url
@@ -118,6 +137,16 @@ async def scan_feedback(
         rejected = 1
         chosen_url = None
     if confirmed and payload.cardmarket_url:
+        if saved_scan["status"] == "printing_ambiguous" and payload.action == "confirm":
+            # Manual printing selection may choose only this printing's
+            # identity-filtered finish links. Do not learn a new mapping from
+            # an arbitrary pasted URL, even with an editable local catalogue.
+            allowed = {item["url"] for item in finish_choices}
+            primary_url = url_for_row(selected_row)
+            if primary_url:
+                allowed.add(primary_url)
+            if normalize_product_url(payload.cardmarket_url) not in allowed:
+                raise HTTPException(status_code=409, detail="Choose a validated finish belonging to the selected printing.")
         try:
             picked = resolve_variant_choice(
                 dbs.catalog,
@@ -127,6 +156,13 @@ async def scan_feedback(
             )
         except MappingError as exc:
             raise HTTPException(status_code=exc.status_code, detail=exc.detail) from exc
+        if saved_scan["status"] == "printing_ambiguous" and payload.action == "confirm":
+            # A finish URL must not silently switch the explicitly selected
+            # printing to a same-name card in a different set.
+            selected = dbs.catalog.execute("SELECT set_name,collector_number,language FROM cards WHERE id=?", (confirmed,)).fetchone()
+            owner = dbs.catalog.execute("SELECT set_name,collector_number,language FROM cards WHERE id=?", (picked["card_id"],)).fetchone()
+            if selected is None or owner is None or tuple(selected) != tuple(owner):
+                raise HTTPException(status_code=409, detail="The chosen listing belongs to a different printing. Choose its set explicitly.")
         confirmed = str(picked["card_id"])
         chosen_url = str(picked["url"])
     dbs.results.execute(
@@ -153,7 +189,7 @@ async def scan_feedback(
 
 @router.get("/session/results")
 async def session_results(request: Request, response: Response) -> dict:
-    from app.schemas import SessionResult, SessionResultsResponse, ScanStatus
+    from app.schemas import MatchPresentation, PrintingReview, SessionResult, SessionResultsResponse, ScanStatus
 
     settings = request.app.state.settings
     dbs = request.app.state.dbs
@@ -161,7 +197,7 @@ async def session_results(request: Request, response: Response) -> dict:
     rows = dbs.results.execute(
         """
         SELECT id, created_at, status, combined_ranking_json, confirmed_card_id,
-               rejected, timings_json
+               rejected, timings_json, chosen_cardmarket_url, ocr_json
         FROM scans
         WHERE session_id = ?
         ORDER BY created_at DESC
@@ -171,7 +207,16 @@ async def session_results(request: Request, response: Response) -> dict:
     results: list[SessionResult] = []
     for row in rows:
         ranking = json.loads(row["combined_ranking_json"] or "[]")
-        suggestions = [Candidate.model_validate(item) for item in ranking[:1]]
+        shown = [] if row["status"] in {"retake", "no_match", "failed"} else ranking[:1]
+        suggestions = [Candidate.model_validate(item) for item in shown]
+        evidence = json.loads(row['ocr_json'] or '{}')
+        review = PrintingReview.model_validate(evidence['printing_review']) if evidence.get('printing_review') else None
+        # Persist new responses exactly; derive the additive display fields for
+        # legacy scans without changing their ranking/status/feedback.
+        presentation = (MatchPresentation.model_validate(evidence['match_presentation'])
+            if evidence.get('match_presentation') else match_presentation(ranking,
+                status=row['status'], printing_review=review,
+                min_visual=settings.threshold_min_visual_ocr))
         results.append(
             SessionResult(
                 scan_id=row["id"],
@@ -179,8 +224,12 @@ async def session_results(request: Request, response: Response) -> dict:
                 status=ScanStatus(row["status"]),
                 suggestions=suggestions,
                 confirmed_card_id=row["confirmed_card_id"],
+                chosen_cardmarket_url=row["chosen_cardmarket_url"],
                 rejected=bool(row["rejected"]),
                 timings_ms=json.loads(row["timings_json"] or "{}"),
+                printing_review=review,
+                confidence=evidence.get("confidence"),
+                **presentation.model_dump(mode='json'),
             )
         )
     coverage_model = coverage_payload(dbs.catalog)

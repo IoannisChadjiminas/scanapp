@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
+from app.recognition.ocr import OcrHit
 
 LANGUAGE_GROUPS: dict[str, tuple[str, ...]] = {
     "en": ("en",),
@@ -137,6 +138,15 @@ def detect_card_language(texts: list[str]) -> str | None:
 
 def detect_script_language(texts: list[str]) -> str | None:
     return detect_card_language(texts)
+
+
+def confident_language_texts(hits: list[OcrHit]) -> list[str]:
+    """Low-confidence OCR hallucinations must not veto a known language.
+
+    Unknown confidence remains neutral. The ordinary script classifier still
+    runs unchanged on the readable text; requested language still takes priority.
+    """
+    return [h.text for h in hits if h.confidence is not None and h.confidence >= .85]
 
 
 def resolve_search_languages(

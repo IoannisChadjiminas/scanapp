@@ -1566,6 +1566,35 @@ def test_apply_variants_keeps_url_when_finishes_belong_to_the_card(tmp_path: Pat
     assert images["Abra-V2-MEW063"].endswith("/720396.jpg")
 
 
+def test_variant_identity_quarantines_wrong_linked_pokemon(tmp_path: Path) -> None:
+    import pytest
+    from app.cardmarket import MappingError, resolve_variant_choice, variants_for_row
+    from app.planetscale import CloudCatalogConnection
+
+    conn = connect(tmp_path / "catalog.sqlite", factory=CloudCatalogConnection)
+    init_catalog(conn)
+    base = "https://www.cardmarket.com/en/Pokemon/Products/Singles/Scarlet-Violet-Promos/"
+    correct = base + "Arctibax-SV-P051"
+    sibling = base + "Arctibax-V2-SV-P051"
+    wrong = base + "Victini-ex-V1-SV-P051"
+    _insert_card(conn, "ja:SV-P-051", "セゴール", "SV Promo", "051", "ja",
+                 cardmarket_url=correct, verified=1)
+    for url, title in [(correct, "Arctibax"), (sibling, "Arctibax"), (wrong, "Victini ex")]:
+        _insert_product(conn, url, f"{title} (SV-P 051)From 0,50 €")
+    conn.execute("UPDATE cardmarket_expansion_products SET card_id=?,matched=1", ("ja:SV-P-051",))
+    row = conn.execute("SELECT * FROM cards WHERE id=?", ("ja:SV-P-051",)).fetchone()
+    assert {v["url"] for v in variants_for_row(conn, row)} == {correct, sibling}
+    conn.execute("DELETE FROM cardmarket_expansion_products WHERE url=?", (sibling,))
+    assert variants_for_row(conn, row) == []
+    # Runtime quarantine must not mutate the source mapping or catalogue URL.
+    assert conn.execute("SELECT matched FROM cardmarket_expansion_products WHERE url=?", (wrong,)).fetchone()[0] == 1
+    assert url_for_row(row) == correct
+    conn.catalogue_readonly = True
+    with pytest.raises(MappingError, match="identity disagrees"):
+        resolve_variant_choice(conn, tmp_path, scanned_card_id="ja:SV-P-051", url=wrong)
+    assert resolve_variant_choice(conn, tmp_path, scanned_card_id="ja:SV-P-051", url=correct)["url"] == correct
+
+
 def test_additionals_listing_is_a_variant_with_metadata(tmp_path: Path) -> None:
     from app.cardmarket import apply_variants_to_candidate, variants_for_row
     from app.schemas import Candidate
@@ -1726,6 +1755,39 @@ def test_pokeball_listing_keeps_original_and_includes_image(tmp_path: Path) -> N
     apply_variants_to_candidate(conn, item)
     assert item["cardmarket_url"] == original
     assert len(item["cardmarket_variants"]) == 2
+
+
+def test_resolve_variant_choice_rejects_different_pokemon_or_language_owner(tmp_path: Path) -> None:
+    import pytest
+    from app.cardmarket import MappingError, resolve_variant_choice
+
+    conn = connect(tmp_path / "catalog.sqlite")
+    init_catalog(conn)
+    url = "https://www.cardmarket.com/en/Pokemon/Products/Singles/Scarlet-Violet-Promos/Victini-ex-V1-SV-P051"
+    _insert_card(conn, "ja:SV-P-051", "セゴール", "SV Promo", "051", "ja")
+    _insert_card(conn, "other-owner", "ビクティニex", "SV Promo", "051", "ja", cardmarket_url=url)
+    for name, language in [("ビクティニex", "ja"), ("Fuecoco", "en"), ("セゴール", "en")]:
+        conn.execute("UPDATE cards SET name=?,language=? WHERE id='other-owner'", (name, language))
+        with pytest.raises(MappingError, match="owner identity"):
+            resolve_variant_choice(conn, tmp_path, scanned_card_id="ja:SV-P-051", url=url)
+
+
+def test_readonly_unowned_sku_group_does_not_bypass_identity_guard(tmp_path: Path) -> None:
+    import pytest
+    from app.cardmarket import MappingError, resolve_variant_choice
+    from app.planetscale import CloudCatalogConnection, protect_catalogue
+
+    conn = connect(tmp_path / "catalog.sqlite", factory=CloudCatalogConnection)
+    init_catalog(conn)
+    _insert_card(conn, "ja:SV-P-051", "セゴール", "SV Promo", "051", "ja")
+    base = "https://www.cardmarket.com/en/Pokemon/Products/Singles/Scarlet-Violet-Promos/"
+    for slug, title in [("Arctibax-SV-P051", "Arctibax"), ("Victini-ex-V1-SV-P051", "Victini ex")]:
+        _insert_product(conn, base + slug, f"{title} (SV-P 051)From 0,50 €")
+    conn.execute("UPDATE cardmarket_expansion_products SET card_id='ja:SV-P-051',matched=1")
+    conn.commit()
+    protect_catalogue(conn)
+    with pytest.raises(MappingError, match="identity disagrees"):
+        resolve_variant_choice(conn, tmp_path, scanned_card_id="ja:SV-P-051", url=base + "Victini-ex-V1-SV-P051")
 
 
 def test_resolve_variant_choice_uses_extra_owner(tmp_path: Path) -> None:

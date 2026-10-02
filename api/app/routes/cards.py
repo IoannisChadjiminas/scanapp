@@ -8,9 +8,9 @@ from fastapi import APIRouter, HTTPException, Query, Request
 from fastapi.responses import FileResponse
 
 from app.card_images import display_image_url
-from app.cardmarket import url_for_row
+from app.cardmarket import url_for_row, variants_for_row
 from app.recognition.language import expand_language
-from app.schemas import CardSearchResponse, CardSummary
+from app.schemas import CardmarketVariant, CardSearchResponse, CardSummary
 
 router = APIRouter()
 
@@ -122,7 +122,12 @@ def get_card(card_id: str, request: Request) -> CardSummary:
     ).fetchone()
     if row is None:
         raise HTTPException(status_code=404, detail="Card not found")
-    return _summary(row)
+    summary = _summary(row)
+    summary.cardmarket_variants = [
+        CardmarketVariant.model_validate(variant)
+        for variant in variants_for_row(request.app.state.dbs.catalog, row)
+    ]
+    return summary
 
 
 @router.get("/cards/{card_id}/image")

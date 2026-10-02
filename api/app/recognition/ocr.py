@@ -30,6 +30,8 @@ class OcrResult:
     lines: list[str] = field(default_factory=list)
     hits: list[OcrHit] = field(default_factory=list)
     failed: bool = False
+    collector_retry_used: bool = False
+    collector_retry_contributed: bool = False
 
 
 def _region(image: Image.Image, y0: float, y1: float) -> Image.Image:
@@ -40,13 +42,32 @@ def _region(image: Image.Image, y0: float, y1: float) -> Image.Image:
 
 
 NAME_BOILERPLATE = {
+    "basic",
+    "stage1",
+    "stage2",
+    "tage1",
+    "tage2",
+    "stagei",
+    "bas1c",
     "basicpokemon",
+    "pokemon",
     "trainer",
     "energy",
+    "supporter",
+    "item",
+    "stadium",
+    "tool",
+    "pokemontool",
+    "authentic",
+    "graded",
+    "mint",
+    "gemmint",
+    "nmmint",
+    "nmmt",
     "evolvesfrom",
 }
 NAME_PREFIX_SKIP = ("evolves from", "put ")
-NAME_EXACT_SKIP = {"たね", "基本", "トレーナー", "エネルギー", "gx", "vmax", "vstar", "ex"}
+NAME_EXACT_SKIP = {"たね", "基本", "トレーナー", "エネルギー", "サポート", "グッズ", "スタジアム", "gx", "vmax", "vstar", "ex"}
 STAGE_ONLY = {"gx", "vmax", "vstar", "ex"}
 
 
@@ -72,6 +93,14 @@ def pick_name_line(lines: list[str]) -> str | None:
         if any(lowered.startswith(prefix) for prefix in NAME_PREFIX_SKIP):
             continue
         compact = _compact_latin(text)
+        # HP, collector/copyright lines and grading labels are not card names.
+        # Uncertain/missing names remain neutral rather than vetoing artwork.
+        if not _has_cjk(text) and (
+            not re.search(r"[a-zA-Z]", text)
+            or re.fullmatch(r"(?:HP\s*)?\d{1,4}(?:\s*(?:HP|ex|vmax|v))?", text, re.I)
+            or re.search(r"(?:\b\d{4}\s+POK[EÉ]MON\b|\bGEM\s*MT\b|\bPSA\b|\bGAME\s*FREAK\b|Nintendo|©|copyright)", text, re.I)
+        ):
+            continue
         if compact in NAME_BOILERPLATE:
             continue
         if compact in STAGE_ONLY and not _has_cjk(text):
@@ -80,6 +109,17 @@ def pick_name_line(lines: list[str]) -> str | None:
             continue
         return text
     return None
+
+
+def pick_confident_name(lines: list[str], scores: list[float | None]) -> str | None:
+    first = pick_name_line(lines)
+    if first is None:
+        return None
+    first_score = next((score or 0. for text,score in zip(lines,scores) if text == first),0.)
+    if first_score >= .85:
+        return first
+    confident = [text for text,score in zip(lines,scores) if score is not None and score >= .85]
+    return pick_name_line(confident) or first
 
 
 COLLECTOR_FRACTION_RE = re.compile(r"\d{1,4}\s*/\s*\d{1,4}")
@@ -128,13 +168,15 @@ class CardOcr:
         txts = getattr(output, "txts", None)
         raw_scores = getattr(output, "scores", None)
         if txts:
-            texts.extend(str(item) for item in txts if item)
-            if raw_scores:
-                scores.extend(
-                    float(score) if score is not None else None for score in list(raw_scores)[: len(texts)]
-                )
-            while len(scores) < len(texts):
-                scores.append(None)
+            score_values = list(raw_scores) if raw_scores is not None else []
+            # Skip text and its score together. Empty OCR entries must not
+            # give a later weak observation an unrelated high confidence.
+            for i, item in enumerate(txts):
+                if not item:
+                    continue
+                texts.append(str(item))
+                score = score_values[i] if i < len(score_values) else None
+                scores.append(float(score) if score is not None else None)
             return texts, scores
         if isinstance(output, (list, tuple)):
             for item in output:
@@ -156,6 +198,36 @@ class CardOcr:
         try:
             name_lines, name_scores = self._run(_region(image, 0.0, 0.22))
             number_lines, number_scores = self._run(_region(image, 0.82, 1.0))
+            name_text = pick_confident_name(name_lines,name_scores)
+            collector_retry_used = False
+            collector_retry_contributed = False
+            name_confidence = max((score or 0. for text, score in zip(name_lines, name_scores)
+                                   if text == name_text), default=0.)
+            # Small slab/card frames often leave the bottom digits only a few
+            # pixels high. One bounded interpolation pass; no invented digits,
+            # confidence boost, or replacement of a conflicting first read.
+            has_identifier = any(COLLECTOR_FRACTION_RE.search(text) or
+                re.search(r'\b[A-Z]{1,5}[- ]?\d{1,4}\b', text) for text in number_lines)
+            if image.width < 450 and name_text and name_confidence >= .85 and not has_identifier:
+                collector_retry_used = True
+                bottom = _region(image, .82, 1.)
+                scale = min(3., 800 / bottom.width)
+                enlarged = bottom.resize((round(bottom.width * scale), round(bottom.height * scale)),
+                                         Image.Resampling.LANCZOS)
+                try:
+                    retry_lines, retry_scores = self._run(enlarged)
+                    # A shifted frame may contain attack/weakness text. This
+                    # optional pass contributes only explicit fractions or
+                    # whole promo codes, never incidental bare digits/"2N".
+                    identifiers = [(text, score) for text, score in zip(retry_lines, retry_scores)
+                        if score is not None and score >= .85 and
+                        (COLLECTOR_FRACTION_RE.search(text) or
+                         re.fullmatch(r'[A-Z]{1,5}[- ]?\d{1,4}', text.strip()))]
+                    collector_retry_contributed = bool(identifiers)
+                    number_lines = [*number_lines, *(text for text, _ in identifiers)]
+                    number_scores = [*number_scores, *(score for _, score in identifiers)]
+                except Exception:  # noqa: BLE001 - keep successful first-pass observations
+                    pass
             extra_lines: list[str] = []
             extra_scores: list[float | None] = []
             if not name_lines and not number_lines:
@@ -176,11 +248,13 @@ class CardOcr:
                 ],
             ]
             return OcrResult(
-                name_text=pick_name_line(name_lines) or pick_name_line(lines),
+                name_text=name_text or pick_name_line(lines),
                 collector_text=pick_collector_text(number_lines),
                 lines=lines,
                 hits=hits,
                 failed=False,
+                collector_retry_used=collector_retry_used,
+                collector_retry_contributed=collector_retry_contributed,
             )
         except Exception:  # noqa: BLE001 - OCR must never block retrieval
             return OcrResult(failed=True)

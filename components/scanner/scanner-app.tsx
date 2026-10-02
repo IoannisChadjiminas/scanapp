@@ -171,6 +171,8 @@ export function ScannerApp() {
             ? "Most likely card is ready."
             : result.status === "uncertain"
               ? "Closest print is ready."
+              : result.status === "printing_ambiguous"
+                ? "Choose the printing or retake the full card."
               : "Not a match.",
       );
       await refreshResults();
@@ -188,12 +190,13 @@ export function ScannerApp() {
     action: "confirm" | "correct" | "reject",
     cardId?: string,
     cardmarketUrl?: string | null,
+    printingSelected = false,
   ) {
     if (!scan) {
       return;
     }
     try {
-      await api.feedback(scan.id, action, cardId, cardmarketUrl ?? undefined);
+      await api.feedback(scan.id, action, cardId, cardmarketUrl ?? undefined, printingSelected);
       if (action !== "reject") {
         await queueCardmarketLookup(cardmarketUrl, cardId);
       }
@@ -383,11 +386,13 @@ export function ScannerApp() {
 
           {stage === "result" && scan ? (
             <Suggestions
+              key={scan.id}
               status={scan.status}
               message={scan.message}
               suggestions={scan.suggestions}
-              onConfirm={(cardId, cardmarketUrl) =>
-                void sendFeedback("confirm", cardId, cardmarketUrl)
+              printingReview={scan.printing_review ?? null}
+              onConfirm={(cardId, cardmarketUrl, printingSelected) =>
+                void sendFeedback("confirm", cardId, cardmarketUrl, printingSelected)
               }
               onChooseAnother={() => setPickerOpen(true)}
               onReject={() => void sendFeedback("reject")}

@@ -1264,6 +1264,22 @@ def _card_owners(conn: sqlite3.Connection) -> dict[str, sqlite3.Row]:
     }
 
 
+def _identity_filtered_products(row: Any, products: list[Any]) -> list[Any]:
+    primary = str(_row_value(row, "cardmarket_url") or "")
+    anchor = next((item for item in products if str(item["url"]) == primary), None)
+    title = (listing_product_title(str(anchor["name"] or "")) if anchor is not None
+             else str(_row_value(row, "name") or ""))
+
+    def identity(value: str) -> str:
+        return _title_key(re.sub(r"\s+cosmos[- ]holo$", "", value, flags=re.I))
+
+    wanted = identity(title)
+    if not wanted:
+        return []
+    return [item for item in products
+            if identity(listing_product_title(str(item["name"] or ""))) == wanted]
+
+
 def variants_for_row(
     conn: sqlite3.Connection,
     row: Any,
@@ -1291,7 +1307,12 @@ def variants_for_row(
     ).fetchall()
     if len(products) < 2:
         return []
-    return [variant_record(item) for item in products]
+    # Stored ownership is necessary but not sufficient: an erroneous imported
+    # owner must not turn a different Pokemon into a selectable finish. Use the
+    # existing primary listing's title for Japanese names, without a network
+    # translation or learning aliases from the suspect sibling itself.
+    valid = _identity_filtered_products(row, products)
+    return [variant_record(item) for item in valid] if len(valid) >= 2 else []
 
 
 def apply_variants_to_candidate(
@@ -1422,17 +1443,44 @@ def resolve_variant_choice(
         raise MappingError("Need a Cardmarket Singles product URL")
     owner = conn.execute(
         """
-        SELECT id FROM cards
+        SELECT id, name, language FROM cards
         WHERE cardmarket_url = ?
         """,
         (product,),
     ).fetchone()
     if owner is not None:
+        scanned = conn.execute(
+            "SELECT name,language FROM cards WHERE id=?", (scanned_card_id,),
+        ).fetchone()
+        def normalized_name(card: Any) -> str:
+            return unicodedata.normalize("NFKC", str(card["name"] or "")).strip().casefold()
+        if (scanned is None or not normalized_name(scanned)
+                or normalized_name(owner) != normalized_name(scanned)
+                or str(owner["language"] or "") != str(scanned["language"] or "")):
+            raise MappingError("Listing owner identity disagrees with the confirmed card", status_code=409)
         return {
             "card_id": str(owner["id"]),
             "url": product,
             "mapped": False,
         }
+    # Cloud catalogues only permit explicit, identity-checked links. Do this
+    # before the legacy unowned-group shortcut used by editable catalogues.
+    if getattr(conn, "catalogue_readonly", False):
+        linked = conn.execute(
+            "SELECT card_id FROM cardmarket_expansion_products WHERE url = ? AND card_id = ? AND matched = 1",
+            (product, scanned_card_id),
+        ).fetchone()
+        if linked is None:
+            raise MappingError("Listing is not linked in the read-only catalogue", status_code=409)
+        scanned = conn.execute("SELECT * FROM cards WHERE id=?", (scanned_card_id,)).fetchone()
+        products = conn.execute(
+            "SELECT url,name FROM cardmarket_expansion_products WHERE card_id=? AND matched=1",
+            (scanned_card_id,),
+        ).fetchall()
+        valid = _identity_filtered_products(scanned, products) if scanned is not None else []
+        if product not in {str(item["url"]) for item in valid}:
+            raise MappingError("Listing identity disagrees with the catalogue card", status_code=409)
+        return {"card_id": scanned_card_id, "url": product, "mapped": False}
     key = product_sku_key(product)
     grouped = grouped_expansion_skus(conn)
     group = grouped.get(key, []) if key is not None else []
@@ -1448,14 +1496,6 @@ def resolve_variant_choice(
             "url": product,
             "mapped": False,
         }
-    if getattr(conn, "catalogue_readonly", False):
-        linked = conn.execute(
-            "SELECT card_id FROM cardmarket_expansion_products WHERE url = ? AND card_id = ? AND matched = 1",
-            (product, scanned_card_id),
-        ).fetchone()
-        if linked is None:
-            raise MappingError("Listing is not linked in the read-only catalogue", status_code=409)
-        return {"card_id": scanned_card_id, "url": product, "mapped": False}
     mapped = map_card_product(
         conn,
         data_dir,

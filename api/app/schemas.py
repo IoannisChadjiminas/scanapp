@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from datetime import datetime
 from enum import Enum
-from typing import Any
+from typing import Any, Literal
 
 from pydantic import BaseModel, Field
 
@@ -11,6 +11,7 @@ class ScanStatus(str, Enum):
     matched = "matched"
     no_match = "no_match"
     uncertain = "uncertain"
+    printing_ambiguous = "printing_ambiguous"
     retake = "retake"
     failed = "failed"
 
@@ -53,6 +54,9 @@ class Candidate(BaseModel):
     cardmarket_url: str | None = None
     cardmarket_prices: list[CardmarketPrice] = Field(default_factory=list)
     cardmarket_variants: list[CardmarketVariant] = Field(default_factory=list)
+    retrieved_via: list[str] = Field(default_factory=list)
+    artwork_score: float | None = None
+    artwork_profile: str | None = None
 
 
 class OcrEvidence(BaseModel):
@@ -60,6 +64,69 @@ class OcrEvidence(BaseModel):
     collector_text: str | None = None
     lines: list[str] = Field(default_factory=list)
     failed: bool = False
+    collector_retry_used: bool = False
+    collector_retry_contributed: bool = False
+
+
+class RecognitionConfidence(BaseModel):
+    """Raw evidence, not a calibrated percentage of successful recognition."""
+
+    probability: float | None = Field(default=None, ge=0, le=1)
+    calibration_status: str = "uncalibrated"
+    candidate_card_id: str | None = None
+    visual_similarity: float | None = None
+    artwork_similarity: float | None = None
+    visual_margin: float | None = None
+    name_ocr_confidence: float | None = None
+    collector_ocr_confidence: float | None = None
+    identity: str = "unknown"
+    printing: str = "unconfirmed"
+    finish: str = "unconfirmed"
+    requires_confirmation: bool = True
+    retake_recommended: bool = False
+    reasons: list[str] = Field(default_factory=list)
+
+
+class PlausiblePrinting(BaseModel):
+    card_id: str
+    name: str
+    set_name: str
+    collector_number: str
+    language: str
+    image_url: str
+    cardmarket_url: str | None = None
+
+
+class PrintingReview(BaseModel):
+    reason: str
+    candidate_group_id: str
+    grouping_basis: str = "reference_similarity_or_near_tied_retrieval"
+    reference_coverage_complete: bool = False
+    collector_evidence: list[str] = Field(default_factory=list)
+    plausible_printings: list[PlausiblePrinting]
+    guidance: str
+
+
+class MatchOption(PlausiblePrinting):
+    """A display choice; absent retrieval scores stay unknown, not fabricated."""
+
+    language: str = ""
+    visual_score: float | None = None
+    combined_score: float | None = None
+    artwork_score: float | None = None
+    ocr_consistent: bool | None = None
+    rarity: str = ""
+    retrieved_via: list[str] = Field(default_factory=list)
+    cardmarket_prices: list[CardmarketPrice] = Field(default_factory=list)
+    cardmarket_variants: list[CardmarketVariant] = Field(default_factory=list)
+    source: Literal["retrieval", "printing_review"] = "retrieval"
+    selection_action: Literal["confirm", "correct"] = "confirm"
+
+
+class MatchPresentation(BaseModel):
+    best_match: MatchOption | None = None
+    alternatives: list[MatchOption] = Field(default_factory=list)
+    match_state: Literal["matched", "likely", "tentative", "unavailable"] = "unavailable"
 
 
 class LanguageCoverage(BaseModel):
@@ -97,7 +164,7 @@ class PrepareResponse(BaseModel):
     converted: bool
 
 
-class ScanResponse(BaseModel):
+class ScanResponse(MatchPresentation):
     id: str
     status: ScanStatus
     suggestions: list[Candidate]
@@ -108,12 +175,15 @@ class ScanResponse(BaseModel):
     message: str | None = None
     detected_language: str | None = None
     search_languages: list[str] = Field(default_factory=list)
+    printing_review: PrintingReview | None = None
+    confidence: RecognitionConfidence | None = None
 
 
 class FeedbackRequest(BaseModel):
     action: FeedbackAction
     card_id: str | None = None
     cardmarket_url: str | None = None
+    printing_selected: bool = False
 
 
 class FeedbackResponse(BaseModel):
@@ -134,6 +204,7 @@ class CardSummary(BaseModel):
     image_url: str | None = None
     variants: dict[str, Any] = Field(default_factory=dict)
     cardmarket_url: str | None = None
+    cardmarket_variants: list[CardmarketVariant] = Field(default_factory=list)
 
 
 class CardSearchResponse(BaseModel):
@@ -141,14 +212,17 @@ class CardSearchResponse(BaseModel):
     total: int
 
 
-class SessionResult(BaseModel):
+class SessionResult(MatchPresentation):
     scan_id: str
     created_at: datetime
     status: ScanStatus
     suggestions: list[Candidate]
     confirmed_card_id: str | None = None
+    chosen_cardmarket_url: str | None = None
     rejected: bool
     timings_ms: dict[str, float] = Field(default_factory=dict)
+    printing_review: PrintingReview | None = None
+    confidence: RecognitionConfidence | None = None
 
 
 class SessionResultsResponse(BaseModel):

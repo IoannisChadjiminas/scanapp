@@ -20,8 +20,8 @@ import {
   EmptyHeader,
   EmptyTitle,
 } from "@/components/ui/empty";
-import { assetUrl } from "@/lib/api";
-import type { Candidate, CardmarketVariant, ScanStatus } from "@/lib/api-types";
+import { api, assetUrl } from "@/lib/api";
+import type { Candidate, CardSummary, CardmarketVariant, PrintingReview, ScanStatus } from "@/lib/api-types";
 import { languageLabel } from "@/lib/languages";
 import { CardmarketOpen } from "@/components/scanner/cardmarket-open";
 import {
@@ -33,7 +33,8 @@ type SuggestionsProps = {
   status: ScanStatus;
   message: string | null;
   suggestions: Candidate[];
-  onConfirm: (cardId: string, cardmarketUrl?: string | null) => void;
+  printingReview: PrintingReview | null;
+  onConfirm: (cardId: string, cardmarketUrl?: string | null, printingSelected?: boolean) => void;
   onChooseAnother: () => void;
   onReject: () => void;
   onScanAgain: () => void;
@@ -45,6 +46,9 @@ function statusLabel(status: ScanStatus) {
   }
   if (status === "uncertain") {
     return "Uncertain";
+  }
+  if (status === "printing_ambiguous") {
+    return "Printing needs review";
   }
   if (status === "retake") {
     return "Retake";
@@ -123,26 +127,48 @@ export function Suggestions({
   status,
   message,
   suggestions,
+  printingReview,
   onConfirm,
   onChooseAnother,
   onReject,
   onScanAgain,
 }: SuggestionsProps) {
   const top = suggestions[0];
-  const variants = top?.cardmarket_variants ?? [];
+  const [printing, setPrinting] = useState<CardSummary | null>(null);
+  const [loadingPrinting, setLoadingPrinting] = useState(false);
+  const [printingError, setPrintingError] = useState<string | null>(null);
+  const ambiguous = status === "printing_ambiguous";
+  const printingReady = !ambiguous || Boolean(printing);
+  const displayed = printing ?? top;
+  const cardId = printing?.id ?? top?.card_id;
+  const variants = displayed?.cardmarket_variants ?? [];
   const needsChoice = variants.length >= 2;
   const [selected, setSelected] = useState<CardmarketVariant | null>(null);
-  const showCard = Boolean(top) && (status === "matched" || status === "uncertain");
+  const showCard = Boolean(displayed) && (status === "matched" || status === "uncertain" || ambiguous);
   const notAMatch = status === "no_match";
-  const listingUrl = needsChoice ? selected?.url : top?.cardmarket_url;
-  const listingCardId = needsChoice
-    ? selected?.card_id || top?.card_id
-    : top?.card_id;
+  const listingUrl = printingReady ? (needsChoice ? selected?.url : displayed?.cardmarket_url) : null;
+  const listingCardId = selected?.card_id || cardId;
+
+  async function choosePrinting(id: string) {
+    setLoadingPrinting(true);
+    setPrintingError(null);
+    setPrinting(null);
+    setSelected(null);
+    try {
+      const detail = await api.card(id);
+      if (detail.id !== id) throw new Error("Printing metadata did not match your choice.");
+      setPrinting(detail);
+    } catch (cause) {
+      setPrintingError(cause instanceof Error ? cause.message : "Could not load that printing.");
+    } finally {
+      setLoadingPrinting(false);
+    }
+  }
   return (
     <div className="flex flex-col gap-4">
       <div className="flex items-center justify-between gap-3">
         <h2 className="font-heading text-lg font-medium">
-          {showCard ? "Most likely card" : "Result"}
+          {ambiguous ? "Choose the printing" : showCard ? "Most likely card" : "Result"}
         </h2>
         <Badge variant={showCard ? "secondary" : "destructive"}>
           {statusLabel(status)}
@@ -150,30 +176,48 @@ export function Suggestions({
       </div>
       {message ? <p className="text-sm text-muted-foreground">{message}</p> : null}
 
-      {showCard && top ? (
+      {showCard && displayed ? (
         <Card>
           <CardHeader>
-            <CardTitle>{top.name}</CardTitle>
+            <CardTitle>{displayed.name}</CardTitle>
             <CardDescription>
-              {top.language ? `${languageLabel(top.language)} · ` : ""}
-              {top.set_name} · #{top.collector_number}
+              {printingReady ? <>{displayed.language ? `${languageLabel(displayed.language)} · ` : ""}
+                {displayed.set_name} · #{displayed.collector_number}</> : "The photograph does not prove a specific printing."}
             </CardDescription>
           </CardHeader>
           <CardContent>
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src={assetUrl(top.image_url)}
-              alt={`${top.name} from ${top.set_name}`}
+            {displayed.image_url ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img
+              src={assetUrl(displayed.image_url)}
+              alt={printingReady ? `${displayed.name} from ${displayed.set_name}` : `${displayed.name} reference — printing unconfirmed`}
               className="mx-auto max-h-72 w-auto rounded-md"
-            />
-            {needsChoice ? (
+              />
+            ) : null}
+            {ambiguous ? (
+              <div className="mt-3 flex flex-col gap-2">
+                <p className="text-sm font-medium">Possible printings — compare your card</p>
+                <p className="text-muted-foreground text-sm">{printingReview?.guidance ?? "Include all four corners and the collector number, or choose the printing manually."}</p>
+                {printingReview?.plausible_printings.map((choice) => (
+                  <button key={choice.card_id} type="button" disabled={loadingPrinting}
+                    aria-pressed={printing?.id === choice.card_id}
+                    onClick={() => void choosePrinting(choice.card_id)}
+                    className={cn("rounded-md border px-3 py-2 text-left text-sm", printing?.id === choice.card_id ? "border-primary bg-primary/5" : "border-border")}>
+                    {choice.set_name} · #{choice.collector_number} · {languageLabel(choice.language)}
+                  </button>
+                ))}
+                {loadingPrinting ? <p role="status">Loading printing and finish choices…</p> : null}
+                {printingError ? <p role="alert">{printingError}</p> : null}
+              </div>
+            ) : null}
+            {printingReady && needsChoice ? (
               <VariantPicker
                 variants={variants}
                 selected={selected}
                 onSelect={setSelected}
               />
             ) : null}
-            <OfferBlock url={listingUrl} prices={needsChoice ? [] : top.cardmarket_prices} />
+            {printingReady ? <OfferBlock url={listingUrl} prices={needsChoice || printing ? [] : top?.cardmarket_prices} /> : null}
           </CardContent>
           <CardFooter className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:justify-end">
             {listingUrl ? (
@@ -187,7 +231,7 @@ export function Suggestions({
               />
             ) : (
               <p className="text-muted-foreground w-full text-sm">
-                {needsChoice
+                {!printingReady ? "Choose the printing before viewing prices or Cardmarket." : needsChoice
                   ? "Choose a listing to open Cardmarket."
                   : "Cardmarket link unavailable."}
               </p>
@@ -203,11 +247,12 @@ export function Suggestions({
             <Button
               type="button"
               className="h-11 min-h-11 w-full sm:w-auto"
-              disabled={needsChoice && !selected}
+              disabled={!printingReady || loadingPrinting || (needsChoice && !selected)}
               onClick={() =>
                 onConfirm(
-                  selected?.card_id || top.card_id,
-                  selected?.url ?? top.cardmarket_url,
+                  (ambiguous ? printing?.id : selected?.card_id || cardId)!,
+                  selected?.url ?? displayed.cardmarket_url,
+                  ambiguous && Boolean(printing),
                 )
               }
             >

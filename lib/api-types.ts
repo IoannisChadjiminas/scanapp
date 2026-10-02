@@ -1,4 +1,23 @@
-export type ScanStatus = "matched" | "no_match" | "uncertain" | "retake" | "failed";
+export type ScanStatus = "matched" | "no_match" | "uncertain" | "printing_ambiguous" | "retake" | "failed";
+
+export type PlausiblePrinting = {
+  card_id: string;
+  name: string;
+  set_name: string;
+  collector_number: string;
+  language: string;
+  image_url: string;
+  cardmarket_url?: string | null;
+};
+
+export type PrintingReview = {
+  reason: string;
+  candidate_group_id: string;
+  grouping_basis: string;
+  reference_coverage_complete: boolean;
+  plausible_printings: PlausiblePrinting[];
+  guidance: string;
+};
 
 export type CardmarketPrice = {
   label: string;
@@ -88,6 +107,7 @@ export type ScanResponse = {
   message: string | null;
   detected_language?: string | null;
   search_languages?: string[];
+  printing_review?: PrintingReview | null;
 };
 
 export type CardSummary = {
@@ -101,6 +121,7 @@ export type CardSummary = {
   image_url: string | null;
   variants: Record<string, unknown>;
   cardmarket_url?: string | null;
+  cardmarket_variants?: CardmarketVariant[];
 };
 
 export type SessionResult = {
@@ -109,6 +130,8 @@ export type SessionResult = {
   status: ScanStatus;
   suggestions: Candidate[];
   confirmed_card_id: string | null;
+  chosen_cardmarket_url?: string | null;
+  printing_review?: PrintingReview | null;
   rejected: boolean;
   timings_ms: Record<string, number>;
 };

@@ -1,7 +1,154 @@
 from __future__ import annotations
 
 from app.recognition.ocr import OcrHit, pick_collector_text, pick_name_line
-from app.recognition.rank import decide_status, name_match, number_match, rerank
+
+
+def test_names_ignore_trainer_titles_hp_and_grading_labels():
+    assert pick_name_line(['Supporter', "Professor's Research", '201/202']) == "Professor's Research"
+    assert pick_name_line(['2023 POKEMON SV2a JP', 'GEM MT 10', 'ピカチュウ']) == 'ピカチュウ'
+    assert pick_name_line(['HP 220', '220', '271/264', '©2021 Pokémon/Nintendo GAME FREAK']) is None
+    assert pick_name_line(['サポート', 'ナンジャモ']) == 'ナンジャモ'
+    assert pick_name_line(['AUTHENTIC', '220 ex', 'Lugia V']) == 'Lugia V'
+    assert pick_name_line(['POKEMON', 'Umbreon VMAX']) == 'Umbreon VMAX'
+    assert pick_name_line(['TAGE2', 'Charizard ex']) == 'Charizard ex'
+
+
+def test_visual_leader_cannot_restore_foreign_printing_over_japanese_evidence():
+    visual = [_card('english','Pikachu','173',.91,'en'),
+              _card('japanese','ピカチュウ','173',.84,'ja')]
+    ranked = rerank(visual,'ピカチュウ',[OcrHit('173/165',.99,'collector')],False,
+                    detected_languages=('ja',),name_confidence=.99,require_confident_ocr=True)
+    assert ranked[0]['card_id'] == 'japanese'
+    assert ranked[1]['language_conflict']
+    assert decide_status(ranked,enable_matched=True,min_visual=.78,min_gap=.04,retake=False) == 'matched'
+
+
+def test_confident_card_name_contradiction_cannot_become_automatic_match():
+    ranked = rerank([_card('wrong','Arctibax','129',.99,'en')], 'Fuecoco', [], False,
+                    detected_languages=('en',),name_confidence=.99,require_confident_ocr=True)
+    assert ranked[0]['strong_name_conflict']
+    assert decide_status(ranked,enable_matched=True,min_visual=.78,min_gap=.04,retake=False) != 'matched'
+
+
+def test_abutting_set_language_codes_are_not_collector_prefixes():
+    from app.recognition.rank import extract_collector_candidates
+    hits = extract_collector_candidates([],hits=[OcrHit('PAL EN 269/193',.99,'collector'),
+                                                OcrHit('SV2a 173/165',.99,'collector')])
+    assert {h.text for h in hits} == {'269/193','173/165'}
+
+
+def test_set_and_rarity_text_do_not_invent_collector_conflicts():
+    hits = extract_collector_candidates([], hits=[
+        OcrHit('PAL269/193', .99, 'collector'),
+        OcrHit('sv2a', .99, 'collector'),
+        OcrHit('173/165AR', .99, 'collector'),
+        OcrHit('348/190SAR', .99, 'collector'),
+        OcrHit('SVIE251/198★★', .99, 'collector'),
+    ])
+    assert {h.text for h in hits} == {'269/193', '173/165', '348/190', '251/198'}
+
+
+def test_low_confidence_title_does_not_hide_readable_name():
+    from app.recognition.ocr import pick_confident_name
+    assert pick_confident_name(['Surter','TRAINER','Miriam'], [.79,.99,.99]) == 'Miriam'
+    assert pick_confident_name(['UmbreonVAX','SINGLE'], [.89,.99]) == 'UmbreonVAX'
+    assert pick_confident_name(['Pikchu'], [.8]) == 'Pikchu'
+    assert pick_confident_name(['TRAINER','220'], [.99,.99]) is None
+
+
+def test_real_collector_namespaces_survive_set_code_cleanup():
+    hits = extract_collector_candidates([], hits=[
+        OcrHit(s, .99, 'collector') for s in
+        ['TG05/030', 'GG25/070', 'SWSH051', 'SM183', 'SV2', 'SVP002']
+    ])
+    assert {h.text for h in hits} == {'TG05/030', 'GG25/070', 'SWSH051',
+                                   'SM183', 'SV2', 'SVP002'}
+
+
+def test_known_printed_denominator_cannot_be_overridden_by_bare_catalogue_number():
+    from app.recognition.rank import number_matches_identifiers
+    assert number_matches_identifiers([OcrHit('186/198', .99, 'collector')],
+                                      ['186', '186/195']) is False
+    assert number_matches_identifiers(['186/195'], ['186', '186/195']) is True
+    assert number_matches_identifiers(['186/198'], ['186']) is True
+    card = _card('lugia', 'Lugia V', '186', .99)
+    card['printed_collector_number'] = '186/195'
+    ranked = rerank([card], 'Lugia V', [OcrHit('186/198', .99, 'collector')], False,
+                    name_confidence=.99, require_confident_ocr=True)
+    assert ranked[0]['structured_collector_conflict']
+    assert ranked[0]['printed_collector_number'] == '186/195'
+    assert decide_status(ranked, enable_matched=True, min_visual=.78, min_gap=.04, retake=False) != 'matched'
+
+
+def test_missing_catalogue_identifier_is_unknown_not_a_contradiction():
+    from app.recognition.rank import number_matches_identifiers
+    assert number_matches_identifiers(['199/165'], []) is None
+    assert number_matches_identifiers(['199/165'], ['unknown']) is None
+    assert number_matches_identifiers([], ['199/165']) is None
+
+
+def test_conflicting_ocr_language_cannot_automatically_accept_only_foreign_candidate():
+    ranked = rerank([_card('english','Pikachu','173',.99,'en')], 'ピカチュウ', [], False,
+                    detected_languages=('ja',), name_confidence=.99, require_confident_ocr=True)
+    assert decide_status(ranked,enable_matched=True,min_visual=.78,min_gap=.04,retake=False) != 'matched'
+from app.recognition.rank import decide_status, extract_collector_candidates, name_match, number_match, rerank
+
+
+def test_gameplay_numbers_are_not_collectors():
+    lines = ["HP80", "80 HP", "×2", "x2", "LV. 12", "IV 12", "#25", "STAGE1"]
+    hits = [OcrHit(text=s, confidence=.99, region="collector") for s in lines]
+    assert extract_collector_candidates(lines, hits) == []
+    assert pick_name_line(["BASIC", "Fuecoco", "HP80"]) == "Fuecoco"
+
+
+def test_real_collectors_survive_gameplay_filter():
+    hits = [OcrHit(text="036/198 ★", confidence=.99, region="collector"),
+            OcrHit(text="SVP002", confidence=.99, region="collector")]
+    assert {h.text for h in extract_collector_candidates([], hits)} == {"036/198", "SVP002"}
+
+
+def test_hidden_fuecoco_number_does_not_favor_promo_from_weakness():
+    visual = [_card("set", "Fuecoco", "036", .983),
+              _card("alias", "Fuecoco", "036", .983),
+              _card("promo", "Fuecoco", "002", .844)]
+    hits = [OcrHit(text="HP80", confidence=.99, region="name"),
+            OcrHit(text="×2", confidence=.99, region="collector")]
+    numbers = extract_collector_candidates([h.text for h in hits], hits)
+    ranked = rerank(visual, "Fuecoco", numbers, ocr_failed=False)
+    assert ranked[0]["card_id"] in {"set", "alias"}
+    assert ranked[0]["collector_conflict"] is False
+    assert decide_status(ranked, enable_matched=True, min_visual=.78,
+                         min_gap=.04, retake=False) == "uncertain"
+
+
+def test_confidence_scales_positive_and_negative_ocr_without_dropping_candidates():
+    cards = [_card("a", "Pikachu", "58", .8), _card("b", "Pikachu", "87", .8)]
+    weak = rerank(cards, None, [OcrHit("58/102", .2, "collector")], False,
+                  require_confident_ocr=True)
+    strong = rerank(cards, None, [OcrHit("58/102", .99, "collector")], False,
+                    require_confident_ocr=True)
+    assert len(weak) == len(strong) == 2
+    assert weak[0]["combined_score"] < strong[0]["combined_score"]
+    assert weak[0]["ocr_consistent"] is None
+    assert weak[1]["collector_conflict"] is False
+    assert strong[1]["collector_conflict"] is True
+
+
+def test_missing_or_unknown_confidence_is_neutral_in_live_evidence_mode():
+    cards = [_card("a", "Pikachu", "58", .8)]
+    ranked = rerank(cards, "Pikachu", [OcrHit("58/102", None, "collector")], False,
+                    name_confidence=None, require_confident_ocr=True)
+    assert ranked[0]["combined_score"] == .8
+    assert ranked[0]["ocr_consistent"] is None
+
+
+def test_confidence_from_unrelated_number_does_not_boost_a_weak_match():
+    cards = [_card("a", "Pikachu", "58", .8)]
+    ranked = rerank(cards, None, [OcrHit("58/102", .1, "collector"),
+                                 OcrHit("87/130", .99, "collector")], False,
+                    require_confident_ocr=True)
+    assert ranked[0]["combined_score"] < .8
+    assert ranked[0]["collector_conflict"] is True
 
 
 def _card(card_id: str, name: str, number: str, score: float, language: str = "en") -> dict:
@@ -349,7 +496,7 @@ def test_wide_visual_gap_beats_a_false_collector_hit() -> None:
     assert ranked[0]["card_id"] == "celebi"
 
 
-def test_same_name_reprint_keeps_closer_image() -> None:
+def test_same_name_does_not_override_confident_fraction_without_printed_number_metadata() -> None:
     visual = [
         _card("reprint", "Darkrai & Cresselia LEGEND", "019", 1.0),
         _card("original", "Darkrai & Cresselia LEGEND", "99", 0.93),
@@ -362,8 +509,8 @@ def test_same_name_reprint_keeps_closer_image() -> None:
         ocr_failed=False,
         detected_languages=("en",),
     )
-    assert ranked[0]["card_id"] == "reprint"
-    assert ranked[0]["collector_conflict"] is True
+    assert ranked[0]["card_id"] == "original"
+    assert ranked[0]["collector_conflict"] is False
     close = [
         _card("reprint", "Darkrai & Cresselia LEGEND", "019", 0.94),
         _card("original", "Darkrai & Cresselia LEGEND", "99", 0.93),

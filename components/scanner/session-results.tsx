@@ -36,7 +36,15 @@ function outcome(row: SessionResult) {
   if (row.status === "no_match" || row.status === "uncertain") {
     return "Not a match";
   }
+  if (row.status === "printing_ambiguous") return "Printing needs review";
   return row.status;
+}
+
+function listingUrl(row: SessionResult) {
+  if (row.rejected) return null;
+  if (row.chosen_cardmarket_url) return row.chosen_cardmarket_url;
+  if (row.status === "printing_ambiguous") return null;
+  return row.suggestions[0]?.cardmarket_url;
 }
 
 export function SessionResults({ results, onExport }: SessionResultsProps) {
@@ -73,10 +81,10 @@ export function SessionResults({ results, onExport }: SessionResultsProps) {
             <p className="text-muted-foreground">
               {row.timings_ms.total_ms ? `${Math.round(row.timings_ms.total_ms)} ms` : "—"}
             </p>
-            {row.suggestions[0]?.cardmarket_url ? (
+            {listingUrl(row) ? (
               <CardmarketOpen
-                url={row.suggestions[0].cardmarket_url}
-                cardId={row.suggestions[0].card_id}
+                url={listingUrl(row)!}
+                cardId={row.confirmed_card_id ?? row.suggestions[0]?.card_id}
                 showIcon={false}
                 className="text-sm underline-offset-4 hover:underline"
               >
@@ -104,12 +112,12 @@ export function SessionResults({ results, onExport }: SessionResultsProps) {
                 <TableCell>{row.status}</TableCell>
                 <TableCell>
                   {row.suggestions[0]?.name ?? "—"}
-                  {row.suggestions[0]?.cardmarket_url ? (
+                  {listingUrl(row) ? (
                     <>
                       {" "}
                       <CardmarketOpen
-                        url={row.suggestions[0].cardmarket_url}
-                        cardId={row.suggestions[0].card_id}
+                        url={listingUrl(row)!}
+                        cardId={row.confirmed_card_id ?? row.suggestions[0]?.card_id}
                         showIcon={false}
                         className="underline-offset-4 hover:underline"
                       >

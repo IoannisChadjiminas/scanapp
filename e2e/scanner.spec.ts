@@ -2,7 +2,7 @@ import { expect, test } from "@playwright/test";
 
 test("scanner shell is keyboard reachable", async ({ page }) => {
   await page.goto("/");
-  await expect(page.getByRole("heading", { name: /identify an english pokémon card/i })).toBeVisible();
+  await expect(page.getByRole("heading", { name: /identify a pokémon card/i })).toBeVisible();
   await expect(page.getByRole("tab", { name: "Scanner" })).toBeVisible();
   await page.getByRole("tab", { name: "Scanner" }).focus();
   await expect(page.getByRole("tab", { name: "Scanner" })).toBeFocused();

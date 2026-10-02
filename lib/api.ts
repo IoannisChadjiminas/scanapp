@@ -85,7 +85,9 @@ export const api = {
       }`,
       { signal },
     ),
-  feedback: (scanId: string, action: string, cardId?: string, cardmarketUrl?: string) =>
+  card: (cardId: string) =>
+    request<CardSummary>(`/api/v1/cards/${encodeURIComponent(cardId)}`),
+  feedback: (scanId: string, action: string, cardId?: string, cardmarketUrl?: string, printingSelected = false) =>
     request(`/api/v1/scans/${scanId}/feedback`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -93,6 +95,7 @@ export const api = {
         action,
         card_id: cardId ?? null,
         cardmarket_url: cardmarketUrl ?? null,
+        printing_selected: printingSelected,
       }),
     }),
   sessionResults: (signal?: AbortSignal) =>

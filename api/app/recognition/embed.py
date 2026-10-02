@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import numpy as np
-import onnxruntime as ort
 from PIL import Image
 
 from app.recognition.preprocess import prepare_full_card, to_nchw
@@ -9,6 +8,8 @@ from app.recognition.preprocess import prepare_full_card, to_nchw
 
 class DinoEmbedder:
     def __init__(self, model_path: str, intra_threads: int, inter_threads: int) -> None:
+        import onnxruntime as ort
+
         options = ort.SessionOptions()
         options.intra_op_num_threads = intra_threads
         options.inter_op_num_threads = inter_threads
