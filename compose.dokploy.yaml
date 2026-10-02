@@ -57,6 +57,10 @@ services:
       - scanapp-tmp:/tmp/scanapp
     expose:
       - "8000"
+    networks:
+      default:
+        aliases:
+          - scanapp-api
     mem_limit: 1536m
     healthcheck:
       test:
@@ -119,6 +123,8 @@ services:
         condition: service_started
     environment:
       SITE_ADDRESS: ":80"
+      # The short name "api" also exists on dokploy-network for another app.
+      API_UPSTREAM: scanapp-api
     expose:
       - "80"
     networks:
