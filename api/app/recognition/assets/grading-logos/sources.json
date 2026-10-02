@@ -1,0 +1,54 @@
+{
+  "assets": [
+    {
+      "company": "ace",
+      "source_url": "https://acegrading.com/apple-touch-icon.png",
+      "transform": "RGBA conversion",
+      "source_sha256": "e22205015cc5993abb4e9f6da99ab72a23d9d0d8d710c9f9df38d8fd6abf8e79",
+      "asset_sha256": "c4a8777bde3e951e8fd10b231b95b3bc01dc8f1649a40b29fde2387230a5fae9"
+    },
+    {
+      "company": "ags",
+      "source_url": "https://agscard.com/logo.svg",
+      "transform": "embedded PNG",
+      "source_sha256": "c60b6162ecce021b96e330523676da67c5b4198bfa3bdf0b4c7b8132c4fb0a93",
+      "asset_sha256": "1da72a5f5db0386eedff42ad684b9fc4bc9933b85263455d8cad0744b230ac3c"
+    },
+    {
+      "company": "tag",
+      "source_url": "https://taggrading.com/cdn/shop/files/TAG_Logo_Official__NoText_Black_Outlined_260x.png?v=1674795543",
+      "transform": "RGBA conversion",
+      "source_sha256": "1100ce25bd41c168b3ffd58e09ebf9aebb0f87584201d5073e96a9b641d7f9b9",
+      "asset_sha256": "fb6f9e7474b62bd2305fcbd03b2a8ef46095f46f5afc8e0fe27d191853d5c7a1"
+    },
+    {
+      "company": "psa",
+      "source_url": "https://store.psacard.com/cdn/shop/files/PSA_Classic_Logo_red_text.png?v=1777044132&width=1013",
+      "transform": "trim right 7% registration mark",
+      "source_sha256": "7003e7c762acff2cb16ca014f7e3bb14d7737503ffd7b34b9663854a694a417e",
+      "asset_sha256": "95ce6457c32365d2b3c5362c41c60511147f5efb3a223f3b9b47592a7c4c1982"
+    },
+    {
+      "company": "beckett",
+      "source_url": "https://maintenance.beckett.com/assets/slab-1.png",
+      "transform": "official wordmark box [40,99,100,114], white-stroke alpha mask",
+      "source_sha256": "bc0b2f70e7d07450df6032a513d0d8d150cf6d8e47a75001f9c415a611864cee",
+      "asset_sha256": "a9cebe2866b1e6ff8c9fd4a120c48779e607a81a58927b53e71b0e4c4de24698"
+    },
+    {
+      "company": "ace",
+      "source_page": "https://acegrading.com/",
+      "source_url": "https://framerusercontent.com/images/SmhZfktrNiGLwzlPVnoHQOYUeQ.webp?height=1398&width=834",
+      "transform": "official seal only [389,305,425,339], dark-stroke alpha mask",
+      "source_sha256": "32f3bae26e2de27106a8cbf647eb37d60c28325cae3f0093617c99c1144dc0ae",
+      "asset_sha256": "1d8b6887a69f70fe2e53426cf47f7e81173cdade8e598256e2f045fb79b05ba5"
+    },
+    {
+      "company": "beckett",
+      "source_url": "https://maintenance.beckett.com/assets/slab-1.png",
+      "transform": "official wreath/B emblem only [39,36,101,94], white-stroke alpha mask",
+      "source_sha256": "bc0b2f70e7d07450df6032a513d0d8d150cf6d8e47a75001f9c415a611864cee",
+      "asset_sha256": "ce9b309f82fea40158dd2383a58907f4f08c6f44493bfb495980baecd42ca9a5"
+    }
+  ]
+}
