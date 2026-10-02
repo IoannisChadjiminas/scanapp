@@ -14,7 +14,7 @@ import threading
 import time
 from typing import Protocol
 
-BLOCKED = [
+CHALLENGE_BLOCKED = [
     "*.png",
     "*.jpg",
     "*.jpeg",
@@ -30,6 +30,49 @@ BLOCKED = [
     "*facebook.com*",
     "*doubleclick*",
 ]
+# After this window has returned offers once. The document itself stays allowed.
+PRICE_BLOCKED = CHALLENGE_BLOCKED + [
+    "*.css",
+    "*.ico",
+    "*static.cardmarket.com*",
+    "*product-images.s3.cardmarket.com*",
+    "*challenges.cloudflare.com*",
+    "*cloudflareinsights*",
+    "*csp-reporting.cloudflare.com*",
+    "*radar.cloudflare.com*",
+    "*mtalk.google.com*",
+    "*android.clients.google.com*",
+    "*accounts.google.com*",
+    "*googleapis.com*",
+    "*googlesyndication*",
+    "*hotjar*",
+    "*sentry.io*",
+    "*segment.com*",
+    "*segment.io*",
+    "*onetrust*",
+    "*cookielaw*",
+    "*nr-data.net*",
+    "*newrelic.com*",
+    "*clarity.ms*",
+    "*adservice*",
+]
+BLOCKED = CHALLENGE_BLOCKED
+
+_QUIET_CHROME = (
+    "--disable-background-networking",
+    "--disable-sync",
+    "--disable-client-side-phishing-detection",
+    "--disable-default-apps",
+    "--no-first-run",
+    "--disable-component-update",
+)
+
+
+def blocked_urls(*, cleared: bool, challenge_reload: bool = False) -> list[str]:
+    """Styles and the check host stay up until this window has returned offers."""
+    if cleared and not challenge_reload:
+        return list(PRICE_BLOCKED)
+    return list(CHALLENGE_BLOCKED)
 
 PROBE_JS = r"""
 (() => {
@@ -193,7 +236,7 @@ def chrome_launch_options(proxy: str | None, net_log: str | None = None) -> dict
     """Headed UC Chrome. ``log_cdp`` turns on the performance log used for bytes."""
     from proxy import seleniumbase_proxy
 
-    args = ["--no-sandbox", "--disable-dev-shm-usage"]
+    args = ["--no-sandbox", "--disable-dev-shm-usage", *_QUIET_CHROME]
     if net_log:
         # Default capture mode leaves credentials and cookies out of the file.
         args += [f"--log-net-log={net_log}", "--net-log-capture-mode=Default"]
@@ -258,6 +301,17 @@ def run_attempt(session: PageSession, url: str, *, parse_html) -> dict:
             while time.monotonic() < deadline:
                 _before_deadline(deadline)
                 outcome = session.probe() or "pending"
+                if (
+                    outcome == "challenge"
+                    and getattr(session, "cleared", False)
+                    and not getattr(session, "challenge_reloaded", False)
+                ):
+                    session.challenge_reloaded = True
+                    session._reload_challenge = True
+                    session.open(url)
+                    continue
+                if outcome == "offers" and hasattr(session, "cleared"):
+                    session.cleared = True
                 if outcome in TERMINAL:
                     break
                 if outcome == "challenge" and time.monotonic() >= next_click:
@@ -330,6 +384,10 @@ class ChromeSession:
         self.stage = "created"
         self.watchdog_aborted = False
         self.reused = False
+        self.cleared = False
+        self.challenge_reloaded = False
+        self._reload_challenge = False
+        self._block_urls = list(CHALLENGE_BLOCKED)
         self._sb = None
         self._context = None
         self._net_dir = tempfile.mkdtemp(prefix="cm-netlog-") if net_log else None
@@ -388,12 +446,22 @@ class ChromeSession:
         self.watchdog_aborted = False
         if self._sb is not None:
             self.reused = True
+            reload = self._reload_challenge
+            self._reload_challenge = False
+            if not reload:
+                self.challenge_reloaded = False
+            self._block_urls = blocked_urls(cleared=self.cleared, challenge_reload=reload)
+            self.block_extra_resources()
             self.stage = "cdp_navigation"
             self._sb.cdp.get(url)
             return
         from seleniumbase import SB
 
         self.reused = False
+        self.cleared = False
+        self.challenge_reloaded = False
+        self._reload_challenge = False
+        self._block_urls = list(CHALLENGE_BLOCKED)
         self.stage = "browser_start"
         self._context = SB(**chrome_launch_options(self.proxy, self._net_path))
         self._sb = self._context.__enter__()
@@ -401,17 +469,19 @@ class ChromeSession:
         self._sb.activate_cdp_mode(url)
 
     def block_extra_resources(self) -> None:
-        import mycdp.network as network
-
         self.stage = "resource_blocking"
         # BaseCase.execute_cdp_cmd reconnects WebDriver. Keep these commands on
         # the same CDP tab and event loop used by navigation and page probing.
-        cdp = self._sb.cdp
-        tab = cdp.get_active_tab()
-        loop = cdp.get_event_loop()
         try:
+            import mycdp.network as network
+
+            cdp = self._sb.cdp
+            tab = cdp.get_active_tab()
+            loop = cdp.get_event_loop()
             loop.run_until_complete(tab.send(network.enable()))
-            loop.run_until_complete(tab.send(network.set_blocked_urls(urls=BLOCKED)))
+            loop.run_until_complete(
+                tab.send(network.set_blocked_urls(urls=list(self._block_urls)))
+            )
         except Exception:
             return
 
@@ -511,7 +581,8 @@ def acquire_browser(proxy: str | None) -> ChromeSession:
     global _held, _held_at
     with _held_lock:
         expired = _held is not None and time.time() - _held_at >= BROWSER_LIFETIME_S
-        if _held is not None and (expired or not _held.alive()):
+        replaced = _held is not None and _held.proxy != proxy
+        if _held is not None and (expired or replaced or not _held.alive()):
             _held.quit()
             _held = None
         if _held is None:

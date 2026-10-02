@@ -141,7 +141,18 @@ def test_configured_proxy_is_passed_to_chrome(monkeypatch):
     assert options["window_size"] == "1920,1080"
     assert options["proxy"] == "login__cr.de;sessid.abc:secret@gw.dataimpulse.com:823"
     assert "proxy" not in chrome_launch_options(None)
-    assert options["chromium_arg"] == "--no-sandbox,--disable-dev-shm-usage"
+    args = options["chromium_arg"].split(",")
+    for flag in (
+        "--no-sandbox",
+        "--disable-dev-shm-usage",
+        "--disable-background-networking",
+        "--disable-sync",
+        "--disable-client-side-phishing-detection",
+        "--disable-default-apps",
+        "--no-first-run",
+        "--disable-component-update",
+    ):
+        assert flag in args
 
 
 def test_second_card_loads_in_the_open_tab():
@@ -171,13 +182,77 @@ def test_acquire_browser_reuses_the_live_window():
     browser_mod._held = None
     first = browser_mod.acquire_browser("http://one")
     first._sb = SimpleNamespace(cdp=object())
-    second = browser_mod.acquire_browser("http://two")
+    second = browser_mod.acquire_browser("http://one")
     assert second is first
     assert second.reused
     assert second.proxy == "http://one"
     first._context = None
     first.quit()
     browser_mod._held = None
+
+
+def test_acquire_browser_closes_the_window_for_a_new_proxy():
+    import browser as browser_mod
+
+    browser_mod._held = None
+    first = browser_mod.acquire_browser("http://one")
+    first._sb = SimpleNamespace(cdp=object())
+    second = browser_mod.acquire_browser("http://two")
+    assert second is not first
+    assert second.proxy == "http://two"
+    assert not second.reused
+    assert first._sb is None
+    second._context = None
+    second.quit()
+    browser_mod._held = None
+
+
+def test_reused_window_blocks_static_and_the_challenge_host_before_navigation():
+    from browser import PRICE_BLOCKED
+
+    opened = []
+
+    class Cdp:
+        def get(self, url):
+            opened.append(list(session._block_urls))
+
+    session = ChromeSession("http://sticky", net_log=False)
+    session._sb = SimpleNamespace(cdp=Cdp())
+    session._context = object()
+    session.cleared = True
+    session.open(URL)
+    assert opened == [session._block_urls]
+    assert "*static.cardmarket.com*" in session._block_urls
+    assert "*challenges.cloudflare.com*" in session._block_urls
+    assert session._block_urls == PRICE_BLOCKED
+    session._context = None
+    session.quit()
+
+
+def test_challenge_on_a_cleared_window_reloads_once_with_stylesheets():
+    from browser import CHALLENGE_BLOCKED
+
+    class Cleared(Scripted):
+        def __init__(self):
+            super().__init__(["challenge", "offers"], html='<div class="article-row">2,50 €</div>')
+            self.cleared = True
+            self.challenge_reloaded = False
+            self._reload_challenge = False
+            self.lists = []
+
+        def open(self, url):
+            self.opened = url
+            reload = self._reload_challenge
+            self._reload_challenge = False
+            self.lists.append(reload)
+            if not reload:
+                self.challenge_reloaded = False
+
+    session = Cleared()
+    result = run_attempt(session, URL, parse_html=_parse)
+    assert result["outcome"] == "offers"
+    assert session.lists == [False, True]
+    assert "*challenges.cloudflare.com*" not in CHALLENGE_BLOCKED
 
 
 def test_net_log_is_written_to_a_private_file_and_removed(tmp_path):

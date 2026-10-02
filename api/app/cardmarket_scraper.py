@@ -35,9 +35,31 @@ from app.db import connect
 log = logging.getLogger("cardmarket.scraper")
 
 
+class StickySession:
+    """One proxy id while the scraper reuses the window. A block or a new window mints another."""
+
+    def __init__(self) -> None:
+        self.session_id = str(uuid.uuid4())
+        self._fresh = True
+
+    def note(self, *, reused: bool, outcome: str) -> None:
+        if outcome in {"challenge_unsolved", "rate_limited"}:
+            self._mint()
+            return
+        if not reused and not self._fresh:
+            self._mint()
+            return
+        self._fresh = False
+
+    def _mint(self) -> None:
+        self.session_id = str(uuid.uuid4())
+        self._fresh = True
+
+
 class ScraperWorker:
     def __init__(self, settings: Settings) -> None:
         self.settings = settings
+        self._sticky = StickySession()
         self._stop = threading.Event()
         self._thread: threading.Thread | None = None
         self._health_state: str | None = None
@@ -227,17 +249,24 @@ class ScraperWorker:
     def _scrape(self, url: str) -> dict:
         response = httpx.post(
             f"{self.settings.scraper_url.rstrip('/')}/scrape",
-            json={"url": url, "session_id": str(uuid.uuid4())},
+            json={"url": url, "session_id": self._sticky.session_id},
             headers={"Authorization": f"Bearer {self.settings.scraper_api_key}"},
             timeout=self.settings.scraper_attempt_seconds + 30,
         )
         if response.status_code == 503:
+            self._sticky.note(reused=False, outcome="rate_limited")
             raise httpx.HTTPStatusError(
                 "scraper unavailable", request=response.request, response=response
             )
         response.raise_for_status()
         body = response.json()
-        return body if isinstance(body, dict) else {}
+        if not isinstance(body, dict):
+            return {}
+        self._sticky.note(
+            reused=body.get("reused") is True,
+            outcome=str(body.get("outcome") or ""),
+        )
+        return body
 
     def _fail(self, conn, job: dict, reason: str) -> None:
         terminal = int(job.get("attempts") or 0) >= 1 or reason in {

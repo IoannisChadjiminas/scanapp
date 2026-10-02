@@ -35,7 +35,34 @@ _quiet_health_access()
 
 from app.admission import ScanLimiter
 from app.cardmarket_events import bind_loop
+from app.cardmarket_daily import run_once, should_schedule
 from app.cardmarket_scraper import ScraperWorker
+
+log = logging.getLogger("cardmarket.daily")
+
+
+def _seconds_until_utc_day() -> float:
+    now = time.time()
+    return max(1.0, (int(now) // 86400 + 1) * 86400 - now)
+
+
+async def _daily_prices(stop: asyncio.Event) -> None:
+    """Refresh holdings, then wait for the next UTC day. A restart continues the remainder."""
+    while not stop.is_set():
+        settings = get_settings()
+        if not should_schedule(settings):
+            return
+        try:
+            status = await asyncio.to_thread(run_once, settings)
+        except Exception as exc:
+            log.info("daily pass failed error=%s", type(exc).__name__)
+            status = "blocked"
+        delay = _seconds_until_utc_day() if status in {"done", "capped"} else 60
+        try:
+            await asyncio.wait_for(stop.wait(), timeout=delay)
+        except TimeoutError:
+            continue
+        return
 from app.config import get_settings
 from app.db import Databases
 from app.recognition.runtime import Runtime
@@ -82,9 +109,14 @@ async def lifespan(app: FastAPI):
     if worker is not None:
         worker.start()
     app.state.scraper_worker = worker
+    daily_stop = asyncio.Event()
+    daily_task = asyncio.create_task(_daily_prices(daily_stop)) if should_schedule(settings) else None
     try:
         yield
     finally:
+        daily_stop.set()
+        if daily_task is not None:
+            daily_task.cancel()
         if worker is not None:
             worker.stop()
         bind_loop(None)

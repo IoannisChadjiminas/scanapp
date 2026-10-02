@@ -59,7 +59,7 @@ API_KEY = os.environ.get("SCRAPER_API_KEY", "")
 MAX_BROWSERS = max(1, int(os.environ.get("MAX_BROWSERS", "1")))
 COOLDOWN_SECONDS = float(os.environ.get("SCRAPER_RATE_LIMIT_S", "900"))
 # Pause after one Cardmarket page before the next one is opened.
-PAGE_GAP_S = max(0.0, float(os.environ.get("SCRAPER_PAGE_GAP_S", "15")))
+PAGE_GAP_S = max(0.0, float(os.environ.get("SCRAPER_PAGE_GAP_S", "0")))
 # Costs one extra paid page load per attempt; leave off outside diagnosis.
 DIRECT_PROBE = os.environ.get("SCRAPER_DIRECT_PROBE", "").strip().lower() in {"1", "true", "yes"}
 
@@ -256,6 +256,7 @@ def scrape(payload: ScrapeRequest, authorization: str | None = Header(default=No
             detail="Rate limited",
             headers={"Retry-After": str(int(COOLDOWN_SECONDS))},
         )
+    result["reused"] = bool(getattr(session, "reused", False))
     log.info(
         json.dumps(
             {
@@ -264,6 +265,7 @@ def scrape(payload: ScrapeRequest, authorization: str | None = Header(default=No
                 "bytes": result.get("bytes"),
                 "elapsed_ms": result.get("elapsed_ms"),
                 "session_id": payload.session_id,
+                "reused": result["reused"],
                 "country": os.environ.get("PROXY_COUNTRY", ""),
                 "wait_ms": int((time.time() - started) * 1000),
             },

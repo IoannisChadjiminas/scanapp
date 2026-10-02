@@ -1,10 +1,11 @@
 from __future__ import annotations
 
 import json
+import logging
 import sqlite3
 import time
 import uuid
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from typing import Any, Callable
 
@@ -29,7 +30,9 @@ from app.recognition.identity import likely_identity_agrees, structured_identity
 from app.recognition.confidence import confidence_payload
 from app.recognition.presentation import match_presentation
 from app.recognition.language import confident_language_texts, expand_language, language_label, resolve_search_languages
-from app.recognition.ocr import OcrResult
+from app.recognition.ocr import OcrResult, inverted_card_layout
+from app.recognition.grading import VERSION as GRADING_VERSION
+from app.recognition.holder_printing import holder_printing_hint
 from app.recognition.orientation import retrieve_oriented
 from app.recognition.printing import PrintingDecision, assess_printings
 from app.recognition.rank import artwork_evidence_compatible, decide_status, extract_collector_candidates, rerank
@@ -37,6 +40,7 @@ from app.recognition.rank import name_match
 from app.recognition.runtime import Runtime
 from app.schemas import (
     Candidate,
+    GradingEvidence,
     OcrEvidence,
     PrintingReview,
     ScanResponse,
@@ -76,6 +80,8 @@ class _ScanEvaluation:
     name_confidence: float
     quality_retake: bool
     evidence: dict
+    ranked: list[dict] = field(default_factory=list)
+    shown: list[dict] = field(default_factory=list)
 
 
 def _recognize_bytes_once(
@@ -165,6 +171,19 @@ def _recognize_bytes_once(
     mark = time.perf_counter()
     if settings.use_ocr and ocr_engine is not None and not retake:
         ocr = ocr_engine.read(image)
+        if inverted_card_layout(ocr):
+            upright=image.rotate(180,expand=True)
+            corrected=ocr_engine.read(upright)
+            title_conf=max((h.confidence or 0. for h in corrected.hits
+                           if h.region=='name' and h.text==corrected.name_text),default=0.)
+            if corrected.name_text and title_conf>=.85 and not inverted_card_layout(corrected):
+                frame_selection['inverted_layout_corrected']=True
+                frame_selection['discarded_inverted_title']=ocr.name_text
+                image,ocr=upright,corrected
+                snapshot,embedder,_=runtime.require()
+                query_vectors[id(image)]=embedder.embed(image,settings.preprocess_config)
+                indices,scores=top_k(snapshot.embeddings,query_vectors[id(image)],k=20,keep=keep)
+                timings['orientation_degrees']=(timings.get('orientation_degrees',0.)+180.)%360.
         # A retrieval window can cut away the footer even when it exists in
         # the uploaded image. Consult the uncropped input once, only for an
         # agreeing title plus explicit, confidence-qualified identifiers.
@@ -232,6 +251,9 @@ def _recognize_bytes_once(
     title_ids = metadata_index.title_candidates(ocr_name=ocr.name_text,
         name_confidence=name_confidence, numbers=numbers, languages=rank_languages
     ) if metadata_index and not metadata_ids else []
+    geometry_ids=metadata_index.geometry_candidates(ocr_name=ocr.name_text,
+        name_confidence=name_confidence,numbers=numbers,languages=rank_languages
+    ) if metadata_index and not metadata_ids and not title_ids and hasattr(metadata_index,'geometry_candidates') else []
     timings['metadata_retrieve_ms'] = (time.perf_counter() - mark) * 1000
     visual: list[dict[str, Any]] = []
     selected_ids = [str(snapshot.card_ids[i]) for i in indices]
@@ -240,11 +262,12 @@ def _recognize_bytes_once(
     selected_ids.extend(h.card_id for h in artwork_hits if h.card_id not in full_ids)
     selected_ids.extend(cid for cid in metadata_ids if cid not in selected_ids)
     selected_ids.extend(cid for cid in title_ids if cid not in selected_ids)
+    selected_ids.extend(cid for cid in geometry_ids if cid not in selected_ids)
     cards = _lookup_cards(catalog, selected_ids)
     full_scores = {str(snapshot.card_ids[i]): float(score)
                    for i, score in zip(indices, scores, strict=True)}
     positions = getattr(runtime, 'card_positions', None) or (
-        {str(cid): i for i, cid in enumerate(snapshot.card_ids)} if artwork_hits or metadata_ids or title_ids else {})
+        {str(cid): i for i, cid in enumerate(snapshot.card_ids)} if artwork_hits or metadata_ids or title_ids or geometry_ids else {})
     for card_id in selected_ids:
         score = full_scores.get(card_id)
         if score is None:
@@ -275,7 +298,8 @@ def _recognize_bytes_once(
                 "retrieved_via": (["full_card"] if card_id in full_ids else []) +
                                  (["artwork"] if card_id in artwork_by_id else []) +
                                  (["ocr_metadata"] if card_id in metadata_ids else []) +
-                                 (["ocr_title"] if card_id in title_ids else []),
+                                 (["ocr_title"] if card_id in title_ids else []) +
+                                 (["ocr_geometry"] if card_id in geometry_ids else []),
                 "artwork_score": artwork_by_id[card_id].score if card_id in artwork_by_id else None,
                 "artwork_profile": artwork_by_id[card_id].reference_profile if card_id in artwork_by_id else None,
             }
@@ -300,6 +324,7 @@ def _recognize_bytes_once(
     ratio = image.width / image.height
     if combined and not retake and verifier is not None and (
         float(combined[0]["visual_score"]) < settings.threshold_min_visual
+        or bool(geometry_ids)
         or any(h.region == 'holder_collector' for h in numbers)
         or combined[0].get('retrieved_via') == ['ocr_title']
         or not .62 <= ratio <= .80
@@ -319,6 +344,9 @@ def _recognize_bytes_once(
             art_only = [r for h in artwork_hits for r in combined
                         if r["card_id"] == h.card_id and r["card_id"] not in full_ids]
             local_order = [*combined[:4], *art_only[:4], *combined[4:]]
+        if geometry_ids:
+            geometry_only=[r for r in combined if r['card_id'] in geometry_ids]
+            local_order=[*geometry_only[:4],*local_order]
         # Geometry can verify art on a sibling with a different collector
         # number; otherwise an older reprint occupying top-K would block the
         # whole family. Name/language constrain identity verification, while
@@ -390,8 +418,15 @@ def _recognize_bytes_once(
         min_gap=settings.threshold_min_gap,
         retake=retake,
     )
+    if framing_review_supported and status=='no_match':
+        # Independently qualified printed name + explicit collector and the
+        # existing OCR-assisted visual floor can support a review result even
+        # when another visual neighbour prevented automatic acceptance.
+        status='uncertain'
     if local_matches:
         status = "uncertain"
+    if any(h.region=='holder_name' for h in ocr.hits) and status=='matched':
+        status='uncertain'
     if any(h.region == 'holder_collector' for h in numbers) and status == 'matched':
         status = 'uncertain'
     if any(h.region == 'holder_collector' for h in numbers) and not local_matches and not framing_review_supported:
@@ -414,6 +449,14 @@ def _recognize_bytes_once(
         else:
             status = 'retake'
             retake = True
+    if combined and 'ocr_geometry' in combined[0].get('retrieved_via',[]):
+        # Weak/missing-language OCR proposes pixels only. It must never escape
+        # local artwork verification or become an automatic printing claim.
+        if combined[0].get('local_artwork_verified'):
+            status='uncertain'
+        else:
+            status='retake'
+            retake=True
     if combined and decision.detected in {'ja','ko','zh','zh-cn','zh-tw'} and combined[0].get('language') not in rank_languages:
         status = 'retake'
         retake = True
@@ -453,6 +496,19 @@ def _recognize_bytes_once(
             guidance='Likely card identified. Confirm the exact set, collector number and finish, or retake with the full card visible.')
     if printing.ambiguous:
         status = "printing_ambiguous"
+        # Geometry verifies shared artwork, not the winning reprint. Once
+        # siblings are explicitly retained as ambiguous, use their existing
+        # OCR/global scores for display order rather than keypoint survival.
+        if local_matches and not .62<=ratio<=.80 and not any(h.region=='collector' and h.confidence is not None
+                and h.confidence>=.85 and ('/' in h.text or any(c.isalpha() for c in h.text)) for h in numbers):
+            sibling_ids={r['card_id'] for r in printing.members}
+            eligible=[r for r in combined if r['card_id'] in sibling_ids
+                and artwork_evidence_compatible(r,ocr_name=ocr.name_text,
+                    name_confidence=name_confidence,numbers=numbers,languages=rank_languages)]
+            if eligible:
+                preferred=max(eligible,key=lambda r:float(r['combined_score']))
+                combined.sort(key=lambda r:r['card_id']==preferred['card_id'],reverse=True)
+                reference_identity=dict(combined[0])
         printing_review = PrintingReview(
             reason=printing.reason, candidate_group_id=printing.candidate_group_id,
             reference_coverage_complete=printing.reference_coverage_complete,
@@ -550,6 +606,7 @@ def _recognize_bytes_once(
         "local_artwork_matches": [vars(m) for m in local_matches],
         "artwork_retrieval": [vars(h) for h in artwork_hits],
         "metadata_candidate_ids": metadata_ids,
+        "geometry_candidate_ids": geometry_ids,
         "framing_unverified": framing_unverified,
         "framing_review_supported": framing_review_supported,
         "likely_identity_supported": likely_identity_supported,
@@ -649,7 +706,8 @@ def _recognize_bytes_once(
     )
     return _ScanEvaluation(response, timings, input_image, save,
                            reference_identity, ocr, numbers,
-                           tuple(rank_languages), name_confidence, too_small or too_blurry, ocr_payload)
+                           tuple(rank_languages), name_confidence, too_small or too_blurry, ocr_payload,
+                           combined, shown)
 
 
 def recognize_bytes(
@@ -758,6 +816,74 @@ def recognize_bytes(
                 selected.timings['boundary_retry_ms'] = retry.timings['total_ms']
     if selected is not first:
         selected.timings['first_pass_ms'] = first.timings['total_ms']
+    # Holder labels belong to this photographed copy, not the catalogue card.
+    # Read only once, after frame recovery, on the original request frame
+    # (respecting any explicit user crop/rotation), before saving that result.
+    # Numeric grading stays separate from card identity. A separate literal
+    # holder read may only order existing ambiguous choices with independently
+    # supported artwork or printed name + collector evidence.
+    mark = time.perf_counter()
+    grading = GradingEvidence(warnings=['grading_detection_disabled'])
+    if getattr(settings, 'use_grading', True) and getattr(settings, 'use_ocr', True):
+        _, _, label_engine = runtime.require()
+        if label_engine is not None and hasattr(label_engine, 'read_grading'):
+            try:
+                grading = label_engine.read_grading(first.input_image)
+            except Exception:  # noqa: BLE001 - preserve otherwise successful scans
+                logging.getLogger(__name__).exception('Grading OCR failed for scan %s', selected.response.id)
+                grading = GradingEvidence(warnings=['grading_ocr_failed'])
+        else:
+            grading = GradingEvidence(warnings=['grading_ocr_unavailable'])
+    selected.response.grading = grading
+    selected.evidence['grading'] = grading.model_dump(mode='json')
+    selected.evidence['grading_version'] = GRADING_VERSION
+    if hasattr(selected.response, 'versions'):
+        selected.response.versions['grading'] = GRADING_VERSION
+    selected.timings['grading_ms'] = (time.perf_counter() - mark) * 1000
+    mark = time.perf_counter()
+    if (selected.response.status == ScanStatus.printing_ambiguous
+            and grading.slab_detected and grading.company
+            and (selected.evidence.get('local_artwork_matches')
+                 or selected.evidence.get('framing_review_supported'))
+            and selected.ranked and selected.response.printing_review
+            and hasattr(label_engine, 'read_holder_identity')):
+        try:
+            lines = label_engine.read_holder_identity(first.input_image)
+            family_ids = {r.card_id for r in selected.response.printing_review.plausible_printings}
+            eligible = [r for r in selected.ranked if r['card_id'] in family_ids
+                        and artwork_evidence_compatible(r, ocr_name=selected.ocr.name_text,
+                            name_confidence=selected.name_confidence, numbers=selected.numbers,
+                            languages=selected.languages)]
+            preferred = holder_printing_hint(eligible, lines,
+                printed_name=selected.ocr.name_text, printed_name_confidence=selected.name_confidence,
+                printed_numbers=selected.numbers, language=selected.response.detected_language)
+            selected.evidence['holder_printing_hint'] = {
+                'preferred_card_id': preferred, 'policy': 'display order only; printing remains ambiguous',
+                'lines': [dict(text=l.text, confidence=l.confidence, box=l.box) for l in lines],
+            }
+            if preferred and preferred != selected.ranked[0]['card_id']:
+                selected.ranked.sort(key=lambda r: r['card_id'] == preferred, reverse=True)
+                selected.lead = dict(selected.ranked[0])
+                selected.shown[:] = selected.ranked[:1]
+                selected.response.suggestions = [Candidate.model_validate(r) for r in selected.shown]
+                presentation = match_presentation(selected.ranked, status='printing_ambiguous',
+                    printing_review=selected.response.printing_review,
+                    min_visual=settings.threshold_min_visual_ocr)
+                selected.response.best_match = presentation.best_match
+                selected.response.alternatives = presentation.alternatives
+                selected.response.match_state = presentation.match_state
+                confidence = confidence_payload(selected.ranked, status='printing_ambiguous',
+                    name_confidence=selected.name_confidence, numbers=selected.numbers,
+                    framing_unverified=selected.evidence.get('framing_unverified', False),
+                    quality_retake=selected.quality_retake, min_visual=settings.threshold_min_visual,
+                    structured_identity=False, likely_identity=False)
+                confidence.reasons.append('holder_label_printing_hint_review_only')
+                selected.response.confidence = confidence
+                selected.evidence['confidence'] = confidence.model_dump(mode='json')
+                selected.evidence['match_presentation'] = presentation.model_dump(mode='json')
+        except Exception:  # noqa: BLE001 - an optional hint must not erase the visual result
+            logging.getLogger(__name__).exception('Holder printing hint failed for scan %s', selected.response.id)
+    selected.timings['holder_hint_ms'] = (time.perf_counter() - mark) * 1000
     selected.timings.update(boundary_proposal_ms=proposal_ms,
                             boundary_selection_ms=embed_ms,
                             boundary_retry_attempted=float(attempted),

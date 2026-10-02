@@ -26,6 +26,7 @@ from app.cardmarket import (
     store_unmatched_product_image,
 )
 from app.cardmarket_events import notify_product, wait_for_product
+from app.cardmarket_daily import replace_portfolio
 from app.cardmarket_html import parse_cardmarket_html
 from app.cardmarket import sample_key
 from app.cardmarket_budget import (
@@ -595,6 +596,30 @@ def helper_status(
         failure_reason=payload.failure_reason,
     )
     return _price_response(state)
+
+
+class PortfolioProductIn(BaseModel):
+    url: str = Field(min_length=8, max_length=500)
+    opened_at: str = Field(min_length=10, max_length=40)
+
+
+class PortfolioSyncIn(BaseModel):
+    products: list[PortfolioProductIn] = Field(default_factory=list, max_length=500)
+
+
+@router.post("/portfolio/products")
+def sync_portfolio(
+    payload: PortfolioSyncIn, request: Request, response: Response
+) -> dict[str, int]:
+    """Replace this session's holdings. The night job reads the distinct URLs."""
+    settings = request.app.state.settings
+    session = get_or_create_session(request, response, request.app.state.dbs, settings)
+    count = replace_portfolio(
+        request.app.state.dbs.portfolio,
+        session,
+        [(item.url, item.opened_at) for item in payload.products],
+    )
+    return {"count": count}
 
 
 @router.post("/cardmarket/parse", response_model=ParseResponse)

@@ -68,6 +68,28 @@ class OcrEvidence(BaseModel):
     collector_retry_contributed: bool = False
 
 
+class GradingEvidence(BaseModel):
+    """Observed label text, not authentication or a photographic condition grade."""
+
+    slab_detected: bool | None = None
+    is_graded: bool | None = None
+    grading_status: Literal["unknown", "graded", "authenticated_only", "ungraded"] = "unknown"
+    company: Literal["psa", "beckett", "cgc", "tag", "ace", "ags"] | None = None
+    company_source: Literal["label_ocr", "verified_logo", "none"] = "none"
+    grade: float | None = Field(default=None, ge=1, le=10)
+    condition_label: str | None = None
+    subgrades: dict[str, float] = Field(default_factory=dict)
+    tag_score: int | None = Field(default=None, ge=1, le=1000)
+    certification_number: str | None = None
+    qualifiers: list[str] = Field(default_factory=list)
+    raw_condition: Literal["not_assessed"] = "not_assessed"
+    authenticity_verified: Literal[False] = False
+    source: Literal["visible_label_ocr", "none"] = "none"
+    requires_confirmation: bool = True
+    label_text: list[str] = Field(default_factory=list)
+    warnings: list[str] = Field(default_factory=list)
+
+
 class RecognitionConfidence(BaseModel):
     """Raw evidence, not a calibrated percentage of successful recognition."""
 
@@ -177,6 +199,7 @@ class ScanResponse(MatchPresentation):
     search_languages: list[str] = Field(default_factory=list)
     printing_review: PrintingReview | None = None
     confidence: RecognitionConfidence | None = None
+    grading: GradingEvidence = Field(default_factory=GradingEvidence)
 
 
 class FeedbackRequest(BaseModel):
@@ -223,6 +246,7 @@ class SessionResult(MatchPresentation):
     timings_ms: dict[str, float] = Field(default_factory=dict)
     printing_review: PrintingReview | None = None
     confidence: RecognitionConfidence | None = None
+    grading: GradingEvidence = Field(default_factory=GradingEvidence)
 
 
 class SessionResultsResponse(BaseModel):

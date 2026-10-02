@@ -215,6 +215,14 @@ def init_catalog(conn: sqlite3.Connection) -> None:
             ON cardmarket_jobs(helper_id, status);
         CREATE INDEX IF NOT EXISTS idx_cardmarket_jobs_retry
             ON cardmarket_jobs(status, next_attempt_at, created_at);
+        CREATE TABLE IF NOT EXISTS portfolio_products (
+            session_id TEXT NOT NULL,
+            sample_key TEXT NOT NULL,
+            opened_at TEXT NOT NULL,
+            PRIMARY KEY (session_id, sample_key)
+        );
+        CREATE INDEX IF NOT EXISTS idx_portfolio_products_opened
+            ON portfolio_products(opened_at);
         """
     )
     conn.commit()
@@ -390,6 +398,18 @@ class Databases:
         self.results = connect(settings.results_sqlite)
         init_catalog(self.catalog)
         init_results(self.results)
+        self._portfolio_owned = False
+        self.portfolio = self.catalog
+        url = settings.portfolio_database_url.get_secret_value().strip()
+        if url:
+            from app.portfolio_db import connect_portfolio
+
+            try:
+                self.portfolio = connect_portfolio(url)
+                self._portfolio_owned = True
+            except Exception:
+                self.close()
+                raise
         if settings.catalogue_backend == "planetscale":
             from app.planetscale import load_cloud_catalogue
             try:
@@ -405,5 +425,7 @@ class Databases:
         sync_cardmarket_links(settings.data_dir, self.catalog)
 
     def close(self) -> None:
+        if getattr(self, "_portfolio_owned", False):
+            self.portfolio.close()
         self.catalog.close()
         self.results.close()

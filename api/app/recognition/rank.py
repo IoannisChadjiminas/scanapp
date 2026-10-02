@@ -125,6 +125,11 @@ def extract_collector_candidates(
             fractions = re.findall(r'(?i)\b((?:TG|GG)?\d{1,4}/(?:TG|GG)?\d{1,4})\b', cleaned)
             return [token for fraction in fractions for token in tokens(fraction)]
         compact = cleaned.replace(' ','')
+        # Legacy Japanese set codes can abut their three-digit footer number.
+        # Require a complete known series + fraction + printed rarity suffix;
+        # English SM promo collectors and arbitrary prefix letters stay intact.
+        compact = re.sub(r'(?i)^(?:SM|5M)(?:1[0-2]|[1-9])[A-Z]?(?=\d{3,4}/\d{3}(?:SAR|SR|AR|UR|RR|SSR|CHR|CSR)$)',
+                         '',compact)
         if japanese_numeric_footer and re.fullmatch(r'(?i)SV\d{1,2}', compact):
             return []
         # OCR may attach regulation/set text to a fraction and repeat its
@@ -153,6 +158,15 @@ def extract_collector_candidates(
             return []
         return COLLECTOR_RE.findall(compact)
 
+    # Scarlet/Violet promos print an isolated set/language code followed by
+    # bare digits. Preserve the explicitly observed namespace; incidental HP
+    # or retreat numbers without this adjacent footer code cannot qualify.
+    for code,digits in zip(hits or [],(hits or [])[1:]):
+        if (code.region==digits.region=='collector' and code.confidence is not None
+                and digits.confidence is not None and min(code.confidence,digits.confidence)>=.85
+                and re.fullmatch(r'(?i)SVP\s*EN',code.text.strip())
+                and re.fullmatch(r'\d{3}',digits.text.strip())):
+            add(OcrHit('SVP'+digits.text.strip(),min(code.confidence,digits.confidence),'collector'))
     for hit in hits or []:
         if hit.region == "name":
             continue
@@ -237,6 +251,8 @@ def accepted_collector_numbers(item: dict[str, Any]) -> list[str]:
     printed = str(item.get("printed_collector_number") or "")
     if printed and printed not in numbers:
         numbers.append(printed)
+    if str(item.get('set_id') or '').lower()=='svp' and re.fullmatch(r'\d{1,3}',numbers[0]):
+        numbers.append('SVP'+numbers[0].zfill(3))
     return [number for number in numbers if number]
 
 

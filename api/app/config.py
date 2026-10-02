@@ -13,11 +13,15 @@ class Settings(BaseSettings):
     data_dir: Path = Path("/data")
     catalogue_backend: str = "sqlite"
     planetscale_database_url: SecretStr = SecretStr("")
+    # Writable portfolio store: PlanetScale database pokesingle-product.
+    # Empty keeps holdings in the local catalogue file for tests.
+    portfolio_database_url: SecretStr = SecretStr("")
     planetscale_schema: str = "pokesingle_import_20261001"
     planetscale_import_id: str = "PS-IMPORT-001-20261001"
     tmp_dir: Path = Path("/tmp/scanapp")
     preprocess_config: str = "pad"
     use_ocr: bool = True
+    use_grading: bool = True
     enable_matched: bool = True
     ort_intra_threads: int = 1
     ort_inter_threads: int = 1
@@ -44,11 +48,21 @@ class Settings(BaseSettings):
     scraper_reserve_kb: int = 500
     scraper_url_cooldown_s: int = 1800
     scraper_attempt_seconds: int = 70
+    scraper_page_gap_s: float = 0
+    scraper_browser_lifetime_s: float = 1800
+    daily_prices_enabled: bool = False
+    daily_gap_min_s: float = 2
+    daily_gap_max_s: float = 60
+    daily_gap_step_s: float = 5
+    daily_session_pages: int = 30
+    daily_session_rotate_before_s: float = 120
+    daily_browsers: int = 1
+    photo_scrape_active: bool = False
 
-    ranking_version: str = "rank-v13-holder-layout-review"
+    ranking_version: str = "rank-v15-holder-printing-review"
     # Opt-in only; an invalid explicitly configured bundle fails validation.
     artwork_bundle_dir: Path | None = None
-    ocr_version: str = "rapidocr-ppocrv6-small-regions-v6-located-frame"
+    ocr_version: str = "rapidocr-ppocrv6-small-regions-v7-layout-orientation"
     model_name: str = "dinov2-small"
 
     @property

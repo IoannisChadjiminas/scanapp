@@ -229,6 +229,7 @@ async def session_results(request: Request, response: Response) -> dict:
                 timings_ms=json.loads(row["timings_json"] or "{}"),
                 printing_review=review,
                 confidence=evidence.get("confidence"),
+                grading=evidence.get("grading") or {},
                 **presentation.model_dump(mode='json'),
             )
         )
