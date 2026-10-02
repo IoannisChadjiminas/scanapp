@@ -6,6 +6,7 @@ import re
 import sqlite3
 import threading
 import time
+from html.parser import HTMLParser
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from pathlib import Path
 from urllib.parse import quote
@@ -478,14 +479,47 @@ def tpc_abs_url(path: str) -> str:
 
 
 def parse_tpc_collector(html: str) -> tuple[str, str] | None:
-    match = _TPC_COLLECTOR_RE.search(html or "")
-    if match is None:
+    matches = set(_TPC_COLLECTOR_RE.findall(html or ""))
+    if len(matches) != 1:
         return None
-    collector = match.group(1).strip()
-    set_id = match.group(2).strip()
-    if not collector or not set_id:
+    collector, denominator = next(iter(matches))
+
+    class SetLogos(HTMLParser):
+        def __init__(self):
+            super().__init__()
+            self.codes: set[str] = set()
+            self.conflict = False
+
+        def handle_starttag(self, tag, attrs):
+            if tag != "img":
+                return
+            attributes = dict(attrs)
+            match = re.fullmatch(
+                r"/assets/images/card/regulation_logo_[^/]+/([A-Za-z0-9.\-]+)\.(?:gif|png|svg)",
+                attributes.get("src") or "", re.I,
+            )
+            if match:
+                code = match.group(1)
+                alt = (attributes.get("alt") or "").strip()
+                if alt and alt.casefold() != code.casefold():
+                    self.conflict = True
+                self.codes.add(code.upper())
+
+    logos = SetLogos()
+    logos.feed(html or "")
+    if logos.conflict or len(logos.codes) > 1:
         return None
-    return collector, set_id
+    logo = next(iter(logos.codes), None)
+    # Regular cards print numerator / set-size, not numerator / set-code.
+    # The set-size must never become a catalogue expansion identity.
+    if denominator.isdigit():
+        return (collector, logo) if logo else None
+    # Promos can explicitly print their series code as the denominator.
+    if not re.fullmatch(r"[A-Za-z][A-Za-z0-9.\-]*", denominator):
+        return None
+    if logo and logo.casefold() != denominator.casefold():
+        return None
+    return collector, denominator
 
 
 _TPC_RETRY_STATUSES = {403, 429, 500, 502, 503, 504}

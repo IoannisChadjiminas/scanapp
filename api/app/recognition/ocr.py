@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, field
+from difflib import SequenceMatcher
 import re
 import unicodedata
 
@@ -88,6 +89,11 @@ def pick_name_line(lines: list[str]) -> str | None:
         if not text:
             continue
         lowered = text.lower()
+        normalized = unicodedata.normalize('NFKC', text)
+        # Japanese stage badges and evolution instructions precede the title
+        # in OCR reading order. They are layout labels, not identity evidence.
+        if re.fullmatch(r'\s*[12]\s*進化\s*', normalized) or re.search(r'から\s*進化\s*$', normalized):
+            continue
         if lowered in NAME_EXACT_SKIP or text in NAME_EXACT_SKIP:
             continue
         if any(lowered.startswith(prefix) for prefix in NAME_PREFIX_SKIP):
@@ -203,6 +209,28 @@ class CardOcr:
             collector_retry_contributed = False
             name_confidence = max((score or 0. for text, score in zip(name_lines, name_scores)
                                    if text == name_text), default=0.)
+            # One higher-resolution title pass for weak reads. Require a
+            # materially more confident, text-compatible reading; do not swap
+            # an unrelated high-confidence title into the identity evidence.
+            if name_text and .55 <= name_confidence < .90:
+                header = _region(image, 0., .22)
+                scale = min(3., 1200 / header.width)
+                if scale > 1.:
+                    try:
+                        retry_lines, retry_scores = self._run(header.resize(
+                            (round(header.width * scale), round(header.height * scale)),
+                            Image.Resampling.LANCZOS))
+                        retry_name = pick_confident_name(retry_lines, retry_scores)
+                        retry_confidence = max((s or 0. for t,s in zip(retry_lines,retry_scores)
+                                                if t == retry_name), default=0.)
+                        if (retry_name and retry_confidence >= .90 and
+                            retry_confidence > name_confidence and
+                            SequenceMatcher(None, name_text, retry_name).ratio() >= .70):
+                            name_text, name_confidence = retry_name, retry_confidence
+                        name_lines.extend(retry_lines)
+                        name_scores.extend(retry_scores)
+                    except Exception:  # noqa: BLE001 - preserve first-pass evidence
+                        pass
             # Small slab/card frames often leave the bottom digits only a few
             # pixels high. One bounded interpolation pass; no invented digits,
             # confidence boost, or replacement of a conflicting first read.
@@ -228,6 +256,30 @@ class CardOcr:
                     number_scores = [*number_scores, *(score for _, score in identifiers)]
                 except Exception:  # noqa: BLE001 - keep successful first-pass observations
                     pass
+            # Large photographs can still have tiny footer text relative to
+            # a wide OCR strip. Retry overlapping footer halves only when the
+            # readable title has no explicit identifier. Never infer a number
+            # from incidental damage/HP, and retain every first-pass conflict.
+            if image.width >= 450 and name_text and name_confidence >= .85 and not has_identifier:
+                collector_retry_used = True
+                bottom = _region(image, .88, 1.)
+                for left, right in ((0., .60), (.40, 1.)):
+                    tile = bottom.crop((round(left * bottom.width), 0,
+                                        round(right * bottom.width), bottom.height))
+                    scale = min(3., 900 / tile.width)
+                    tile = tile.resize((round(tile.width * scale), round(tile.height * scale)),
+                                       Image.Resampling.LANCZOS)
+                    try:
+                        retry_lines, retry_scores = self._run(tile)
+                        identifiers = [(text, score) for text, score in zip(retry_lines, retry_scores)
+                            if score is not None and score >= .85 and
+                            (COLLECTOR_FRACTION_RE.search(text) or
+                             re.fullmatch(r'[A-Z]{1,5}[- ]?\d{1,4}', text.strip()))]
+                        collector_retry_contributed |= bool(identifiers)
+                        number_lines.extend(text for text, _ in identifiers)
+                        number_scores.extend(score for _, score in identifiers)
+                    except Exception:  # noqa: BLE001 - optional retry cannot erase first read
+                        pass
             extra_lines: list[str] = []
             extra_scores: list[float | None] = []
             if not name_lines and not number_lines:

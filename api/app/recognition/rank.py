@@ -327,7 +327,8 @@ def rerank(
             }
         )
     ranked.sort(key=lambda row: row["combined_score"], reverse=True)
-    ranked = _prefer_language_print(ranked, detected_languages)
+    ranked = _prefer_language_print(ranked, detected_languages,
+                                    qualified_evidence=require_confident_ocr)
     return _keep_visual_leader(ranked, languages=detected_languages)
 
 
@@ -335,17 +336,23 @@ def _prefer_language_print(
     ranked: list[dict[str, Any]],
     languages: tuple[str, ...],
     max_drop: float = 0.10,
+    *, qualified_evidence: bool = False,
 ) -> list[dict[str, Any]]:
     if not languages or len(ranked) < 2:
         return ranked
-    matching = [row for row in ranked if row.get("language") in languages]
+    matching = [row for row in ranked if row.get("language") in languages
+                and not row.get('structured_collector_conflict')
+                and not row.get('strong_name_conflict')]
     if not matching:
         return ranked
     if ranked[0].get("language") in languages:
         return ranked
     best = max(matching, key=lambda row: float(row["visual_score"]))
-    if best.get("collector_conflict"):
+    if best.get('collector_conflict') and not qualified_evidence:
         return ranked
+    # Unstructured numbers from a misaligned bottom ROI (attack damage, HP)
+    # must not force a known-language conflict into first place. They still
+    # lower the score and prevent automatic confirmation in decide_status.
     visual_best = max(ranked, key=lambda row: float(row["visual_score"]))
     drop = float(visual_best["visual_score"]) - float(best["visual_score"])
     if drop > max_drop:

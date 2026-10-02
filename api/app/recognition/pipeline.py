@@ -161,6 +161,30 @@ def _recognize_bytes_once(
     mark = time.perf_counter()
     if settings.use_ocr and ocr_engine is not None and not retake:
         ocr = ocr_engine.read(image)
+        # A retrieval window can cut away the footer even when it exists in
+        # the uploaded image. Consult the uncropped input once, only for an
+        # agreeing title plus explicit, confidence-qualified identifiers.
+        # Supplement, never replace, first-pass evidence; later contradictions
+        # remain visible to the normal ranking/printing safety rules.
+        if inferred_frame and ocr.name_text and not ocr.failed:
+            first_numbers = extract_collector_candidates([], hits=ocr.hits)
+            has_explicit = any(h.confidence is not None and h.confidence >= .85
+                and ('/' in h.text or any(c.isalpha() for c in h.text)) for h in first_numbers)
+            title_conf = max((h.confidence or 0. for h in ocr.hits
+                              if h.region == 'name' and h.text == ocr.name_text), default=0.)
+            if not has_explicit and title_conf >= .85:
+                raw_ocr = ocr_engine.read(input_image)
+                raw_title_conf = max((h.confidence or 0. for h in raw_ocr.hits
+                    if h.region == 'name' and h.text == raw_ocr.name_text), default=0.)
+                if raw_title_conf >= .85 and name_match(raw_ocr.name_text, ocr.name_text):
+                    extra = [h for h in extract_collector_candidates([], hits=raw_ocr.hits)
+                        if h.region == 'collector' and h.confidence is not None and h.confidence >= .85
+                        and ('/' in h.text or any(c.isalpha() for c in h.text))]
+                    if extra:
+                        ocr.hits.extend(extra)
+                        ocr.lines.extend(h.text for h in extra)
+                        ocr.collector_retry_used = True
+                        ocr.collector_retry_contributed = True
     timings["ocr_ms"] = (time.perf_counter() - mark) * 1000
     if artwork_index is not None and not retake:
         artwork_hits, artwork_timings = artwork_index.search(
