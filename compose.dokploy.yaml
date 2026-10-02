@@ -14,9 +14,10 @@ services:
     environment:
       DATA_DIR: /data
       CATALOGUE_BACKEND: ${CATALOGUE_BACKEND:-planetscale}
-      PLANETSCALE_SCHEMA: ${PLANETSCALE_SCHEMA:-pokesingle_import_20261001}
+      PLANETSCALE_SCHEMA: ${PLANETSCALE_SCHEMA:-pokesingle_recovery_20261003}
       PORTFOLIO_DATABASE_URL: ${PORTFOLIO_DATABASE_URL:-}
-      PLANETSCALE_IMPORT_ID: ${PLANETSCALE_IMPORT_ID:-PS-IMPORT-001-20261001}
+      PLANETSCALE_IMPORT_ID: ${PLANETSCALE_IMPORT_ID:-PS-RECOVERY-011-20261003}
+      ARTWORK_BUNDLE_DIR: ${ARTWORK_BUNDLE_DIR:-/data/artwork/PS-RECOVERY-011-20261003}
       TMP_DIR: /tmp/scanapp
       PREPROCESS_CONFIG: ${PREPROCESS_CONFIG:-pad}
       USE_OCR: ${USE_OCR:-true}
@@ -126,12 +127,12 @@ services:
     labels:
       - traefik.enable=true
       - traefik.docker.network=dokploy-network
-      - traefik.http.routers.scanapp.rule=Host(`staging-scan.auctaro.com`)
+      - traefik.http.routers.scanapp.rule=Host(`scan.pokesingle.com`)
       - traefik.http.routers.scanapp.entrypoints=web
       - traefik.http.routers.scanapp.service=scanapp
       - traefik.http.services.scanapp.loadbalancer.server.port=80
       - traefik.http.services.scanapp.loadbalancer.responseforwarding.flushinterval=1ms
-      - traefik.http.routers.scanapp-secure.rule=Host(`staging-scan.auctaro.com`)
+      - traefik.http.routers.scanapp-secure.rule=Host(`scan.pokesingle.com`)
       - traefik.http.routers.scanapp-secure.entrypoints=websecure
       - traefik.http.routers.scanapp-secure.tls=true
       - traefik.http.routers.scanapp-secure.service=scanapp
