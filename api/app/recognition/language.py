@@ -117,6 +117,13 @@ def detect_card_language(texts: list[str]) -> str | None:
     zh_tw_words = sum(1 for phrase in ZH_TW_PHRASES if phrase in blob)
     ko_words = sum(1 for phrase in KO_PHRASES if phrase in blob)
 
+    # Two incidental footer glyphs (energy/retreat symbols) cannot outweigh
+    # multiple explicit English layout labels. Real localized phrases, kana,
+    # Hangul and longer CJK text retain their normal language priority.
+    if (en_words >= 2 and cjk <= 2 and hira + kata < 2 and hangul < 2
+            and not (ja_words or zh_cn_words or zh_tw_words or ko_words)):
+        return "en"
+
     if hira + kata >= 2 or ja_words:
         return "ja"
     if hangul >= 2 or ko_words:

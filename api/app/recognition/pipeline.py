@@ -135,6 +135,10 @@ def _recognize_bytes_once(
         alternatives.extend((f'loose_{i}', frame) for i, frame in
                             enumerate(loose_frame_candidates(input_image, limit=2)))
         alternatives.extend(portrait_window_candidates(input_image))
+        if not detected:
+            slab = slab_interior_candidate(input_image)
+            if slab is not None:
+                alternatives.append(slab)
     timings['frame_proposal_ms'] = (time.perf_counter() - mark) * 1000
     image, indices, scores, orientation_timings = retrieve_oriented(
         image, embedder, snapshot.embeddings,
@@ -147,7 +151,7 @@ def _recognize_bytes_once(
     )
     if _frame_override is not None:
         frame_selection['profile'] = _frame_override[0]
-    inferred_frame = frame_selection.get('profile','').startswith(('line_', 'loose_', 'window_', 'slab_'))
+    inferred_frame = frame_selection.get('profile','').startswith(('line_', 'loose_', 'window_', 'slab_', 'aligned_'))
     if frame_selection.get('profile') == 'as_supplied' or inferred_frame:
         detected = False
     timings.update(orientation_timings)
@@ -166,17 +170,34 @@ def _recognize_bytes_once(
         # agreeing title plus explicit, confidence-qualified identifiers.
         # Supplement, never replace, first-pass evidence; later contradictions
         # remain visible to the normal ranking/printing safety rules.
-        if inferred_frame and ocr.name_text and not ocr.failed:
+        if inferred_frame and not ocr.failed:
             first_numbers = extract_collector_candidates([], hits=ocr.hits)
             has_explicit = any(h.confidence is not None and h.confidence >= .85
                 and ('/' in h.text or any(c.isalpha() for c in h.text)) for h in first_numbers)
             title_conf = max((h.confidence or 0. for h in ocr.hits
                               if h.region == 'name' and h.text == ocr.name_text), default=0.)
-            if not has_explicit and title_conf >= .85:
+            # A clipped title can be weaker than the same visible title on
+            # the original upload. Consult that upload for agreeing evidence,
+            # never overwrite a confident different title or collector.
+            if (not has_explicit and title_conf >= .85) or .50 <= title_conf < .85 or (ocr.name_text is None and not has_explicit):
                 raw_ocr = ocr_engine.read(input_image)
                 raw_title_conf = max((h.confidence or 0. for h in raw_ocr.hits
                     if h.region == 'name' and h.text == raw_ocr.name_text), default=0.)
-                if raw_title_conf >= .85 and name_match(raw_ocr.name_text, ocr.name_text):
+                holder_hints=[h for h in extract_collector_candidates([],hits=raw_ocr.hits)
+                              if h.region == 'holder_collector']
+                agreeing_title=bool(ocr.name_text and name_match(raw_ocr.name_text,ocr.name_text))
+                printed_language=resolve_search_languages('auto',confident_language_texts(ocr.hits)).detected
+                title_has_localized_script=any('\u3040' <= c <= '\u30ff' or '\u4e00' <= c <= '\u9fff'
+                    or '\uac00' <= c <= '\ud7a3' for c in raw_ocr.name_text or '')
+                holder_title_compatible=printed_language not in {'ja','ko','zh','zh-cn','zh-tw'} or title_has_localized_script
+                if raw_title_conf >= .85 and (agreeing_title or
+                        (ocr.name_text is None and holder_hints and holder_title_compatible)):
+                    if title_conf < .85:
+                        ocr.hits.extend(h for h in raw_ocr.hits
+                            if h.region == 'name' and h.text == raw_ocr.name_text)
+                        ocr.name_text = raw_ocr.name_text
+                        ocr.lines.append(raw_ocr.name_text)
+                    ocr.hits.extend(holder_hints)
                     extra = [h for h in extract_collector_candidates([], hits=raw_ocr.hits)
                         if h.region == 'collector' and h.confidence is not None and h.confidence >= .85
                         and ('/' in h.text or any(c.isalpha() for c in h.text))]
@@ -208,6 +229,9 @@ def _recognize_bytes_once(
     metadata_index = getattr(runtime, 'metadata_index', None)
     metadata_ids = metadata_index.candidates(ocr_name=ocr.name_text,
         name_confidence=name_confidence, numbers=numbers, languages=rank_languages) if metadata_index else []
+    title_ids = metadata_index.title_candidates(ocr_name=ocr.name_text,
+        name_confidence=name_confidence, numbers=numbers, languages=rank_languages
+    ) if metadata_index and not metadata_ids else []
     timings['metadata_retrieve_ms'] = (time.perf_counter() - mark) * 1000
     visual: list[dict[str, Any]] = []
     selected_ids = [str(snapshot.card_ids[i]) for i in indices]
@@ -215,11 +239,12 @@ def _recognize_bytes_once(
     artwork_by_id = {h.card_id: h for h in artwork_hits}
     selected_ids.extend(h.card_id for h in artwork_hits if h.card_id not in full_ids)
     selected_ids.extend(cid for cid in metadata_ids if cid not in selected_ids)
+    selected_ids.extend(cid for cid in title_ids if cid not in selected_ids)
     cards = _lookup_cards(catalog, selected_ids)
     full_scores = {str(snapshot.card_ids[i]): float(score)
                    for i, score in zip(indices, scores, strict=True)}
     positions = getattr(runtime, 'card_positions', None) or (
-        {str(cid): i for i, cid in enumerate(snapshot.card_ids)} if artwork_hits or metadata_ids else {})
+        {str(cid): i for i, cid in enumerate(snapshot.card_ids)} if artwork_hits or metadata_ids or title_ids else {})
     for card_id in selected_ids:
         score = full_scores.get(card_id)
         if score is None:
@@ -249,7 +274,8 @@ def _recognize_bytes_once(
                 "cardmarket_url": url_for_row(row),
                 "retrieved_via": (["full_card"] if card_id in full_ids else []) +
                                  (["artwork"] if card_id in artwork_by_id else []) +
-                                 (["ocr_metadata"] if card_id in metadata_ids else []),
+                                 (["ocr_metadata"] if card_id in metadata_ids else []) +
+                                 (["ocr_title"] if card_id in title_ids else []),
                 "artwork_score": artwork_by_id[card_id].score if card_id in artwork_by_id else None,
                 "artwork_profile": artwork_by_id[card_id].reference_profile if card_id in artwork_by_id else None,
             }
@@ -274,6 +300,8 @@ def _recognize_bytes_once(
     ratio = image.width / image.height
     if combined and not retake and verifier is not None and (
         float(combined[0]["visual_score"]) < settings.threshold_min_visual
+        or any(h.region == 'holder_collector' for h in numbers)
+        or combined[0].get('retrieved_via') == ['ocr_title']
         or not .62 <= ratio <= .80
         # A high global score with weak OCR and close visual neighbours can
         # still be unresolved. Verify geometry instead of lowering thresholds
@@ -318,7 +346,11 @@ def _recognize_bytes_once(
                 numbers=numbers, languages=rank_languages)]
             # If none resolve the metadata, use only an artwork family seed;
             # below it must expand to review choices or request a retake.
-            chosen_id = (eligible or local_matches)[0].card_id
+            # Keypoint counts certify shared artwork, not which reprint it is.
+            # Preserve the OCR/global ranking among verified, compatible
+            # candidates instead of using descriptor count as printing proof.
+            preferred_ids = {m.card_id for m in eligible or local_matches}
+            chosen_id = next(r['card_id'] for r in combined if r['card_id'] in preferred_ids)
             for item in combined:
                 item["local_artwork_verified"] = item["card_id"] in verified_ids
             combined.sort(key=lambda r: (r["card_id"] == chosen_id,
@@ -360,6 +392,11 @@ def _recognize_bytes_once(
     )
     if local_matches:
         status = "uncertain"
+    if any(h.region == 'holder_collector' for h in numbers) and status == 'matched':
+        status = 'uncertain'
+    if any(h.region == 'holder_collector' for h in numbers) and not local_matches and not framing_review_supported:
+        status = 'retake'
+        retake = True
     # Upscaled collector OCR can support a review, never introduce a new
     # automatic claim. It does not add independent pixels or calibrated proof.
     if ocr.collector_retry_contributed and status == 'matched':
@@ -370,6 +407,13 @@ def _recognize_bytes_once(
         status = 'uncertain'
     if combined and combined[0].get('retrieved_via') == ['ocr_metadata'] and status == 'matched':
         status = 'uncertain'
+    if combined and combined[0].get('retrieved_via') == ['ocr_title']:
+        # Name-only fallback must pass geometry, never automatically confirm.
+        if combined[0].get('local_artwork_verified'):
+            status = 'uncertain'
+        else:
+            status = 'retake'
+            retake = True
     if combined and decision.detected in {'ja','ko','zh','zh-cn','zh-tw'} and combined[0].get('language') not in rank_languages:
         status = 'retake'
         retake = True
@@ -647,9 +691,19 @@ def recognize_bytes(
     if (not skip_detect and all(v is None for v in (crop_x,crop_y,crop_w,crop_h))
             and first.response.status == ScanStatus.retake and not first.quality_retake):
         mark = time.perf_counter()
-        # Slab edges can outrank the inner card geometrically. Eight cheap
-        # vector probes still lead to at most ONE additional OCR evaluation.
+        # Slab edges can outrank the inner card geometrically. Eight line
+        # probes plus one artwork-aligned proposal still lead to at most ONE
+        # additional OCR evaluation.
         frames = line_frame_candidates(first.input_image,limit=8)
+        profiles=[f'line_{i}' for i in range(len(frames))]
+        verifier=getattr(runtime,'artwork_verifier',None)
+        if first.lead and hasattr(verifier,'propose_frame'):
+            row=catalog.execute('SELECT image_path FROM cards WHERE id=?',(first.lead['card_id'],)).fetchone()
+            if row and row['image_path']:
+                aligned=verifier.propose_frame(first.input_image,(first.lead['card_id'],str(row['image_path'])))
+                if aligned is not None:
+                    frames=[*frames,aligned]
+                    profiles=[*profiles,'aligned_reference']
         recovery['hypotheses'] = len(frames)
         proposal_ms = (time.perf_counter()-mark)*1000
         if frames:
@@ -679,14 +733,18 @@ def recognize_bytes(
                 # Proposal selection is not acceptance. The existing OCR-assisted
                 # floor permits a readable number/name to rescue a glare image;
                 # the complete evaluation still enforces every evidence guard.
-                if score >= settings.threshold_min_visual_ocr and (best is None or score > best[0]+settings.threshold_min_gap):
+                # Compare retrieval hypotheses by their maximum score. A
+                # confidence gap belongs to final printing decisions, not
+                # between crops: first-proposal order must not lock in a
+                # lower-scoring holder crop and hide a better card interior.
+                if score >= settings.threshold_min_visual_ocr and (best is None or score > best[0]):
                     best = (score,i,frame)
             embed_ms = (time.perf_counter()-mark)*1000
             if best is not None:
                 attempted = True
-                recovery.update(proposal_profile=f'line_{best[1]}',proposal_score=best[0])
+                recovery.update(proposal_profile=profiles[best[1]],proposal_score=best[0])
                 retry = _recognize_bytes_once(data, **kwargs,
-                    _frame_override=(f'line_{best[1]}',best[2]))
+                    _frame_override=(profiles[best[1]],best[2]))
                 compatible = bool(retry.lead and artwork_evidence_compatible(
                     retry.lead,ocr_name=first.ocr.name_text,
                     name_confidence=first.name_confidence,numbers=first.numbers,

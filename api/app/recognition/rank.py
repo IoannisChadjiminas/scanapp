@@ -78,30 +78,60 @@ def extract_collector_candidates(
 ) -> list[OcrHit]:
     found: list[OcrHit] = []
     seen: set[str] = set()
+    # Japanese numeric set fractions followed by rarity establish footer
+    # layout context. An isolated SV7 beside 131/102 SAR is a set code, not
+    # an English shiny-vault collector. Preserve SV collectors otherwise.
+    japanese_numeric_footer = any(re.search(
+        r'(?i)(?<![A-Z0-9])\d{1,4}\s*/\s*\d{1,4}\s*(?:SAR|SR|AR|UR|RR|SSR|CHR|CSR)\b', text)
+        for text in [*lines, *(h.text for h in hits or [] if h.region == 'collector')])
 
     def add(item: OcrHit) -> None:
         token = item.text.upper().replace(" ", "")
-        if not token or token in seen:
+        if not token:
+            return
+        if token in seen:
+            # A real footer observation must retain its region/confidence even
+            # when a holder label happened to propose the same bare number.
+            previous=next(h for h in found if h.text == token)
+            if previous.region == 'holder_collector' and item.region == 'collector':
+                found.remove(previous)
+                found.append(OcrHit(token,item.confidence,item.region))
             return
         if parse_collector(token) is None:
             return
         seen.add(token)
         found.append(OcrHit(text=token, confidence=item.confidence, region=item.region))
 
+    # Holder labels are explicitly labelled evidence, not bottom-of-card OCR.
+    # Only an isolated #SKU next to grading boilerplate qualifies; its role is
+    # a review-only ranking hint, never a hard contradiction/printing proof.
+    if hits and any(h.region == 'name' and h.confidence is not None and h.confidence >= .85
+                    and re.fullmatch(r'(?i)\s*GEM\s*MT\s*',h.text) for h in hits):
+        for hit in hits:
+            if hit.region == 'name' and hit.confidence is not None and hit.confidence >= .85:
+                match=re.fullmatch(r'\s*#\s*([A-Za-z]{0,4}\d{1,4})\s*',hit.text)
+                if match:
+                    add(OcrHit(match[1],hit.confidence,'holder_collector'))
+
     def tokens(text: str) -> list[str]:
         # Bottom-of-card OCR also contains weakness, level and Pokedex text.
         # Region/confidence alone cannot make those numbers collectors.
         cleaned = NON_COLLECTOR_NUMBER_RE.sub(" ", text)
-        if re.search(r'(?i)(?:©|copyright|Nintendo|GAME\s*FREAK|\bIllus\b)', cleaned):
+        if (re.search(r'(?i)(?:©|copyright|Nintendo|GAME\s*FREAK|\bIllus\b)', cleaned)
+                or re.search(r'(?i)\bL[VY]\.?\s*\d+', text)
+                or len(re.findall(r'\b[a-z]{3,}\b', text)) >= 4):
             # Older frames print the collector fraction on the copyright
             # line itself. Keep explicit fractions, not years/artist numbers.
             fractions = re.findall(r'(?i)\b((?:TG|GG)?\d{1,4}/(?:TG|GG)?\d{1,4})\b', cleaned)
             return [token for fraction in fractions for token in tokens(fraction)]
         compact = cleaned.replace(' ','')
+        if japanese_numeric_footer and re.fullmatch(r'(?i)SV\d{1,2}', compact):
+            return []
         # OCR may attach regulation/set text to a fraction and repeat its
         # gallery namespace in the denominator. Retain the gallery prefix;
         # do not treat its denominator as a second bare collector number.
         compact = re.sub(r'(?i)^(?:[D-J])?S[VY]\d+[A-Z]?(?=\d{3,4}/)', '', compact)
+        compact = re.sub(r'(?i)^[A-Z]?[D-J](?=(TG|GG)\d+/\1\d+\b)', '', compact)
         compact = re.sub(r'(?i)^(?:[D-J]|M[D-J])(?=(?:TG|GG)\d+/)', '', compact)
         compact = re.sub(r'(?i)\b(TG|GG)(\d{1,4})/\1(\d{1,4})\b', r'\1\2/\3', compact)
         # Modern set/language codes abut a numeric fraction in OCR, e.g.
@@ -309,6 +339,11 @@ def rerank(
             conflict_weight = max((max(0.0, min(1.0, h.confidence)) for h in known_numbers
                                    if _match_any([h], numbers) is False), default=0.0)
             combined += .08*match_weight - .12*conflict_weight
+            if not explicit and name_ok and name_weight >= .85:
+                holder_weight=max((h.confidence or 0. for h in ocr_numbers
+                    if isinstance(h,OcrHit) and h.region == 'holder_collector'
+                    and _match_any([h],numbers) is True),default=0.)
+                combined += .08*holder_weight
             if collector_conflict:
                 combined -= .08*conflict_weight
             if name_ok:

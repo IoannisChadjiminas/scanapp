@@ -45,10 +45,10 @@ class Settings(BaseSettings):
     scraper_url_cooldown_s: int = 1800
     scraper_attempt_seconds: int = 70
 
-    ranking_version: str = "rank-v10-explicit-collector-localized-review"
+    ranking_version: str = "rank-v13-holder-layout-review"
     # Opt-in only; an invalid explicitly configured bundle fails validation.
     artwork_bundle_dir: Path | None = None
-    ocr_version: str = "rapidocr-ppocrv6-small-regions-v3-title-labels"
+    ocr_version: str = "rapidocr-ppocrv6-small-regions-v6-located-frame"
     model_name: str = "dinov2-small"
 
     @property

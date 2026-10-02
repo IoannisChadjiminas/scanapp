@@ -84,13 +84,29 @@ def _compact_latin(text: str) -> str:
     return re.sub(r"[^a-z0-9]+", "", decomposed)
 
 
-def pick_name_line(lines: list[str]) -> str | None:
+def _is_layout_badge(line: str) -> bool:
+    normalized = unicodedata.normalize('NFKC', line).strip().casefold()
+    compact = _compact_latin(line)
+    # An inferred frame may clip one letter of the long Basic Pokémon badge.
+    # Do not fuzzy-match short labels or arbitrary card names.
+    clipped_basic = (abs(len(compact)-len('basicpokemon')) <= 1 and
+                     SequenceMatcher(None, compact, 'basicpokemon').ratio() >= .90)
+    return bool(compact in {'basic','basicpokemon','stage1','stage2','trainer'}
+                or clipped_basic or normalized in {'たね','トレーナー','トレーナーズ'}
+                or re.fullmatch(r'[12]\s*進化', normalized))
+
+
+def _pick_name_line(lines: list[str]) -> str | None:
     for line in lines:
         text = line.strip()
         if not text:
             continue
         lowered = text.lower()
         normalized = unicodedata.normalize('NFKC', text)
+        # A misplaced title region can include the printed supporter rule.
+        # This is layout boilerplate, not a confident different card name.
+        if re.match(r'サ[ポボ]ートは[、,\s]*自分の番', normalized):
+            continue
         # Japanese stage badges and evolution instructions precede the title
         # in OCR reading order. They are layout labels, not identity evidence.
         if re.fullmatch(r'\s*[12]\s*進化\s*', normalized) or re.search(r'から\s*進化\s*$', normalized):
@@ -100,6 +116,8 @@ def pick_name_line(lines: list[str]) -> str | None:
         if any(lowered.startswith(prefix) for prefix in NAME_PREFIX_SKIP):
             continue
         compact = _compact_latin(text)
+        if _is_layout_badge(text):
+            continue
         # Collector-only grading labels are not titles. Preserve actual names
         # containing numbers (e.g. Porygon2), not standalone SKU identifiers.
         if re.fullmatch(r'\s*#\s*[A-Za-z]{0,4}\d{1,4}\s*', text):
@@ -120,6 +138,18 @@ def pick_name_line(lines: list[str]) -> str | None:
             continue
         return text
     return None
+
+
+def pick_name_line(lines: list[str]) -> str | None:
+    # Prefer a title after the card's stage/trainer badge, rather than a
+    # background sign above it. This is reading-order layout evidence, not a
+    # catalogue-specific name whitelist. Evolution instructions aren't badges.
+    for i, line in enumerate(lines):
+        if _is_layout_badge(line):
+            title = _pick_name_line(lines[i+1:])
+            if title:
+                return title
+    return _pick_name_line(lines)
 
 
 def pick_confident_name(lines: list[str], scores: list[float | None]) -> str | None:
@@ -172,6 +202,10 @@ class CardOcr:
     def _run(self, image: Image.Image) -> tuple[list[str], list[float | None]]:
         array = np.asarray(image.convert("RGB"))
         output = self.engine(array)
+        return self._parse_output(output)
+
+    @staticmethod
+    def _parse_output(output) -> tuple[list[str], list[float | None]]:
         texts: list[str] = []
         scores: list[float | None] = []
         if output is None:
@@ -205,10 +239,44 @@ class CardOcr:
                     scores.append(None)
         return texts, scores
 
+    def _run_located(self, image: Image.Image) -> tuple[list[str], list[float | None], list[str]]:
+        """Full-frame fallback with observed locations, never guessed regions."""
+        if not hasattr(self, 'engine'):
+            texts, scores = self._run(image)
+            return texts, scores, ['full'] * len(texts)
+        output = self.engine(np.asarray(image.convert('RGB')))
+        texts, scores = self._parse_output(output)
+        raw_texts = getattr(output, 'txts', None)
+        boxes = getattr(output, 'boxes', None)
+        regions = []
+        if raw_texts is not None and boxes is not None and len(raw_texts) == len(boxes):
+            for text, box in zip(raw_texts, boxes):
+                if not text:
+                    continue
+                points = np.asarray(box, dtype=float)
+                region = 'full'
+                if points.shape == (4,2) and np.isfinite(points).all():
+                    if 0 <= points[:,1].min() and points[:,1].max() <= .22*image.height:
+                        region = 'name'
+                    elif .82*image.height <= points[:,1].min() and points[:,1].max() <= image.height:
+                        region = 'collector'
+                regions.append(region)
+        if len(regions) != len(texts):
+            regions = ['full'] * len(texts)
+        return texts, scores, regions
+
     def read(self, image: Image.Image) -> OcrResult:
         try:
-            name_lines, name_scores = self._run(_region(image, 0.0, 0.22))
-            number_lines, number_scores = self._run(_region(image, 0.82, 1.0))
+            # Tiny detected cards/slab interiors have title/footer strips too
+            # short for text detection. Interpolate regions before OCR, not
+            # after an empty result has forced shared-art printing guesses.
+            ocr_image = image
+            if image.width < 450:
+                scale = min(3., 600 / image.width)
+                ocr_image = image.resize((round(image.width*scale),round(image.height*scale)),
+                                         Image.Resampling.LANCZOS)
+            name_lines, name_scores = self._run(_region(ocr_image, 0.0, 0.22))
+            number_lines, number_scores = self._run(_region(ocr_image, 0.82, 1.0))
             name_text = pick_confident_name(name_lines,name_scores)
             collector_retry_used = False
             collector_retry_contributed = False
@@ -217,7 +285,7 @@ class CardOcr:
             # One higher-resolution title pass for weak reads. Require a
             # materially more confident, text-compatible reading; do not swap
             # an unrelated high-confidence title into the identity evidence.
-            if name_text and .55 <= name_confidence < .90:
+            if name_text and .50 <= name_confidence < .90:
                 header = _region(image, 0., .22)
                 scale = min(3., 1200 / header.width)
                 if scale > 1.:
@@ -230,7 +298,7 @@ class CardOcr:
                                                 if t == retry_name), default=0.)
                         if (retry_name and retry_confidence >= .90 and
                             retry_confidence > name_confidence and
-                            SequenceMatcher(None, name_text, retry_name).ratio() >= .70):
+                            SequenceMatcher(None, name_text.casefold(), retry_name.casefold()).ratio() >= .70):
                             name_text, name_confidence = retry_name, retry_confidence
                         name_lines.extend(retry_lines)
                         name_scores.extend(retry_scores)
@@ -287,8 +355,12 @@ class CardOcr:
                         pass
             extra_lines: list[str] = []
             extra_scores: list[float | None] = []
+            extra_regions: list[str] = []
             if not name_lines and not number_lines:
-                extra_lines, extra_scores = self._run(image)
+                extra_lines, extra_scores, extra_regions = self._run_located(image)
+                title_pairs = [(t,s) for t,s,r in zip(extra_lines,extra_scores,extra_regions) if r == 'name']
+                name_text = pick_confident_name([t for t,_ in title_pairs],[s for _,s in title_pairs])
+                number_lines = [t for t,r in zip(extra_lines,extra_regions) if r == 'collector']
             lines = [*name_lines, *number_lines, *extra_lines]
             hits = [
                 *[
@@ -300,12 +372,14 @@ class CardOcr:
                     for text, score in zip(number_lines, number_scores, strict=False)
                 ],
                 *[
-                    OcrHit(text=text, confidence=score, region="full")
-                    for text, score in zip(extra_lines, extra_scores, strict=False)
+                    OcrHit(text=text, confidence=score, region=region)
+                    for text, score, region in zip(extra_lines, extra_scores, extra_regions, strict=False)
                 ],
             ]
             return OcrResult(
-                name_text=name_text or pick_name_line(lines),
+                # Footer observations must not become title evidence when a
+                # slab/proposal misses the actual name region.
+                name_text=name_text,
                 collector_text=pick_collector_text(number_lines),
                 lines=lines,
                 hits=hits,
