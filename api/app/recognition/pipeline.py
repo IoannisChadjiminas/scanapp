@@ -9,6 +9,7 @@ from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from typing import Any, Callable
 
+import cv2
 import numpy as np
 
 from app.config import Settings
@@ -32,6 +33,8 @@ from app.recognition.presentation import match_presentation
 from app.recognition.language import confident_language_texts, expand_language, language_label, resolve_search_languages
 from app.recognition.ocr import OcrResult, inverted_card_layout
 from app.recognition.ocr_framing import complete_frame_probe_allowed, complete_frame_identity_supported, normalize_complete_frame_footer
+from app.recognition.ocr_cache import RequestOcrCache
+from app.recognition.stamp_printing import stamp_printing_hint
 from app.recognition.grading import VERSION as GRADING_VERSION
 from app.recognition.grading_parallel import GradingJob, parallel_grading_scope
 from app.recognition.holder_printing import holder_printing_hint
@@ -104,6 +107,7 @@ def _recognize_bytes_once(
     store_capture: bool | None = None,
     _frame_override: tuple[str, Any] | None = None,
     _input_observer: Callable | None = None,
+    _ocr_cache: RequestOcrCache | None = None,
 ) -> _ScanEvaluation:
     started = time.perf_counter()
     timings: dict[str, float] = {}
@@ -174,9 +178,14 @@ def _recognize_bytes_once(
     artwork_index = getattr(runtime, "artwork_index", None)
     ocr = OcrResult(failed=True)
     ocr_passes = []
+    ocr_cache_hits = []
     def read_card(frame, scope):
-        observed = ocr_engine.read(frame)
-        ocr_passes.extend(dict(scope=scope, **p) for p in observed.passes)
+        observed, cached = (_ocr_cache.read(ocr_engine, frame) if _ocr_cache is not None
+                            else (ocr_engine.read(frame), False))
+        if cached:
+            ocr_cache_hits.append(dict(scope=scope, width=frame.width, height=frame.height))
+        else:
+            ocr_passes.extend(dict(scope=scope, **p) for p in observed.passes)
         return observed
     original_ocr = None
     original_identity_used = False
@@ -514,6 +523,7 @@ def _recognize_bytes_once(
         retake=retake,
     )
     printing_review = None
+    stamp_hint = None
     if likely_identity_supported and not framing_review_supported and not printing.ambiguous and not retake:
         # Even a single retrieved printing isn't proof that no reprints exist.
         # Require explicit selection using the existing review/feedback contract.
@@ -536,6 +546,15 @@ def _recognize_bytes_once(
                 preferred=max(eligible,key=lambda r:float(r['combined_score']))
                 combined.sort(key=lambda r:r['card_id']==preferred['card_id'],reverse=True)
                 reference_identity=dict(combined[0])
+        try:
+            stamp_hint = stamp_printing_hint(combined, printing.members, image,
+                ocr_name=ocr.name_text, name_confidence=name_confidence,
+                numbers=numbers, languages=rank_languages)
+            if stamp_hint:
+                combined.sort(key=lambda r:r['card_id']==stamp_hint['preferred_card_id'],reverse=True)
+                reference_identity = dict(combined[0])
+        except (OSError, ValueError, KeyError, cv2.error):
+            logging.getLogger(__name__).exception('Optional stamp ordering failed')
         printing_review = PrintingReview(
             reason=printing.reason, candidate_group_id=printing.candidate_group_id,
             reference_coverage_complete=printing.reference_coverage_complete,
@@ -603,6 +622,8 @@ def _recognize_bytes_once(
             scan_id, record['scope'], record['region'], record['reason'], record['width'], record['height'], record['ms'])
     versions = runtime.versions()
     versions['presentation'] = 'best-match-v1'
+    versions['stamp_ordering'] = 'play-stamp-review-v1'
+    versions['ocr_cache'] = 'request-pixels-v1'
     presentation = match_presentation(combined, status=status, printing_review=printing_review,
                                       min_visual=settings.threshold_min_visual_ocr)
     confidence = confidence_payload(combined, status=status,
@@ -612,6 +633,8 @@ def _recognize_bytes_once(
         structured_identity=bool(reference_identity and structured_identity_agrees(reference_identity,
             ocr_name=ocr.name_text, name_confidence=name_confidence, numbers=numbers, languages=rank_languages)),
         likely_identity=likely_identity_supported)
+    if stamp_hint:
+        confidence.reasons.append('stamp_display_hint_printing_unconfirmed')
     ocr_payload = {
         "name_text": ocr.name_text,
         "collector_text": ocr.collector_text,
@@ -620,6 +643,8 @@ def _recognize_bytes_once(
         "collector_retry_used": ocr.collector_retry_used,
         "collector_retry_contributed": ocr.collector_retry_contributed,
         "passes": ocr_passes,
+        "ocr_cache_hits": ocr_cache_hits,
+        "stamp_printing_hint": stamp_hint,
         "confidence": confidence.model_dump(mode='json'),
         "match_presentation": presentation.model_dump(mode='json'),
         "hits": [
@@ -768,10 +793,12 @@ def recognize_bytes(
     Explicit crops and quality retakes do not trigger this extra OCR pass.
     """
     started = time.perf_counter()
+    ocr_cache = RequestOcrCache()
     kwargs = dict(settings=settings, runtime=runtime, catalog=catalog,
                   results=results, session_id=session_id, crop_x=crop_x,
                   crop_y=crop_y, crop_w=crop_w, crop_h=crop_h, rotation=rotation,
                   skip_detect=skip_detect, language=language, store_capture=store_capture)
+    kwargs['_ocr_cache'] = ocr_cache
     if _grading_job is not None:
         kwargs['_input_observer'] = _grading_job.start
     first = _recognize_bytes_once(data, **kwargs)
@@ -950,6 +977,8 @@ def recognize_bytes(
                             boundary_retry_attempted=float(attempted),
                             boundary_retry_selected=float(selected is not first),
                             total_ms=(time.perf_counter()-started)*1000)
+    selected.timings['ocr_cache_hits'] = float(ocr_cache.hits)
+    selected.timings['ocr_unique_reads'] = float(ocr_cache.reads)
     selected.response.timings_ms = {key:round(value,2) for key,value in selected.timings.items()}
     selected.evidence['boundary_recovery'] = {
         **recovery,
@@ -957,6 +986,12 @@ def recognize_bytes(
         'first_status': first.response.status.value,
         'first_top_id': first.lead.get('card_id') if first.lead else None,
         'policy': 'one review-only retry; preserve first-pass identity contradictions',
+    }
+    selected.evidence['ocr_request_summary'] = {
+        'unique_reads': ocr_cache.reads, 'cache_hits': ocr_cache.hits,
+        'first_pass_region_reads': first.evidence.get('passes', []),
+        'selected_pass_region_reads': selected.evidence.get('passes', []) if selected is not first else [],
+        'policy': 'identical request pixels only; pristine cloned observations, no cross-upload cache',
     }
     selected.save()
     return selected.response

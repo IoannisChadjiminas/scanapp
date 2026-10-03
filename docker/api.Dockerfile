@@ -29,7 +29,7 @@ COPY api/app /app/app
 
 # Validate the packaged import graph without running the lifespan or accessing
 # the catalogue. Missing runtime helpers must fail the build, not live startup.
-RUN python -c "from app.main import app; assert callable(app)"
+RUN python -c "from app.main import app; from app.recognition.stamp_printing import _template; _template(); assert callable(app)"
 
 RUN mkdir -p /data /tmp/scanapp
 
