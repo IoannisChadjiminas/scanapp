@@ -27,6 +27,10 @@ RUN pip install --no-cache-dir -r /app/requirements.txt
 
 COPY api/app /app/app
 
+# Validate the packaged import graph without running the lifespan or accessing
+# the catalogue. Missing runtime helpers must fail the build, not live startup.
+RUN python -c "from app.main import app; assert callable(app)"
+
 RUN mkdir -p /data /tmp/scanapp
 
 EXPOSE 8000
