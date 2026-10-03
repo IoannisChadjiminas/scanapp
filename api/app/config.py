@@ -29,6 +29,12 @@ class Settings(BaseSettings):
     # Retrieval windows may omit metadata. Try the supplied card-shaped frame
     # for OCR first, without changing the visual/artwork retrieval crop.
     ocr_complete_frame_first: bool = False
+    # Keep initial OCR unchanged; omit optional footer retries only for a
+    # strongly supported, reviewable identity. Never certify its printing.
+    ocr_adaptive_footer: bool = False
+    # One isolated footer reader overlaps initial title/footer inference.
+    # Its auxiliary CPU lane is shared with optional grading, not added to it.
+    ocr_parallel_regions: bool = False
     enable_matched: bool = True
     ort_intra_threads: int = 1
     ort_inter_threads: int = 1

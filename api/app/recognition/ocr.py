@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, field
+from contextlib import nullcontext
 from difflib import SequenceMatcher
 import re
 import time
@@ -34,6 +35,7 @@ class OcrResult:
     failed: bool = False
     collector_retry_used: bool = False
     collector_retry_contributed: bool = False
+    collector_retry_skipped: bool = False
     passes: list[dict] = field(default_factory=list)
 
 
@@ -265,6 +267,11 @@ class CardOcr:
             target.session = session
 
     def _grading_lines(self, image: Image.Image):
+        gate = getattr(self, 'auxiliary_gate', None)
+        with gate.grading() if gate is not None else nullcontext():
+            return self._grading_lines_unbudgeted(image)
+
+    def _grading_lines_unbudgeted(self, image: Image.Image):
         from app.recognition.grading import LabelLine
         array = np.asarray(image.convert('RGB'))
         # Grading already evaluates whole-photo orientations explicitly. An
@@ -306,6 +313,11 @@ class CardOcr:
         return lines
 
     def _grading_tokens(self, patches):
+        gate = getattr(self, 'auxiliary_gate', None)
+        with gate.grading() if gate is not None else nullcontext():
+            return self._grading_tokens_unbudgeted(patches)
+
+    def _grading_tokens_unbudgeted(self, patches):
         """Recognize isolated observed fields without mutating detector state."""
         from app.recognition.grading import LabelLine
         output = self.engine.get_rec_res([np.asarray(p.convert('RGB')) for p in patches])
@@ -678,7 +690,7 @@ class CardOcr:
             regions = ['full'] * len(texts)
         return texts, scores, regions
 
-    def read(self, image: Image.Image) -> OcrResult:
+    def read(self, image: Image.Image, *, collector_retry_policy=None) -> OcrResult:
         passes = []
         def run(patch, region, reason):
             started = time.perf_counter()
@@ -696,8 +708,44 @@ class CardOcr:
                 scale = min(3., 600 / image.width)
                 ocr_image = image.resize((round(image.width*scale),round(image.height*scale)),
                                          Image.Resampling.LANCZOS)
-            name_lines, name_scores = run(_region(ocr_image, 0.0, 0.22), 'name', 'initial')
-            number_lines, number_scores = run(_region(ocr_image, 0.82, 1.0), 'collector', 'initial')
+            reader = getattr(self, 'region_reader', None)
+            executor = getattr(self, 'region_executor', None)
+            gate = getattr(self, 'auxiliary_gate', None)
+            if reader is not None and (reader is self or reader.engine is self.engine):
+                raise RuntimeError('Parallel regions require isolated OCR engines')
+            if reader is not None and executor is not None and gate is not None and gate.try_reserve_card():
+                footer = _region(ocr_image, .82, 1.).copy()
+                footer_record = {}
+                def read_footer():
+                    started = time.perf_counter()
+                    try:
+                        return reader._run(footer)
+                    finally:
+                        footer_record.update(region='collector',reason='initial',
+                            width=footer.width,height=footer.height,
+                            ms=round((time.perf_counter()-started)*1000,2),parallel=True)
+                        footer.close()
+                        gate.release_card()
+                try:
+                    future = executor.submit(read_footer)
+                except Exception:
+                    footer.close()
+                    gate.release_card()
+                    raise
+                try:
+                    name_lines, name_scores = run(_region(ocr_image, 0.0, 0.22), 'name', 'initial')
+                finally:
+                    # Drain before returning, including title failures. A late
+                    # region may never mutate another request or its evidence.
+                    try:
+                        observed = future.result()
+                    finally:
+                        if footer_record:
+                            passes.append(footer_record)
+                number_lines, number_scores = observed
+            else:
+                name_lines, name_scores = run(_region(ocr_image, 0.0, 0.22), 'name', 'initial')
+                number_lines, number_scores = run(_region(ocr_image, 0.82, 1.0), 'collector', 'initial')
             name_text = pick_confident_name(name_lines,name_scores)
             if name_text is None and any(_is_layout_badge(t) and s is not None and s>=.85
                                         for t,s in zip(name_lines,name_scores)):
@@ -719,6 +767,7 @@ class CardOcr:
                     pass
             collector_retry_used = False
             collector_retry_contributed = False
+            collector_retry_skipped = False
             name_confidence = max((score or 0. for text, score in zip(name_lines, name_scores)
                                    if text == name_text), default=0.)
             # One higher-resolution title pass for weak reads. Require a
@@ -748,7 +797,19 @@ class CardOcr:
             # confidence boost, or replacement of a conflicting first read.
             has_identifier = any(COLLECTOR_FRACTION_RE.search(text) or
                 re.search(r'\b[A-Z]{1,5}[- ]?\d{1,4}\b', text) for text in number_lines)
-            if image.width < 450 and name_text and name_confidence >= .85 and not has_identifier:
+            retry_allowed = True
+            if collector_retry_policy is not None and name_text and name_confidence >= .85 and not has_identifier:
+                # A failed optional policy must keep the established evidence
+                # gathering path. Give it copies, never mutable reader buffers.
+                initial = OcrResult(name_text=name_text, lines=[*name_lines, *number_lines], hits=[
+                    *(OcrHit(t, s, 'name') for t, s in zip(name_lines, name_scores)),
+                    *(OcrHit(t, s, 'collector') for t, s in zip(number_lines, number_scores))])
+                try:
+                    retry_allowed = bool(collector_retry_policy(initial))
+                except Exception:  # noqa: BLE001 - optional optimization fails closed
+                    retry_allowed = True
+                collector_retry_skipped = not retry_allowed
+            if image.width < 450 and name_text and name_confidence >= .85 and not has_identifier and retry_allowed:
                 collector_retry_used = True
                 bottom = _region(image, .82, 1.)
                 scale = min(3., 800 / bottom.width)
@@ -772,7 +833,7 @@ class CardOcr:
             # a wide OCR strip. Retry overlapping footer halves only when the
             # readable title has no explicit identifier. Never infer a number
             # from incidental damage/HP, and retain every first-pass conflict.
-            if image.width >= 450 and name_text and name_confidence >= .85 and not has_identifier:
+            if image.width >= 450 and name_text and name_confidence >= .85 and not has_identifier and retry_allowed:
                 collector_retry_used = True
                 bottom = _region(image, .88, 1.)
                 for left, right in ((0., .60), (.40, 1.)):
@@ -844,6 +905,7 @@ class CardOcr:
                 failed=False,
                 collector_retry_used=collector_retry_used,
                 collector_retry_contributed=collector_retry_contributed,
+                collector_retry_skipped=collector_retry_skipped,
                 passes=passes,
             )
         except Exception:  # noqa: BLE001 - OCR must never block retrieval

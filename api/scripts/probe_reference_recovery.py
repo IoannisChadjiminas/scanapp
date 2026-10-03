@@ -31,11 +31,16 @@ def main():
     p.add_argument('--reported-only',action='store_true')
     p.add_argument('--features-dir',type=Path,required=True)
     p.add_argument('--output-name',default=None)
+    p.add_argument('--case-id',action='append',default=[],help='Replay only these frozen case IDs')
+    p.add_argument('--adaptive-footer',action='store_true')
+    p.add_argument('--parallel-regions',action='store_true')
     a=p.parse_args();cv2.setNumThreads(1)
     from rapidocr.utils.vis_res import VisRes
     VisRes.get_font_path=lambda self,*args,**kwargs:'unused-benchmark-drawing-font'
     settings=Settings(store_captures=False,portfolio_database_url='',enable_matched=True,
         parallel_grading=True,grading_at_card_deadline=True,ocr_complete_frame_first=True)
+    settings.ocr_adaptive_footer = a.adaptive_footer
+    settings.ocr_parallel_regions = a.parallel_regions
     parent=sqlite3.connect(':memory:');parent.row_factory=sqlite3.Row;init_catalog(parent)
     snapshot=load_cloud_catalogue(settings,parent);parent.close()
     manifest=json.loads((a.candidate/'vectors/manifest.json').read_text())
@@ -47,12 +52,18 @@ def main():
         catalogue_version=manifest['catalogue_version'],indexed_count=manifest['indexed_count'],
         missing_images=manifest['missing_images'],embeddings_sha256=manifest['embeddings_sha256'],
         ids_sha256=manifest['ids_sha256'])
-    catalog=sqlite3.connect(f'file:{a.candidate}/catalog.sqlite?mode=ro',uri=True,
-                           factory=CloudCatalogConnection);catalog.row_factory=sqlite3.Row
+    source=sqlite3.connect(f'file:{a.candidate}/catalog.sqlite?mode=ro',uri=True)
+    # The deployed cloud reader serves its validated snapshot from memory.
+    # Disk-backed candidate scans add unrelated repeated listing-query I/O.
+    catalog=sqlite3.connect(':memory:',factory=CloudCatalogConnection)
+    catalog.row_factory=sqlite3.Row
+    source.backup(catalog);source.close()
     settings.reference_features_dir=a.features_dir;settings.artwork_bundle_dir=a.candidate/'artwork'
     runtime=Runtime(settings);runtime.load(snapshot);runtime.bind_card_languages(catalog);runtime.require()
     cases=json.loads((a.audit_dir/'cases.json').read_text())
     if a.reported_only:cases=[c for c in cases if c['kind']=='reported_phone']
+    if a.case_id:cases=[c for c in cases if c['id'] in a.case_id]
+    assert cases and (not a.case_id or len(cases)==len(set(a.case_id)))
     baseline={r['case']['id']:r['after'] for r in
         (json.loads(line) for line in a.baseline.read_text().splitlines())} if a.baseline else {}
     records=[]

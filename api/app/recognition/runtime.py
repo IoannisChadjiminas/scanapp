@@ -12,6 +12,7 @@ from app.cardmarket import grouped_expansion_skus
 from app.recognition.artifacts import ArtifactError, ArtifactSnapshot, load_snapshot
 from app.recognition.embed import DinoEmbedder
 from app.recognition.ocr import CardOcr
+from app.recognition.auxiliary_work import AuxiliaryWorkGate
 from app.recognition.printing import ReferencePrintingIndex
 from app.recognition.local_match import FULL_ART_BOX, FULL_ART_RARITIES, LocalArtworkVerifier
 from app.recognition.artwork import ArtworkIndex
@@ -27,6 +28,7 @@ class Runtime:
     ocr: CardOcr | None = None
     grading_ocr: CardOcr | None = None
     grading_executor: ThreadPoolExecutor | None = field(default=None, repr=False)
+    region_executor: ThreadPoolExecutor | None = field(default=None, repr=False)
     grading_slots: Any = field(default_factory=lambda: BoundedSemaphore(1), repr=False)
     card_languages: np.ndarray | None = None
     error: str | None = None
@@ -80,6 +82,22 @@ class Runtime:
                 self.embedder = embedder
                 self.ocr = ocr
                 self.grading_ocr = grading_ocr
+                if self.settings.use_ocr and self.settings.ocr_parallel_regions:
+                    gate = AuxiliaryWorkGate()
+                    region_ocr = CardOcr(
+                        det_path=str(self.settings.models_dir / "PP-OCRv6_det_small.onnx"),
+                        rec_path=str(self.settings.models_dir / "PP-OCRv6_rec_small.onnx"),
+                        cls_path=str(self.settings.models_dir / "ch_ppocr_mobile_v2.0_cls_mobile.onnx"),
+                        intra_threads=self.settings.ort_intra_threads,
+                        inter_threads=self.settings.ort_inter_threads,
+                    )
+                    region_ocr.share_inference_sessions_from(ocr)
+                    self.region_executor = ThreadPoolExecutor(max_workers=1, thread_name_prefix='card-region')
+                    ocr.region_reader = region_ocr
+                    ocr.region_executor = self.region_executor
+                    ocr.auxiliary_gate = gate
+                    if grading_ocr is not None:
+                        grading_ocr.auxiliary_gate = gate
                 if grading_ocr is not None:
                     self.grading_executor = ThreadPoolExecutor(max_workers=1, thread_name_prefix='grading')
                 self.card_languages = None
@@ -159,6 +177,9 @@ class Runtime:
                 self.error = str(exc)
 
     def close(self) -> None:
+        if self.region_executor is not None:
+            self.region_executor.shutdown(wait=False, cancel_futures=True)
+        self.region_executor = None
         if self.grading_executor is not None:
             self.grading_executor.shutdown(wait=False, cancel_futures=True)
         self.grading_executor = None
@@ -189,6 +210,10 @@ class Runtime:
         }
         if self.settings.use_ocr and self.settings.ocr_complete_frame_first:
             versions['ocr'] += '+complete-frame-first-v1'
+        if self.settings.use_ocr and self.settings.ocr_adaptive_footer:
+            versions['ocr'] += '+supported-identity-footer-v1'
+        if self.settings.use_ocr and self.settings.ocr_parallel_regions:
+            versions['ocr'] += '+bounded-regions-v1'
         if self.artwork_index is not None:
             versions["artwork"] = (self.artwork_index.manifest["schema_version"] + ":" +
                                     self.artwork_index.manifest["records_sha256"][:12])

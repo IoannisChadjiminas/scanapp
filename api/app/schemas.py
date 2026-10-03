@@ -66,6 +66,7 @@ class OcrEvidence(BaseModel):
     failed: bool = False
     collector_retry_used: bool = False
     collector_retry_contributed: bool = False
+    collector_retry_skipped: bool = False
 
 
 class GradingEvidence(BaseModel):

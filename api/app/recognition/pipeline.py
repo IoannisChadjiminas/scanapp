@@ -34,6 +34,7 @@ from app.recognition.language import confident_language_texts, expand_language, 
 from app.recognition.ocr import OcrResult, inverted_card_layout
 from app.recognition.ocr_framing import complete_frame_probe_allowed, complete_frame_identity_supported, normalize_complete_frame_footer
 from app.recognition.ocr_cache import RequestOcrCache
+from app.recognition.ocr_budget import footer_retry_required, VERSION as OCR_BUDGET_VERSION
 from app.recognition.stamp_printing import stamp_printing_hint
 from app.recognition.grading import VERSION as GRADING_VERSION
 from app.recognition.grading_parallel import GradingJob, parallel_grading_scope
@@ -176,12 +177,33 @@ def _recognize_bytes_once(
     retake = too_small or too_blurry
     artwork_hits = []
     artwork_index = getattr(runtime, "artwork_index", None)
+    adaptive_footer = bool(getattr(settings, 'ocr_adaptive_footer', False))
+    artwork_image = None
+    full_candidates = []
+    if adaptive_footer and artwork_index is not None and not retake:
+        # Retrieve independent illustration evidence before deciding whether
+        # optional collector retries are useful. Initial OCR stays untouched.
+        artwork_hits, artwork_timings = artwork_index.search(
+            image, embedder, mode=settings.preprocess_config,
+            as_supplied_vector=query_vectors[id(image)],
+            languages=tuple(requested.search) if requested.reason == "user" else (),
+        )
+        timings.update(artwork_timings)
+        artwork_image = image
+        rows = _lookup_cards(catalog, [str(snapshot.card_ids[i]) for i in indices])
+        full_candidates = [dict(card_id=str(snapshot.card_ids[i]), name=rows[str(snapshot.card_ids[i])]['name'],
+                                visual_score=float(score))
+            for i, score in zip(indices, scores) if str(snapshot.card_ids[i]) in rows]
     ocr = OcrResult(failed=True)
     ocr_passes = []
     ocr_cache_hits = []
     def read_card(frame, scope):
-        observed, cached = (_ocr_cache.read(ocr_engine, frame) if _ocr_cache is not None
-                            else (ocr_engine.read(frame), False))
+        options = {}
+        if adaptive_footer and scope == 'selected' and frame is artwork_image:
+            options['collector_retry_policy'] = lambda observed: footer_retry_required(
+                observed, full_candidates, artwork_hits, image_size=frame.size)
+        observed, cached = (_ocr_cache.read(ocr_engine, frame, **options) if _ocr_cache is not None
+                            else (ocr_engine.read(frame, **options), False))
         if cached:
             ocr_cache_hits.append(dict(scope=scope, width=frame.width, height=frame.height))
         else:
@@ -261,7 +283,8 @@ def _recognize_bytes_once(
                         ocr.collector_retry_contributed = True
     timings["ocr_ms"] = (time.perf_counter() - mark) * 1000
     timings['ocr_passes_count'] = float(len(ocr_passes))
-    if artwork_index is not None and not retake:
+    timings['ocr_footer_retry_skipped'] = float(ocr.collector_retry_skipped)
+    if artwork_index is not None and not retake and image is not artwork_image:
         artwork_hits, artwork_timings = artwork_index.search(
             image, embedder, mode=settings.preprocess_config,
             as_supplied_vector=query_vectors[id(image)],
@@ -472,6 +495,8 @@ def _recognize_bytes_once(
     # automatic claim. It does not add independent pixels or calibrated proof.
     if ocr.collector_retry_contributed and status == 'matched':
         status = 'uncertain'
+    if ocr.collector_retry_skipped and status == 'matched':
+        status = 'uncertain'
     # A foreground/min-area rectangle is only a retrieval proposal. Even a
     # strong global match on it stays reviewable, never an automatic printing.
     if inferred_frame and status == 'matched':
@@ -624,6 +649,8 @@ def _recognize_bytes_once(
     versions['presentation'] = 'best-match-v1'
     versions['stamp_ordering'] = 'play-stamp-review-v1'
     versions['ocr_cache'] = 'request-pixels-v1'
+    if adaptive_footer:
+        versions['ocr_budget'] = OCR_BUDGET_VERSION
     presentation = match_presentation(combined, status=status, printing_review=printing_review,
                                       min_visual=settings.threshold_min_visual_ocr)
     confidence = confidence_payload(combined, status=status,
@@ -635,6 +662,8 @@ def _recognize_bytes_once(
         likely_identity=likely_identity_supported)
     if stamp_hint:
         confidence.reasons.append('stamp_display_hint_printing_unconfirmed')
+    if ocr.collector_retry_skipped:
+        confidence.reasons.append('optional_footer_retry_skipped_printing_unconfirmed')
     ocr_payload = {
         "name_text": ocr.name_text,
         "collector_text": ocr.collector_text,
@@ -642,6 +671,7 @@ def _recognize_bytes_once(
         "failed": ocr.failed,
         "collector_retry_used": ocr.collector_retry_used,
         "collector_retry_contributed": ocr.collector_retry_contributed,
+        "collector_retry_skipped": ocr.collector_retry_skipped,
         "passes": ocr_passes,
         "ocr_cache_hits": ocr_cache_hits,
         "stamp_printing_hint": stamp_hint,
@@ -749,6 +779,7 @@ def _recognize_bytes_once(
             failed=ocr.failed,
             collector_retry_used=ocr.collector_retry_used,
             collector_retry_contributed=ocr.collector_retry_contributed,
+            collector_retry_skipped=ocr.collector_retry_skipped,
         ),
         coverage=coverage_model,
         timings_ms={key: round(value, 2) for key, value in timings.items()},
