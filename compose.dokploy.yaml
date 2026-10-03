@@ -67,7 +67,10 @@ services:
       default:
         aliases:
           - scanapp-api
-    mem_limit: 1536m
+    # Model/OCR buffers exceeded 1.5 GiB and swapped despite free host RAM.
+    # Keep the total RAM + swap allowance at 3 GiB on the existing 4 GiB host.
+    mem_limit: 2048m
+    memswap_limit: 3072m
     healthcheck:
       test:
         [
