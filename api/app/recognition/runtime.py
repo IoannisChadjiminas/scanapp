@@ -14,6 +14,7 @@ from app.recognition.printing import ReferencePrintingIndex
 from app.recognition.local_match import FULL_ART_BOX, FULL_ART_RARITIES, LocalArtworkVerifier
 from app.recognition.artwork import ArtworkIndex
 from app.recognition.metadata import MetadataCandidateIndex
+from app.recognition.reference_features import ReferenceFeatureStore, SCHEMA_VERSION as FEATURES_VERSION
 
 
 @dataclass
@@ -96,6 +97,18 @@ class Runtime:
             self.artwork_verifier.reference_boxes = {
                 str(row['id']): FULL_ART_BOX for row in catalog.execute('SELECT id, rarity FROM cards')
                 if str(row['rarity'] or '').casefold() in FULL_ART_RARITIES}
+        if self.settings.reference_features_dir is not None:
+            try:
+                store = ReferenceFeatureStore.load(self.settings.reference_features_dir,
+                    [dict(row) for row in catalog.execute('SELECT id, image_path, rarity FROM cards')])
+                self.artwork_verifier.feature_store = store
+                self.printing_index.feature_store = store
+            except ArtifactError as exc:
+                self.snapshot = None
+                self.embedder = None
+                self.card_languages = None
+                self.error = str(exc)
+                return
         if self.settings.artwork_bundle_dir is not None:
             try:
                 self.artwork_index = ArtworkIndex.load(
@@ -130,6 +143,9 @@ class Runtime:
         if self.artwork_index is not None:
             versions["artwork"] = (self.artwork_index.manifest["schema_version"] + ":" +
                                     self.artwork_index.manifest["records_sha256"][:12])
+        if self.artwork_verifier is not None and self.artwork_verifier.feature_store is not None:
+            versions['reference_features'] = (FEATURES_VERSION + ':' +
+                self.artwork_verifier.feature_store.manifest['catalogue_sha256'][:12])
         return versions
 
     def threshold_config(self) -> dict[str, Any]:

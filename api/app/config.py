@@ -62,6 +62,8 @@ class Settings(BaseSettings):
     ranking_version: str = "rank-v15-holder-printing-review"
     # Opt-in only; an invalid explicitly configured bundle fails validation.
     artwork_bundle_dir: Path | None = None
+    # Immutable, catalogue-bound local geometry/printing probes. Opt-in only.
+    reference_features_dir: Path | None = None
     ocr_version: str = "rapidocr-ppocrv6-small-regions-v7-layout-orientation"
     model_name: str = "dinov2-small"
 

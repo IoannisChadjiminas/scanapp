@@ -62,11 +62,12 @@ class ReferencePrintingIndex:
     outside retrieval top-K and unindexed references; missing files are reported
     as incomplete evidence. Never downloads images during a scan.
     """
-    def __init__(self, data_dir: Path, max_groups: int = 32) -> None:
+    def __init__(self, data_dir: Path, max_groups: int = 32, feature_store=None) -> None:
         self.root = (data_dir / "reference-images").resolve()
         self.max_groups = max_groups
         self._groups: OrderedDict[tuple[str, str], list[tuple[dict, np.ndarray | None]]] = OrderedDict()
         self._lock = RLock()
+        self.feature_store = feature_store
 
     def family(self, catalog: Any, top: dict[str, Any]) -> tuple[list[dict], bool]:
         name, language = str(top["name"]), str(top.get("language") or "")
@@ -82,8 +83,11 @@ class ReferencePrintingIndex:
                 for row in rows[:512]:
                     card = dict(row)
                     probe = None
-                    path = Path(str(card.get("image_path") or "")).resolve()
-                    if path.is_relative_to(self.root) and path.is_file():
+                    raw_path = str(card.get("image_path") or "")
+                    path = Path(raw_path).resolve()
+                    if self.feature_store is not None:
+                        probe = self.feature_store.thumbnail(str(card['id']), raw_path)
+                    elif path.is_relative_to(self.root) and path.is_file():
                         try:
                             with Image.open(path) as image:
                                 probe = artwork_thumbnail(image)

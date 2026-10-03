@@ -12,6 +12,7 @@ from PIL import Image
 
 from app.recognition.printing import ART_BOX
 from app.recognition.artwork import PROFILES, crop_profile
+from app.recognition.reference_features import extract_reference
 
 FULL_ART_BOX = (.08, .18, .92, .56)
 FULL_ART_RARITIES = {'ultra rare','secret rare','illustration rare','special illustration rare',
@@ -77,12 +78,33 @@ def verify_geometry(query_points: np.ndarray, reference_points: np.ndarray,
 
 
 class LocalArtworkVerifier:
-    def __init__(self, data_dir: Path, max_references: int = 64) -> None:
+    def __init__(self, data_dir: Path, max_references: int = 64, feature_store=None) -> None:
         self.root = (data_dir / "reference-images").resolve()
         self.max_references = max_references
         self._cache = OrderedDict()
         self._lock = RLock()
         self.reference_boxes: dict[str, tuple[float,float,float,float]] = {}
+        self.feature_store = feature_store
+
+    def _reference_features(self, card_id, raw_path, art_box, features, contrast):
+        key = (card_id, raw_path, art_box, features, contrast)
+        if key not in self._cache:
+            if self.feature_store is not None:
+                reference = self.feature_store.features(card_id, raw_path, art_box, features, contrast)
+            else:
+                path = Path(raw_path).resolve()
+                if not path.is_relative_to(self.root) or not path.is_file():
+                    return None
+                try:
+                    with Image.open(path) as image:
+                        reference = extract_reference(image, art_box, features, contrast)
+                except (OSError, ValueError, cv2.error):
+                    return None
+            self._cache[key] = reference
+            while len(self._cache) > self.max_references:
+                self._cache.popitem(last=False)
+        self._cache.move_to_end(key)
+        return self._cache[key]
 
     def propose_frame(self, image: Image.Image, reference: tuple[str,str],
                       diagnostics: list | None = None) -> Image.Image | None:
@@ -96,21 +118,13 @@ class LocalArtworkVerifier:
         from app.recognition.frame_fallback import portrait_window_candidates, slab_interior_candidate
         with self._lock:
             card_id,raw_path=reference
-            path=Path(raw_path).resolve()
-            if not path.is_relative_to(self.root) or not path.is_file():
-                return None
-            try:
-                with Image.open(path) as original:
-                    ref=_pixels(original)
-            except (OSError,ValueError,cv2.error):
-                return None
-            rh,rw=ref.shape
             art_box=self.reference_boxes.get(card_id,ART_BOX)
-            x0,y0,x1,y1=art_box
-            mask=np.zeros_like(ref)
-            mask[round(y0*rh)+8:round(y1*rh)-8,round(x0*rw)+8:round(x1*rw)-8]=255
+            stored = self._reference_features(card_id, raw_path, art_box, 1000, .04)
+            if stored is None:
+                return None
+            rw,rh=stored.size
             detector=cv2.SIFT_create(nfeatures=1000)
-            rkeys,rdesc=detector.detectAndCompute(ref,mask)
+            rpoints,rdesc=stored.points,stored.descriptors
             if rdesc is None or len(rdesc)<2:
                 return None
             windows=portrait_window_candidates(image)
@@ -140,7 +154,7 @@ class LocalArtworkVerifier:
                 good=[a for pair in pairs if len(pair)==2 for a,b in [pair] if a.distance<.75*b.distance]
                 good=list({m.trainIdx:m for m in sorted(good,key=lambda m:-m.distance)}.values())
                 qpts=np.float32([qkeys[m.queryIdx].pt for m in good]).reshape(-1,2)
-                rpts=np.float32([rkeys[m.trainIdx].pt for m in good]).reshape(-1,2)
+                rpts=np.float32([rpoints[m.trainIdx] for m in good]).reshape(-1,2)
                 proof=verify_geometry(qpts,rpts,(qw,qh),(rw,rh),art_box)
                 if not proof:
                     continue
@@ -226,32 +240,10 @@ class LocalArtworkVerifier:
             for card_id, raw_path in references[:limit]:
                 art_box = self.reference_boxes.get(card_id, ART_BOX)
                 reference_profile = 'broad_full_art' if art_box == FULL_ART_BOX else 'conventional_window'
-                path = Path(raw_path).resolve()
-                if not path.is_relative_to(self.root) or not path.is_file():
+                stored = self._reference_features(card_id, raw_path, art_box, features, contrast)
+                if stored is None:
                     continue
-                cache_key = (path,art_box,features,contrast)
-                cached = self._cache.get(cache_key)
-                if cached is None:
-                    try:
-                        with Image.open(path) as ref_image:
-                            pixels = _pixels(ref_image)
-                        # Features must lie inside the illustration, not its
-                        # repeated frame/text. Matching a common border is not
-                        # evidence that two cards share artwork.
-                        ph, pw = pixels.shape
-                        mask = np.zeros_like(pixels)
-                        x0, y0, x1, y1 = art_box
-                        mask[round(y0*ph)+8:round(y1*ph)-8,
-                             round(x0*pw)+8:round(x1*pw)-8] = 255
-                        keys, desc = detector.detectAndCompute(pixels, mask)
-                    except (OSError, ValueError, cv2.error):
-                        continue
-                    cached = (keys, desc, (pixels.shape[1], pixels.shape[0]))
-                    self._cache[cache_key] = cached
-                    while len(self._cache) > self.max_references:
-                        self._cache.popitem(last=False)
-                self._cache.move_to_end(cache_key)
-                keys, desc, size = cached
+                points, desc, size = stored.points, stored.descriptors, stored.size
                 if desc is None or len(desc) < 2:
                     continue
                 best = None
@@ -264,7 +256,7 @@ class LocalArtworkVerifier:
                     unique = {m.trainIdx: m for m in sorted(good, key=lambda m: -m.distance)}
                     good = list(unique.values())
                     qpts = np.float32([qkeys[m.queryIdx].pt for m in good]).reshape(-1,2)
-                    rpts = np.float32([keys[m.trainIdx].pt for m in good]).reshape(-1,2)
+                    rpts = np.float32([points[m.trainIdx] for m in good]).reshape(-1,2)
                     proof = verify_geometry(qpts, rpts, (query.shape[1], query.shape[0]), size, art_box)
                     if proof and (best is None or proof[1] > best.artwork_inliers):
                         best = LocalArtworkMatch(card_id, proof[0], proof[1], round(proof[2], 3), profile, reference_profile)
