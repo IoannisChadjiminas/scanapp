@@ -14,6 +14,7 @@ import numpy as np
 from PIL import Image
 
 from app.recognition.detect import _order_points
+from app.recognition.grading_control import check_grading_cancelled
 
 
 def text_label_panel(image: Image.Image, lines, *, compact=False, strip_fraction=.36) -> Image.Image | None:
@@ -228,6 +229,7 @@ def _logo_matches(image: Image.Image, *, aggregate=True, text_boxes=()):
     Only lower-central logo positions of a localized label are considered.
     Reject weak/small/ambiguous shapes; text context is enforced by the caller.
     """
+    check_grading_cancelled()
     array = np.asarray(image.convert('RGB'))
     scale = min(1.,800/image.width)
     if scale < 1:
@@ -253,6 +255,7 @@ def _logo_matches(image: Image.Image, *, aggregate=True, text_boxes=()):
         return np.where(area <= .20*width*height,np.abs(correlation),0.)
     results = []
     for template_name,mask in _logo_masks().items():
+        check_grading_cancelled()
         company = template_name.split('-')[0]
         left,top,right,bottom = ((round(.20*w),0,round(.80*w),round(.48*h)) if company == 'tag'
             else (0,0,round(.80*w),h) if template_name == 'beckett-emblem'
@@ -267,6 +270,7 @@ def _logo_matches(image: Image.Image, *, aggregate=True, text_boxes=()):
         # multi-letter wordmarks retain the smaller-scale search.
         minimum_height = 20 if template_name == 'beckett-emblem' else 10
         for height in range(minimum_height,min(85,roi.shape[0])):
+            check_grading_cancelled()
             for aspect in (.85,1.,1.15):
                 width = round(height*mask.shape[1]/mask.shape[0]*aspect)
                 if width >= roi.shape[1]:
@@ -291,6 +295,7 @@ def _logo_matches(image: Image.Image, *, aggregate=True, text_boxes=()):
                 width = max(2,round(base_width*height/base_height))
                 template = cv2.resize(mask,(width,height),interpolation=cv2.INTER_AREA)
                 for angle in (-6,-3,3,6):
+                    check_grading_cancelled()
                     radians = np.deg2rad(angle)
                     rw = round(abs(width*np.cos(radians))+abs(height*np.sin(radians)))+2
                     rh = round(abs(height*np.cos(radians))+abs(width*np.sin(radians)))+2

@@ -3,6 +3,7 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from difflib import SequenceMatcher
 import re
+import time
 import unicodedata
 
 import numpy as np
@@ -33,6 +34,7 @@ class OcrResult:
     failed: bool = False
     collector_retry_used: bool = False
     collector_retry_contributed: bool = False
+    passes: list[dict] = field(default_factory=list)
 
 
 def _region(image: Image.Image, y0: float, y1: float) -> Image.Image:
@@ -221,6 +223,7 @@ class CardOcr:
     ) -> None:
         from rapidocr import EngineType, RapidOCR
 
+        self._model_signature = (det_path, rec_path, cls_path, intra_threads, inter_threads)
         self.engine = RapidOCR(
             params={
                 "Det.engine_type": EngineType.ONNXRUNTIME,
@@ -234,6 +237,32 @@ class CardOcr:
                 "EngineConfig.onnxruntime.inter_op_num_threads": inter_threads,
             }
         )
+
+    def share_inference_sessions_from(self, other: CardOcr) -> None:
+        """Share read-only CPU model sessions, never mutable RapidOCR state.
+
+        ONNX Runtime permits concurrent Run calls. Each reader still owns its
+        detector preprocessing, recognizer buffers and pipeline flags. Validate
+        the complete pair before replacing any session, and fail closed on an
+        incompatible model/runtime rather than weakening the isolation guard.
+        """
+        from onnxruntime import InferenceSession
+
+        if self is other or self.engine is other.engine:
+            raise ValueError('OCR readers must own separate engines')
+        if self._model_signature != other._model_signature:
+            raise ValueError('Cannot share sessions from different OCR models/settings')
+        pairs = []
+        for component in ('text_det', 'text_cls', 'text_rec'):
+            target = getattr(self.engine, component).session
+            source = getattr(other.engine, component).session
+            if target is source or not isinstance(source.session, InferenceSession):
+                raise ValueError('Expected isolated CPU ONNX Runtime session wrappers')
+            if source.session.get_providers() != ['CPUExecutionProvider']:
+                raise ValueError('Only CPU sessions support this OCR sharing path')
+            pairs.append((target, source.session))
+        for target, session in pairs:
+            target.session = session
 
     def _grading_lines(self, image: Image.Image):
         from app.recognition.grading import LabelLine
@@ -311,6 +340,7 @@ class CardOcr:
         )
         from app.recognition.label_vision import contrast_label, grade_regions, label_panels, logo_company, logo_text_regions, text_label_panel
         from app.schemas import GradingEvidence
+        from app.recognition.grading_control import GradingCancelled, check_grading_cancelled
 
         # Photograph aspect ratio is not holder orientation. A landscape photo
         # can contain an upright slab and wide margins; always try original
@@ -329,6 +359,7 @@ class CardOcr:
 
         def read(patch):
             nonlocal calls
+            check_grading_cancelled()
             calls += 1
             lines = self._grading_lines(patch)
             fuzzy_views.append(list(lines))
@@ -341,6 +372,7 @@ class CardOcr:
 
         def read_tokens(patches):
             nonlocal calls
+            check_grading_cancelled()
             # Invoke the recognizer directly, never change RapidOCR's shared
             # use_det/use_cls flags (which persist across subsequent scans).
             calls += len(patches)
@@ -390,6 +422,7 @@ class CardOcr:
             return reconcile(parse_label([*lines,*located]),prior) if located else prior
 
         for angle in angles:
+            check_grading_cancelled()
             if calls >= 10:
                 break
             try:
@@ -563,6 +596,8 @@ class CardOcr:
                         return finish(max(viable,key=lambda r:(complete(r),r.grade is not None,r.company is not None)))
                 if initial.slab_detected:
                     break
+            except GradingCancelled:
+                raise
             except Exception:  # noqa: BLE001 - failure must not affect card recognition
                 failed = True
                 if any(result.slab_detected for result in observations):
@@ -644,6 +679,14 @@ class CardOcr:
         return texts, scores, regions
 
     def read(self, image: Image.Image) -> OcrResult:
+        passes = []
+        def run(patch, region, reason):
+            started = time.perf_counter()
+            try:
+                return self._run(patch)
+            finally:
+                passes.append(dict(region=region, reason=reason, width=patch.width,
+                    height=patch.height, ms=round((time.perf_counter()-started)*1000, 2)))
         try:
             # Tiny detected cards/slab interiors have title/footer strips too
             # short for text detection. Interpolate regions before OCR, not
@@ -653,8 +696,8 @@ class CardOcr:
                 scale = min(3., 600 / image.width)
                 ocr_image = image.resize((round(image.width*scale),round(image.height*scale)),
                                          Image.Resampling.LANCZOS)
-            name_lines, name_scores = self._run(_region(ocr_image, 0.0, 0.22))
-            number_lines, number_scores = self._run(_region(ocr_image, 0.82, 1.0))
+            name_lines, name_scores = run(_region(ocr_image, 0.0, 0.22), 'name', 'initial')
+            number_lines, number_scores = run(_region(ocr_image, 0.82, 1.0), 'collector', 'initial')
             name_text = pick_confident_name(name_lines,name_scores)
             if name_text is None and any(_is_layout_badge(t) and s is not None and s>=.85
                                         for t,s in zip(name_lines,name_scores)):
@@ -664,8 +707,9 @@ class CardOcr:
                 try:
                     wider=_region(image,0.,.35)
                     scale=min(3.,900/wider.width)
-                    retry_lines,retry_scores=self._run(wider.resize(
-                        (round(wider.width*scale),round(wider.height*scale)),Image.Resampling.LANCZOS))
+                    retry_lines,retry_scores=run(wider.resize(
+                        (round(wider.width*scale),round(wider.height*scale)),Image.Resampling.LANCZOS),
+                        'name', 'wider_header')
                     retry_name=pick_confident_name(retry_lines,retry_scores)
                     score=max((s or 0. for t,s in zip(retry_lines,retry_scores) if t==retry_name),default=0.)
                     if retry_name and score>=.85:
@@ -685,9 +729,9 @@ class CardOcr:
                 scale = min(3., 1200 / header.width)
                 if scale > 1.:
                     try:
-                        retry_lines, retry_scores = self._run(header.resize(
+                        retry_lines, retry_scores = run(header.resize(
                             (round(header.width * scale), round(header.height * scale)),
-                            Image.Resampling.LANCZOS))
+                            Image.Resampling.LANCZOS), 'name', 'weak_header')
                         retry_name = pick_confident_name(retry_lines, retry_scores)
                         retry_confidence = max((s or 0. for t,s in zip(retry_lines,retry_scores)
                                                 if t == retry_name), default=0.)
@@ -711,7 +755,7 @@ class CardOcr:
                 enlarged = bottom.resize((round(bottom.width * scale), round(bottom.height * scale)),
                                          Image.Resampling.LANCZOS)
                 try:
-                    retry_lines, retry_scores = self._run(enlarged)
+                    retry_lines, retry_scores = run(enlarged, 'collector', 'small_footer')
                     # A shifted frame may contain attack/weakness text. This
                     # optional pass contributes only explicit fractions or
                     # whole promo codes, never incidental bare digits/"2N".
@@ -738,7 +782,7 @@ class CardOcr:
                     tile = tile.resize((round(tile.width * scale), round(tile.height * scale)),
                                        Image.Resampling.LANCZOS)
                     try:
-                        retry_lines, retry_scores = self._run(tile)
+                        retry_lines, retry_scores = run(tile, 'collector', 'footer_half')
                         identifiers = [(text, score) for text, score in zip(retry_lines, retry_scores)
                             if score is not None and score >= .85 and
                             (COLLECTOR_FRACTION_RE.search(text) or
@@ -752,7 +796,12 @@ class CardOcr:
             extra_scores: list[float | None] = []
             extra_regions: list[str] = []
             if not name_lines and not number_lines:
-                extra_lines, extra_scores, extra_regions = self._run_located(image)
+                started = time.perf_counter()
+                try:
+                    extra_lines, extra_scores, extra_regions = self._run_located(image)
+                finally:
+                    passes.append(dict(region='full', reason='empty_regions', width=image.width,
+                        height=image.height, ms=round((time.perf_counter()-started)*1000, 2)))
                 title_pairs = [(t,s) for t,s,r in zip(extra_lines,extra_scores,extra_regions) if r == 'name']
                 name_text = pick_confident_name([t for t,_ in title_pairs],[s for _,s in title_pairs])
                 number_lines = [t for t,r in zip(extra_lines,extra_regions) if r == 'collector']
@@ -795,6 +844,7 @@ class CardOcr:
                 failed=False,
                 collector_retry_used=collector_retry_used,
                 collector_retry_contributed=collector_retry_contributed,
+                passes=passes,
             )
         except Exception:  # noqa: BLE001 - OCR must never block retrieval
-            return OcrResult(failed=True)
+            return OcrResult(failed=True, passes=passes)

@@ -22,6 +22,13 @@ class Settings(BaseSettings):
     preprocess_config: str = "pad"
     use_ocr: bool = True
     use_grading: bool = True
+    # Opt-in: a separate OCR engine overlaps label work with card recognition.
+    parallel_grading: bool = False
+    # Return at card completion; unfinished/unidentified grading defaults Raw.
+    grading_at_card_deadline: bool = False
+    # Retrieval windows may omit metadata. Try the supplied card-shaped frame
+    # for OCR first, without changing the visual/artwork retrieval crop.
+    ocr_complete_frame_first: bool = False
     enable_matched: bool = True
     ort_intra_threads: int = 1
     ort_inter_threads: int = 1

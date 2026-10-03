@@ -122,6 +122,7 @@ async def lifespan(app: FastAPI):
         bind_loop(None)
         app.state.executor.shutdown(wait=False, cancel_futures=True)
         app.state.image_executor.shutdown(wait=False, cancel_futures=True)
+        runtime.close()
         dbs.close()
 
 

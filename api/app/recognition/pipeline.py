@@ -31,7 +31,9 @@ from app.recognition.confidence import confidence_payload
 from app.recognition.presentation import match_presentation
 from app.recognition.language import confident_language_texts, expand_language, language_label, resolve_search_languages
 from app.recognition.ocr import OcrResult, inverted_card_layout
+from app.recognition.ocr_framing import complete_frame_probe_allowed, complete_frame_identity_supported, normalize_complete_frame_footer
 from app.recognition.grading import VERSION as GRADING_VERSION
+from app.recognition.grading_parallel import GradingJob, parallel_grading_scope
 from app.recognition.holder_printing import holder_printing_hint
 from app.recognition.orientation import retrieve_oriented
 from app.recognition.printing import PrintingDecision, assess_printings
@@ -101,6 +103,7 @@ def _recognize_bytes_once(
     language: str = "auto",
     store_capture: bool | None = None,
     _frame_override: tuple[str, Any] | None = None,
+    _input_observer: Callable | None = None,
 ) -> _ScanEvaluation:
     started = time.perf_counter()
     timings: dict[str, float] = {}
@@ -109,6 +112,8 @@ def _recognize_bytes_once(
 
     decoded = decode_image(data, settings.max_image_pixels)
     input_image = apply_crop(decoded.image, crop_x, crop_y, crop_w, crop_h, rotation)
+    if _input_observer is not None:
+        _input_observer(input_image)
     image = input_image
     timings["decode_ms"] = (time.perf_counter() - started) * 1000
 
@@ -168,12 +173,32 @@ def _recognize_bytes_once(
     artwork_hits = []
     artwork_index = getattr(runtime, "artwork_index", None)
     ocr = OcrResult(failed=True)
+    ocr_passes = []
+    def read_card(frame, scope):
+        observed = ocr_engine.read(frame)
+        ocr_passes.extend(dict(scope=scope, **p) for p in observed.passes)
+        return observed
+    original_ocr = None
+    original_identity_used = False
     mark = time.perf_counter()
     if settings.use_ocr and ocr_engine is not None and not retake:
-        ocr = ocr_engine.read(image)
+        if (getattr(settings, 'ocr_complete_frame_first', False)
+                and complete_frame_probe_allowed(input_image,
+                    profile=frame_selection.get('profile', ''),
+                    orientation=timings.get('orientation_degrees', 0))):
+            original_ocr = read_card(input_image, 'complete_frame_probe')
+            original_ocr, footer_changes = normalize_complete_frame_footer(original_ocr)
+            frame_selection['ocr_complete_frame_footer_normalizations'] = footer_changes
+            # Use the existing bounded visual shortlist, not only its first
+            # three rows: a metadata-clipped crop may bury the right identity.
+            leading = _lookup_cards(catalog, [str(snapshot.card_ids[i]) for i in indices])
+            original_identity_used = complete_frame_identity_supported(original_ocr,
+                [row['name'] for row in leading.values()])
+        ocr = original_ocr if original_identity_used else read_card(image, 'selected')
+        frame_selection['ocr_complete_frame_used'] = original_identity_used
         if inverted_card_layout(ocr):
             upright=image.rotate(180,expand=True)
-            corrected=ocr_engine.read(upright)
+            corrected=read_card(upright, 'upright')
             title_conf=max((h.confidence or 0. for h in corrected.hits
                            if h.region=='name' and h.text==corrected.name_text),default=0.)
             if corrected.name_text and title_conf>=.85 and not inverted_card_layout(corrected):
@@ -189,7 +214,7 @@ def _recognize_bytes_once(
         # agreeing title plus explicit, confidence-qualified identifiers.
         # Supplement, never replace, first-pass evidence; later contradictions
         # remain visible to the normal ranking/printing safety rules.
-        if inferred_frame and not ocr.failed:
+        if inferred_frame and not ocr.failed and not original_identity_used:
             first_numbers = extract_collector_candidates([], hits=ocr.hits)
             has_explicit = any(h.confidence is not None and h.confidence >= .85
                 and ('/' in h.text or any(c.isalpha() for c in h.text)) for h in first_numbers)
@@ -199,7 +224,7 @@ def _recognize_bytes_once(
             # the original upload. Consult that upload for agreeing evidence,
             # never overwrite a confident different title or collector.
             if (not has_explicit and title_conf >= .85) or .50 <= title_conf < .85 or (ocr.name_text is None and not has_explicit):
-                raw_ocr = ocr_engine.read(input_image)
+                raw_ocr = original_ocr if original_ocr is not None else read_card(input_image, 'original')
                 raw_title_conf = max((h.confidence or 0. for h in raw_ocr.hits
                     if h.region == 'name' and h.text == raw_ocr.name_text), default=0.)
                 holder_hints=[h for h in extract_collector_candidates([],hits=raw_ocr.hits)
@@ -226,6 +251,7 @@ def _recognize_bytes_once(
                         ocr.collector_retry_used = True
                         ocr.collector_retry_contributed = True
     timings["ocr_ms"] = (time.perf_counter() - mark) * 1000
+    timings['ocr_passes_count'] = float(len(ocr_passes))
     if artwork_index is not None and not retake:
         artwork_hits, artwork_timings = artwork_index.search(
             image, embedder, mode=settings.preprocess_config,
@@ -401,7 +427,8 @@ def _recognize_bytes_once(
     # Preserve catalogue evidence before Cardmarket enrichment mutates rows.
     reference_identity = dict(combined[0]) if combined else None
     mark = time.perf_counter()
-    sku_groups = grouped_expansion_skus(catalog)
+    get_groups = getattr(runtime, 'listing_groups', None)
+    sku_groups = get_groups(catalog) if get_groups else grouped_expansion_skus(catalog)
     for item in combined:
         apply_variants_to_candidate(catalog, item, groups=sku_groups)
     if combined:
@@ -571,6 +598,9 @@ def _recognize_bytes_once(
     suggestions = [Candidate.model_validate(item) for item in shown]
     scan_id = str(uuid.uuid4())
     created_at = _now()
+    for record in ocr_passes:
+        logging.getLogger('scan.diagnostics').info('card_ocr_pass scan_id=%s scope=%s region=%s reason=%s width=%s height=%s elapsed_ms=%s',
+            scan_id, record['scope'], record['region'], record['reason'], record['width'], record['height'], record['ms'])
     versions = runtime.versions()
     versions['presentation'] = 'best-match-v1'
     presentation = match_presentation(combined, status=status, printing_review=printing_review,
@@ -589,6 +619,7 @@ def _recognize_bytes_once(
         "failed": ocr.failed,
         "collector_retry_used": ocr.collector_retry_used,
         "collector_retry_contributed": ocr.collector_retry_contributed,
+        "passes": ocr_passes,
         "confidence": confidence.model_dump(mode='json'),
         "match_presentation": presentation.model_dump(mode='json'),
         "hits": [
@@ -710,6 +741,7 @@ def _recognize_bytes_once(
                            combined, shown)
 
 
+@parallel_grading_scope
 def recognize_bytes(
     data: bytes,
     *,
@@ -726,6 +758,7 @@ def recognize_bytes(
     skip_detect: bool = False,
     language: str = "auto",
     store_capture: bool | None = None,
+    _grading_job: GradingJob | None = None,
 ) -> ScanResponse:
     """Evaluate first, then persist exactly one result and optional capture.
 
@@ -739,6 +772,8 @@ def recognize_bytes(
                   results=results, session_id=session_id, crop_x=crop_x,
                   crop_y=crop_y, crop_w=crop_w, crop_h=crop_h, rotation=rotation,
                   skip_detect=skip_detect, language=language, store_capture=store_capture)
+    if _grading_job is not None:
+        kwargs['_input_observer'] = _grading_job.start
     first = _recognize_bytes_once(data, **kwargs)
     selected = first
     attempted = False
@@ -823,12 +858,29 @@ def recognize_bytes(
     # holder read may only order existing ambiguous choices with independently
     # supported artwork or printed name + collector evidence.
     mark = time.perf_counter()
-    grading = GradingEvidence(warnings=['grading_detection_disabled'])
+    deadline = getattr(settings, 'grading_at_card_deadline', False)
+    grading = (GradingEvidence(is_graded=False, grading_status='ungraded') if deadline
+               else GradingEvidence(warnings=['grading_detection_disabled']))
+    grading_ready = bool(_grading_job is not None and _grading_job.future is not None
+                         and _grading_job.future.done())
     if getattr(settings, 'use_grading', True) and getattr(settings, 'use_ocr', True):
         _, _, label_engine = runtime.require()
-        if label_engine is not None and hasattr(label_engine, 'read_grading'):
+        if deadline:
+            if grading_ready:
+                try:
+                    observed = _grading_job.result()
+                    if observed.company is not None:
+                        grading = observed
+                except Exception:  # noqa: BLE001 - return Raw for manual confirmation
+                    logging.getLogger(__name__).exception('Optional grading failed for scan %s', selected.response.id)
+            elif _grading_job is not None:
+                _grading_job.stop()
+        elif (_grading_job is not None and _grading_job.future is not None
+                or label_engine is not None and hasattr(label_engine, 'read_grading')):
             try:
-                grading = label_engine.read_grading(first.input_image)
+                grading = (_grading_job.result() if _grading_job is not None
+                           and _grading_job.future is not None
+                           else label_engine.read_grading(first.input_image))
             except Exception:  # noqa: BLE001 - preserve otherwise successful scans
                 logging.getLogger(__name__).exception('Grading OCR failed for scan %s', selected.response.id)
                 grading = GradingEvidence(warnings=['grading_ocr_failed'])
@@ -839,7 +891,16 @@ def recognize_bytes(
     selected.evidence['grading_version'] = GRADING_VERSION
     if hasattr(selected.response, 'versions'):
         selected.response.versions['grading'] = GRADING_VERSION
-    selected.timings['grading_ms'] = (time.perf_counter() - mark) * 1000
+    grading_wait_ms = (time.perf_counter() - mark) * 1000
+    if _grading_job is not None and _grading_job.future is not None:
+        selected.timings['grading_ms'] = (_grading_job.elapsed_ms if _grading_job.future.done()
+            else (time.perf_counter()-_grading_job.started_at)*1000)
+        selected.timings['grading_wait_ms'] = grading_wait_ms
+        selected.timings['grading_parallel'] = 1.
+    else:
+        selected.timings['grading_ms'] = grading_wait_ms
+    if deadline:
+        selected.timings['grading_ready_at_card_deadline'] = float(grading_ready)
     mark = time.perf_counter()
     if (selected.response.status == ScanStatus.printing_ambiguous
             and grading.slab_detected and grading.company
