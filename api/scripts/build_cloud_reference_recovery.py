@@ -40,6 +40,15 @@ def literal(value):
     return "'"+value.replace("'","''")+"'"
 
 
+def manifest_delta(old, new):
+    """Append IDs without sending the entire index through a connector."""
+    prefix=old['indexed_ids'];suffix=new['indexed_ids'][len(prefix):]
+    if (new['indexed_ids'][:len(prefix)]!=prefix or not suffix
+            or len(set(new['indexed_ids']))!=len(new['indexed_ids'])):
+        raise ValueError('Manifest update must append unique IDs and preserve their order')
+    return {k:v for k,v in new.items() if k!='indexed_ids' and old.get(k)!=v},suffix
+
+
 def main():
     p=argparse.ArgumentParser(description=__doc__)
     p.add_argument('--selection',type=Path,required=True)
@@ -157,6 +166,13 @@ def main():
     (output/'before.json').write_text(json.dumps(dict(metadata=meta,manifest=old_manifest,card=old_row),indent=2))
     schema=settings.planetscale_schema
     vector_literal=literal('['+','.join(str(float(v)) for v in vector)+']')+'::public.vector'
+    delta,appended=manifest_delta(old_manifest,manifest)
+    manifest_expression=(f'metadata || {literal(json.dumps(delta))}::jsonb || '
+        f"jsonb_build_object('indexed_ids',(metadata->'indexed_ids') || {literal(json.dumps(appended))}::jsonb)")
+    metadata_expression=(f"jsonb_set(jsonb_set(metadata,'{{digests,cards,md5}}',"
+        f"{literal(json.dumps(newmeta['digests']['cards']['md5']))}::jsonb),"
+        f"'{{vectors,{snapshot.preprocess_config}}}',{literal(json.dumps(stats))}::jsonb) || "
+        f"{literal(json.dumps({'reference_recovery':newmeta['reference_recovery']}))}::jsonb")
     # All four mutations are in ONE statement. An unexpected missing CAS step
     # raises division-by-zero, rolling back everything instead of partial state.
     sql=f'''WITH gate AS (SELECT import_id FROM {schema}.import_manifest
@@ -167,9 +183,9 @@ def main():
       WHERE id={literal(selection['id'])} AND has_image=0 AND (image_path IS NULL OR image_path='') RETURNING id),
     vector AS (INSERT INTO {schema}.card_embeddings(card_id,mode,snapshot_id,embedding,source_vector_sha256)
       SELECT id,{literal(snapshot.preprocess_config)},{literal(stats['snapshot'])},{vector_literal},{literal(newhash)} FROM card RETURNING card_id),
-    reference AS (UPDATE {schema}.reference_metadata SET metadata={literal(json.dumps(manifest))}::jsonb FROM vector
+    reference AS (UPDATE {schema}.reference_metadata SET metadata={manifest_expression} FROM vector
       WHERE source_key={literal('vector-manifest:'+snapshot.preprocess_config)} AND md5(metadata::text)={literal(manifest_cas)} RETURNING source_key),
-    audit AS (UPDATE {schema}.import_manifest SET metadata={literal(json.dumps(newmeta))}::jsonb,
+    audit AS (UPDATE {schema}.import_manifest SET metadata={metadata_expression},
       validated_at=now() FROM reference WHERE import_id={literal(settings.planetscale_import_id)} RETURNING import_id)
     SELECT 1/(CASE WHEN (SELECT count(*) FROM audit)=1 THEN 1 ELSE 0 END) AS atomic_recovery_applied;'''
     (output/'publish.sql').write_text(sql)
