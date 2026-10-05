@@ -145,6 +145,9 @@ def extract_collector_candidates(
         compact = re.sub(r'(?i)\bSV\d+[A-Z]?(?=\d{1,4}/\d{1,4})','',compact)
         compact = re.sub(r'(?i)\b(?:' + '|'.join(MODERN_SET_CODES) +
                          r')(?:EN|E|N)?(?=\d{1,4}/\d{1,4})', '', compact)
+        # McDonald's promos print M24 EN immediately before 001/015. The digits
+        # hide it from the letter-only set-code rule, which otherwise keeps 015.
+        compact = re.sub(r'(?i)\bM\d{2}(?:EN|JP|JA)?[D-J]?(?=\d{1,4}/\d{1,4})', '', compact)
         # Japanese rarity follows the denominator without a space in OCR.
         compact = re.sub(r'(?i)(/\d{1,4})(?:SAR|SR|AR|UR|RR|SSR|CHR|CSR)\b',
                          r'\1', compact)
@@ -244,6 +247,28 @@ def number_matches_identifiers(hits: list[OcrHit] | list[str], identifiers: list
         expected = structured if parsed.denominator and structured else identifiers
         results.append(any(number_match([hit], n) is True for n in expected))
     return any(results) if results else None
+
+
+def fraction_named_printing(ranked: list[dict[str, Any]], members, hits) -> str | None:
+    """Show the one printing named by a footer fraction that rejects the current card.
+
+    An unknown number does not move the display. Two agreeing printings stay
+    unresolved. This chooses the shown card and does not confirm the finish.
+    """
+    reliable = [hit for hit in hits if isinstance(hit, OcrHit) and hit.region == 'collector'
+                and hit.confidence is not None and hit.confidence >= .85 and '/' in hit.text]
+    if not reliable or not ranked:
+        return None
+
+    def verdicts(row: dict[str, Any]) -> list[bool | None]:
+        return [number_matches_identifiers([hit], accepted_collector_numbers(row)) for hit in reliable]
+
+    rows = [row for row in (members or ranked) if row.get('card_id')]
+    matched = [row for row in rows if (found := verdicts(row)) and all(item is True for item in found)]
+    leader = verdicts(ranked[0])
+    if len(matched) != 1 or not leader or any(item is not False for item in leader):
+        return None
+    return str(matched[0].get('card_id'))
 
 
 def accepted_collector_numbers(item: dict[str, Any]) -> list[str]:

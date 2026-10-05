@@ -1,0 +1,813 @@
+{
+  "sources_sha256": "19de26ad8c15b55bd9ec0d3502b7f458626ceb9088b270d144c352fbeb171219",
+  "catalogue_sha256": "c7d8c60ca228aa3053148c9b06b3f687b85b7aca1803b9a2424ed7eaadbfe360",
+  "annotations": "Card IDs bound before card-matching inference from visible names/numbers and read-only catalogue. Japanese translations checked against catalogue names.",
+  "annotation_corrections": [
+    {
+      "id": "fresh100_206285662050",
+      "original_number": "MOP023",
+      "correct_number": "MEP023",
+      "reason": "Full-resolution original-pixel re-review before card inference. Grader/grade truth remains unchanged."
+    }
+  ],
+  "photos": [
+    {
+      "id": "fresh100_327234085023",
+      "expected_card_ids": [
+        "en:ex14-14"
+      ],
+      "truth_scope": "set/collector/language; finish, stamp and authenticity unscored",
+      "unscored_reason": null
+    },
+    {
+      "id": "fresh100_388751795697",
+      "expected_card_ids": [
+        "ja:SM9-065"
+      ],
+      "truth_scope": "set/collector/language; finish, stamp and authenticity unscored",
+      "unscored_reason": null
+    },
+    {
+      "id": "freshraw_0_299404800",
+      "expected_card_ids": [
+        "en:sv02-204"
+      ],
+      "truth_scope": "set/collector/language; finish, stamp and authenticity unscored",
+      "unscored_reason": null
+    },
+    {
+      "id": "fresh100_227232802112",
+      "expected_card_ids": [
+        "en:sv01-203"
+      ],
+      "truth_scope": "set/collector/language; finish, stamp and authenticity unscored",
+      "unscored_reason": null
+    },
+    {
+      "id": "fresh100_135663917530",
+      "expected_card_ids": [
+        "en:sv03-205"
+      ],
+      "truth_scope": "set/collector/language; finish, stamp and authenticity unscored",
+      "unscored_reason": null
+    },
+    {
+      "id": "fresh100_396269138140",
+      "expected_card_ids": [
+        "en:sv01-212"
+      ],
+      "truth_scope": "set/collector/language; finish, stamp and authenticity unscored",
+      "unscored_reason": null
+    },
+    {
+      "id": "fresh100_167458253135",
+      "expected_card_ids": [
+        "en:sv01-210"
+      ],
+      "truth_scope": "set/collector/language; finish, stamp and authenticity unscored",
+      "unscored_reason": null
+    },
+    {
+      "id": "fresh100_116249576361",
+      "expected_card_ids": [
+        "en:sv03.5-174"
+      ],
+      "truth_scope": "set/collector/language; finish, stamp and authenticity unscored",
+      "unscored_reason": null
+    },
+    {
+      "id": "fresh100_116219612870",
+      "expected_card_ids": [
+        "en:sv03.5-181"
+      ],
+      "truth_scope": "set/collector/language; finish, stamp and authenticity unscored",
+      "unscored_reason": null
+    },
+    {
+      "id": "fresh100_387647223051",
+      "expected_card_ids": [
+        "en:swsh11tg-TG01"
+      ],
+      "truth_scope": "set/collector/language; finish, stamp and authenticity unscored",
+      "unscored_reason": null
+    },
+    {
+      "id": "fresh100_156890431856",
+      "expected_card_ids": [
+        "en:sv03-209"
+      ],
+      "truth_scope": "set/collector/language; finish, stamp and authenticity unscored",
+      "unscored_reason": null
+    },
+    {
+      "id": "fresh100_127005898900",
+      "expected_card_ids": [
+        "en:sv03.5-178"
+      ],
+      "truth_scope": "set/collector/language; finish, stamp and authenticity unscored",
+      "unscored_reason": null
+    },
+    {
+      "id": "fresh100_316758938735",
+      "expected_card_ids": [
+        "en:sv02-204"
+      ],
+      "truth_scope": "set/collector/language; finish, stamp and authenticity unscored",
+      "unscored_reason": null
+    },
+    {
+      "id": "freshraw_1_925085473",
+      "expected_card_ids": [
+        "en:sv01-203"
+      ],
+      "truth_scope": "set/collector/language; finish, stamp and authenticity unscored",
+      "unscored_reason": null
+    },
+    {
+      "id": "freshraw_2_1235899331",
+      "expected_card_ids": [
+        "en:sv03-205"
+      ],
+      "truth_scope": "set/collector/language; finish, stamp and authenticity unscored",
+      "unscored_reason": null
+    },
+    {
+      "id": "fresh100_127125641244",
+      "expected_card_ids": [
+        "en:sv01-212"
+      ],
+      "truth_scope": "set/collector/language; finish, stamp and authenticity unscored",
+      "unscored_reason": null
+    },
+    {
+      "id": "fresh100_226992725275",
+      "expected_card_ids": [
+        "en:sv01-210"
+      ],
+      "truth_scope": "set/collector/language; finish, stamp and authenticity unscored",
+      "unscored_reason": null
+    },
+    {
+      "id": "fresh100_197071758287",
+      "expected_card_ids": [
+        "en:sv03.5-174"
+      ],
+      "truth_scope": "set/collector/language; finish, stamp and authenticity unscored",
+      "unscored_reason": null
+    },
+    {
+      "id": "fresh100_186821197401",
+      "expected_card_ids": [
+        "en:sv03.5-181"
+      ],
+      "truth_scope": "set/collector/language; finish, stamp and authenticity unscored",
+      "unscored_reason": null
+    },
+    {
+      "id": "freshraw_7_316441841",
+      "expected_card_ids": [
+        "en:swsh11tg-TG01"
+      ],
+      "truth_scope": "set/collector/language; finish, stamp and authenticity unscored",
+      "unscored_reason": null
+    },
+    {
+      "id": "fresh100_167884982800",
+      "expected_card_ids": [
+        "en:sv03-209"
+      ],
+      "truth_scope": "set/collector/language; finish, stamp and authenticity unscored",
+      "unscored_reason": null
+    },
+    {
+      "id": "fresh100_134878995437",
+      "expected_card_ids": [
+        "en:sv03.5-178"
+      ],
+      "truth_scope": "set/collector/language; finish, stamp and authenticity unscored",
+      "unscored_reason": null
+    },
+    {
+      "id": "fresh100_177223455994",
+      "expected_card_ids": [
+        "en:sv02-204"
+      ],
+      "truth_scope": "set/collector/language; finish, stamp and authenticity unscored",
+      "unscored_reason": null
+    },
+    {
+      "id": "fresh100_185962385461",
+      "expected_card_ids": [
+        "en:sv01-203"
+      ],
+      "truth_scope": "set/collector/language; finish, stamp and authenticity unscored",
+      "unscored_reason": null
+    },
+    {
+      "id": "fresh100_186598235842",
+      "expected_card_ids": [
+        "en:sv03-205"
+      ],
+      "truth_scope": "set/collector/language; finish, stamp and authenticity unscored",
+      "unscored_reason": null
+    },
+    {
+      "id": "fresh100_356618307865",
+      "expected_card_ids": [
+        "en:sv01-212"
+      ],
+      "truth_scope": "set/collector/language; finish, stamp and authenticity unscored",
+      "unscored_reason": null
+    },
+    {
+      "id": "fresh100_235971735451",
+      "expected_card_ids": [
+        "en:sv01-210"
+      ],
+      "truth_scope": "set/collector/language; finish, stamp and authenticity unscored",
+      "unscored_reason": null
+    },
+    {
+      "id": "fresh100_397434208029",
+      "expected_card_ids": [
+        "en:sv03.5-174"
+      ],
+      "truth_scope": "set/collector/language; finish, stamp and authenticity unscored",
+      "unscored_reason": null
+    },
+    {
+      "id": "freshraw_7_795209806",
+      "expected_card_ids": [
+        "en:swsh11tg-TG01"
+      ],
+      "truth_scope": "set/collector/language; finish, stamp and authenticity unscored",
+      "unscored_reason": null
+    },
+    {
+      "id": "freshextra_6_1736995038",
+      "expected_card_ids": [
+        "en:sv03-209"
+      ],
+      "truth_scope": "set/collector/language; finish, stamp and authenticity unscored",
+      "unscored_reason": null
+    },
+    {
+      "id": "fresh100_336501773626",
+      "expected_card_ids": [
+        "en:sv03.5-178"
+      ],
+      "truth_scope": "set/collector/language; finish, stamp and authenticity unscored",
+      "unscored_reason": null
+    },
+    {
+      "id": "freshraw_0_1109460011",
+      "expected_card_ids": [
+        "en:sv02-204"
+      ],
+      "truth_scope": "set/collector/language; finish, stamp and authenticity unscored",
+      "unscored_reason": null
+    },
+    {
+      "id": "fresh100_236504673185",
+      "expected_card_ids": [
+        "en:sv01-203"
+      ],
+      "truth_scope": "set/collector/language; finish, stamp and authenticity unscored",
+      "unscored_reason": null
+    },
+    {
+      "id": "fresh100_396170517118",
+      "expected_card_ids": [
+        "en:sv01-212"
+      ],
+      "truth_scope": "set/collector/language; finish, stamp and authenticity unscored",
+      "unscored_reason": null
+    },
+    {
+      "id": "freshraw_4_1318482242",
+      "expected_card_ids": [
+        "en:sv01-210"
+      ],
+      "truth_scope": "set/collector/language; finish, stamp and authenticity unscored",
+      "unscored_reason": null
+    },
+    {
+      "id": "fresh100_125514764134",
+      "expected_card_ids": [
+        "en:swsh11tg-TG01"
+      ],
+      "truth_scope": "set/collector/language; finish, stamp and authenticity unscored",
+      "unscored_reason": null
+    },
+    {
+      "id": "fresh100_205836607918",
+      "expected_card_ids": [
+        "en:sv02-204"
+      ],
+      "truth_scope": "set/collector/language; finish, stamp and authenticity unscored",
+      "unscored_reason": null
+    },
+    {
+      "id": "fresh100_235982624286",
+      "expected_card_ids": [
+        "en:sv01-203"
+      ],
+      "truth_scope": "set/collector/language; finish, stamp and authenticity unscored",
+      "unscored_reason": null
+    },
+    {
+      "id": "fresh100_135586143350",
+      "expected_card_ids": [
+        "en:sv01-212"
+      ],
+      "truth_scope": "set/collector/language; finish, stamp and authenticity unscored",
+      "unscored_reason": null
+    },
+    {
+      "id": "fresh100_267406776028",
+      "expected_card_ids": [
+        "en:sv01-210"
+      ],
+      "truth_scope": "set/collector/language; finish, stamp and authenticity unscored",
+      "unscored_reason": null
+    },
+    {
+      "id": "fresh100_334557743755",
+      "expected_card_ids": [
+        "en:swsh11tg-TG01"
+      ],
+      "truth_scope": "set/collector/language; finish, stamp and authenticity unscored",
+      "unscored_reason": null
+    },
+    {
+      "id": "freshraw_0_1861309623",
+      "expected_card_ids": [
+        "en:sv02-204"
+      ],
+      "truth_scope": "set/collector/language; finish, stamp and authenticity unscored",
+      "unscored_reason": null
+    },
+    {
+      "id": "freshraw_1_2051404991",
+      "expected_card_ids": [
+        "en:sv01-203"
+      ],
+      "truth_scope": "set/collector/language; finish, stamp and authenticity unscored",
+      "unscored_reason": null
+    },
+    {
+      "id": "freshraw_3_1376470916",
+      "expected_card_ids": [
+        "en:sv01-212"
+      ],
+      "truth_scope": "set/collector/language; finish, stamp and authenticity unscored",
+      "unscored_reason": null
+    },
+    {
+      "id": "freshraw_4_123815526",
+      "expected_card_ids": [
+        "en:sv01-210"
+      ],
+      "truth_scope": "set/collector/language; finish, stamp and authenticity unscored",
+      "unscored_reason": null
+    },
+    {
+      "id": "fresh100_235278936401",
+      "expected_card_ids": [
+        "en:swsh11tg-TG01"
+      ],
+      "truth_scope": "set/collector/language; finish, stamp and authenticity unscored",
+      "unscored_reason": null
+    },
+    {
+      "id": "freshraw_0_1807925107",
+      "expected_card_ids": [
+        "en:sv02-204"
+      ],
+      "truth_scope": "set/collector/language; finish, stamp and authenticity unscored",
+      "unscored_reason": null
+    },
+    {
+      "id": "fresh100_286467766284",
+      "expected_card_ids": [
+        "en:sv01-203"
+      ],
+      "truth_scope": "set/collector/language; finish, stamp and authenticity unscored",
+      "unscored_reason": null
+    },
+    {
+      "id": "fresh100_365490414711",
+      "expected_card_ids": [
+        "en:sv01-212"
+      ],
+      "truth_scope": "set/collector/language; finish, stamp and authenticity unscored",
+      "unscored_reason": null
+    },
+    {
+      "id": "freshraw_4_343408992",
+      "expected_card_ids": [
+        "en:sv01-210"
+      ],
+      "truth_scope": "set/collector/language; finish, stamp and authenticity unscored",
+      "unscored_reason": null
+    },
+    {
+      "id": "fresh100_397747206164",
+      "expected_card_ids": [
+        "ja:SM9-038"
+      ],
+      "truth_scope": "set/collector/language; finish, stamp and authenticity unscored",
+      "unscored_reason": null
+    },
+    {
+      "id": "fresh100_406359778998",
+      "expected_card_ids": [
+        "ja:SM9-065"
+      ],
+      "truth_scope": "set/collector/language; finish, stamp and authenticity unscored",
+      "unscored_reason": null
+    },
+    {
+      "id": "fresh100_277613285848",
+      "expected_card_ids": [
+        "en:svp-053"
+      ],
+      "truth_scope": "set/collector/language; finish, stamp and authenticity unscored",
+      "unscored_reason": null
+    },
+    {
+      "id": "freshimg_0_995976121",
+      "expected_card_ids": [
+        "en:sv03.5-200"
+      ],
+      "truth_scope": "set/collector/language; finish, stamp and authenticity unscored",
+      "unscored_reason": null
+    },
+    {
+      "id": "freshimg_0_1677673688",
+      "expected_card_ids": [
+        "en:svp-052"
+      ],
+      "truth_scope": "set/collector/language; finish, stamp and authenticity unscored",
+      "unscored_reason": null
+    },
+    {
+      "id": "freshimg_0_1212241946",
+      "expected_card_ids": [
+        "en:sv03.5-199"
+      ],
+      "truth_scope": "set/collector/language; finish, stamp and authenticity unscored",
+      "unscored_reason": null
+    },
+    {
+      "id": "freshimg_0_967558432",
+      "expected_card_ids": [
+        "en:g1-RC29"
+      ],
+      "truth_scope": "set/collector/language; finish, stamp and authenticity unscored",
+      "unscored_reason": null
+    },
+    {
+      "id": "freshimg_0_1142638013",
+      "expected_card_ids": [
+        "en:swshp-SWSH020"
+      ],
+      "truth_scope": "set/collector/language; finish, stamp and authenticity unscored",
+      "unscored_reason": null
+    },
+    {
+      "id": "fresh100_137339181702",
+      "expected_card_ids": [
+        "en:base1-15"
+      ],
+      "truth_scope": "set/collector/language; finish, stamp and authenticity unscored",
+      "unscored_reason": null
+    },
+    {
+      "id": "fresh100_336762686851",
+      "expected_card_ids": [
+        "en:swsh10.5-055"
+      ],
+      "truth_scope": "set/collector/language; finish, stamp and authenticity unscored",
+      "unscored_reason": null
+    },
+    {
+      "id": "freshimg_1_113190404",
+      "expected_card_ids": [
+        "en:sv04.5-232"
+      ],
+      "truth_scope": "set/collector/language; finish, stamp and authenticity unscored",
+      "unscored_reason": null
+    },
+    {
+      "id": "fresh100_277888034880",
+      "expected_card_ids": [
+        "en:sv03.5-199"
+      ],
+      "truth_scope": "set/collector/language; finish, stamp and authenticity unscored",
+      "unscored_reason": null
+    },
+    {
+      "id": "fresh100_157312218315",
+      "expected_card_ids": [
+        "en:sv05-051"
+      ],
+      "truth_scope": "set/collector/language; finish, stamp and authenticity unscored",
+      "unscored_reason": null
+    },
+    {
+      "id": "fresh100_196431506881",
+      "expected_card_ids": [
+        "en:pop9-15"
+      ],
+      "truth_scope": "set/collector/language; finish, stamp and authenticity unscored",
+      "unscored_reason": null
+    },
+    {
+      "id": "fresh100_276983335602",
+      "expected_card_ids": [
+        "en:sv08-247"
+      ],
+      "truth_scope": "set/collector/language; finish, stamp and authenticity unscored",
+      "unscored_reason": null
+    },
+    {
+      "id": "fresh100_116749113357",
+      "expected_card_ids": [
+        "en:sv10.5b-166"
+      ],
+      "truth_scope": "set/collector/language; finish, stamp and authenticity unscored",
+      "unscored_reason": null
+    },
+    {
+      "id": "fresh100_206285662050",
+      "expected_card_ids": [
+        "en:mep-023"
+      ],
+      "truth_scope": "set/collector/language; finish, stamp and authenticity unscored",
+      "unscored_reason": null
+    },
+    {
+      "id": "fresh100_126873299285",
+      "expected_card_ids": [
+        "en:base1-15"
+      ],
+      "truth_scope": "set/collector/language; finish, stamp and authenticity unscored",
+      "unscored_reason": null
+    },
+    {
+      "id": "fresh100_305430906935",
+      "expected_card_ids": [
+        "en:swsh3.5-16"
+      ],
+      "truth_scope": "set/collector/language; finish, stamp and authenticity unscored",
+      "unscored_reason": null
+    },
+    {
+      "id": "fresh100_326079637741",
+      "expected_card_ids": [
+        "en:sm7-8"
+      ],
+      "truth_scope": "set/collector/language; finish, stamp and authenticity unscored",
+      "unscored_reason": null
+    },
+    {
+      "id": "fresh100_135116047131",
+      "expected_card_ids": [
+        "ja:CLF-026"
+      ],
+      "truth_scope": "set/collector/language; finish, stamp and authenticity unscored",
+      "unscored_reason": null
+    },
+    {
+      "id": "fresh100_326160477186",
+      "expected_card_ids": [
+        "en:sv03.5-063"
+      ],
+      "truth_scope": "set/collector/language; finish, stamp and authenticity unscored",
+      "unscored_reason": null
+    },
+    {
+      "id": "fresh100_326075712447",
+      "expected_card_ids": [
+        "en:swsh9-013"
+      ],
+      "truth_scope": "set/collector/language; finish, stamp and authenticity unscored",
+      "unscored_reason": null
+    },
+    {
+      "id": "fresh100_287247791643",
+      "expected_card_ids": [
+        "en:svp-085"
+      ],
+      "truth_scope": "set/collector/language; finish, stamp and authenticity unscored",
+      "unscored_reason": null
+    },
+    {
+      "id": "fresh100_177390016065",
+      "expected_card_ids": [
+        "en:sma-SV59"
+      ],
+      "truth_scope": "set/collector/language; finish, stamp and authenticity unscored",
+      "unscored_reason": null
+    },
+    {
+      "id": "fresh100_407246892266",
+      "expected_card_ids": [],
+      "truth_scope": "set/collector/language; finish, stamp and authenticity unscored",
+      "unscored_reason": "No independently resolved catalogue printing; retained, not removed"
+    },
+    {
+      "id": "fresh100_377526701873",
+      "expected_card_ids": [
+        "ja:SM12a-083"
+      ],
+      "truth_scope": "set/collector/language; finish, stamp and authenticity unscored",
+      "unscored_reason": null
+    },
+    {
+      "id": "fresh100_298706855994",
+      "expected_card_ids": [
+        "en:base1-9"
+      ],
+      "truth_scope": "set/collector/language; finish, stamp and authenticity unscored",
+      "unscored_reason": null
+    },
+    {
+      "id": "fresh100_336794948594",
+      "expected_card_ids": [
+        "ja:SV6-109"
+      ],
+      "truth_scope": "set/collector/language; finish, stamp and authenticity unscored",
+      "unscored_reason": null
+    },
+    {
+      "id": "fresh100_168302185613",
+      "expected_card_ids": [
+        "ja:SM12a-041"
+      ],
+      "truth_scope": "set/collector/language; finish, stamp and authenticity unscored",
+      "unscored_reason": null
+    },
+    {
+      "id": "freshextra_0_70889495",
+      "expected_card_ids": [
+        "en:sv08.5-075"
+      ],
+      "truth_scope": "set/collector/language; finish, stamp and authenticity unscored",
+      "unscored_reason": null
+    },
+    {
+      "id": "fresh100_127464063628",
+      "expected_card_ids": [
+        "en:sv01-245"
+      ],
+      "truth_scope": "set/collector/language; finish, stamp and authenticity unscored",
+      "unscored_reason": null
+    },
+    {
+      "id": "freshextra_5_636235657",
+      "expected_card_ids": [
+        "en:swsh10tg-TG05"
+      ],
+      "truth_scope": "set/collector/language; finish, stamp and authenticity unscored",
+      "unscored_reason": null
+    },
+    {
+      "id": "fresh100_197768683572",
+      "expected_card_ids": [
+        "en:sv04.5-233"
+      ],
+      "truth_scope": "set/collector/language; finish, stamp and authenticity unscored",
+      "unscored_reason": null
+    },
+    {
+      "id": "fresh100_178061679870",
+      "expected_card_ids": [
+        "en:pl4-71"
+      ],
+      "truth_scope": "set/collector/language; finish, stamp and authenticity unscored",
+      "unscored_reason": null
+    },
+    {
+      "id": "fresh100_205408031074",
+      "expected_card_ids": [
+        "en:sv06-188"
+      ],
+      "truth_scope": "set/collector/language; finish, stamp and authenticity unscored",
+      "unscored_reason": null
+    },
+    {
+      "id": "fresh100_407246154199",
+      "expected_card_ids": [
+        "en:svp-174"
+      ],
+      "truth_scope": "set/collector/language; finish, stamp and authenticity unscored",
+      "unscored_reason": null
+    },
+    {
+      "id": "fresh100_307061782471",
+      "expected_card_ids": [
+        "en:xy9-115"
+      ],
+      "truth_scope": "set/collector/language; finish, stamp and authenticity unscored",
+      "unscored_reason": null
+    },
+    {
+      "id": "fresh100_227337115305",
+      "expected_card_ids": [
+        "en:base5-21"
+      ],
+      "truth_scope": "set/collector/language; finish, stamp and authenticity unscored",
+      "unscored_reason": null
+    },
+    {
+      "id": "fresh100_287264323565",
+      "expected_card_ids": [
+        "en:ex9-9"
+      ],
+      "truth_scope": "set/collector/language; finish, stamp and authenticity unscored",
+      "unscored_reason": null
+    },
+    {
+      "id": "fresh100_336576388984",
+      "expected_card_ids": [
+        "en:swshp-SWSH261"
+      ],
+      "truth_scope": "set/collector/language; finish, stamp and authenticity unscored",
+      "unscored_reason": null
+    },
+    {
+      "id": "fresh100_145662665211",
+      "expected_card_ids": [
+        "en:sm115-16"
+      ],
+      "truth_scope": "set/collector/language; finish, stamp and authenticity unscored",
+      "unscored_reason": null
+    },
+    {
+      "id": "fresh100_198196929850",
+      "expected_card_ids": [
+        "en:base5-25"
+      ],
+      "truth_scope": "set/collector/language; finish, stamp and authenticity unscored",
+      "unscored_reason": null
+    },
+    {
+      "id": "fresh100_376009575543",
+      "expected_card_ids": [
+        "en:sv06-188"
+      ],
+      "truth_scope": "set/collector/language; finish, stamp and authenticity unscored",
+      "unscored_reason": null
+    },
+    {
+      "id": "freshextra_1_1957211138",
+      "expected_card_ids": [
+        "en:base5-68"
+      ],
+      "truth_scope": "set/collector/language; finish, stamp and authenticity unscored",
+      "unscored_reason": null
+    },
+    {
+      "id": "fresh100_146365926690",
+      "expected_card_ids": [
+        "en:sv04.5-132"
+      ],
+      "truth_scope": "set/collector/language; finish, stamp and authenticity unscored",
+      "unscored_reason": null
+    },
+    {
+      "id": "fresh100_196323744191",
+      "expected_card_ids": [
+        "en:base1-6"
+      ],
+      "truth_scope": "set/collector/language; finish, stamp and authenticity unscored",
+      "unscored_reason": null
+    },
+    {
+      "id": "fresh100_145701209354",
+      "expected_card_ids": [
+        "en:swsh7-29"
+      ],
+      "truth_scope": "set/collector/language; finish, stamp and authenticity unscored",
+      "unscored_reason": null
+    },
+    {
+      "id": "fresh100_205148259527",
+      "expected_card_ids": [
+        "en:CLB-007"
+      ],
+      "truth_scope": "set/collector/language; finish, stamp and authenticity unscored",
+      "unscored_reason": null
+    },
+    {
+      "id": "fresh100_146314372000",
+      "expected_card_ids": [
+        "en:xy12-106"
+      ],
+      "truth_scope": "set/collector/language; finish, stamp and authenticity unscored",
+      "unscored_reason": null
+    }
+  ]
+}

@@ -1,0 +1,4131 @@
+{
+  "summary": {
+    "probes": 30,
+    "top_correct": 16,
+    "candidate_recalled": 19,
+    "negative_probes": 2,
+    "false_specific_claims": 0,
+    "printing_ambiguous": 13,
+    "baseline_candidate_recalled": 19,
+    "regressed_candidate_recall": 3,
+    "source": "local read-only SQLite/reference/vector volume; not PlanetScale or live staging",
+    "visualization_font_setup_disabled": true,
+    "note": "Synthetic reference crops. Low-resolution retakes count as retrieval misses; no confidence calibration claim."
+  },
+  "baseline_candidate_recalled": 19,
+  "recall_gains": [
+    [
+      "en:base1-58",
+      "partial_crop"
+    ],
+    [
+      "en:30th-c-014",
+      "partial_crop"
+    ],
+    [
+      "en:sv01-036",
+      "art_only"
+    ]
+  ],
+  "recall_regressions": [
+    [
+      "en:sv01-036",
+      "central_patch"
+    ],
+    [
+      "ja:SV-P-051",
+      "top_half"
+    ],
+    [
+      "ja:SV-P-051",
+      "partial_crop"
+    ]
+  ],
+  "art_only": {
+    "candidate_recalled": 5,
+    "false_specific_claim": 0
+  },
+  "art_only_automatic_claims": 0,
+  "cases": [
+    {
+      "expected_id": "en:base1-58",
+      "condition": "full",
+      "status": "printing_ambiguous",
+      "top_id": "base1-58",
+      "top_correct": true,
+      "candidate_recalled": true,
+      "false_specific_claim": false
+    },
+    {
+      "expected_id": "en:base1-58",
+      "condition": "art_only",
+      "status": "printing_ambiguous",
+      "top_id": "en:A1-094",
+      "top_correct": false,
+      "candidate_recalled": true,
+      "false_specific_claim": false
+    },
+    {
+      "expected_id": "en:base1-58",
+      "condition": "top_half",
+      "status": "printing_ambiguous",
+      "top_id": "en:base1-58",
+      "top_correct": true,
+      "candidate_recalled": true,
+      "false_specific_claim": false
+    },
+    {
+      "expected_id": "en:base1-58",
+      "condition": "bottom_half",
+      "status": "retake",
+      "top_id": "en:base5-58",
+      "top_correct": false,
+      "candidate_recalled": false,
+      "false_specific_claim": false
+    },
+    {
+      "expected_id": "en:base1-58",
+      "condition": "partial_crop",
+      "status": "printing_ambiguous",
+      "top_id": "en:base4-87",
+      "top_correct": false,
+      "candidate_recalled": true,
+      "false_specific_claim": false
+    },
+    {
+      "expected_id": "en:base1-58",
+      "condition": "central_patch",
+      "status": "no_match",
+      "top_id": "en:base4-87",
+      "top_correct": false,
+      "candidate_recalled": false,
+      "false_specific_claim": false
+    },
+    {
+      "expected_id": "en:30th-c-014",
+      "condition": "full",
+      "status": "printing_ambiguous",
+      "top_id": "en:30th-c-014",
+      "top_correct": true,
+      "candidate_recalled": true,
+      "false_specific_claim": false
+    },
+    {
+      "expected_id": "en:30th-c-014",
+      "condition": "art_only",
+      "status": "printing_ambiguous",
+      "top_id": "en:A1-094",
+      "top_correct": false,
+      "candidate_recalled": true,
+      "false_specific_claim": false
+    },
+    {
+      "expected_id": "en:30th-c-014",
+      "condition": "top_half",
+      "status": "printing_ambiguous",
+      "top_id": "en:30th-c-014",
+      "top_correct": true,
+      "candidate_recalled": true,
+      "false_specific_claim": false
+    },
+    {
+      "expected_id": "en:30th-c-014",
+      "condition": "bottom_half",
+      "status": "retake",
+      "top_id": "en:swsh10-015",
+      "top_correct": false,
+      "candidate_recalled": false,
+      "false_specific_claim": false
+    },
+    {
+      "expected_id": "en:30th-c-014",
+      "condition": "partial_crop",
+      "status": "printing_ambiguous",
+      "top_id": "en:30th-c-014",
+      "top_correct": true,
+      "candidate_recalled": true,
+      "false_specific_claim": false
+    },
+    {
+      "expected_id": "en:30th-c-014",
+      "condition": "central_patch",
+      "status": "no_match",
+      "top_id": "en:base4-87",
+      "top_correct": false,
+      "candidate_recalled": false,
+      "false_specific_claim": false
+    },
+    {
+      "expected_id": "en:PPS2-BRS-121",
+      "condition": "full",
+      "status": "printing_ambiguous",
+      "top_id": "en:PPS2-BRS-121",
+      "top_correct": true,
+      "candidate_recalled": true,
+      "false_specific_claim": false
+    },
+    {
+      "expected_id": "en:PPS2-BRS-121",
+      "condition": "art_only",
+      "status": "printing_ambiguous",
+      "top_id": "en:PPS2-BRS-121",
+      "top_correct": true,
+      "candidate_recalled": true,
+      "false_specific_claim": false
+    },
+    {
+      "expected_id": "en:PPS2-BRS-121",
+      "condition": "top_half",
+      "status": "printing_ambiguous",
+      "top_id": "en:PPS3-BRS-121",
+      "top_correct": false,
+      "candidate_recalled": true,
+      "false_specific_claim": false
+    },
+    {
+      "expected_id": "en:PPS2-BRS-121",
+      "condition": "bottom_half",
+      "status": "retake",
+      "top_id": "en:sm4-121",
+      "top_correct": false,
+      "candidate_recalled": false,
+      "false_specific_claim": false
+    },
+    {
+      "expected_id": "en:PPS2-BRS-121",
+      "condition": "partial_crop",
+      "status": "printing_ambiguous",
+      "top_id": "en:PPS2-BRS-121",
+      "top_correct": true,
+      "candidate_recalled": true,
+      "false_specific_claim": false
+    },
+    {
+      "expected_id": "en:PPS2-BRS-121",
+      "condition": "central_patch",
+      "status": "printing_ambiguous",
+      "top_id": "en:PPS2-BRS-121",
+      "top_correct": true,
+      "candidate_recalled": true,
+      "false_specific_claim": false
+    },
+    {
+      "expected_id": "en:sv01-036",
+      "condition": "full",
+      "status": "uncertain",
+      "top_id": "en:sv01-036",
+      "top_correct": true,
+      "candidate_recalled": true,
+      "false_specific_claim": false
+    },
+    {
+      "expected_id": "en:sv01-036",
+      "condition": "art_only",
+      "status": "uncertain",
+      "top_id": "en:sv01-036",
+      "top_correct": true,
+      "candidate_recalled": true,
+      "false_specific_claim": false
+    },
+    {
+      "expected_id": "en:sv01-036",
+      "condition": "top_half",
+      "status": "uncertain",
+      "top_id": "sv01-036",
+      "top_correct": true,
+      "candidate_recalled": true,
+      "false_specific_claim": false
+    },
+    {
+      "expected_id": "en:sv01-036",
+      "condition": "bottom_half",
+      "status": "retake",
+      "top_id": "en:me02.5-011",
+      "top_correct": false,
+      "candidate_recalled": false,
+      "false_specific_claim": false
+    },
+    {
+      "expected_id": "en:sv01-036",
+      "condition": "partial_crop",
+      "status": "uncertain",
+      "top_id": "sv01-036",
+      "top_correct": true,
+      "candidate_recalled": true,
+      "false_specific_claim": false
+    },
+    {
+      "expected_id": "en:sv01-036",
+      "condition": "central_patch",
+      "status": "no_match",
+      "top_id": "en:hgss1-3",
+      "top_correct": false,
+      "candidate_recalled": false,
+      "false_specific_claim": false
+    },
+    {
+      "expected_id": "ja:SV-P-051",
+      "condition": "full",
+      "status": "uncertain",
+      "top_id": "ja:SV-P-051",
+      "top_correct": true,
+      "candidate_recalled": true,
+      "false_specific_claim": false
+    },
+    {
+      "expected_id": "ja:SV-P-051",
+      "condition": "art_only",
+      "status": "uncertain",
+      "top_id": "ja:SV-P-051",
+      "top_correct": true,
+      "candidate_recalled": true,
+      "false_specific_claim": false
+    },
+    {
+      "expected_id": "ja:SV-P-051",
+      "condition": "top_half",
+      "status": "retake",
+      "top_id": "ja:BW9-030",
+      "top_correct": false,
+      "candidate_recalled": false,
+      "false_specific_claim": false
+    },
+    {
+      "expected_id": "ja:SV-P-051",
+      "condition": "bottom_half",
+      "status": "retake",
+      "top_id": "ja:SV-P-063",
+      "top_correct": false,
+      "candidate_recalled": false,
+      "false_specific_claim": false
+    },
+    {
+      "expected_id": "ja:SV-P-051",
+      "condition": "partial_crop",
+      "status": "retake",
+      "top_id": "ja:SV-P-051",
+      "top_correct": true,
+      "candidate_recalled": false,
+      "false_specific_claim": false
+    },
+    {
+      "expected_id": "ja:SV-P-051",
+      "condition": "central_patch",
+      "status": "no_match",
+      "top_id": "ja:SM11b-053",
+      "top_correct": false,
+      "candidate_recalled": false,
+      "false_specific_claim": false
+    }
+  ],
+  "negatives": [
+    {
+      "condition": "blank",
+      "status": "retake",
+      "false_specific_claim": false
+    },
+    {
+      "condition": "random_noise",
+      "status": "no_match",
+      "false_specific_claim": false
+    }
+  ],
+  "provenance": {
+    "raw_run_sha256": "287baca6d61c7f0854ded71fa4ca6475e68f624721cef68876ac5f390a82143d",
+    "baseline_sha256": "dddc911ff95052d9c86891edda70306c0ea68be8d55762d7f840600fd5690d7e",
+    "selected_photo_report_sha256": "75a3bf0d4811ebe9b8400562df47369c642ac0d7c49727c5198444141c0afcc3",
+    "analysis_sha256": "029ea3cfafa61ae004337fef73613aa5957e5e9d04dba1cbb03fcfa84ff034c6",
+    "recognition_code_hashes": {
+      "app/recognition/artwork.py": "6ef7a9d33cd1ea5290202e8376ee50cebbc536467a3425e34fae3c6e2696dd94",
+      "app/recognition/pipeline.py": "2b25cdf6da2d516f37b59c04c6b1f0f85955a9a29361ce0aac3ab8e7cf5b2e68",
+      "app/recognition/local_match.py": "1b3879657dd222829afeee28412bc0ca85a7e0905796aed8693f4a315489d720",
+      "app/recognition/rank.py": "86c241ce10928b36942109b4f120176bee854a1dcf51c916aab89e8467dc9723",
+      "app/recognition/orientation.py": "2111cf569b9f69f5dcb69dcaa33c38643cedf89699b0625159989f3bd0e31225",
+      "app/recognition/runtime.py": "66e6fbfa686ba1df872c95280a32e8dd4bcdb685810eb5d701233a6918b874f0",
+      "app/recognition/detect.py": "5a4052c7c7d611dd6577bca69f870b90464ec04fc52b7acb11e166bc4c64d2aa",
+      "app/recognition/frame_fallback.py": "66ff4b59a673f102833bfbc3a6bbbc7806c8a931b9a63af332acc3b9857c0506",
+      "app/recognition/identity.py": "6bdfd6a1e26af1ae9fb03e3708596c73db279df30d702ab74afe47048081b863",
+      "app/recognition/printing.py": "d9ef3d666dcbcfb3eebee1267327e5b7f2feaeca9c0ddb03b2ad7ef584e69966",
+      "app/recognition/metadata.py": "1a9438246783f753c286505973e51199c454b9bf1bec13f2345c2ae061a6926a",
+      "app/recognition/ocr.py": "c7753c7bac18c4284e5ce690d2a833d9210812ab39d36d9fa62e708c9c4d0085",
+      "app/recognition/language.py": "fc1e39452ceeae1dac9480c76a42f88387a4c675059617fea5c2c5e695cd8d34",
+      "scripts/benchmark_artwork_pilot.py": "25b068864614d209a60a1febd1b47fef5e4f704abb6c819e06bb2fa1fbc4f24f"
+    },
+    "artwork_manifest": {
+      "schema_version": "artwork-hypotheses-v1",
+      "created_at": "2026-10-01T21:19:04.162691+00:00",
+      "preprocess_config": "pad",
+      "model_sha256": "2ddf6ec79e377069b6e884a838f42c65b8a70e222dada1eeeb41979948ce1146",
+      "base_embeddings_sha256": "0f28a64337aed0bae7f860eb38989a528dac15e38af37e0f3bb89aceb21d2377",
+      "base_ids_sha256": "4a9fc353edabd3dfe0567fcd3a84d892df554a600ecb1e1e67c20f49d8e19a87",
+      "profiles": {
+        "conventional_window": [
+          0.12,
+          0.19,
+          0.88,
+          0.46
+        ],
+        "broad_center_hypothesis": [
+          0.08,
+          0.1,
+          0.92,
+          0.62
+        ]
+      },
+      "indexed_cards": 4834,
+      "indexed_regions": 9668,
+      "embeddings_sha256": "94964cd163abdff8c3c463974db677aece1e1222d73c795386ea043d88732af5",
+      "records_sha256": "a0497addbcd291abc9e43efb6eae70e60e309aef708c7dbaf3d6efb232f5343f",
+      "pilot_names": [
+        "Pikachu",
+        "\u30d4\u30ab\u30c1\u30e5\u30a6",
+        "Fuecoco",
+        "\u30db\u30b2\u30fc\u30bf",
+        "Bibarel",
+        "\u30d3\u30fc\u30c0\u30eb",
+        "Victini",
+        "\u30d3\u30af\u30c6\u30a3\u30cb",
+        "Alakazam ex",
+        "\u30d5\u30fc\u30c7\u30a3\u30f3ex",
+        "Mew ex",
+        "Charizard ex"
+      ],
+      "random_distractors_requested": 512,
+      "rarity_selection": [
+        "character rare",
+        "character super rare",
+        "full art trainer",
+        "holo rare vmax",
+        "hyper rare",
+        "illustration rare",
+        "secret rare",
+        "shiny rare vmax",
+        "shiny ultra rare",
+        "special illustration rare",
+        "ultra rare"
+      ],
+      "scope": "rarity-expanded subset, not full catalogue",
+      "seed": 20261002,
+      "profile_status": "explicit crop hypotheses, not validated layout classification",
+      "skipped": [
+        {
+          "card_id": "en:2014xy-5",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "en:2015xy-6",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "en:2016xy-6",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "en:2017sm-5",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "en:2019sm-6",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "en:2022swsh-5",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "en:2022swsh-7",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "en:2024sv-2",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "en:B2a-016",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "en:B2a-094",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "en:cel25-25",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "en:ex5.5-5",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "en:mep-062",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "en:mfb-17",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "en:sm2-143",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "en:sm3.5-27",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "en:sm3.5-28",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "en:sm3.5-29",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "en:sm3.5-39",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "en:sm3.5-40",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "en:sm3.5-42",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "en:sm3.5-53",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "en:sm3.5-56",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "en:sm3.5-57",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "en:sm3.5-71",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "en:sm3.5-72",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "en:sm3.5-73",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "en:sm3.5-74",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "en:sm3.5-75",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "en:sm3.5-76",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "en:sm3.5-77",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "en:sm3.5-78",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "en:sm3.5-9",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "en:sm6-122",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "en:sm6-126",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "en:sm6-134",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "en:sm6-140",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "en:sm6-82",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "en:sm6-90",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "en:sm7.5-11",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "en:sm7.5-18",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "en:sm7.5-37",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "en:sm7.5-41",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "en:sm7.5-44",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "en:sm7.5-48",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "en:sm7.5-65",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "en:sm7.5-66",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "en:sm7.5-67",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "en:sm7.5-68",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "en:sm7.5-69",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "en:sm7.5-70",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "en:sm7.5-71",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "en:sm7.5-72",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "en:sm7.5-73",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "en:sm7.5-74",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "en:sm7.5-75",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "en:sm7.5-76",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "en:sm7.5-77",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "en:sm7.5-78",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "en:smp-SM183",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "en:smp-SM225",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "en:smp-SM227",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "en:smp-SM234",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "en:svp-190",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "en:svp-192",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "en:svp-196",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "en:svp-208",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "en:svp-214",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "en:svp-225",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "en:swsh10tg-TG13",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "en:swsh10tg-TG14",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "en:swsh10tg-TG15",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "en:swsh10tg-TG16",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "en:swsh10tg-TG17",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "en:swsh10tg-TG18",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "en:swsh10tg-TG19",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "en:swsh10tg-TG20",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "en:swsh10tg-TG21",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "en:swsh10tg-TG22",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "en:swsh10tg-TG23",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "en:swsh10tg-TG24",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "en:swsh10tg-TG25",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "en:swsh10tg-TG26",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "en:swsh10tg-TG27",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "en:swsh10tg-TG28",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "en:swsh10tg-TG29",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "en:swsh10tg-TG30",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "en:swsh11tg-TG05",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "en:swsh11tg-TG12",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "en:swsh11tg-TG13",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "en:swsh11tg-TG14",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "en:swsh11tg-TG15",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "en:swsh11tg-TG16",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "en:swsh11tg-TG17",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "en:swsh11tg-TG18",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "en:swsh11tg-TG19",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "en:swsh11tg-TG20",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "en:swsh11tg-TG21",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "en:swsh11tg-TG22",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "en:swsh11tg-TG23",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "en:swsh11tg-TG24",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "en:swsh11tg-TG25",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "en:swsh11tg-TG26",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "en:swsh11tg-TG27",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "en:swsh11tg-TG28",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "en:swsh11tg-TG29",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "en:swsh11tg-TG30",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "en:swsh12.5gg-GG25",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "en:swsh12.5gg-GG30",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "en:swsh12.5gg-GG35",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "en:swsh12.5gg-GG36",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "en:swsh12.5gg-GG37",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "en:swsh12.5gg-GG38",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "en:swsh12.5gg-GG39",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "en:swsh12.5gg-GG40",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "en:swsh12.5gg-GG41",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "en:swsh12.5gg-GG42",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "en:swsh12.5gg-GG43",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "en:swsh12.5gg-GG44",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "en:swsh12.5gg-GG45",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "en:swsh12.5gg-GG46",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "en:swsh12.5gg-GG47",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "en:swsh12.5gg-GG48",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "en:swsh12.5gg-GG49",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "en:swsh12.5gg-GG50",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "en:swsh12.5gg-GG51",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "en:swsh12.5gg-GG52",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "en:swsh12.5gg-GG53",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "en:swsh12.5gg-GG54",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "en:swsh12.5gg-GG55",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "en:swsh12.5gg-GG56",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "en:swsh12.5gg-GG57",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "en:swsh12.5gg-GG58",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "en:swsh12.5gg-GG59",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "en:swsh12.5gg-GG60",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "en:swsh12.5gg-GG61",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "en:swsh12.5gg-GG62",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "en:swsh12.5gg-GG63",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "en:swsh12.5gg-GG64",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "en:swsh12.5gg-GG65",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "en:swsh12.5gg-GG66",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "en:swsh12.5gg-GG67",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "en:swsh12.5gg-GG68",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "en:swsh12.5gg-GG69",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "en:swsh12.5gg-GG70",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "en:swsh12tg-TG15",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "en:swsh12tg-TG19",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "en:swsh12tg-TG20",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "en:swsh12tg-TG21",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "en:swsh12tg-TG23",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "en:swsh12tg-TG24",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "en:swsh12tg-TG25",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "en:swsh12tg-TG26",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "en:swsh12tg-TG27",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "en:swsh12tg-TG28",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "en:swsh12tg-TG29",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "en:swsh12tg-TG30",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "en:swsh4.5sv-SV122",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "en:swsh9tg-TG13",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "en:swsh9tg-TG14",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "en:swsh9tg-TG15",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "en:swsh9tg-TG16",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "en:swsh9tg-TG17",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "en:swsh9tg-TG18",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "en:swsh9tg-TG19",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "en:swsh9tg-TG20",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "en:swsh9tg-TG21",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "en:swsh9tg-TG22",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "en:swsh9tg-TG23",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "en:swsh9tg-TG24",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "en:swsh9tg-TG25",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "en:swsh9tg-TG26",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "en:swsh9tg-TG27",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "en:swsh9tg-TG28",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "en:swsh9tg-TG29",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "en:swsh9tg-TG30",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "en:tk-hs-r-16",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "en:tk-hs-r-2",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:E1-016",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:E3-088",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:E3-089",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:E3-090",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:E4-033",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:E4-089",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:E4-090",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:E4-091",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:E5-089",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:E5-090",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:E5-091",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:M-P-126",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:M1L-064",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:M1L-065",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:M1L-066",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:M1L-067",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:M1L-068",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:M1L-069",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:M1L-070",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:M1L-071",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:M1L-072",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:M1L-073",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:M1L-074",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:M1L-075",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:M1L-076",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:M1L-077",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:M1L-078",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:M1L-079",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:M1L-080",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:M1L-081",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:M1L-082",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:M1L-085",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:M1L-086",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:M1L-087",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:M1L-088",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:M1L-089",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:M1L-090",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:M1L-091",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:M1S-087",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:M2-081",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:M2-082",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:M2-083",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:M2-084",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:M2-085",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:M2-086",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:M2-087",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:M2-088",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:M2-089",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:M2-090",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:M2-091",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:M2-092",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:M2-093",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:M2-094",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:M2-095",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:M2-096",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:M2-097",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:M2-098",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:M2-099",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:M2-100",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:M2-101",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:M2-103",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:M2-105",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:M2-106",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:M2-107",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:M2-108",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:M2-110",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:M2-111",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:M2-112",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:M2-113",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:M2-114",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:M2-115",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:M2a-194",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:M2a-195",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:M2a-196",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:M2a-197",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:M2a-198",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:M2a-199",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:M2a-200",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:M2a-201",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:M2a-202",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:M2a-203",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:M2a-204",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:M2a-205",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:M2a-206",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:M2a-207",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:M2a-208",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:M2a-209",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:M2a-210",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:M2a-211",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:M2a-212",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:M2a-213",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:M2a-214",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:M2a-215",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:M2a-217",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:M2a-218",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:M2a-219",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:M2a-221",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:M2a-224",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:M2a-225",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:M2a-226",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:M2a-227",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:M2a-228",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:M2a-229",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:M2a-230",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:M2a-231",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:M2a-232",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:M2a-233",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:M2a-234",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:M2a-235",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:M2a-236",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:M2a-237",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:M2a-238",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:M2a-239",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:M2a-240",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:M2a-241",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:M2a-242",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:M2a-244",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:M2a-246",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:M2a-247",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:M2a-248",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:M2a-249",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:M3-081",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:M3-082",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:M3-083",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:M3-084",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:M3-085",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:M3-086",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:M3-087",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:M3-088",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:M3-089",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:M3-090",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:M3-091",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:M3-092",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:M3-093",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:M3-094",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:M3-095",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:M3-096",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:M3-097",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:M3-098",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:M3-099",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:M3-100",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:M3-103",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:M3-105",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:M3-106",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:M3-107",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:M3-108",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:M3-110",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:M3-111",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:M3-112",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:M3-113",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:M3-114",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:M3-115",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:M3-116",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:M5-082",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:M5-083",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:M5-084",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:M5-085",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:M5-086",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:M5-087",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:M5-088",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:M5-089",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:M5-090",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:M5-091",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:M5-092",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:M5-093",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:M5-094",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:M5-095",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:M5-096",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:M5-097",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:M5-098",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:M5-099",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:M5-100",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:M5-101",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:M5-105",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:M5-106",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:M5-108",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:M5-109",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:M5-110",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:M5-111",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:M5-112",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:M5-113",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:M5-114",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:M5-115",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:M5-116",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:M5-117",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:MC-106",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:MC-107",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:PCG1-037",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:PMCG1-035",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:PMCG2-024",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:PMCG4-062",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:PMCG6-074",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:PMCG6-075",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:S5I-082",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:S5I-083",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:S5I-084",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:S5I-085",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:S5I-086",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:S5I-087",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:S5I-088",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:S5I-089",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:S5I-090",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:S5I-091",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:S6H-084",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:S6H-085",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:S6H-086",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:S6H-087",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:S6H-088",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:S6H-089",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:S6H-090",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:S6H-091",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:S6H-092",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:S6H-093",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:S6H-094",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:S6H-095",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:S6K-084",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:S6K-085",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:S6K-086",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:S6K-087",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:S6K-088",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:S6K-089",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:S6K-090",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:S6K-091",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:S6K-092",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:S6K-093",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:S6K-094",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:S6K-095",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:S7D-080",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:S7D-081",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:S7D-082",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:S7D-083",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:S7D-084",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:S7D-085",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:S7D-086",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:S7D-087",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:S7D-088",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:S7D-089",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:S7D-090",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:S8-116",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:S8-117",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:S8-118",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:S8-119",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:S8-120",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:S8-121",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:S8-122",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:S8-123",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:S8-124",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:S8-125",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:S8-126",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:S8-127",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:S8-128",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:S8-129",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:S8b-227",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:S8b-228",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:S8b-229",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:S8b-278",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:S8b-279",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:S8b-280",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:S8b-281",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:S8b-282",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:S8b-283",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:S8b-284",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:S8b-285",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SM10-108",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SM10-109",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SM10-110",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SM10-111",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SM10-112",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SM10-113",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SM10-114",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SM10-115",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SM10-116",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SM10a-055",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SM10a-056",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SM10a-057",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SM10a-058",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SM10a-059",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SM10a-060",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SM10a-061",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SM10a-062",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SM10a-063",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SM10a-064",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SM10a-065",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SM10a-066",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SM10a-067",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SM10a-068",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SM10a-069",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SM10b-063",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SM10b-064",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SM10b-065",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SM10b-066",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SM10b-067",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SM10b-068",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SM10b-069",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SM11a-074",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SM11a-075",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SM11a-076",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SM11a-077",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SM11a-078",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SM11a-079",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SM11a-080",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SM11b-069",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SM11b-070",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SM11b-071",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SM11b-072",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SM11b-073",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SM11b-074",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SM11b-075",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SM12-109",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SM12-110",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SM12-111",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SM12-112",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SM12-113",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SM12-114",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SM12-115",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SM12-116",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SM12-117",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SM12a-211",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SM12a-212",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SM12a-213",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SM12a-214",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SM12a-215",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SM12a-216",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SM12a-217",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SM12a-218",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SM12a-219",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SM12a-220",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SM12a-221",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SM12a-222",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SM12a-223",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SM12a-224",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SM12a-225",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SM12a-226",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SM1M-067",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SM1M-068",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SM1M-069",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SM1M-070",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SM1M-071",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SM1M-072",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SM1M-073",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SM1S-067",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SM1S-068",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SM1S-069",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SM1S-070",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SM1S-071",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SM1S-072",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SM1S-073",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SM1p-052",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SM1p-053",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SM1p-054",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SM1p-055",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SM1p-056",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SM1p-057",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SM1p-058",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SM1p-059",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SM1p-060",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SM1p-061",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SM1p-062",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SM1p-063",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SM1p-064",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SM1p-065",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SM1p-066",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SM1p-067",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SM2K-051",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SM2K-052",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SM2K-053",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SM2K-054",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SM2K-055",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SM2K-056",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SM2K-057",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SM2K-058",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SM2K-059",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SM2K-060",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SM2K-061",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SM2L-056",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SM2L-057",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SM2L-058",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SM2L-059",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SM2L-060",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SM2L-061",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SM2L-062",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SM2p-050",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SM2p-051",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SM2p-052",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SM2p-053",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SM2p-054",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SM2p-055",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SM2p-056",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SM2p-057",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SM2p-058",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SM2p-059",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SM2p-060",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SM2p-061",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SM2p-062",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SM2p-063",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SM2p-064",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SM2p-065",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SM3H-058",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SM3H-059",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SM3H-060",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SM3H-061",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SM3H-062",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SM3H-063",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SM3H-064",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SM3N-053",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SM3N-058",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SM3N-059",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SM3N-060",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SM3N-061",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SM3N-062",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SM3N-063",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SM3N-064",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SM3p-073",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SM3p-074",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SM3p-075",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SM3p-076",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SM3p-077",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SM3p-078",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SM3p-079",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SM3p-080",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SM3p-081",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SM3p-082",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SM4A-056",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SM4A-057",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SM4A-058",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SM4A-059",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SM4A-060",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SM4A-061",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SM4S-056",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SM4S-057",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SM4S-058",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SM4S-059",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SM4S-060",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SM4S-061",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SM4S-062",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SM4p-115",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SM4p-116",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SM4p-117",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SM4p-118",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SM4p-119",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SM4p-120",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SM4p-121",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SM4p-122",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SM4p-123",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SM4p-124",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SM4p-125",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SM5M-073",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SM5M-074",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SM5M-075",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SM5M-076",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SM5M-077",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SM5M-078",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SM5S-073",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SM5S-074",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SM5S-075",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SM5S-076",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SM5S-077",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SM5S-078",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SM5p-051",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SM5p-052",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SM5p-053",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SM5p-054",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SM5p-055",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SM5p-056",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SM5p-057",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SM5p-058",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SM5p-059",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SM5p-060",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SM5p-061",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SM5p-062",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SM5p-063",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SM6-103",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SM6-104",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SM6-105",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SM6-106",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SM6-107",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SM6-108",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SM6-109",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SM6-110",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SM6a-060",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SM6a-061",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SM6a-062",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SM6a-063",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SM6a-064",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SM6a-065",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SM6a-066",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SM6b-078",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SM6b-079",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SM6b-080",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SM6b-081",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SM6b-082",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SM6b-083",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SM6b-084",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SM6b-085",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SM6b-086",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SM7-105",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SM7-106",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SM7-107",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SM7-108",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SM7-109",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SM7-110",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SM7-111",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SM7-112",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SM7a-067",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SM7a-068",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SM7a-069",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SM7a-070",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SM7a-071",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SM7a-072",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SM7a-073",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SM7b-057",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SM7b-058",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SM7b-059",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SM7b-060",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SM7b-061",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SM7b-062",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SM7b-063",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SM8-104",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SM8-105",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SM8-106",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SM8-107",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SM8-108",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SM8-109",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SM8-110",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SM8-111",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SM8a-059",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SM8a-060",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SM8a-061",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SM8a-062",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SM8a-063",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SM8a-064",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SM8a-065",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SM8b-244",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SM8b-245",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SM8b-246",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SM8b-247",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SM8b-248",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SM8b-249",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SM8b-250",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SM9-110",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SM9-111",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SM9-112",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SM9-113",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SM9-114",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SM9-115",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SM9-116",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SM9-117",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SM9-118",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SM9a-064",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SM9a-065",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SM9a-066",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SM9a-067",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SM9a-068",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SM9a-069",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SM9a-070",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SM9b-063",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SM9b-064",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SM9b-065",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SM9b-066",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SM9b-067",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SM9b-068",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SM9b-069",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SV-P-001",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SV-P-074",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SV-P-120",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SV-P-197",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SV-P-216",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SV-P-218",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SV-P-242",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SV-P-271",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SV-P-288",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SV11B-012",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SV11B-087",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SV11B-088",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SV11B-089",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SV11B-090",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SV11B-091",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SV11B-092",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SV11B-093",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SV11B-094",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SV11B-095",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SV11B-096",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SV11B-097",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SV11B-098",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SV11B-099",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SV11B-100",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SV11B-101",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SV11B-102",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SV11B-103",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SV11B-104",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SV11B-105",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SV11B-106",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SV11B-107",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SV11B-108",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SV11B-109",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SV11B-110",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SV11B-111",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SV11B-112",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SV11B-113",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SV11B-114",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SV11B-115",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SV11B-116",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SV11B-117",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SV11B-118",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SV11B-119",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SV11B-120",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SV11B-121",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SV11B-122",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SV11B-123",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SV11B-124",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SV11B-125",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SV11B-126",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SV11B-127",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SV11B-128",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SV11B-129",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SV11B-130",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SV11B-131",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SV11B-132",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SV11B-133",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SV11B-134",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SV11B-135",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SV11B-136",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SV11B-137",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SV11B-138",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SV11B-139",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SV11B-140",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SV11B-141",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SV11B-142",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SV11B-143",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SV11B-144",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SV11B-145",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SV11B-146",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SV11B-147",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SV11B-148",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SV11B-149",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SV11B-150",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SV11B-151",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SV11B-152",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SV11B-153",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SV11B-154",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SV11B-155",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SV11B-156",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SV11B-157",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SV11B-158",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SV11B-159",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SV11B-160",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SV11B-161",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SV11B-162",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SV11B-163",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SV11B-164",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SV11B-165",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SV11B-166",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SV11B-167",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SV11B-168",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SV11B-169",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SV11B-170",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SV11B-171",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SV11B-172",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SV11B-173",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SV11W-087",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SV11W-088",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SV11W-089",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SV11W-090",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SV11W-091",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SV11W-092",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SV11W-093",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SV11W-094",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SV11W-095",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SV11W-096",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SV11W-097",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SV11W-098",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SV11W-099",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SV11W-100",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SV11W-101",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SV11W-102",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SV11W-103",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SV11W-104",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SV11W-105",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SV11W-106",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SV11W-107",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SV11W-108",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SV11W-109",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SV11W-110",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SV11W-111",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SV11W-112",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SV11W-113",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SV11W-114",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SV11W-115",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SV11W-116",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SV11W-117",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SV11W-118",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SV11W-119",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SV11W-120",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SV11W-121",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SV11W-122",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SV11W-123",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SV11W-124",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SV11W-125",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SV11W-126",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SV11W-127",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SV11W-128",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SV11W-129",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SV11W-130",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SV11W-131",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SV11W-132",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SV11W-133",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SV11W-134",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SV11W-135",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SV11W-136",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SV11W-137",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SV11W-138",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SV11W-139",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SV11W-140",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SV11W-141",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SV11W-142",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SV11W-143",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SV11W-144",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SV11W-145",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SV11W-146",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SV11W-147",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SV11W-148",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SV11W-149",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SV11W-150",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SV11W-151",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SV11W-152",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SV11W-153",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SV11W-154",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SV11W-155",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SV11W-156",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SV11W-157",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SV11W-158",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SV11W-159",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SV11W-160",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SV11W-161",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SV11W-162",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SV11W-163",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SV11W-164",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SV11W-165",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SV11W-166",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SV11W-167",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SV11W-168",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SV11W-169",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SV11W-170",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SV11W-171",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SV11W-172",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SV11W-173",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:SV5M-086",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:neo1-036",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:neo2-021",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:neo3-022",
+          "reason": "reference_unavailable"
+        },
+        {
+          "card_id": "ja:neo3-023",
+          "reason": "reference_unavailable"
+        }
+      ]
+    }
+  },
+  "scope": "Synthetic reference controls, not independent camera accuracy. All data mounts read-only, network disabled."
+}

@@ -1,0 +1,11 @@
+{
+  "scope": "English official asset identity review; not finish or stamp authentication",
+  "method": "Visual inspection of each named header and printed collector fraction on the listed sheets, plus official set-specific asset path",
+  "approved_sheets": {
+    "a": ["review-00.png", "review-01.png", "review-02.png"],
+    "b": ["review-00.png", "review-01.png", "review-02.png", "review-03.png", "review-04.png", "review-05.png", "review-06.png", "review-07.png", "review-08.png", "review-09.png"],
+    "c": ["review-00.png", "review-01.png", "review-02.png", "review-03.png", "review-04.png", "review-05.png", "review-06.png", "review-07.png", "review-08.png", "review-09.png", "review-10.png"]
+  },
+  "rejected_card_ids": [],
+  "individual_full_image_review": ["en:swsh12.5gg-GG44"]
+}

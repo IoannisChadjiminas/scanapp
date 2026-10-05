@@ -14,6 +14,8 @@ import platform
 from pathlib import Path
 import re
 from zipfile import BadZipFile
+from collections import OrderedDict
+from threading import RLock
 
 import cv2
 import numpy as np
@@ -132,6 +134,10 @@ class ReferenceFeatureStore:
     def __init__(self, directory: Path, manifest: dict) -> None:
         self.directory = directory
         self.manifest = manifest
+        self._arrays = OrderedDict()
+        self._arrays_bytes = 0
+        self._arrays_limit = 16 * 1024 * 1024
+        self._arrays_lock = RLock()
 
     @classmethod
     def load(cls, directory: Path, rows: list[dict]) -> "ReferenceFeatureStore":
@@ -180,6 +186,13 @@ class ReferenceFeatureStore:
             path = self.directory / record["filename"]
             if path.is_symlink() or sha256_file(path) != record["sha256"]:
                 raise ArtifactError("Reference-feature checksum mismatch")
+            # Keep checksum verification on every access, including hits.
+            # Cache only immutable decoded arrays bound to this store/record.
+            with self._arrays_lock:
+                key = (card_id, record['sha256'])
+                if key in self._arrays:
+                    self._arrays.move_to_end(key)
+                    return dict(self._arrays[key][0])
             with np.load(path, allow_pickle=False) as source:
                 arrays = {key: source[key] for key in source.files}
             expected = {"thumbnail"} | {f"{key}_{f}" for f, _ in SIFT_PROFILES
@@ -199,7 +212,16 @@ class ReferenceFeatureStore:
                 raise ArtifactError("Invalid reference-feature printing thumbnail")
             for array in arrays.values():
                 array.flags.writeable = False
-            return arrays
+            size = sum(array.nbytes for array in arrays.values())
+            if size <= self._arrays_limit:
+                with self._arrays_lock:
+                    if key not in self._arrays:
+                        self._arrays[key] = (arrays, size)
+                        self._arrays_bytes += size
+                    while self._arrays_bytes > self._arrays_limit or len(self._arrays) > 64:
+                        _, (_, old_size) = self._arrays.popitem(last=False)
+                        self._arrays_bytes -= old_size
+            return dict(arrays)
         except (OSError, ValueError, TypeError, KeyError, AttributeError, BadZipFile) as exc:
             raise ArtifactError("Unreadable or malformed reference features") from exc
 

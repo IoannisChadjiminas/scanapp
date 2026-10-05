@@ -1,0 +1,874 @@
+{
+  "purpose": "Fresh 50-photo convenience holdout, labels frozen before inference.",
+  "frozen_at_utc": "2026-10-02T06:50:28.418287+00:00",
+  "selection": "Manual visible name/number/language review of 79 search candidates. Eleven printing identities, none in the previous 69. Balance across selected available identities; not random sampling. No scanner predictions consulted.",
+  "exclusions": "Exact duplicates 62-65; previously tested Espeon identity 23/30; near duplicate 72/75; apparently digital product image 78. Remaining eligible extras omitted for a fixed 50-photo identity mix before inference.",
+  "limitations": "Internet listing photos, not independently captured app-camera input. Seller authenticity, finish, editing and model-pretraining overlap unverified. Repeated identities/listing-category sources reduce statistical independence. Finish is not a truth label. No rescan, tuning or indexing of holdout images.",
+  "deduplication": {
+    "old_download_sha_count": 106,
+    "exact_byte_overlap": 0,
+    "old_printing_identity_overlap": 0,
+    "near_duplicate_flags_for_manual_review": [],
+    "method": "SHA256 and whole-image 256-bit difference hash; manual contact-sheet review. Not an exhaustive crop/asset reuse proof."
+  },
+  "identity_counts": {
+    "en:swsh11-180": 6,
+    "en:swsh11-186": 1,
+    "en:base1-58": 5,
+    "en:sv03.5-203": 8,
+    "en:swsh12.5gg-GG44": 8,
+    "ja:SV2a-205": 6,
+    "ja:SV1a-080": 1,
+    "en:sv03.5-201": 6,
+    "en:sv03.5-202": 1,
+    "en:sv01-245": 4,
+    "ja:SV1S-101": 4
+  },
+  "photos": [
+    {
+      "id": "fresh_001",
+      "page_url": "https://www.ebay.co.uk/p/17056216177",
+      "image_url": "https://i.ebayimg.com/images/g/rVAAAeSwK6lo4QH2/s-l1200.jpg",
+      "review_status": "visually_verified",
+      "expected_card_id": "en:swsh11-180",
+      "visible_label": "Aerodactyl V 180/196",
+      "language": "en",
+      "layout": "pokemon_full_art",
+      "conditions": [
+        "background",
+        "foil_texture",
+        "holder_or_sleeve"
+      ],
+      "sha256": "83e8931b29ef0062e1c39755a7f29d5f84c661da7b788eb57057c425dca379ac",
+      "truth_in_frozen_artwork_index": true
+    },
+    {
+      "id": "fresh_002",
+      "page_url": "https://www.sportscardinvestor.com/cards/aerodactyl-v-pokemon/2022-sword-shield-lost-origin-holo-alternate-full-art-180-196",
+      "image_url": "https://i.ebayimg.com/images/g/uCUAAOSwZa1nil6D/s-l1600.jpg",
+      "review_status": "visually_verified",
+      "expected_card_id": "en:swsh11-180",
+      "visible_label": "Aerodactyl V 180/196",
+      "language": "en",
+      "layout": "pokemon_full_art",
+      "conditions": [
+        "background",
+        "foil_texture",
+        "holder_or_sleeve"
+      ],
+      "sha256": "f458ac6615d57a4313fade286bd9dba4d4f60869968ea1f888509cce0f99d8bd",
+      "truth_in_frozen_artwork_index": true
+    },
+    {
+      "id": "fresh_003",
+      "page_url": "https://www.ebay.com/itm/256657882198",
+      "image_url": "https://i.ebayimg.com/images/g/ZREAAOSwrDBm-FQ~/s-l1600.jpg",
+      "review_status": "visually_verified",
+      "expected_card_id": "en:swsh11-180",
+      "visible_label": "Aerodactyl V 180/196",
+      "language": "en",
+      "layout": "pokemon_full_art",
+      "conditions": [
+        "background",
+        "foil_texture"
+      ],
+      "sha256": "d32fbf6925e4a98cefc0df66c9838b37dec357946476aa5b3ec834eef33a3357",
+      "truth_in_frozen_artwork_index": true
+    },
+    {
+      "id": "fresh_004",
+      "page_url": "https://www.ebay.com/itm/146913362687",
+      "image_url": "https://i.ebayimg.com/00/s/MTYwMFgxMTc5/z/STAAAeSw0TBo-T8d/%24_57.JPG?set_id=880000500F",
+      "review_status": "visually_verified",
+      "expected_card_id": "en:swsh11-180",
+      "visible_label": "Aerodactyl V 180/196",
+      "language": "en",
+      "layout": "pokemon_full_art",
+      "conditions": [
+        "background",
+        "foil_texture",
+        "glare_or_strong_reflection"
+      ],
+      "sha256": "9567d8d19ccb02c392e01cb070a0bc7903f93e08258de6be85b24088e606292c",
+      "truth_in_frozen_artwork_index": true
+    },
+    {
+      "id": "fresh_005",
+      "page_url": "https://www.ebay.com/itm/126170568284",
+      "image_url": "https://i.ebayimg.com/00/s/MTU3MFgxMTI4/z/03cAAOSww2NlRrw6/%24_57.PNG?set_id=880000500F",
+      "review_status": "visually_verified",
+      "expected_card_id": "en:swsh11-180",
+      "visible_label": "Aerodactyl V 180/196",
+      "language": "en",
+      "layout": "pokemon_full_art",
+      "conditions": [
+        "background",
+        "foil_texture",
+        "glare_or_strong_reflection"
+      ],
+      "sha256": "93419d7ef7ff5c71aca129be70da2856d4f078c0b7c49eee91f1599dbcf1ccfd",
+      "truth_in_frozen_artwork_index": true
+    },
+    {
+      "id": "fresh_006",
+      "page_url": "https://www.ebay.com/itm/146109296320",
+      "image_url": "https://i.ebayimg.com/images/g/vTgAAOSw-8lnET9v/s-l1200.jpg",
+      "review_status": "visually_verified",
+      "expected_card_id": "en:swsh11-180",
+      "visible_label": "Aerodactyl V 180/196",
+      "language": "en",
+      "layout": "pokemon_full_art",
+      "conditions": [
+        "background",
+        "foil_texture",
+        "holder_or_sleeve",
+        "stand"
+      ],
+      "sha256": "bf57190c6059958802c8349d9a47fd5cb0a24685b77e6294cf4e89b44f30f17d",
+      "truth_in_frozen_artwork_index": true
+    },
+    {
+      "id": "fresh_009",
+      "page_url": "https://www.ebay.com/itm/316147194366",
+      "image_url": "https://i.ebayimg.com/images/g/ONQAAOSwYblnjm1W/s-l1600.jpg",
+      "review_status": "visually_verified",
+      "expected_card_id": "en:swsh11-186",
+      "visible_label": "Giratina V 186/196",
+      "language": "en",
+      "layout": "pokemon_full_art",
+      "conditions": [
+        "background",
+        "foil_texture",
+        "holder_or_sleeve"
+      ],
+      "sha256": "e6a40a1fe1dfdd72f0340c2fdbf40419ca77f66f939a68c57bf33d950d5b6d76",
+      "truth_in_frozen_artwork_index": true
+    },
+    {
+      "id": "fresh_010",
+      "page_url": "https://www.ebay.com/itm/405470689945",
+      "image_url": "https://i.ebayimg.com/images/g/lmsAAOSw-iRngeek/s-l1200.jpg",
+      "review_status": "visually_verified",
+      "expected_card_id": "en:base1-58",
+      "visible_label": "Pikachu 58/102, shadowed, no first-edition stamp",
+      "language": "en",
+      "layout": "standard_frame",
+      "conditions": [
+        "background",
+        "perspective_tilt"
+      ],
+      "sha256": "2207c79e109339d7c24d2c7579c500d7e4aefc136313b05acfa563e9ed835c8c",
+      "truth_in_frozen_artwork_index": true
+    },
+    {
+      "id": "fresh_011",
+      "page_url": "https://www.ebay.com/itm/193771437844",
+      "image_url": "https://i.ebayimg.com/images/g/v00AAOSw6qhfws0P/s-l1200.jpg",
+      "review_status": "visually_verified",
+      "expected_card_id": "en:base1-58",
+      "visible_label": "Pikachu 58/102, shadowed, no first-edition stamp",
+      "language": "en",
+      "layout": "standard_frame",
+      "conditions": [
+        "background"
+      ],
+      "sha256": "c3b09c818baea438441d254a7cb776fad6c1f93832d8de71f70c7f4285113cd9",
+      "truth_in_frozen_artwork_index": true
+    },
+    {
+      "id": "fresh_012",
+      "page_url": "https://www.ebay.com/itm/396262766898",
+      "image_url": "https://i.ebayimg.com/images/g/BcYAAOSwDJxm~SyL/s-l1200.jpg",
+      "review_status": "visually_verified",
+      "expected_card_id": "en:base1-58",
+      "visible_label": "Pikachu 58/102, shadowed, no first-edition stamp",
+      "language": "en",
+      "layout": "standard_frame",
+      "conditions": [
+        "background"
+      ],
+      "sha256": "167ff81ae67be70f29e248bb3c2f88251b3504ca54e8036d2f6eaa21c74daec3",
+      "truth_in_frozen_artwork_index": true
+    },
+    {
+      "id": "fresh_013",
+      "page_url": "https://www.ebay.com/itm/353774647514",
+      "image_url": "https://i.ebayimg.com/images/g/8ssAAOSwwnlgS~zP/s-l1200.jpg",
+      "review_status": "visually_verified",
+      "expected_card_id": "en:base1-58",
+      "visible_label": "Pikachu 58/102, shadowed, no first-edition stamp",
+      "language": "en",
+      "layout": "standard_frame",
+      "conditions": [
+        "background"
+      ],
+      "sha256": "c9fb072b5843cfa4203ad131b5db6103807c855aa092026f8a4322e15f50ac66",
+      "truth_in_frozen_artwork_index": true
+    },
+    {
+      "id": "fresh_018",
+      "page_url": "https://www.ebay.com/itm/167307030719",
+      "image_url": "https://i.ebayimg.com/images/g/RlIAAOSwosBhRqr9/s-l1200.jpg",
+      "review_status": "visually_verified",
+      "expected_card_id": "en:base1-58",
+      "visible_label": "Pikachu 58/102, shadowed, no first-edition stamp",
+      "language": "en",
+      "layout": "standard_frame",
+      "conditions": [
+        "background"
+      ],
+      "sha256": "c0888ccd718745485fd4220d47e6bef60279345436b045705906fca2be660c0a",
+      "truth_in_frozen_artwork_index": true
+    },
+    {
+      "id": "fresh_014",
+      "page_url": "https://www.ebay.com/itm/126984332888",
+      "image_url": "https://i.ebayimg.com/00/s/MTYwMFgxMjAw/z/1vwAAOSwojVnzhQa/%24_57.PNG?set_id=880000500F",
+      "review_status": "visually_verified",
+      "expected_card_id": "en:sv03.5-203",
+      "visible_label": "Erika's Invitation MEW 203/165",
+      "language": "en",
+      "layout": "trainer_full_art",
+      "conditions": [
+        "background",
+        "foil_texture",
+        "holder_or_sleeve"
+      ],
+      "sha256": "99e9f8fab92e5649b1b60cdb684d458b0b8efdb3937c6a547724b6bee69db4e7",
+      "truth_in_frozen_artwork_index": true
+    },
+    {
+      "id": "fresh_015",
+      "page_url": "https://www.ebay.com/itm/176213887291",
+      "image_url": "https://i.ebayimg.com/images/g/zbMAAOSwoeJluEoc/s-l1200.jpg",
+      "review_status": "visually_verified",
+      "expected_card_id": "en:sv03.5-203",
+      "visible_label": "Erika's Invitation MEW 203/165",
+      "language": "en",
+      "layout": "trainer_full_art",
+      "conditions": [
+        "background",
+        "foil_texture",
+        "holder_or_sleeve",
+        "stand"
+      ],
+      "sha256": "e84aefc2f18a0dfe07fb8eccc231c4fd6aeeb64aff820a1622d7eb7520dfbfa1",
+      "truth_in_frozen_artwork_index": true
+    },
+    {
+      "id": "fresh_017",
+      "page_url": "https://www.ebay.com/itm/155997959387",
+      "image_url": "https://i.ebayimg.com/images/g/SzMAAOSwP9dlnEzQ/s-l1200.jpg",
+      "review_status": "visually_verified",
+      "expected_card_id": "en:sv03.5-203",
+      "visible_label": "Erika's Invitation MEW 203/165",
+      "language": "en",
+      "layout": "trainer_full_art",
+      "conditions": [
+        "background",
+        "foil_texture"
+      ],
+      "sha256": "4ac354bdf6fdf0d36ccb0ae7b60f113aac88bb6d9ff7a960c6f09e3b535ed635",
+      "truth_in_frozen_artwork_index": true
+    },
+    {
+      "id": "fresh_019",
+      "page_url": "https://www.ebay.ca/itm/305331784037",
+      "image_url": "https://i.ebayimg.com/images/g/HksAAOSwyBJljiXp/s-l1200.jpg",
+      "review_status": "visually_verified",
+      "expected_card_id": "en:sv03.5-203",
+      "visible_label": "Erika's Invitation MEW 203/165",
+      "language": "en",
+      "layout": "trainer_full_art",
+      "conditions": [
+        "background",
+        "foil_texture",
+        "holder_or_sleeve",
+        "stand"
+      ],
+      "sha256": "1305f414358d1555a9fe60300c945f3bb6599b8a42dd51a861ec87bc4fafc59e",
+      "truth_in_frozen_artwork_index": true
+    },
+    {
+      "id": "fresh_066",
+      "page_url": "https://www.ebay.co.uk/itm/186161803680",
+      "image_url": "https://i.ebayimg.com/00/s/MTYwMFgxMjAw/z/7fYAAOSw11tlUM7a/%24_57.JPG?set_id=880000500F",
+      "review_status": "visually_verified",
+      "expected_card_id": "en:sv03.5-203",
+      "visible_label": "Erika's Invitation MEW 203/165",
+      "language": "en",
+      "layout": "trainer_full_art",
+      "conditions": [
+        "background",
+        "foil_texture",
+        "glare_or_strong_reflection"
+      ],
+      "sha256": "3562735ab66b8484d8fc28c93c0b3451cd3fef97f706b6b35f093e55cebd8db7",
+      "truth_in_frozen_artwork_index": true
+    },
+    {
+      "id": "fresh_067",
+      "page_url": "https://www.ebay.com/itm/127282635883",
+      "image_url": "https://i.ebayimg.com/images/g/CjYAAeSwpSFnw-K4/s-l500.jpg",
+      "review_status": "visually_verified",
+      "expected_card_id": "en:sv03.5-203",
+      "visible_label": "Erika's Invitation MEW 203/165",
+      "language": "en",
+      "layout": "trainer_full_art",
+      "conditions": [
+        "background",
+        "foil_texture",
+        "holder_or_sleeve",
+        "glare_or_strong_reflection"
+      ],
+      "sha256": "89aa8d37c7f17e59e9b499374616a8dc3ba27eb5aa8fa366fe7a6988821e76ba",
+      "truth_in_frozen_artwork_index": true
+    },
+    {
+      "id": "fresh_068",
+      "page_url": "https://www.ebay.com/itm/267174043958",
+      "image_url": "https://i.ebayimg.com/images/g/ftYAAeSw2itnwhmC/s-l1600.jpg",
+      "review_status": "visually_verified",
+      "expected_card_id": "en:sv03.5-203",
+      "visible_label": "Erika's Invitation MEW 203/165",
+      "language": "en",
+      "layout": "trainer_full_art",
+      "conditions": [
+        "background",
+        "foil_texture",
+        "holder_or_sleeve"
+      ],
+      "sha256": "31d83d64539aaf4abe4a165ea5131e4d1c569d1088a5e734a1cee1a892c339a7",
+      "truth_in_frozen_artwork_index": true
+    },
+    {
+      "id": "fresh_069",
+      "page_url": "https://www.ebay.com/itm/166350759051",
+      "image_url": "https://i.ebayimg.com/images/g/yJMAAOSwsDllE5k-/s-l1200.jpg",
+      "review_status": "visually_verified",
+      "expected_card_id": "en:sv03.5-203",
+      "visible_label": "Erika's Invitation MEW 203/165",
+      "language": "en",
+      "layout": "trainer_full_art",
+      "conditions": [
+        "background",
+        "foil_texture",
+        "holder_or_sleeve",
+        "glare_or_strong_reflection"
+      ],
+      "sha256": "a6a316b68e1a7919e8c6c8ef468da573976450e4a24ed4e9f4caec4b546e5ddf",
+      "truth_in_frozen_artwork_index": true
+    },
+    {
+      "id": "fresh_020",
+      "page_url": "https://www.ebay.ca/b/Mewtwo-VSTAR-GG44-GG70-Crown-Zenith-Galarian-Gallery/2536/bn_7124868771",
+      "image_url": "https://i.ebayimg.com/images/g/8iEAAeSwFENpuSUA/s-l1200.webp",
+      "review_status": "visually_verified",
+      "expected_card_id": "en:swsh12.5gg-GG44",
+      "visible_label": "Mewtwo VSTAR GG44/GG70",
+      "language": "en",
+      "layout": "pokemon_full_art",
+      "conditions": [
+        "background",
+        "foil_texture"
+      ],
+      "sha256": "133438989be7b1d9c6458f8bc30ac6141a5e97ec878873289e5951be6c77a4f0",
+      "truth_in_frozen_artwork_index": false
+    },
+    {
+      "id": "fresh_021",
+      "page_url": "https://www.ebay.com/itm/306685017241",
+      "image_url": "https://i.ebayimg.com/images/g/Q4IAAeSwy6lpVFDN/s-l1200.jpg",
+      "review_status": "visually_verified",
+      "expected_card_id": "en:swsh12.5gg-GG44",
+      "visible_label": "Mewtwo VSTAR GG44/GG70",
+      "language": "en",
+      "layout": "pokemon_full_art",
+      "conditions": [
+        "background",
+        "foil_texture",
+        "perspective_tilt",
+        "glare_or_strong_reflection"
+      ],
+      "sha256": "10a38de079bf9be10d94a7a60e395e8aad67045d715565e2e3b278498b231d85",
+      "truth_in_frozen_artwork_index": false
+    },
+    {
+      "id": "fresh_022",
+      "page_url": "https://www.ebay.com/b/Mewtwo-VSTAR-Pokemon-TCG-Cards/2536/bn_7124854606",
+      "image_url": "https://i.ebayimg.com/images/g/X6QAAeSw0uxpsLS7/s-l1200.webp",
+      "review_status": "visually_verified",
+      "expected_card_id": "en:swsh12.5gg-GG44",
+      "visible_label": "Mewtwo VSTAR GG44/GG70",
+      "language": "en",
+      "layout": "pokemon_full_art",
+      "conditions": [
+        "background",
+        "foil_texture"
+      ],
+      "sha256": "ca3f04c79ace8d8436dbf7f9e1f301ea2e95dfa0ee6f2dc8c258968c6a83c622",
+      "truth_in_frozen_artwork_index": false
+    },
+    {
+      "id": "fresh_024",
+      "page_url": "https://www.ebay.com/b/Mewtwo-VSTAR-GG44-GG70-Crown-Zenith-Galarian-Gallery/2536/bn_7124868771",
+      "image_url": "https://i.ebayimg.com/images/g/eloAAeSwe3dpxYQ1/s-l1200.webp",
+      "review_status": "visually_verified",
+      "expected_card_id": "en:swsh12.5gg-GG44",
+      "visible_label": "Mewtwo VSTAR GG44/GG70",
+      "language": "en",
+      "layout": "pokemon_full_art",
+      "conditions": [
+        "background",
+        "foil_texture"
+      ],
+      "sha256": "a1f2c75a82d4979120970f42d69b2ecf4cd5dcd9a0836d8b743a790a3a0ed8d0",
+      "truth_in_frozen_artwork_index": false
+    },
+    {
+      "id": "fresh_025",
+      "page_url": "https://www.ebay.com/itm/406267924628",
+      "image_url": "https://i.ebayimg.com/images/g/cs0AAeSwxEpo5GR3/s-l1200.jpg",
+      "review_status": "visually_verified",
+      "expected_card_id": "en:swsh12.5gg-GG44",
+      "visible_label": "Mewtwo VSTAR GG44/GG70",
+      "language": "en",
+      "layout": "pokemon_full_art",
+      "conditions": [
+        "background",
+        "foil_texture",
+        "holder_or_sleeve"
+      ],
+      "sha256": "4a4ef7564717e3a0c459fbb7f5de189b4dedec75cd090e6d512067f95f9324cc",
+      "truth_in_frozen_artwork_index": false
+    },
+    {
+      "id": "fresh_026",
+      "page_url": "https://www.sportscardinvestor.com/cards/mewtwo-vstar-pokemon/2023-sword-shield-crown-zenith-galarian-gallery-gg44-gg70",
+      "image_url": "https://i.ebayimg.com/images/g/D5YAAeSwDI5ppmIl/s-l1600.jpg",
+      "review_status": "visually_verified",
+      "expected_card_id": "en:swsh12.5gg-GG44",
+      "visible_label": "Mewtwo VSTAR GG44/GG70",
+      "language": "en",
+      "layout": "pokemon_full_art",
+      "conditions": [
+        "background",
+        "foil_texture"
+      ],
+      "sha256": "17ccc72b337da35099aa7259e27036601f5217b7df535f325986580017365ac1",
+      "truth_in_frozen_artwork_index": false
+    },
+    {
+      "id": "fresh_027",
+      "page_url": "https://www.ebay.com/b/Mewtwo-VSTAR-GG44-GG70-Crown-Zenith-Galarian-Gallery/2536/bn_7124868771",
+      "image_url": "https://i.ebayimg.com/images/g/Cf8AAeSwTh5pxDZz/s-l1200.webp",
+      "review_status": "visually_verified",
+      "expected_card_id": "en:swsh12.5gg-GG44",
+      "visible_label": "Mewtwo VSTAR GG44/GG70",
+      "language": "en",
+      "layout": "pokemon_full_art",
+      "conditions": [
+        "background",
+        "foil_texture",
+        "holder_or_sleeve"
+      ],
+      "sha256": "29060af06b46d6107038a7d33e679ea5761c931ae1d59a1e236bdfe821d03ba1",
+      "truth_in_frozen_artwork_index": false
+    },
+    {
+      "id": "fresh_028",
+      "page_url": "https://www.ebay.co.uk/itm/126924542731",
+      "image_url": "https://i.ebayimg.com/00/s/MTYwMFgxMjAw/z/7wQAAeSwltloyYUh/%24_57.JPG?set_id=880000500F",
+      "review_status": "visually_verified",
+      "expected_card_id": "en:swsh12.5gg-GG44",
+      "visible_label": "Mewtwo VSTAR GG44/GG70",
+      "language": "en",
+      "layout": "pokemon_full_art",
+      "conditions": [
+        "background",
+        "foil_texture"
+      ],
+      "sha256": "dda1913ec954db803d5ce7fab4bcdc1699e217ddbdd4595c01477edd41f3f0b9",
+      "truth_in_frozen_artwork_index": false
+    },
+    {
+      "id": "fresh_031",
+      "page_url": "https://www.ebay.com/itm/256150299844",
+      "image_url": "https://i.ebayimg.com/images/g/o8sAAOSwA11kuwe5/s-l1200.jpg",
+      "review_status": "visually_verified",
+      "expected_card_id": "ja:SV2a-205",
+      "visible_label": "ミュウex sv2a 205/165",
+      "language": "ja",
+      "layout": "pokemon_full_art",
+      "conditions": [
+        "background",
+        "foil_texture",
+        "holder_or_sleeve"
+      ],
+      "sha256": "70fb11e4cb86e4f2febc700c5854baf556eac25e8347e2cdb3d894f47fa2763a",
+      "truth_in_frozen_artwork_index": true
+    },
+    {
+      "id": "fresh_032",
+      "page_url": "https://www.ebay.com/itm/356852644743",
+      "image_url": "https://i.ebayimg.com/images/g/BxAAAeSwkBdo7GiV/s-l1200.jpg",
+      "review_status": "visually_verified",
+      "expected_card_id": "ja:SV2a-205",
+      "visible_label": "ミュウex sv2a 205/165",
+      "language": "ja",
+      "layout": "pokemon_full_art",
+      "conditions": [
+        "background",
+        "foil_texture"
+      ],
+      "sha256": "b07504f2f75a1757fc00f566736470f777a41c93093dd79cb682cb2bf4ce7902",
+      "truth_in_frozen_artwork_index": true
+    },
+    {
+      "id": "fresh_033",
+      "page_url": "https://www.sportscardinvestor.com/cards/mew-ex-pokemon/2023-japanese-scarlet-violet-151-special-art-rare-205-165",
+      "image_url": "https://i.ebayimg.com/images/g/Qy4AAeSwmdloXc5W/s-l1600.jpg",
+      "review_status": "visually_verified",
+      "expected_card_id": "ja:SV2a-205",
+      "visible_label": "ミュウex sv2a 205/165",
+      "language": "ja",
+      "layout": "pokemon_full_art",
+      "conditions": [
+        "background",
+        "foil_texture",
+        "holder_or_sleeve"
+      ],
+      "sha256": "3316be7ac89e3d6ccae8d4894032f0d69eee228ec23bc7313cac43542bd484c7",
+      "truth_in_frozen_artwork_index": true
+    },
+    {
+      "id": "fresh_034",
+      "page_url": "https://www.ebay.com/itm/387064850111",
+      "image_url": "https://i.ebayimg.com/00/s/MTA4MFgxMDgw/z/OPYAAOSwJxJnWkSD/%24_57.JPG?set_id=880000500F",
+      "review_status": "visually_verified",
+      "expected_card_id": "ja:SV2a-205",
+      "visible_label": "ミュウex sv2a 205/165",
+      "language": "ja",
+      "layout": "pokemon_full_art",
+      "conditions": [
+        "background",
+        "foil_texture",
+        "glare_or_strong_reflection"
+      ],
+      "sha256": "817cd520eaaffea58885d7aa047dbef5d6c7f15c076c7774ac790a44b203af8e",
+      "truth_in_frozen_artwork_index": true
+    },
+    {
+      "id": "fresh_035",
+      "page_url": "https://www.ebay.com/itm/225807713830",
+      "image_url": "https://i.ebayimg.com/images/g/ICAAAeSw6aZoY5K6/s-l1200.jpg",
+      "review_status": "visually_verified",
+      "expected_card_id": "ja:SV2a-205",
+      "visible_label": "ミュウex sv2a 205/165",
+      "language": "ja",
+      "layout": "pokemon_full_art",
+      "conditions": [
+        "background",
+        "foil_texture",
+        "holder_or_sleeve",
+        "stand"
+      ],
+      "sha256": "ff21eeb96e984dfab7f200162ebeb22092d5a3e90fbbecfd013ea62ab8028bb8",
+      "truth_in_frozen_artwork_index": true
+    },
+    {
+      "id": "fresh_036",
+      "page_url": "https://www.ebay.pl/itm/325695571977",
+      "image_url": "https://i.ebayimg.com/images/g/i~kAAOSwpW5ki4y2/s-l1200.jpg",
+      "review_status": "visually_verified",
+      "expected_card_id": "ja:SV2a-205",
+      "visible_label": "ミュウex sv2a 205/165",
+      "language": "ja",
+      "layout": "pokemon_full_art",
+      "conditions": [
+        "background",
+        "foil_texture",
+        "holder_or_sleeve"
+      ],
+      "sha256": "c99b1549e65522d232d10f4bbd9fb84acd311dc9847a19f988723aef4598b3ef",
+      "truth_in_frozen_artwork_index": true
+    },
+    {
+      "id": "fresh_040",
+      "page_url": "https://www.ebay.com/itm/386916944711",
+      "image_url": "https://i.ebayimg.com/00/s/MTYwMFgxMjAw/z/JgsAAOSwBtBleFUw/%24_57.PNG?set_id=880000500F",
+      "review_status": "visually_verified",
+      "expected_card_id": "ja:SV1a-080",
+      "visible_label": "コイキング sv1a 080/073",
+      "language": "ja",
+      "layout": "pokemon_full_art",
+      "conditions": [
+        "background",
+        "foil_texture",
+        "perspective_tilt",
+        "glare_or_strong_reflection"
+      ],
+      "sha256": "9eef65e53179308c0fbdd0f29315455b6b84c69eaa09191c4af9b528e5d752b4",
+      "truth_in_frozen_artwork_index": false
+    },
+    {
+      "id": "fresh_041",
+      "page_url": "https://www.ebay.com/itm/297614154440",
+      "image_url": "https://i.ebayimg.com/00/s/MTYwMFgxMjAw/z/tjgAAeSwoWZoyOHU/%24_57.JPG?set_id=880000500F",
+      "review_status": "visually_verified",
+      "expected_card_id": "en:sv03.5-201",
+      "visible_label": "Alakazam ex MEW 201/165",
+      "language": "en",
+      "layout": "pokemon_full_art",
+      "conditions": [
+        "background",
+        "foil_texture"
+      ],
+      "sha256": "eebade168a0960c2d50697ee08d475231bbb9252466fac4b11ebf39a050aae9e",
+      "truth_in_frozen_artwork_index": true
+    },
+    {
+      "id": "fresh_042",
+      "page_url": "https://www.ebay.com/b/Alakazam-Ex-201-165-Sv-Scarlet-Violet-151/2536/bn_7124868359",
+      "image_url": "https://i.ebayimg.com/images/g/ZY0AAeSw7EFpSXuC/s-l1200.webp",
+      "review_status": "visually_verified",
+      "expected_card_id": "en:sv03.5-201",
+      "visible_label": "Alakazam ex MEW 201/165",
+      "language": "en",
+      "layout": "pokemon_full_art",
+      "conditions": [
+        "background",
+        "foil_texture"
+      ],
+      "sha256": "8511bc559f697cebf168ea7c93c1dcd3e15a7f6a1fac249239e9115a1493ed35",
+      "truth_in_frozen_artwork_index": true
+    },
+    {
+      "id": "fresh_045",
+      "page_url": "https://www.ebay.com/itm/157405284782",
+      "image_url": "https://i.ebayimg.com/images/g/JiwAAeSwI29o9ngM/s-l1600.jpg",
+      "review_status": "visually_verified",
+      "expected_card_id": "en:sv03.5-201",
+      "visible_label": "Alakazam ex MEW 201/165",
+      "language": "en",
+      "layout": "pokemon_full_art",
+      "conditions": [
+        "background",
+        "foil_texture",
+        "glare_or_strong_reflection"
+      ],
+      "sha256": "b1eda713f076a9a809b8aac31ce5af2effb9dbc360029e78d5a3357942441d46",
+      "truth_in_frozen_artwork_index": true
+    },
+    {
+      "id": "fresh_046",
+      "page_url": "https://www.ebay.com/itm/135970264301",
+      "image_url": "https://i.ebayimg.com/images/g/Sb8AAeSwp0RoSLBr/s-l500.jpg",
+      "review_status": "visually_verified",
+      "expected_card_id": "en:sv03.5-201",
+      "visible_label": "Alakazam ex MEW 201/165",
+      "language": "en",
+      "layout": "pokemon_full_art",
+      "conditions": [
+        "background",
+        "foil_texture",
+        "holder_or_sleeve",
+        "glare_or_strong_reflection",
+        "hand"
+      ],
+      "sha256": "23203445983ddbe5f6e68ffdb5add4eb90bdcb77f78a3f62768beab7d5b704c4",
+      "truth_in_frozen_artwork_index": true
+    },
+    {
+      "id": "fresh_048",
+      "page_url": "https://www.sportscardinvestor.com/cards/alakazam-ex-pokemon/2023-scarlet-violet-151-special-illustration-rare-201-165",
+      "image_url": "https://i.ebayimg.com/images/g/TmUAAeSwdUVprz50/s-l1600.jpg",
+      "review_status": "visually_verified",
+      "expected_card_id": "en:sv03.5-201",
+      "visible_label": "Alakazam ex MEW 201/165",
+      "language": "en",
+      "layout": "pokemon_full_art",
+      "conditions": [
+        "background",
+        "foil_texture",
+        "hand"
+      ],
+      "sha256": "f412ee4ab1060431eca8e4a1e79b7e7a3672973d5c79884e68f9345e0c489083",
+      "truth_in_frozen_artwork_index": true
+    },
+    {
+      "id": "fresh_049",
+      "page_url": "https://www.ebay.com/b/Alakazam-Ex-201-165-Sv-Scarlet-Violet-151/2536/bn_7124868359",
+      "image_url": "https://i.ebayimg.com/images/g/wf8AAeSwW3RprKc-/s-l1200.webp",
+      "review_status": "visually_verified",
+      "expected_card_id": "en:sv03.5-201",
+      "visible_label": "Alakazam ex MEW 201/165",
+      "language": "en",
+      "layout": "pokemon_full_art",
+      "conditions": [
+        "background",
+        "foil_texture"
+      ],
+      "sha256": "5ba2e78bafbc94764a3645229e479863f3ef8e901184a15b89059da61c36eb8b",
+      "truth_in_frozen_artwork_index": true
+    },
+    {
+      "id": "fresh_051",
+      "page_url": "https://www.ebay.com/itm/188192062361",
+      "image_url": "https://i.ebayimg.com/images/g/YjwAAeSwGMNpvuIR/s-l1600.jpg",
+      "review_status": "visually_verified",
+      "expected_card_id": "en:sv03.5-202",
+      "visible_label": "Zapdos ex MEW 202/165",
+      "language": "en",
+      "layout": "pokemon_full_art",
+      "conditions": [
+        "background",
+        "foil_texture",
+        "holder_or_sleeve",
+        "stand",
+        "glare_or_strong_reflection"
+      ],
+      "sha256": "af028d47cacf5d7e0af36d69386bafa2d5503091b74c16233becd8e09e584f96",
+      "truth_in_frozen_artwork_index": true
+    },
+    {
+      "id": "fresh_052",
+      "page_url": "https://www.sportscardinvestor.com/cards/gardevoir-ex-pokemon/2023-scarlet-violet-special-illustration-rare-245-198",
+      "image_url": "https://i.ebayimg.com/images/g/TeYAAeSwJRlpZDyn/s-l1600.jpg",
+      "review_status": "visually_verified",
+      "expected_card_id": "en:sv01-245",
+      "visible_label": "Gardevoir ex SVI 245/198",
+      "language": "en",
+      "layout": "pokemon_full_art",
+      "conditions": [
+        "background",
+        "foil_texture",
+        "glare_or_strong_reflection"
+      ],
+      "sha256": "6691dc4a8a01be371756bfd0ad802a6e771d1c18996b16cd437d39bc25e8737c",
+      "truth_in_frozen_artwork_index": true
+    },
+    {
+      "id": "fresh_053",
+      "page_url": "https://www.ebay.com/itm/266198180095",
+      "image_url": "https://i.ebayimg.com/images/g/hKYAAOSwbRVkKDZS/s-l1200.jpg",
+      "review_status": "visually_verified",
+      "expected_card_id": "en:sv01-245",
+      "visible_label": "Gardevoir ex SVI 245/198",
+      "language": "en",
+      "layout": "pokemon_full_art",
+      "conditions": [
+        "background",
+        "foil_texture",
+        "holder_or_sleeve",
+        "perspective_tilt"
+      ],
+      "sha256": "1d914e6fa376a5db84b5fe17bc3a25778581e266c7df46492cdfac8da0c5c4e8",
+      "truth_in_frozen_artwork_index": true
+    },
+    {
+      "id": "fresh_058",
+      "page_url": "https://www.ebay.com/itm/297556051476",
+      "image_url": "https://i.ebayimg.com/images/g/~tcAAeSw9jdoptqt/s-l1200.jpg",
+      "review_status": "visually_verified",
+      "expected_card_id": "en:sv01-245",
+      "visible_label": "Gardevoir ex SVI 245/198",
+      "language": "en",
+      "layout": "pokemon_full_art",
+      "conditions": [
+        "background",
+        "foil_texture",
+        "perspective_tilt",
+        "glare_or_strong_reflection",
+        "hand",
+        "slab"
+      ],
+      "sha256": "74c39b842011da02038fd2b542c84b84c055550384fb07c9f0c5b8ca11dc8dad",
+      "truth_in_frozen_artwork_index": true
+    },
+    {
+      "id": "fresh_060",
+      "page_url": "https://www.ebay.com/itm/187416051452",
+      "image_url": "https://i.ebayimg.com/images/g/g0IAAeSwdAtoduU5/s-l1200.jpg",
+      "review_status": "visually_verified",
+      "expected_card_id": "en:sv01-245",
+      "visible_label": "Gardevoir ex SVI 245/198",
+      "language": "en",
+      "layout": "pokemon_full_art",
+      "conditions": [
+        "background",
+        "foil_texture",
+        "holder_or_sleeve",
+        "stand"
+      ],
+      "sha256": "93954fb1107b3bce51edef7774024ee5858d415458990196389aa4208bbe1861",
+      "truth_in_frozen_artwork_index": true
+    },
+    {
+      "id": "fresh_070",
+      "page_url": "https://www.ebay.de/itm/395753468767",
+      "image_url": "https://i.ebayimg.com/images/g/8CsAAOSwLoZlrvRE/s-l1200.jpg",
+      "review_status": "visually_verified",
+      "expected_card_id": "ja:SV1S-101",
+      "visible_label": "サーナイトex sv1S 101/078",
+      "language": "ja",
+      "layout": "pokemon_full_art",
+      "conditions": [
+        "background",
+        "foil_texture"
+      ],
+      "sha256": "cb1aed21dd5ffbd614d2efc81119cd6761dfddc78235ab3548613f221a0eed16",
+      "truth_in_frozen_artwork_index": false
+    },
+    {
+      "id": "fresh_071",
+      "page_url": "https://www.ebay.com/itm/356650792633",
+      "image_url": "https://i.ebayimg.com/images/g/7wUAAOSwtzdnyZ9N/s-l1200.png",
+      "review_status": "visually_verified",
+      "expected_card_id": "ja:SV1S-101",
+      "visible_label": "サーナイトex sv1S 101/078",
+      "language": "ja",
+      "layout": "pokemon_full_art",
+      "conditions": [
+        "background",
+        "foil_texture"
+      ],
+      "sha256": "1aeb2c04747b5285b20e7ba3c8f60f12b13020d8dab1c62384b97dc23b02b099",
+      "truth_in_frozen_artwork_index": false
+    },
+    {
+      "id": "fresh_073",
+      "page_url": "https://www.sportscardinvestor.com/cards/gardevoir-ex-pokemon/2023-japanese-scarlet-violet-scarlet-ex-special-art-rare-101-078",
+      "image_url": "https://i.ebayimg.com/images/g/kDgAAeSw~85pem1m/s-l1600.jpg",
+      "review_status": "visually_verified",
+      "expected_card_id": "ja:SV1S-101",
+      "visible_label": "サーナイトex sv1S 101/078",
+      "language": "ja",
+      "layout": "pokemon_full_art",
+      "conditions": [
+        "background",
+        "foil_texture",
+        "stand"
+      ],
+      "sha256": "4e81f835169c22be967b7309568b07a3199e889c93b45efc14a1459955d121e6",
+      "truth_in_frozen_artwork_index": false
+    },
+    {
+      "id": "fresh_074",
+      "page_url": "https://www.ebay.com/itm/396984686776",
+      "image_url": "https://i.ebayimg.com/images/g/050AAeSwlmZohw1i/s-l500.jpg",
+      "review_status": "visually_verified",
+      "expected_card_id": "ja:SV1S-101",
+      "visible_label": "サーナイトex sv1S 101/078",
+      "language": "ja",
+      "layout": "pokemon_full_art",
+      "conditions": [
+        "background",
+        "foil_texture",
+        "glare_or_strong_reflection"
+      ],
+      "sha256": "eabdba298eca93b2b1de3cf552f1b5f2ef809f331f61817aa4fcbb3961c9794a",
+      "truth_in_frozen_artwork_index": false
+    }
+  ]
+}

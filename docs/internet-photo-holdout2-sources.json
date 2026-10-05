@@ -1,0 +1,1109 @@
+{
+  "purpose": "Second fresh 50-photo Internet camera-image holdout, labels frozen before inference.",
+  "frozen_at_utc": "2026-10-02T08:54:12.335369+00:00",
+  "selection": "Manual visible title/collector/language review of all 98 candidate photos on 17 contact sheets. Eighteen printing identities; selection made without scanner predictions. Search hints corrected for Machamp and Eevee/Iono printings.",
+  "limitations": "Convenience sample, not random population sampling. Repeated identities and marketplace sources. Camera photos of physical cards, not Flutter/live API tests. Authenticity, finish, physical-copy independence and model-pretraining overlap unverified. Images never indexed or used to tune this run.",
+  "identity_counts": {
+    "en:swsh7-205": 4,
+    "en:swsh7-209": 4,
+    "en:swsh6-177": 3,
+    "en:swsh10-172": 3,
+    "en:swsh10-072": 1,
+    "en:swsh12.5gg-GG68": 4,
+    "ja:SV3-134": 4,
+    "ja:SV8a-126": 1,
+    "ja:SV8a-223": 1,
+    "ja:SV8a-224": 1,
+    "ja:SV2D-096": 3,
+    "ja:SV2D-091": 1,
+    "ja:S8a-001": 3,
+    "en:swsh12.5gg-GG60": 3,
+    "en:base5-4": 3,
+    "en:base4-87": 3,
+    "en:sv01-036": 4,
+    "en:swsh7-218": 4
+  },
+  "conditions": {
+    "background": 50,
+    "foil_texture": 35,
+    "holder_or_sleeve": 27,
+    "stand": 13,
+    "glare_or_strong_reflection": 30,
+    "perspective_tilt": 11,
+    "slab": 3
+  },
+  "deduplication": {
+    "old_download_sha_count": 181,
+    "exact_byte_overlap": 0,
+    "old_printing_identity_overlap": [
+      "en:swsh6-177"
+    ],
+    "near_duplicate_flags_for_manual_review": [],
+    "method": "SHA256/URL overlap, 256-bit whole-image difference hash plus manual review; not exhaustive crop reuse detection."
+  },
+  "exclusions": [
+    {
+      "id": "holdout2_002",
+      "reason": "eligible_photo_not_selected_before_inference_for_fixed_diverse_50"
+    },
+    {
+      "id": "holdout2_006",
+      "reason": "eligible_photo_not_selected_before_inference_for_fixed_diverse_50"
+    },
+    {
+      "id": "holdout2_007",
+      "reason": "eligible_photo_not_selected_before_inference_for_fixed_diverse_50"
+    },
+    {
+      "id": "holdout2_012",
+      "reason": "eligible_photo_not_selected_before_inference_for_fixed_diverse_50"
+    },
+    {
+      "id": "holdout2_014",
+      "reason": "eligible_photo_not_selected_before_inference_for_fixed_diverse_50"
+    },
+    {
+      "id": "holdout2_017",
+      "reason": "eligible_photo_not_selected_before_inference_for_fixed_diverse_50"
+    },
+    {
+      "id": "holdout2_018",
+      "reason": "eligible_photo_not_selected_before_inference_for_fixed_diverse_50"
+    },
+    {
+      "id": "holdout2_019",
+      "reason": "eligible_photo_not_selected_before_inference_for_fixed_diverse_50"
+    },
+    {
+      "id": "holdout2_025",
+      "reason": "eligible_photo_not_selected_before_inference_for_fixed_diverse_50"
+    },
+    {
+      "id": "holdout2_027",
+      "reason": "eligible_photo_not_selected_before_inference_for_fixed_diverse_50"
+    },
+    {
+      "id": "holdout2_028",
+      "reason": "eligible_photo_not_selected_before_inference_for_fixed_diverse_50"
+    },
+    {
+      "id": "holdout2_031",
+      "reason": "eligible_photo_not_selected_before_inference_for_fixed_diverse_50"
+    },
+    {
+      "id": "holdout2_033",
+      "reason": "digital_reference_or_product_render"
+    },
+    {
+      "id": "holdout2_037",
+      "reason": "eligible_photo_not_selected_before_inference_for_fixed_diverse_50"
+    },
+    {
+      "id": "holdout2_038",
+      "reason": "eligible_photo_not_selected_before_inference_for_fixed_diverse_50"
+    },
+    {
+      "id": "holdout2_039",
+      "reason": "eligible_photo_not_selected_before_inference_for_fixed_diverse_50"
+    },
+    {
+      "id": "holdout2_040",
+      "reason": "eligible_photo_not_selected_before_inference_for_fixed_diverse_50"
+    },
+    {
+      "id": "holdout2_041",
+      "reason": "eligible_photo_not_selected_before_inference_for_fixed_diverse_50"
+    },
+    {
+      "id": "holdout2_042",
+      "reason": "eligible_photo_not_selected_before_inference_for_fixed_diverse_50"
+    },
+    {
+      "id": "holdout2_044",
+      "reason": "eligible_photo_not_selected_before_inference_for_fixed_diverse_50"
+    },
+    {
+      "id": "holdout2_047",
+      "reason": "eligible_photo_not_selected_before_inference_for_fixed_diverse_50"
+    },
+    {
+      "id": "holdout2_050",
+      "reason": "digital_reference_or_product_render"
+    },
+    {
+      "id": "holdout2_053",
+      "reason": "digital_reference_or_product_render"
+    },
+    {
+      "id": "holdout2_055",
+      "reason": "eligible_photo_not_selected_before_inference_for_fixed_diverse_50"
+    },
+    {
+      "id": "holdout2_059",
+      "reason": "eligible_photo_not_selected_before_inference_for_fixed_diverse_50"
+    },
+    {
+      "id": "holdout2_061",
+      "reason": "eligible_photo_not_selected_before_inference_for_fixed_diverse_50"
+    },
+    {
+      "id": "holdout2_064",
+      "reason": "eligible_photo_not_selected_before_inference_for_fixed_diverse_50"
+    },
+    {
+      "id": "holdout2_065",
+      "reason": "eligible_photo_not_selected_before_inference_for_fixed_diverse_50"
+    },
+    {
+      "id": "holdout2_066",
+      "reason": "eligible_photo_not_selected_before_inference_for_fixed_diverse_50"
+    },
+    {
+      "id": "holdout2_067",
+      "reason": "eligible_photo_not_selected_before_inference_for_fixed_diverse_50"
+    },
+    {
+      "id": "holdout2_068",
+      "reason": "eligible_photo_not_selected_before_inference_for_fixed_diverse_50"
+    },
+    {
+      "id": "holdout2_070",
+      "reason": "eligible_photo_not_selected_before_inference_for_fixed_diverse_50"
+    },
+    {
+      "id": "holdout2_072",
+      "reason": "eligible_photo_not_selected_before_inference_for_fixed_diverse_50"
+    },
+    {
+      "id": "holdout2_073",
+      "reason": "eligible_photo_not_selected_before_inference_for_fixed_diverse_50"
+    },
+    {
+      "id": "holdout2_074",
+      "reason": "eligible_photo_not_selected_before_inference_for_fixed_diverse_50"
+    },
+    {
+      "id": "holdout2_076",
+      "reason": "eligible_photo_not_selected_before_inference_for_fixed_diverse_50"
+    },
+    {
+      "id": "holdout2_077",
+      "reason": "eligible_photo_not_selected_before_inference_for_fixed_diverse_50"
+    },
+    {
+      "id": "holdout2_078",
+      "reason": "eligible_photo_not_selected_before_inference_for_fixed_diverse_50"
+    },
+    {
+      "id": "holdout2_080",
+      "reason": "eligible_photo_not_selected_before_inference_for_fixed_diverse_50"
+    },
+    {
+      "id": "holdout2_081",
+      "reason": "eligible_photo_not_selected_before_inference_for_fixed_diverse_50"
+    },
+    {
+      "id": "holdout2_083",
+      "reason": "eligible_photo_not_selected_before_inference_for_fixed_diverse_50"
+    },
+    {
+      "id": "holdout2_084",
+      "reason": "eligible_photo_not_selected_before_inference_for_fixed_diverse_50"
+    },
+    {
+      "id": "holdout2_087",
+      "reason": "digital_reference_or_product_render"
+    },
+    {
+      "id": "holdout2_088",
+      "reason": "digital_reference_or_product_render"
+    },
+    {
+      "id": "holdout2_091",
+      "reason": "eligible_photo_not_selected_before_inference_for_fixed_diverse_50"
+    },
+    {
+      "id": "holdout2_092",
+      "reason": "eligible_photo_not_selected_before_inference_for_fixed_diverse_50"
+    },
+    {
+      "id": "holdout2_094",
+      "reason": "eligible_photo_not_selected_before_inference_for_fixed_diverse_50"
+    },
+    {
+      "id": "holdout2_097",
+      "reason": "eligible_photo_not_selected_before_inference_for_fixed_diverse_50"
+    }
+  ],
+  "photos": [
+    {
+      "id": "holdout2_001",
+      "page_url": "https://www.ebay.com/b/Holo-Pokemon-TCG-Secret-Rare-Individual-Collectible-Card-Game-Cards/183454/bn_56894987",
+      "image_url": "https://i.ebayimg.com/images/g/hqQAAeSww7tovr77/s-l1200.webp",
+      "review_status": "visually_verified",
+      "expected_card_id": "en:swsh7-205",
+      "visible_label": "Leafeon VMAX 205/203",
+      "language": "en",
+      "layout": "pokemon_full_art",
+      "conditions": [
+        "background",
+        "foil_texture",
+        "holder_or_sleeve",
+        "stand",
+        "glare_or_strong_reflection",
+        "perspective_tilt"
+      ],
+      "sha256": "d33f43bd31ce1675713295c8773a88ad0c8dac80bf214385bbcfd11d5ac4b79f",
+      "truth_in_frozen_artwork_index": true
+    },
+    {
+      "id": "holdout2_003",
+      "page_url": "https://www.ebay.co.uk/itm/277005677853",
+      "image_url": "https://i.ebayimg.com/images/g/4aAAAeSwt5Jn7ytj/s-l1200.jpg",
+      "review_status": "visually_verified",
+      "expected_card_id": "en:swsh7-205",
+      "visible_label": "Leafeon VMAX 205/203",
+      "language": "en",
+      "layout": "pokemon_full_art",
+      "conditions": [
+        "background",
+        "foil_texture",
+        "glare_or_strong_reflection"
+      ],
+      "sha256": "7012d43c5ce05445e84348945db3998737982d7b9da2e2a22ea0e300ea4f24a7",
+      "truth_in_frozen_artwork_index": true
+    },
+    {
+      "id": "holdout2_004",
+      "page_url": "https://www.ebay.co.uk/itm/396712071610",
+      "image_url": "https://i.ebayimg.com/images/g/iZgAAeSwIGdoRHxX/s-l1200.jpg",
+      "review_status": "visually_verified",
+      "expected_card_id": "en:swsh7-205",
+      "visible_label": "Leafeon VMAX 205/203",
+      "language": "en",
+      "layout": "pokemon_full_art",
+      "conditions": [
+        "background",
+        "foil_texture",
+        "holder_or_sleeve",
+        "glare_or_strong_reflection",
+        "slab"
+      ],
+      "sha256": "d835fe76f71cba2edcba58c65fd4bfd2d04870c5a5640f1140404d78412dfd62",
+      "truth_in_frozen_artwork_index": true
+    },
+    {
+      "id": "holdout2_005",
+      "page_url": "https://www.ebay.com/itm/276838209498",
+      "image_url": "https://i.ebayimg.com/images/g/UycAAOSwqe1nnSsw/s-l1600.jpg",
+      "review_status": "visually_verified",
+      "expected_card_id": "en:swsh7-205",
+      "visible_label": "Leafeon VMAX 205/203",
+      "language": "en",
+      "layout": "pokemon_full_art",
+      "conditions": [
+        "background",
+        "foil_texture",
+        "holder_or_sleeve"
+      ],
+      "sha256": "1e11fd2be4a35b1d99230126c802a4c47b05acef65cc0c867edc42e839a5bca5",
+      "truth_in_frozen_artwork_index": true
+    },
+    {
+      "id": "holdout2_008",
+      "page_url": "https://www.ebay.com/itm/405489121366",
+      "image_url": "https://i.ebayimg.com/images/g/kZIAAOSwfptkk11y/s-l1200.jpg",
+      "review_status": "visually_verified",
+      "expected_card_id": "en:swsh7-209",
+      "visible_label": "Glaceon VMAX 209/203",
+      "language": "en",
+      "layout": "pokemon_full_art",
+      "conditions": [
+        "background",
+        "foil_texture",
+        "glare_or_strong_reflection"
+      ],
+      "sha256": "b5aa94f43830adfb3321a0af51cc96bac1b3abdccad3c0f9bc59aedfa922e8c4",
+      "truth_in_frozen_artwork_index": true
+    },
+    {
+      "id": "holdout2_009",
+      "page_url": "https://www.ebay.co.uk/itm/135865400223",
+      "image_url": "https://i.ebayimg.com/00/s/MTYwMFgxMjAw/z/AGkAAOSwHbZoNCIP/%24_57.JPG?set_id=880000500F",
+      "review_status": "visually_verified",
+      "expected_card_id": "en:swsh7-209",
+      "visible_label": "Glaceon VMAX 209/203",
+      "language": "en",
+      "layout": "pokemon_full_art",
+      "conditions": [
+        "background",
+        "foil_texture",
+        "holder_or_sleeve"
+      ],
+      "sha256": "c0605cbe8381a476c078cb38abfb83d259db1efba608124a1b614143971496fa",
+      "truth_in_frozen_artwork_index": true
+    },
+    {
+      "id": "holdout2_010",
+      "page_url": "https://www.ebay.com/itm/405489121366",
+      "image_url": "https://i.ebayimg.com/images/g/JLAAAOSwcKRkk112/s-l1200.jpg",
+      "review_status": "visually_verified",
+      "expected_card_id": "en:swsh7-209",
+      "visible_label": "Glaceon VMAX 209/203",
+      "language": "en",
+      "layout": "pokemon_full_art",
+      "conditions": [
+        "background",
+        "foil_texture",
+        "glare_or_strong_reflection",
+        "perspective_tilt"
+      ],
+      "sha256": "def6cf49688e3eaf0dbc392acdc175ef6eaf58ea0d3a3fb0a9f4d1e0ade14834",
+      "truth_in_frozen_artwork_index": true
+    },
+    {
+      "id": "holdout2_011",
+      "page_url": "https://www.ebay.com/b/Glaceon-VMAX-209-203-SWSH07-Evolving-Skies/2536/bn_7124863221",
+      "image_url": "https://i.ebayimg.com/images/g/b2QAAeSwbGRo~viq/s-l1200.webp",
+      "review_status": "visually_verified",
+      "expected_card_id": "en:swsh7-209",
+      "visible_label": "Glaceon VMAX 209/203",
+      "language": "en",
+      "layout": "pokemon_full_art",
+      "conditions": [
+        "background",
+        "foil_texture",
+        "holder_or_sleeve",
+        "stand",
+        "glare_or_strong_reflection"
+      ],
+      "sha256": "8954ad896a7083b33bebf0d1a44bd075e1bffa53c089b7bb185ea6ecc01ed2ad",
+      "truth_in_frozen_artwork_index": true
+    },
+    {
+      "id": "holdout2_013",
+      "page_url": "https://www.ebay.it/itm/185943810549",
+      "image_url": "https://i.ebayimg.com/images/g/0ycAAOSwk8pmPpwx/s-l1200.jpg",
+      "review_status": "visually_verified",
+      "expected_card_id": "en:swsh6-177",
+      "visible_label": "Galarian Moltres V 177/198",
+      "language": "en",
+      "layout": "pokemon_full_art",
+      "conditions": [
+        "background",
+        "foil_texture",
+        "glare_or_strong_reflection",
+        "perspective_tilt"
+      ],
+      "sha256": "c84cdc481b081bcd32b5b9918080edabd0564a533cf7981531b7c12db502c726",
+      "truth_in_frozen_artwork_index": true
+    },
+    {
+      "id": "holdout2_015",
+      "page_url": "https://www.ebay.com/itm/287034734118",
+      "image_url": "https://i.ebayimg.com/images/g/StwAAeSwxWlpTqAv/s-l1200.jpg",
+      "review_status": "visually_verified",
+      "expected_card_id": "en:swsh6-177",
+      "visible_label": "Galarian Moltres V 177/198",
+      "language": "en",
+      "layout": "pokemon_full_art",
+      "conditions": [
+        "background",
+        "foil_texture",
+        "holder_or_sleeve",
+        "stand",
+        "glare_or_strong_reflection"
+      ],
+      "sha256": "71a378b63c83e42673ae38a0efe281b279a07992e4b8606b823fa3d4a8f4215c",
+      "truth_in_frozen_artwork_index": true
+    },
+    {
+      "id": "holdout2_016",
+      "page_url": "https://www.ebay.com/itm/185943810549",
+      "image_url": "https://i.ebayimg.com/images/g/SlkAAOSwiKtmPpwp/s-l1200.jpg",
+      "review_status": "visually_verified",
+      "expected_card_id": "en:swsh6-177",
+      "visible_label": "Galarian Moltres V 177/198",
+      "language": "en",
+      "layout": "pokemon_full_art",
+      "conditions": [
+        "background",
+        "foil_texture",
+        "holder_or_sleeve",
+        "stand",
+        "glare_or_strong_reflection"
+      ],
+      "sha256": "8ffde9a8217389e3f66bcb04a2169de4bd3921fe4438579b1beabb4f7f742402",
+      "truth_in_frozen_artwork_index": true
+    },
+    {
+      "id": "holdout2_020",
+      "page_url": "https://www.ebay.com/b/Machamp-Pokemon-TCG-Fighting-Ultra-Rare-Individual-Collectible-Card-Game-Cards/183454/bn_83131187",
+      "image_url": "https://i.ebayimg.com/images/g/1SQAAeSwUnlpf8Rb/s-l1200.webp",
+      "review_status": "visually_verified",
+      "expected_card_id": "en:swsh10-172",
+      "visible_label": "Machamp V 172/189",
+      "language": "en",
+      "layout": "pokemon_full_art",
+      "conditions": [
+        "background",
+        "foil_texture"
+      ],
+      "sha256": "f8246229aa59231eebea6ee146ea81dbbe1ba96dc19cef6cbfde380b1cf0cfc0",
+      "truth_in_frozen_artwork_index": true
+    },
+    {
+      "id": "holdout2_021",
+      "page_url": "https://www.ebay.com/b/Machamp-Pokemon-TCG-Full-Art-Individual-Trading-Card-Games/183454/bn_7117045849",
+      "image_url": "https://i.ebayimg.com/images/g/srwAAeSwlJNptfE~/s-l1200.webp",
+      "review_status": "visually_verified",
+      "expected_card_id": "en:swsh10-172",
+      "visible_label": "Machamp V 172/189",
+      "language": "en",
+      "layout": "pokemon_full_art",
+      "conditions": [
+        "background",
+        "foil_texture",
+        "holder_or_sleeve",
+        "glare_or_strong_reflection"
+      ],
+      "sha256": "03d462c8e06e7bce8b1f977e435a6d6c79df80203c294f51c5143765898cbb33",
+      "truth_in_frozen_artwork_index": true
+    },
+    {
+      "id": "holdout2_023",
+      "page_url": "https://www.ebay.com/itm/177977550477",
+      "image_url": "https://i.ebayimg.com/images/g/v30AAeSwUMZpvcMw/s-l1200.jpg",
+      "review_status": "visually_verified",
+      "expected_card_id": "en:swsh10-172",
+      "visible_label": "Machamp V 172/189",
+      "language": "en",
+      "layout": "pokemon_full_art",
+      "conditions": [
+        "background",
+        "foil_texture",
+        "holder_or_sleeve"
+      ],
+      "sha256": "145da766c27de6eba244ecde7d85d8f1570665f08fd5e96003c094250f6914df",
+      "truth_in_frozen_artwork_index": true
+    },
+    {
+      "id": "holdout2_022",
+      "page_url": "https://www.ebay.com/itm/166421250310",
+      "image_url": "https://i.ebayimg.com/images/g/LC0AAOSw93JlPSKO/s-l1200.jpg",
+      "review_status": "visually_verified",
+      "expected_card_id": "en:swsh10-072",
+      "visible_label": "Machamp V 072/189",
+      "language": "en",
+      "layout": "standard_frame",
+      "conditions": [
+        "background"
+      ],
+      "sha256": "b72348722083538347787402bedfdb52c52831237aea731c85b52309982f2db5",
+      "truth_in_frozen_artwork_index": false
+    },
+    {
+      "id": "holdout2_024",
+      "page_url": "https://www.ebay.com/itm/267416756545",
+      "image_url": "https://i.ebayimg.com/images/g/QwgAAeSwG4ho1v5v/s-l1200.jpg",
+      "review_status": "visually_verified",
+      "expected_card_id": "en:swsh12.5gg-GG68",
+      "visible_label": "Origin Forme Dialga VSTAR GG68/GG70",
+      "language": "en",
+      "layout": "pokemon_full_art",
+      "conditions": [
+        "background",
+        "foil_texture",
+        "perspective_tilt"
+      ],
+      "sha256": "b0982f1906cc60c1c7a6f39c88f87c7c48c15324f74b3ac2e8d3ba8037f90705",
+      "truth_in_frozen_artwork_index": true
+    },
+    {
+      "id": "holdout2_026",
+      "page_url": "https://www.ebay.com/itm/376750140326",
+      "image_url": "https://i.ebayimg.com/images/g/AGgAAeSwc99pMDBR/s-l1600.jpg",
+      "review_status": "visually_verified",
+      "expected_card_id": "en:swsh12.5gg-GG68",
+      "visible_label": "Origin Forme Dialga VSTAR GG68/GG70",
+      "language": "en",
+      "layout": "pokemon_full_art",
+      "conditions": [
+        "background",
+        "foil_texture",
+        "glare_or_strong_reflection"
+      ],
+      "sha256": "3f67bb090a2650dcd48cb8d619a11d07da183a384a9c9f1378356b837c3a0f80",
+      "truth_in_frozen_artwork_index": true
+    },
+    {
+      "id": "holdout2_029",
+      "page_url": "https://www.ebay.com/itm/166857857673",
+      "image_url": "https://i.ebayimg.com/images/g/1cQAAOSwYUlmisZE/s-l1600.jpg",
+      "review_status": "visually_verified",
+      "expected_card_id": "en:swsh12.5gg-GG68",
+      "visible_label": "Origin Forme Dialga VSTAR GG68/GG70",
+      "language": "en",
+      "layout": "pokemon_full_art",
+      "conditions": [
+        "background",
+        "foil_texture",
+        "holder_or_sleeve",
+        "glare_or_strong_reflection"
+      ],
+      "sha256": "c91f09c1392217364c691d1f2087e8d56072870da0377266eacbbc0b877bac67",
+      "truth_in_frozen_artwork_index": true
+    },
+    {
+      "id": "holdout2_030",
+      "page_url": "https://collectorworth.com/cards/origin-forme-dialga-vstar-pokemon-crown-zenith/",
+      "image_url": "https://i.ebayimg.com/images/g/xIcAAeSw5ehqRCD2/s-l1600.jpg",
+      "review_status": "visually_verified",
+      "expected_card_id": "en:swsh12.5gg-GG68",
+      "visible_label": "Origin Forme Dialga VSTAR GG68/GG70",
+      "language": "en",
+      "layout": "pokemon_full_art",
+      "conditions": [
+        "background",
+        "foil_texture",
+        "holder_or_sleeve",
+        "glare_or_strong_reflection"
+      ],
+      "sha256": "70c51859b4c6ba116ad6ba50cba3e82b41eb8898086b8a956a5bc7f5349ecbb4",
+      "truth_in_frozen_artwork_index": true
+    },
+    {
+      "id": "holdout2_032",
+      "page_url": "https://www.ebay.com.sg/b/Charizard-ex-134-108-Sv3-Ruler-of-the-Black-Flame/2536/bn_7124591709",
+      "image_url": "https://i.ebayimg.com/images/g/g-AAAeSwutNpqnUb/s-l1200.webp",
+      "review_status": "visually_verified",
+      "expected_card_id": "ja:SV3-134",
+      "visible_label": "リザードンex 134/108",
+      "language": "ja",
+      "layout": "pokemon_full_art",
+      "conditions": [
+        "background",
+        "foil_texture"
+      ],
+      "sha256": "37fb46d68740289515453e643c9b786248a3447e2e7551928ce3303992e12fa6",
+      "truth_in_frozen_artwork_index": false
+    },
+    {
+      "id": "holdout2_034",
+      "page_url": "https://www.ebay.com/itm/226990634480",
+      "image_url": "https://i.ebayimg.com/images/g/EjUAAOSwuGdl3-kC/s-l1200.jpg",
+      "review_status": "visually_verified",
+      "expected_card_id": "ja:SV3-134",
+      "visible_label": "リザードンex 134/108",
+      "language": "ja",
+      "layout": "pokemon_full_art",
+      "conditions": [
+        "background",
+        "foil_texture"
+      ],
+      "sha256": "df3b82487cf5e9b904912ee32c6b362922b72022ea4960b7fd84034ea30b1dee",
+      "truth_in_frozen_artwork_index": false
+    },
+    {
+      "id": "holdout2_035",
+      "page_url": "https://www.ebay.com/itm/397020137665",
+      "image_url": "https://i.ebayimg.com/images/g/4pAAAeSwI2FouAHa/s-l1200.jpg",
+      "review_status": "visually_verified",
+      "expected_card_id": "ja:SV3-134",
+      "visible_label": "リザードンex 134/108",
+      "language": "ja",
+      "layout": "pokemon_full_art",
+      "conditions": [
+        "background",
+        "foil_texture",
+        "stand",
+        "glare_or_strong_reflection"
+      ],
+      "sha256": "14c03bafa115a0c55dfd57ca381b89c623be23dce380b8cf8f5f7a174cf0447e",
+      "truth_in_frozen_artwork_index": false
+    },
+    {
+      "id": "holdout2_036",
+      "page_url": "https://www.ebay.it/itm/134669106393",
+      "image_url": "https://i.ebayimg.com/00/s/MTYwMFgxNjAw/z/WgoAAOSwK-ZkwrBb/%24_57.PNG?set_id=880000500F",
+      "review_status": "visually_verified",
+      "expected_card_id": "ja:SV3-134",
+      "visible_label": "リザードンex 134/108",
+      "language": "ja",
+      "layout": "pokemon_full_art",
+      "conditions": [
+        "background",
+        "foil_texture",
+        "glare_or_strong_reflection"
+      ],
+      "sha256": "98bc4619daaa36c9fa8c589c6b1572fd1020b44a0eeb06c32c8780a7e7493f4c",
+      "truth_in_frozen_artwork_index": false
+    },
+    {
+      "id": "holdout2_043",
+      "page_url": "https://www.ebay.com/itm/256749986464",
+      "image_url": "https://i.ebayimg.com/images/g/DiIAAOSwN9pnXOtQ/s-l1200.jpg",
+      "review_status": "visually_verified",
+      "expected_card_id": "ja:SV8a-126",
+      "visible_label": "イーブイex 126/187",
+      "language": "ja",
+      "layout": "standard_frame",
+      "conditions": [
+        "background",
+        "holder_or_sleeve",
+        "glare_or_strong_reflection",
+        "perspective_tilt"
+      ],
+      "sha256": "695fdff6a2a925d3e61b24354f08f65459e4f1291a1a9499123277c0c1f05934",
+      "truth_in_frozen_artwork_index": false
+    },
+    {
+      "id": "holdout2_045",
+      "page_url": "https://www.ebay.ca/itm/405404514971",
+      "image_url": "https://i.ebayimg.com/images/g/egoAAOSwwDhnU-Rh/s-l1200.jpg",
+      "review_status": "visually_verified",
+      "expected_card_id": "ja:SV8a-223",
+      "visible_label": "イーブイex 223/187",
+      "language": "ja",
+      "layout": "pokemon_full_art",
+      "conditions": [
+        "background",
+        "foil_texture",
+        "holder_or_sleeve",
+        "glare_or_strong_reflection"
+      ],
+      "sha256": "2104abc2ef9aaa3d8770cf3be8f6f5f50e56b57e6fc6100079385ace2386ddc3",
+      "truth_in_frozen_artwork_index": false
+    },
+    {
+      "id": "holdout2_046",
+      "page_url": "https://www.ebay.com/itm/305959451466",
+      "image_url": "https://i.ebayimg.com/images/g/KjAAAeSwpXNo8e~u/s-l500.png",
+      "review_status": "visually_verified",
+      "expected_card_id": "ja:SV8a-224",
+      "visible_label": "イーブイex 224/187",
+      "language": "ja",
+      "layout": "pokemon_full_art",
+      "conditions": [
+        "background",
+        "foil_texture",
+        "stand"
+      ],
+      "sha256": "914b14926644d5e41fcbe76241ff9cf4ea40b2b5aa147ff0546f34018641b14d",
+      "truth_in_frozen_artwork_index": false
+    },
+    {
+      "id": "holdout2_048",
+      "page_url": "https://www.ebay.com/itm/166623702284",
+      "image_url": "https://i.ebayimg.com/images/g/cZ4AAOSwpldl4Vcd/s-l1200.jpg",
+      "review_status": "visually_verified",
+      "expected_card_id": "ja:SV2D-096",
+      "visible_label": "ナンジャモ 096/071",
+      "language": "ja",
+      "layout": "trainer_full_art",
+      "conditions": [
+        "background",
+        "foil_texture",
+        "holder_or_sleeve",
+        "glare_or_strong_reflection"
+      ],
+      "sha256": "2086ef915804d7181d6a8946e7d313583620566236185cbdd3300fa9add782be",
+      "truth_in_frozen_artwork_index": false
+    },
+    {
+      "id": "holdout2_049",
+      "page_url": "https://www.ebay.com/itm/277386265562",
+      "image_url": "https://i.ebayimg.com/images/g/iesAAeSwJoJoyglU/s-l1200.jpg",
+      "review_status": "visually_verified",
+      "expected_card_id": "ja:SV2D-096",
+      "visible_label": "ナンジャモ 096/071",
+      "language": "ja",
+      "layout": "trainer_full_art",
+      "conditions": [
+        "background",
+        "foil_texture",
+        "glare_or_strong_reflection"
+      ],
+      "sha256": "aa2e3e7b2d74f90a1050be0f3aaa408def7a143dffe06cd706ccb0c535fd177d",
+      "truth_in_frozen_artwork_index": false
+    },
+    {
+      "id": "holdout2_051",
+      "page_url": "https://www.ebay.com/itm/388114383897",
+      "image_url": "https://i.ebayimg.com/images/g/9~QAAeSwtvtn2su9/s-l1200.jpg",
+      "review_status": "visually_verified",
+      "expected_card_id": "ja:SV2D-096",
+      "visible_label": "ナンジャモ 096/071",
+      "language": "ja",
+      "layout": "trainer_full_art",
+      "conditions": [
+        "background",
+        "foil_texture",
+        "glare_or_strong_reflection"
+      ],
+      "sha256": "1e8764a774c8da036632607969b2c8867e8a29182315e8353e5e3503b07447ec",
+      "truth_in_frozen_artwork_index": false
+    },
+    {
+      "id": "holdout2_052",
+      "page_url": "https://www.ebay.com/itm/335344891683",
+      "image_url": "https://i.ebayimg.com/images/g/vY4AAOSwfbVmz9jD/s-l1200.png",
+      "review_status": "visually_verified",
+      "expected_card_id": "ja:SV2D-091",
+      "visible_label": "ナンジャモ 091/071",
+      "language": "ja",
+      "layout": "trainer_full_art",
+      "conditions": [
+        "background",
+        "foil_texture",
+        "holder_or_sleeve",
+        "glare_or_strong_reflection"
+      ],
+      "sha256": "8426c24da55b3caac8aeb8cfb5cbc4ff9c3d56e31e40d62588b2d6b0b3052084",
+      "truth_in_frozen_artwork_index": false
+    },
+    {
+      "id": "holdout2_054",
+      "page_url": "https://www.ebay.com/b/Pikachu-001-028-S8a-25th-Anniversary-Collection/2536/bn_7124581368",
+      "image_url": "https://i.ebayimg.com/images/g/k00AAeSwGwtpxVIJ/s-l960.webp",
+      "review_status": "visually_verified",
+      "expected_card_id": "ja:S8a-001",
+      "visible_label": "Pikachu 001/028",
+      "language": "ja",
+      "layout": "standard_frame",
+      "conditions": [
+        "background"
+      ],
+      "sha256": "dbbee354ce9b9a3b961c8fac1690ba57ee0ce9ca1bcfe74937d2dbe067d8a671",
+      "truth_in_frozen_artwork_index": true
+    },
+    {
+      "id": "holdout2_056",
+      "page_url": "https://www.ebay.com/itm/405692582993",
+      "image_url": "https://i.ebayimg.com/images/g/or8AAOSw4mRn4lGj/s-l1200.jpg",
+      "review_status": "visually_verified",
+      "expected_card_id": "ja:S8a-001",
+      "visible_label": "Pikachu 001/028",
+      "language": "ja",
+      "layout": "standard_frame",
+      "conditions": [
+        "background",
+        "holder_or_sleeve",
+        "stand",
+        "perspective_tilt"
+      ],
+      "sha256": "55d8f5e8595a7dba2c34541911c571b85f17d1fb0c2017b48293f1ea5f7d7057",
+      "truth_in_frozen_artwork_index": true
+    },
+    {
+      "id": "holdout2_057",
+      "page_url": "https://www.ebay.com/itm/354297297536",
+      "image_url": "https://i.ebayimg.com/images/g/SRAAAOSwHO5jL9D4/s-l1200.jpg",
+      "review_status": "visually_verified",
+      "expected_card_id": "ja:S8a-001",
+      "visible_label": "Pikachu 001/028",
+      "language": "ja",
+      "layout": "standard_frame",
+      "conditions": [
+        "background",
+        "holder_or_sleeve"
+      ],
+      "sha256": "da7bf76c9f535590a638b6733b2e8813fbd774d3884336cae42d6f3e6f658d81",
+      "truth_in_frozen_artwork_index": true
+    },
+    {
+      "id": "holdout2_058",
+      "page_url": "https://www.ebay.com.au/itm/267551532020",
+      "image_url": "https://i.ebayimg.com/images/g/-E8AAeSwOXFpb0Qf/s-l960.jpg",
+      "review_status": "visually_verified",
+      "expected_card_id": "en:swsh12.5gg-GG60",
+      "visible_label": "Cynthia's Ambition GG60/GG70",
+      "language": "en",
+      "layout": "trainer_full_art",
+      "conditions": [
+        "background",
+        "foil_texture",
+        "glare_or_strong_reflection"
+      ],
+      "sha256": "5edde1d21f3faf8a0e73e1655c933291942cb85cf3bab2242d39b9a3055053cc",
+      "truth_in_frozen_artwork_index": true
+    },
+    {
+      "id": "holdout2_060",
+      "page_url": "https://www.ebay.co.uk/itm/186651030582",
+      "image_url": "https://i.ebayimg.com/images/g/~K4AAeSwWXpoBVc-/s-l1200.jpg",
+      "review_status": "visually_verified",
+      "expected_card_id": "en:swsh12.5gg-GG60",
+      "visible_label": "Cynthia's Ambition GG60/GG70",
+      "language": "en",
+      "layout": "trainer_full_art",
+      "conditions": [
+        "background",
+        "foil_texture",
+        "holder_or_sleeve",
+        "stand",
+        "glare_or_strong_reflection"
+      ],
+      "sha256": "89922ad812096f99b43443e3f9a01842e967f752d2ebf6e862816466e7be7796",
+      "truth_in_frozen_artwork_index": true
+    },
+    {
+      "id": "holdout2_062",
+      "page_url": "https://www.ebay.com/p/28058549954",
+      "image_url": "https://i.ebayimg.com/images/g/T64AAeSwk-RpB~vK/s-l1200.jpg",
+      "review_status": "visually_verified",
+      "expected_card_id": "en:swsh12.5gg-GG60",
+      "visible_label": "Cynthia's Ambition GG60/GG70",
+      "language": "en",
+      "layout": "trainer_full_art",
+      "conditions": [
+        "background",
+        "foil_texture",
+        "holder_or_sleeve",
+        "stand",
+        "glare_or_strong_reflection",
+        "slab"
+      ],
+      "sha256": "a7321e16238fa12b932c4c8ba6dd06f62f824ab40968b625a26cc10350684460",
+      "truth_in_frozen_artwork_index": true
+    },
+    {
+      "id": "holdout2_063",
+      "page_url": "https://www.ebay.com/itm/336382567982",
+      "image_url": "https://i.ebayimg.com/images/g/AnoAAeSwSwtpFPzk/s-l1200.jpg",
+      "review_status": "visually_verified",
+      "expected_card_id": "en:base5-4",
+      "visible_label": "Dark Charizard 4/82",
+      "language": "en",
+      "layout": "standard_frame",
+      "conditions": [
+        "background",
+        "holder_or_sleeve"
+      ],
+      "sha256": "2d4d79bd73c90362c5585ac6a1e0f45e35cba6ead409ce6280701ffa0d151a5d",
+      "truth_in_frozen_artwork_index": false
+    },
+    {
+      "id": "holdout2_069",
+      "page_url": "https://www.ebay.com/itm/187673130287",
+      "image_url": "https://i.ebayimg.com/images/g/~B4AAeSwb1xo-Ltm/s-l1200.jpg",
+      "review_status": "visually_verified",
+      "expected_card_id": "en:base5-4",
+      "visible_label": "Dark Charizard 4/82",
+      "language": "en",
+      "layout": "standard_frame",
+      "conditions": [
+        "background",
+        "perspective_tilt"
+      ],
+      "sha256": "46b5214e1eff9f2df2ecad5c48adfd02e4f32787699e699c15fd4d97e64af255",
+      "truth_in_frozen_artwork_index": false
+    },
+    {
+      "id": "holdout2_071",
+      "page_url": "https://www.sportscardinvestor.com/cards/dark-charizard-pokemon/2000-team-rocket-unlimited-holo-04-82",
+      "image_url": "https://i.ebayimg.com/images/g/boMAAOSwIy1fy5c8/s-l1600.jpg",
+      "review_status": "visually_verified",
+      "expected_card_id": "en:base5-4",
+      "visible_label": "Dark Charizard 4/82",
+      "language": "en",
+      "layout": "standard_frame",
+      "conditions": [
+        "background",
+        "glare_or_strong_reflection"
+      ],
+      "sha256": "e6e3d1c07a4e6015467c146f5aed57a216b9ccb377321d54eae5d17d5105e5b5",
+      "truth_in_frozen_artwork_index": false
+    },
+    {
+      "id": "holdout2_075",
+      "page_url": "https://www.ebay.com/itm/175568423288",
+      "image_url": "https://i.ebayimg.com/images/g/-sYAAOSwIt5jvhcr/s-l1600.jpg",
+      "review_status": "visually_verified",
+      "expected_card_id": "en:base4-87",
+      "visible_label": "Pikachu 87/130",
+      "language": "en",
+      "layout": "standard_frame",
+      "conditions": [
+        "background",
+        "holder_or_sleeve"
+      ],
+      "sha256": "126e07d4992474a22cd16c0eb636f66358362a74c7551625375462071e630be8",
+      "truth_in_frozen_artwork_index": true
+    },
+    {
+      "id": "holdout2_079",
+      "page_url": "https://www.ebay.com/itm/386000414452",
+      "image_url": "https://i.ebayimg.com/images/g/wOAAAOSwVOhk4Wsg/s-l1200.jpg",
+      "review_status": "visually_verified",
+      "expected_card_id": "en:base4-87",
+      "visible_label": "Pikachu 87/130",
+      "language": "en",
+      "layout": "standard_frame",
+      "conditions": [
+        "background",
+        "perspective_tilt"
+      ],
+      "sha256": "12203c80e7add4cb8015585064e5b3e68e9be0369501d441795d5073c2bff5ca",
+      "truth_in_frozen_artwork_index": true
+    },
+    {
+      "id": "holdout2_082",
+      "page_url": "https://www.ebay.com/itm/265304755566",
+      "image_url": "https://i.ebayimg.com/00/s/MTYwMFgxMjAw/z/zHIAAOSwgJxhOO7d/%24_57.JPG?set_id=8800005007",
+      "review_status": "visually_verified",
+      "expected_card_id": "en:base4-87",
+      "visible_label": "Pikachu 87/130",
+      "language": "en",
+      "layout": "standard_frame",
+      "conditions": [
+        "background",
+        "holder_or_sleeve",
+        "stand"
+      ],
+      "sha256": "2ecdf49d54843d498dfce171c4dcef5283548a87a0d371c746100ba523592e0b",
+      "truth_in_frozen_artwork_index": true
+    },
+    {
+      "id": "holdout2_085",
+      "page_url": "https://www.ebay.com/itm/305943292231",
+      "image_url": "https://i.ebayimg.com/images/g/2KwAAOSwI4ZnSvBk/s-l1200.jpg",
+      "review_status": "visually_verified",
+      "expected_card_id": "en:sv01-036",
+      "visible_label": "Fuecoco 036/198",
+      "language": "en",
+      "layout": "standard_frame",
+      "conditions": [
+        "background",
+        "holder_or_sleeve",
+        "stand",
+        "perspective_tilt"
+      ],
+      "sha256": "b36ba4f157852d6d6f60de00061ceb12ea940287fbbc7fd121dca822c0ae48cd",
+      "truth_in_frozen_artwork_index": true
+    },
+    {
+      "id": "holdout2_086",
+      "page_url": "https://www.ebay.com/itm/374960714182",
+      "image_url": "https://i.ebayimg.com/images/g/GukAAOSwaOtkTIg~/s-l1200.jpg",
+      "review_status": "visually_verified",
+      "expected_card_id": "en:sv01-036",
+      "visible_label": "Fuecoco 036/198",
+      "language": "en",
+      "layout": "standard_frame",
+      "conditions": [
+        "background",
+        "holder_or_sleeve",
+        "stand"
+      ],
+      "sha256": "84a1b5a5cc3a5dd2f7fe7da56a9af1ddeb434b2e89707d6e66e91ca32cc36ac9",
+      "truth_in_frozen_artwork_index": true
+    },
+    {
+      "id": "holdout2_089",
+      "page_url": "https://www.ebay.com/itm/185907089087",
+      "image_url": "https://i.ebayimg.com/images/g/U~MAAOSwgH1kaamL/s-l1600.jpg",
+      "review_status": "visually_verified",
+      "expected_card_id": "en:sv01-036",
+      "visible_label": "Fuecoco 036/198",
+      "language": "en",
+      "layout": "standard_frame",
+      "conditions": [
+        "background"
+      ],
+      "sha256": "71a25c85bc791dc64430d7b4cc970a4f5243316e3a28a06f02e5c4b9412137a2",
+      "truth_in_frozen_artwork_index": true
+    },
+    {
+      "id": "holdout2_090",
+      "page_url": "https://www.ebay.com.au/itm/325594136790",
+      "image_url": "https://i.ebayimg.com/images/g/6oIAAOSwyolkJK8X/s-l1600.jpg",
+      "review_status": "visually_verified",
+      "expected_card_id": "en:sv01-036",
+      "visible_label": "Fuecoco 036/198",
+      "language": "en",
+      "layout": "standard_frame",
+      "conditions": [
+        "background",
+        "holder_or_sleeve",
+        "glare_or_strong_reflection"
+      ],
+      "sha256": "ab02eab0441f2cdea0463b05186dc31fdd68939c6a8620544616b94f7894fddd",
+      "truth_in_frozen_artwork_index": true
+    },
+    {
+      "id": "holdout2_093",
+      "page_url": "https://www.ebay.com/b/Rayquaza-VMAX-218-203-SWSH07-Evolving-Skies/2536/bn_7124865971",
+      "image_url": "https://i.ebayimg.com/images/g/0LkAAeSw9MBpgqX2/s-l1200.webp",
+      "review_status": "visually_verified",
+      "expected_card_id": "en:swsh7-218",
+      "visible_label": "Rayquaza VMAX 218/203",
+      "language": "en",
+      "layout": "pokemon_full_art",
+      "conditions": [
+        "background",
+        "foil_texture",
+        "glare_or_strong_reflection",
+        "perspective_tilt"
+      ],
+      "sha256": "0f27f6d51679b2b8f6258227bb43ca7eae19971f9cead853f995cedaaa001f0a",
+      "truth_in_frozen_artwork_index": true
+    },
+    {
+      "id": "holdout2_095",
+      "page_url": "https://collectorworth.com/cards/rayquaza-vmax-pokemon-evolving-skies/",
+      "image_url": "https://i.ebayimg.com/images/g/emgAAeSwu-ZorbID/s-l1600.jpg",
+      "review_status": "visually_verified",
+      "expected_card_id": "en:swsh7-218",
+      "visible_label": "Rayquaza VMAX 218/203",
+      "language": "en",
+      "layout": "pokemon_full_art",
+      "conditions": [
+        "background",
+        "foil_texture",
+        "holder_or_sleeve",
+        "stand",
+        "glare_or_strong_reflection"
+      ],
+      "sha256": "8c6b0139e2a2826c4c2a4cdebffb6083321fa67e86068a1ae94363820c67dfa3",
+      "truth_in_frozen_artwork_index": true
+    },
+    {
+      "id": "holdout2_096",
+      "page_url": "https://www.ebay.com.sg/b/Rayquaza-VMAX-218-203-SWSH07-Evolving-Skies/2536/bn_7124865971",
+      "image_url": "https://i.ebayimg.com/images/g/X9sAAeSw6HRplpBj/s-l1200.webp",
+      "review_status": "visually_verified",
+      "expected_card_id": "en:swsh7-218",
+      "visible_label": "Rayquaza VMAX 218/203",
+      "language": "en",
+      "layout": "pokemon_full_art",
+      "conditions": [
+        "background",
+        "foil_texture",
+        "holder_or_sleeve",
+        "glare_or_strong_reflection",
+        "slab"
+      ],
+      "sha256": "2af12175afe18dcf2e3a83dde9bf5e8f08510281f3f6ce17d02887ae3d3b9dde",
+      "truth_in_frozen_artwork_index": true
+    },
+    {
+      "id": "holdout2_098",
+      "page_url": "https://www.ebay.com/itm/257430538002",
+      "image_url": "https://i.ebayimg.com/images/g/nwEAAeSwve5pyDVG/s-l1200.jpg",
+      "review_status": "visually_verified",
+      "expected_card_id": "en:swsh7-218",
+      "visible_label": "Rayquaza VMAX 218/203",
+      "language": "en",
+      "layout": "pokemon_full_art",
+      "conditions": [
+        "background",
+        "foil_texture",
+        "glare_or_strong_reflection",
+        "perspective_tilt"
+      ],
+      "sha256": "5cfe89224ef70bf40149695aa8f17ce731c679bf6359bd64cfd4547af26ab0b3",
+      "truth_in_frozen_artwork_index": true
+    }
+  ]
+}

@@ -163,13 +163,21 @@ def assess_printings(
     reliable = [h for h in hits if h.region == "collector" and
                 h.confidence is not None and h.confidence >= MIN_IDENTIFIER_CONFIDENCE
                 and ("/" in h.text or any(c.isalpha() for c in h.text))]
-    matching = [r for r in choices if any(
-        number_matches_identifiers([h], accepted_collector_numbers(r)) is True for h in reliable)]
     # Evidence must resolve to the leader, and every reliable observation must
     # agree with it. Shared numbers, unknown siblings and conflicts abstain.
     top_row = next(r for r in choices if printing_key(r) == top_key)
     top_consistent = reliable and all(number_matches_identifiers([h], accepted_collector_numbers(top_row)) is True
                                      for h in reliable)
+    # Unknown/missing reference coverage still requires manual confirmation,
+    # but does not make a positively conflicting printed number plausible.
+    # Only prune when every strong, card-footer observation supports the leader;
+    # conflicting OCR, bare digits and holder labels keep the original caution.
+    if top_consistent:
+        choices = [r for r in choices if not any(
+            number_matches_identifiers([h], accepted_collector_numbers(r)) is False
+            for h in reliable)]
+    matching = [r for r in choices if any(
+        number_matches_identifiers([h], accepted_collector_numbers(r)) is True for h in reliable)]
     if len(matching) == 1 and printing_key(matching[0]) == top_key and top_consistent and not reference_incomplete:
         return PrintingDecision(False)
     reason = "shared_printing_identifier" if len(matching) > 1 else "printing_not_proven"

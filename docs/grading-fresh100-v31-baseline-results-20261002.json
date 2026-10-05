@@ -1,0 +1,5183 @@
+{
+  "summary": {
+    "evaluation_kind": "fresh_unseen_baseline",
+    "photos": 100,
+    "slabs": {
+      "photos": 50,
+      "both_correct": 42,
+      "company_correct": 42,
+      "grade_correct": 45,
+      "wrong_company": 0,
+      "wrong_grade": 0,
+      "slab_detected": 47
+    },
+    "raw_cards": {
+      "photos": 50,
+      "false_slab_claims": 0,
+      "false_company": 0,
+      "false_grade": 0
+    },
+    "by_company": {
+      "psa": {
+        "photos": 10,
+        "both_correct": 9,
+        "company_correct": 9,
+        "grade_correct": 10,
+        "wrong_company": 0,
+        "wrong_grade": 0,
+        "slab_detected": 10
+      },
+      "beckett": {
+        "photos": 8,
+        "both_correct": 7,
+        "company_correct": 7,
+        "grade_correct": 7,
+        "wrong_company": 0,
+        "wrong_grade": 0,
+        "slab_detected": 8
+      },
+      "cgc": {
+        "photos": 8,
+        "both_correct": 7,
+        "company_correct": 7,
+        "grade_correct": 7,
+        "wrong_company": 0,
+        "wrong_grade": 0,
+        "slab_detected": 7
+      },
+      "tag": {
+        "photos": 8,
+        "both_correct": 6,
+        "company_correct": 6,
+        "grade_correct": 6,
+        "wrong_company": 0,
+        "wrong_grade": 0,
+        "slab_detected": 6
+      },
+      "ace": {
+        "photos": 7,
+        "both_correct": 5,
+        "company_correct": 5,
+        "grade_correct": 6,
+        "wrong_company": 0,
+        "wrong_grade": 0,
+        "slab_detected": 7
+      },
+      "ags": {
+        "photos": 9,
+        "both_correct": 8,
+        "company_correct": 8,
+        "grade_correct": 9,
+        "wrong_company": 0,
+        "wrong_grade": 0,
+        "slab_detected": 9
+      }
+    },
+    "latency_ms": {
+      "median": 1930.975,
+      "p95": 9534.34,
+      "max": 26330.6
+    },
+    "code_hashes": {
+      "app/recognition/grading.py": "a55327c05afa0e543b066cbdeea307bb4d194ca671539e1f1c06b6ec8c35b9df",
+      "app/recognition/label_vision.py": "52cca4295e5ca27d46ae959a698f829abf12b0bfbac31106b20e5c6dff9e9fcd",
+      "app/recognition/ocr.py": "4d16eba18317a40e8ab30db1a2a384593f01b0e21c94056be50c4f3c6cbce91b",
+      "app/recognition/detect.py": "5a4052c7c7d611dd6577bca69f870b90464ec04fc52b7acb11e166bc4c64d2aa",
+      "app/schemas.py": "dfbea85b9005e80be99f539eb87bb61190c00a834ea8758a4d43e03a004343d1",
+      "scripts/probe_grading_labels.py": "fd4c9aa1c1c941221c17ff7a6d4ea20ded3fb257d67806e1a58830aee019852a",
+      "app/recognition/assets/grading-logos/ace-outline.png": "1d8b6887a69f70fe2e53426cf47f7e81173cdade8e598256e2f045fb79b05ba5",
+      "app/recognition/assets/grading-logos/ace.png": "c4a8777bde3e951e8fd10b231b95b3bc01dc8f1649a40b29fde2387230a5fae9",
+      "app/recognition/assets/grading-logos/ags.png": "1da72a5f5db0386eedff42ad684b9fc4bc9933b85263455d8cad0744b230ac3c",
+      "app/recognition/assets/grading-logos/beckett-emblem.png": "ce9b309f82fea40158dd2383a58907f4f08c6f44493bfb495980baecd42ca9a5",
+      "app/recognition/assets/grading-logos/beckett.png": "a9cebe2866b1e6ff8c9fd4a120c48779e607a81a58927b53e71b0e4c4de24698",
+      "app/recognition/assets/grading-logos/psa.png": "95ce6457c32365d2b3c5362c41c60511147f5efb3a223f3b9b47592a7c4c1982",
+      "app/recognition/assets/grading-logos/sources.json": "9cb9ee5abdce4d54459723c92b8a585a2070d77079692a7dc4c8cbf2269e88de",
+      "app/recognition/assets/grading-logos/tag.png": "fb6f9e7474b62bd2305fcbd03b2a8ef46095f46f5afc8e0fe27d191853d5c7a1"
+    },
+    "source_sha256": "19de26ad8c15b55bd9ec0d3502b7f458626ceb9088b270d144c352fbeb171219",
+    "truth_sha256": "bd75dadedfe32adcb6420b61999ad9caf44567fffad4aa166349aba412b5dabb",
+    "code_unchanged_during_probe": true,
+    "limitations": "Isolated local label component; marketplace convenience sample, not live app/card identity accuracy. No raw condition, authenticity, cert, subgrade or TAG-score accuracy claim."
+  },
+  "cases": [
+    {
+      "id": "fresh100_327234085023",
+      "conditions": [
+        "raw_card"
+      ],
+      "grading_ms": 1905.28,
+      "grading": {
+        "slab_detected": null,
+        "is_graded": null,
+        "grading_status": "unknown",
+        "company": null,
+        "company_source": "none",
+        "grade": null,
+        "condition_label": null,
+        "subgrades": {},
+        "tag_score": null,
+        "certification_number": null,
+        "qualifiers": [],
+        "raw_condition": "not_assessed",
+        "authenticity_verified": false,
+        "source": "none",
+        "requires_confirmation": true,
+        "label_text": [
+          "Blastoise",
+          "120HP"
+        ],
+        "warnings": [
+          "no_supported_grading_label_detected",
+          "ungraded_status_not_proven"
+        ]
+      },
+      "manual_truth": {
+        "kind": "raw",
+        "company": null,
+        "grade": null,
+        "name": "Blastoise",
+        "number": "14/100",
+        "language": "en"
+      },
+      "source_page": "https://www.ebay.com/itm/327234085023",
+      "company_correct": true,
+      "grade_correct": true,
+      "wrong_company": false,
+      "wrong_grade": false,
+      "false_slab_claim": false
+    },
+    {
+      "id": "fresh100_388751795697",
+      "conditions": [
+        "raw_card"
+      ],
+      "grading_ms": 2843.74,
+      "grading": {
+        "slab_detected": null,
+        "is_graded": null,
+        "grading_status": "unknown",
+        "company": null,
+        "company_source": "none",
+        "grade": null,
+        "condition_label": null,
+        "subgrades": {},
+        "tag_score": null,
+        "certification_number": null,
+        "qualifiers": [],
+        "raw_condition": "not_assessed",
+        "authenticity_verified": false,
+        "source": "none",
+        "requires_confirmation": true,
+        "label_text": [
+          "2\u9032\u5316",
+          "\u30ab\u30a4\u30ea\u30e5\u30fc",
+          "Hp 160"
+        ],
+        "warnings": [
+          "no_supported_grading_label_detected",
+          "ungraded_status_not_proven"
+        ]
+      },
+      "manual_truth": {
+        "kind": "raw",
+        "company": null,
+        "grade": null,
+        "name": "Dragonite",
+        "number": "065/095",
+        "language": "ja"
+      },
+      "source_page": "https://www.ebay.com/itm/388751795697",
+      "company_correct": true,
+      "grade_correct": true,
+      "wrong_company": false,
+      "wrong_grade": false,
+      "false_slab_claim": false
+    },
+    {
+      "id": "freshraw_0_299404800",
+      "conditions": [
+        "raw_card"
+      ],
+      "grading_ms": 2180.82,
+      "grading": {
+        "slab_detected": null,
+        "is_graded": null,
+        "grading_status": "unknown",
+        "company": null,
+        "company_source": "none",
+        "grade": null,
+        "condition_label": null,
+        "subgrades": {},
+        "tag_score": null,
+        "certification_number": null,
+        "qualifiers": [],
+        "raw_condition": "not_assessed",
+        "authenticity_verified": false,
+        "source": "none",
+        "requires_confirmation": true,
+        "label_text": [
+          "GETTI",
+          "BASIC",
+          "Marill",
+          ".70",
+          "HP",
+          "SNI"
+        ],
+        "warnings": [
+          "no_supported_grading_label_detected",
+          "ungraded_status_not_proven"
+        ]
+      },
+      "manual_truth": {
+        "kind": "raw",
+        "company": null,
+        "grade": null,
+        "name": "Marill",
+        "number": "204/193",
+        "language": "en"
+      },
+      "source_page": "https://www.sportscardinvestor.com/cards/marill-pokemon/2023-scarlet-violet-paldea-evolved-illustration-rare-204-193",
+      "company_correct": true,
+      "grade_correct": true,
+      "wrong_company": false,
+      "wrong_grade": false,
+      "false_slab_claim": false
+    },
+    {
+      "id": "fresh100_227232802112",
+      "conditions": [
+        "raw_card"
+      ],
+      "grading_ms": 2791.3,
+      "grading": {
+        "slab_detected": null,
+        "is_graded": null,
+        "grading_status": "unknown",
+        "company": null,
+        "company_source": "none",
+        "grade": null,
+        "condition_label": null,
+        "subgrades": {},
+        "tag_score": null,
+        "certification_number": null,
+        "qualifiers": [],
+        "raw_condition": "not_assessed",
+        "authenticity_verified": false,
+        "source": "none",
+        "requires_confirmation": true,
+        "label_text": [
+          "STAGE1",
+          "Armarouge",
+          "130",
+          "HP",
+          "Evolves from Charcadet"
+        ],
+        "warnings": [
+          "no_supported_grading_label_detected",
+          "ungraded_status_not_proven"
+        ]
+      },
+      "manual_truth": {
+        "kind": "raw",
+        "company": null,
+        "grade": null,
+        "name": "Armarouge",
+        "number": "203/198",
+        "language": "en"
+      },
+      "source_page": "https://www.ebay.com/itm/227232802112",
+      "company_correct": true,
+      "grade_correct": true,
+      "wrong_company": false,
+      "wrong_grade": false,
+      "false_slab_claim": false
+    },
+    {
+      "id": "fresh100_135663917530",
+      "conditions": [
+        "raw_card"
+      ],
+      "grading_ms": 2175.18,
+      "grading": {
+        "slab_detected": null,
+        "is_graded": null,
+        "grading_status": "unknown",
+        "company": null,
+        "company_source": "none",
+        "grade": null,
+        "condition_label": null,
+        "subgrades": {},
+        "tag_score": null,
+        "certification_number": null,
+        "qualifiers": [],
+        "raw_condition": "not_assessed",
+        "authenticity_verified": false,
+        "source": "none",
+        "requires_confirmation": true,
+        "label_text": [
+          "STAGE]",
+          "Saor",
+          "140",
+          "HP",
+          "Evolves from Scyther"
+        ],
+        "warnings": [
+          "no_supported_grading_label_detected",
+          "ungraded_status_not_proven"
+        ]
+      },
+      "manual_truth": {
+        "kind": "raw",
+        "company": null,
+        "grade": null,
+        "name": "Scizor",
+        "number": "205/197",
+        "language": "en"
+      },
+      "source_page": "https://www.ebay.com/itm/135663917530",
+      "company_correct": true,
+      "grade_correct": true,
+      "wrong_company": false,
+      "wrong_grade": false,
+      "false_slab_claim": false
+    },
+    {
+      "id": "fresh100_396269138140",
+      "conditions": [
+        "raw_card"
+      ],
+      "grading_ms": 1777.26,
+      "grading": {
+        "slab_detected": null,
+        "is_graded": null,
+        "grading_status": "unknown",
+        "company": null,
+        "company_source": "none",
+        "grade": null,
+        "condition_label": null,
+        "subgrades": {},
+        "tag_score": null,
+        "certification_number": null,
+        "qualifiers": [],
+        "raw_condition": "not_assessed",
+        "authenticity_verified": false,
+        "source": "none",
+        "requires_confirmation": true,
+        "label_text": [
+          "Kirlial",
+          "90"
+        ],
+        "warnings": [
+          "no_supported_grading_label_detected",
+          "ungraded_status_not_proven"
+        ]
+      },
+      "manual_truth": {
+        "kind": "raw",
+        "company": null,
+        "grade": null,
+        "name": "Kirlia",
+        "number": "212/198",
+        "language": "en"
+      },
+      "source_page": "https://www.ebay.com/itm/396269138140",
+      "company_correct": true,
+      "grade_correct": true,
+      "wrong_company": false,
+      "wrong_grade": false,
+      "false_slab_claim": false
+    },
+    {
+      "id": "fresh100_167458253135",
+      "conditions": [
+        "raw_card"
+      ],
+      "grading_ms": 1943.66,
+      "grading": {
+        "slab_detected": null,
+        "is_graded": null,
+        "grading_status": "unknown",
+        "company": null,
+        "company_source": "none",
+        "grade": null,
+        "condition_label": null,
+        "subgrades": {},
+        "tag_score": null,
+        "certification_number": null,
+        "qualifiers": [],
+        "raw_condition": "not_assessed",
+        "authenticity_verified": false,
+        "source": "none",
+        "requires_confirmation": true,
+        "label_text": [
+          "BASIC",
+          "Drowzee",
+          "7L",
+          "HP"
+        ],
+        "warnings": [
+          "no_supported_grading_label_detected",
+          "ungraded_status_not_proven"
+        ]
+      },
+      "manual_truth": {
+        "kind": "raw",
+        "company": null,
+        "grade": null,
+        "name": "Drowzee",
+        "number": "210/198",
+        "language": "en"
+      },
+      "source_page": "https://www.ebay.com.au/itm/167458253135",
+      "company_correct": true,
+      "grade_correct": true,
+      "wrong_company": false,
+      "wrong_grade": false,
+      "false_slab_claim": false
+    },
+    {
+      "id": "fresh100_116249576361",
+      "conditions": [
+        "raw_card"
+      ],
+      "grading_ms": 2025.65,
+      "grading": {
+        "slab_detected": null,
+        "is_graded": null,
+        "grading_status": "unknown",
+        "company": null,
+        "company_source": "none",
+        "grade": null,
+        "condition_label": null,
+        "subgrades": {},
+        "tag_score": null,
+        "certification_number": null,
+        "qualifiers": [],
+        "raw_condition": "not_assessed",
+        "authenticity_verified": false,
+        "source": "none",
+        "requires_confirmation": true,
+        "label_text": [
+          "STAGE2",
+          "Nidoking",
+          "170",
+          "HP",
+          "Evolves from Nidorino",
+          "mM"
+        ],
+        "warnings": [
+          "no_supported_grading_label_detected",
+          "ungraded_status_not_proven"
+        ]
+      },
+      "manual_truth": {
+        "kind": "raw",
+        "company": null,
+        "grade": null,
+        "name": "Nidoking",
+        "number": "174/165",
+        "language": "en"
+      },
+      "source_page": "https://www.ebay.com/itm/116249576361",
+      "company_correct": true,
+      "grade_correct": true,
+      "wrong_company": false,
+      "wrong_grade": false,
+      "false_slab_claim": false
+    },
+    {
+      "id": "fresh100_116219612870",
+      "conditions": [
+        "raw_card"
+      ],
+      "grading_ms": 1787.53,
+      "grading": {
+        "slab_detected": null,
+        "is_graded": null,
+        "grading_status": "unknown",
+        "company": null,
+        "company_source": "none",
+        "grade": null,
+        "condition_label": null,
+        "subgrades": {},
+        "tag_score": null,
+        "certification_number": null,
+        "qualifiers": [],
+        "raw_condition": "not_assessed",
+        "authenticity_verified": false,
+        "source": "none",
+        "requires_confirmation": true,
+        "label_text": [
+          "STAGE1",
+          "Dragonair",
+          "100",
+          "HP",
+          "Evolves from Dratini"
+        ],
+        "warnings": [
+          "no_supported_grading_label_detected",
+          "ungraded_status_not_proven"
+        ]
+      },
+      "manual_truth": {
+        "kind": "raw",
+        "company": null,
+        "grade": null,
+        "name": "Dragonair",
+        "number": "181/165",
+        "language": "en"
+      },
+      "source_page": "https://www.ebay.com/itm/116219612870",
+      "company_correct": true,
+      "grade_correct": true,
+      "wrong_company": false,
+      "wrong_grade": false,
+      "false_slab_claim": false
+    },
+    {
+      "id": "fresh100_387647223051",
+      "conditions": [
+        "raw_card"
+      ],
+      "grading_ms": 2750.27,
+      "grading": {
+        "slab_detected": null,
+        "is_graded": null,
+        "grading_status": "unknown",
+        "company": null,
+        "company_source": "none",
+        "grade": null,
+        "condition_label": null,
+        "subgrades": {},
+        "tag_score": null,
+        "certification_number": null,
+        "qualifiers": [],
+        "raw_condition": "not_assessed",
+        "authenticity_verified": false,
+        "source": "none",
+        "requires_confirmation": true,
+        "label_text": [
+          "Parasect",
+          "120",
+          "STAGE1",
+          "HP",
+          "Evolves from Paras"
+        ],
+        "warnings": [
+          "no_supported_grading_label_detected",
+          "ungraded_status_not_proven"
+        ]
+      },
+      "manual_truth": {
+        "kind": "raw",
+        "company": null,
+        "grade": null,
+        "name": "Parasect",
+        "number": "TG01/TG30",
+        "language": "en"
+      },
+      "source_page": "https://www.ebay.co.uk/itm/387647223051",
+      "company_correct": true,
+      "grade_correct": true,
+      "wrong_company": false,
+      "wrong_grade": false,
+      "false_slab_claim": false
+    },
+    {
+      "id": "fresh100_156890431856",
+      "conditions": [
+        "raw_card"
+      ],
+      "grading_ms": 1742.57,
+      "grading": {
+        "slab_detected": null,
+        "is_graded": null,
+        "grading_status": "unknown",
+        "company": null,
+        "company_source": "none",
+        "grade": null,
+        "condition_label": null,
+        "subgrades": {},
+        "tag_score": null,
+        "certification_number": null,
+        "qualifiers": [],
+        "raw_condition": "not_assessed",
+        "authenticity_verified": false,
+        "source": "none",
+        "requires_confirmation": true,
+        "label_text": [
+          "BASIC",
+          "Lechonk",
+          "60"
+        ],
+        "warnings": [
+          "no_supported_grading_label_detected",
+          "ungraded_status_not_proven"
+        ]
+      },
+      "manual_truth": {
+        "kind": "raw",
+        "company": null,
+        "grade": null,
+        "name": "Lechonk",
+        "number": "209/197",
+        "language": "en"
+      },
+      "source_page": "https://www.ebay.com/itm/156890431856",
+      "company_correct": true,
+      "grade_correct": true,
+      "wrong_company": false,
+      "wrong_grade": false,
+      "false_slab_claim": false
+    },
+    {
+      "id": "fresh100_127005898900",
+      "conditions": [
+        "raw_card"
+      ],
+      "grading_ms": 1877.86,
+      "grading": {
+        "slab_detected": null,
+        "is_graded": null,
+        "grading_status": "unknown",
+        "company": null,
+        "company_source": "none",
+        "grade": null,
+        "condition_label": null,
+        "subgrades": {},
+        "tag_score": null,
+        "certification_number": null,
+        "qualifiers": [],
+        "raw_condition": "not_assessed",
+        "authenticity_verified": false,
+        "source": "none",
+        "requires_confirmation": true,
+        "label_text": [
+          "BASIC",
+          "Tangela",
+          "H80"
+        ],
+        "warnings": [
+          "no_supported_grading_label_detected",
+          "ungraded_status_not_proven"
+        ]
+      },
+      "manual_truth": {
+        "kind": "raw",
+        "company": null,
+        "grade": null,
+        "name": "Tangela",
+        "number": "178/165",
+        "language": "en"
+      },
+      "source_page": "https://www.ebay.com/itm/127005898900",
+      "company_correct": true,
+      "grade_correct": true,
+      "wrong_company": false,
+      "wrong_grade": false,
+      "false_slab_claim": false
+    },
+    {
+      "id": "fresh100_316758938735",
+      "conditions": [
+        "raw_card"
+      ],
+      "grading_ms": 1724.36,
+      "grading": {
+        "slab_detected": null,
+        "is_graded": null,
+        "grading_status": "unknown",
+        "company": null,
+        "company_source": "none",
+        "grade": null,
+        "condition_label": null,
+        "subgrades": {},
+        "tag_score": null,
+        "certification_number": null,
+        "qualifiers": [],
+        "raw_condition": "not_assessed",
+        "authenticity_verified": false,
+        "source": "none",
+        "requires_confirmation": true,
+        "label_text": [
+          "Marill",
+          "70",
+          "BASIC",
+          "HP"
+        ],
+        "warnings": [
+          "no_supported_grading_label_detected",
+          "ungraded_status_not_proven"
+        ]
+      },
+      "manual_truth": {
+        "kind": "raw",
+        "company": null,
+        "grade": null,
+        "name": "Marill",
+        "number": "204/193",
+        "language": "en"
+      },
+      "source_page": "https://www.ebay.com/itm/316758938735",
+      "company_correct": true,
+      "grade_correct": true,
+      "wrong_company": false,
+      "wrong_grade": false,
+      "false_slab_claim": false
+    },
+    {
+      "id": "freshraw_1_925085473",
+      "conditions": [
+        "raw_card"
+      ],
+      "grading_ms": 1870.59,
+      "grading": {
+        "slab_detected": null,
+        "is_graded": null,
+        "grading_status": "unknown",
+        "company": null,
+        "company_source": "none",
+        "grade": null,
+        "condition_label": null,
+        "subgrades": {},
+        "tag_score": null,
+        "certification_number": null,
+        "qualifiers": [],
+        "raw_condition": "not_assessed",
+        "authenticity_verified": false,
+        "source": "none",
+        "requires_confirmation": true,
+        "label_text": [
+          "STAGE1",
+          "Armarouge",
+          "130",
+          "HP",
+          "Evolves from Charcadet"
+        ],
+        "warnings": [
+          "no_supported_grading_label_detected",
+          "ungraded_status_not_proven"
+        ]
+      },
+      "manual_truth": {
+        "kind": "raw",
+        "company": null,
+        "grade": null,
+        "name": "Armarouge",
+        "number": "203/198",
+        "language": "en"
+      },
+      "source_page": "https://www.sportscardinvestor.com/cards/armarouge-pokemon/2023-scarlet-violet-illustration-rare-203-198",
+      "company_correct": true,
+      "grade_correct": true,
+      "wrong_company": false,
+      "wrong_grade": false,
+      "false_slab_claim": false
+    },
+    {
+      "id": "freshraw_2_1235899331",
+      "conditions": [
+        "raw_card"
+      ],
+      "grading_ms": 3913.56,
+      "grading": {
+        "slab_detected": null,
+        "is_graded": null,
+        "grading_status": "unknown",
+        "company": null,
+        "company_source": "none",
+        "grade": null,
+        "condition_label": null,
+        "subgrades": {},
+        "tag_score": null,
+        "certification_number": null,
+        "qualifiers": [],
+        "raw_condition": "not_assessed",
+        "authenticity_verified": false,
+        "source": "none",
+        "requires_confirmation": true,
+        "label_text": [
+          "STAGE1",
+          "Scizor",
+          "140",
+          "HP",
+          "Evolves from Scyther"
+        ],
+        "warnings": [
+          "no_supported_grading_label_detected",
+          "ungraded_status_not_proven"
+        ]
+      },
+      "manual_truth": {
+        "kind": "raw",
+        "company": null,
+        "grade": null,
+        "name": "Scizor",
+        "number": "205/197",
+        "language": "en"
+      },
+      "source_page": "https://www.sportscardinvestor.com/cards/scizor-pokemon/2023-scarlet-violet-obsidian-flames-illustration-rare-205-197",
+      "company_correct": true,
+      "grade_correct": true,
+      "wrong_company": false,
+      "wrong_grade": false,
+      "false_slab_claim": false
+    },
+    {
+      "id": "fresh100_127125641244",
+      "conditions": [
+        "raw_card"
+      ],
+      "grading_ms": 2505.01,
+      "grading": {
+        "slab_detected": null,
+        "is_graded": null,
+        "grading_status": "unknown",
+        "company": null,
+        "company_source": "none",
+        "grade": null,
+        "condition_label": null,
+        "subgrades": {},
+        "tag_score": null,
+        "certification_number": null,
+        "qualifiers": [],
+        "raw_condition": "not_assessed",
+        "authenticity_verified": false,
+        "source": "none",
+        "requires_confirmation": true,
+        "label_text": [
+          "Kirlia",
+          "90",
+          "STAGE1",
+          "Evolves from Ralts"
+        ],
+        "warnings": [
+          "no_supported_grading_label_detected",
+          "ungraded_status_not_proven"
+        ]
+      },
+      "manual_truth": {
+        "kind": "raw",
+        "company": null,
+        "grade": null,
+        "name": "Kirlia",
+        "number": "212/198",
+        "language": "en"
+      },
+      "source_page": "https://www.ebay.co.uk/itm/127125641244",
+      "company_correct": true,
+      "grade_correct": true,
+      "wrong_company": false,
+      "wrong_grade": false,
+      "false_slab_claim": false
+    },
+    {
+      "id": "fresh100_226992725275",
+      "conditions": [
+        "raw_card"
+      ],
+      "grading_ms": 2082.09,
+      "grading": {
+        "slab_detected": null,
+        "is_graded": null,
+        "grading_status": "unknown",
+        "company": null,
+        "company_source": "none",
+        "grade": null,
+        "condition_label": null,
+        "subgrades": {},
+        "tag_score": null,
+        "certification_number": null,
+        "qualifiers": [],
+        "raw_condition": "not_assessed",
+        "authenticity_verified": false,
+        "source": "none",
+        "requires_confirmation": true,
+        "label_text": [
+          "BASIC",
+          "70",
+          "Drowzee",
+          "HP"
+        ],
+        "warnings": [
+          "no_supported_grading_label_detected",
+          "ungraded_status_not_proven"
+        ]
+      },
+      "manual_truth": {
+        "kind": "raw",
+        "company": null,
+        "grade": null,
+        "name": "Drowzee",
+        "number": "210/198",
+        "language": "en"
+      },
+      "source_page": "https://www.ebay.com/itm/226992725275",
+      "company_correct": true,
+      "grade_correct": true,
+      "wrong_company": false,
+      "wrong_grade": false,
+      "false_slab_claim": false
+    },
+    {
+      "id": "fresh100_197071758287",
+      "conditions": [
+        "raw_card"
+      ],
+      "grading_ms": 1950.21,
+      "grading": {
+        "slab_detected": null,
+        "is_graded": null,
+        "grading_status": "unknown",
+        "company": null,
+        "company_source": "none",
+        "grade": null,
+        "condition_label": null,
+        "subgrades": {},
+        "tag_score": null,
+        "certification_number": null,
+        "qualifiers": [],
+        "raw_condition": "not_assessed",
+        "authenticity_verified": false,
+        "source": "none",
+        "requires_confirmation": true,
+        "label_text": [
+          "STAGE2",
+          "Nidoking",
+          "170",
+          "HP",
+          "Evolves from Nidorino",
+          "m"
+        ],
+        "warnings": [
+          "no_supported_grading_label_detected",
+          "ungraded_status_not_proven"
+        ]
+      },
+      "manual_truth": {
+        "kind": "raw",
+        "company": null,
+        "grade": null,
+        "name": "Nidoking",
+        "number": "174/165",
+        "language": "en"
+      },
+      "source_page": "https://www.ebay.com/itm/197071758287",
+      "company_correct": true,
+      "grade_correct": true,
+      "wrong_company": false,
+      "wrong_grade": false,
+      "false_slab_claim": false
+    },
+    {
+      "id": "fresh100_186821197401",
+      "conditions": [
+        "raw_card"
+      ],
+      "grading_ms": 1765.07,
+      "grading": {
+        "slab_detected": null,
+        "is_graded": null,
+        "grading_status": "unknown",
+        "company": null,
+        "company_source": "none",
+        "grade": null,
+        "condition_label": null,
+        "subgrades": {},
+        "tag_score": null,
+        "certification_number": null,
+        "qualifiers": [],
+        "raw_condition": "not_assessed",
+        "authenticity_verified": false,
+        "source": "none",
+        "requires_confirmation": true,
+        "label_text": [
+          "Dragonair",
+          "100",
+          "STAGE1",
+          "HP",
+          "Evolves from Dratini"
+        ],
+        "warnings": [
+          "no_supported_grading_label_detected",
+          "ungraded_status_not_proven"
+        ]
+      },
+      "manual_truth": {
+        "kind": "raw",
+        "company": null,
+        "grade": null,
+        "name": "Dragonair",
+        "number": "181/165",
+        "language": "en"
+      },
+      "source_page": "https://www.ebay.com/itm/186821197401",
+      "company_correct": true,
+      "grade_correct": true,
+      "wrong_company": false,
+      "wrong_grade": false,
+      "false_slab_claim": false
+    },
+    {
+      "id": "freshraw_7_316441841",
+      "conditions": [
+        "raw_card"
+      ],
+      "grading_ms": 4187.51,
+      "grading": {
+        "slab_detected": null,
+        "is_graded": null,
+        "grading_status": "unknown",
+        "company": null,
+        "company_source": "none",
+        "grade": null,
+        "condition_label": null,
+        "subgrades": {},
+        "tag_score": null,
+        "certification_number": null,
+        "qualifiers": [],
+        "raw_condition": "not_assessed",
+        "authenticity_verified": false,
+        "source": "none",
+        "requires_confirmation": true,
+        "label_text": [
+          "Parasect",
+          "120",
+          "STAGE1",
+          "Evolves from Paras"
+        ],
+        "warnings": [
+          "no_supported_grading_label_detected",
+          "ungraded_status_not_proven"
+        ]
+      },
+      "manual_truth": {
+        "kind": "raw",
+        "company": null,
+        "grade": null,
+        "name": "Parasect",
+        "number": "TG01/TG30",
+        "language": "en"
+      },
+      "source_page": "https://www.ebay.com/b/Parasect-TG01-TG30-Swsh11-Lost-Origin-Trainer-Gallery/2536/bn_7124575457",
+      "company_correct": true,
+      "grade_correct": true,
+      "wrong_company": false,
+      "wrong_grade": false,
+      "false_slab_claim": false
+    },
+    {
+      "id": "fresh100_167884982800",
+      "conditions": [
+        "raw_card"
+      ],
+      "grading_ms": 1680.21,
+      "grading": {
+        "slab_detected": null,
+        "is_graded": null,
+        "grading_status": "unknown",
+        "company": null,
+        "company_source": "none",
+        "grade": null,
+        "condition_label": null,
+        "subgrades": {},
+        "tag_score": null,
+        "certification_number": null,
+        "qualifiers": [],
+        "raw_condition": "not_assessed",
+        "authenticity_verified": false,
+        "source": "none",
+        "requires_confirmation": true,
+        "label_text": [
+          "BASIC",
+          "Lechonk",
+          "HP60"
+        ],
+        "warnings": [
+          "no_supported_grading_label_detected",
+          "ungraded_status_not_proven"
+        ]
+      },
+      "manual_truth": {
+        "kind": "raw",
+        "company": null,
+        "grade": null,
+        "name": "Lechonk",
+        "number": "209/197",
+        "language": "en"
+      },
+      "source_page": "https://www.ebay.com/itm/167884982800",
+      "company_correct": true,
+      "grade_correct": true,
+      "wrong_company": false,
+      "wrong_grade": false,
+      "false_slab_claim": false
+    },
+    {
+      "id": "fresh100_134878995437",
+      "conditions": [
+        "raw_card"
+      ],
+      "grading_ms": 1706.43,
+      "grading": {
+        "slab_detected": null,
+        "is_graded": null,
+        "grading_status": "unknown",
+        "company": null,
+        "company_source": "none",
+        "grade": null,
+        "condition_label": null,
+        "subgrades": {},
+        "tag_score": null,
+        "certification_number": null,
+        "qualifiers": [],
+        "raw_condition": "not_assessed",
+        "authenticity_verified": false,
+        "source": "none",
+        "requires_confirmation": true,
+        "label_text": [
+          "BASIC",
+          "Tangela",
+          "80"
+        ],
+        "warnings": [
+          "no_supported_grading_label_detected",
+          "ungraded_status_not_proven"
+        ]
+      },
+      "manual_truth": {
+        "kind": "raw",
+        "company": null,
+        "grade": null,
+        "name": "Tangela",
+        "number": "178/165",
+        "language": "en"
+      },
+      "source_page": "https://www.ebay.com/itm/134878995437",
+      "company_correct": true,
+      "grade_correct": true,
+      "wrong_company": false,
+      "wrong_grade": false,
+      "false_slab_claim": false
+    },
+    {
+      "id": "fresh100_177223455994",
+      "conditions": [
+        "raw_card"
+      ],
+      "grading_ms": 1737.55,
+      "grading": {
+        "slab_detected": null,
+        "is_graded": null,
+        "grading_status": "unknown",
+        "company": null,
+        "company_source": "none",
+        "grade": null,
+        "condition_label": null,
+        "subgrades": {},
+        "tag_score": null,
+        "certification_number": null,
+        "qualifiers": [],
+        "raw_condition": "not_assessed",
+        "authenticity_verified": false,
+        "source": "none",
+        "requires_confirmation": true,
+        "label_text": [
+          "BASIC",
+          "Marill",
+          "70",
+          "HP"
+        ],
+        "warnings": [
+          "no_supported_grading_label_detected",
+          "ungraded_status_not_proven"
+        ]
+      },
+      "manual_truth": {
+        "kind": "raw",
+        "company": null,
+        "grade": null,
+        "name": "Marill",
+        "number": "204/193",
+        "language": "en"
+      },
+      "source_page": "https://www.ebay.com/itm/177223455994",
+      "company_correct": true,
+      "grade_correct": true,
+      "wrong_company": false,
+      "wrong_grade": false,
+      "false_slab_claim": false
+    },
+    {
+      "id": "fresh100_185962385461",
+      "conditions": [
+        "raw_card"
+      ],
+      "grading_ms": 1832.02,
+      "grading": {
+        "slab_detected": null,
+        "is_graded": null,
+        "grading_status": "unknown",
+        "company": null,
+        "company_source": "none",
+        "grade": null,
+        "condition_label": null,
+        "subgrades": {},
+        "tag_score": null,
+        "certification_number": null,
+        "qualifiers": [],
+        "raw_condition": "not_assessed",
+        "authenticity_verified": false,
+        "source": "none",
+        "requires_confirmation": true,
+        "label_text": [
+          "130",
+          "STAGE1",
+          "Armarouge",
+          "HP",
+          "Evolves from Charcadet"
+        ],
+        "warnings": [
+          "no_supported_grading_label_detected",
+          "ungraded_status_not_proven"
+        ]
+      },
+      "manual_truth": {
+        "kind": "raw",
+        "company": null,
+        "grade": null,
+        "name": "Armarouge",
+        "number": "203/198",
+        "language": "en"
+      },
+      "source_page": "https://www.ebay.com/itm/185962385461",
+      "company_correct": true,
+      "grade_correct": true,
+      "wrong_company": false,
+      "wrong_grade": false,
+      "false_slab_claim": false
+    },
+    {
+      "id": "fresh100_186598235842",
+      "conditions": [
+        "raw_card"
+      ],
+      "grading_ms": 1917.7,
+      "grading": {
+        "slab_detected": null,
+        "is_graded": null,
+        "grading_status": "unknown",
+        "company": null,
+        "company_source": "none",
+        "grade": null,
+        "condition_label": null,
+        "subgrades": {},
+        "tag_score": null,
+        "certification_number": null,
+        "qualifiers": [],
+        "raw_condition": "not_assessed",
+        "authenticity_verified": false,
+        "source": "none",
+        "requires_confirmation": true,
+        "label_text": [
+          "STAGE1",
+          "Scizor",
+          "140",
+          "HP",
+          "X",
+          "Evolves from Scyther"
+        ],
+        "warnings": [
+          "no_supported_grading_label_detected",
+          "ungraded_status_not_proven"
+        ]
+      },
+      "manual_truth": {
+        "kind": "raw",
+        "company": null,
+        "grade": null,
+        "name": "Scizor",
+        "number": "205/197",
+        "language": "en"
+      },
+      "source_page": "https://www.ebay.co.uk/itm/186598235842",
+      "company_correct": true,
+      "grade_correct": true,
+      "wrong_company": false,
+      "wrong_grade": false,
+      "false_slab_claim": false
+    },
+    {
+      "id": "fresh100_356618307865",
+      "conditions": [
+        "raw_card"
+      ],
+      "grading_ms": 1920.9,
+      "grading": {
+        "slab_detected": null,
+        "is_graded": null,
+        "grading_status": "unknown",
+        "company": null,
+        "company_source": "none",
+        "grade": null,
+        "condition_label": null,
+        "subgrades": {},
+        "tag_score": null,
+        "certification_number": null,
+        "qualifiers": [],
+        "raw_condition": "not_assessed",
+        "authenticity_verified": false,
+        "source": "none",
+        "requires_confirmation": true,
+        "label_text": [
+          "90",
+          "Kirlia",
+          "STAGE1",
+          "Evolves from Ralts"
+        ],
+        "warnings": [
+          "no_supported_grading_label_detected",
+          "ungraded_status_not_proven"
+        ]
+      },
+      "manual_truth": {
+        "kind": "raw",
+        "company": null,
+        "grade": null,
+        "name": "Kirlia",
+        "number": "212/198",
+        "language": "en"
+      },
+      "source_page": "https://www.ebay.com/itm/356618307865",
+      "company_correct": true,
+      "grade_correct": true,
+      "wrong_company": false,
+      "wrong_grade": false,
+      "false_slab_claim": false
+    },
+    {
+      "id": "fresh100_235971735451",
+      "conditions": [
+        "raw_card"
+      ],
+      "grading_ms": 1758.79,
+      "grading": {
+        "slab_detected": null,
+        "is_graded": null,
+        "grading_status": "unknown",
+        "company": null,
+        "company_source": "none",
+        "grade": null,
+        "condition_label": null,
+        "subgrades": {},
+        "tag_score": null,
+        "certification_number": null,
+        "qualifiers": [],
+        "raw_condition": "not_assessed",
+        "authenticity_verified": false,
+        "source": "none",
+        "requires_confirmation": true,
+        "label_text": [
+          "BASIC",
+          "70",
+          "Drowzee",
+          "HP",
+          "1892"
+        ],
+        "warnings": [
+          "no_supported_grading_label_detected",
+          "ungraded_status_not_proven"
+        ]
+      },
+      "manual_truth": {
+        "kind": "raw",
+        "company": null,
+        "grade": null,
+        "name": "Drowzee",
+        "number": "210/198",
+        "language": "en"
+      },
+      "source_page": "https://www.ebay.co.uk/itm/235971735451",
+      "company_correct": true,
+      "grade_correct": true,
+      "wrong_company": false,
+      "wrong_grade": false,
+      "false_slab_claim": false
+    },
+    {
+      "id": "fresh100_397434208029",
+      "conditions": [
+        "raw_card"
+      ],
+      "grading_ms": 2002.13,
+      "grading": {
+        "slab_detected": null,
+        "is_graded": null,
+        "grading_status": "unknown",
+        "company": null,
+        "company_source": "none",
+        "grade": null,
+        "condition_label": null,
+        "subgrades": {},
+        "tag_score": null,
+        "certification_number": null,
+        "qualifiers": [],
+        "raw_condition": "not_assessed",
+        "authenticity_verified": false,
+        "source": "none",
+        "requires_confirmation": true,
+        "label_text": [
+          "STAGE2",
+          "Nidoking",
+          "170",
+          "HP",
+          "Evolves from Nidorino",
+          "mN"
+        ],
+        "warnings": [
+          "no_supported_grading_label_detected",
+          "ungraded_status_not_proven"
+        ]
+      },
+      "manual_truth": {
+        "kind": "raw",
+        "company": null,
+        "grade": null,
+        "name": "Nidoking",
+        "number": "174/165",
+        "language": "en"
+      },
+      "source_page": "https://www.ebay.com/itm/397434208029",
+      "company_correct": true,
+      "grade_correct": true,
+      "wrong_company": false,
+      "wrong_grade": false,
+      "false_slab_claim": false
+    },
+    {
+      "id": "freshraw_7_795209806",
+      "conditions": [
+        "raw_card"
+      ],
+      "grading_ms": 3072.38,
+      "grading": {
+        "slab_detected": null,
+        "is_graded": null,
+        "grading_status": "unknown",
+        "company": null,
+        "company_source": "none",
+        "grade": null,
+        "condition_label": null,
+        "subgrades": {},
+        "tag_score": null,
+        "certification_number": null,
+        "qualifiers": [],
+        "raw_condition": "not_assessed",
+        "authenticity_verified": false,
+        "source": "none",
+        "requires_confirmation": true,
+        "label_text": [
+          "Parasect",
+          "STAGE1",
+          "120",
+          "HP",
+          "Evolves from Paras"
+        ],
+        "warnings": [
+          "no_supported_grading_label_detected",
+          "ungraded_status_not_proven"
+        ]
+      },
+      "manual_truth": {
+        "kind": "raw",
+        "company": null,
+        "grade": null,
+        "name": "Parasect",
+        "number": "TG01/TG30",
+        "language": "en"
+      },
+      "source_page": "https://www.ebay.com/b/Parasect-TG01-TG30-Swsh11-Lost-Origin-Trainer-Gallery/2536/bn_7124575457",
+      "company_correct": true,
+      "grade_correct": true,
+      "wrong_company": false,
+      "wrong_grade": false,
+      "false_slab_claim": false
+    },
+    {
+      "id": "freshextra_6_1736995038",
+      "conditions": [
+        "raw_card"
+      ],
+      "grading_ms": 1708.12,
+      "grading": {
+        "slab_detected": null,
+        "is_graded": null,
+        "grading_status": "unknown",
+        "company": null,
+        "company_source": "none",
+        "grade": null,
+        "condition_label": null,
+        "subgrades": {},
+        "tag_score": null,
+        "certification_number": null,
+        "qualifiers": [],
+        "raw_condition": "not_assessed",
+        "authenticity_verified": false,
+        "source": "none",
+        "requires_confirmation": true,
+        "label_text": [
+          "60",
+          "BASIC",
+          "Lechonk",
+          "HP"
+        ],
+        "warnings": [
+          "no_supported_grading_label_detected",
+          "ungraded_status_not_proven"
+        ]
+      },
+      "manual_truth": {
+        "kind": "raw",
+        "company": null,
+        "grade": null,
+        "name": "Lechonk",
+        "number": "209/197",
+        "language": "en"
+      },
+      "source_page": "https://www.sportscardinvestor.com/cards/lechonk-pokemon/2023-scarlet-violet-obsidian-flames-illustration-rare-209-197",
+      "company_correct": true,
+      "grade_correct": true,
+      "wrong_company": false,
+      "wrong_grade": false,
+      "false_slab_claim": false
+    },
+    {
+      "id": "fresh100_336501773626",
+      "conditions": [
+        "raw_card"
+      ],
+      "grading_ms": 1678.3,
+      "grading": {
+        "slab_detected": null,
+        "is_graded": null,
+        "grading_status": "unknown",
+        "company": null,
+        "company_source": "none",
+        "grade": null,
+        "condition_label": null,
+        "subgrades": {},
+        "tag_score": null,
+        "certification_number": null,
+        "qualifiers": [],
+        "raw_condition": "not_assessed",
+        "authenticity_verified": false,
+        "source": "none",
+        "requires_confirmation": true,
+        "label_text": [
+          "BASIC",
+          "Tangela",
+          "80"
+        ],
+        "warnings": [
+          "no_supported_grading_label_detected",
+          "ungraded_status_not_proven"
+        ]
+      },
+      "manual_truth": {
+        "kind": "raw",
+        "company": null,
+        "grade": null,
+        "name": "Tangela",
+        "number": "178/165",
+        "language": "en"
+      },
+      "source_page": "https://www.ebay.com/itm/336501773626",
+      "company_correct": true,
+      "grade_correct": true,
+      "wrong_company": false,
+      "wrong_grade": false,
+      "false_slab_claim": false
+    },
+    {
+      "id": "freshraw_0_1109460011",
+      "conditions": [
+        "raw_card"
+      ],
+      "grading_ms": 1765.28,
+      "grading": {
+        "slab_detected": null,
+        "is_graded": null,
+        "grading_status": "unknown",
+        "company": null,
+        "company_source": "none",
+        "grade": null,
+        "condition_label": null,
+        "subgrades": {},
+        "tag_score": null,
+        "certification_number": null,
+        "qualifiers": [],
+        "raw_condition": "not_assessed",
+        "authenticity_verified": false,
+        "source": "none",
+        "requires_confirmation": true,
+        "label_text": [
+          "BASIC",
+          "Marill",
+          "70",
+          "HP"
+        ],
+        "warnings": [
+          "no_supported_grading_label_detected",
+          "ungraded_status_not_proven"
+        ]
+      },
+      "manual_truth": {
+        "kind": "raw",
+        "company": null,
+        "grade": null,
+        "name": "Marill",
+        "number": "204/193",
+        "language": "en"
+      },
+      "source_page": "https://www.sportscardinvestor.com/cards/marill-pokemon/2023-scarlet-violet-paldea-evolved-illustration-rare-204-193",
+      "company_correct": true,
+      "grade_correct": true,
+      "wrong_company": false,
+      "wrong_grade": false,
+      "false_slab_claim": false
+    },
+    {
+      "id": "fresh100_236504673185",
+      "conditions": [
+        "raw_card"
+      ],
+      "grading_ms": 1907.05,
+      "grading": {
+        "slab_detected": null,
+        "is_graded": null,
+        "grading_status": "unknown",
+        "company": null,
+        "company_source": "none",
+        "grade": null,
+        "condition_label": null,
+        "subgrades": {},
+        "tag_score": null,
+        "certification_number": null,
+        "qualifiers": [],
+        "raw_condition": "not_assessed",
+        "authenticity_verified": false,
+        "source": "none",
+        "requires_confirmation": true,
+        "label_text": [
+          "Armarouge",
+          "STAGE1",
+          "130",
+          "HP",
+          "Evolves from Charcadet"
+        ],
+        "warnings": [
+          "no_supported_grading_label_detected",
+          "ungraded_status_not_proven"
+        ]
+      },
+      "manual_truth": {
+        "kind": "raw",
+        "company": null,
+        "grade": null,
+        "name": "Armarouge",
+        "number": "203/198",
+        "language": "en"
+      },
+      "source_page": "https://www.ebay.com/itm/236504673185",
+      "company_correct": true,
+      "grade_correct": true,
+      "wrong_company": false,
+      "wrong_grade": false,
+      "false_slab_claim": false
+    },
+    {
+      "id": "fresh100_396170517118",
+      "conditions": [
+        "raw_card"
+      ],
+      "grading_ms": 3020.46,
+      "grading": {
+        "slab_detected": null,
+        "is_graded": null,
+        "grading_status": "unknown",
+        "company": null,
+        "company_source": "none",
+        "grade": null,
+        "condition_label": null,
+        "subgrades": {},
+        "tag_score": null,
+        "certification_number": null,
+        "qualifiers": [],
+        "raw_condition": "not_assessed",
+        "authenticity_verified": false,
+        "source": "none",
+        "requires_confirmation": true,
+        "label_text": [
+          "STAGE1",
+          "Kirlia",
+          "190",
+          "Evolves from Ralts"
+        ],
+        "warnings": [
+          "no_supported_grading_label_detected",
+          "ungraded_status_not_proven"
+        ]
+      },
+      "manual_truth": {
+        "kind": "raw",
+        "company": null,
+        "grade": null,
+        "name": "Kirlia",
+        "number": "212/198",
+        "language": "en"
+      },
+      "source_page": "https://www.ebay.com.au/itm/396170517118",
+      "company_correct": true,
+      "grade_correct": true,
+      "wrong_company": false,
+      "wrong_grade": false,
+      "false_slab_claim": false
+    },
+    {
+      "id": "freshraw_4_1318482242",
+      "conditions": [
+        "raw_card"
+      ],
+      "grading_ms": 2933.17,
+      "grading": {
+        "slab_detected": null,
+        "is_graded": null,
+        "grading_status": "unknown",
+        "company": null,
+        "company_source": "none",
+        "grade": null,
+        "condition_label": null,
+        "subgrades": {},
+        "tag_score": null,
+        "certification_number": null,
+        "qualifiers": [],
+        "raw_condition": "not_assessed",
+        "authenticity_verified": false,
+        "source": "none",
+        "requires_confirmation": true,
+        "label_text": [
+          "BASIC",
+          "70",
+          "Drowzee",
+          "HP"
+        ],
+        "warnings": [
+          "no_supported_grading_label_detected",
+          "ungraded_status_not_proven"
+        ]
+      },
+      "manual_truth": {
+        "kind": "raw",
+        "company": null,
+        "grade": null,
+        "name": "Drowzee",
+        "number": "210/198",
+        "language": "en"
+      },
+      "source_page": "https://www.ebay.ca/b/Drowzee-210-198-SV01-Scarlet-Violet-Base-Set/2536/bn_7124580318",
+      "company_correct": true,
+      "grade_correct": true,
+      "wrong_company": false,
+      "wrong_grade": false,
+      "false_slab_claim": false
+    },
+    {
+      "id": "fresh100_125514764134",
+      "conditions": [
+        "raw_card"
+      ],
+      "grading_ms": 2910.66,
+      "grading": {
+        "slab_detected": null,
+        "is_graded": null,
+        "grading_status": "unknown",
+        "company": null,
+        "company_source": "none",
+        "grade": null,
+        "condition_label": null,
+        "subgrades": {},
+        "tag_score": null,
+        "certification_number": null,
+        "qualifiers": [],
+        "raw_condition": "not_assessed",
+        "authenticity_verified": false,
+        "source": "none",
+        "requires_confirmation": true,
+        "label_text": [
+          "STAGE1",
+          "Parasect",
+          "120",
+          "Evolves from Paras"
+        ],
+        "warnings": [
+          "no_supported_grading_label_detected",
+          "ungraded_status_not_proven"
+        ]
+      },
+      "manual_truth": {
+        "kind": "raw",
+        "company": null,
+        "grade": null,
+        "name": "Parasect",
+        "number": "TG01/TG30",
+        "language": "en"
+      },
+      "source_page": "https://www.ebay.com/itm/125514764134",
+      "company_correct": true,
+      "grade_correct": true,
+      "wrong_company": false,
+      "wrong_grade": false,
+      "false_slab_claim": false
+    },
+    {
+      "id": "fresh100_205836607918",
+      "conditions": [
+        "raw_card"
+      ],
+      "grading_ms": 1950.9,
+      "grading": {
+        "slab_detected": null,
+        "is_graded": null,
+        "grading_status": "unknown",
+        "company": null,
+        "company_source": "none",
+        "grade": null,
+        "condition_label": null,
+        "subgrades": {},
+        "tag_score": null,
+        "certification_number": null,
+        "qualifiers": [],
+        "raw_condition": "not_assessed",
+        "authenticity_verified": false,
+        "source": "none",
+        "requires_confirmation": true,
+        "label_text": [
+          "Marill",
+          "70",
+          "BASIC",
+          "HP"
+        ],
+        "warnings": [
+          "no_supported_grading_label_detected",
+          "ungraded_status_not_proven"
+        ]
+      },
+      "manual_truth": {
+        "kind": "raw",
+        "company": null,
+        "grade": null,
+        "name": "Marill",
+        "number": "204/193",
+        "language": "en"
+      },
+      "source_page": "https://www.ebay.com/itm/205836607918",
+      "company_correct": true,
+      "grade_correct": true,
+      "wrong_company": false,
+      "wrong_grade": false,
+      "false_slab_claim": false
+    },
+    {
+      "id": "fresh100_235982624286",
+      "conditions": [
+        "raw_card"
+      ],
+      "grading_ms": 1906.58,
+      "grading": {
+        "slab_detected": null,
+        "is_graded": null,
+        "grading_status": "unknown",
+        "company": null,
+        "company_source": "none",
+        "grade": null,
+        "condition_label": null,
+        "subgrades": {},
+        "tag_score": null,
+        "certification_number": null,
+        "qualifiers": [],
+        "raw_condition": "not_assessed",
+        "authenticity_verified": false,
+        "source": "none",
+        "requires_confirmation": true,
+        "label_text": [
+          "STAGE1",
+          "Armarouge",
+          "130",
+          "HP",
+          "Evolves from Charcadet"
+        ],
+        "warnings": [
+          "no_supported_grading_label_detected",
+          "ungraded_status_not_proven"
+        ]
+      },
+      "manual_truth": {
+        "kind": "raw",
+        "company": null,
+        "grade": null,
+        "name": "Armarouge",
+        "number": "203/198",
+        "language": "en"
+      },
+      "source_page": "https://www.ebay.co.uk/itm/235982624286",
+      "company_correct": true,
+      "grade_correct": true,
+      "wrong_company": false,
+      "wrong_grade": false,
+      "false_slab_claim": false
+    },
+    {
+      "id": "fresh100_135586143350",
+      "conditions": [
+        "raw_card"
+      ],
+      "grading_ms": 1875.73,
+      "grading": {
+        "slab_detected": null,
+        "is_graded": null,
+        "grading_status": "unknown",
+        "company": null,
+        "company_source": "none",
+        "grade": null,
+        "condition_label": null,
+        "subgrades": {},
+        "tag_score": null,
+        "certification_number": null,
+        "qualifiers": [],
+        "raw_condition": "not_assessed",
+        "authenticity_verified": false,
+        "source": "none",
+        "requires_confirmation": true,
+        "label_text": [
+          "STAGE1",
+          "Kirlia",
+          "90",
+          "Evolves from Ralts"
+        ],
+        "warnings": [
+          "no_supported_grading_label_detected",
+          "ungraded_status_not_proven"
+        ]
+      },
+      "manual_truth": {
+        "kind": "raw",
+        "company": null,
+        "grade": null,
+        "name": "Kirlia",
+        "number": "212/198",
+        "language": "en"
+      },
+      "source_page": "https://www.ebay.com/itm/135586143350",
+      "company_correct": true,
+      "grade_correct": true,
+      "wrong_company": false,
+      "wrong_grade": false,
+      "false_slab_claim": false
+    },
+    {
+      "id": "fresh100_267406776028",
+      "conditions": [
+        "raw_card"
+      ],
+      "grading_ms": 1965.61,
+      "grading": {
+        "slab_detected": null,
+        "is_graded": null,
+        "grading_status": "unknown",
+        "company": null,
+        "company_source": "none",
+        "grade": null,
+        "condition_label": null,
+        "subgrades": {},
+        "tag_score": null,
+        "certification_number": null,
+        "qualifiers": [],
+        "raw_condition": "not_assessed",
+        "authenticity_verified": false,
+        "source": "none",
+        "requires_confirmation": true,
+        "label_text": [
+          "BASIC",
+          "Drowzee",
+          "\u201470",
+          "1292"
+        ],
+        "warnings": [
+          "no_supported_grading_label_detected",
+          "ungraded_status_not_proven"
+        ]
+      },
+      "manual_truth": {
+        "kind": "raw",
+        "company": null,
+        "grade": null,
+        "name": "Drowzee",
+        "number": "210/198",
+        "language": "en"
+      },
+      "source_page": "https://www.ebay.com/itm/267406776028",
+      "company_correct": true,
+      "grade_correct": true,
+      "wrong_company": false,
+      "wrong_grade": false,
+      "false_slab_claim": false
+    },
+    {
+      "id": "fresh100_334557743755",
+      "conditions": [
+        "raw_card"
+      ],
+      "grading_ms": 1992.71,
+      "grading": {
+        "slab_detected": null,
+        "is_graded": null,
+        "grading_status": "unknown",
+        "company": null,
+        "company_source": "none",
+        "grade": null,
+        "condition_label": null,
+        "subgrades": {},
+        "tag_score": null,
+        "certification_number": null,
+        "qualifiers": [],
+        "raw_condition": "not_assessed",
+        "authenticity_verified": false,
+        "source": "none",
+        "requires_confirmation": true,
+        "label_text": [
+          "Parasect",
+          "STAGE1",
+          "120",
+          "Evolves from Paras"
+        ],
+        "warnings": [
+          "no_supported_grading_label_detected",
+          "ungraded_status_not_proven"
+        ]
+      },
+      "manual_truth": {
+        "kind": "raw",
+        "company": null,
+        "grade": null,
+        "name": "Parasect",
+        "number": "TG01/TG30",
+        "language": "en"
+      },
+      "source_page": "https://www.ebay.com/itm/334557743755",
+      "company_correct": true,
+      "grade_correct": true,
+      "wrong_company": false,
+      "wrong_grade": false,
+      "false_slab_claim": false
+    },
+    {
+      "id": "freshraw_0_1861309623",
+      "conditions": [
+        "raw_card"
+      ],
+      "grading_ms": 1787.65,
+      "grading": {
+        "slab_detected": null,
+        "is_graded": null,
+        "grading_status": "unknown",
+        "company": null,
+        "company_source": "none",
+        "grade": null,
+        "condition_label": null,
+        "subgrades": {},
+        "tag_score": null,
+        "certification_number": null,
+        "qualifiers": [],
+        "raw_condition": "not_assessed",
+        "authenticity_verified": false,
+        "source": "none",
+        "requires_confirmation": true,
+        "label_text": [
+          "BASIC",
+          "Marill",
+          "700",
+          "HP"
+        ],
+        "warnings": [
+          "no_supported_grading_label_detected",
+          "ungraded_status_not_proven"
+        ]
+      },
+      "manual_truth": {
+        "kind": "raw",
+        "company": null,
+        "grade": null,
+        "name": "Marill",
+        "number": "204/193",
+        "language": "en"
+      },
+      "source_page": "https://www.sportscardinvestor.com/cards/marill-pokemon/2023-scarlet-violet-paldea-evolved-illustration-rare-204-193",
+      "company_correct": true,
+      "grade_correct": true,
+      "wrong_company": false,
+      "wrong_grade": false,
+      "false_slab_claim": false
+    },
+    {
+      "id": "freshraw_1_2051404991",
+      "conditions": [
+        "raw_card"
+      ],
+      "grading_ms": 2254.59,
+      "grading": {
+        "slab_detected": null,
+        "is_graded": null,
+        "grading_status": "unknown",
+        "company": null,
+        "company_source": "none",
+        "grade": null,
+        "condition_label": null,
+        "subgrades": {},
+        "tag_score": null,
+        "certification_number": null,
+        "qualifiers": [],
+        "raw_condition": "not_assessed",
+        "authenticity_verified": false,
+        "source": "none",
+        "requires_confirmation": true,
+        "label_text": [
+          "STAGE1",
+          "Armarouge",
+          "130",
+          "HP",
+          "Evolves from Charcadet"
+        ],
+        "warnings": [
+          "no_supported_grading_label_detected",
+          "ungraded_status_not_proven"
+        ]
+      },
+      "manual_truth": {
+        "kind": "raw",
+        "company": null,
+        "grade": null,
+        "name": "Armarouge",
+        "number": "203/198",
+        "language": "en"
+      },
+      "source_page": "https://www.sportscardinvestor.com/cards/armarouge-pokemon/2023-scarlet-violet-illustration-rare-203-198",
+      "company_correct": true,
+      "grade_correct": true,
+      "wrong_company": false,
+      "wrong_grade": false,
+      "false_slab_claim": false
+    },
+    {
+      "id": "freshraw_3_1376470916",
+      "conditions": [
+        "raw_card"
+      ],
+      "grading_ms": 2475.18,
+      "grading": {
+        "slab_detected": null,
+        "is_graded": null,
+        "grading_status": "unknown",
+        "company": null,
+        "company_source": "none",
+        "grade": null,
+        "condition_label": null,
+        "subgrades": {},
+        "tag_score": null,
+        "certification_number": null,
+        "qualifiers": [],
+        "raw_condition": "not_assessed",
+        "authenticity_verified": false,
+        "source": "none",
+        "requires_confirmation": true,
+        "label_text": [
+          "GETTI",
+          "STAGE1",
+          "Kirlia",
+          "90",
+          "SNI",
+          "Evolves from Ralts"
+        ],
+        "warnings": [
+          "no_supported_grading_label_detected",
+          "ungraded_status_not_proven"
+        ]
+      },
+      "manual_truth": {
+        "kind": "raw",
+        "company": null,
+        "grade": null,
+        "name": "Kirlia",
+        "number": "212/198",
+        "language": "en"
+      },
+      "source_page": "https://www.sportscardinvestor.com/cards/kirlia-pokemon/2023-scarlet-violet-illustration-rare-212-198",
+      "company_correct": true,
+      "grade_correct": true,
+      "wrong_company": false,
+      "wrong_grade": false,
+      "false_slab_claim": false
+    },
+    {
+      "id": "freshraw_4_123815526",
+      "conditions": [
+        "raw_card"
+      ],
+      "grading_ms": 1854.62,
+      "grading": {
+        "slab_detected": null,
+        "is_graded": null,
+        "grading_status": "unknown",
+        "company": null,
+        "company_source": "none",
+        "grade": null,
+        "condition_label": null,
+        "subgrades": {},
+        "tag_score": null,
+        "certification_number": null,
+        "qualifiers": [],
+        "raw_condition": "not_assessed",
+        "authenticity_verified": false,
+        "source": "none",
+        "requires_confirmation": true,
+        "label_text": [
+          "BASIC",
+          "70",
+          "Drowzee",
+          "HP"
+        ],
+        "warnings": [
+          "no_supported_grading_label_detected",
+          "ungraded_status_not_proven"
+        ]
+      },
+      "manual_truth": {
+        "kind": "raw",
+        "company": null,
+        "grade": null,
+        "name": "Drowzee",
+        "number": "210/198",
+        "language": "en"
+      },
+      "source_page": "https://www.sportscardinvestor.com/cards/drowzee-pokemon/2023-scarlet-violet-illustration-rare-210-198",
+      "company_correct": true,
+      "grade_correct": true,
+      "wrong_company": false,
+      "wrong_grade": false,
+      "false_slab_claim": false
+    },
+    {
+      "id": "fresh100_235278936401",
+      "conditions": [
+        "raw_card"
+      ],
+      "grading_ms": 2147.57,
+      "grading": {
+        "slab_detected": null,
+        "is_graded": null,
+        "grading_status": "unknown",
+        "company": null,
+        "company_source": "none",
+        "grade": null,
+        "condition_label": null,
+        "subgrades": {},
+        "tag_score": null,
+        "certification_number": null,
+        "qualifiers": [],
+        "raw_condition": "not_assessed",
+        "authenticity_verified": false,
+        "source": "none",
+        "requires_confirmation": true,
+        "label_text": [
+          "Parasect",
+          "STAGE1",
+          "120",
+          "HP",
+          "Evolves from Paras"
+        ],
+        "warnings": [
+          "no_supported_grading_label_detected",
+          "ungraded_status_not_proven"
+        ]
+      },
+      "manual_truth": {
+        "kind": "raw",
+        "company": null,
+        "grade": null,
+        "name": "Parasect",
+        "number": "TG01/TG30",
+        "language": "en"
+      },
+      "source_page": "https://www.ebay.com/itm/235278936401",
+      "company_correct": true,
+      "grade_correct": true,
+      "wrong_company": false,
+      "wrong_grade": false,
+      "false_slab_claim": false
+    },
+    {
+      "id": "freshraw_0_1807925107",
+      "conditions": [
+        "raw_card"
+      ],
+      "grading_ms": 1492.0,
+      "grading": {
+        "slab_detected": null,
+        "is_graded": null,
+        "grading_status": "unknown",
+        "company": null,
+        "company_source": "none",
+        "grade": null,
+        "condition_label": null,
+        "subgrades": {},
+        "tag_score": null,
+        "certification_number": null,
+        "qualifiers": [],
+        "raw_condition": "not_assessed",
+        "authenticity_verified": false,
+        "source": "none",
+        "requires_confirmation": true,
+        "label_text": [
+          "70",
+          "Marill"
+        ],
+        "warnings": [
+          "no_supported_grading_label_detected",
+          "ungraded_status_not_proven"
+        ]
+      },
+      "manual_truth": {
+        "kind": "raw",
+        "company": null,
+        "grade": null,
+        "name": "Marill",
+        "number": "204/193",
+        "language": "en"
+      },
+      "source_page": "https://www.sportscardinvestor.com/cards/marill-pokemon/2023-scarlet-violet-paldea-evolved-illustration-rare-204-193",
+      "company_correct": true,
+      "grade_correct": true,
+      "wrong_company": false,
+      "wrong_grade": false,
+      "false_slab_claim": false
+    },
+    {
+      "id": "fresh100_286467766284",
+      "conditions": [
+        "raw_card"
+      ],
+      "grading_ms": 1941.05,
+      "grading": {
+        "slab_detected": null,
+        "is_graded": null,
+        "grading_status": "unknown",
+        "company": null,
+        "company_source": "none",
+        "grade": null,
+        "condition_label": null,
+        "subgrades": {},
+        "tag_score": null,
+        "certification_number": null,
+        "qualifiers": [],
+        "raw_condition": "not_assessed",
+        "authenticity_verified": false,
+        "source": "none",
+        "requires_confirmation": true,
+        "label_text": [
+          "Armarouge",
+          "130",
+          "STAGE1",
+          "HP",
+          "Evolves from Charcadet"
+        ],
+        "warnings": [
+          "no_supported_grading_label_detected",
+          "ungraded_status_not_proven"
+        ]
+      },
+      "manual_truth": {
+        "kind": "raw",
+        "company": null,
+        "grade": null,
+        "name": "Armarouge",
+        "number": "203/198",
+        "language": "en"
+      },
+      "source_page": "https://www.ebay.com/itm/286467766284",
+      "company_correct": true,
+      "grade_correct": true,
+      "wrong_company": false,
+      "wrong_grade": false,
+      "false_slab_claim": false
+    },
+    {
+      "id": "fresh100_365490414711",
+      "conditions": [
+        "raw_card"
+      ],
+      "grading_ms": 1658.99,
+      "grading": {
+        "slab_detected": null,
+        "is_graded": null,
+        "grading_status": "unknown",
+        "company": null,
+        "company_source": "none",
+        "grade": null,
+        "condition_label": null,
+        "subgrades": {},
+        "tag_score": null,
+        "certification_number": null,
+        "qualifiers": [],
+        "raw_condition": "not_assessed",
+        "authenticity_verified": false,
+        "source": "none",
+        "requires_confirmation": true,
+        "label_text": [
+          "STAGE1",
+          "Kirlia",
+          "90",
+          "HP",
+          "Evolves from Ralts"
+        ],
+        "warnings": [
+          "no_supported_grading_label_detected",
+          "ungraded_status_not_proven"
+        ]
+      },
+      "manual_truth": {
+        "kind": "raw",
+        "company": null,
+        "grade": null,
+        "name": "Kirlia",
+        "number": "212/198",
+        "language": "en"
+      },
+      "source_page": "https://www.ebay.com/itm/365490414711",
+      "company_correct": true,
+      "grade_correct": true,
+      "wrong_company": false,
+      "wrong_grade": false,
+      "false_slab_claim": false
+    },
+    {
+      "id": "freshraw_4_343408992",
+      "conditions": [
+        "raw_card"
+      ],
+      "grading_ms": 1901.59,
+      "grading": {
+        "slab_detected": null,
+        "is_graded": null,
+        "grading_status": "unknown",
+        "company": null,
+        "company_source": "none",
+        "grade": null,
+        "condition_label": null,
+        "subgrades": {},
+        "tag_score": null,
+        "certification_number": null,
+        "qualifiers": [],
+        "raw_condition": "not_assessed",
+        "authenticity_verified": false,
+        "source": "none",
+        "requires_confirmation": true,
+        "label_text": [
+          "70",
+          "BASIC",
+          "Drowzee",
+          "HP"
+        ],
+        "warnings": [
+          "no_supported_grading_label_detected",
+          "ungraded_status_not_proven"
+        ]
+      },
+      "manual_truth": {
+        "kind": "raw",
+        "company": null,
+        "grade": null,
+        "name": "Drowzee",
+        "number": "210/198",
+        "language": "en"
+      },
+      "source_page": "https://www.sportscardinvestor.com/cards/drowzee-pokemon/2023-scarlet-violet-illustration-rare-210-198",
+      "company_correct": true,
+      "grade_correct": true,
+      "wrong_company": false,
+      "wrong_grade": false,
+      "false_slab_claim": false
+    },
+    {
+      "id": "fresh100_397747206164",
+      "conditions": [
+        "slab"
+      ],
+      "grading_ms": 6139.73,
+      "grading": {
+        "slab_detected": true,
+        "is_graded": true,
+        "grading_status": "graded",
+        "company": "psa",
+        "company_source": "label_ocr",
+        "grade": 8.0,
+        "condition_label": "NM-MT",
+        "subgrades": {},
+        "tag_score": null,
+        "certification_number": "158323111",
+        "qualifiers": [],
+        "raw_condition": "not_assessed",
+        "authenticity_verified": false,
+        "source": "visible_label_ocr",
+        "requires_confirmation": true,
+        "label_text": [
+          "M. JPN. SUN & MOON",
+          "#038",
+          "R & MIMIKYU GX",
+          "NM-MT",
+          "OLT",
+          "8",
+          "FSA",
+          "158323111",
+          "PSA"
+        ],
+        "warnings": []
+      },
+      "manual_truth": {
+        "kind": "slab",
+        "company": "psa",
+        "grade": 8,
+        "name": "Gengar & Mimikyu GX",
+        "number": "038/095",
+        "language": "ja"
+      },
+      "source_page": "https://www.ebay.com/itm/397747206164",
+      "company_correct": true,
+      "grade_correct": true,
+      "wrong_company": false,
+      "wrong_grade": false,
+      "false_slab_claim": false
+    },
+    {
+      "id": "fresh100_406359778998",
+      "conditions": [
+        "slab"
+      ],
+      "grading_ms": 11639.33,
+      "grading": {
+        "slab_detected": true,
+        "is_graded": true,
+        "grading_status": "graded",
+        "company": "psa",
+        "company_source": "verified_logo",
+        "grade": 9.0,
+        "condition_label": "MINT",
+        "subgrades": {},
+        "tag_score": null,
+        "certification_number": "136210024",
+        "qualifiers": [],
+        "raw_condition": "not_assessed",
+        "authenticity_verified": false,
+        "source": "visible_label_ocr",
+        "requires_confirmation": true,
+        "label_text": [
+          "2018 P.M. JPN. SUN & MOON",
+          "#065",
+          "DRAGONITE-HOLO",
+          "MINT",
+          "TAG BOLT",
+          "9",
+          "136210024",
+          "P"
+        ],
+        "warnings": []
+      },
+      "manual_truth": {
+        "kind": "slab",
+        "company": "psa",
+        "grade": 9,
+        "name": "Dragonite",
+        "number": "065/095",
+        "language": "ja"
+      },
+      "source_page": "https://www.ebay.com/itm/406359778998",
+      "company_correct": true,
+      "grade_correct": true,
+      "wrong_company": false,
+      "wrong_grade": false,
+      "false_slab_claim": false
+    },
+    {
+      "id": "fresh100_277613285848",
+      "conditions": [
+        "slab"
+      ],
+      "grading_ms": 856.4,
+      "grading": {
+        "slab_detected": true,
+        "is_graded": true,
+        "grading_status": "graded",
+        "company": "psa",
+        "company_source": "label_ocr",
+        "grade": 8.0,
+        "condition_label": "NM-MT",
+        "subgrades": {},
+        "tag_score": null,
+        "certification_number": null,
+        "qualifiers": [],
+        "raw_condition": "not_assessed",
+        "authenticity_verified": false,
+        "source": "visible_label_ocr",
+        "requires_confirmation": true,
+        "label_text": [
+          "2023 POKEMON SVP EN",
+          "#053",
+          "MEW ex",
+          "NM-MT",
+          "151 ULTRA-PREMIUM COLL",
+          "8",
+          "PSA",
+          "BASIC",
+          "Mewex",
+          "180",
+          "HP"
+        ],
+        "warnings": []
+      },
+      "manual_truth": {
+        "kind": "slab",
+        "company": "psa",
+        "grade": 8,
+        "name": "Mew ex",
+        "number": "SVP053",
+        "language": "en"
+      },
+      "source_page": "https://www.ebay.com/itm/277613285848",
+      "company_correct": true,
+      "grade_correct": true,
+      "wrong_company": false,
+      "wrong_grade": false,
+      "false_slab_claim": false
+    },
+    {
+      "id": "freshimg_0_995976121",
+      "conditions": [
+        "slab"
+      ],
+      "grading_ms": 5467.05,
+      "grading": {
+        "slab_detected": true,
+        "is_graded": true,
+        "grading_status": "graded",
+        "company": "psa",
+        "company_source": "label_ocr",
+        "grade": 8.0,
+        "condition_label": "NM-MT",
+        "subgrades": {},
+        "tag_score": null,
+        "certification_number": "107716192",
+        "qualifiers": [],
+        "raw_condition": "not_assessed",
+        "authenticity_verified": false,
+        "source": "visible_label_ocr",
+        "requires_confirmation": true,
+        "label_text": [
+          "2023 POKEMON MEW EN",
+          "#200",
+          "BLASTOISE ex",
+          "NM-MT",
+          "SPECIAL ILLUSTRATION RARE",
+          "8",
+          "107716192",
+          "PSA"
+        ],
+        "warnings": []
+      },
+      "manual_truth": {
+        "kind": "slab",
+        "company": "psa",
+        "grade": 8,
+        "name": "Blastoise ex",
+        "number": "200/165",
+        "language": "en"
+      },
+      "source_page": "https://www.ebay.com/p/28062931363",
+      "company_correct": true,
+      "grade_correct": true,
+      "wrong_company": false,
+      "wrong_grade": false,
+      "false_slab_claim": false
+    },
+    {
+      "id": "freshimg_0_1677673688",
+      "conditions": [
+        "slab"
+      ],
+      "grading_ms": 909.32,
+      "grading": {
+        "slab_detected": true,
+        "is_graded": true,
+        "grading_status": "graded",
+        "company": "psa",
+        "company_source": "label_ocr",
+        "grade": 8.0,
+        "condition_label": "NM-MT",
+        "subgrades": {},
+        "tag_score": null,
+        "certification_number": "129868688",
+        "qualifiers": [],
+        "raw_condition": "not_assessed",
+        "authenticity_verified": false,
+        "source": "visible_label_ocr",
+        "requires_confirmation": true,
+        "label_text": [
+          "2023 POKEMON SVP EN",
+          "#052",
+          "MEWTWO",
+          "NM-MT",
+          "151ULTRA-PREMIUM COLL",
+          "8",
+          "PSA",
+          "129868688",
+          "BASIC",
+          "Mewtwo",
+          "130",
+          "HP"
+        ],
+        "warnings": []
+      },
+      "manual_truth": {
+        "kind": "slab",
+        "company": "psa",
+        "grade": 8,
+        "name": "Mewtwo",
+        "number": "SVP052",
+        "language": "en"
+      },
+      "source_page": "https://www.ebay.com/p/26063212569",
+      "company_correct": true,
+      "grade_correct": true,
+      "wrong_company": false,
+      "wrong_grade": false,
+      "false_slab_claim": false
+    },
+    {
+      "id": "freshimg_0_1212241946",
+      "conditions": [
+        "slab"
+      ],
+      "grading_ms": 8091.23,
+      "grading": {
+        "slab_detected": true,
+        "is_graded": true,
+        "grading_status": "graded",
+        "company": null,
+        "company_source": "none",
+        "grade": 8.0,
+        "condition_label": "NM-MT",
+        "subgrades": {},
+        "tag_score": null,
+        "certification_number": "130282811",
+        "qualifiers": [],
+        "raw_condition": "not_assessed",
+        "authenticity_verified": false,
+        "source": "visible_label_ocr",
+        "requires_confirmation": true,
+        "label_text": [
+          "2023 POKEMON MEW EN",
+          "199",
+          "CHARIZARD ex",
+          "NM-MT",
+          "SPECIAL ILLUSTRATIONRARE",
+          "8",
+          "PA",
+          "130282811",
+          "Charizard@X",
+          "330"
+        ],
+        "warnings": [
+          "grading_company_unreadable_or_unsupported"
+        ]
+      },
+      "manual_truth": {
+        "kind": "slab",
+        "company": "psa",
+        "grade": 8,
+        "name": "Charizard ex",
+        "number": "199/165",
+        "language": "en"
+      },
+      "source_page": "https://www.ebay.com/p/17062924371",
+      "company_correct": false,
+      "grade_correct": true,
+      "wrong_company": false,
+      "wrong_grade": false,
+      "false_slab_claim": false
+    },
+    {
+      "id": "freshimg_0_967558432",
+      "conditions": [
+        "slab"
+      ],
+      "grading_ms": 841.74,
+      "grading": {
+        "slab_detected": true,
+        "is_graded": true,
+        "grading_status": "graded",
+        "company": "psa",
+        "company_source": "label_ocr",
+        "grade": 8.0,
+        "condition_label": "NM-MT",
+        "subgrades": {},
+        "tag_score": null,
+        "certification_number": "144364703",
+        "qualifiers": [],
+        "raw_condition": "not_assessed",
+        "authenticity_verified": false,
+        "source": "visible_label_ocr",
+        "requires_confirmation": true,
+        "label_text": [
+          "2016 POKEMON XY",
+          "#RC29",
+          "FA/PIKACHU",
+          "NM-MT",
+          "GEN.RADIANT COLLECTION",
+          "8",
+          "PSA",
+          "144364703",
+          "BASIC",
+          "Pikachu",
+          "HP60"
+        ],
+        "warnings": []
+      },
+      "manual_truth": {
+        "kind": "slab",
+        "company": "psa",
+        "grade": 8,
+        "name": "Pikachu",
+        "number": "RC29/RC32",
+        "language": "en"
+      },
+      "source_page": "https://www.ebay.com/b/Pikachu-Pokemon-TCG-Generations-Ultra-Rare-Individual-Collectible-Card-Game-Cards/183454/bn_84948685",
+      "company_correct": true,
+      "grade_correct": true,
+      "wrong_company": false,
+      "wrong_grade": false,
+      "false_slab_claim": false
+    },
+    {
+      "id": "freshimg_0_1142638013",
+      "conditions": [
+        "slab"
+      ],
+      "grading_ms": 904.72,
+      "grading": {
+        "slab_detected": true,
+        "is_graded": true,
+        "grading_status": "graded",
+        "company": "psa",
+        "company_source": "label_ocr",
+        "grade": 8.0,
+        "condition_label": "NM-MT",
+        "subgrades": {},
+        "tag_score": null,
+        "certification_number": "145834168",
+        "qualifiers": [],
+        "raw_condition": "not_assessed",
+        "authenticity_verified": false,
+        "source": "visible_label_ocr",
+        "requires_confirmation": true,
+        "label_text": [
+          "2020 POKEMON SWSH BSP",
+          "#020",
+          "FA/PIKACHU",
+          "NM-MT",
+          "FIGURE COLLECTION",
+          "8",
+          "PSA",
+          "145834168",
+          "Pikachu",
+          "BASIC",
+          "70"
+        ],
+        "warnings": []
+      },
+      "manual_truth": {
+        "kind": "slab",
+        "company": "psa",
+        "grade": 8,
+        "name": "Pikachu",
+        "number": "SWSH020",
+        "language": "en"
+      },
+      "source_page": "https://www.ebay.com/p/14043372310",
+      "company_correct": true,
+      "grade_correct": true,
+      "wrong_company": false,
+      "wrong_grade": false,
+      "false_slab_claim": false
+    },
+    {
+      "id": "fresh100_137339181702",
+      "conditions": [
+        "slab"
+      ],
+      "grading_ms": 873.42,
+      "grading": {
+        "slab_detected": true,
+        "is_graded": true,
+        "grading_status": "graded",
+        "company": "psa",
+        "company_source": "label_ocr",
+        "grade": 9.0,
+        "condition_label": "MINT",
+        "subgrades": {},
+        "tag_score": null,
+        "certification_number": "25514109",
+        "qualifiers": [],
+        "raw_condition": "not_assessed",
+        "authenticity_verified": false,
+        "source": "visible_label_ocr",
+        "requires_confirmation": true,
+        "label_text": [
+          "PSA",
+          "1999 POKEMON GAME",
+          "#15",
+          "VENUSAUR-HOLO",
+          "MINT",
+          "1STEDITION",
+          "9",
+          "25514109",
+          "Evolves from Ivysaur",
+          "STAGE 2",
+          "Put Venusaur on the Stage I card"
+        ],
+        "warnings": []
+      },
+      "manual_truth": {
+        "kind": "slab",
+        "company": "psa",
+        "grade": 9,
+        "name": "Venusaur",
+        "number": "15/102",
+        "language": "en"
+      },
+      "source_page": "https://www.ebay.com/itm/137339181702",
+      "company_correct": true,
+      "grade_correct": true,
+      "wrong_company": false,
+      "wrong_grade": false,
+      "false_slab_claim": false
+    },
+    {
+      "id": "fresh100_336762686851",
+      "conditions": [
+        "slab"
+      ],
+      "grading_ms": 1863.07,
+      "grading": {
+        "slab_detected": true,
+        "is_graded": true,
+        "grading_status": "graded",
+        "company": "psa",
+        "company_source": "label_ocr",
+        "grade": 8.0,
+        "condition_label": "NM-MT",
+        "subgrades": {},
+        "tag_score": null,
+        "certification_number": "122992791",
+        "qualifiers": [],
+        "raw_condition": "not_assessed",
+        "authenticity_verified": false,
+        "source": "visible_label_ocr",
+        "requires_confirmation": true,
+        "label_text": [
+          "#055",
+          "2022 POKEMON GO",
+          "SNORLAX-HOLO",
+          "NM-MT",
+          "8",
+          "PSA",
+          "122992791"
+        ],
+        "warnings": []
+      },
+      "manual_truth": {
+        "kind": "slab",
+        "company": "psa",
+        "grade": 8,
+        "name": "Snorlax",
+        "number": "055/078",
+        "language": "en"
+      },
+      "source_page": "https://www.ebay.com/itm/336762686851",
+      "company_correct": true,
+      "grade_correct": true,
+      "wrong_company": false,
+      "wrong_grade": false,
+      "false_slab_claim": false
+    },
+    {
+      "id": "freshimg_1_113190404",
+      "conditions": [
+        "slab"
+      ],
+      "grading_ms": 7891.78,
+      "grading": {
+        "slab_detected": true,
+        "is_graded": null,
+        "grading_status": "unknown",
+        "company": null,
+        "company_source": "none",
+        "grade": null,
+        "condition_label": "MINT",
+        "subgrades": {
+          "centering": 9.5,
+          "corners": 9.0
+        },
+        "tag_score": null,
+        "certification_number": "0018814275",
+        "qualifiers": [],
+        "raw_condition": "not_assessed",
+        "authenticity_verified": false,
+        "source": "visible_label_ocr",
+        "requires_confirmation": true,
+        "label_text": [
+          "2024 SCARLET & VIOLET",
+          "PALDEAN FATES",
+          "6",
+          "#232 MEW EX SIR",
+          "CENTERING 9.5",
+          "BECKETTO",
+          "CORNERS 9",
+          "EDGES",
+          "MINT",
+          "9",
+          "SURFACE",
+          "8.5",
+          "0018814275",
+          "2024 SCARLET & VIOLET",
+          "PALDEAN FATES",
+          "#232 MEW EX SIR",
+          "9",
+          "CENTERING 9.5",
+          "BECKETTO",
+          "CORNERS 9",
+          "EDGES",
+          "MINT",
+          "9",
+          "SURFACE",
+          "8.5",
+          "0018814275"
+        ],
+        "warnings": [
+          "grading_company_unreadable_or_unsupported",
+          "conflicting_overall_grades",
+          "overall_grade_unreadable_or_ambiguous"
+        ]
+      },
+      "manual_truth": {
+        "kind": "slab",
+        "company": "beckett",
+        "grade": 9,
+        "name": "Mew ex",
+        "number": "232/091",
+        "language": "en"
+      },
+      "source_page": "https://www.ebay.ca/p/22065243991",
+      "company_correct": false,
+      "grade_correct": false,
+      "wrong_company": false,
+      "wrong_grade": false,
+      "false_slab_claim": false
+    },
+    {
+      "id": "fresh100_277888034880",
+      "conditions": [
+        "slab"
+      ],
+      "grading_ms": 869.89,
+      "grading": {
+        "slab_detected": true,
+        "is_graded": true,
+        "grading_status": "graded",
+        "company": "beckett",
+        "company_source": "label_ocr",
+        "grade": 9.0,
+        "condition_label": "MINT",
+        "subgrades": {},
+        "tag_score": null,
+        "certification_number": "0019308565",
+        "qualifiers": [],
+        "raw_condition": "not_assessed",
+        "authenticity_verified": false,
+        "source": "visible_label_ocr",
+        "requires_confirmation": true,
+        "label_text": [
+          "2023 SCARLET & VIOLET 151",
+          "9",
+          "B",
+          "#199 CHARIZARD EX SIR",
+          "MINT",
+          "BECKETT\u00ae",
+          "0019308565",
+          "STAGE2",
+          "CharizardeX",
+          "330",
+          "Evolvesfrom Charmeleon"
+        ],
+        "warnings": []
+      },
+      "manual_truth": {
+        "kind": "slab",
+        "company": "beckett",
+        "grade": 9,
+        "name": "Charizard ex",
+        "number": "199/165",
+        "language": "en"
+      },
+      "source_page": "https://www.ebay.com/itm/277888034880",
+      "company_correct": true,
+      "grade_correct": true,
+      "wrong_company": false,
+      "wrong_grade": false,
+      "false_slab_claim": false
+    },
+    {
+      "id": "fresh100_157312218315",
+      "conditions": [
+        "slab"
+      ],
+      "grading_ms": 5831.85,
+      "grading": {
+        "slab_detected": true,
+        "is_graded": true,
+        "grading_status": "graded",
+        "company": "beckett",
+        "company_source": "label_ocr",
+        "grade": 9.0,
+        "condition_label": "MINT",
+        "subgrades": {
+          "centering": 9.0
+        },
+        "tag_score": null,
+        "certification_number": "0018205423",
+        "qualifiers": [],
+        "raw_condition": "not_assessed",
+        "authenticity_verified": false,
+        "source": "visible_label_ocr",
+        "requires_confirmation": true,
+        "label_text": [
+          "2024 SCARLET & VIOLET",
+          "9",
+          "B",
+          "TEMPORALFORCES",
+          "#051 PIKACHU C",
+          "CENTERING 9",
+          "CORNERS",
+          "8.5",
+          "MINT",
+          "EDGES",
+          "10",
+          "SURFACE",
+          "10",
+          "0018205423",
+          "BECKETTO",
+          "BECKETT"
+        ],
+        "warnings": []
+      },
+      "manual_truth": {
+        "kind": "slab",
+        "company": "beckett",
+        "grade": 9,
+        "name": "Pikachu",
+        "number": "051/162",
+        "language": "en"
+      },
+      "source_page": "https://www.ebay.com/itm/157312218315",
+      "company_correct": true,
+      "grade_correct": true,
+      "wrong_company": false,
+      "wrong_grade": false,
+      "false_slab_claim": false
+    },
+    {
+      "id": "fresh100_196431506881",
+      "conditions": [
+        "slab"
+      ],
+      "grading_ms": 1089.68,
+      "grading": {
+        "slab_detected": true,
+        "is_graded": true,
+        "grading_status": "graded",
+        "company": "beckett",
+        "company_source": "label_ocr",
+        "grade": 9.0,
+        "condition_label": "MINT",
+        "subgrades": {},
+        "tag_score": null,
+        "certification_number": "0014502086",
+        "qualifiers": [],
+        "raw_condition": "not_assessed",
+        "authenticity_verified": false,
+        "source": "visible_label_ocr",
+        "requires_confirmation": true,
+        "label_text": [
+          "2009 ORGANIZED PLAY",
+          "9",
+          "B",
+          "SERIES 9",
+          "#15 PIKACHU",
+          "POKEMON DAY",
+          "MINT",
+          "CENTERING",
+          "9.5",
+          "CORNERS",
+          "8.5",
+          "0014502086",
+          "BECKETT\u00ae",
+          "EDGES",
+          "9",
+          "SURFACE",
+          "6",
+          "Pikachuwv.18",
+          "60",
+          "HP"
+        ],
+        "warnings": []
+      },
+      "manual_truth": {
+        "kind": "slab",
+        "company": "beckett",
+        "grade": 9,
+        "name": "Pikachu",
+        "number": "15/17",
+        "language": "en"
+      },
+      "source_page": "https://www.ebay.com/itm/196431506881",
+      "company_correct": true,
+      "grade_correct": true,
+      "wrong_company": false,
+      "wrong_grade": false,
+      "false_slab_claim": false
+    },
+    {
+      "id": "fresh100_276983335602",
+      "conditions": [
+        "slab"
+      ],
+      "grading_ms": 2123.26,
+      "grading": {
+        "slab_detected": true,
+        "is_graded": true,
+        "grading_status": "graded",
+        "company": "beckett",
+        "company_source": "label_ocr",
+        "grade": 9.0,
+        "condition_label": "MINT",
+        "subgrades": {},
+        "tag_score": null,
+        "certification_number": "0017644517",
+        "qualifiers": [],
+        "raw_condition": "not_assessed",
+        "authenticity_verified": false,
+        "source": "visible_label_ocr",
+        "requires_confirmation": true,
+        "label_text": [
+          "2024 SCARLET & VIOLET",
+          "9",
+          "SURGING SPARKS",
+          "#247 PIKACHU EX HR",
+          "MINT",
+          "0017644517",
+          "BECKETT\u00ae"
+        ],
+        "warnings": []
+      },
+      "manual_truth": {
+        "kind": "slab",
+        "company": "beckett",
+        "grade": 9,
+        "name": "Pikachu ex",
+        "number": "247/191",
+        "language": "en"
+      },
+      "source_page": "https://www.ebay.com/itm/276983335602",
+      "company_correct": true,
+      "grade_correct": true,
+      "wrong_company": false,
+      "wrong_grade": false,
+      "false_slab_claim": false
+    },
+    {
+      "id": "fresh100_116749113357",
+      "conditions": [
+        "slab"
+      ],
+      "grading_ms": 919.34,
+      "grading": {
+        "slab_detected": true,
+        "is_graded": true,
+        "grading_status": "graded",
+        "company": "beckett",
+        "company_source": "label_ocr",
+        "grade": 9.0,
+        "condition_label": "MINT",
+        "subgrades": {
+          "centering": 9.0,
+          "corners": 9.5,
+          "surface": 9.5
+        },
+        "tag_score": null,
+        "certification_number": "0018429639",
+        "qualifiers": [],
+        "raw_condition": "not_assessed",
+        "authenticity_verified": false,
+        "source": "visible_label_ocr",
+        "requires_confirmation": true,
+        "label_text": [
+          "2025 SCARLET & VIOLET",
+          "B",
+          "BLACK BOLT",
+          "9",
+          "#166 ZEKROM EX SIR",
+          "CENTERING 9",
+          "CORNERS  9.5",
+          "MINT",
+          "EDGES",
+          "9",
+          "SURFACE 9.5",
+          "0018429639",
+          "BECKETT\u00ae",
+          "BASIC",
+          "Zekrom",
+          "230"
+        ],
+        "warnings": []
+      },
+      "manual_truth": {
+        "kind": "slab",
+        "company": "beckett",
+        "grade": 9,
+        "name": "Zekrom ex",
+        "number": "166/086",
+        "language": "en"
+      },
+      "source_page": "https://www.ebay.com/itm/116749113357",
+      "company_correct": true,
+      "grade_correct": true,
+      "wrong_company": false,
+      "wrong_grade": false,
+      "false_slab_claim": false
+    },
+    {
+      "id": "fresh100_206285662050",
+      "conditions": [
+        "slab"
+      ],
+      "grading_ms": 6050.54,
+      "grading": {
+        "slab_detected": true,
+        "is_graded": true,
+        "grading_status": "graded",
+        "company": "beckett",
+        "company_source": "label_ocr",
+        "grade": 8.5,
+        "condition_label": "NM-MT+",
+        "subgrades": {
+          "centering": 8.0,
+          "corners": 10.0,
+          "surface": 9.5,
+          "edges": 10.0
+        },
+        "tag_score": null,
+        "certification_number": "0019946158",
+        "qualifiers": [],
+        "raw_condition": "not_assessed",
+        "authenticity_verified": false,
+        "source": "visible_label_ocr",
+        "requires_confirmation": true,
+        "label_text": [
+          "2025 POKEMON PROMOS",
+          "8.5",
+          "B",
+          "MEGA EVOLUTION BLACK STAR",
+          "#023 MEGA CHARIZARD X EX",
+          "ULTRA PREMIUM COLLECTION",
+          "NM-MT+",
+          "CENTERING 8",
+          "CORNERS 10",
+          "BECKETTO",
+          "EDGES",
+          "10",
+          "SURFACE 9.5",
+          "0019946158",
+          "BECKETT"
+        ],
+        "warnings": []
+      },
+      "manual_truth": {
+        "kind": "slab",
+        "company": "beckett",
+        "grade": 8.5,
+        "name": "Mega Charizard X ex",
+        "number": "MOP023",
+        "language": "en"
+      },
+      "source_page": "https://www.ebay.com/itm/206285662050",
+      "company_correct": true,
+      "grade_correct": true,
+      "wrong_company": false,
+      "wrong_grade": false,
+      "false_slab_claim": false
+    },
+    {
+      "id": "fresh100_126873299285",
+      "conditions": [
+        "slab"
+      ],
+      "grading_ms": 7161.49,
+      "grading": {
+        "slab_detected": true,
+        "is_graded": true,
+        "grading_status": "graded",
+        "company": "beckett",
+        "company_source": "label_ocr",
+        "grade": 8.5,
+        "condition_label": "NM-MT+",
+        "subgrades": {
+          "centering": 9.5
+        },
+        "tag_score": null,
+        "certification_number": "0014630014",
+        "qualifiers": [],
+        "raw_condition": "not_assessed",
+        "authenticity_verified": false,
+        "source": "visible_label_ocr",
+        "requires_confirmation": true,
+        "label_text": [
+          "1999 BASE 1ST EDITION",
+          "8.5",
+          "THICK STAMP",
+          "#15 VENUSAUR HOLOR",
+          "CENTERING",
+          "9.5",
+          "CORNERS",
+          "8.5",
+          "NM-MT+",
+          "EDGES",
+          "8.5",
+          "SURFACE",
+          "9",
+          "0014630014",
+          "1999 BASE 1ST EDITION",
+          "8.5",
+          "THICK STAMP",
+          "#15 VENUSAUR HOLOR",
+          "CENTERING 9.5",
+          "CORNERS",
+          "S 8.5",
+          "NM-MT+",
+          "EDGES",
+          "8.5",
+          "SURFACE",
+          "9",
+          "0014630014",
+          "BECKETT"
+        ],
+        "warnings": []
+      },
+      "manual_truth": {
+        "kind": "slab",
+        "company": "beckett",
+        "grade": 8.5,
+        "name": "Venusaur",
+        "number": "15/102",
+        "language": "en"
+      },
+      "source_page": "https://www.ebay.com/itm/126873299285",
+      "company_correct": true,
+      "grade_correct": true,
+      "wrong_company": false,
+      "wrong_grade": false,
+      "false_slab_claim": false
+    },
+    {
+      "id": "fresh100_305430906935",
+      "conditions": [
+        "slab"
+      ],
+      "grading_ms": 827.75,
+      "grading": {
+        "slab_detected": true,
+        "is_graded": true,
+        "grading_status": "graded",
+        "company": "cgc",
+        "company_source": "label_ocr",
+        "grade": 8.5,
+        "condition_label": "NM/MINT+",
+        "subgrades": {},
+        "tag_score": null,
+        "certification_number": null,
+        "qualifiers": [],
+        "raw_condition": "not_assessed",
+        "authenticity_verified": false,
+        "source": "visible_label_ocr",
+        "requires_confirmation": true,
+        "label_text": [
+          "CGCUNIVERSAL GRADE",
+          "Gardevoir V",
+          "NM/Mint+",
+          "8.5",
+          "Pok\u00e9mon (2020)",
+          "Champion's Path - 016/073",
+          "GardevoirV",
+          "210",
+          "BASIC"
+        ],
+        "warnings": []
+      },
+      "manual_truth": {
+        "kind": "slab",
+        "company": "cgc",
+        "grade": 8.5,
+        "name": "Gardevoir V",
+        "number": "016/073",
+        "language": "en"
+      },
+      "source_page": "https://www.ebay.com/itm/305430906935",
+      "company_correct": true,
+      "grade_correct": true,
+      "wrong_company": false,
+      "wrong_grade": false,
+      "false_slab_claim": false
+    },
+    {
+      "id": "fresh100_326079637741",
+      "conditions": [
+        "slab"
+      ],
+      "grading_ms": 2971.24,
+      "grading": {
+        "slab_detected": true,
+        "is_graded": true,
+        "grading_status": "graded",
+        "company": "cgc",
+        "company_source": "label_ocr",
+        "grade": 10.0,
+        "condition_label": "PRISTINE",
+        "subgrades": {},
+        "tag_score": null,
+        "certification_number": "1401027635025",
+        "qualifiers": [],
+        "raw_condition": "not_assessed",
+        "authenticity_verified": false,
+        "source": "visible_label_ocr",
+        "requires_confirmation": true,
+        "label_text": [
+          "CGC",
+          "CERTIFIED GUARANTY COMPANY",
+          "PRISTINE",
+          "Treecko",
+          "Pok\u00e9mon (2018)",
+          "Celestial Storm - 8/168",
+          "1401027635025",
+          "CERTIFIED GUARANTY COMPANY",
+          "OCGC",
+          "CERTIFIED GUARANTY COMPANY",
+          "PRISTINE",
+          "Treecko",
+          "Pok\u00e9mon (2018)",
+          "Celestial Storm - 8/168",
+          "1401027635025",
+          "10"
+        ],
+        "warnings": []
+      },
+      "manual_truth": {
+        "kind": "slab",
+        "company": "cgc",
+        "grade": 10,
+        "name": "Treecko",
+        "number": "8/168",
+        "language": "en"
+      },
+      "source_page": "https://www.ebay.com/itm/326079637741",
+      "company_correct": true,
+      "grade_correct": true,
+      "wrong_company": false,
+      "wrong_grade": false,
+      "false_slab_claim": false
+    },
+    {
+      "id": "fresh100_135116047131",
+      "conditions": [
+        "slab"
+      ],
+      "grading_ms": 3687.57,
+      "grading": {
+        "slab_detected": true,
+        "is_graded": true,
+        "grading_status": "graded",
+        "company": "cgc",
+        "company_source": "label_ocr",
+        "grade": 10.0,
+        "condition_label": "PRISTINE",
+        "subgrades": {},
+        "tag_score": null,
+        "certification_number": "1401030352109",
+        "qualifiers": [],
+        "raw_condition": "not_assessed",
+        "authenticity_verified": false,
+        "source": "visible_label_ocr",
+        "requires_confirmation": true,
+        "label_text": [
+          "SACGC",
+          "CERTIFIED GUARANTY COMPANY",
+          "Professor Oak",
+          "PRISTINE",
+          "Pok\u00e9mon (2023) Japanese",
+          "Trading Card Game Classic - 026/032",
+          "Holo - Blastoise & Suicune ex Deck",
+          "1401030352109",
+          "SACGE",
+          "CERTIFIED GUARANTY COMPANY",
+          "Professor Oak",
+          "PRISTINE",
+          "Pok\u00e9mon (2023) Japanese",
+          "Trading Card Game Classic - 026/032",
+          "Holo - Blastoise & Suicune ex Deck",
+          "1401030352109",
+          "10"
+        ],
+        "warnings": []
+      },
+      "manual_truth": {
+        "kind": "slab",
+        "company": "cgc",
+        "grade": 10,
+        "name": "Professor Oak",
+        "number": "026/032",
+        "language": "ja"
+      },
+      "source_page": "https://www.ebay.com/itm/135116047131",
+      "company_correct": true,
+      "grade_correct": true,
+      "wrong_company": false,
+      "wrong_grade": false,
+      "false_slab_claim": false
+    },
+    {
+      "id": "fresh100_326160477186",
+      "conditions": [
+        "slab"
+      ],
+      "grading_ms": 1259.27,
+      "grading": {
+        "slab_detected": true,
+        "is_graded": true,
+        "grading_status": "graded",
+        "company": "cgc",
+        "company_source": "label_ocr",
+        "grade": 10.0,
+        "condition_label": "PRISTINE",
+        "subgrades": {},
+        "tag_score": null,
+        "certification_number": "1401030294004",
+        "qualifiers": [],
+        "raw_condition": "not_assessed",
+        "authenticity_verified": false,
+        "source": "visible_label_ocr",
+        "requires_confirmation": true,
+        "label_text": [
+          "DCGC",
+          "CERTIFIED GUARANTY COMPANY",
+          "Abra",
+          "10",
+          "PRISTINE",
+          "Pok\u00e9mon (2023)",
+          "Scarlet & Violet 151 - 063/165",
+          "Cos. Holo - 151 ex Box-Alakazam ex",
+          "1401030294004",
+          "BASIC",
+          "50"
+        ],
+        "warnings": []
+      },
+      "manual_truth": {
+        "kind": "slab",
+        "company": "cgc",
+        "grade": 10,
+        "name": "Abra",
+        "number": "63/165",
+        "language": "en"
+      },
+      "source_page": "https://www.ebay.com/itm/326160477186",
+      "company_correct": true,
+      "grade_correct": true,
+      "wrong_company": false,
+      "wrong_grade": false,
+      "false_slab_claim": false
+    },
+    {
+      "id": "fresh100_326075712447",
+      "conditions": [
+        "slab"
+      ],
+      "grading_ms": 3601.64,
+      "grading": {
+        "slab_detected": null,
+        "is_graded": null,
+        "grading_status": "unknown",
+        "company": null,
+        "company_source": "none",
+        "grade": null,
+        "condition_label": null,
+        "subgrades": {},
+        "tag_score": null,
+        "certification_number": null,
+        "qualifiers": [],
+        "raw_condition": "not_assessed",
+        "authenticity_verified": false,
+        "source": "none",
+        "requires_confirmation": true,
+        "label_text": [
+          "SCGC",
+          "CERTIFIED GUARANTY COMPANY",
+          "Shaymin V",
+          "PRISTIRO",
+          "Pok\u00e9mon (2022)",
+          "Brilliant Stars-013/172",
+          " 46",
+          "Shaymin",
+          "190"
+        ],
+        "warnings": [
+          "no_supported_grading_label_detected",
+          "ungraded_status_not_proven"
+        ]
+      },
+      "manual_truth": {
+        "kind": "slab",
+        "company": "cgc",
+        "grade": 10,
+        "name": "Shaymin V",
+        "number": "013/172",
+        "language": "en"
+      },
+      "source_page": "https://www.ebay.com/itm/326075712447",
+      "company_correct": false,
+      "grade_correct": false,
+      "wrong_company": false,
+      "wrong_grade": false,
+      "false_slab_claim": false
+    },
+    {
+      "id": "fresh100_287247791643",
+      "conditions": [
+        "slab"
+      ],
+      "grading_ms": 930.47,
+      "grading": {
+        "slab_detected": true,
+        "is_graded": true,
+        "grading_status": "graded",
+        "company": "cgc",
+        "company_source": "label_ocr",
+        "grade": 10.0,
+        "condition_label": "PRISTINE",
+        "subgrades": {},
+        "tag_score": null,
+        "certification_number": "6130064006",
+        "qualifiers": [],
+        "raw_condition": "not_assessed",
+        "authenticity_verified": false,
+        "source": "visible_label_ocr",
+        "requires_confirmation": true,
+        "label_text": [
+          "CGC",
+          "CERTIFIED GUARANTY COMPANY",
+          "Pikachu with Grey Felt Hat",
+          "PRISTINE",
+          "Pok\u00e9mon (2023)",
+          "10",
+          "Black Star Promos - 085",
+          "Pok\u00e9mon x Van Gogh",
+          "6130064006",
+          "BASIC",
+          "Pikachu with Grey Felt Hat",
+          "60"
+        ],
+        "warnings": []
+      },
+      "manual_truth": {
+        "kind": "slab",
+        "company": "cgc",
+        "grade": 10,
+        "name": "Pikachu with Grey Felt Hat",
+        "number": "SVP085",
+        "language": "en"
+      },
+      "source_page": "https://www.ebay.com/itm/287247791643",
+      "company_correct": true,
+      "grade_correct": true,
+      "wrong_company": false,
+      "wrong_grade": false,
+      "false_slab_claim": false
+    },
+    {
+      "id": "fresh100_177390016065",
+      "conditions": [
+        "slab"
+      ],
+      "grading_ms": 1017.66,
+      "grading": {
+        "slab_detected": true,
+        "is_graded": true,
+        "grading_status": "graded",
+        "company": "cgc",
+        "company_source": "label_ocr",
+        "grade": 10.0,
+        "condition_label": "PRISTINE",
+        "subgrades": {},
+        "tag_score": null,
+        "certification_number": null,
+        "qualifiers": [],
+        "raw_condition": "not_assessed",
+        "authenticity_verified": false,
+        "source": "visible_label_ocr",
+        "requires_confirmation": true,
+        "label_text": [
+          "CGC UNIVERSAL GRADE",
+          "Mewtwo GX",
+          "Pristine",
+          "10",
+          "Pok\u00e9mon (2019)",
+          "Hidden Fates - SV59/SV94",
+          "Centering",
+          "SurfaceCorners",
+          "Edaes"
+        ],
+        "warnings": []
+      },
+      "manual_truth": {
+        "kind": "slab",
+        "company": "cgc",
+        "grade": 10,
+        "name": "Mewtwo GX",
+        "number": "SV59/SV94",
+        "language": "en"
+      },
+      "source_page": "https://www.ebay.com/itm/177390016065",
+      "company_correct": true,
+      "grade_correct": true,
+      "wrong_company": false,
+      "wrong_grade": false,
+      "false_slab_claim": false
+    },
+    {
+      "id": "fresh100_407246892266",
+      "conditions": [
+        "slab"
+      ],
+      "grading_ms": 979.61,
+      "grading": {
+        "slab_detected": true,
+        "is_graded": true,
+        "grading_status": "graded",
+        "company": "cgc",
+        "company_source": "label_ocr",
+        "grade": 7.5,
+        "condition_label": "NEAR MINT+",
+        "subgrades": {},
+        "tag_score": null,
+        "certification_number": "6149302118",
+        "qualifiers": [],
+        "raw_condition": "not_assessed",
+        "authenticity_verified": false,
+        "source": "visible_label_ocr",
+        "requires_confirmation": true,
+        "label_text": [
+          "Ke",
+          "4CGC",
+          "CERTIFIED GUARANTY COMPANY",
+          "Gardevoir",
+          "Pok\u00e9mon (2003) Japanese",
+          "NEAR MINT+",
+          "7.5",
+          "CARD",
+          "Expansion Pack - 029/055",
+          "Holo",
+          "6149302118"
+        ],
+        "warnings": []
+      },
+      "manual_truth": {
+        "kind": "slab",
+        "company": "cgc",
+        "grade": 7.5,
+        "name": "Gardevoir",
+        "number": "029/055",
+        "language": "ja"
+      },
+      "source_page": "https://www.ebay.com/itm/407246892266",
+      "company_correct": true,
+      "grade_correct": true,
+      "wrong_company": false,
+      "wrong_grade": false,
+      "false_slab_claim": false
+    },
+    {
+      "id": "fresh100_377526701873",
+      "conditions": [
+        "slab"
+      ],
+      "grading_ms": 2044.29,
+      "grading": {
+        "slab_detected": null,
+        "is_graded": null,
+        "grading_status": "unknown",
+        "company": null,
+        "company_source": "none",
+        "grade": null,
+        "condition_label": null,
+        "subgrades": {},
+        "tag_score": null,
+        "certification_number": null,
+        "qualifiers": [],
+        "raw_condition": "not_assessed",
+        "authenticity_verified": false,
+        "source": "none",
+        "requires_confirmation": true,
+        "label_text": [
+          "\u30eb\u30ab\u30ea\u30aa&\u30e1\u30eb\u30e1\u30bf\u30ebX260",
+          "\u305f\u306d"
+        ],
+        "warnings": [
+          "no_supported_grading_label_detected",
+          "ungraded_status_not_proven"
+        ]
+      },
+      "manual_truth": {
+        "kind": "slab",
+        "company": "tag",
+        "grade": 10,
+        "name": "Lucario & Melmetal GX",
+        "number": "083/173",
+        "language": "ja"
+      },
+      "source_page": "https://www.ebay.com/itm/377526701873",
+      "company_correct": false,
+      "grade_correct": false,
+      "wrong_company": false,
+      "wrong_grade": false,
+      "false_slab_claim": false
+    },
+    {
+      "id": "fresh100_298706855994",
+      "conditions": [
+        "slab"
+      ],
+      "grading_ms": 3248.36,
+      "grading": {
+        "slab_detected": true,
+        "is_graded": true,
+        "grading_status": "graded",
+        "company": "tag",
+        "company_source": "label_ocr",
+        "grade": 6.0,
+        "condition_label": "EX MT",
+        "subgrades": {},
+        "tag_score": null,
+        "certification_number": null,
+        "qualifiers": [],
+        "raw_condition": "not_assessed",
+        "authenticity_verified": false,
+        "source": "visible_label_ocr",
+        "requires_confirmation": true,
+        "label_text": [
+          "TAG",
+          "MAGNETON",
+          "1999 WOTC POK\u00c9MON",
+          "BASE SET - HOLO #9/102",
+          "1ST EDITION",
+          "EX MT",
+          "TAG",
+          "MAGNETON",
+          "1999 WOTC POK\u00c9MON",
+          "Q9384",
+          "BASE SET - HOLO #9/102",
+          "1ST EDITION",
+          "EX MT",
+          "6"
+        ],
+        "warnings": []
+      },
+      "manual_truth": {
+        "kind": "slab",
+        "company": "tag",
+        "grade": 6,
+        "name": "Magneton",
+        "number": "9/102",
+        "language": "en"
+      },
+      "source_page": "https://www.ebay.com/itm/298706855994",
+      "company_correct": true,
+      "grade_correct": true,
+      "wrong_company": false,
+      "wrong_grade": false,
+      "false_slab_claim": false
+    },
+    {
+      "id": "fresh100_336794948594",
+      "conditions": [
+        "slab"
+      ],
+      "grading_ms": 4196.64,
+      "grading": {
+        "slab_detected": true,
+        "is_graded": true,
+        "grading_status": "graded",
+        "company": "tag",
+        "company_source": "label_ocr",
+        "grade": 9.0,
+        "condition_label": "MINT",
+        "subgrades": {},
+        "tag_score": null,
+        "certification_number": "V2852969",
+        "qualifiers": [],
+        "raw_condition": "not_assessed",
+        "authenticity_verified": false,
+        "source": "visible_label_ocr",
+        "requires_confirmation": true,
+        "label_text": [
+          "TAG",
+          "\u30c9\u30c3\u30b3\u30e9\u30fc|TIMBURR",
+          "V2852969",
+          "2024 POK\u00c9MON SV JAPANESE",
+          "TAG",
+          "MASK OF CHANGE #109/101",
+          "MINT",
+          "ART RARE",
+          "TAG",
+          "\u30c9\u30c3\u30b3\u30e9\u30fc|TIMBURR",
+          "V2852969",
+          "2024 POK\u00c9MON SV JAPANESE",
+          "MASK OF CHANGE #109/101",
+          "ART RARE",
+          "MINT",
+          "9"
+        ],
+        "warnings": []
+      },
+      "manual_truth": {
+        "kind": "slab",
+        "company": "tag",
+        "grade": 9,
+        "name": "Timburr",
+        "number": "109/101",
+        "language": "ja"
+      },
+      "source_page": "https://www.ebay.com/itm/336794948594",
+      "company_correct": true,
+      "grade_correct": true,
+      "wrong_company": false,
+      "wrong_grade": false,
+      "false_slab_claim": false
+    },
+    {
+      "id": "fresh100_168302185613",
+      "conditions": [
+        "slab"
+      ],
+      "grading_ms": 1040.87,
+      "grading": {
+        "slab_detected": true,
+        "is_graded": true,
+        "grading_status": "graded",
+        "company": "tag",
+        "company_source": "label_ocr",
+        "grade": 9.0,
+        "condition_label": "MINT",
+        "subgrades": {},
+        "tag_score": null,
+        "certification_number": "N5877484",
+        "qualifiers": [],
+        "raw_condition": "not_assessed",
+        "authenticity_verified": false,
+        "source": "visible_label_ocr",
+        "requires_confirmation": true,
+        "label_text": [
+          "TAG",
+          "\u30d4\u30ab\u30c1\u30e5\u30a6&\u30bc\u30af\u30ed\u30e0",
+          "N5877484",
+          "9",
+          "PIKACHU & ZEKROM GX",
+          "2019 POK\u00c9MON SUN & MOON JPN",
+          "TAG",
+          "TAG TEAM GX A/S - RR #041/173",
+          "MINT"
+        ],
+        "warnings": []
+      },
+      "manual_truth": {
+        "kind": "slab",
+        "company": "tag",
+        "grade": 9,
+        "name": "Pikachu & Zekrom GX",
+        "number": "041/173",
+        "language": "ja"
+      },
+      "source_page": "https://www.ebay.com/itm/168302185613",
+      "company_correct": true,
+      "grade_correct": true,
+      "wrong_company": false,
+      "wrong_grade": false,
+      "false_slab_claim": false
+    },
+    {
+      "id": "freshextra_0_70889495",
+      "conditions": [
+        "slab"
+      ],
+      "grading_ms": 834.01,
+      "grading": {
+        "slab_detected": true,
+        "is_graded": true,
+        "grading_status": "graded",
+        "company": "tag",
+        "company_source": "label_ocr",
+        "grade": 9.0,
+        "condition_label": "MINT",
+        "subgrades": {},
+        "tag_score": null,
+        "certification_number": null,
+        "qualifiers": [],
+        "raw_condition": "not_assessed",
+        "authenticity_verified": false,
+        "source": "visible_label_ocr",
+        "requires_confirmation": true,
+        "label_text": [
+          "TAG",
+          "EEVEE EX",
+          "9",
+          "2025 POK\u00c9MON SCARLET & VIOLET",
+          "F32453",
+          "PRISMATIC EVOLUTIONS #075/131",
+          "DOUBLE RARE",
+          "MINT"
+        ],
+        "warnings": []
+      },
+      "manual_truth": {
+        "kind": "slab",
+        "company": "tag",
+        "grade": 9,
+        "name": "Eevee ex",
+        "number": "075/131",
+        "language": "en"
+      },
+      "source_page": "https://www.ebay.com/p/4074368147",
+      "company_correct": true,
+      "grade_correct": true,
+      "wrong_company": false,
+      "wrong_grade": false,
+      "false_slab_claim": false
+    },
+    {
+      "id": "fresh100_127464063628",
+      "conditions": [
+        "slab"
+      ],
+      "grading_ms": 1014.13,
+      "grading": {
+        "slab_detected": true,
+        "is_graded": true,
+        "grading_status": "graded",
+        "company": "tag",
+        "company_source": "label_ocr",
+        "grade": 8.5,
+        "condition_label": "NMMT+",
+        "subgrades": {},
+        "tag_score": null,
+        "certification_number": "C8462546",
+        "qualifiers": [],
+        "raw_condition": "not_assessed",
+        "authenticity_verified": false,
+        "source": "visible_label_ocr",
+        "requires_confirmation": true,
+        "label_text": [
+          "TAG",
+          "GARDEVOIR EX",
+          "C8462546",
+          "8.5",
+          "2023 POK\u00c9MON SCARLET & VIOLET",
+          "SCARLET & VIOLET BASE #245/198",
+          "SPECIAL ILLUSTRATION RARE",
+          "NMMT+"
+        ],
+        "warnings": []
+      },
+      "manual_truth": {
+        "kind": "slab",
+        "company": "tag",
+        "grade": 8.5,
+        "name": "Gardevoir ex",
+        "number": "245/198",
+        "language": "en"
+      },
+      "source_page": "https://www.ebay.com/itm/127464063628",
+      "company_correct": true,
+      "grade_correct": true,
+      "wrong_company": false,
+      "wrong_grade": false,
+      "false_slab_claim": false
+    },
+    {
+      "id": "freshextra_5_636235657",
+      "conditions": [
+        "slab"
+      ],
+      "grading_ms": 1176.39,
+      "grading": {
+        "slab_detected": true,
+        "is_graded": true,
+        "grading_status": "graded",
+        "company": "tag",
+        "company_source": "label_ocr",
+        "grade": 10.0,
+        "condition_label": "GEM MINT",
+        "subgrades": {},
+        "tag_score": null,
+        "certification_number": "C3954374",
+        "qualifiers": [],
+        "raw_condition": "not_assessed",
+        "authenticity_verified": false,
+        "source": "visible_label_ocr",
+        "requires_confirmation": true,
+        "label_text": [
+          "TAG",
+          "GARDEVOIR",
+          "10",
+          "C3954374",
+          "2022 POK\u00c9MON SWORD & SHIELD",
+          "SILVER TEMPEST #TG05",
+          "TRAINER GALLERY - HOLO",
+          "GEM MINT",
+          "Gardevoir",
+          "STAGE2",
+          "150",
+          "HP",
+          "Evolves from Kirlia"
+        ],
+        "warnings": []
+      },
+      "manual_truth": {
+        "kind": "slab",
+        "company": "tag",
+        "grade": 10,
+        "name": "Gardevoir",
+        "number": "TG05/TG30",
+        "language": "en"
+      },
+      "source_page": "https://www.ebay.com/b/Gardevoir-TG05-TG30-Swsh12-Sword-Shield-Silver-Tempest-Trainer-Gallery/2536/bn_7124584442",
+      "company_correct": true,
+      "grade_correct": true,
+      "wrong_company": false,
+      "wrong_grade": false,
+      "false_slab_claim": false
+    },
+    {
+      "id": "fresh100_197768683572",
+      "conditions": [
+        "slab"
+      ],
+      "grading_ms": 3317.06,
+      "grading": {
+        "slab_detected": null,
+        "is_graded": null,
+        "grading_status": "unknown",
+        "company": null,
+        "company_source": "none",
+        "grade": null,
+        "condition_label": null,
+        "subgrades": {},
+        "tag_score": null,
+        "certification_number": null,
+        "qualifiers": [],
+        "raw_condition": "not_assessed",
+        "authenticity_verified": false,
+        "source": "none",
+        "requires_confirmation": true,
+        "label_text": [
+          "TAC",
+          "GARDEVOIR EX",
+          "2024 POK\u00c9MON SCARLET & VIOLET",
+          "PALDEAN FATES #233/091",
+          "SPECIAL ILLUSTRATION RARE",
+          "MINT",
+          "STAGE2",
+          "GardevoireX",
+          "310",
+          "Evolvesfrom Kirlia"
+        ],
+        "warnings": [
+          "no_supported_grading_label_detected",
+          "ungraded_status_not_proven"
+        ]
+      },
+      "manual_truth": {
+        "kind": "slab",
+        "company": "tag",
+        "grade": 9,
+        "name": "Gardevoir ex",
+        "number": "233/091",
+        "language": "en"
+      },
+      "source_page": "https://www.ebay.com/itm/197768683572",
+      "company_correct": false,
+      "grade_correct": false,
+      "wrong_company": false,
+      "wrong_grade": false,
+      "false_slab_claim": false
+    },
+    {
+      "id": "fresh100_178061679870",
+      "conditions": [
+        "slab"
+      ],
+      "grading_ms": 4511.72,
+      "grading": {
+        "slab_detected": true,
+        "is_graded": true,
+        "grading_status": "graded",
+        "company": "ace",
+        "company_source": "verified_logo",
+        "grade": 10.0,
+        "condition_label": "GEMMINT",
+        "subgrades": {},
+        "tag_score": null,
+        "certification_number": "270305",
+        "qualifiers": [],
+        "raw_condition": "not_assessed",
+        "authenticity_verified": false,
+        "source": "visible_label_ocr",
+        "requires_confirmation": true,
+        "label_text": [
+          "10",
+          "2009 ARCEUS",
+          "PIKACHU",
+          "#71",
+          "GEMMINT",
+          "270305"
+        ],
+        "warnings": []
+      },
+      "manual_truth": {
+        "kind": "slab",
+        "company": "ace",
+        "grade": 10,
+        "name": "Pikachu",
+        "number": "71/99",
+        "language": "en"
+      },
+      "source_page": "https://www.ebay.com/itm/178061679870",
+      "company_correct": true,
+      "grade_correct": true,
+      "wrong_company": false,
+      "wrong_grade": false,
+      "false_slab_claim": false
+    },
+    {
+      "id": "fresh100_205408031074",
+      "conditions": [
+        "slab"
+      ],
+      "grading_ms": 26330.6,
+      "grading": {
+        "slab_detected": true,
+        "is_graded": null,
+        "grading_status": "unknown",
+        "company": null,
+        "company_source": "none",
+        "grade": null,
+        "condition_label": "MINT",
+        "subgrades": {},
+        "tag_score": null,
+        "certification_number": "320870",
+        "qualifiers": [],
+        "raw_condition": "not_assessed",
+        "authenticity_verified": false,
+        "source": "visible_label_ocr",
+        "requires_confirmation": true,
+        "label_text": [
+          "2024TWILIGHTMASQUERADE",
+          "EEVEE",
+          "ILLUSTRATIONRARE",
+          "#188",
+          "MINT",
+          "320870",
+          "BASIC",
+          "Eevee",
+          "50",
+          "HP"
+        ],
+        "warnings": [
+          "grading_company_unreadable_or_unsupported",
+          "overall_grade_unreadable_or_ambiguous"
+        ]
+      },
+      "manual_truth": {
+        "kind": "slab",
+        "company": "ace",
+        "grade": 9,
+        "name": "Eevee",
+        "number": "188/167",
+        "language": "en"
+      },
+      "source_page": "https://www.ebay.co.uk/itm/205408031074",
+      "company_correct": false,
+      "grade_correct": false,
+      "wrong_company": false,
+      "wrong_grade": false,
+      "false_slab_claim": false
+    },
+    {
+      "id": "fresh100_407246154199",
+      "conditions": [
+        "slab"
+      ],
+      "grading_ms": 9534.34,
+      "grading": {
+        "slab_detected": true,
+        "is_graded": true,
+        "grading_status": "graded",
+        "company": "ace",
+        "company_source": "verified_logo",
+        "grade": 8.0,
+        "condition_label": "NM-MT",
+        "subgrades": {},
+        "tag_score": null,
+        "certification_number": "1020326",
+        "qualifiers": [],
+        "raw_condition": "not_assessed",
+        "authenticity_verified": false,
+        "source": "visible_label_ocr",
+        "requires_confirmation": true,
+        "label_text": [
+          "2025BLACKSTARPROMO",
+          "EEVEEEX",
+          "#174",
+          "PRISMATICEVOLUTIONS",
+          "NM-MT",
+          "SUPER-PREMIUMCOLLECTION",
+          "1020326",
+          "2025BLACKSTARPROMO",
+          "EEVEEEX",
+          "#174",
+          "PRISMATICEVOLUTIONS",
+          "NM-MT",
+          "SUPER-PREMIUMCOLLECTION",
+          "1020326",
+          "8"
+        ],
+        "warnings": []
+      },
+      "manual_truth": {
+        "kind": "slab",
+        "company": "ace",
+        "grade": 8,
+        "name": "Eevee ex",
+        "number": "174",
+        "language": "en"
+      },
+      "source_page": "https://www.ebay.com/itm/407246154199",
+      "company_correct": true,
+      "grade_correct": true,
+      "wrong_company": false,
+      "wrong_grade": false,
+      "false_slab_claim": false
+    },
+    {
+      "id": "fresh100_307061782471",
+      "conditions": [
+        "slab"
+      ],
+      "grading_ms": 7606.87,
+      "grading": {
+        "slab_detected": true,
+        "is_graded": true,
+        "grading_status": "graded",
+        "company": "ace",
+        "company_source": "verified_logo",
+        "grade": 8.0,
+        "condition_label": "NM-MT",
+        "subgrades": {},
+        "tag_score": null,
+        "certification_number": "792958",
+        "qualifiers": [],
+        "raw_condition": "not_assessed",
+        "authenticity_verified": false,
+        "source": "visible_label_ocr",
+        "requires_confirmation": true,
+        "label_text": [
+          "2016 BREAKPOINT",
+          "MGYARADOSEX",
+          "FULLART",
+          "#115",
+          "NM-MT",
+          "792958",
+          "2016BREAKPOINT",
+          "M GYARADOS EX",
+          "FULL ART",
+          "#115",
+          "NM-MT",
+          "792958",
+          "8"
+        ],
+        "warnings": []
+      },
+      "manual_truth": {
+        "kind": "slab",
+        "company": "ace",
+        "grade": 8,
+        "name": "M Gyarados EX",
+        "number": "115/122",
+        "language": "en"
+      },
+      "source_page": "https://www.ebay.com/itm/307061782471",
+      "company_correct": true,
+      "grade_correct": true,
+      "wrong_company": false,
+      "wrong_grade": false,
+      "false_slab_claim": false
+    },
+    {
+      "id": "fresh100_227337115305",
+      "conditions": [
+        "slab"
+      ],
+      "grading_ms": 13154.91,
+      "grading": {
+        "slab_detected": true,
+        "is_graded": true,
+        "grading_status": "graded",
+        "company": null,
+        "company_source": "none",
+        "grade": 8.0,
+        "condition_label": "NM-MT",
+        "subgrades": {},
+        "tag_score": null,
+        "certification_number": "936268",
+        "qualifiers": [],
+        "raw_condition": "not_assessed",
+        "authenticity_verified": false,
+        "source": "visible_label_ocr",
+        "requires_confirmation": true,
+        "label_text": [
+          "DARKCHARIZARD",
+          "8",
+          "#21",
+          "NM-MT",
+          "936268",
+          "Evolves from Dark Charmeleon Put Dark Charizard on the Stage I card",
+          "STAG",
+          "Dark Charizard 80 HP"
+        ],
+        "warnings": [
+          "grading_company_unreadable_or_unsupported"
+        ]
+      },
+      "manual_truth": {
+        "kind": "slab",
+        "company": "ace",
+        "grade": 8,
+        "name": "Dark Charizard",
+        "number": "21/82",
+        "language": "en"
+      },
+      "source_page": "https://www.ebay.com/itm/227337115305",
+      "company_correct": false,
+      "grade_correct": true,
+      "wrong_company": false,
+      "wrong_grade": false,
+      "false_slab_claim": false
+    },
+    {
+      "id": "fresh100_287264323565",
+      "conditions": [
+        "slab"
+      ],
+      "grading_ms": 13183.06,
+      "grading": {
+        "slab_detected": true,
+        "is_graded": true,
+        "grading_status": "graded",
+        "company": "ace",
+        "company_source": "verified_logo",
+        "grade": 8.0,
+        "condition_label": "NM-MT",
+        "subgrades": {},
+        "tag_score": null,
+        "certification_number": "976117",
+        "qualifiers": [],
+        "raw_condition": "not_assessed",
+        "authenticity_verified": false,
+        "source": "visible_label_ocr",
+        "requires_confirmation": true,
+        "label_text": [
+          "2005 EMERALD",
+          "RAYQUAZA",
+          "HOLO",
+          "#9",
+          "NM-MT",
+          "976117",
+          "2005 EMERALD",
+          "RAYQUAZA",
+          "O",
+          "HOLO",
+          "#9",
+          "NM-MT",
+          "976117",
+          "8"
+        ],
+        "warnings": []
+      },
+      "manual_truth": {
+        "kind": "slab",
+        "company": "ace",
+        "grade": 8,
+        "name": "Rayquaza",
+        "number": "9/106",
+        "language": "en"
+      },
+      "source_page": "https://www.ebay.com/itm/287264323565",
+      "company_correct": true,
+      "grade_correct": true,
+      "wrong_company": false,
+      "wrong_grade": false,
+      "false_slab_claim": false
+    },
+    {
+      "id": "fresh100_336576388984",
+      "conditions": [
+        "slab"
+      ],
+      "grading_ms": 4886.88,
+      "grading": {
+        "slab_detected": true,
+        "is_graded": true,
+        "grading_status": "graded",
+        "company": "ace",
+        "company_source": "verified_logo",
+        "grade": 8.0,
+        "condition_label": "NM-MT",
+        "subgrades": {},
+        "tag_score": null,
+        "certification_number": "374600",
+        "qualifiers": [],
+        "raw_condition": "not_assessed",
+        "authenticity_verified": false,
+        "source": "visible_label_ocr",
+        "requires_confirmation": true,
+        "label_text": [
+          "2022 BLACKSTAR PROMO",
+          "CHARIZARD VMAX",
+          "8",
+          "#SWSH261",
+          "ULTRA PREMIUM",
+          "NM-MT",
+          "COLLECTIONCHARIZARD",
+          "374600"
+        ],
+        "warnings": []
+      },
+      "manual_truth": {
+        "kind": "slab",
+        "company": "ace",
+        "grade": 8,
+        "name": "Charizard VMAX",
+        "number": "SWSH261",
+        "language": "en"
+      },
+      "source_page": "https://www.ebay.com/itm/336576388984",
+      "company_correct": true,
+      "grade_correct": true,
+      "wrong_company": false,
+      "wrong_grade": false,
+      "false_slab_claim": false
+    },
+    {
+      "id": "fresh100_145662665211",
+      "conditions": [
+        "slab"
+      ],
+      "grading_ms": 1228.59,
+      "grading": {
+        "slab_detected": true,
+        "is_graded": true,
+        "grading_status": "graded",
+        "company": "ags",
+        "company_source": "label_ocr",
+        "grade": 9.5,
+        "condition_label": "MINT+",
+        "subgrades": {},
+        "tag_score": null,
+        "certification_number": "00132873",
+        "qualifiers": [],
+        "raw_condition": "not_assessed",
+        "authenticity_verified": false,
+        "source": "visible_label_ocr",
+        "requires_confirmation": true,
+        "label_text": [
+          "2019 POKEMON SM",
+          "MINT+",
+          "GYARADOS GX",
+          "9.5",
+          "HIDDEN FATES",
+          "#16",
+          "00132873",
+          "AGS",
+          "STAGE1",
+          "GyaradosGX",
+          "230",
+          "HP",
+          "Evolves from Magikarp"
+        ],
+        "warnings": []
+      },
+      "manual_truth": {
+        "kind": "slab",
+        "company": "ags",
+        "grade": 9.5,
+        "name": "Gyarados GX",
+        "number": "16/68",
+        "language": "en"
+      },
+      "source_page": "https://www.ebay.com/itm/145662665211",
+      "company_correct": true,
+      "grade_correct": true,
+      "wrong_company": false,
+      "wrong_grade": false,
+      "false_slab_claim": false
+    },
+    {
+      "id": "fresh100_198196929850",
+      "conditions": [
+        "slab"
+      ],
+      "grading_ms": 1053.39,
+      "grading": {
+        "slab_detected": true,
+        "is_graded": true,
+        "grading_status": "graded",
+        "company": "ags",
+        "company_source": "label_ocr",
+        "grade": 8.0,
+        "condition_label": "NM-MT",
+        "subgrades": {},
+        "tag_score": null,
+        "certification_number": "00208774",
+        "qualifiers": [],
+        "raw_condition": "not_assessed",
+        "authenticity_verified": false,
+        "source": "visible_label_ocr",
+        "requires_confirmation": true,
+        "label_text": [
+          "NM-MT",
+          "2000 POKEMON ROCKET",
+          "8",
+          "DARK GYARADOS",
+          "1ST EDITION",
+          "00208774",
+          "#25",
+          "AGS",
+          "Evolves from Magikarp",
+          "Put Dark Gyarados on the Basic Pok\u00e9mon",
+          "Dark Gyarados 70 HP"
+        ],
+        "warnings": []
+      },
+      "manual_truth": {
+        "kind": "slab",
+        "company": "ags",
+        "grade": 8,
+        "name": "Dark Gyarados",
+        "number": "25/82",
+        "language": "en"
+      },
+      "source_page": "https://www.ebay.com/itm/198196929850",
+      "company_correct": true,
+      "grade_correct": true,
+      "wrong_company": false,
+      "wrong_grade": false,
+      "false_slab_claim": false
+    },
+    {
+      "id": "fresh100_376009575543",
+      "conditions": [
+        "slab"
+      ],
+      "grading_ms": 1048.7,
+      "grading": {
+        "slab_detected": true,
+        "is_graded": true,
+        "grading_status": "graded",
+        "company": "ags",
+        "company_source": "label_ocr",
+        "grade": 9.0,
+        "condition_label": "MINT",
+        "subgrades": {},
+        "tag_score": null,
+        "certification_number": "00248929",
+        "qualifiers": [],
+        "raw_condition": "not_assessed",
+        "authenticity_verified": false,
+        "source": "visible_label_ocr",
+        "requires_confirmation": true,
+        "label_text": [
+          "2024 POKEMON SV",
+          "MINT",
+          "FA/EEVEE",
+          "9",
+          "TWLT. MASQUERADE- SECRET",
+          "#188",
+          "00248929",
+          "AGS",
+          "BASIC",
+          "Eevee",
+          "50\u672c"
+        ],
+        "warnings": []
+      },
+      "manual_truth": {
+        "kind": "slab",
+        "company": "ags",
+        "grade": 9,
+        "name": "Eevee",
+        "number": "188/167",
+        "language": "en"
+      },
+      "source_page": "https://www.ebay.com/itm/376009575543",
+      "company_correct": true,
+      "grade_correct": true,
+      "wrong_company": false,
+      "wrong_grade": false,
+      "false_slab_claim": false
+    },
+    {
+      "id": "freshextra_1_1957211138",
+      "conditions": [
+        "slab"
+      ],
+      "grading_ms": 18398.62,
+      "grading": {
+        "slab_detected": true,
+        "is_graded": true,
+        "grading_status": "graded",
+        "company": null,
+        "company_source": "none",
+        "grade": 8.5,
+        "condition_label": "NM-MT+",
+        "subgrades": {},
+        "tag_score": null,
+        "certification_number": "00165666",
+        "qualifiers": [],
+        "raw_condition": "not_assessed",
+        "authenticity_verified": false,
+        "source": "visible_label_ocr",
+        "requires_confirmation": true,
+        "label_text": [
+          "NM-MT+",
+          "8.5",
+          "00165666",
+          "2000 POKEMON ROCKET",
+          "SQUIRTLE",
+          "#68",
+          "50 HP",
+          "Basic Pok\u00e9mon",
+          "Squirtle"
+        ],
+        "warnings": [
+          "grading_company_unreadable_or_unsupported"
+        ]
+      },
+      "manual_truth": {
+        "kind": "slab",
+        "company": "ags",
+        "grade": 8.5,
+        "name": "Squirtle",
+        "number": "68/82",
+        "language": "en"
+      },
+      "source_page": "https://www.ebay.com/p/16043369495",
+      "company_correct": false,
+      "grade_correct": true,
+      "wrong_company": false,
+      "wrong_grade": false,
+      "false_slab_claim": false
+    },
+    {
+      "id": "fresh100_146365926690",
+      "conditions": [
+        "slab"
+      ],
+      "grading_ms": 4111.03,
+      "grading": {
+        "slab_detected": true,
+        "is_graded": true,
+        "grading_status": "graded",
+        "company": "ags",
+        "company_source": "verified_logo",
+        "grade": 9.5,
+        "condition_label": "MINT+",
+        "subgrades": {},
+        "tag_score": null,
+        "certification_number": "00222069",
+        "qualifiers": [],
+        "raw_condition": "not_assessed",
+        "authenticity_verified": false,
+        "source": "visible_label_ocr",
+        "requires_confirmation": true,
+        "label_text": [
+          "2024 POKEMON SV",
+          "MINT+",
+          "RAICHU- HOLO",
+          "9.5",
+          "PALDEAN FATES- SECRET",
+          "#132",
+          "00222069",
+          "A"
+        ],
+        "warnings": []
+      },
+      "manual_truth": {
+        "kind": "slab",
+        "company": "ags",
+        "grade": 9.5,
+        "name": "Raichu",
+        "number": "132/091",
+        "language": "en"
+      },
+      "source_page": "https://www.ebay.com/itm/146365926690",
+      "company_correct": true,
+      "grade_correct": true,
+      "wrong_company": false,
+      "wrong_grade": false,
+      "false_slab_claim": false
+    },
+    {
+      "id": "fresh100_196323744191",
+      "conditions": [
+        "slab"
+      ],
+      "grading_ms": 962.69,
+      "grading": {
+        "slab_detected": true,
+        "is_graded": true,
+        "grading_status": "graded",
+        "company": "ags",
+        "company_source": "label_ocr",
+        "grade": 8.5,
+        "condition_label": "NM-MT+",
+        "subgrades": {},
+        "tag_score": null,
+        "certification_number": "00140951",
+        "qualifiers": [],
+        "raw_condition": "not_assessed",
+        "authenticity_verified": false,
+        "source": "visible_label_ocr",
+        "requires_confirmation": true,
+        "label_text": [
+          "1999 POKEMON GAME",
+          "GYARADOS-HOLO",
+          "NM-MT+",
+          "8.5",
+          "#6",
+          "AGS",
+          "00140951",
+          "Evolves from Magikarp Put Gyarados on the Basic Pok\u00e9mon",
+          "STAGE I"
+        ],
+        "warnings": []
+      },
+      "manual_truth": {
+        "kind": "slab",
+        "company": "ags",
+        "grade": 8.5,
+        "name": "Gyarados",
+        "number": "6/102",
+        "language": "en"
+      },
+      "source_page": "https://www.ebay.com/itm/196323744191",
+      "company_correct": true,
+      "grade_correct": true,
+      "wrong_company": false,
+      "wrong_grade": false,
+      "false_slab_claim": false
+    },
+    {
+      "id": "fresh100_145701209354",
+      "conditions": [
+        "slab"
+      ],
+      "grading_ms": 1268.47,
+      "grading": {
+        "slab_detected": true,
+        "is_graded": true,
+        "grading_status": "graded",
+        "company": "ags",
+        "company_source": "label_ocr",
+        "grade": 10.0,
+        "condition_label": "GEM-MT",
+        "subgrades": {},
+        "tag_score": null,
+        "certification_number": "00102666",
+        "qualifiers": [],
+        "raw_condition": "not_assessed",
+        "authenticity_verified": false,
+        "source": "visible_label_ocr",
+        "requires_confirmation": true,
+        "label_text": [
+          "2021 POKEMON SWSH",
+          "GEM-MT",
+          "FA/GYARADOS VMAX",
+          "10",
+          "EVOLVING SKIES",
+          "#029",
+          "00102666",
+          "AGS",
+          "VMAX",
+          "GyaradosVMAX",
+          "330",
+          "Evolves from GyaradosV"
+        ],
+        "warnings": []
+      },
+      "manual_truth": {
+        "kind": "slab",
+        "company": "ags",
+        "grade": 10,
+        "name": "Gyarados VMAX",
+        "number": "029/203",
+        "language": "en"
+      },
+      "source_page": "https://www.ebay.com/itm/145701209354",
+      "company_correct": true,
+      "grade_correct": true,
+      "wrong_company": false,
+      "wrong_grade": false,
+      "false_slab_claim": false
+    },
+    {
+      "id": "fresh100_205148259527",
+      "conditions": [
+        "slab"
+      ],
+      "grading_ms": 3733.61,
+      "grading": {
+        "slab_detected": true,
+        "is_graded": true,
+        "grading_status": "graded",
+        "company": "ags",
+        "company_source": "verified_logo",
+        "grade": 10.0,
+        "condition_label": "GEM-MT",
+        "subgrades": {},
+        "tag_score": null,
+        "certification_number": "00154899",
+        "qualifiers": [],
+        "raw_condition": "not_assessed",
+        "authenticity_verified": false,
+        "source": "visible_label_ocr",
+        "requires_confirmation": true,
+        "label_text": [
+          "2023 POKEMON CLB",
+          "GEM-MT",
+          "GYARADOS- HOLO",
+          "10",
+          "#007",
+          "00154899"
+        ],
+        "warnings": []
+      },
+      "manual_truth": {
+        "kind": "slab",
+        "company": "ags",
+        "grade": 10,
+        "name": "Gyarados",
+        "number": "007/034",
+        "language": "en"
+      },
+      "source_page": "https://www.ebay.com/itm/205148259527",
+      "company_correct": true,
+      "grade_correct": true,
+      "wrong_company": false,
+      "wrong_grade": false,
+      "false_slab_claim": false
+    },
+    {
+      "id": "fresh100_146314372000",
+      "conditions": [
+        "slab"
+      ],
+      "grading_ms": 1084.81,
+      "grading": {
+        "slab_detected": true,
+        "is_graded": true,
+        "grading_status": "graded",
+        "company": "ags",
+        "company_source": "label_ocr",
+        "grade": 9.5,
+        "condition_label": "MINT+",
+        "subgrades": {},
+        "tag_score": null,
+        "certification_number": "00001685",
+        "qualifiers": [],
+        "raw_condition": "not_assessed",
+        "authenticity_verified": false,
+        "source": "visible_label_ocr",
+        "requires_confirmation": true,
+        "label_text": [
+          "2016 POKEMON XY",
+          "MINT+",
+          "FA/DRAGONITE EX",
+          "9.5",
+          "EVOLUTIONS",
+          "#106",
+          "00001685",
+          "AGS",
+          "BASIC",
+          "DragoniteEX",
+          "180 HP"
+        ],
+        "warnings": []
+      },
+      "manual_truth": {
+        "kind": "slab",
+        "company": "ags",
+        "grade": 9.5,
+        "name": "Dragonite EX",
+        "number": "106/108",
+        "language": "en"
+      },
+      "source_page": "https://www.ebay.com/itm/146314372000",
+      "company_correct": true,
+      "grade_correct": true,
+      "wrong_company": false,
+      "wrong_grade": false,
+      "false_slab_claim": false
+    }
+  ]
+}

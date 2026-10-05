@@ -1,0 +1,26 @@
+{
+  "valid": true,
+  "published": false,
+  "recovered": 1696,
+  "full_snapshots": {
+    "pad": {
+      "old_count": 37755,
+      "new_count": 39451,
+      "old_vectors_bitwise_identical": true,
+      "old_manifest_sha256": "e1d13207b2432d6650bcd4d8b9da7acff74118e0f264c7d426134a5c6892f477"
+    },
+    "square": {
+      "old_count": 37755,
+      "new_count": 39451,
+      "old_vectors_bitwise_identical": true,
+      "old_manifest_sha256": "4221f296ca76f33000e26e0cf99ca8e0a08742812aa466933bead9eca0a210e6"
+    }
+  },
+  "artwork_cards": 6530,
+  "artwork_regions": 13060,
+  "old_artwork_vectors_bitwise_identical": true,
+  "missing_usable_files_all_languages": 9201,
+  "imageflag_but_unindexed": [],
+  "catalogue_sha256": "c7d8c60ca228aa3053148c9b06b3f687b85b7aca1803b9a2424ed7eaadbfe360",
+  "selection_sha256": "68a9f5fcb9c8c3bccc90bf18d48010033e1a2b9fee7533e134cf409fb3ae301e"
+}

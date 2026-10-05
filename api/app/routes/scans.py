@@ -16,6 +16,7 @@ from app.recognition.images import ImageError
 from app.recognition.captures import apply_feedback
 from app.recognition.pipeline import recognize_bytes
 from app.recognition.presentation import match_presentation
+from app.recognition.progress import scan_stream
 from app.recognition.upload import read_upload_limited
 from app.schemas import (
     Candidate,
@@ -40,7 +41,8 @@ async def create_scan(
     rotation: int = Form(default=0),
     skip_detect: bool = Form(default=False),
     language: str = Form(default="auto"),
-) -> ScanResponse:
+    stream_results: bool = Form(default=False),
+) -> ScanResponse | Response:
     settings = request.app.state.settings
     started = time.perf_counter()
     logger = logging.getLogger("scan.diagnostics")
@@ -58,6 +60,15 @@ async def create_scan(
             detail="Recognition is busy. Try again shortly.",
             headers={"Retry-After": "3"},
         )
+    if stream_results and settings.scan_stream_enabled:
+        return scan_stream(loop=request.app.state.loop, executor=request.app.state.executor,
+            limiter=limiter, response=response, trace=trace,
+            recognize=lambda observer: recognize_bytes(data, settings=settings,
+                runtime=request.app.state.runtime, catalog=request.app.state.dbs.catalog,
+                results=request.app.state.dbs.results, session_id=session_id,
+                crop_x=crop_x, crop_y=crop_y, crop_w=crop_w, crop_h=crop_h,
+                rotation=rotation, skip_detect=skip_detect, language=language,
+                _progress_observer=observer))
     try:
         future = request.app.state.loop.run_in_executor(
             request.app.state.executor,

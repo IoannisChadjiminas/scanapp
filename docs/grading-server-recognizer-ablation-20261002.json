@@ -1,0 +1,660 @@
+{
+  "scope": "Isolated incomplete-label diagnostic, not held-out accuracy or an enabled fallback. No runtime model replaced.",
+  "model": "ch_PP-OCRv5_rec_server.onnx",
+  "model_sha256": "e09385400eaaaef34ceff54aeb7c4f0f1fe014c27fa8b9905d4709b65746562a",
+  "provenance": "https://raw.githubusercontent.com/RapidAI/RapidOCR/main/python/rapidocr/default_models.yaml",
+  "photos": 14,
+  "new_complete": 2,
+  "lost_existing_field": 1,
+  "wrong_field": 0,
+  "decision": "Not adopted: only two issuer recoveries, one existing issuer loss, no missing overall-grade recovery; larger model requires separate bounded latency and safety validation.",
+  "cases": [
+    {
+      "id": "label100_406975129126",
+      "manual_truth": {
+        "company": "beckett",
+        "grade": 8
+      },
+      "current_company": null,
+      "current_grade": 8.0,
+      "experimental_grading": {
+        "slab_detected": true,
+        "is_graded": true,
+        "grading_status": "graded",
+        "company": "beckett",
+        "company_source": "label_ocr",
+        "grade": 8.0,
+        "condition_label": "NM-MT",
+        "subgrades": {},
+        "tag_score": null,
+        "certification_number": "0012622704",
+        "qualifiers": [],
+        "raw_condition": "not_assessed",
+        "authenticity_verified": false,
+        "source": "visible_label_ocr",
+        "requires_confirmation": true,
+        "label_text": [
+          "1999BASEUNLIMITED",
+          "8",
+          "#4CHARIZARDHOLOR",
+          "NM-MT",
+          "0012622704",
+          "BECKETT",
+          "Evcires from Charmken M Oavmronve Soa ",
+          "Charizard",
+          "120H"
+        ],
+        "warnings": []
+      },
+      "new_complete": true,
+      "lost_existing_field": false,
+      "wrong_field": false
+    },
+    {
+      "id": "label100_147245288873",
+      "manual_truth": {
+        "company": "cgc",
+        "grade": 10
+      },
+      "current_company": "cgc",
+      "current_grade": null,
+      "experimental_grading": {
+        "slab_detected": null,
+        "is_graded": null,
+        "grading_status": "unknown",
+        "company": null,
+        "company_source": "none",
+        "grade": null,
+        "condition_label": null,
+        "subgrades": {},
+        "tag_score": null,
+        "certification_number": null,
+        "qualifiers": [],
+        "raw_condition": "not_assessed",
+        "authenticity_verified": false,
+        "source": "none",
+        "requires_confirmation": true,
+        "label_text": [
+          "DCGC",
+          "CERTIFIEDGUARANTYCOMPANY",
+          "Charizard",
+          "FRISTINE",
+          "Pok\u00e9mon (2018) Japanese",
+          "Tag Bolt - 013/095",
+          "Holo",
+          "4310885287",
+          "2\u9032\u5316",
+          "\u30ea\u30b6\u30fc\u30c9\u30f3",
+          "150",
+          "HP"
+        ],
+        "warnings": [
+          "no_supported_grading_label_detected",
+          "ungraded_status_not_proven"
+        ]
+      },
+      "new_complete": false,
+      "lost_existing_field": true,
+      "wrong_field": false
+    },
+    {
+      "id": "label100_205373770550",
+      "manual_truth": {
+        "company": "tag",
+        "grade": 10
+      },
+      "current_company": null,
+      "current_grade": null,
+      "experimental_grading": {
+        "slab_detected": null,
+        "is_graded": null,
+        "grading_status": "unknown",
+        "company": null,
+        "company_source": "none",
+        "grade": null,
+        "condition_label": null,
+        "subgrades": {},
+        "tag_score": null,
+        "certification_number": null,
+        "qualifiers": [],
+        "raw_condition": "not_assessed",
+        "authenticity_verified": false,
+        "source": "none",
+        "requires_confirmation": true,
+        "label_text": [],
+        "warnings": [
+          "no_supported_grading_label_detected",
+          "ungraded_status_not_proven"
+        ]
+      },
+      "new_complete": false,
+      "lost_existing_field": false,
+      "wrong_field": false
+    },
+    {
+      "id": "label100_317559256789",
+      "manual_truth": {
+        "company": "ace",
+        "grade": 6
+      },
+      "current_company": "ace",
+      "current_grade": null,
+      "experimental_grading": {
+        "slab_detected": true,
+        "is_graded": null,
+        "grading_status": "unknown",
+        "company": "ace",
+        "company_source": "verified_logo",
+        "grade": null,
+        "condition_label": "EX-MT",
+        "subgrades": {},
+        "tag_score": null,
+        "certification_number": "632873",
+        "qualifiers": [],
+        "raw_condition": "not_assessed",
+        "authenticity_verified": false,
+        "source": "visible_label_ocr",
+        "requires_confirmation": true,
+        "label_text": [
+          "1999JUNGLE1ST EDITION",
+          "PIKACHU",
+          "#60",
+          "EX-MT",
+          "632873"
+        ],
+        "warnings": [
+          "overall_grade_unreadable_or_ambiguous"
+        ]
+      },
+      "new_complete": false,
+      "lost_existing_field": false,
+      "wrong_field": false
+    },
+    {
+      "id": "label100_227526033226",
+      "manual_truth": {
+        "company": "ace",
+        "grade": 8
+      },
+      "current_company": null,
+      "current_grade": null,
+      "experimental_grading": {
+        "slab_detected": true,
+        "is_graded": null,
+        "grading_status": "unknown",
+        "company": null,
+        "company_source": "none",
+        "grade": null,
+        "condition_label": "NM-MT",
+        "subgrades": {},
+        "tag_score": null,
+        "certification_number": null,
+        "qualifiers": [],
+        "raw_condition": "not_assessed",
+        "authenticity_verified": false,
+        "source": "visible_label_ocr",
+        "requires_confirmation": true,
+        "label_text": [
+          "P",
+          "POKE",
+          "PnKF",
+          "PA",
+          "PACKS",
+          "2023151",
+          "CHARIZARDEX",
+          "SPECIALILLUSTRATIONRARE",
+          "#199",
+          "NM-MT",
+          "1437667"
+        ],
+        "warnings": [
+          "grading_company_unreadable_or_unsupported",
+          "overall_grade_unreadable_or_ambiguous",
+          "certification_number_ambiguous"
+        ]
+      },
+      "new_complete": false,
+      "lost_existing_field": false,
+      "wrong_field": false
+    },
+    {
+      "id": "label100_287567779040",
+      "manual_truth": {
+        "company": "ace",
+        "grade": 10
+      },
+      "current_company": null,
+      "current_grade": null,
+      "experimental_grading": {
+        "slab_detected": null,
+        "is_graded": null,
+        "grading_status": "unknown",
+        "company": null,
+        "company_source": "none",
+        "grade": null,
+        "condition_label": null,
+        "subgrades": {},
+        "tag_score": null,
+        "certification_number": null,
+        "qualifiers": [],
+        "raw_condition": "not_assessed",
+        "authenticity_verified": false,
+        "source": "none",
+        "requires_confirmation": true,
+        "label_text": [
+          "2022BRILLIANT STARS",
+          "10",
+          "ARCEUSVSTAR",
+          "SECRETRARE",
+          "#176",
+          "GEM MINT",
+          "VSTAR",
+          "ArceusVSTAR",
+          "280",
+          "TvohvesfromAcnsV"
+        ],
+        "warnings": [
+          "no_supported_grading_label_detected",
+          "ungraded_status_not_proven"
+        ]
+      },
+      "new_complete": false,
+      "lost_existing_field": false,
+      "wrong_field": false
+    },
+    {
+      "id": "label100_168242458584",
+      "manual_truth": {
+        "company": "ags",
+        "grade": 9.5
+      },
+      "current_company": null,
+      "current_grade": 9.5,
+      "experimental_grading": {
+        "slab_detected": true,
+        "is_graded": true,
+        "grading_status": "graded",
+        "company": null,
+        "company_source": "none",
+        "grade": 9.5,
+        "condition_label": "MINT+",
+        "subgrades": {},
+        "tag_score": null,
+        "certification_number": "00538426",
+        "qualifiers": [],
+        "raw_condition": "not_assessed",
+        "authenticity_verified": false,
+        "source": "visible_label_ocr",
+        "requires_confirmation": true,
+        "label_text": [
+          "2021PM.CELEBRATIONS",
+          "MINT+",
+          "FLYING PIKACHUV",
+          "9.5",
+          "25THANNIVERSARY",
+          "#006",
+          "00538426",
+          "BASIC",
+          "FlyingPikachu",
+          "190"
+        ],
+        "warnings": [
+          "grading_company_unreadable_or_unsupported"
+        ]
+      },
+      "new_complete": false,
+      "lost_existing_field": false,
+      "wrong_field": false
+    },
+    {
+      "id": "label100_196982574569",
+      "manual_truth": {
+        "company": "ags",
+        "grade": 9.5
+      },
+      "current_company": null,
+      "current_grade": 9.5,
+      "experimental_grading": {
+        "slab_detected": true,
+        "is_graded": true,
+        "grading_status": "graded",
+        "company": null,
+        "company_source": "none",
+        "grade": 9.5,
+        "condition_label": "MINT+",
+        "subgrades": {},
+        "tag_score": null,
+        "certification_number": "00236262",
+        "qualifiers": [],
+        "raw_condition": "not_assessed",
+        "authenticity_verified": false,
+        "source": "visible_label_ocr",
+        "requires_confirmation": true,
+        "label_text": [
+          "QUALITY",
+          "aznPlun",
+          "MINT+",
+          "dSignatureisprou",
+          "2022 POKEMON SWSH",
+          "unsweerDried Plu",
+          "LUGIAV",
+          "9.5",
+          "aplum is jusuaplum",
+          "SILVERTEMPEST",
+          "sweer'sfantastic flavo",
+          "00236262",
+          "#138",
+          "gweet and irresi",
+          "adand livea liule",
+          "Or add prunes",
+          "220",
+          "Lugia",
+          "BASIC",
+          "HP",
+          "um"
+        ],
+        "warnings": [
+          "grading_company_unreadable_or_unsupported"
+        ]
+      },
+      "new_complete": false,
+      "lost_existing_field": false,
+      "wrong_field": false
+    },
+    {
+      "id": "freshimg_0_1212241946",
+      "manual_truth": {
+        "kind": "slab",
+        "company": "psa",
+        "grade": 8,
+        "name": "Charizard ex",
+        "number": "199/165",
+        "language": "en"
+      },
+      "current_company": null,
+      "current_grade": 8.0,
+      "experimental_grading": {
+        "slab_detected": true,
+        "is_graded": true,
+        "grading_status": "graded",
+        "company": null,
+        "company_source": "none",
+        "grade": 8.0,
+        "condition_label": "NM-MT",
+        "subgrades": {},
+        "tag_score": null,
+        "certification_number": "130282811",
+        "qualifiers": [],
+        "raw_condition": "not_assessed",
+        "authenticity_verified": false,
+        "source": "visible_label_ocr",
+        "requires_confirmation": true,
+        "label_text": [
+          "2023POKEMONMEWEN",
+          "199",
+          "CHARIZARDOX",
+          "NM-MT",
+          "SPECIAL ILLUSTRATIONRARE",
+          "8",
+          "PA",
+          "130282811",
+          "Charizardex",
+          "330"
+        ],
+        "warnings": [
+          "grading_company_unreadable_or_unsupported"
+        ]
+      },
+      "new_complete": false,
+      "lost_existing_field": false,
+      "wrong_field": false
+    },
+    {
+      "id": "freshimg_1_113190404",
+      "manual_truth": {
+        "kind": "slab",
+        "company": "beckett",
+        "grade": 9,
+        "name": "Mew ex",
+        "number": "232/091",
+        "language": "en"
+      },
+      "current_company": null,
+      "current_grade": 9.0,
+      "experimental_grading": {
+        "slab_detected": true,
+        "is_graded": true,
+        "grading_status": "graded",
+        "company": "beckett",
+        "company_source": "label_ocr",
+        "grade": 9.0,
+        "condition_label": "MINT",
+        "subgrades": {
+          "centering": 9.5,
+          "corners": 9.0
+        },
+        "tag_score": null,
+        "certification_number": "0018814275",
+        "qualifiers": [],
+        "raw_condition": "not_assessed",
+        "authenticity_verified": false,
+        "source": "visible_label_ocr",
+        "requires_confirmation": true,
+        "label_text": [
+          "2024 SCARLET&VIOLET",
+          "PALDEAN FATES",
+          "9",
+          "#232MEW EX SIR",
+          "CENTERING 9.5",
+          "BECKETTO",
+          "CORNERS 9",
+          "EDGES",
+          "MINT",
+          "9",
+          "SURFACE",
+          "8.5",
+          "0018814275",
+          "2024 SCARLET&VIOLET",
+          "PALDEAN FATES",
+          "#232MEW EX SIR",
+          "9",
+          "CENTERING 9.5",
+          "BECKETT",
+          "CORNERS 9",
+          "EDGES",
+          "MINT",
+          "9",
+          "SURFACE",
+          "8.5",
+          "0018814275"
+        ],
+        "warnings": []
+      },
+      "new_complete": true,
+      "lost_existing_field": false,
+      "wrong_field": false
+    },
+    {
+      "id": "fresh100_326075712447",
+      "manual_truth": {
+        "kind": "slab",
+        "company": "cgc",
+        "grade": 10,
+        "name": "Shaymin V",
+        "number": "013/172",
+        "language": "en"
+      },
+      "current_company": null,
+      "current_grade": null,
+      "experimental_grading": {
+        "slab_detected": null,
+        "is_graded": null,
+        "grading_status": "unknown",
+        "company": null,
+        "company_source": "none",
+        "grade": null,
+        "condition_label": null,
+        "subgrades": {},
+        "tag_score": null,
+        "certification_number": null,
+        "qualifiers": [],
+        "raw_condition": "not_assessed",
+        "authenticity_verified": false,
+        "source": "none",
+        "requires_confirmation": true,
+        "label_text": [
+          "CGC",
+          "CERTFIEDGUARANTYCOMPANY",
+          "ShayminV",
+          "Pokamon (2022)",
+          "BnlSant Stars-013/172",
+          "Shaymin",
+          "1900"
+        ],
+        "warnings": [
+          "no_supported_grading_label_detected",
+          "ungraded_status_not_proven"
+        ]
+      },
+      "new_complete": false,
+      "lost_existing_field": false,
+      "wrong_field": false
+    },
+    {
+      "id": "fresh100_377526701873",
+      "manual_truth": {
+        "kind": "slab",
+        "company": "tag",
+        "grade": 10,
+        "name": "Lucario & Melmetal GX",
+        "number": "083/173",
+        "language": "ja"
+      },
+      "current_company": null,
+      "current_grade": null,
+      "experimental_grading": {
+        "slab_detected": null,
+        "is_graded": null,
+        "grading_status": "unknown",
+        "company": null,
+        "company_source": "none",
+        "grade": null,
+        "condition_label": null,
+        "subgrades": {},
+        "tag_score": null,
+        "certification_number": null,
+        "qualifiers": [],
+        "raw_condition": "not_assessed",
+        "authenticity_verified": false,
+        "source": "none",
+        "requires_confirmation": true,
+        "label_text": [
+          "\u30eb\u30ab\u30ea\u30aa&\u30e1\u30e1\u30bf260",
+          "\u305f\u306d"
+        ],
+        "warnings": [
+          "no_supported_grading_label_detected",
+          "ungraded_status_not_proven"
+        ]
+      },
+      "new_complete": false,
+      "lost_existing_field": false,
+      "wrong_field": false
+    },
+    {
+      "id": "fresh100_205408031074",
+      "manual_truth": {
+        "kind": "slab",
+        "company": "ace",
+        "grade": 9,
+        "name": "Eevee",
+        "number": "188/167",
+        "language": "en"
+      },
+      "current_company": null,
+      "current_grade": null,
+      "experimental_grading": {
+        "slab_detected": true,
+        "is_graded": null,
+        "grading_status": "unknown",
+        "company": null,
+        "company_source": "none",
+        "grade": null,
+        "condition_label": "MINT",
+        "subgrades": {},
+        "tag_score": null,
+        "certification_number": "320870",
+        "qualifiers": [],
+        "raw_condition": "not_assessed",
+        "authenticity_verified": false,
+        "source": "visible_label_ocr",
+        "requires_confirmation": true,
+        "label_text": [
+          "2024TWILIGHTMASQUERADE",
+          "EEVEE",
+          "ILLUSTRATION RARE",
+          "#188",
+          "MINT",
+          "320870",
+          "BASIC",
+          "Eevee",
+          "50",
+          "HP"
+        ],
+        "warnings": [
+          "grading_company_unreadable_or_unsupported",
+          "overall_grade_unreadable_or_ambiguous"
+        ]
+      },
+      "new_complete": false,
+      "lost_existing_field": false,
+      "wrong_field": false
+    },
+    {
+      "id": "fresh100_227337115305",
+      "manual_truth": {
+        "kind": "slab",
+        "company": "ace",
+        "grade": 8,
+        "name": "Dark Charizard",
+        "number": "21/82",
+        "language": "en"
+      },
+      "current_company": null,
+      "current_grade": 8.0,
+      "experimental_grading": {
+        "slab_detected": true,
+        "is_graded": true,
+        "grading_status": "graded",
+        "company": null,
+        "company_source": "none",
+        "grade": 8.0,
+        "condition_label": "NM-MT",
+        "subgrades": {},
+        "tag_score": null,
+        "certification_number": "936268",
+        "qualifiers": [],
+        "raw_condition": "not_assessed",
+        "authenticity_verified": false,
+        "source": "visible_label_ocr",
+        "requires_confirmation": true,
+        "label_text": [
+          "DARK CHARIZARD",
+          "8",
+          "#21",
+          "NM-MT",
+          "936268",
+          "EvolvesromDrkCharmloPutDarkChazardotgd",
+          "STAGE",
+          "Dark Charizard 80 HP"
+        ],
+        "warnings": [
+          "grading_company_unreadable_or_unsupported"
+        ]
+      },
+      "new_complete": false,
+      "lost_existing_field": false,
+      "wrong_field": false
+    }
+  ]
+}

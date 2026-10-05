@@ -30,6 +30,19 @@ def test_confident_card_name_contradiction_cannot_become_automatic_match():
     assert decide_status(ranked,enable_matched=True,min_visual=.78,min_gap=.04,retake=False) != 'matched'
 
 
+def test_mcdonalds_set_code_keeps_the_printed_fraction():
+    from app.recognition.rank import extract_collector_candidates, fraction_named_printing
+    hits = extract_collector_candidates([], hits=[OcrHit('M24EN  001/015', .92, 'collector')])
+    assert [hit.text for hit in hits] == ['001/015']
+    spaced = extract_collector_candidates([], hits=[OcrHit('M24 EN D 001/015', .92, 'collector')])
+    assert [hit.text for hit in spaced] == ['001/015']
+    vivid = dict(card_id='swsh4-25', collector_number='25', printed_collector_number='025/185')
+    promo = dict(card_id='2024sv-1', collector_number='1', printed_collector_number='')
+    prize = dict(card_id='PPS1-VIV-025', collector_number='025', printed_collector_number='025')
+    assert fraction_named_printing([vivid, promo, prize], [vivid, promo, prize], hits) == '2024sv-1'
+    assert fraction_named_printing([promo, vivid], [vivid, promo], hits) is None
+
+
 def test_abutting_set_language_codes_are_not_collector_prefixes():
     from app.recognition.rank import extract_collector_candidates
     hits = extract_collector_candidates([],hits=[OcrHit('PAL EN 269/193',.99,'collector'),

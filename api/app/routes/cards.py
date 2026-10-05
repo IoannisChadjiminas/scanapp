@@ -5,7 +5,8 @@ import re
 from pathlib import Path
 
 from fastapi import APIRouter, HTTPException, Query, Request
-from fastapi.responses import FileResponse
+from fastapi.responses import FileResponse, RedirectResponse
+from urllib.parse import urlsplit
 
 from app.card_images import display_image_url
 from app.cardmarket import url_for_row, variants_for_row
@@ -130,15 +131,21 @@ def get_card(card_id: str, request: Request) -> CardSummary:
     return summary
 
 
-@router.get("/cards/{card_id}/image")
-def card_image(card_id: str, request: Request) -> FileResponse:
+@router.get("/cards/{card_id}/image", response_model=None)
+def card_image(card_id: str, request: Request) -> FileResponse | RedirectResponse:
     row = request.app.state.dbs.catalog.execute(
-        "SELECT image_path, has_image FROM cards WHERE id = ?", (card_id,)
+        "SELECT image_path, has_image, remote_image_url FROM cards WHERE id = ?", (card_id,)
     ).fetchone()
     if row is None or not row["has_image"] or not row["image_path"]:
         raise HTTPException(status_code=404, detail="Card image not found")
     path = Path(row["image_path"])
     if not path.is_file():
+        # References may be represented by a verified feature bundle while
+        # display stays at the observed source URL instead of a public mirror.
+        remote = str(row["remote_image_url"] or "")
+        parsed = urlsplit(remote)
+        if parsed.scheme == "https" and parsed.hostname and not any(c in remote for c in "\r\n"):
+            return RedirectResponse(remote, status_code=307)
         raise HTTPException(status_code=404, detail="Card image not found")
     media = "image/webp" if path.suffix.lower() == ".webp" else "image/jpeg"
     return FileResponse(path, media_type=media)

@@ -1,0 +1,26 @@
+{
+  "purpose": "Independent visual transcription of existing physical-photo labels before comparison with the final label OCR run. Not authentication, not population-random grading accuracy.",
+  "review": "Label contact sheets visually inspected. Printed overall grade and company only; certificate digits not scored. Unsupported or unidentified companies deliberately remain null.",
+  "cases": {
+    "holdout4_002": {"company": "psa", "grade": 10},
+    "holdout4_003": {"company": null, "grade": 9, "note": "PCG, unsupported issuer; do not infer another company"},
+    "holdout4_010": {"company": null, "grade": 10, "note": "No recognizable company on visible front label"},
+    "holdout4_018": {"company": "psa", "grade": 10},
+    "holdout4_022": {"company": "psa", "grade": 10},
+    "holdout4_023": {"company": "psa", "grade": 10},
+    "holdout4_026": {"company": "cgc", "grade": 10},
+    "holdout4_036": {"company": "psa", "grade": 10},
+    "holdout4_043": {"company": "psa", "grade": 9},
+    "holdout4_045": {"company": "psa", "grade": 10},
+    "holdout4_067": {"company": "psa", "grade": 10},
+    "holdout4_113": {"company": "cgc", "grade": 10},
+    "holdout3_025": {"company": "psa", "grade": 8},
+    "holdout3_067": {"company": "cgc", "grade": 10},
+    "holdout3_068": {"company": "cgc", "grade": 10},
+    "holdout3_070": {"company": "cgc", "grade": 10},
+    "holdout3_100": {"company": "psa", "grade": 10},
+    "holdout3_102": {"company": "psa", "grade": 10},
+    "holdout3_103": {"company": "psa", "grade": 10},
+    "holdout3_107": {"company": "psa", "grade": 10}
+  }
+}

@@ -1,0 +1,33 @@
+{
+  "purpose": "Additional Japanese physical-card photo candidates",
+  "photos": [
+    {
+      "id": "jpgraded_2",
+      "page_url": "https://www.ebay.com/itm/364697474610",
+      "image_url": "https://i.ebayimg.com/00/s/MTYwMFgxNjAw/z/3fwAAOSwzY9lsdX8/%24_57.JPG?set_id=880000500F",
+      "search_group": "jpgraded",
+      "review_status": "pending"
+    },
+    {
+      "id": "jpgraded_3",
+      "page_url": "https://www.ebay.com/itm/356482450465",
+      "image_url": "https://i.ebayimg.com/images/g/hAoAAOSwK8BnjDPQ/s-l1200.png",
+      "search_group": "jpgraded",
+      "review_status": "pending"
+    },
+    {
+      "id": "jpgraded_7",
+      "page_url": "https://www.ebay.it/p/15073646281",
+      "image_url": "https://i.ebayimg.com/images/g/sIsAAeSwARhpdQPC/s-l1200.jpg",
+      "search_group": "jpgraded",
+      "review_status": "pending"
+    },
+    {
+      "id": "jpgraded_9",
+      "page_url": "https://www.ebay.com/itm/364697474610",
+      "image_url": "https://i.ebayimg.com/images/g/vMgAAOSwN~plsdY8/s-l1200.jpg",
+      "search_group": "jpgraded",
+      "review_status": "pending"
+    }
+  ]
+}

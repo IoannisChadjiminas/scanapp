@@ -112,6 +112,36 @@ def test_lane_reservation_is_nonblocking_exclusive_and_recoverable():
     gate.release_card()
 
 
+def test_card_priority_blocks_new_grading_but_not_auxiliary_card_work():
+    gate = AuxiliaryWorkGate(); entered = Event(); waiting = Event()
+    def grade():
+        waiting.set()
+        with gate.grading():
+            entered.set()
+    with ThreadPoolExecutor(max_workers=1) as executor:
+        with gate.prioritize_card():
+            task = executor.submit(grade)
+            assert waiting.wait(2) and not entered.is_set()
+            assert gate.try_reserve_card()
+            gate.release_card()
+            with gate.prioritize_card():
+                assert gate.card_priority == 2
+            assert gate.card_priority == 1
+        task.result(timeout=2)
+    assert entered.is_set() and not gate.active and gate.card_priority == 0
+
+
+def test_card_priority_cancellation_and_failures_release_reservation():
+    gate = AuxiliaryWorkGate(); stop = Event()
+    with pytest.raises(ValueError):
+        with gate.prioritize_card(), grading_cancellation_scope(stop):
+            stop.set()
+            with pytest.raises(GradingCancelled), gate.grading():
+                pytest.fail('Cancelled grading may not infer')
+            raise ValueError('foreground failed')
+    assert gate.card_priority == 0 and not gate.active
+
+
 def test_runtime_isolates_region_state_and_releases_executor_on_reload(monkeypatch,tmp_path):
     readers=[]
     def make_reader(**kwargs):
@@ -130,3 +160,76 @@ def test_runtime_isolates_region_state_and_releases_executor_on_reload(monkeypat
     assert previous._max_workers==1
     runtime.load(SimpleNamespace());assert previous._shutdown
     runtime.close();assert runtime.region_executor is None
+
+
+@pytest.mark.parametrize('failed_half', [None, 'left', 'right'])
+def test_footer_halves_overlap_keep_conflicts_order_and_drain_failures(failed_half):
+    left_entered, right_entered = Event(), Event()
+    reader = CardOcr.__new__(CardOcr); reader.engine = object()
+    reader.parallel_footer_halves = True
+    def main(image):
+        if image.width == 600:
+            return ['Pikachu'], [.99]
+        left_entered.set()
+        assert right_entered.wait(2)
+        if failed_half == 'left':
+            raise ValueError('left failed')
+        return ['35/108'], [.98]
+    def auxiliary(image):
+        if image.width == 600:
+            return ['retreat'], [.99]
+        right_entered.set()
+        assert left_entered.wait(2)
+        if failed_half == 'right':
+            raise ValueError('right failed')
+        return ['35/109'], [.97]
+    reader._run = main
+    reader.region_reader = SimpleNamespace(engine=object(), _run=auxiliary)
+    reader.auxiliary_gate = AuxiliaryWorkGate()
+    with ThreadPoolExecutor(max_workers=1) as executor:
+        reader.region_executor = executor
+        observed = reader.read(Image.new('RGB', (600, 840)))
+    assert not observed.failed and not reader.auxiliary_gate.active
+    numbers = [h.text for h in observed.hits if '/' in h.text]
+    expected = ([] if failed_half == 'left' else ['35/108']) + ([] if failed_half == 'right' else ['35/109'])
+    assert numbers == expected
+    assert len(observed.passes) == 4
+    assert observed.passes[-1]['parallel'] is True
+    assert observed.collector_retry_contributed
+
+
+def test_busy_lane_keeps_both_footer_halves_serial_and_preserves_evidence():
+    reader = CardOcr.__new__(CardOcr); reader.engine = object()
+    reader.parallel_footer_halves = True
+    observations = iter([(['Pikachu'], [.99]), (['retreat'], [.98]),
+                         (['35/108'], [.97]), (['35/109'], [.96])])
+    reader._run = lambda image: next(observations)
+    reader.region_reader = SimpleNamespace(engine=object(), _run=lambda image: pytest.fail('Busy lane'))
+    reader.auxiliary_gate = AuxiliaryWorkGate()
+    with ThreadPoolExecutor(max_workers=1) as executor, reader.auxiliary_gate.grading():
+        reader.region_executor = executor
+        result = reader.read(Image.new('RGB', (600, 840)))
+    assert [h.text for h in result.hits] == ['Pikachu', 'retreat', '35/108', '35/109']
+    assert all('parallel' not in p for p in result.passes)
+    assert not result.failed and not reader.auxiliary_gate.active
+
+
+def test_footer_schedule_failure_releases_lane_and_reads_both_patches_serially():
+    from concurrent.futures import Future
+    reader = CardOcr.__new__(CardOcr); reader.engine = object()
+    reader.parallel_footer_halves = True
+    reader.auxiliary_gate = AuxiliaryWorkGate()
+    halves = iter([(['35/108'], [.98]), (['35/109'], [.97])])
+    reader._run = lambda image: (['Pikachu'], [.99]) if image.width == 600 else next(halves)
+    reader.region_reader = SimpleNamespace(engine=object(), _run=lambda image: (['retreat'], [.99]))
+    class Executor:
+        submitted = 0
+        def submit(self, fn):
+            self.submitted += 1
+            if self.submitted == 2:
+                raise RuntimeError('optional worker unavailable')
+            future = Future(); future.set_result(fn()); return future
+    reader.region_executor = Executor()
+    result = reader.read(Image.new('RGB', (600, 840)))
+    assert not result.failed and not reader.auxiliary_gate.active
+    assert [h.text for h in result.hits] == ['Pikachu', 'retreat', '35/108', '35/109']

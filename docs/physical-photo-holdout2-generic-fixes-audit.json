@@ -1,0 +1,2144 @@
+{
+  "scope": "Tuned 50-photo regression, NOT fresh holdout accuracy. Local offline API recognition, not deployed Flutter/camera/HTTP tests. Exact set/number/language evaluated; finish/authenticity not ground truth.",
+  "counts": {
+    "photos": 50,
+    "best_match_correct": 49,
+    "best_match_wrong": 1,
+    "no_best_match": 0,
+    "correct_in_best_or_alternatives": 50,
+    "automatic_matches": 12,
+    "wrong_automatic_matches": 0,
+    "statuses": {
+      "uncertain": 34,
+      "matched": 12,
+      "printing_ambiguous": 4
+    }
+  },
+  "full_card_only": {
+    "photos": 50,
+    "best_match_correct": 48,
+    "best_match_wrong": 1,
+    "no_best_match": 1,
+    "correct_in_best_or_alternatives": 49,
+    "automatic_matches": 12,
+    "wrong_automatic_matches": 0,
+    "statuses": {
+      "uncertain": 34,
+      "matched": 12,
+      "retake": 1,
+      "printing_ambiguous": 3
+    }
+  },
+  "distinct_printing_ids": 18,
+  "strata": {
+    "language:en": {
+      "photos": 36,
+      "best_match_correct": 35,
+      "best_match_wrong": 1,
+      "no_best_match": 0,
+      "correct_in_best_or_alternatives": 36,
+      "automatic_matches": 9,
+      "wrong_automatic_matches": 0,
+      "statuses": {
+        "uncertain": 23,
+        "matched": 9,
+        "printing_ambiguous": 4
+      }
+    },
+    "language:ja": {
+      "photos": 14,
+      "best_match_correct": 14,
+      "best_match_wrong": 0,
+      "no_best_match": 0,
+      "correct_in_best_or_alternatives": 14,
+      "automatic_matches": 3,
+      "wrong_automatic_matches": 0,
+      "statuses": {
+        "uncertain": 11,
+        "matched": 3
+      }
+    },
+    "layout:pokemon_full_art": {
+      "photos": 28,
+      "best_match_correct": 28,
+      "best_match_wrong": 0,
+      "no_best_match": 0,
+      "correct_in_best_or_alternatives": 28,
+      "automatic_matches": 9,
+      "wrong_automatic_matches": 0,
+      "statuses": {
+        "uncertain": 18,
+        "matched": 9,
+        "printing_ambiguous": 1
+      }
+    },
+    "layout:standard_frame": {
+      "photos": 15,
+      "best_match_correct": 14,
+      "best_match_wrong": 1,
+      "no_best_match": 0,
+      "correct_in_best_or_alternatives": 15,
+      "automatic_matches": 2,
+      "wrong_automatic_matches": 0,
+      "statuses": {
+        "matched": 2,
+        "uncertain": 10,
+        "printing_ambiguous": 3
+      }
+    },
+    "layout:trainer_full_art": {
+      "photos": 7,
+      "best_match_correct": 7,
+      "best_match_wrong": 0,
+      "no_best_match": 0,
+      "correct_in_best_or_alternatives": 7,
+      "automatic_matches": 1,
+      "wrong_automatic_matches": 0,
+      "statuses": {
+        "uncertain": 6,
+        "matched": 1
+      }
+    },
+    "artwork_covered:False": {
+      "photos": 15,
+      "best_match_correct": 15,
+      "best_match_wrong": 0,
+      "no_best_match": 0,
+      "correct_in_best_or_alternatives": 15,
+      "automatic_matches": 4,
+      "wrong_automatic_matches": 0,
+      "statuses": {
+        "matched": 4,
+        "uncertain": 11
+      }
+    },
+    "artwork_covered:True": {
+      "photos": 35,
+      "best_match_correct": 34,
+      "best_match_wrong": 1,
+      "no_best_match": 0,
+      "correct_in_best_or_alternatives": 35,
+      "automatic_matches": 8,
+      "wrong_automatic_matches": 0,
+      "statuses": {
+        "uncertain": 23,
+        "matched": 8,
+        "printing_ambiguous": 4
+      }
+    }
+  },
+  "code_unchanged_from_generic_fix_regression": false,
+  "regression_run": true,
+  "changed_code_files": [
+    "app/recognition/pipeline.py",
+    "app/recognition/rank.py",
+    "app/config.py",
+    "app/recognition/ocr.py"
+  ],
+  "source_labels_sha256": "2f7149f32aaf768f04279c08f8d9d51dcd0ee943b2f7e9aebf95bca8693688aa",
+  "all_50_retained": true,
+  "failures": [
+    {
+      "photo": "holdout2_082",
+      "expected_id": "en:base4-87",
+      "best_match_id": "en:base1-58",
+      "best_match_correct": false,
+      "correct_in_best_or_alternatives": true,
+      "status": "printing_ambiguous",
+      "match_state": "likely",
+      "automatic_wrong_match": false,
+      "artwork_covered": true,
+      "language": "en",
+      "layout": "standard_frame",
+      "page_url": "https://www.ebay.com/itm/265304755566",
+      "full_shortlist_recall": true,
+      "artwork_shortlist_recall": true,
+      "identity_evidence": {
+        "collector_conflict": false,
+        "structured_collector_conflict": false,
+        "strong_name_conflict": false,
+        "language_conflict": false
+      },
+      "ocr": {
+        "name_text": "Pikachu",
+        "collector_text": "87/130",
+        "failed": false,
+        "collector_retry_used": false,
+        "collector_retry_contributed": false
+      },
+      "query_size": [
+        817,
+        1105
+      ],
+      "frame_selection": {
+        "profile": "loose_1",
+        "alternate_hypotheses": 4
+      },
+      "best_cardmarket_url": null
+    }
+  ],
+  "wrong_automatic_cases": [],
+  "negatives": [
+    {
+      "name": "blank",
+      "before": {
+        "status": "retake",
+        "suggestions": 0,
+        "automatic_claim": false
+      },
+      "after": {
+        "status": "retake",
+        "suggestions": 0,
+        "automatic_claim": false
+      }
+    },
+    {
+      "name": "noise",
+      "before": {
+        "status": "no_match",
+        "suggestions": 0,
+        "automatic_claim": false
+      },
+      "after": {
+        "status": "no_match",
+        "suggestions": 0,
+        "automatic_claim": false
+      }
+    }
+  ],
+  "cases": [
+    {
+      "photo": "holdout2_001",
+      "expected_id": "en:swsh7-205",
+      "best_match_id": "en:swsh7-205",
+      "best_match_correct": true,
+      "correct_in_best_or_alternatives": true,
+      "status": "uncertain",
+      "match_state": "tentative",
+      "automatic_wrong_match": false,
+      "artwork_covered": true,
+      "language": "en",
+      "layout": "pokemon_full_art",
+      "page_url": "https://www.ebay.com/b/Holo-Pokemon-TCG-Secret-Rare-Individual-Collectible-Card-Game-Cards/183454/bn_56894987",
+      "full_shortlist_recall": true,
+      "artwork_shortlist_recall": true,
+      "identity_evidence": {
+        "collector_conflict": true,
+        "structured_collector_conflict": false,
+        "strong_name_conflict": false,
+        "language_conflict": false
+      },
+      "ocr": {
+        "name_text": "LeafeonMAX",
+        "collector_text": "cards.",
+        "failed": false,
+        "collector_retry_used": true,
+        "collector_retry_contributed": false
+      },
+      "query_size": [
+        472,
+        660
+      ],
+      "frame_selection": {
+        "profile": "window_0.70",
+        "alternate_hypotheses": 4
+      },
+      "best_cardmarket_url": null
+    },
+    {
+      "photo": "holdout2_003",
+      "expected_id": "en:swsh7-205",
+      "best_match_id": "en:swsh7-205",
+      "best_match_correct": true,
+      "correct_in_best_or_alternatives": true,
+      "status": "matched",
+      "match_state": "matched",
+      "automatic_wrong_match": false,
+      "artwork_covered": true,
+      "language": "en",
+      "layout": "pokemon_full_art",
+      "page_url": "https://www.ebay.co.uk/itm/277005677853",
+      "full_shortlist_recall": true,
+      "artwork_shortlist_recall": true,
+      "identity_evidence": {
+        "collector_conflict": false,
+        "structured_collector_conflict": false,
+        "strong_name_conflict": false,
+        "language_conflict": false
+      },
+      "ocr": {
+        "name_text": "LeafeonVMAX",
+        "collector_text": "is Knocked Out, your opponent takes 3 Prize cards",
+        "failed": false,
+        "collector_retry_used": true,
+        "collector_retry_contributed": false
+      },
+      "query_size": [
+        621,
+        891
+      ],
+      "frame_selection": {
+        "profile": "primary",
+        "alternate_hypotheses": 5
+      },
+      "best_cardmarket_url": null
+    },
+    {
+      "photo": "holdout2_004",
+      "expected_id": "en:swsh7-205",
+      "best_match_id": "en:swsh7-205",
+      "best_match_correct": true,
+      "correct_in_best_or_alternatives": true,
+      "status": "printing_ambiguous",
+      "match_state": "likely",
+      "automatic_wrong_match": false,
+      "artwork_covered": true,
+      "language": "en",
+      "layout": "pokemon_full_art",
+      "page_url": "https://www.ebay.co.uk/itm/396712071610",
+      "full_shortlist_recall": true,
+      "artwork_shortlist_recall": true,
+      "identity_evidence": {
+        "collector_conflict": false,
+        "structured_collector_conflict": false,
+        "strong_name_conflict": false,
+        "language_conflict": false
+      },
+      "ocr": {
+        "name_text": "LeafeonV",
+        "collector_text": "205/203",
+        "failed": false,
+        "collector_retry_used": false,
+        "collector_retry_contributed": false
+      },
+      "query_size": [
+        584,
+        817
+      ],
+      "frame_selection": {
+        "profile": "line_1",
+        "alternate_hypotheses": 0
+      },
+      "best_cardmarket_url": null
+    },
+    {
+      "photo": "holdout2_005",
+      "expected_id": "en:swsh7-205",
+      "best_match_id": "en:swsh7-205",
+      "best_match_correct": true,
+      "correct_in_best_or_alternatives": true,
+      "status": "uncertain",
+      "match_state": "likely",
+      "automatic_wrong_match": false,
+      "artwork_covered": true,
+      "language": "en",
+      "layout": "pokemon_full_art",
+      "page_url": "https://www.ebay.com/itm/276838209498",
+      "full_shortlist_recall": true,
+      "artwork_shortlist_recall": true,
+      "identity_evidence": {
+        "collector_conflict": false,
+        "structured_collector_conflict": false,
+        "strong_name_conflict": false,
+        "language_conflict": false
+      },
+      "ocr": {
+        "name_text": "LeafeonVMAX",
+        "collector_text": "205/203",
+        "failed": false,
+        "collector_retry_used": false,
+        "collector_retry_contributed": false
+      },
+      "query_size": [
+        916,
+        1230
+      ],
+      "frame_selection": {
+        "profile": "loose_0",
+        "alternate_hypotheses": 3
+      },
+      "best_cardmarket_url": null
+    },
+    {
+      "photo": "holdout2_008",
+      "expected_id": "en:swsh7-209",
+      "best_match_id": "en:swsh7-209",
+      "best_match_correct": true,
+      "correct_in_best_or_alternatives": true,
+      "status": "matched",
+      "match_state": "matched",
+      "automatic_wrong_match": false,
+      "artwork_covered": true,
+      "language": "en",
+      "layout": "pokemon_full_art",
+      "page_url": "https://www.ebay.com/itm/405489121366",
+      "full_shortlist_recall": true,
+      "artwork_shortlist_recall": true,
+      "identity_evidence": {
+        "collector_conflict": false,
+        "structured_collector_conflict": false,
+        "strong_name_conflict": false,
+        "language_conflict": false
+      },
+      "ocr": {
+        "name_text": "GlaceonVMAX",
+        "collector_text": "209/203",
+        "failed": false,
+        "collector_retry_used": false,
+        "collector_retry_contributed": false
+      },
+      "query_size": [
+        895,
+        1197
+      ],
+      "frame_selection": {
+        "profile": "primary",
+        "alternate_hypotheses": 0
+      },
+      "best_cardmarket_url": null
+    },
+    {
+      "photo": "holdout2_009",
+      "expected_id": "en:swsh7-209",
+      "best_match_id": "en:swsh7-209",
+      "best_match_correct": true,
+      "correct_in_best_or_alternatives": true,
+      "status": "matched",
+      "match_state": "matched",
+      "automatic_wrong_match": false,
+      "artwork_covered": true,
+      "language": "en",
+      "layout": "pokemon_full_art",
+      "page_url": "https://www.ebay.co.uk/itm/135865400223",
+      "full_shortlist_recall": true,
+      "artwork_shortlist_recall": true,
+      "identity_evidence": {
+        "collector_conflict": false,
+        "structured_collector_conflict": false,
+        "strong_name_conflict": false,
+        "language_conflict": false
+      },
+      "ocr": {
+        "name_text": "GlaceonVMAX",
+        "collector_text": "209/203",
+        "failed": false,
+        "collector_retry_used": false,
+        "collector_retry_contributed": false
+      },
+      "query_size": [
+        828,
+        1106
+      ],
+      "frame_selection": {
+        "profile": "frame_1",
+        "alternate_hypotheses": 6
+      },
+      "best_cardmarket_url": null
+    },
+    {
+      "photo": "holdout2_010",
+      "expected_id": "en:swsh7-209",
+      "best_match_id": "en:swsh7-209",
+      "best_match_correct": true,
+      "correct_in_best_or_alternatives": true,
+      "status": "uncertain",
+      "match_state": "likely",
+      "automatic_wrong_match": false,
+      "artwork_covered": true,
+      "language": "en",
+      "layout": "pokemon_full_art",
+      "page_url": "https://www.ebay.com/itm/405489121366",
+      "full_shortlist_recall": true,
+      "artwork_shortlist_recall": true,
+      "identity_evidence": {
+        "collector_conflict": false,
+        "structured_collector_conflict": false,
+        "strong_name_conflict": false,
+        "language_conflict": false
+      },
+      "ocr": {
+        "name_text": "GlaceonV",
+        "collector_text": "209/203",
+        "failed": false,
+        "collector_retry_used": false,
+        "collector_retry_contributed": false
+      },
+      "query_size": [
+        601,
+        840
+      ],
+      "frame_selection": {
+        "profile": "window_0.70",
+        "alternate_hypotheses": 3
+      },
+      "best_cardmarket_url": null
+    },
+    {
+      "photo": "holdout2_011",
+      "expected_id": "en:swsh7-209",
+      "best_match_id": "en:swsh7-209",
+      "best_match_correct": true,
+      "correct_in_best_or_alternatives": true,
+      "status": "uncertain",
+      "match_state": "likely",
+      "automatic_wrong_match": false,
+      "artwork_covered": true,
+      "language": "en",
+      "layout": "pokemon_full_art",
+      "page_url": "https://www.ebay.com/b/Glaceon-VMAX-209-203-SWSH07-Evolving-Skies/2536/bn_7124863221",
+      "full_shortlist_recall": true,
+      "artwork_shortlist_recall": true,
+      "identity_evidence": {
+        "collector_conflict": false,
+        "structured_collector_conflict": false,
+        "strong_name_conflict": false,
+        "language_conflict": false
+      },
+      "ocr": {
+        "name_text": "Glaceom",
+        "collector_text": "retreat",
+        "failed": false,
+        "collector_retry_used": true,
+        "collector_retry_contributed": false
+      },
+      "query_size": [
+        495,
+        691
+      ],
+      "frame_selection": {
+        "profile": "window_0.70",
+        "alternate_hypotheses": 2
+      },
+      "best_cardmarket_url": null
+    },
+    {
+      "photo": "holdout2_013",
+      "expected_id": "en:swsh6-177",
+      "best_match_id": "en:swsh6-177",
+      "best_match_correct": true,
+      "correct_in_best_or_alternatives": true,
+      "status": "uncertain",
+      "match_state": "likely",
+      "automatic_wrong_match": false,
+      "artwork_covered": true,
+      "language": "en",
+      "layout": "pokemon_full_art",
+      "page_url": "https://www.ebay.it/itm/185943810549",
+      "full_shortlist_recall": true,
+      "artwork_shortlist_recall": true,
+      "identity_evidence": {
+        "collector_conflict": false,
+        "structured_collector_conflict": false,
+        "strong_name_conflict": false,
+        "language_conflict": false
+      },
+      "ocr": {
+        "name_text": "Gaitan MoltresV",
+        "collector_text": "177/198",
+        "failed": false,
+        "collector_retry_used": false,
+        "collector_retry_contributed": false
+      },
+      "query_size": [
+        712,
+        987
+      ],
+      "frame_selection": {
+        "profile": "loose_0",
+        "alternate_hypotheses": 3
+      },
+      "best_cardmarket_url": null
+    },
+    {
+      "photo": "holdout2_015",
+      "expected_id": "en:swsh6-177",
+      "best_match_id": "en:swsh6-177",
+      "best_match_correct": true,
+      "correct_in_best_or_alternatives": true,
+      "status": "uncertain",
+      "match_state": "likely",
+      "automatic_wrong_match": false,
+      "artwork_covered": true,
+      "language": "en",
+      "layout": "pokemon_full_art",
+      "page_url": "https://www.ebay.com/itm/287034734118",
+      "full_shortlist_recall": true,
+      "artwork_shortlist_recall": true,
+      "identity_evidence": {
+        "collector_conflict": false,
+        "structured_collector_conflict": false,
+        "strong_name_conflict": false,
+        "language_conflict": false
+      },
+      "ocr": {
+        "name_text": "Galarian MoltresV",
+        "collector_text": "177/198",
+        "failed": false,
+        "collector_retry_used": false,
+        "collector_retry_contributed": false
+      },
+      "query_size": [
+        601,
+        840
+      ],
+      "frame_selection": {
+        "profile": "window_0.70",
+        "alternate_hypotheses": 5
+      },
+      "best_cardmarket_url": null
+    },
+    {
+      "photo": "holdout2_016",
+      "expected_id": "en:swsh6-177",
+      "best_match_id": "en:swsh6-177",
+      "best_match_correct": true,
+      "correct_in_best_or_alternatives": true,
+      "status": "uncertain",
+      "match_state": "likely",
+      "automatic_wrong_match": false,
+      "artwork_covered": true,
+      "language": "en",
+      "layout": "pokemon_full_art",
+      "page_url": "https://www.ebay.com/itm/185943810549",
+      "full_shortlist_recall": true,
+      "artwork_shortlist_recall": true,
+      "identity_evidence": {
+        "collector_conflict": false,
+        "structured_collector_conflict": false,
+        "strong_name_conflict": false,
+        "language_conflict": false
+      },
+      "ocr": {
+        "name_text": "Galarian Moltres",
+        "collector_text": "177/198",
+        "failed": false,
+        "collector_retry_used": false,
+        "collector_retry_contributed": false
+      },
+      "query_size": [
+        601,
+        840
+      ],
+      "frame_selection": {
+        "profile": "window_0.70",
+        "alternate_hypotheses": 4
+      },
+      "best_cardmarket_url": null
+    },
+    {
+      "photo": "holdout2_020",
+      "expected_id": "en:swsh10-172",
+      "best_match_id": "en:swsh10-172",
+      "best_match_correct": true,
+      "correct_in_best_or_alternatives": true,
+      "status": "uncertain",
+      "match_state": "likely",
+      "automatic_wrong_match": false,
+      "artwork_covered": true,
+      "language": "en",
+      "layout": "pokemon_full_art",
+      "page_url": "https://www.ebay.com/b/Machamp-Pokemon-TCG-Fighting-Ultra-Rare-Individual-Collectible-Card-Game-Cards/183454/bn_83131187",
+      "full_shortlist_recall": true,
+      "artwork_shortlist_recall": true,
+      "identity_evidence": {
+        "collector_conflict": false,
+        "structured_collector_conflict": false,
+        "strong_name_conflict": false,
+        "language_conflict": false
+      },
+      "ocr": {
+        "name_text": "国国用",
+        "collector_text": "172/189",
+        "failed": false,
+        "collector_retry_used": false,
+        "collector_retry_contributed": false
+      },
+      "query_size": [
+        601,
+        840
+      ],
+      "frame_selection": {
+        "profile": "window_0.70",
+        "alternate_hypotheses": 2
+      },
+      "best_cardmarket_url": "https://www.cardmarket.com/en/Pokemon/Products/Singles/Astral-Radiance/Machamp-V-V3-ASR172"
+    },
+    {
+      "photo": "holdout2_021",
+      "expected_id": "en:swsh10-172",
+      "best_match_id": "en:swsh10-172",
+      "best_match_correct": true,
+      "correct_in_best_or_alternatives": true,
+      "status": "matched",
+      "match_state": "matched",
+      "automatic_wrong_match": false,
+      "artwork_covered": true,
+      "language": "en",
+      "layout": "pokemon_full_art",
+      "page_url": "https://www.ebay.com/b/Machamp-Pokemon-TCG-Full-Art-Individual-Trading-Card-Games/183454/bn_7117045849",
+      "full_shortlist_recall": true,
+      "artwork_shortlist_recall": true,
+      "identity_evidence": {
+        "collector_conflict": false,
+        "structured_collector_conflict": false,
+        "strong_name_conflict": false,
+        "language_conflict": false
+      },
+      "ocr": {
+        "name_text": "田画田",
+        "collector_text": "172/189",
+        "failed": false,
+        "collector_retry_used": false,
+        "collector_retry_contributed": false
+      },
+      "query_size": [
+        648,
+        896
+      ],
+      "frame_selection": {
+        "profile": "primary",
+        "alternate_hypotheses": 6
+      },
+      "best_cardmarket_url": "https://www.cardmarket.com/en/Pokemon/Products/Singles/Astral-Radiance/Machamp-V-V3-ASR172"
+    },
+    {
+      "photo": "holdout2_023",
+      "expected_id": "en:swsh10-172",
+      "best_match_id": "en:swsh10-172",
+      "best_match_correct": true,
+      "correct_in_best_or_alternatives": true,
+      "status": "matched",
+      "match_state": "matched",
+      "automatic_wrong_match": false,
+      "artwork_covered": true,
+      "language": "en",
+      "layout": "pokemon_full_art",
+      "page_url": "https://www.ebay.com/itm/177977550477",
+      "full_shortlist_recall": true,
+      "artwork_shortlist_recall": true,
+      "identity_evidence": {
+        "collector_conflict": false,
+        "structured_collector_conflict": false,
+        "strong_name_conflict": false,
+        "language_conflict": false
+      },
+      "ocr": {
+        "name_text": "Machamp",
+        "collector_text": "172/189",
+        "failed": false,
+        "collector_retry_used": false,
+        "collector_retry_contributed": false
+      },
+      "query_size": [
+        598,
+        833
+      ],
+      "frame_selection": {
+        "profile": "primary",
+        "alternate_hypotheses": 0
+      },
+      "best_cardmarket_url": "https://www.cardmarket.com/en/Pokemon/Products/Singles/Astral-Radiance/Machamp-V-V3-ASR172"
+    },
+    {
+      "photo": "holdout2_022",
+      "expected_id": "en:swsh10-072",
+      "best_match_id": "en:swsh10-072",
+      "best_match_correct": true,
+      "correct_in_best_or_alternatives": true,
+      "status": "matched",
+      "match_state": "matched",
+      "automatic_wrong_match": false,
+      "artwork_covered": false,
+      "language": "en",
+      "layout": "standard_frame",
+      "page_url": "https://www.ebay.com/itm/166421250310",
+      "full_shortlist_recall": true,
+      "artwork_shortlist_recall": false,
+      "identity_evidence": {
+        "collector_conflict": false,
+        "structured_collector_conflict": false,
+        "strong_name_conflict": false,
+        "language_conflict": false
+      },
+      "ocr": {
+        "name_text": "MachampV",
+        "collector_text": "072/189",
+        "failed": false,
+        "collector_retry_used": false,
+        "collector_retry_contributed": false
+      },
+      "query_size": [
+        797,
+        1094
+      ],
+      "frame_selection": {
+        "profile": "primary",
+        "alternate_hypotheses": 0
+      },
+      "best_cardmarket_url": "https://www.cardmarket.com/en/Pokemon/Products/Singles/Astral-Radiance/Machamp-V-V1-ASR072"
+    },
+    {
+      "photo": "holdout2_024",
+      "expected_id": "en:swsh12.5gg-GG68",
+      "best_match_id": "en:swsh12.5gg-GG68",
+      "best_match_correct": true,
+      "correct_in_best_or_alternatives": true,
+      "status": "matched",
+      "match_state": "matched",
+      "automatic_wrong_match": false,
+      "artwork_covered": true,
+      "language": "en",
+      "layout": "pokemon_full_art",
+      "page_url": "https://www.ebay.com/itm/267416756545",
+      "full_shortlist_recall": true,
+      "artwork_shortlist_recall": true,
+      "identity_evidence": {
+        "collector_conflict": false,
+        "structured_collector_conflict": false,
+        "strong_name_conflict": false,
+        "language_conflict": false
+      },
+      "ocr": {
+        "name_text": "Origin Forme Dialgga",
+        "collector_text": "©2023 Pokemon/Nintendo/Creatures/GAMEFREAK",
+        "failed": false,
+        "collector_retry_used": false,
+        "collector_retry_contributed": false
+      },
+      "query_size": [
+        757,
+        1037
+      ],
+      "frame_selection": {
+        "profile": "primary",
+        "alternate_hypotheses": 0
+      },
+      "best_cardmarket_url": "https://www.cardmarket.com/en/Pokemon/Products/Singles/Crown-Zenith/Origin-Forme-Dialga-VSTAR-CRZGG68"
+    },
+    {
+      "photo": "holdout2_026",
+      "expected_id": "en:swsh12.5gg-GG68",
+      "best_match_id": "en:swsh12.5gg-GG68",
+      "best_match_correct": true,
+      "correct_in_best_or_alternatives": true,
+      "status": "uncertain",
+      "match_state": "likely",
+      "automatic_wrong_match": false,
+      "artwork_covered": true,
+      "language": "en",
+      "layout": "pokemon_full_art",
+      "page_url": "https://www.ebay.com/itm/376750140326",
+      "full_shortlist_recall": true,
+      "artwork_shortlist_recall": true,
+      "identity_evidence": {
+        "collector_conflict": false,
+        "structured_collector_conflict": false,
+        "strong_name_conflict": false,
+        "language_conflict": false
+      },
+      "ocr": {
+        "name_text": "Origin ForDoialga",
+        "collector_text": "©2023 Pokemon/Nintendo/Creatures/GAME FREAK",
+        "failed": false,
+        "collector_retry_used": false,
+        "collector_retry_contributed": false
+      },
+      "query_size": [
+        974,
+        1360
+      ],
+      "frame_selection": {
+        "profile": "window_0.85",
+        "alternate_hypotheses": 2
+      },
+      "best_cardmarket_url": "https://www.cardmarket.com/en/Pokemon/Products/Singles/Crown-Zenith/Origin-Forme-Dialga-VSTAR-CRZGG68"
+    },
+    {
+      "photo": "holdout2_029",
+      "expected_id": "en:swsh12.5gg-GG68",
+      "best_match_id": "en:swsh12.5gg-GG68",
+      "best_match_correct": true,
+      "correct_in_best_or_alternatives": true,
+      "status": "matched",
+      "match_state": "matched",
+      "automatic_wrong_match": false,
+      "artwork_covered": true,
+      "language": "en",
+      "layout": "pokemon_full_art",
+      "page_url": "https://www.ebay.com/itm/166857857673",
+      "full_shortlist_recall": true,
+      "artwork_shortlist_recall": true,
+      "identity_evidence": {
+        "collector_conflict": false,
+        "structured_collector_conflict": false,
+        "strong_name_conflict": false,
+        "language_conflict": false
+      },
+      "ocr": {
+        "name_text": "OriginForme Dialga",
+        "collector_text": "©2023 Pokémon/Nintendo/Creatures/GAME FREAK",
+        "failed": false,
+        "collector_retry_used": false,
+        "collector_retry_contributed": false
+      },
+      "query_size": [
+        1144,
+        1555
+      ],
+      "frame_selection": {
+        "profile": "primary",
+        "alternate_hypotheses": 5
+      },
+      "best_cardmarket_url": "https://www.cardmarket.com/en/Pokemon/Products/Singles/Crown-Zenith/Origin-Forme-Dialga-VSTAR-CRZGG68"
+    },
+    {
+      "photo": "holdout2_030",
+      "expected_id": "en:swsh12.5gg-GG68",
+      "best_match_id": "en:swsh12.5gg-GG68",
+      "best_match_correct": true,
+      "correct_in_best_or_alternatives": true,
+      "status": "uncertain",
+      "match_state": "likely",
+      "automatic_wrong_match": false,
+      "artwork_covered": true,
+      "language": "en",
+      "layout": "pokemon_full_art",
+      "page_url": "https://collectorworth.com/cards/origin-forme-dialga-vstar-pokemon-crown-zenith/",
+      "full_shortlist_recall": true,
+      "artwork_shortlist_recall": true,
+      "identity_evidence": {
+        "collector_conflict": false,
+        "structured_collector_conflict": false,
+        "strong_name_conflict": false,
+        "language_conflict": false
+      },
+      "ocr": {
+        "name_text": "Origin Form Dialga",
+        "collector_text": "©2023 Pokémon/ Nintendo/Creatures/GAME FREAK",
+        "failed": false,
+        "collector_retry_used": false,
+        "collector_retry_contributed": false
+      },
+      "query_size": [
+        745,
+        1058
+      ],
+      "frame_selection": {
+        "profile": "loose_0",
+        "alternate_hypotheses": 3
+      },
+      "best_cardmarket_url": "https://www.cardmarket.com/en/Pokemon/Products/Singles/Crown-Zenith/Origin-Forme-Dialga-VSTAR-CRZGG68"
+    },
+    {
+      "photo": "holdout2_032",
+      "expected_id": "ja:SV3-134",
+      "best_match_id": "ja:SV3-134",
+      "best_match_correct": true,
+      "correct_in_best_or_alternatives": true,
+      "status": "uncertain",
+      "match_state": "likely",
+      "automatic_wrong_match": false,
+      "artwork_covered": false,
+      "language": "ja",
+      "layout": "pokemon_full_art",
+      "page_url": "https://www.ebay.com.sg/b/Charizard-ex-134-108-Sv3-Ruler-of-the-Black-Flame/2536/bn_7124591709",
+      "full_shortlist_recall": true,
+      "artwork_shortlist_recall": false,
+      "identity_evidence": {
+        "collector_conflict": false,
+        "structured_collector_conflict": false,
+        "strong_name_conflict": false,
+        "language_conflict": false
+      },
+      "ocr": {
+        "name_text": "リザードンEX",
+        "collector_text": "134/108",
+        "failed": false,
+        "collector_retry_used": false,
+        "collector_retry_contributed": false
+      },
+      "query_size": [
+        601,
+        840
+      ],
+      "frame_selection": {
+        "profile": "window_0.70",
+        "alternate_hypotheses": 4
+      },
+      "best_cardmarket_url": null
+    },
+    {
+      "photo": "holdout2_034",
+      "expected_id": "ja:SV3-134",
+      "best_match_id": "ja:SV3-134",
+      "best_match_correct": true,
+      "correct_in_best_or_alternatives": true,
+      "status": "matched",
+      "match_state": "matched",
+      "automatic_wrong_match": false,
+      "artwork_covered": false,
+      "language": "ja",
+      "layout": "pokemon_full_art",
+      "page_url": "https://www.ebay.com/itm/226990634480",
+      "full_shortlist_recall": true,
+      "artwork_shortlist_recall": false,
+      "identity_evidence": {
+        "collector_conflict": false,
+        "structured_collector_conflict": false,
+        "strong_name_conflict": false,
+        "language_conflict": false
+      },
+      "ocr": {
+        "name_text": "リザードンビX",
+        "collector_text": "134/108",
+        "failed": false,
+        "collector_retry_used": false,
+        "collector_retry_contributed": false
+      },
+      "query_size": [
+        785,
+        1098
+      ],
+      "frame_selection": {
+        "profile": "primary",
+        "alternate_hypotheses": 3
+      },
+      "best_cardmarket_url": null
+    },
+    {
+      "photo": "holdout2_035",
+      "expected_id": "ja:SV3-134",
+      "best_match_id": "ja:SV3-134",
+      "best_match_correct": true,
+      "correct_in_best_or_alternatives": true,
+      "status": "uncertain",
+      "match_state": "likely",
+      "automatic_wrong_match": false,
+      "artwork_covered": false,
+      "language": "ja",
+      "layout": "pokemon_full_art",
+      "page_url": "https://www.ebay.com/itm/397020137665",
+      "full_shortlist_recall": true,
+      "artwork_shortlist_recall": false,
+      "identity_evidence": {
+        "collector_conflict": false,
+        "structured_collector_conflict": false,
+        "strong_name_conflict": false,
+        "language_conflict": false
+      },
+      "ocr": {
+        "name_text": "リザードンR",
+        "collector_text": "134/108",
+        "failed": false,
+        "collector_retry_used": false,
+        "collector_retry_contributed": false
+      },
+      "query_size": [
+        841,
+        1130
+      ],
+      "frame_selection": {
+        "profile": "loose_0",
+        "alternate_hypotheses": 4
+      },
+      "best_cardmarket_url": null
+    },
+    {
+      "photo": "holdout2_036",
+      "expected_id": "ja:SV3-134",
+      "best_match_id": "ja:SV3-134",
+      "best_match_correct": true,
+      "correct_in_best_or_alternatives": true,
+      "status": "uncertain",
+      "match_state": "likely",
+      "automatic_wrong_match": false,
+      "artwork_covered": false,
+      "language": "ja",
+      "layout": "pokemon_full_art",
+      "page_url": "https://www.ebay.it/itm/134669106393",
+      "full_shortlist_recall": true,
+      "artwork_shortlist_recall": false,
+      "identity_evidence": {
+        "collector_conflict": false,
+        "structured_collector_conflict": false,
+        "strong_name_conflict": false,
+        "language_conflict": false
+      },
+      "ocr": {
+        "name_text": "リザードンビX",
+        "collector_text": "134/108",
+        "failed": false,
+        "collector_retry_used": false,
+        "collector_retry_contributed": false
+      },
+      "query_size": [
+        1600,
+        1600
+      ],
+      "frame_selection": {
+        "profile": "primary",
+        "alternate_hypotheses": 0
+      },
+      "best_cardmarket_url": null
+    },
+    {
+      "photo": "holdout2_043",
+      "expected_id": "ja:SV8a-126",
+      "best_match_id": "ja:SV8a-126",
+      "best_match_correct": true,
+      "correct_in_best_or_alternatives": true,
+      "status": "matched",
+      "match_state": "matched",
+      "automatic_wrong_match": false,
+      "artwork_covered": false,
+      "language": "ja",
+      "layout": "standard_frame",
+      "page_url": "https://www.ebay.com/itm/256749986464",
+      "full_shortlist_recall": true,
+      "artwork_shortlist_recall": false,
+      "identity_evidence": {
+        "collector_conflict": false,
+        "structured_collector_conflict": false,
+        "strong_name_conflict": false,
+        "language_conflict": false
+      },
+      "ocr": {
+        "name_text": "イーブイ",
+        "collector_text": "126/187",
+        "failed": false,
+        "collector_retry_used": false,
+        "collector_retry_contributed": false
+      },
+      "query_size": [
+        800,
+        1039
+      ],
+      "frame_selection": {
+        "profile": "primary",
+        "alternate_hypotheses": 4
+      },
+      "best_cardmarket_url": null
+    },
+    {
+      "photo": "holdout2_045",
+      "expected_id": "ja:SV8a-223",
+      "best_match_id": "ja:SV8a-223",
+      "best_match_correct": true,
+      "correct_in_best_or_alternatives": true,
+      "status": "uncertain",
+      "match_state": "likely",
+      "automatic_wrong_match": false,
+      "artwork_covered": false,
+      "language": "ja",
+      "layout": "pokemon_full_art",
+      "page_url": "https://www.ebay.ca/itm/405404514971",
+      "full_shortlist_recall": true,
+      "artwork_shortlist_recall": false,
+      "identity_evidence": {
+        "collector_conflict": false,
+        "structured_collector_conflict": false,
+        "strong_name_conflict": false,
+        "language_conflict": false
+      },
+      "ocr": {
+        "name_text": "イーブイ",
+        "collector_text": "223/187",
+        "failed": false,
+        "collector_retry_used": false,
+        "collector_retry_contributed": false
+      },
+      "query_size": [
+        680,
+        951
+      ],
+      "frame_selection": {
+        "profile": "line_0",
+        "alternate_hypotheses": 0
+      },
+      "best_cardmarket_url": null
+    },
+    {
+      "photo": "holdout2_046",
+      "expected_id": "ja:SV8a-224",
+      "best_match_id": "ja:SV8a-224",
+      "best_match_correct": true,
+      "correct_in_best_or_alternatives": true,
+      "status": "uncertain",
+      "match_state": "likely",
+      "automatic_wrong_match": false,
+      "artwork_covered": false,
+      "language": "ja",
+      "layout": "pokemon_full_art",
+      "page_url": "https://www.ebay.com/itm/305959451466",
+      "full_shortlist_recall": true,
+      "artwork_shortlist_recall": false,
+      "identity_evidence": {
+        "collector_conflict": false,
+        "structured_collector_conflict": false,
+        "strong_name_conflict": false,
+        "language_conflict": false
+      },
+      "ocr": {
+        "name_text": "イー1",
+        "collector_text": "卷x与一",
+        "failed": false,
+        "collector_retry_used": false,
+        "collector_retry_contributed": false
+      },
+      "query_size": [
+        209,
+        291
+      ],
+      "frame_selection": {
+        "profile": "loose_0",
+        "alternate_hypotheses": 3
+      },
+      "best_cardmarket_url": null
+    },
+    {
+      "photo": "holdout2_048",
+      "expected_id": "ja:SV2D-096",
+      "best_match_id": "ja:SV2D-096",
+      "best_match_correct": true,
+      "correct_in_best_or_alternatives": true,
+      "status": "uncertain",
+      "match_state": "likely",
+      "automatic_wrong_match": false,
+      "artwork_covered": false,
+      "language": "ja",
+      "layout": "trainer_full_art",
+      "page_url": "https://www.ebay.com/itm/166623702284",
+      "full_shortlist_recall": true,
+      "artwork_shortlist_recall": false,
+      "identity_evidence": {
+        "collector_conflict": false,
+        "structured_collector_conflict": false,
+        "strong_name_conflict": false,
+        "language_conflict": false
+      },
+      "ocr": {
+        "name_text": "ナンジャモ",
+        "collector_text": "096/071",
+        "failed": false,
+        "collector_retry_used": false,
+        "collector_retry_contributed": false
+      },
+      "query_size": [
+        559,
+        781
+      ],
+      "frame_selection": {
+        "profile": "window_0.85",
+        "alternate_hypotheses": 4
+      },
+      "best_cardmarket_url": null
+    },
+    {
+      "photo": "holdout2_049",
+      "expected_id": "ja:SV2D-096",
+      "best_match_id": "ja:SV2D-096",
+      "best_match_correct": true,
+      "correct_in_best_or_alternatives": true,
+      "status": "uncertain",
+      "match_state": "likely",
+      "automatic_wrong_match": false,
+      "artwork_covered": false,
+      "language": "ja",
+      "layout": "trainer_full_art",
+      "page_url": "https://www.ebay.com/itm/277386265562",
+      "full_shortlist_recall": true,
+      "artwork_shortlist_recall": false,
+      "identity_evidence": {
+        "collector_conflict": false,
+        "structured_collector_conflict": false,
+        "strong_name_conflict": false,
+        "language_conflict": false
+      },
+      "ocr": {
+        "name_text": "ナンジャモ",
+        "collector_text": "096/071",
+        "failed": false,
+        "collector_retry_used": false,
+        "collector_retry_contributed": false
+      },
+      "query_size": [
+        733,
+        933
+      ],
+      "frame_selection": {
+        "profile": "loose_0",
+        "alternate_hypotheses": 4
+      },
+      "best_cardmarket_url": null
+    },
+    {
+      "photo": "holdout2_051",
+      "expected_id": "ja:SV2D-096",
+      "best_match_id": "ja:SV2D-096",
+      "best_match_correct": true,
+      "correct_in_best_or_alternatives": true,
+      "status": "matched",
+      "match_state": "matched",
+      "automatic_wrong_match": false,
+      "artwork_covered": false,
+      "language": "ja",
+      "layout": "trainer_full_art",
+      "page_url": "https://www.ebay.com/itm/388114383897",
+      "full_shortlist_recall": true,
+      "artwork_shortlist_recall": false,
+      "identity_evidence": {
+        "collector_conflict": false,
+        "structured_collector_conflict": false,
+        "strong_name_conflict": false,
+        "language_conflict": false
+      },
+      "ocr": {
+        "name_text": "ナンジャモ",
+        "collector_text": "096/071",
+        "failed": false,
+        "collector_retry_used": false,
+        "collector_retry_contributed": false
+      },
+      "query_size": [
+        736,
+        1012
+      ],
+      "frame_selection": {
+        "profile": "primary",
+        "alternate_hypotheses": 0
+      },
+      "best_cardmarket_url": null
+    },
+    {
+      "photo": "holdout2_052",
+      "expected_id": "ja:SV2D-091",
+      "best_match_id": "ja:SV2D-091",
+      "best_match_correct": true,
+      "correct_in_best_or_alternatives": true,
+      "status": "uncertain",
+      "match_state": "tentative",
+      "automatic_wrong_match": false,
+      "artwork_covered": false,
+      "language": "ja",
+      "layout": "trainer_full_art",
+      "page_url": "https://www.ebay.com/itm/335344891683",
+      "full_shortlist_recall": true,
+      "artwork_shortlist_recall": false,
+      "identity_evidence": {
+        "collector_conflict": true,
+        "structured_collector_conflict": false,
+        "strong_name_conflict": false,
+        "language_conflict": false
+      },
+      "ocr": {
+        "name_text": "Y2D 091/071 SR",
+        "collector_text": "091/071",
+        "failed": false,
+        "collector_retry_used": false,
+        "collector_retry_contributed": false
+      },
+      "query_size": [
+        564,
+        782
+      ],
+      "frame_selection": {
+        "profile": "line_0",
+        "alternate_hypotheses": 0
+      },
+      "best_cardmarket_url": null
+    },
+    {
+      "photo": "holdout2_054",
+      "expected_id": "ja:S8a-001",
+      "best_match_id": "ja:S8a-001",
+      "best_match_correct": true,
+      "correct_in_best_or_alternatives": true,
+      "status": "uncertain",
+      "match_state": "likely",
+      "automatic_wrong_match": false,
+      "artwork_covered": true,
+      "language": "ja",
+      "layout": "standard_frame",
+      "page_url": "https://www.ebay.com/b/Pikachu-001-028-S8a-25th-Anniversary-Collection/2536/bn_7124581368",
+      "full_shortlist_recall": true,
+      "artwork_shortlist_recall": true,
+      "identity_evidence": {
+        "collector_conflict": false,
+        "structured_collector_conflict": false,
+        "strong_name_conflict": false,
+        "language_conflict": false
+      },
+      "ocr": {
+        "name_text": "ビカチュウ",
+        "collector_text": "001/028",
+        "failed": false,
+        "collector_retry_used": false,
+        "collector_retry_contributed": false
+      },
+      "query_size": [
+        527,
+        732
+      ],
+      "frame_selection": {
+        "profile": "primary",
+        "alternate_hypotheses": 0
+      },
+      "best_cardmarket_url": "https://www.cardmarket.com/en/Pokemon/Products/Singles/25th-Anniversary-Collection/Pikachu"
+    },
+    {
+      "photo": "holdout2_056",
+      "expected_id": "ja:S8a-001",
+      "best_match_id": "ja:S8a-001",
+      "best_match_correct": true,
+      "correct_in_best_or_alternatives": true,
+      "status": "uncertain",
+      "match_state": "tentative",
+      "automatic_wrong_match": false,
+      "artwork_covered": true,
+      "language": "ja",
+      "layout": "standard_frame",
+      "page_url": "https://www.ebay.com/itm/405692582993",
+      "full_shortlist_recall": true,
+      "artwork_shortlist_recall": true,
+      "identity_evidence": {
+        "collector_conflict": true,
+        "structured_collector_conflict": false,
+        "strong_name_conflict": false,
+        "language_conflict": false
+      },
+      "ocr": {
+        "name_text": "ピカチュウ",
+        "collector_text": "001/028",
+        "failed": false,
+        "collector_retry_used": false,
+        "collector_retry_contributed": false
+      },
+      "query_size": [
+        684,
+        896
+      ],
+      "frame_selection": {
+        "profile": "loose_0",
+        "alternate_hypotheses": 6
+      },
+      "best_cardmarket_url": "https://www.cardmarket.com/en/Pokemon/Products/Singles/25th-Anniversary-Collection/Pikachu"
+    },
+    {
+      "photo": "holdout2_057",
+      "expected_id": "ja:S8a-001",
+      "best_match_id": "ja:S8a-001",
+      "best_match_correct": true,
+      "correct_in_best_or_alternatives": true,
+      "status": "uncertain",
+      "match_state": "likely",
+      "automatic_wrong_match": false,
+      "artwork_covered": true,
+      "language": "ja",
+      "layout": "standard_frame",
+      "page_url": "https://www.ebay.com/itm/354297297536",
+      "full_shortlist_recall": true,
+      "artwork_shortlist_recall": true,
+      "identity_evidence": {
+        "collector_conflict": false,
+        "structured_collector_conflict": false,
+        "strong_name_conflict": false,
+        "language_conflict": false
+      },
+      "ocr": {
+        "name_text": "ピカチュウ",
+        "collector_text": "001/028",
+        "failed": false,
+        "collector_retry_used": false,
+        "collector_retry_contributed": false
+      },
+      "query_size": [
+        709,
+        993
+      ],
+      "frame_selection": {
+        "profile": "line_0",
+        "alternate_hypotheses": 0
+      },
+      "best_cardmarket_url": "https://www.cardmarket.com/en/Pokemon/Products/Singles/25th-Anniversary-Collection/Pikachu"
+    },
+    {
+      "photo": "holdout2_058",
+      "expected_id": "en:swsh12.5gg-GG60",
+      "best_match_id": "en:swsh12.5gg-GG60",
+      "best_match_correct": true,
+      "correct_in_best_or_alternatives": true,
+      "status": "uncertain",
+      "match_state": "likely",
+      "automatic_wrong_match": false,
+      "artwork_covered": true,
+      "language": "en",
+      "layout": "trainer_full_art",
+      "page_url": "https://www.ebay.com.au/itm/267551532020",
+      "full_shortlist_recall": true,
+      "artwork_shortlist_recall": true,
+      "identity_evidence": {
+        "collector_conflict": false,
+        "structured_collector_conflict": false,
+        "strong_name_conflict": false,
+        "language_conflict": false
+      },
+      "ocr": {
+        "name_text": "Cynthia's Ambition",
+        "collector_text": "your turn.",
+        "failed": false,
+        "collector_retry_used": false,
+        "collector_retry_contributed": false
+      },
+      "query_size": [
+        530,
+        741
+      ],
+      "frame_selection": {
+        "profile": "loose_0",
+        "alternate_hypotheses": 4
+      },
+      "best_cardmarket_url": "https://www.cardmarket.com/en/Pokemon/Products/Singles/Crown-Zenith/Cynthias-Ambition-CRZGG60"
+    },
+    {
+      "photo": "holdout2_060",
+      "expected_id": "en:swsh12.5gg-GG60",
+      "best_match_id": "en:swsh12.5gg-GG60",
+      "best_match_correct": true,
+      "correct_in_best_or_alternatives": true,
+      "status": "uncertain",
+      "match_state": "likely",
+      "automatic_wrong_match": false,
+      "artwork_covered": true,
+      "language": "en",
+      "layout": "trainer_full_art",
+      "page_url": "https://www.ebay.co.uk/itm/186651030582",
+      "full_shortlist_recall": true,
+      "artwork_shortlist_recall": true,
+      "identity_evidence": {
+        "collector_conflict": false,
+        "structured_collector_conflict": false,
+        "strong_name_conflict": false,
+        "language_conflict": false
+      },
+      "ocr": {
+        "name_text": "ynthia's Ambition",
+        "collector_text": "inyour hand instead.",
+        "failed": false,
+        "collector_retry_used": true,
+        "collector_retry_contributed": true
+      },
+      "query_size": [
+        601,
+        840
+      ],
+      "frame_selection": {
+        "profile": "window_0.70",
+        "alternate_hypotheses": 3
+      },
+      "best_cardmarket_url": "https://www.cardmarket.com/en/Pokemon/Products/Singles/Crown-Zenith/Cynthias-Ambition-CRZGG60"
+    },
+    {
+      "photo": "holdout2_062",
+      "expected_id": "en:swsh12.5gg-GG60",
+      "best_match_id": "en:swsh12.5gg-GG60",
+      "best_match_correct": true,
+      "correct_in_best_or_alternatives": true,
+      "status": "uncertain",
+      "match_state": "tentative",
+      "automatic_wrong_match": false,
+      "artwork_covered": true,
+      "language": "en",
+      "layout": "trainer_full_art",
+      "page_url": "https://www.ebay.com/p/28058549954",
+      "full_shortlist_recall": true,
+      "artwork_shortlist_recall": true,
+      "identity_evidence": {
+        "collector_conflict": false,
+        "structured_collector_conflict": false,
+        "strong_name_conflict": true,
+        "language_conflict": false
+      },
+      "ocr": {
+        "name_text": "AINER",
+        "collector_text": "Youmax",
+        "failed": false,
+        "collector_retry_used": true,
+        "collector_retry_contributed": false
+      },
+      "query_size": [
+        474,
+        663
+      ],
+      "frame_selection": {
+        "profile": "line_4",
+        "alternate_hypotheses": 0
+      },
+      "best_cardmarket_url": "https://www.cardmarket.com/en/Pokemon/Products/Singles/Crown-Zenith/Cynthias-Ambition-CRZGG60"
+    },
+    {
+      "photo": "holdout2_063",
+      "expected_id": "en:base5-4",
+      "best_match_id": "en:base5-4",
+      "best_match_correct": true,
+      "correct_in_best_or_alternatives": true,
+      "status": "uncertain",
+      "match_state": "likely",
+      "automatic_wrong_match": false,
+      "artwork_covered": false,
+      "language": "en",
+      "layout": "standard_frame",
+      "page_url": "https://www.ebay.com/itm/336382567982",
+      "full_shortlist_recall": true,
+      "artwork_shortlist_recall": false,
+      "identity_evidence": {
+        "collector_conflict": false,
+        "structured_collector_conflict": false,
+        "strong_name_conflict": false,
+        "language_conflict": false
+      },
+      "ocr": {
+        "name_text": "Dark Charizard",
+        "collector_text": "4/82",
+        "failed": false,
+        "collector_retry_used": false,
+        "collector_retry_contributed": false
+      },
+      "query_size": [
+        714,
+        1027
+      ],
+      "frame_selection": {
+        "profile": "loose_0",
+        "alternate_hypotheses": 5
+      },
+      "best_cardmarket_url": "https://www.cardmarket.com/en/Pokemon/Products/Singles/Team-Rocket/Dark-Charizard-TR4"
+    },
+    {
+      "photo": "holdout2_069",
+      "expected_id": "en:base5-4",
+      "best_match_id": "en:base5-4",
+      "best_match_correct": true,
+      "correct_in_best_or_alternatives": true,
+      "status": "uncertain",
+      "match_state": "likely",
+      "automatic_wrong_match": false,
+      "artwork_covered": false,
+      "language": "en",
+      "layout": "standard_frame",
+      "page_url": "https://www.ebay.com/itm/187673130287",
+      "full_shortlist_recall": true,
+      "artwork_shortlist_recall": false,
+      "identity_evidence": {
+        "collector_conflict": false,
+        "structured_collector_conflict": false,
+        "strong_name_conflict": false,
+        "language_conflict": false
+      },
+      "ocr": {
+        "name_text": "Exolres from Dark Charmeleon Put Darks C",
+        "collector_text": "4/8",
+        "failed": false,
+        "collector_retry_used": false,
+        "collector_retry_contributed": false
+      },
+      "query_size": [
+        601,
+        840
+      ],
+      "frame_selection": {
+        "profile": "window_0.70",
+        "alternate_hypotheses": 3
+      },
+      "best_cardmarket_url": "https://www.cardmarket.com/en/Pokemon/Products/Singles/Team-Rocket/Dark-Charizard-TR4"
+    },
+    {
+      "photo": "holdout2_071",
+      "expected_id": "en:base5-4",
+      "best_match_id": "en:base5-4",
+      "best_match_correct": true,
+      "correct_in_best_or_alternatives": true,
+      "status": "uncertain",
+      "match_state": "tentative",
+      "automatic_wrong_match": false,
+      "artwork_covered": false,
+      "language": "en",
+      "layout": "standard_frame",
+      "page_url": "https://www.sportscardinvestor.com/cards/dark-charizard-pokemon/2000-team-rocket-unlimited-holo-04-82",
+      "full_shortlist_recall": true,
+      "artwork_shortlist_recall": false,
+      "identity_evidence": {
+        "collector_conflict": false,
+        "structured_collector_conflict": false,
+        "strong_name_conflict": true,
+        "language_conflict": false
+      },
+      "ocr": {
+        "name_text": "STAGE",
+        "collector_text": "4/82",
+        "failed": false,
+        "collector_retry_used": false,
+        "collector_retry_contributed": false
+      },
+      "query_size": [
+        942,
+        1337
+      ],
+      "frame_selection": {
+        "profile": "primary",
+        "alternate_hypotheses": 5
+      },
+      "best_cardmarket_url": "https://www.cardmarket.com/en/Pokemon/Products/Singles/Team-Rocket/Dark-Charizard-TR4"
+    },
+    {
+      "photo": "holdout2_075",
+      "expected_id": "en:base4-87",
+      "best_match_id": "en:base4-87",
+      "best_match_correct": true,
+      "correct_in_best_or_alternatives": true,
+      "status": "printing_ambiguous",
+      "match_state": "likely",
+      "automatic_wrong_match": false,
+      "artwork_covered": true,
+      "language": "en",
+      "layout": "standard_frame",
+      "page_url": "https://www.ebay.com/itm/175568423288",
+      "full_shortlist_recall": true,
+      "artwork_shortlist_recall": true,
+      "identity_evidence": {
+        "collector_conflict": false,
+        "structured_collector_conflict": false,
+        "strong_name_conflict": false,
+        "language_conflict": false
+      },
+      "ocr": {
+        "name_text": "Pikachu",
+        "collector_text": "87/130",
+        "failed": false,
+        "collector_retry_used": false,
+        "collector_retry_contributed": false
+      },
+      "query_size": [
+        913,
+        1292
+      ],
+      "frame_selection": {
+        "profile": "loose_0",
+        "alternate_hypotheses": 4
+      },
+      "best_cardmarket_url": null
+    },
+    {
+      "photo": "holdout2_079",
+      "expected_id": "en:base4-87",
+      "best_match_id": "en:base4-87",
+      "best_match_correct": true,
+      "correct_in_best_or_alternatives": true,
+      "status": "printing_ambiguous",
+      "match_state": "likely",
+      "automatic_wrong_match": false,
+      "artwork_covered": true,
+      "language": "en",
+      "layout": "standard_frame",
+      "page_url": "https://www.ebay.com/itm/386000414452",
+      "full_shortlist_recall": true,
+      "artwork_shortlist_recall": true,
+      "identity_evidence": {
+        "collector_conflict": false,
+        "structured_collector_conflict": false,
+        "strong_name_conflict": false,
+        "language_conflict": false
+      },
+      "ocr": {
+        "name_text": "Pikachu",
+        "collector_text": "87/130",
+        "failed": false,
+        "collector_retry_used": false,
+        "collector_retry_contributed": false
+      },
+      "query_size": [
+        463,
+        626
+      ],
+      "frame_selection": {
+        "profile": "primary",
+        "alternate_hypotheses": 0
+      },
+      "best_cardmarket_url": null
+    },
+    {
+      "photo": "holdout2_082",
+      "expected_id": "en:base4-87",
+      "best_match_id": "en:base1-58",
+      "best_match_correct": false,
+      "correct_in_best_or_alternatives": true,
+      "status": "printing_ambiguous",
+      "match_state": "likely",
+      "automatic_wrong_match": false,
+      "artwork_covered": true,
+      "language": "en",
+      "layout": "standard_frame",
+      "page_url": "https://www.ebay.com/itm/265304755566",
+      "full_shortlist_recall": true,
+      "artwork_shortlist_recall": true,
+      "identity_evidence": {
+        "collector_conflict": false,
+        "structured_collector_conflict": false,
+        "strong_name_conflict": false,
+        "language_conflict": false
+      },
+      "ocr": {
+        "name_text": "Pikachu",
+        "collector_text": "87/130",
+        "failed": false,
+        "collector_retry_used": false,
+        "collector_retry_contributed": false
+      },
+      "query_size": [
+        817,
+        1105
+      ],
+      "frame_selection": {
+        "profile": "loose_1",
+        "alternate_hypotheses": 4
+      },
+      "best_cardmarket_url": null
+    },
+    {
+      "photo": "holdout2_085",
+      "expected_id": "en:sv01-036",
+      "best_match_id": "sv01-036",
+      "best_match_correct": true,
+      "correct_in_best_or_alternatives": true,
+      "status": "uncertain",
+      "match_state": "likely",
+      "automatic_wrong_match": false,
+      "artwork_covered": true,
+      "language": "en",
+      "layout": "standard_frame",
+      "page_url": "https://www.ebay.com/itm/305943292231",
+      "full_shortlist_recall": true,
+      "artwork_shortlist_recall": true,
+      "identity_evidence": {
+        "collector_conflict": false,
+        "structured_collector_conflict": false,
+        "strong_name_conflict": false,
+        "language_conflict": false
+      },
+      "ocr": {
+        "name_text": "Fuecoco",
+        "collector_text": "036/198",
+        "failed": false,
+        "collector_retry_used": false,
+        "collector_retry_contributed": false
+      },
+      "query_size": [
+        669,
+        952
+      ],
+      "frame_selection": {
+        "profile": "loose_0",
+        "alternate_hypotheses": 3
+      },
+      "best_cardmarket_url": "https://www.cardmarket.com/en/Pokemon/Products/Singles/Scarlet-Violet/Fuecoco-V1-SVI036"
+    },
+    {
+      "photo": "holdout2_086",
+      "expected_id": "en:sv01-036",
+      "best_match_id": "en:sv01-036",
+      "best_match_correct": true,
+      "correct_in_best_or_alternatives": true,
+      "status": "uncertain",
+      "match_state": "tentative",
+      "automatic_wrong_match": false,
+      "artwork_covered": true,
+      "language": "en",
+      "layout": "standard_frame",
+      "page_url": "https://www.ebay.com/itm/374960714182",
+      "full_shortlist_recall": true,
+      "artwork_shortlist_recall": true,
+      "identity_evidence": {
+        "collector_conflict": true,
+        "structured_collector_conflict": false,
+        "strong_name_conflict": false,
+        "language_conflict": false
+      },
+      "ocr": {
+        "name_text": "Fuecoco",
+        "collector_text": "sawaysicaking",
+        "failed": false,
+        "collector_retry_used": true,
+        "collector_retry_contributed": false
+      },
+      "query_size": [
+        295,
+        424
+      ],
+      "frame_selection": {
+        "profile": "loose_1",
+        "alternate_hypotheses": 4
+      },
+      "best_cardmarket_url": "https://www.cardmarket.com/en/Pokemon/Products/Singles/Scarlet-Violet-Simplified-Chinese-Promos/Fuecoco-V2-SV-PCS036"
+    },
+    {
+      "photo": "holdout2_089",
+      "expected_id": "en:sv01-036",
+      "best_match_id": "sv01-036",
+      "best_match_correct": true,
+      "correct_in_best_or_alternatives": true,
+      "status": "uncertain",
+      "match_state": "likely",
+      "automatic_wrong_match": false,
+      "artwork_covered": true,
+      "language": "en",
+      "layout": "standard_frame",
+      "page_url": "https://www.ebay.com/itm/185907089087",
+      "full_shortlist_recall": true,
+      "artwork_shortlist_recall": true,
+      "identity_evidence": {
+        "collector_conflict": false,
+        "structured_collector_conflict": false,
+        "strong_name_conflict": false,
+        "language_conflict": false
+      },
+      "ocr": {
+        "name_text": "Fuecoco",
+        "collector_text": "036/198",
+        "failed": false,
+        "collector_retry_used": false,
+        "collector_retry_contributed": false
+      },
+      "query_size": [
+        800,
+        1073
+      ],
+      "frame_selection": {
+        "profile": "primary",
+        "alternate_hypotheses": 6
+      },
+      "best_cardmarket_url": "https://www.cardmarket.com/en/Pokemon/Products/Singles/Scarlet-Violet/Fuecoco-V1-SVI036"
+    },
+    {
+      "photo": "holdout2_090",
+      "expected_id": "en:sv01-036",
+      "best_match_id": "sv01-036",
+      "best_match_correct": true,
+      "correct_in_best_or_alternatives": true,
+      "status": "uncertain",
+      "match_state": "likely",
+      "automatic_wrong_match": false,
+      "artwork_covered": true,
+      "language": "en",
+      "layout": "standard_frame",
+      "page_url": "https://www.ebay.com.au/itm/325594136790",
+      "full_shortlist_recall": true,
+      "artwork_shortlist_recall": true,
+      "identity_evidence": {
+        "collector_conflict": false,
+        "structured_collector_conflict": false,
+        "strong_name_conflict": false,
+        "language_conflict": false
+      },
+      "ocr": {
+        "name_text": "Fuecoco",
+        "collector_text": "036/198",
+        "failed": false,
+        "collector_retry_used": false,
+        "collector_retry_contributed": false
+      },
+      "query_size": [
+        956,
+        1334
+      ],
+      "frame_selection": {
+        "profile": "loose_0",
+        "alternate_hypotheses": 4
+      },
+      "best_cardmarket_url": "https://www.cardmarket.com/en/Pokemon/Products/Singles/Scarlet-Violet/Fuecoco-V1-SVI036"
+    },
+    {
+      "photo": "holdout2_093",
+      "expected_id": "en:swsh7-218",
+      "best_match_id": "en:swsh7-218",
+      "best_match_correct": true,
+      "correct_in_best_or_alternatives": true,
+      "status": "matched",
+      "match_state": "matched",
+      "automatic_wrong_match": false,
+      "artwork_covered": true,
+      "language": "en",
+      "layout": "pokemon_full_art",
+      "page_url": "https://www.ebay.com/b/Rayquaza-VMAX-218-203-SWSH07-Evolving-Skies/2536/bn_7124865971",
+      "full_shortlist_recall": true,
+      "artwork_shortlist_recall": true,
+      "identity_evidence": {
+        "collector_conflict": false,
+        "structured_collector_conflict": false,
+        "strong_name_conflict": false,
+        "language_conflict": false
+      },
+      "ocr": {
+        "name_text": "RayquazaVMAX",
+        "collector_text": "218/203",
+        "failed": false,
+        "collector_retry_used": false,
+        "collector_retry_contributed": false
+      },
+      "query_size": [
+        636,
+        831
+      ],
+      "frame_selection": {
+        "profile": "primary",
+        "alternate_hypotheses": 0
+      },
+      "best_cardmarket_url": "https://www.cardmarket.com/en/Pokemon/Products/Singles/Evolving-Skies/Rayquaza-VMAX-V3-EVS218"
+    },
+    {
+      "photo": "holdout2_095",
+      "expected_id": "en:swsh7-218",
+      "best_match_id": "en:swsh7-218",
+      "best_match_correct": true,
+      "correct_in_best_or_alternatives": true,
+      "status": "uncertain",
+      "match_state": "tentative",
+      "automatic_wrong_match": false,
+      "artwork_covered": true,
+      "language": "en",
+      "layout": "pokemon_full_art",
+      "page_url": "https://collectorworth.com/cards/rayquaza-vmax-pokemon-evolving-skies/",
+      "full_shortlist_recall": true,
+      "artwork_shortlist_recall": true,
+      "identity_evidence": {
+        "collector_conflict": true,
+        "structured_collector_conflict": false,
+        "strong_name_conflict": false,
+        "language_conflict": false
+      },
+      "ocr": {
+        "name_text": "RayquazaVMAX",
+        "collector_text": "©2021 Pokémon/Nintendo/ Creatures/GAME FREAK",
+        "failed": false,
+        "collector_retry_used": true,
+        "collector_retry_contributed": false
+      },
+      "query_size": [
+        927,
+        1436
+      ],
+      "frame_selection": {
+        "profile": "primary",
+        "alternate_hypotheses": 6
+      },
+      "best_cardmarket_url": "https://www.cardmarket.com/en/Pokemon/Products/Singles/Evolving-Skies/Rayquaza-VMAX-V3-EVS218"
+    },
+    {
+      "photo": "holdout2_096",
+      "expected_id": "en:swsh7-218",
+      "best_match_id": "en:swsh7-218",
+      "best_match_correct": true,
+      "correct_in_best_or_alternatives": true,
+      "status": "uncertain",
+      "match_state": "likely",
+      "automatic_wrong_match": false,
+      "artwork_covered": true,
+      "language": "en",
+      "layout": "pokemon_full_art",
+      "page_url": "https://www.ebay.com.sg/b/Rayquaza-VMAX-218-203-SWSH07-Evolving-Skies/2536/bn_7124865971",
+      "full_shortlist_recall": true,
+      "artwork_shortlist_recall": true,
+      "identity_evidence": {
+        "collector_conflict": false,
+        "structured_collector_conflict": false,
+        "strong_name_conflict": false,
+        "language_conflict": false
+      },
+      "ocr": {
+        "name_text": "RayquazaVMAX",
+        "collector_text": "218/203",
+        "failed": false,
+        "collector_retry_used": false,
+        "collector_retry_contributed": false
+      },
+      "query_size": [
+        536,
+        748
+      ],
+      "frame_selection": {
+        "profile": "loose_1",
+        "alternate_hypotheses": 4
+      },
+      "best_cardmarket_url": "https://www.cardmarket.com/en/Pokemon/Products/Singles/Evolving-Skies/Rayquaza-VMAX-V3-EVS218"
+    },
+    {
+      "photo": "holdout2_098",
+      "expected_id": "en:swsh7-218",
+      "best_match_id": "en:swsh7-218",
+      "best_match_correct": true,
+      "correct_in_best_or_alternatives": true,
+      "status": "uncertain",
+      "match_state": "likely",
+      "automatic_wrong_match": false,
+      "artwork_covered": true,
+      "language": "en",
+      "layout": "pokemon_full_art",
+      "page_url": "https://www.ebay.com/itm/257430538002",
+      "full_shortlist_recall": true,
+      "artwork_shortlist_recall": true,
+      "identity_evidence": {
+        "collector_conflict": false,
+        "structured_collector_conflict": false,
+        "strong_name_conflict": false,
+        "language_conflict": false
+      },
+      "ocr": {
+        "name_text": "Rayquaza",
+        "collector_text": "218/203",
+        "failed": false,
+        "collector_retry_used": false,
+        "collector_retry_contributed": false
+      },
+      "query_size": [
+        734,
+        1018
+      ],
+      "frame_selection": {
+        "profile": "loose_0",
+        "alternate_hypotheses": 3
+      },
+      "best_cardmarket_url": "https://www.cardmarket.com/en/Pokemon/Products/Singles/Evolving-Skies/Rayquaza-VMAX-V3-EVS218"
+    }
+  ],
+  "latency_ms": {
+    "median": 4890.77,
+    "sample_p95_nearest_rank": 10187.19,
+    "max": 13555.95,
+    "stage_medians": {
+      "detect_ms": 13.08,
+      "frame_proposal_ms": 47.34,
+      "embed_ms": 666.6,
+      "artwork_embed_ms": 264.25,
+      "artwork_retrieve_ms": 3.81,
+      "ocr_ms": 2503.48,
+      "local_artwork_ms": 0.0,
+      "cardmarket_ms": 1167.0,
+      "boundary_proposal_ms": 0.0,
+      "boundary_selection_ms": 0.0,
+      "boundary_retry_ms": 0.0,
+      "first_pass_ms": 0.0
+    }
+  },
+  "catalogue_missing_reference_truths": [],
+  "catalogue_missing_cardmarket_truths": [
+    "en:swsh7-205",
+    "en:swsh7-209",
+    "en:swsh6-177",
+    "ja:SV3-134",
+    "ja:SV8a-126",
+    "ja:SV8a-223",
+    "ja:SV8a-224",
+    "ja:SV2D-096",
+    "ja:SV2D-091",
+    "en:base4-87"
+  ],
+  "limitations": "Convenience sample, not random population sampling. Repeated identities and marketplace sources. Camera photos of physical cards, not Flutter/live API tests. Authenticity, finish, physical-copy independence and model-pretraining overlap unverified. Images never indexed or used to tune this run."
+}

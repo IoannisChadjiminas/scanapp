@@ -1,0 +1,213 @@
+{
+  "purpose": "Fresh 12-photo, four-identity convenience holdout. No recognition results inspected before freezing labels.",
+  "selection": "Manual visible name/number/language review; no reference images or tested identities from the 54-photo set.",
+  "limitations": "New photos/identities, not an independently captured app-camera population sample. No authenticity/finish labels. Once evaluated and used for tuning, no longer untouched.",
+  "photos": [
+    {
+      "id": "holda_2",
+      "page_url": "https://www.ebay.com/itm/336496600717",
+      "image_url": "https://i.ebayimg.com/images/g/QEEAAeSw2nhpway7/s-l1200.jpg",
+      "review_status": "visually_verified",
+      "expected_card_id": "en:swsh7-192",
+      "visible_label": "Dragonite V — 192/203",
+      "language": "en",
+      "layout": "pokemon_full_art",
+      "conditions": [
+        "background",
+        "foil_texture",
+        "stand"
+      ]
+    },
+    {
+      "id": "holda_5",
+      "page_url": "https://www.ebay.com/itm/197417925681",
+      "image_url": "https://i.ebayimg.com/images/g/K4oAAOSwRNtoR4e6/s-l1600.jpg",
+      "review_status": "visually_verified",
+      "expected_card_id": "en:swsh7-192",
+      "visible_label": "Dragonite V — 192/203",
+      "language": "en",
+      "layout": "pokemon_full_art",
+      "conditions": [
+        "background",
+        "foil_texture"
+      ]
+    },
+    {
+      "id": "holda_7",
+      "page_url": "https://www.ebay.com/itm/357759094879",
+      "image_url": "https://i.ebayimg.com/00/s/MTYwMFgxNjAw/z/PnwAAeSwihFo8G1r/%24_1.JPG?set_id=8800005007",
+      "review_status": "visually_verified",
+      "expected_card_id": "en:swsh7-192",
+      "visible_label": "Dragonite V — 192/203",
+      "language": "en",
+      "layout": "pokemon_full_art",
+      "conditions": [
+        "background",
+        "foil_texture"
+      ]
+    },
+    {
+      "id": "holda_8",
+      "page_url": "https://www.ebay.com/itm/236723063583",
+      "image_url": "https://i.ebayimg.com/images/g/s1AAAeSwYXZpyei0/s-l1200.jpg",
+      "review_status": "visually_verified",
+      "expected_card_id": "en:sv03.5-175",
+      "visible_label": "Psyduck — MEW 175/165",
+      "language": "en",
+      "layout": "pokemon_full_art",
+      "conditions": [
+        "background",
+        "foil_texture"
+      ]
+    },
+    {
+      "id": "holda_9",
+      "page_url": "https://www.ebay.com/itm/226837042786",
+      "image_url": "https://i.ebayimg.com/images/g/bCYAAeSwN-ZoXaaB/s-l400.jpg",
+      "review_status": "visually_verified",
+      "expected_card_id": "en:swsh7-192",
+      "visible_label": "Dragonite V — 192/203",
+      "language": "en",
+      "layout": "pokemon_full_art",
+      "conditions": [
+        "background",
+        "foil_texture",
+        "stand"
+      ]
+    },
+    {
+      "id": "holda_10",
+      "page_url": "https://www.ebay.com/itm/176928159367",
+      "image_url": "https://i.ebayimg.com/images/g/2BUAAeSwVtdn1wXR/s-l500.jpg",
+      "review_status": "visually_verified",
+      "expected_card_id": "en:swsh7-192",
+      "visible_label": "Dragonite V — 192/203",
+      "language": "en",
+      "layout": "pokemon_full_art",
+      "conditions": [
+        "background",
+        "foil_texture",
+        "holder"
+      ]
+    },
+    {
+      "id": "holdb_0",
+      "page_url": "https://www.ebay.co.uk/itm/186933307314",
+      "image_url": "https://i.ebayimg.com/00/s/MTYwMFgxMjAw/z/07sAAOSwLa5noUsS/%24_57.JPG?set_id=880000500F",
+      "review_status": "visually_verified",
+      "expected_card_id": "en:sv01-251",
+      "visible_label": "Miriam — SVI 251/198",
+      "language": "en",
+      "layout": "trainer_full_art",
+      "conditions": [
+        "slab",
+        "background"
+      ]
+    },
+    {
+      "id": "holdb_1",
+      "page_url": "https://www.sportscardinvestor.com/cards/miriam-pokemon/2023-scarlet-violet-special-illustration-rare-251-198",
+      "image_url": "https://i.ebayimg.com/images/g/1YoAAOSwDTRoCX9y/s-l1600.jpg",
+      "review_status": "visually_verified",
+      "expected_card_id": "en:sv01-251",
+      "visible_label": "Miriam — SVI 251/198",
+      "language": "en",
+      "layout": "trainer_full_art",
+      "conditions": [
+        "slab",
+        "background"
+      ]
+    },
+    {
+      "id": "holdb_3",
+      "page_url": "https://www.ebay.com/itm/286849741348",
+      "image_url": "https://i.ebayimg.com/images/g/tQcAAeSwB~Jo298R/s-l1200.jpg",
+      "review_status": "visually_verified",
+      "expected_card_id": "en:sv01-251",
+      "visible_label": "Miriam — SVI 251/198",
+      "language": "en",
+      "layout": "trainer_full_art",
+      "conditions": [
+        "background",
+        "foil_texture"
+      ]
+    },
+    {
+      "id": "holdb_6",
+      "page_url": "https://www.sportscardinvestor.com/cards/miriam-pokemon/2023-scarlet-violet-special-illustration-rare-251-198",
+      "image_url": "https://i.ebayimg.com/images/g/sfQAAeSwaPhoD-qO/s-l1600.jpg",
+      "review_status": "visually_verified",
+      "expected_card_id": "en:sv01-251",
+      "visible_label": "Miriam — SVI 251/198",
+      "language": "en",
+      "layout": "trainer_full_art",
+      "conditions": [
+        "slab",
+        "background"
+      ]
+    },
+    {
+      "id": "holdb_7",
+      "page_url": "https://www.ebay.com/p/24059498498",
+      "image_url": "https://i.ebayimg.com/images/g/Y5AAAeSwyE5oUaHI/s-l1600.jpg",
+      "review_status": "visually_verified",
+      "expected_card_id": "en:sv01-251",
+      "visible_label": "Miriam — SVI 251/198",
+      "language": "en",
+      "layout": "trainer_full_art",
+      "conditions": [
+        "slab",
+        "background"
+      ]
+    },
+    {
+      "id": "holdjp_6",
+      "page_url": "https://www.ebay.com/itm/186769727583",
+      "image_url": "https://i.ebayimg.com/images/g/juIAAeSwiDhnpHwL/s-l1200.jpg",
+      "review_status": "visually_verified",
+      "expected_card_id": "ja:SV4a-348",
+      "visible_label": "サーナイトex — SV4a 348/190 SAR",
+      "language": "ja",
+      "layout": "pokemon_full_art",
+      "conditions": [
+        "background",
+        "foil_texture",
+        "stand"
+      ]
+    }
+  ],
+  "exclusions": [
+    {
+      "id": "holdb_8",
+      "reason": "Multiple front/back slabs in frame"
+    },
+    {
+      "id": "holdjp_0",
+      "reason": "Reference-like product image; physical camera context not established"
+    },
+    {
+      "id": "holdjp_1",
+      "reason": "Reference-like product image; physical camera context not established"
+    },
+    {
+      "id": "holdjp_2",
+      "reason": "Reference-like product image; physical camera context not established"
+    },
+    {
+      "id": "holdjp_3",
+      "reason": "Reference-like product image; physical camera context not established"
+    },
+    {
+      "id": "holdjp_5",
+      "reason": "Reference-like product image; physical camera context not established"
+    },
+    {
+      "id": "holdjp_7",
+      "reason": "Reference-like product image; physical camera context not established"
+    },
+    {
+      "id": "holdjp_10",
+      "reason": "Suspected reuse of stand capture as product closeup"
+    }
+  ]
+}

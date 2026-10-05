@@ -7,6 +7,7 @@ from pathlib import Path
 from threading import RLock
 
 import cv2
+import hashlib
 import numpy as np
 from PIL import Image
 
@@ -85,6 +86,30 @@ class LocalArtworkVerifier:
         self._lock = RLock()
         self.reference_boxes: dict[str, tuple[float,float,float,float]] = {}
         self.feature_store = feature_store
+        # Exact-pixel SIFT reuse only. Homography/RANSAC still runs for every
+        # verification; no match, OCR text or prior scan decision is cached.
+        self._query_cache = OrderedDict()
+        self._query_cache_bytes = 0
+        self._query_cache_limit = 8 * 1024 * 1024
+
+    def _query_features(self, pixels, detector, features, contrast):
+        key = (pixels.shape, pixels.dtype.str, features, contrast,
+               hashlib.sha256(pixels.tobytes()).digest())
+        if key in self._query_cache:
+            self._query_cache.move_to_end(key)
+            return self._query_cache[key][0]
+        keys, desc = detector.detectAndCompute(pixels, None)
+        observed = (tuple(keys), desc)
+        if desc is not None:
+            desc.flags.writeable = False
+        size = (desc.nbytes if desc is not None else 0) + len(keys) * 128
+        if size <= self._query_cache_limit:
+            self._query_cache[key] = (observed, size)
+            self._query_cache_bytes += size
+            while self._query_cache_bytes > self._query_cache_limit or len(self._query_cache) > 24:
+                _, (_, old_size) = self._query_cache.popitem(last=False)
+                self._query_cache_bytes -= old_size
+        return observed
 
     def _reference_features(self, card_id, raw_path, art_box, features, contrast):
         key = (card_id, raw_path, art_box, features, contrast)
@@ -147,7 +172,7 @@ class LocalArtworkVerifier:
             for patch,offset in hypotheses:
                 query=_pixels(patch.copy())
                 qh,qw=query.shape
-                qkeys,qdesc=detector.detectAndCompute(query,None)
+                qkeys,qdesc=self._query_features(query,detector,1000,.04)
                 if qdesc is None or len(qkeys)<16:
                     continue
                 pairs=cv2.BFMatcher().knnMatch(qdesc,rdesc,k=2)
@@ -231,7 +256,7 @@ class LocalArtworkVerifier:
             queries = []
             for profile, pixels in hypotheses:
                 query = _pixels(pixels.copy())
-                qkeys, qdesc = detector.detectAndCompute(query, None)
+                qkeys, qdesc = self._query_features(query, detector, features, contrast)
                 if qdesc is not None and len(qkeys) >= 16:
                     queries.append((profile, query, qkeys, qdesc))
             if not queries:

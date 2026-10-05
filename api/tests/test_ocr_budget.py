@@ -130,3 +130,60 @@ def test_pipeline_skipping_footer_never_automatically_certifies_printing(tmp_pat
         assert saved['collector_retry_skipped'] and len(saved['passes'])==2
     finally:
         catalog.close();results.close()
+
+
+@pytest.mark.parametrize('number,skipped', [('35/108', True), ('35/109', False)])
+def test_staged_original_uses_each_frame_once_and_keeps_printing_manual(tmp_path, monkeypatch, number, skipped):
+    import io
+    import json
+    import numpy as np
+    import app.recognition.pipeline as pipeline
+    from app.config import Settings
+    from app.db import connect, init_catalog, init_results
+    catalog = connect(tmp_path/'catalog.sqlite'); results = connect(tmp_path/'results.sqlite')
+    init_catalog(catalog); init_results(results)
+    results.execute("INSERT INTO sessions VALUES('test','test','test')")
+    catalog.execute("INSERT INTO cards(id,provider_id,name,set_id,set_name,collector_number,printed_collector_number,language) VALUES('card','card','Pikachu','set','Set','35','35/108','en')")
+    catalog.commit()
+    reader = CardOcr.__new__(CardOcr); calls = []
+    def read(patch):
+        calls.append(patch.size)
+        if patch.width in (600, 500):
+            if patch.height in (184, 154): return ['Pikachu'], [.99]
+            return ([number], [.99]) if patch.width == 600 else (['retreat'], [.99])
+        return ['35/108'], [.99]
+    reader._run = read
+    monkeypatch.setattr(pipeline, 'detect_and_rectify', lambda image: (image, False))
+    for name in ('card_frame_candidates', 'loose_frame_candidates', 'portrait_window_candidates'):
+        monkeypatch.setattr(pipeline, name, lambda *a, **k: [])
+    monkeypatch.setattr(pipeline, 'slab_interior_candidate', lambda *a: None)
+    monkeypatch.setattr(pipeline, 'line_frame_candidates', lambda *a, **k: [])
+    def oriented(image, *args, **kwargs):
+        frame = image.resize((500,700)); kwargs['query_vectors'][id(frame)] = np.array([1.,0.],dtype=np.float32)
+        kwargs['selection_metadata'].update(profile='loose_0')
+        return frame,np.array([0]),np.array([.9]),{'orientation_degrees':0.}
+    monkeypatch.setattr(pipeline, 'retrieve_oriented', oriented)
+    snapshot = SimpleNamespace(card_ids=np.array(['card']), embeddings=np.array([[1.,0.]],dtype=np.float32))
+    runtime = SimpleNamespace(require=lambda: (snapshot, None, reader), artwork_verifier=None,
+        printing_index=None, versions=lambda:dict(ocr='test',ranking='test',model_revision='test',catalogue='test'),
+        threshold_config=lambda:{})
+    image = Image.fromarray(np.random.default_rng(8).integers(0,255,(840,600,3),dtype=np.uint8))
+    data = io.BytesIO(); image.save(data, format='JPEG')
+    try:
+        response = pipeline.recognize_bytes(data.getvalue(), settings=Settings(_env_file=None,
+            data_dir=tmp_path, use_grading=False, store_captures=False, ocr_staged_original=True),
+            runtime=runtime, catalog=catalog, results=results, session_id='test')
+        assert response.ocr.collector_retry_skipped is skipped
+        assert len(calls) == (4 if skipped else 6)
+        assert calls.count((600,184)) == 1 and calls.count((600,152)) == 1
+        saved = json.loads(results.execute('SELECT ocr_json FROM scans').fetchone()[0])
+        assert saved['frame_selection']['ocr_staged_footer_supported'] is skipped
+        assert response.status.value != 'matched'
+        if skipped:
+            assert response.best_match.card_id == 'card'
+            # Literal original metadata is supported, not certified; manual
+            # confirmation remains required after omitting optional retries.
+            assert response.confidence.printing == 'metadata_supported'
+            assert response.confidence.requires_confirmation
+    finally:
+        catalog.close(); results.close()

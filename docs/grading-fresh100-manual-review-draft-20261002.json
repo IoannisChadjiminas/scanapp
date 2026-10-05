@@ -1,0 +1,261 @@
+{
+  "status": "manual_visual_review_before_inference_incomplete_draft",
+  "cases": {
+    "fresh100_327234085023": {
+      "kind": "raw",
+      "company": null,
+      "grade": null,
+      "name": "Blastoise",
+      "number": "14/100",
+      "language": "en"
+    },
+    "fresh100_397747206164": {
+      "kind": "slab",
+      "company": "psa",
+      "grade": 8,
+      "name": "Gengar & Mimikyu GX",
+      "number": "038/095",
+      "language": "ja"
+    },
+    "fresh100_406359778998": {
+      "kind": "slab",
+      "company": "psa",
+      "grade": 9,
+      "name": "Dragonite",
+      "number": "065/095",
+      "language": "ja"
+    },
+    "fresh100_388751795697": {
+      "kind": "raw",
+      "company": null,
+      "grade": null,
+      "name": "Dragonite",
+      "number": "065/095",
+      "language": "ja"
+    },
+    "fresh100_145662665211": {
+      "kind": "slab",
+      "company": "ags",
+      "grade": 9.5,
+      "name": "Gyarados GX",
+      "number": "16/68",
+      "language": "en"
+    },
+    "fresh100_305430906935": {
+      "kind": "slab",
+      "company": "cgc",
+      "grade": 8.5,
+      "name": "Gardevoir V",
+      "number": "016/073",
+      "language": "en"
+    },
+    "fresh100_178061679870": {
+      "kind": "slab",
+      "company": "ace",
+      "grade": 10,
+      "name": "Pikachu",
+      "number": "71/99",
+      "language": "en"
+    },
+    "fresh100_377526701873": {
+      "kind": "slab",
+      "company": "tag",
+      "grade": 10,
+      "name": "Lucario & Melmetal GX",
+      "number": "083/173",
+      "language": "ja"
+    },
+    "fresh100_298706855994": {
+      "kind": "slab",
+      "company": "tag",
+      "grade": 6,
+      "name": "Magneton",
+      "number": "9/102",
+      "language": "en"
+    },
+    "fresh100_336794948594": {
+      "kind": "slab",
+      "company": "tag",
+      "grade": 9,
+      "name": "Timburr",
+      "number": "109/101",
+      "language": "ja"
+    },
+    "fresh100_277613285848": {
+      "kind": "slab",
+      "company": "psa",
+      "grade": 8,
+      "name": "Mew ex",
+      "number": "SVP053",
+      "language": "en"
+    },
+    "freshimg_0_995976121": {
+      "kind": "slab",
+      "company": "psa",
+      "grade": 8,
+      "name": "Blastoise ex",
+      "number": "200/165",
+      "language": "en"
+    },
+    "freshimg_0_1677673688": {
+      "kind": "slab",
+      "company": "psa",
+      "grade": 8,
+      "name": "Mewtwo",
+      "number": "SVP052",
+      "language": "en"
+    },
+    "freshimg_0_1212241946": {
+      "kind": "slab",
+      "company": "psa",
+      "grade": 8,
+      "name": "Charizard ex",
+      "number": "199/165",
+      "language": "en"
+    },
+    "freshimg_0_967558432": {
+      "kind": "slab",
+      "company": "psa",
+      "grade": 8,
+      "name": "Pikachu",
+      "number": "RC29/RC32",
+      "language": "en"
+    },
+    "freshimg_0_1007228164": {
+      "kind": "slab",
+      "company": "psa",
+      "grade": 8,
+      "name": "Charizard ex",
+      "number": "199/165",
+      "language": "en"
+    },
+    "freshimg_0_1142638013": {
+      "kind": "slab",
+      "company": "psa",
+      "grade": 8,
+      "name": "Pikachu",
+      "number": "SWSH020",
+      "language": "en"
+    },
+    "freshimg_0_1203037452": {
+      "kind": "slab",
+      "company": "psa",
+      "grade": 8,
+      "name": "Charizard ex",
+      "number": "199/165",
+      "language": "en"
+    },
+    "fresh100_388305477523": {
+      "kind": "slab",
+      "company": "psa",
+      "grade": 8,
+      "name": "Charizard ex",
+      "number": "199/165",
+      "language": "en"
+    },
+    "freshimg_1_113190404": {
+      "kind": "slab",
+      "company": "beckett",
+      "grade": 9,
+      "name": "Mew ex",
+      "number": "232/091",
+      "language": "en"
+    },
+    "fresh100_277888034880": {
+      "kind": "slab",
+      "company": "beckett",
+      "grade": 9,
+      "name": "Charizard ex",
+      "number": "199/165",
+      "language": "en"
+    },
+    "fresh100_157312218315": {
+      "kind": "slab",
+      "company": "beckett",
+      "grade": 9,
+      "name": "Pikachu",
+      "number": "051/162",
+      "language": "en"
+    },
+    "fresh100_196431506881": {
+      "kind": "slab",
+      "company": "beckett",
+      "grade": 9,
+      "name": "Pikachu",
+      "number": "15/17",
+      "language": "en"
+    },
+    "fresh100_276983335602": {
+      "kind": "slab",
+      "company": "beckett",
+      "grade": 9,
+      "name": "Pikachu ex",
+      "number": "247/191",
+      "language": "en"
+    },
+    "fresh100_116749113357": {
+      "kind": "slab",
+      "company": "beckett",
+      "grade": 9,
+      "name": "Zekrom ex",
+      "number": "166/086",
+      "language": "en"
+    },
+    "fresh100_326079637741": {
+      "kind": "slab",
+      "company": "cgc",
+      "grade": 10,
+      "name": "Treecko",
+      "number": "8/168",
+      "language": "en"
+    },
+    "fresh100_135116047131": {
+      "kind": "slab",
+      "company": "cgc",
+      "grade": 10,
+      "name": "Professor Oak",
+      "number": "026/032",
+      "language": "ja"
+    },
+    "fresh100_326160477186": {
+      "kind": "slab",
+      "company": "cgc",
+      "grade": 10,
+      "name": "Abra",
+      "number": "63/165",
+      "language": "en"
+    },
+    "fresh100_326075712447": {
+      "kind": "slab",
+      "company": "cgc",
+      "grade": 10,
+      "name": "Shaymin V",
+      "number": "013/172",
+      "language": "en"
+    },
+    "fresh100_287247791643": {
+      "kind": "slab",
+      "company": "cgc",
+      "grade": 10,
+      "name": "Pikachu with Grey Felt Hat",
+      "number": "SVP085",
+      "language": "en"
+    },
+    "fresh100_177390016065": {
+      "kind": "slab",
+      "company": "cgc",
+      "grade": 10,
+      "name": "Mewtwo GX",
+      "number": "SV59/SV94",
+      "language": "en"
+    },
+    "fresh100_168302185613": {
+      "kind": "slab",
+      "company": "tag",
+      "grade": 9,
+      "name": "Pikachu & Zekrom GX",
+      "number": "041/173",
+      "language": "ja"
+    }
+  }
+}

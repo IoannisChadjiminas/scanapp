@@ -35,6 +35,15 @@ class Settings(BaseSettings):
     # One isolated footer reader overlaps initial title/footer inference.
     # Its auxiliary CPU lane is shared with optional grading, not added to it.
     ocr_parallel_regions: bool = False
+    # Opt-in reuse of the existing auxiliary reader for enlarged footer halves.
+    ocr_parallel_footer_halves: bool = False
+    # Optional grading yields between inference calls while card OCR is active.
+    ocr_card_priority: bool = False
+    # Probe the complete upload before enlarging an inferred, clipped footer.
+    # Strong agreeing printed evidence can omit retries; printing stays review-only.
+    ocr_staged_original: bool = False
+    # Optional NDJSON progress stream; legacy scans remain a single JSON response.
+    scan_stream_enabled: bool = False
     enable_matched: bool = True
     ort_intra_threads: int = 1
     ort_inter_threads: int = 1

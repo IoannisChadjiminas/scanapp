@@ -1,0 +1,10 @@
+{
+  "purpose":"Three-photo, two-identity fresh convenience holdout after freezing the current candidate. Not used to choose crops, thresholds, reference IDs or ranking rules.",
+  "selection":"Visually checked physical cards, visible name/number/language. Rights/authenticity/finish and camera origin are not established. Validation rejected the initial four-photo manifest before any scan: the two Moltres CDN URLs returned identical bytes. The duplicate is excluded, not counted as another successful scan.",
+  "excluded":[{"id":"extra_moltres_1","reason":"identical bytes to extra_moltres_0","sha256":"ac67e7d42cd906fc7dcabd73d27cc0dc796870076136799a738591093481ccaa"}],
+  "photos":[
+    {"id":"extra_espeon_0","page_url":"https://www.ebay.com/itm/158304101999","image_url":"https://i.ebayimg.com/images/g/puYAAeSwMyBqrI-j/s-l1200.jpg","review_status":"visually_verified","expected_card_id":"en:swsh7-180","visible_label":"Espeon V — 180/203","language":"en","layout":"pokemon_full_art","conditions":["holder","background","foil_texture"]},
+    {"id":"extra_espeon_1","page_url":"https://www.ebay.com/itm/227466501313","image_url":"https://i.ebayimg.com/images/g/rboAAeSwUulqdka2/s-l1200.jpg","review_status":"visually_verified","expected_card_id":"en:swsh7-180","visible_label":"Espeon V — 180/203","language":"en","layout":"pokemon_full_art","conditions":["tight_framing","background","foil_texture"]},
+    {"id":"extra_moltres_0","page_url":"https://www.ebay.com/p/5047827276","image_url":"https://i.ebayimg.com/images/g/D9sAAeSwAbNqPV45/s-l1200.jpg","review_status":"visually_verified","expected_card_id":"en:swsh6-177","visible_label":"Galarian Moltres V — 177/198","language":"en","layout":"pokemon_full_art","conditions":["slab","stand","background"]}
+  ]
+}

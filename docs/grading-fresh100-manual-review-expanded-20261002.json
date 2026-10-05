@@ -1,0 +1,933 @@
+{
+  "annotation_method": "Manual visual inspection of original photos before inference; listing titles are not truth.",
+  "cases": {
+    "fresh100_327234085023": {
+      "kind": "raw",
+      "company": null,
+      "grade": null,
+      "name": "Blastoise",
+      "number": "14/100",
+      "language": "en"
+    },
+    "fresh100_397747206164": {
+      "kind": "slab",
+      "company": "psa",
+      "grade": 8,
+      "name": "Gengar & Mimikyu GX",
+      "number": "038/095",
+      "language": "ja"
+    },
+    "fresh100_406359778998": {
+      "kind": "slab",
+      "company": "psa",
+      "grade": 9,
+      "name": "Dragonite",
+      "number": "065/095",
+      "language": "ja"
+    },
+    "fresh100_388751795697": {
+      "kind": "raw",
+      "company": null,
+      "grade": null,
+      "name": "Dragonite",
+      "number": "065/095",
+      "language": "ja"
+    },
+    "fresh100_145662665211": {
+      "kind": "slab",
+      "company": "ags",
+      "grade": 9.5,
+      "name": "Gyarados GX",
+      "number": "16/68",
+      "language": "en"
+    },
+    "fresh100_305430906935": {
+      "kind": "slab",
+      "company": "cgc",
+      "grade": 8.5,
+      "name": "Gardevoir V",
+      "number": "016/073",
+      "language": "en"
+    },
+    "fresh100_178061679870": {
+      "kind": "slab",
+      "company": "ace",
+      "grade": 10,
+      "name": "Pikachu",
+      "number": "71/99",
+      "language": "en"
+    },
+    "fresh100_377526701873": {
+      "kind": "slab",
+      "company": "tag",
+      "grade": 10,
+      "name": "Lucario & Melmetal GX",
+      "number": "083/173",
+      "language": "ja"
+    },
+    "fresh100_298706855994": {
+      "kind": "slab",
+      "company": "tag",
+      "grade": 6,
+      "name": "Magneton",
+      "number": "9/102",
+      "language": "en"
+    },
+    "fresh100_336794948594": {
+      "kind": "slab",
+      "company": "tag",
+      "grade": 9,
+      "name": "Timburr",
+      "number": "109/101",
+      "language": "ja"
+    },
+    "fresh100_277613285848": {
+      "kind": "slab",
+      "company": "psa",
+      "grade": 8,
+      "name": "Mew ex",
+      "number": "SVP053",
+      "language": "en"
+    },
+    "freshimg_0_995976121": {
+      "kind": "slab",
+      "company": "psa",
+      "grade": 8,
+      "name": "Blastoise ex",
+      "number": "200/165",
+      "language": "en"
+    },
+    "freshimg_0_1677673688": {
+      "kind": "slab",
+      "company": "psa",
+      "grade": 8,
+      "name": "Mewtwo",
+      "number": "SVP052",
+      "language": "en"
+    },
+    "freshimg_0_1212241946": {
+      "kind": "slab",
+      "company": "psa",
+      "grade": 8,
+      "name": "Charizard ex",
+      "number": "199/165",
+      "language": "en"
+    },
+    "freshimg_0_967558432": {
+      "kind": "slab",
+      "company": "psa",
+      "grade": 8,
+      "name": "Pikachu",
+      "number": "RC29/RC32",
+      "language": "en"
+    },
+    "freshimg_0_1007228164": {
+      "kind": "slab",
+      "company": "psa",
+      "grade": 8,
+      "name": "Charizard ex",
+      "number": "199/165",
+      "language": "en"
+    },
+    "freshimg_0_1142638013": {
+      "kind": "slab",
+      "company": "psa",
+      "grade": 8,
+      "name": "Pikachu",
+      "number": "SWSH020",
+      "language": "en"
+    },
+    "freshimg_0_1203037452": {
+      "kind": "slab",
+      "company": "psa",
+      "grade": 8,
+      "name": "Charizard ex",
+      "number": "199/165",
+      "language": "en"
+    },
+    "fresh100_388305477523": {
+      "kind": "slab",
+      "company": "psa",
+      "grade": 8,
+      "name": "Charizard ex",
+      "number": "199/165",
+      "language": "en"
+    },
+    "freshimg_1_113190404": {
+      "kind": "slab",
+      "company": "beckett",
+      "grade": 9,
+      "name": "Mew ex",
+      "number": "232/091",
+      "language": "en"
+    },
+    "fresh100_277888034880": {
+      "kind": "slab",
+      "company": "beckett",
+      "grade": 9,
+      "name": "Charizard ex",
+      "number": "199/165",
+      "language": "en"
+    },
+    "fresh100_157312218315": {
+      "kind": "slab",
+      "company": "beckett",
+      "grade": 9,
+      "name": "Pikachu",
+      "number": "051/162",
+      "language": "en"
+    },
+    "fresh100_196431506881": {
+      "kind": "slab",
+      "company": "beckett",
+      "grade": 9,
+      "name": "Pikachu",
+      "number": "15/17",
+      "language": "en"
+    },
+    "fresh100_276983335602": {
+      "kind": "slab",
+      "company": "beckett",
+      "grade": 9,
+      "name": "Pikachu ex",
+      "number": "247/191",
+      "language": "en"
+    },
+    "fresh100_116749113357": {
+      "kind": "slab",
+      "company": "beckett",
+      "grade": 9,
+      "name": "Zekrom ex",
+      "number": "166/086",
+      "language": "en"
+    },
+    "fresh100_326079637741": {
+      "kind": "slab",
+      "company": "cgc",
+      "grade": 10,
+      "name": "Treecko",
+      "number": "8/168",
+      "language": "en"
+    },
+    "fresh100_135116047131": {
+      "kind": "slab",
+      "company": "cgc",
+      "grade": 10,
+      "name": "Professor Oak",
+      "number": "026/032",
+      "language": "ja"
+    },
+    "fresh100_326160477186": {
+      "kind": "slab",
+      "company": "cgc",
+      "grade": 10,
+      "name": "Abra",
+      "number": "63/165",
+      "language": "en"
+    },
+    "fresh100_326075712447": {
+      "kind": "slab",
+      "company": "cgc",
+      "grade": 10,
+      "name": "Shaymin V",
+      "number": "013/172",
+      "language": "en"
+    },
+    "fresh100_287247791643": {
+      "kind": "slab",
+      "company": "cgc",
+      "grade": 10,
+      "name": "Pikachu with Grey Felt Hat",
+      "number": "SVP085",
+      "language": "en"
+    },
+    "fresh100_177390016065": {
+      "kind": "slab",
+      "company": "cgc",
+      "grade": 10,
+      "name": "Mewtwo GX",
+      "number": "SV59/SV94",
+      "language": "en"
+    },
+    "fresh100_168302185613": {
+      "kind": "slab",
+      "company": "tag",
+      "grade": 9,
+      "name": "Pikachu & Zekrom GX",
+      "number": "041/173",
+      "language": "ja"
+    },
+    "fresh100_198196929850": {
+      "kind": "slab",
+      "company": "ags",
+      "grade": 8,
+      "name": "Dark Gyarados",
+      "number": "25/82",
+      "language": "en"
+    },
+    "fresh100_407246892266": {
+      "kind": "slab",
+      "company": "cgc",
+      "grade": 7.5,
+      "name": "Gardevoir",
+      "number": "029/055",
+      "language": "ja"
+    },
+    "fresh100_236447320708": {
+      "kind": "slab",
+      "company": "cgc",
+      "grade": 8.5,
+      "name": "Scyther",
+      "number": "26/64",
+      "language": "en"
+    },
+    "fresh100_137339181702": {
+      "kind": "slab",
+      "company": "psa",
+      "grade": 9,
+      "name": "Venusaur",
+      "number": "15/102",
+      "language": "en"
+    },
+    "fresh100_336762686851": {
+      "kind": "slab",
+      "company": "psa",
+      "grade": 8,
+      "name": "Snorlax",
+      "number": "055/078",
+      "language": "en"
+    },
+    "fresh100_206285662050": {
+      "kind": "slab",
+      "company": "beckett",
+      "grade": 8.5,
+      "name": "Mega Charizard X ex",
+      "number": "MOP023",
+      "language": "en"
+    },
+    "fresh100_126873299285": {
+      "kind": "slab",
+      "company": "beckett",
+      "grade": 8.5,
+      "name": "Venusaur",
+      "number": "15/102",
+      "language": "en"
+    },
+    "fresh100_267368874387": {
+      "kind": "slab",
+      "company": "psa",
+      "grade": 7,
+      "name": "Gardevoir",
+      "number": "072/068",
+      "language": "ja"
+    },
+    "freshraw_0_299404800": {
+      "kind": "raw",
+      "company": null,
+      "grade": null,
+      "name": "Marill",
+      "number": "204/193",
+      "language": "en"
+    },
+    "fresh100_316758938735": {
+      "kind": "raw",
+      "company": null,
+      "grade": null,
+      "name": "Marill",
+      "number": "204/193",
+      "language": "en"
+    },
+    "fresh100_177223455994": {
+      "kind": "raw",
+      "company": null,
+      "grade": null,
+      "name": "Marill",
+      "number": "204/193",
+      "language": "en"
+    },
+    "freshraw_0_1109460011": {
+      "kind": "raw",
+      "company": null,
+      "grade": null,
+      "name": "Marill",
+      "number": "204/193",
+      "language": "en"
+    },
+    "fresh100_205836607918": {
+      "kind": "raw",
+      "company": null,
+      "grade": null,
+      "name": "Marill",
+      "number": "204/193",
+      "language": "en"
+    },
+    "freshraw_0_1861309623": {
+      "kind": "raw",
+      "company": null,
+      "grade": null,
+      "name": "Marill",
+      "number": "204/193",
+      "language": "en"
+    },
+    "freshraw_0_1807925107": {
+      "kind": "raw",
+      "company": null,
+      "grade": null,
+      "name": "Marill",
+      "number": "204/193",
+      "language": "en"
+    },
+    "fresh100_186821236291": {
+      "kind": "raw",
+      "company": null,
+      "grade": null,
+      "name": "Marill",
+      "number": "204/193",
+      "language": "en"
+    },
+    "fresh100_227232802112": {
+      "kind": "raw",
+      "company": null,
+      "grade": null,
+      "name": "Armarouge",
+      "number": "203/198",
+      "language": "en"
+    },
+    "freshraw_1_925085473": {
+      "kind": "raw",
+      "company": null,
+      "grade": null,
+      "name": "Armarouge",
+      "number": "203/198",
+      "language": "en"
+    },
+    "fresh100_185962385461": {
+      "kind": "raw",
+      "company": null,
+      "grade": null,
+      "name": "Armarouge",
+      "number": "203/198",
+      "language": "en"
+    },
+    "fresh100_236504673185": {
+      "kind": "raw",
+      "company": null,
+      "grade": null,
+      "name": "Armarouge",
+      "number": "203/198",
+      "language": "en"
+    },
+    "fresh100_235982624286": {
+      "kind": "raw",
+      "company": null,
+      "grade": null,
+      "name": "Armarouge",
+      "number": "203/198",
+      "language": "en"
+    },
+    "freshraw_1_2051404991": {
+      "kind": "raw",
+      "company": null,
+      "grade": null,
+      "name": "Armarouge",
+      "number": "203/198",
+      "language": "en"
+    },
+    "fresh100_286467766284": {
+      "kind": "raw",
+      "company": null,
+      "grade": null,
+      "name": "Armarouge",
+      "number": "203/198",
+      "language": "en"
+    },
+    "fresh100_355853966331": {
+      "kind": "raw",
+      "company": null,
+      "grade": null,
+      "name": "Scizor",
+      "number": "205/197",
+      "language": "en"
+    },
+    "fresh100_135663917530": {
+      "kind": "raw",
+      "company": null,
+      "grade": null,
+      "name": "Scizor",
+      "number": "205/197",
+      "language": "en"
+    },
+    "fresh100_267151817166": {
+      "kind": "raw",
+      "company": null,
+      "grade": null,
+      "name": "Scizor",
+      "number": "205/197",
+      "language": "en"
+    },
+    "freshraw_2_1235899331": {
+      "kind": "raw",
+      "company": null,
+      "grade": null,
+      "name": "Scizor",
+      "number": "205/197",
+      "language": "en"
+    },
+    "fresh100_186598235842": {
+      "kind": "raw",
+      "company": null,
+      "grade": null,
+      "name": "Scizor",
+      "number": "205/197",
+      "language": "en"
+    },
+    "fresh100_396269138140": {
+      "kind": "raw",
+      "company": null,
+      "grade": null,
+      "name": "Kirlia",
+      "number": "212/198",
+      "language": "en"
+    },
+    "fresh100_127125641244": {
+      "kind": "raw",
+      "company": null,
+      "grade": null,
+      "name": "Kirlia",
+      "number": "212/198",
+      "language": "en"
+    },
+    "fresh100_356618307865": {
+      "kind": "raw",
+      "company": null,
+      "grade": null,
+      "name": "Kirlia",
+      "number": "212/198",
+      "language": "en"
+    },
+    "fresh100_396170517118": {
+      "kind": "raw",
+      "company": null,
+      "grade": null,
+      "name": "Kirlia",
+      "number": "212/198",
+      "language": "en"
+    },
+    "fresh100_135586143350": {
+      "kind": "raw",
+      "company": null,
+      "grade": null,
+      "name": "Kirlia",
+      "number": "212/198",
+      "language": "en"
+    },
+    "freshraw_3_1376470916": {
+      "kind": "raw",
+      "company": null,
+      "grade": null,
+      "name": "Kirlia",
+      "number": "212/198",
+      "language": "en"
+    },
+    "fresh100_365490414711": {
+      "kind": "raw",
+      "company": null,
+      "grade": null,
+      "name": "Kirlia",
+      "number": "212/198",
+      "language": "en"
+    },
+    "freshraw_3_1153690412": {
+      "kind": "raw",
+      "company": null,
+      "grade": null,
+      "name": "Kirlia",
+      "number": "212/198",
+      "language": "en"
+    },
+    "fresh100_167458253135": {
+      "kind": "raw",
+      "company": null,
+      "grade": null,
+      "name": "Drowzee",
+      "number": "210/198",
+      "language": "en"
+    },
+    "fresh100_226992725275": {
+      "kind": "raw",
+      "company": null,
+      "grade": null,
+      "name": "Drowzee",
+      "number": "210/198",
+      "language": "en"
+    },
+    "fresh100_235971735451": {
+      "kind": "raw",
+      "company": null,
+      "grade": null,
+      "name": "Drowzee",
+      "number": "210/198",
+      "language": "en"
+    },
+    "freshraw_4_1318482242": {
+      "kind": "raw",
+      "company": null,
+      "grade": null,
+      "name": "Drowzee",
+      "number": "210/198",
+      "language": "en"
+    },
+    "fresh100_267406776028": {
+      "kind": "raw",
+      "company": null,
+      "grade": null,
+      "name": "Drowzee",
+      "number": "210/198",
+      "language": "en"
+    },
+    "freshraw_4_123815526": {
+      "kind": "raw",
+      "company": null,
+      "grade": null,
+      "name": "Drowzee",
+      "number": "210/198",
+      "language": "en"
+    },
+    "freshraw_4_343408992": {
+      "kind": "raw",
+      "company": null,
+      "grade": null,
+      "name": "Drowzee",
+      "number": "210/198",
+      "language": "en"
+    },
+    "fresh100_185962407163": {
+      "kind": "raw",
+      "company": null,
+      "grade": null,
+      "name": "Drowzee",
+      "number": "210/198",
+      "language": "en"
+    },
+    "fresh100_177746909243": {
+      "kind": "raw",
+      "company": null,
+      "grade": null,
+      "name": "Drowzee",
+      "number": "210/198",
+      "language": "en"
+    },
+    "fresh100_116249576361": {
+      "kind": "raw",
+      "company": null,
+      "grade": null,
+      "name": "Nidoking",
+      "number": "174/165",
+      "language": "en"
+    },
+    "fresh100_197071758287": {
+      "kind": "raw",
+      "company": null,
+      "grade": null,
+      "name": "Nidoking",
+      "number": "174/165",
+      "language": "en"
+    },
+    "fresh100_397434208029": {
+      "kind": "raw",
+      "company": null,
+      "grade": null,
+      "name": "Nidoking",
+      "number": "174/165",
+      "language": "en"
+    },
+    "fresh100_116219612870": {
+      "kind": "raw",
+      "company": null,
+      "grade": null,
+      "name": "Dragonair",
+      "number": "181/165",
+      "language": "en"
+    },
+    "fresh100_186821197401": {
+      "kind": "raw",
+      "company": null,
+      "grade": null,
+      "name": "Dragonair",
+      "number": "181/165",
+      "language": "en"
+    },
+    "fresh100_387647223051": {
+      "kind": "raw",
+      "company": null,
+      "grade": null,
+      "name": "Parasect",
+      "number": "TG01/TG30",
+      "language": "en"
+    },
+    "freshraw_7_316441841": {
+      "kind": "raw",
+      "company": null,
+      "grade": null,
+      "name": "Parasect",
+      "number": "TG01/TG30",
+      "language": "en"
+    },
+    "freshraw_7_795209806": {
+      "kind": "raw",
+      "company": null,
+      "grade": null,
+      "name": "Parasect",
+      "number": "TG01/TG30",
+      "language": "en"
+    },
+    "fresh100_125514764134": {
+      "kind": "raw",
+      "company": null,
+      "grade": null,
+      "name": "Parasect",
+      "number": "TG01/TG30",
+      "language": "en"
+    },
+    "fresh100_334557743755": {
+      "kind": "raw",
+      "company": null,
+      "grade": null,
+      "name": "Parasect",
+      "number": "TG01/TG30",
+      "language": "en"
+    },
+    "fresh100_235278936401": {
+      "kind": "raw",
+      "company": null,
+      "grade": null,
+      "name": "Parasect",
+      "number": "TG01/TG30",
+      "language": "en"
+    },
+    "fresh100_205408031074": {
+      "kind": "slab",
+      "company": "ace",
+      "grade": 9,
+      "name": "Eevee",
+      "number": "188/167",
+      "language": "en"
+    },
+    "fresh100_376009575543": {
+      "kind": "slab",
+      "company": "ags",
+      "grade": 9,
+      "name": "Eevee",
+      "number": "188/167",
+      "language": "en"
+    },
+    "fresh100_178019237584": {
+      "kind": "slab",
+      "company": "psa",
+      "grade": 9,
+      "name": "Eevee ex",
+      "number": "167/131",
+      "language": "en"
+    },
+    "freshextra_0_70889495": {
+      "kind": "slab",
+      "company": "tag",
+      "grade": 9,
+      "name": "Eevee ex",
+      "number": "075/131",
+      "language": "en"
+    },
+    "freshextra_1_596156461": {
+      "kind": "slab",
+      "company": "psa",
+      "grade": 8,
+      "name": "Squirtle",
+      "number": "170/165",
+      "language": "en"
+    },
+    "freshextra_1_1957211138": {
+      "kind": "slab",
+      "company": "ags",
+      "grade": 8.5,
+      "name": "Squirtle",
+      "number": "68/82",
+      "language": "en"
+    },
+    "fresh100_196775894930": {
+      "kind": "slab",
+      "company": "psa",
+      "grade": 3,
+      "name": "Squirtle",
+      "number": "007/165",
+      "language": "en"
+    },
+    "freshextra_1_1951077684": {
+      "kind": "slab",
+      "company": "cgc",
+      "grade": 8.5,
+      "name": "Squirtle",
+      "number": "170/165",
+      "language": "ja"
+    },
+    "freshextra_1_2110376533": {
+      "kind": "slab",
+      "company": "psa",
+      "grade": 8,
+      "name": "Squirtle",
+      "number": "170/165",
+      "language": "en"
+    },
+    "freshextra_1_1172724396": {
+      "kind": "slab",
+      "company": "psa",
+      "grade": 8,
+      "name": "Squirtle",
+      "number": "170/165",
+      "language": "en"
+    },
+    "fresh100_146365926690": {
+      "kind": "slab",
+      "company": "ags",
+      "grade": 9.5,
+      "name": "Raichu",
+      "number": "132/091",
+      "language": "en"
+    },
+    "freshextra_2_1556180249": {
+      "kind": "slab",
+      "company": "beckett",
+      "grade": 9.5,
+      "name": "Lt. Surge's Raichu",
+      "number": "11/132",
+      "language": "en"
+    },
+    "freshextra_2_1348774565": {
+      "kind": "slab",
+      "company": "beckett",
+      "grade": 8.5,
+      "name": "Lt. Surge's Raichu",
+      "number": "28/132",
+      "language": "en"
+    },
+    "fresh100_196323744191": {
+      "kind": "slab",
+      "company": "ags",
+      "grade": 8.5,
+      "name": "Gyarados",
+      "number": "6/102",
+      "language": "en"
+    },
+    "fresh100_145701209354": {
+      "kind": "slab",
+      "company": "ags",
+      "grade": 10,
+      "name": "Gyarados VMAX",
+      "number": "029/203",
+      "language": "en"
+    },
+    "fresh100_205148259527": {
+      "kind": "slab",
+      "company": "ags",
+      "grade": 10,
+      "name": "Gyarados",
+      "number": "007/034",
+      "language": "en"
+    },
+    "fresh100_146314372000": {
+      "kind": "slab",
+      "company": "ags",
+      "grade": 9.5,
+      "name": "Dragonite EX",
+      "number": "106/108",
+      "language": "en"
+    },
+    "fresh100_297135056911": {
+      "kind": "slab",
+      "company": "ags",
+      "grade": 10,
+      "name": "Dragonite",
+      "number": "149/165",
+      "language": "ja"
+    },
+    "freshextra_4_1999278983": {
+      "kind": "slab",
+      "company": "ags",
+      "grade": 9,
+      "name": "Dragonite",
+      "number": "149/165",
+      "language": "en"
+    },
+    "fresh100_147104549601": {
+      "kind": "slab",
+      "company": "ags",
+      "grade": 9.5,
+      "name": "Dragonite",
+      "number": "96/149",
+      "language": "en"
+    },
+    "fresh100_267467530001": {
+      "kind": "slab",
+      "company": "ags",
+      "grade": 10,
+      "name": "Dragonite V",
+      "number": "049/071",
+      "language": "ja"
+    },
+    "fresh100_127464063628": {
+      "kind": "slab",
+      "company": "tag",
+      "grade": 8.5,
+      "name": "Gardevoir ex",
+      "number": "245/198",
+      "language": "en"
+    },
+    "freshextra_5_636235657": {
+      "kind": "slab",
+      "company": "tag",
+      "grade": 10,
+      "name": "Gardevoir",
+      "number": "TG05/TG30",
+      "language": "en"
+    },
+    "fresh100_197768683572": {
+      "kind": "slab",
+      "company": "tag",
+      "grade": 9,
+      "name": "Gardevoir ex",
+      "number": "233/091",
+      "language": "en"
+    },
+    "fresh100_406258833168": {
+      "kind": "slab",
+      "company": "tag",
+      "grade": 10,
+      "name": "Gardevoir GX",
+      "number": "SV75/SV94",
+      "language": "en"
+    },
+    "fresh100_306610054910": {
+      "kind": "slab",
+      "company": "tag",
+      "grade": 10,
+      "name": "Mega Gardevoir ex",
+      "number": "237/132",
+      "language": "en"
+    },
+    "fresh100_317455780011": {
+      "kind": "slab",
+      "company": "psa",
+      "grade": 8,
+      "name": "Gardevoir ex",
+      "number": "245/198",
+      "language": "en"
+    },
+    "freshextra_5_1247516731": {
+      "kind": "slab",
+      "company": "psa",
+      "grade": 10,
+      "name": "Gardevoir ex",
+      "number": "245/198",
+      "language": "en"
+    }
+  }
+}

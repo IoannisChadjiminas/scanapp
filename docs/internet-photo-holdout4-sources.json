@@ -1,0 +1,1147 @@
+{
+  "purpose": "Fourth untouched 50-photo physical-card Internet holdout, new printings and subjects, labelled before inference.",
+  "frozen_at_utc": "2026-10-02T10:47:56.201232+00:00",
+  "selection": "All 114 candidates manually reviewed on 19 contact sheets. Printed title, collector number and language determine labels, not search hints. Fifty physical-photo samples, 20 printing identities, not 50 different printings. References and current scanner frozen.",
+  "limitations": "Convenience marketplace sample; repeated identities, not population-random sampling. Physical authenticity, finish, copy independence and model-pretraining overlap unverified. Local API pipeline, not Flutter camera end-to-end. Internet test photos never indexed or used to tune this run.",
+  "identity_counts": {
+    "en:swsh12.5gg-GG38": 5,
+    "en:swsh12.5gg-GG42": 3,
+    "en:swsh12.5gg-GG54": 1,
+    "en:swsh12.5gg-GG47": 3,
+    "en:swsh12.5gg-GG64": 3,
+    "en:swsh12.5gg-GG66": 5,
+    "en:swsh12.5gg-GG61": 1,
+    "en:swsh12.5gg-GG23": 2,
+    "en:swsh12.5gg-GG22": 2,
+    "en:swsh12.5gg-GG31": 2,
+    "en:base1-20": 3,
+    "en:base1-65": 2,
+    "en:base1-43": 3,
+    "en:base2-58": 3,
+    "en:base1-68": 2,
+    "en:base1-62": 2,
+    "ja:SV5a-090": 2,
+    "ja:SV4M-088": 1,
+    "ja:SV5M-094": 2,
+    "ja:SV5K-093": 3
+  },
+  "conditions": {
+    "physical_background": 50,
+    "foil_texture_or_reflection": 35,
+    "holder_or_sleeve": 21,
+    "slab": 12,
+    "stand": 9,
+    "perspective_or_handheld": 14,
+    "busy_packaging_background": 1
+  },
+  "deduplication": {
+    "old_download_sha_count": 386,
+    "exact_byte_overlap": 0,
+    "old_printing_identity_overlap": [],
+    "old_catalogue_name_overlap": [],
+    "near_duplicate_flags_for_manual_review": [],
+    "method": "SHA256/URL overlap against prior photo manifests, 256-bit whole-image difference hash and visual review. Does not prove absence of every transformed crop or stock-photo reuse."
+  },
+  "exclusions": [
+    {
+      "id": "holdout4_001",
+      "reason": "Pre-inference manual photo selection: render/cutout, composite, or eligible reserve not selected for fixed diverse sample."
+    },
+    {
+      "id": "holdout4_007",
+      "reason": "Pre-inference manual photo selection: render/cutout, composite, or eligible reserve not selected for fixed diverse sample."
+    },
+    {
+      "id": "holdout4_008",
+      "reason": "Pre-inference manual photo selection: render/cutout, composite, or eligible reserve not selected for fixed diverse sample."
+    },
+    {
+      "id": "holdout4_012",
+      "reason": "Pre-inference manual photo selection: render/cutout, composite, or eligible reserve not selected for fixed diverse sample."
+    },
+    {
+      "id": "holdout4_014",
+      "reason": "Pre-inference manual photo selection: render/cutout, composite, or eligible reserve not selected for fixed diverse sample."
+    },
+    {
+      "id": "holdout4_015",
+      "reason": "Pre-inference manual photo selection: render/cutout, composite, or eligible reserve not selected for fixed diverse sample."
+    },
+    {
+      "id": "holdout4_019",
+      "reason": "Pre-inference manual photo selection: render/cutout, composite, or eligible reserve not selected for fixed diverse sample."
+    },
+    {
+      "id": "holdout4_020",
+      "reason": "Pre-inference manual photo selection: render/cutout, composite, or eligible reserve not selected for fixed diverse sample."
+    },
+    {
+      "id": "holdout4_021",
+      "reason": "Pre-inference manual photo selection: render/cutout, composite, or eligible reserve not selected for fixed diverse sample."
+    },
+    {
+      "id": "holdout4_025",
+      "reason": "Pre-inference manual photo selection: render/cutout, composite, or eligible reserve not selected for fixed diverse sample."
+    },
+    {
+      "id": "holdout4_030",
+      "reason": "Pre-inference manual photo selection: render/cutout, composite, or eligible reserve not selected for fixed diverse sample."
+    },
+    {
+      "id": "holdout4_032",
+      "reason": "Pre-inference manual photo selection: render/cutout, composite, or eligible reserve not selected for fixed diverse sample."
+    },
+    {
+      "id": "holdout4_033",
+      "reason": "Pre-inference manual photo selection: render/cutout, composite, or eligible reserve not selected for fixed diverse sample."
+    },
+    {
+      "id": "holdout4_034",
+      "reason": "Pre-inference manual photo selection: render/cutout, composite, or eligible reserve not selected for fixed diverse sample."
+    },
+    {
+      "id": "holdout4_035",
+      "reason": "Pre-inference manual photo selection: render/cutout, composite, or eligible reserve not selected for fixed diverse sample."
+    },
+    {
+      "id": "holdout4_037",
+      "reason": "Pre-inference manual photo selection: render/cutout, composite, or eligible reserve not selected for fixed diverse sample."
+    },
+    {
+      "id": "holdout4_038",
+      "reason": "Pre-inference manual photo selection: render/cutout, composite, or eligible reserve not selected for fixed diverse sample."
+    },
+    {
+      "id": "holdout4_040",
+      "reason": "Pre-inference manual photo selection: render/cutout, composite, or eligible reserve not selected for fixed diverse sample."
+    },
+    {
+      "id": "holdout4_042",
+      "reason": "Pre-inference manual photo selection: render/cutout, composite, or eligible reserve not selected for fixed diverse sample."
+    },
+    {
+      "id": "holdout4_044",
+      "reason": "Pre-inference manual photo selection: render/cutout, composite, or eligible reserve not selected for fixed diverse sample."
+    },
+    {
+      "id": "holdout4_048",
+      "reason": "Pre-inference manual photo selection: render/cutout, composite, or eligible reserve not selected for fixed diverse sample."
+    },
+    {
+      "id": "holdout4_052",
+      "reason": "Pre-inference manual photo selection: render/cutout, composite, or eligible reserve not selected for fixed diverse sample."
+    },
+    {
+      "id": "holdout4_053",
+      "reason": "Pre-inference manual photo selection: render/cutout, composite, or eligible reserve not selected for fixed diverse sample."
+    },
+    {
+      "id": "holdout4_054",
+      "reason": "Pre-inference manual photo selection: render/cutout, composite, or eligible reserve not selected for fixed diverse sample."
+    },
+    {
+      "id": "holdout4_055",
+      "reason": "Pre-inference manual photo selection: render/cutout, composite, or eligible reserve not selected for fixed diverse sample."
+    },
+    {
+      "id": "holdout4_056",
+      "reason": "Pre-inference manual photo selection: render/cutout, composite, or eligible reserve not selected for fixed diverse sample."
+    },
+    {
+      "id": "holdout4_057",
+      "reason": "Pre-inference manual photo selection: render/cutout, composite, or eligible reserve not selected for fixed diverse sample."
+    },
+    {
+      "id": "holdout4_059",
+      "reason": "Pre-inference manual photo selection: render/cutout, composite, or eligible reserve not selected for fixed diverse sample."
+    },
+    {
+      "id": "holdout4_061",
+      "reason": "Pre-inference manual photo selection: render/cutout, composite, or eligible reserve not selected for fixed diverse sample."
+    },
+    {
+      "id": "holdout4_062",
+      "reason": "Pre-inference manual photo selection: render/cutout, composite, or eligible reserve not selected for fixed diverse sample."
+    },
+    {
+      "id": "holdout4_065",
+      "reason": "Pre-inference manual photo selection: render/cutout, composite, or eligible reserve not selected for fixed diverse sample."
+    },
+    {
+      "id": "holdout4_066",
+      "reason": "Pre-inference manual photo selection: render/cutout, composite, or eligible reserve not selected for fixed diverse sample."
+    },
+    {
+      "id": "holdout4_069",
+      "reason": "Pre-inference manual photo selection: render/cutout, composite, or eligible reserve not selected for fixed diverse sample."
+    },
+    {
+      "id": "holdout4_071",
+      "reason": "Pre-inference manual photo selection: render/cutout, composite, or eligible reserve not selected for fixed diverse sample."
+    },
+    {
+      "id": "holdout4_073",
+      "reason": "Pre-inference manual photo selection: render/cutout, composite, or eligible reserve not selected for fixed diverse sample."
+    },
+    {
+      "id": "holdout4_074",
+      "reason": "Pre-inference manual photo selection: render/cutout, composite, or eligible reserve not selected for fixed diverse sample."
+    },
+    {
+      "id": "holdout4_075",
+      "reason": "Pre-inference manual photo selection: render/cutout, composite, or eligible reserve not selected for fixed diverse sample."
+    },
+    {
+      "id": "holdout4_076",
+      "reason": "Pre-inference manual photo selection: render/cutout, composite, or eligible reserve not selected for fixed diverse sample."
+    },
+    {
+      "id": "holdout4_077",
+      "reason": "Pre-inference manual photo selection: render/cutout, composite, or eligible reserve not selected for fixed diverse sample."
+    },
+    {
+      "id": "holdout4_079",
+      "reason": "Pre-inference manual photo selection: render/cutout, composite, or eligible reserve not selected for fixed diverse sample."
+    },
+    {
+      "id": "holdout4_081",
+      "reason": "Pre-inference manual photo selection: render/cutout, composite, or eligible reserve not selected for fixed diverse sample."
+    },
+    {
+      "id": "holdout4_082",
+      "reason": "Pre-inference manual photo selection: render/cutout, composite, or eligible reserve not selected for fixed diverse sample."
+    },
+    {
+      "id": "holdout4_083",
+      "reason": "Pre-inference manual photo selection: render/cutout, composite, or eligible reserve not selected for fixed diverse sample."
+    },
+    {
+      "id": "holdout4_087",
+      "reason": "Pre-inference manual photo selection: render/cutout, composite, or eligible reserve not selected for fixed diverse sample."
+    },
+    {
+      "id": "holdout4_088",
+      "reason": "Pre-inference manual photo selection: render/cutout, composite, or eligible reserve not selected for fixed diverse sample."
+    },
+    {
+      "id": "holdout4_089",
+      "reason": "Pre-inference manual photo selection: render/cutout, composite, or eligible reserve not selected for fixed diverse sample."
+    },
+    {
+      "id": "holdout4_091",
+      "reason": "Pre-inference manual photo selection: render/cutout, composite, or eligible reserve not selected for fixed diverse sample."
+    },
+    {
+      "id": "holdout4_092",
+      "reason": "Pre-inference manual photo selection: render/cutout, composite, or eligible reserve not selected for fixed diverse sample."
+    },
+    {
+      "id": "holdout4_093",
+      "reason": "Pre-inference manual photo selection: render/cutout, composite, or eligible reserve not selected for fixed diverse sample."
+    },
+    {
+      "id": "holdout4_094",
+      "reason": "Pre-inference manual photo selection: render/cutout, composite, or eligible reserve not selected for fixed diverse sample."
+    },
+    {
+      "id": "holdout4_095",
+      "reason": "Pre-inference manual photo selection: render/cutout, composite, or eligible reserve not selected for fixed diverse sample."
+    },
+    {
+      "id": "holdout4_096",
+      "reason": "Pre-inference manual photo selection: render/cutout, composite, or eligible reserve not selected for fixed diverse sample."
+    },
+    {
+      "id": "holdout4_098",
+      "reason": "Pre-inference manual photo selection: render/cutout, composite, or eligible reserve not selected for fixed diverse sample."
+    },
+    {
+      "id": "holdout4_100",
+      "reason": "Pre-inference manual photo selection: render/cutout, composite, or eligible reserve not selected for fixed diverse sample."
+    },
+    {
+      "id": "holdout4_101",
+      "reason": "Pre-inference manual photo selection: render/cutout, composite, or eligible reserve not selected for fixed diverse sample."
+    },
+    {
+      "id": "holdout4_102",
+      "reason": "Pre-inference manual photo selection: render/cutout, composite, or eligible reserve not selected for fixed diverse sample."
+    },
+    {
+      "id": "holdout4_103",
+      "reason": "Pre-inference manual photo selection: render/cutout, composite, or eligible reserve not selected for fixed diverse sample."
+    },
+    {
+      "id": "holdout4_104",
+      "reason": "Pre-inference manual photo selection: render/cutout, composite, or eligible reserve not selected for fixed diverse sample."
+    },
+    {
+      "id": "holdout4_106",
+      "reason": "Pre-inference manual photo selection: render/cutout, composite, or eligible reserve not selected for fixed diverse sample."
+    },
+    {
+      "id": "holdout4_107",
+      "reason": "Pre-inference manual photo selection: render/cutout, composite, or eligible reserve not selected for fixed diverse sample."
+    },
+    {
+      "id": "holdout4_108",
+      "reason": "Pre-inference manual photo selection: render/cutout, composite, or eligible reserve not selected for fixed diverse sample."
+    },
+    {
+      "id": "holdout4_109",
+      "reason": "Pre-inference manual photo selection: render/cutout, composite, or eligible reserve not selected for fixed diverse sample."
+    },
+    {
+      "id": "holdout4_110",
+      "reason": "Pre-inference manual photo selection: render/cutout, composite, or eligible reserve not selected for fixed diverse sample."
+    },
+    {
+      "id": "holdout4_114",
+      "reason": "Pre-inference manual photo selection: render/cutout, composite, or eligible reserve not selected for fixed diverse sample."
+    }
+  ],
+  "photos": [
+    {
+      "id": "holdout4_002",
+      "page_url": "https://www.ebay.ca/itm/285610271855",
+      "image_url": "https://i.ebayimg.com/images/g/ha0AAeSwE7Nozk0C/s-l1200.jpg",
+      "review_status": "visually_verified",
+      "expected_card_id": "en:swsh12.5gg-GG38",
+      "visible_label": "Suicune V GG38/GG70",
+      "language": "en",
+      "layout": "pokemon_full_art",
+      "conditions": [
+        "physical_background",
+        "foil_texture_or_reflection",
+        "holder_or_sleeve",
+        "slab"
+      ],
+      "sha256": "acc890bf9e7efd4242d95735730df52feba16fe6509d6beef37536b198683610",
+      "truth_in_frozen_artwork_index": true
+    },
+    {
+      "id": "holdout4_003",
+      "page_url": "https://www.ebay.com/itm/336269330019",
+      "image_url": "https://i.ebayimg.com/images/g/cNYAAeSw8sRpCi7W/s-l1200.jpg",
+      "review_status": "visually_verified",
+      "expected_card_id": "en:swsh12.5gg-GG38",
+      "visible_label": "Suicune V GG38/GG70",
+      "language": "en",
+      "layout": "pokemon_full_art",
+      "conditions": [
+        "physical_background",
+        "foil_texture_or_reflection",
+        "holder_or_sleeve",
+        "slab"
+      ],
+      "sha256": "12baf98ad4916b48596a82ad8fea38444f164070e0b0360eb753095ef49ccd92",
+      "truth_in_frozen_artwork_index": true
+    },
+    {
+      "id": "holdout4_004",
+      "page_url": "https://www.ebay.com/b/Suicune-Holo-Pokemon-TCG-Individual-Collectible-Card-Game-Cards/183454/bn_7117021603",
+      "image_url": "https://i.ebayimg.com/images/g/QfYAAeSwfyppsNnw/s-l1200.webp",
+      "review_status": "visually_verified",
+      "expected_card_id": "en:swsh12.5gg-GG38",
+      "visible_label": "Suicune V GG38/GG70",
+      "language": "en",
+      "layout": "pokemon_full_art",
+      "conditions": [
+        "physical_background",
+        "foil_texture_or_reflection",
+        "stand"
+      ],
+      "sha256": "ccb7342f4460dde73253153b6e8fe859edd3ad968c59554a9b920ce005f4450d",
+      "truth_in_frozen_artwork_index": true
+    },
+    {
+      "id": "holdout4_005",
+      "page_url": "https://www.ebay.com/itm/357920487400",
+      "image_url": "https://i.ebayimg.com/images/g/FjMAAeSwAf5pHPvR/s-l1200.jpg",
+      "review_status": "visually_verified",
+      "expected_card_id": "en:swsh12.5gg-GG38",
+      "visible_label": "Suicune V GG38/GG70",
+      "language": "en",
+      "layout": "pokemon_full_art",
+      "conditions": [
+        "physical_background",
+        "foil_texture_or_reflection",
+        "perspective_or_handheld"
+      ],
+      "sha256": "aa56725a621b6b173258531f472cf69aefa5d6b4393b9752e08db138b51e24e0",
+      "truth_in_frozen_artwork_index": true
+    },
+    {
+      "id": "holdout4_006",
+      "page_url": "https://www.ebay.com/itm/146375366854",
+      "image_url": "https://i.ebayimg.com/images/g/ilEAAOSwQyBnpQau/s-l500.jpg",
+      "review_status": "visually_verified",
+      "expected_card_id": "en:swsh12.5gg-GG38",
+      "visible_label": "Suicune V GG38/GG70",
+      "language": "en",
+      "layout": "pokemon_full_art",
+      "conditions": [
+        "physical_background",
+        "foil_texture_or_reflection"
+      ],
+      "sha256": "20dbe83f8aefa8c3eb3b4ea16fff352f80fc768f9b3aaf45be808bffccc23a83",
+      "truth_in_frozen_artwork_index": true
+    },
+    {
+      "id": "holdout4_009",
+      "page_url": "https://www.ebay.com/itm/234868042242",
+      "image_url": "https://i.ebayimg.com/images/g/N4cAAOSw40ljy4Ha/s-l1200.jpg",
+      "review_status": "visually_verified",
+      "expected_card_id": "en:swsh12.5gg-GG42",
+      "visible_label": "Zeraora VMAX GG42/GG70",
+      "language": "en",
+      "layout": "pokemon_full_art",
+      "conditions": [
+        "physical_background",
+        "foil_texture_or_reflection",
+        "perspective_or_handheld"
+      ],
+      "sha256": "f96e3cc6eb8ab140db7c56828d682b1d990912e966cf30b4d7f3bf5ed4686dcf",
+      "truth_in_frozen_artwork_index": true
+    },
+    {
+      "id": "holdout4_010",
+      "page_url": "https://www.ebay.com/itm/188314499593",
+      "image_url": "https://i.ebayimg.com/images/g/N5sAAeSw6SNp7D66/s-l1200.jpg",
+      "review_status": "visually_verified",
+      "expected_card_id": "en:swsh12.5gg-GG42",
+      "visible_label": "Zeraora VMAX GG42/GG70",
+      "language": "en",
+      "layout": "pokemon_full_art",
+      "conditions": [
+        "physical_background",
+        "foil_texture_or_reflection",
+        "holder_or_sleeve",
+        "slab"
+      ],
+      "sha256": "1e45e18e0485b445145bbec91cebf09c81de4616df1d9d5a9b9beeb8e1d3b55a",
+      "truth_in_frozen_artwork_index": true
+    },
+    {
+      "id": "holdout4_011",
+      "page_url": "https://www.ebay.co.uk/itm/334842178952",
+      "image_url": "https://i.ebayimg.com/images/g/8tcAAOSwNxNkQrwN/s-l1200.jpg",
+      "review_status": "visually_verified",
+      "expected_card_id": "en:swsh12.5gg-GG42",
+      "visible_label": "Zeraora VMAX GG42/GG70",
+      "language": "en",
+      "layout": "pokemon_full_art",
+      "conditions": [
+        "physical_background",
+        "foil_texture_or_reflection",
+        "perspective_or_handheld"
+      ],
+      "sha256": "e9204d626f7c8e0e3604073ef0df0c2e6feabae83323e1d9e463f9a9de844cd1",
+      "truth_in_frozen_artwork_index": true
+    },
+    {
+      "id": "holdout4_013",
+      "page_url": "https://www.ebay.com/itm/116695713820",
+      "image_url": "https://i.ebayimg.com/images/g/qAEAAeSw~cloeYnc/s-l1200.jpg",
+      "review_status": "visually_verified",
+      "expected_card_id": "en:swsh12.5gg-GG54",
+      "visible_label": "Zamazenta V GG54/GG70",
+      "language": "en",
+      "layout": "pokemon_full_art",
+      "conditions": [
+        "physical_background",
+        "foil_texture_or_reflection",
+        "holder_or_sleeve",
+        "perspective_or_handheld"
+      ],
+      "sha256": "b03399f60ba36813e8cc26634c386a610b02edd24c19177f3f4afa91cfd8f37d",
+      "truth_in_frozen_artwork_index": true
+    },
+    {
+      "id": "holdout4_016",
+      "page_url": "https://www.ebay.com/itm/115711191525",
+      "image_url": "https://i.ebayimg.com/images/g/DcgAAOSwhLtj8pNI/s-l1200.jpg",
+      "review_status": "visually_verified",
+      "expected_card_id": "en:swsh12.5gg-GG47",
+      "visible_label": "Hatterene VMAX GG47/GG70",
+      "language": "en",
+      "layout": "pokemon_full_art",
+      "conditions": [
+        "physical_background",
+        "foil_texture_or_reflection",
+        "stand"
+      ],
+      "sha256": "e27903b6e4ff73d780c103c71d815d3074e19470eca222dbb0eed189c9738bb7",
+      "truth_in_frozen_artwork_index": true
+    },
+    {
+      "id": "holdout4_017",
+      "page_url": "https://www.ebay.com/itm/394583968440",
+      "image_url": "https://i.ebayimg.com/00/s/MTYwMFgxMjA1/z/R7YAAOSwREZj0wW~/%24_57.JPG?set_id=880000500F",
+      "review_status": "visually_verified",
+      "expected_card_id": "en:swsh12.5gg-GG47",
+      "visible_label": "Hatterene VMAX GG47/GG70",
+      "language": "en",
+      "layout": "pokemon_full_art",
+      "conditions": [
+        "physical_background",
+        "foil_texture_or_reflection",
+        "holder_or_sleeve"
+      ],
+      "sha256": "508a2665c0d1a058f2279db0490a7b9ab6acad2e2b0282b703d0628e1599907c",
+      "truth_in_frozen_artwork_index": true
+    },
+    {
+      "id": "holdout4_018",
+      "page_url": "https://www.ebay.com/itm/297653162320",
+      "image_url": "https://i.ebayimg.com/images/g/wsMAAeSw~YBo3V1y/s-l1200.jpg",
+      "review_status": "visually_verified",
+      "expected_card_id": "en:swsh12.5gg-GG47",
+      "visible_label": "Hatterene VMAX GG47/GG70",
+      "language": "en",
+      "layout": "pokemon_full_art",
+      "conditions": [
+        "physical_background",
+        "foil_texture_or_reflection",
+        "holder_or_sleeve",
+        "slab"
+      ],
+      "sha256": "2397d403a12544e68a751204d9ac64340d100da5a338d6c55716073eadcf089b",
+      "truth_in_frozen_artwork_index": true
+    },
+    {
+      "id": "holdout4_022",
+      "page_url": "https://www.ebay.com/itm/394844159840",
+      "image_url": "https://i.ebayimg.com/thumbs/images/g/GqIAAOSw4k1k7Wqp/s-l1200.jpg",
+      "review_status": "visually_verified",
+      "expected_card_id": "en:swsh12.5gg-GG64",
+      "visible_label": "Melony GG64/GG70",
+      "language": "en",
+      "layout": "trainer_full_art",
+      "conditions": [
+        "physical_background",
+        "foil_texture_or_reflection",
+        "holder_or_sleeve",
+        "slab"
+      ],
+      "sha256": "0518967a69b75f9421529a77f88b2e537eb963430cfc346dca0585756642b97b",
+      "truth_in_frozen_artwork_index": true
+    },
+    {
+      "id": "holdout4_023",
+      "page_url": "https://www.ebay.com/itm/364183662928",
+      "image_url": "https://i.ebayimg.com/images/g/XlYAAOSwc1pkEd4B/s-l1200.jpg",
+      "review_status": "visually_verified",
+      "expected_card_id": "en:swsh12.5gg-GG64",
+      "visible_label": "Melony GG64/GG70",
+      "language": "en",
+      "layout": "trainer_full_art",
+      "conditions": [
+        "physical_background",
+        "foil_texture_or_reflection",
+        "holder_or_sleeve",
+        "slab"
+      ],
+      "sha256": "ab6abd32414fd015fb09f14231488179b4383aab57f5f89bc649d9407dd29beb",
+      "truth_in_frozen_artwork_index": true
+    },
+    {
+      "id": "holdout4_024",
+      "page_url": "https://www.ebay.com/b/Melony-GG64-GG70-Crown-Zenith-Galarian-Gallery/2536/bn_7124584951",
+      "image_url": "https://i.ebayimg.com/images/g/l1EAAeSwJrNppbVe/s-l1200.webp",
+      "review_status": "visually_verified",
+      "expected_card_id": "en:swsh12.5gg-GG64",
+      "visible_label": "Melony GG64/GG70",
+      "language": "en",
+      "layout": "trainer_full_art",
+      "conditions": [
+        "physical_background",
+        "foil_texture_or_reflection"
+      ],
+      "sha256": "a09abc6d021a8ffa43f4f00fae062b42a1c61567111fd3be3855dadb2c056804",
+      "truth_in_frozen_artwork_index": true
+    },
+    {
+      "id": "holdout4_026",
+      "page_url": "https://www.ebay.com/itm/204551605133",
+      "image_url": "https://i.ebayimg.com/images/g/JbAAAOSwJLhlX3gW/s-l1200.jpg",
+      "review_status": "visually_verified",
+      "expected_card_id": "en:swsh12.5gg-GG66",
+      "visible_label": "Roxanne GG66/GG70",
+      "language": "en",
+      "layout": "trainer_full_art",
+      "conditions": [
+        "physical_background",
+        "foil_texture_or_reflection",
+        "holder_or_sleeve",
+        "slab"
+      ],
+      "sha256": "e6e52c9f9af3865e20d24df9f1d519ee1bb5f1ca78ee7406b96256e99ae993cb",
+      "truth_in_frozen_artwork_index": true
+    },
+    {
+      "id": "holdout4_027",
+      "page_url": "https://www.ebay.com/itm/135498640971",
+      "image_url": "https://i.ebayimg.com/images/g/-Y0AAOSwxK5nhtIv/s-l1200.jpg",
+      "review_status": "visually_verified",
+      "expected_card_id": "en:swsh12.5gg-GG66",
+      "visible_label": "Roxanne GG66/GG70",
+      "language": "en",
+      "layout": "trainer_full_art",
+      "conditions": [
+        "physical_background",
+        "foil_texture_or_reflection",
+        "stand"
+      ],
+      "sha256": "8a495c5c750a75da07d3e8c09dbcf2ce670f9b29289fa59ed3cd5b1795210f47",
+      "truth_in_frozen_artwork_index": true
+    },
+    {
+      "id": "holdout4_028",
+      "page_url": "https://www.ebay.com/itm/115714913529",
+      "image_url": "https://i.ebayimg.com/images/g/hdMAAOSwn~Zj-BtZ/s-l1200.jpg",
+      "review_status": "visually_verified",
+      "expected_card_id": "en:swsh12.5gg-GG66",
+      "visible_label": "Roxanne GG66/GG70",
+      "language": "en",
+      "layout": "trainer_full_art",
+      "conditions": [
+        "physical_background",
+        "foil_texture_or_reflection"
+      ],
+      "sha256": "df819e9b9d4075406cff4e39d7e6d5637613c724601924e02f7b64035d4c78ab",
+      "truth_in_frozen_artwork_index": true
+    },
+    {
+      "id": "holdout4_029",
+      "page_url": "https://www.ebay.com/itm/256621890812",
+      "image_url": "https://i.ebayimg.com/images/g/XhIAAOSwEE9m0hQG/s-l1200.jpg",
+      "review_status": "visually_verified",
+      "expected_card_id": "en:swsh12.5gg-GG66",
+      "visible_label": "Roxanne GG66/GG70",
+      "language": "en",
+      "layout": "trainer_full_art",
+      "conditions": [
+        "physical_background",
+        "foil_texture_or_reflection"
+      ],
+      "sha256": "103c2d3db803e2abcafd94b9c67c0be4d8a339720380b56a10190e42bf6569a8",
+      "truth_in_frozen_artwork_index": true
+    },
+    {
+      "id": "holdout4_031",
+      "page_url": "https://www.ebay.com/itm/286014859614",
+      "image_url": "https://i.ebayimg.com/images/g/xlYAAOSwbvVmv79F/s-l1200.png",
+      "review_status": "visually_verified",
+      "expected_card_id": "en:swsh12.5gg-GG66",
+      "visible_label": "Roxanne GG66/GG70",
+      "language": "en",
+      "layout": "trainer_full_art",
+      "conditions": [
+        "physical_background",
+        "foil_texture_or_reflection",
+        "holder_or_sleeve"
+      ],
+      "sha256": "f2bf32d9493c57c3612879ba6cb254286b9eadc5745c71c0421f225b9c2d5849",
+      "truth_in_frozen_artwork_index": true
+    },
+    {
+      "id": "holdout4_036",
+      "page_url": "https://www.ebay.com/itm/235464395977",
+      "image_url": "https://i.ebayimg.com/images/g/By0AAOSwzG1l6gZm/s-l1200.jpg",
+      "review_status": "visually_verified",
+      "expected_card_id": "en:swsh12.5gg-GG61",
+      "visible_label": "Gardenia's Vigor GG61/GG70",
+      "language": "en",
+      "layout": "trainer_full_art",
+      "conditions": [
+        "physical_background",
+        "foil_texture_or_reflection",
+        "holder_or_sleeve",
+        "slab"
+      ],
+      "sha256": "9f5979adfa8465cce09a3cb6a46f54836ef49d7c4615fef5c25c057e361d952e",
+      "truth_in_frozen_artwork_index": true
+    },
+    {
+      "id": "holdout4_039",
+      "page_url": "https://www.ebay.com/itm/235649054311",
+      "image_url": "https://i.ebayimg.com/images/g/uu0AAOSw6o9mEkog/s-l1600.jpg",
+      "review_status": "visually_verified",
+      "expected_card_id": "en:swsh12.5gg-GG23",
+      "visible_label": "Dunsparce GG23/GG70",
+      "language": "en",
+      "layout": "pokemon_full_art",
+      "conditions": [
+        "physical_background",
+        "foil_texture_or_reflection"
+      ],
+      "sha256": "ba0b6e1d7f0724ccedfcd8cb6e4a89955aa664feff9cbfa9dacc901557de13ae",
+      "truth_in_frozen_artwork_index": true
+    },
+    {
+      "id": "holdout4_041",
+      "page_url": "https://www.ebay.com/itm/115875708028",
+      "image_url": "https://i.ebayimg.com/images/g/Ac4AAOSwsIRkyFhM/s-l1200.jpg",
+      "review_status": "visually_verified",
+      "expected_card_id": "en:swsh12.5gg-GG23",
+      "visible_label": "Dunsparce GG23/GG70",
+      "language": "en",
+      "layout": "pokemon_full_art",
+      "conditions": [
+        "physical_background",
+        "foil_texture_or_reflection",
+        "stand"
+      ],
+      "sha256": "f8d222d4c2320e9bf7941e7d84c03bf0a47106053af5c9d70184820270ec8b7e",
+      "truth_in_frozen_artwork_index": true
+    },
+    {
+      "id": "holdout4_043",
+      "page_url": "https://www.ebay.com/itm/155774334055",
+      "image_url": "https://i.ebayimg.com/00/s/MTYwMFgxNjAw/z/qPYAAOSwbGBlBKNp/%24_57.PNG?set_id=880000500F",
+      "review_status": "visually_verified",
+      "expected_card_id": "en:swsh12.5gg-GG22",
+      "visible_label": "Ditto GG22/GG70",
+      "language": "en",
+      "layout": "pokemon_full_art",
+      "conditions": [
+        "physical_background",
+        "foil_texture_or_reflection",
+        "holder_or_sleeve",
+        "slab"
+      ],
+      "sha256": "320e2094d06dd58bccc764a50021e77536f16f4a68c91ab574b0a599925c610b",
+      "truth_in_frozen_artwork_index": true
+    },
+    {
+      "id": "holdout4_045",
+      "page_url": "https://www.ebay.com/itm/226448576997",
+      "image_url": "https://i.ebayimg.com/images/g/7NYAAOSwL7BnNcCn/s-l1600.jpg",
+      "review_status": "visually_verified",
+      "expected_card_id": "en:swsh12.5gg-GG22",
+      "visible_label": "Ditto GG22/GG70",
+      "language": "en",
+      "layout": "pokemon_full_art",
+      "conditions": [
+        "physical_background",
+        "foil_texture_or_reflection",
+        "holder_or_sleeve",
+        "slab"
+      ],
+      "sha256": "7e94cad9a3aabd91842e1046419ca1a26a646adaa7500500b57de64ea578774f",
+      "truth_in_frozen_artwork_index": true
+    },
+    {
+      "id": "holdout4_046",
+      "page_url": "https://www.ebay.com/itm/297535859373",
+      "image_url": "https://i.ebayimg.com/images/g/3~QAAeSwPyRomwnt/s-l1200.jpg",
+      "review_status": "visually_verified",
+      "expected_card_id": "en:swsh12.5gg-GG31",
+      "visible_label": "Turtwig GG31/GG70",
+      "language": "en",
+      "layout": "pokemon_full_art",
+      "conditions": [
+        "physical_background",
+        "foil_texture_or_reflection",
+        "perspective_or_handheld"
+      ],
+      "sha256": "a7913e394ddcfff4e9a83a0e1e19a20554a331068c204502f1a8c417c993fff1",
+      "truth_in_frozen_artwork_index": true
+    },
+    {
+      "id": "holdout4_047",
+      "page_url": "https://www.ebay.com/itm/295989641482",
+      "image_url": "https://i.ebayimg.com/00/s/MTYwMFgxMjYy/z/d9QAAOSw7zJlLL5g/%24_57.PNG?set_id=880000500F",
+      "review_status": "visually_verified",
+      "expected_card_id": "en:swsh12.5gg-GG31",
+      "visible_label": "Turtwig GG31/GG70",
+      "language": "en",
+      "layout": "pokemon_full_art",
+      "conditions": [
+        "physical_background",
+        "foil_texture_or_reflection"
+      ],
+      "sha256": "4bc7ecc211d61c90d49f22a93b0a3fd6e70891e3f7fd3a8a23d180ab29859243",
+      "truth_in_frozen_artwork_index": true
+    },
+    {
+      "id": "holdout4_049",
+      "page_url": "https://www.ebay.co.uk/itm/403846203504",
+      "image_url": "https://i.ebayimg.com/images/g/6jcAAOSw~jBjA8Fv/s-l1200.jpg",
+      "review_status": "visually_verified",
+      "expected_card_id": "en:base1-20",
+      "visible_label": "Electabuzz 20/102",
+      "language": "en",
+      "layout": "standard_frame",
+      "conditions": [
+        "physical_background"
+      ],
+      "sha256": "346c9d13dca7950f82144d2a25a907b12155bbcb1772fdf5f9bc78c0a5253c1b",
+      "truth_in_frozen_artwork_index": false
+    },
+    {
+      "id": "holdout4_050",
+      "page_url": "https://www.ebay.com.au/itm/127680769675",
+      "image_url": "https://i.ebayimg.com/images/g/Y~AAAeSwAB5pjeC5/s-l960.jpg",
+      "review_status": "visually_verified",
+      "expected_card_id": "en:base1-20",
+      "visible_label": "Electabuzz 20/102",
+      "language": "en",
+      "layout": "standard_frame",
+      "conditions": [
+        "physical_background",
+        "perspective_or_handheld"
+      ],
+      "sha256": "1e4a36ff28c65a68e760a63821d0616f65b23fd4cc1a9b5f4f59a3a6df113ee2",
+      "truth_in_frozen_artwork_index": false
+    },
+    {
+      "id": "holdout4_051",
+      "page_url": "https://www.ebay.com/itm/364065432677",
+      "image_url": "https://i.ebayimg.com/images/g/aXkAAOSwLUdjh9VX/s-l1200.jpg",
+      "review_status": "visually_verified",
+      "expected_card_id": "en:base1-20",
+      "visible_label": "Electabuzz 20/102",
+      "language": "en",
+      "layout": "standard_frame",
+      "conditions": [
+        "physical_background"
+      ],
+      "sha256": "d86d34f2cf668adcbd694beaea579e6ecf84cea91a32aa238caf17e9a68c8c97",
+      "truth_in_frozen_artwork_index": false
+    },
+    {
+      "id": "holdout4_058",
+      "page_url": "https://www.ebay.com/itm/176169588591",
+      "image_url": "https://i.ebayimg.com/images/g/U4UAAOSwdKNk0DJl/s-l500.jpg",
+      "review_status": "visually_verified",
+      "expected_card_id": "en:base1-65",
+      "visible_label": "Staryu 65/102",
+      "language": "en",
+      "layout": "standard_frame",
+      "conditions": [
+        "physical_background",
+        "holder_or_sleeve"
+      ],
+      "sha256": "fd7e8ce6cc48b5b236f92561e1969fbbe8db7f04f55f0785eab690cf0929e1da",
+      "truth_in_frozen_artwork_index": false
+    },
+    {
+      "id": "holdout4_060",
+      "page_url": "https://www.ebay.com/itm/176336704961",
+      "image_url": "https://i.ebayimg.com/00/s/MTYwMFgxMjAw/z/xIEAAOSwhOdmHrjj/%24_57.JPG?set_id=880000500F",
+      "review_status": "visually_verified",
+      "expected_card_id": "en:base1-65",
+      "visible_label": "Staryu 65/102",
+      "language": "en",
+      "layout": "standard_frame",
+      "conditions": [
+        "physical_background",
+        "stand"
+      ],
+      "sha256": "43b397a0a3451731553a42a5425292e837f1875cda6d55b53a32a710a7a1a399",
+      "truth_in_frozen_artwork_index": false
+    },
+    {
+      "id": "holdout4_063",
+      "page_url": "https://www.ebay.com/itm/233914367524",
+      "image_url": "https://i.ebayimg.com/images/g/zuMAAOSw1qtgPBXX/s-l1600.jpg",
+      "review_status": "visually_verified",
+      "expected_card_id": "en:base1-43",
+      "visible_label": "Abra 43/102",
+      "language": "en",
+      "layout": "standard_frame",
+      "conditions": [
+        "physical_background",
+        "perspective_or_handheld"
+      ],
+      "sha256": "cee788157eb7cc65b7ed8b9fd0af0453a4a0fd78214e16aeb6446686afbca3fb",
+      "truth_in_frozen_artwork_index": false
+    },
+    {
+      "id": "holdout4_064",
+      "page_url": "https://www.ebay.com/itm/265376811905",
+      "image_url": "https://i.ebayimg.com/images/g/ANMAAOSwm1Fhdvh2/s-l1200.jpg",
+      "review_status": "visually_verified",
+      "expected_card_id": "en:base1-43",
+      "visible_label": "Abra 43/102",
+      "language": "en",
+      "layout": "standard_frame",
+      "conditions": [
+        "physical_background",
+        "stand"
+      ],
+      "sha256": "5239f6b80bc1f0c1e49479b042bb798bcd1022c0ea331fa938beb9f102f4047d",
+      "truth_in_frozen_artwork_index": false
+    },
+    {
+      "id": "holdout4_067",
+      "page_url": "https://www.ebay.co.uk/itm/365909128525",
+      "image_url": "https://i.ebayimg.com/images/g/a~MAAeSw~ZRoAB4o/s-l400.jpg",
+      "review_status": "visually_verified",
+      "expected_card_id": "en:base1-43",
+      "visible_label": "Abra 43/102",
+      "language": "en",
+      "layout": "standard_frame",
+      "conditions": [
+        "physical_background",
+        "holder_or_sleeve",
+        "slab"
+      ],
+      "sha256": "4244453f53c5c7956f1cc5499d54e461246df463ebb1ea42b39e871ef7da933b",
+      "truth_in_frozen_artwork_index": false
+    },
+    {
+      "id": "holdout4_068",
+      "page_url": "https://www.ebay.co.uk/itm/235766711445",
+      "image_url": "https://i.ebayimg.com/images/g/yn0AAOSwp-ZlYy~A/s-l1200.jpg",
+      "review_status": "visually_verified",
+      "expected_card_id": "en:base2-58",
+      "visible_label": "Oddish 58/64",
+      "language": "en",
+      "layout": "standard_frame",
+      "conditions": [
+        "physical_background",
+        "holder_or_sleeve",
+        "perspective_or_handheld"
+      ],
+      "sha256": "759bce37118ca54e02283220b5f34a652c940f5a8b87cc4bc6018e5722f022ff",
+      "truth_in_frozen_artwork_index": false
+    },
+    {
+      "id": "holdout4_070",
+      "page_url": "https://www.ebay.com/itm/165723243760",
+      "image_url": "https://i.ebayimg.com/images/g/qF4AAOSwy7hjRuSi/s-l1600.jpg",
+      "review_status": "visually_verified",
+      "expected_card_id": "en:base2-58",
+      "visible_label": "Oddish 58/64",
+      "language": "en",
+      "layout": "standard_frame",
+      "conditions": [
+        "physical_background"
+      ],
+      "sha256": "62988369f18f0099044c128b26de79598983b2ffa818ed5b5ab348aa3735c697",
+      "truth_in_frozen_artwork_index": false
+    },
+    {
+      "id": "holdout4_072",
+      "page_url": "https://www.ebay.com/itm/395449009259",
+      "image_url": "https://i.ebayimg.com/images/g/DtkAAOSwTwJiZaor/s-l1200.jpg",
+      "review_status": "visually_verified",
+      "expected_card_id": "en:base2-58",
+      "visible_label": "Oddish 58/64",
+      "language": "en",
+      "layout": "standard_frame",
+      "conditions": [
+        "physical_background",
+        "holder_or_sleeve",
+        "perspective_or_handheld",
+        "busy_packaging_background"
+      ],
+      "sha256": "7da07ffc669e1a393dfb7274241f5b3040897c05359302e4deadef2adca87b60",
+      "truth_in_frozen_artwork_index": false
+    },
+    {
+      "id": "holdout4_078",
+      "page_url": "https://www.ebay.fr/itm/203262058975",
+      "image_url": "https://i.ebayimg.com/images/g/2tgAAOSwSHlgEq-D/s-l1200.jpg",
+      "review_status": "visually_verified",
+      "expected_card_id": "en:base1-68",
+      "visible_label": "Vulpix 68/102",
+      "language": "en",
+      "layout": "standard_frame",
+      "conditions": [
+        "physical_background"
+      ],
+      "sha256": "65050299c58cd9824f95e67b6dcc7fced26e12502488c2f2c95875c98739c18e",
+      "truth_in_frozen_artwork_index": false
+    },
+    {
+      "id": "holdout4_080",
+      "page_url": "https://www.ebay.com/itm/184199328841",
+      "image_url": "https://i.ebayimg.com/images/g/J2oAAOSwOWteWDSy/s-l960.jpg",
+      "review_status": "visually_verified",
+      "expected_card_id": "en:base1-68",
+      "visible_label": "Vulpix 68/102",
+      "language": "en",
+      "layout": "standard_frame",
+      "conditions": [
+        "physical_background",
+        "perspective_or_handheld"
+      ],
+      "sha256": "9b3e8747458242966eccf0f175550ebdf47bb2f8bd57d450d5cc0c2629b58262",
+      "truth_in_frozen_artwork_index": false
+    },
+    {
+      "id": "holdout4_084",
+      "page_url": "https://www.ebay.com.au/itm/364172638912",
+      "image_url": "https://i.ebayimg.com/images/g/bLIAAOSw5rlkBkKe/s-l1200.jpg",
+      "review_status": "visually_verified",
+      "expected_card_id": "en:base1-62",
+      "visible_label": "Sandshrew 62/102",
+      "language": "en",
+      "layout": "standard_frame",
+      "conditions": [
+        "physical_background",
+        "holder_or_sleeve"
+      ],
+      "sha256": "e3a6785b870cdb1d1ba0061f69f8f43ea7b35b67462023704e69d64b8748f533",
+      "truth_in_frozen_artwork_index": false
+    },
+    {
+      "id": "holdout4_085",
+      "page_url": "https://www.ebay.co.uk/itm/196608245355",
+      "image_url": "https://i.ebayimg.com/images/g/LuoAAOSwG1Nm2NQd/s-l1200.jpg",
+      "review_status": "visually_verified",
+      "expected_card_id": "en:base1-62",
+      "visible_label": "Sandshrew 62/102",
+      "language": "en",
+      "layout": "standard_frame",
+      "conditions": [
+        "physical_background",
+        "holder_or_sleeve",
+        "perspective_or_handheld"
+      ],
+      "sha256": "839ad47144bdbc99e16954705185599260bd2573108e09403b6ab87936bf4821",
+      "truth_in_frozen_artwork_index": false
+    },
+    {
+      "id": "holdout4_086",
+      "page_url": "https://www.ebay.com/b/Greninja-Ex-090-066-Sv5a-Crimson-Haze/2536/bn_7124866731",
+      "image_url": "https://i.ebayimg.com/images/g/Aa4AAeSwVE9pDbTe/s-l1200.webp",
+      "review_status": "visually_verified",
+      "expected_card_id": "ja:SV5a-090",
+      "visible_label": "ゲッコウガex 090/066",
+      "language": "ja",
+      "layout": "pokemon_full_art",
+      "conditions": [
+        "physical_background",
+        "foil_texture_or_reflection",
+        "perspective_or_handheld"
+      ],
+      "sha256": "9ebceca1519ee8101a38b2d6aff53366da1e34563b269f7f0b747a4e54514313",
+      "truth_in_frozen_artwork_index": false
+    },
+    {
+      "id": "holdout4_090",
+      "page_url": "https://www.ebay.com/itm/226059102120",
+      "image_url": "https://i.ebayimg.com/00/s/MTYwMFgxMTEw/z/9J0AAOSw0itmBCVW/%24_57.JPG?set_id=880000500F",
+      "review_status": "visually_verified",
+      "expected_card_id": "ja:SV5a-090",
+      "visible_label": "ゲッコウガex 090/066",
+      "language": "ja",
+      "layout": "pokemon_full_art",
+      "conditions": [
+        "physical_background",
+        "foil_texture_or_reflection",
+        "stand"
+      ],
+      "sha256": "d06111b913dc4d900b8dbb88850d9fafbb2e5b2476e3409374efd63d5a3b4e28",
+      "truth_in_frozen_artwork_index": false
+    },
+    {
+      "id": "holdout4_097",
+      "page_url": "https://www.ebay.com/itm/394963090456",
+      "image_url": "https://i.ebayimg.com/images/g/JM0AAOSwAnRlO-ZY/s-l1200.jpg",
+      "review_status": "visually_verified",
+      "expected_card_id": "ja:SV4M-088",
+      "visible_label": "テツノカイナex 088/066",
+      "language": "ja",
+      "layout": "pokemon_full_art",
+      "conditions": [
+        "physical_background",
+        "foil_texture_or_reflection"
+      ],
+      "sha256": "12b53c3061d7601a08489dbbc6637f5eef6d2b6f58cb1cc7c4295eb91fabe92c",
+      "truth_in_frozen_artwork_index": false
+    },
+    {
+      "id": "holdout4_099",
+      "page_url": "https://www.ebay.co.uk/itm/204791538373",
+      "image_url": "https://i.ebayimg.com/images/g/rccAAOSwtIpmS4Kf/s-l1200.jpg",
+      "review_status": "visually_verified",
+      "expected_card_id": "ja:SV5M-094",
+      "visible_label": "テツノカシラex 094/071",
+      "language": "ja",
+      "layout": "pokemon_full_art",
+      "conditions": [
+        "physical_background",
+        "foil_texture_or_reflection",
+        "stand"
+      ],
+      "sha256": "71f1468dca03e64e0dec62bed3b86bd2c3210b3ae3f7225ea3a4bc0fa8aede73",
+      "truth_in_frozen_artwork_index": true
+    },
+    {
+      "id": "holdout4_105",
+      "page_url": "https://www.ebay.com/itm/404774417904",
+      "image_url": "https://i.ebayimg.com/images/g/NpkAAOSw3V1lu3cA/s-l400.jpg",
+      "review_status": "visually_verified",
+      "expected_card_id": "ja:SV5M-094",
+      "visible_label": "テツノカシラex 094/071",
+      "language": "ja",
+      "layout": "pokemon_full_art",
+      "conditions": [
+        "physical_background",
+        "foil_texture_or_reflection",
+        "perspective_or_handheld"
+      ],
+      "sha256": "93337ac96fbbbd4ffe4f305b25ae933402da8ab7848a3c0bb06fb30e64e53001",
+      "truth_in_frozen_artwork_index": true
+    },
+    {
+      "id": "holdout4_111",
+      "page_url": "https://www.ebay.com/itm/166978813978",
+      "image_url": "https://i.ebayimg.com/images/g/jSYAAOSw0H1m61zh/s-l1200.jpg",
+      "review_status": "visually_verified",
+      "expected_card_id": "ja:SV5K-093",
+      "visible_label": "ウガツホムラex 093/071",
+      "language": "ja",
+      "layout": "pokemon_full_art",
+      "conditions": [
+        "physical_background",
+        "foil_texture_or_reflection",
+        "holder_or_sleeve"
+      ],
+      "sha256": "cb59256e12459d15b1bf0f282bd7f00798fcebe335610bbdeb5b3fe0ee1b516f",
+      "truth_in_frozen_artwork_index": true
+    },
+    {
+      "id": "holdout4_112",
+      "page_url": "https://www.ebay.com/itm/315561794063",
+      "image_url": "https://i.ebayimg.com/images/g/Fr4AAOSwOYxmwA2P/s-l1200.jpg",
+      "review_status": "visually_verified",
+      "expected_card_id": "ja:SV5K-093",
+      "visible_label": "ウガツホムラex 093/071",
+      "language": "ja",
+      "layout": "pokemon_full_art",
+      "conditions": [
+        "physical_background",
+        "foil_texture_or_reflection",
+        "perspective_or_handheld"
+      ],
+      "sha256": "35ed09c48bdef5f44f5fd13dff23aeebf8f417b08bbedc7d85fc60830b4609a1",
+      "truth_in_frozen_artwork_index": true
+    },
+    {
+      "id": "holdout4_113",
+      "page_url": "https://www.ebay.com/itm/267495727650",
+      "image_url": "https://i.ebayimg.com/images/g/iVUAAeSw4VRpK~jU/s-l1600.jpg",
+      "review_status": "visually_verified",
+      "expected_card_id": "ja:SV5K-093",
+      "visible_label": "ウガツホムラex 093/071",
+      "language": "ja",
+      "layout": "pokemon_full_art",
+      "conditions": [
+        "physical_background",
+        "foil_texture_or_reflection",
+        "holder_or_sleeve",
+        "slab",
+        "stand"
+      ],
+      "sha256": "9f6d15c4f589f7a65c8e905f17415b48ce96c747317216c6d1f04087ea74c736",
+      "truth_in_frozen_artwork_index": true
+    }
+  ]
+}

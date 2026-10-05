@@ -1,0 +1,1078 @@
+{
+  "purpose": "Frozen, visually reviewed physical-card photo benchmark; private diagnostic evaluation only",
+  "frozen_before_scoring": true,
+  "selection": "Targeted convenience sample, not random deployment distribution",
+  "review_method": "Front images inspected manually; visible card name, collector number, language and frame used. Search captions not used as truth.",
+  "ground_truth_scope": "Card printing identity only, not foil/material authenticity or grading. Slab labels can provide extra OCR evidence.",
+  "rights": "Third-party photos remain outside Git; no training, indexing or redistribution. Unknown model pretraining overlap.",
+  "limitations": [
+    "54 photos are 15 printing identities, not 54 distinct cards or independent photographers.",
+    "Exact-byte duplicate screening does not establish independence from all reference/pretraining data.",
+    "The frozen artwork index covers only 837 cards, not the complete catalogue."
+  ],
+  "photos": [
+    {
+      "id": "venus_0",
+      "page_url": "https://www.ebay.com/itm/116189984752",
+      "image_url": "https://i.ebayimg.com/00/s/MTYwMFgxMTY2/z/TLAAAOSw2dBmsvPl/%24_57.JPG?set_id=880000500F",
+      "search_group": "venus",
+      "review_status": "visually_verified",
+      "expected_card_id": "en:sv03.5-198",
+      "visible_label": "Venusaur ex — MEW 198/165",
+      "layout": "pokemon_full_art",
+      "language": "en",
+      "conditions": [
+        "tight_framing",
+        "foil_texture"
+      ]
+    },
+    {
+      "id": "venus_1",
+      "page_url": "https://www.ebay.com/itm/226992720965",
+      "image_url": "https://i.ebayimg.com/00/s/MTYwMFgxMTc1/z/BpwAAeSwr6Zo1a31/%24_57.JPG?set_id=880000500F",
+      "search_group": "venus",
+      "review_status": "visually_verified",
+      "expected_card_id": "en:sv03.5-198",
+      "visible_label": "Venusaur ex — MEW 198/165",
+      "layout": "pokemon_full_art",
+      "language": "en",
+      "conditions": [
+        "tight_framing",
+        "foil_texture"
+      ]
+    },
+    {
+      "id": "venus_8",
+      "page_url": "https://www.ebay.com/p/13062916148",
+      "image_url": "https://i.ebayimg.com/images/g/5t0AAeSwJNBptLEX/s-l1200.png",
+      "search_group": "venus",
+      "review_status": "visually_verified",
+      "expected_card_id": "en:sv03.5-198",
+      "visible_label": "Venusaur ex — MEW 198/165",
+      "layout": "pokemon_full_art",
+      "language": "en",
+      "conditions": [
+        "slab",
+        "glare",
+        "background"
+      ]
+    },
+    {
+      "id": "venus_9",
+      "page_url": "https://www.ebay.com/itm/226590389535",
+      "image_url": "https://i.ebayimg.com/images/g/gIUAAOSw75xnqCmZ/s-l1200.jpg",
+      "search_group": "venus",
+      "review_status": "visually_verified",
+      "expected_card_id": "en:sv03.5-198",
+      "visible_label": "Venusaur ex — MEW 198/165",
+      "layout": "pokemon_full_art",
+      "language": "en",
+      "conditions": [
+        "stand",
+        "background"
+      ]
+    },
+    {
+      "id": "venus_10",
+      "page_url": "https://www.ebay.com/itm/365942584751",
+      "image_url": "https://i.ebayimg.com/images/g/4dgAAeSwymlo~AAJ/s-l1200.jpg",
+      "search_group": "venus",
+      "review_status": "visually_verified",
+      "expected_card_id": "en:sv03.5-199",
+      "visible_label": "Charizard ex — MEW 199/165",
+      "layout": "pokemon_full_art",
+      "language": "en",
+      "conditions": [
+        "sleeve",
+        "stand",
+        "background"
+      ]
+    },
+    {
+      "id": "venus_11",
+      "page_url": "https://www.ebay.com/itm/336506275273",
+      "image_url": "https://i.ebayimg.com/images/g/P4MAAeSwpFBpyI7t/s-l1200.jpg",
+      "search_group": "venus",
+      "review_status": "visually_verified",
+      "expected_card_id": "en:sv03.5-199",
+      "visible_label": "Charizard ex — MEW 199/165",
+      "layout": "pokemon_full_art",
+      "language": "en",
+      "conditions": [
+        "stand",
+        "background"
+      ]
+    },
+    {
+      "id": "char_1",
+      "page_url": "https://www.ebay.com/itm/376317645290",
+      "image_url": "https://i.ebayimg.com/images/g/p4MAAeSwK7RoRKNt/s-l500.jpg",
+      "search_group": "char",
+      "review_status": "visually_verified",
+      "expected_card_id": "en:sv03.5-199",
+      "visible_label": "Charizard ex — MEW 199/165",
+      "layout": "pokemon_full_art",
+      "language": "en",
+      "conditions": [
+        "sleeve",
+        "background",
+        "low_resolution"
+      ]
+    },
+    {
+      "id": "char_3",
+      "page_url": "https://www.ebay.com/itm/177774899630",
+      "image_url": "https://i.ebayimg.com/images/g/3BcAAeSwlb1pZqJ4/s-l500.png",
+      "search_group": "char",
+      "review_status": "visually_verified",
+      "expected_card_id": "en:sv03.5-199",
+      "visible_label": "Charizard ex — MEW 199/165",
+      "layout": "pokemon_full_art",
+      "language": "en",
+      "conditions": [
+        "stand",
+        "background",
+        "low_resolution"
+      ]
+    },
+    {
+      "id": "char_4",
+      "page_url": "https://www.sportscardinvestor.com/cards/charizard-ex-pokemon/2023-scarlet-violet-151-special-illustration-rare-199-165",
+      "image_url": "https://i.ebayimg.com/images/g/tgMAAeSwc1ppW7vK/s-l1600.jpg",
+      "search_group": "char",
+      "review_status": "visually_verified",
+      "expected_card_id": "en:sv03.5-199",
+      "visible_label": "Charizard ex — MEW 199/165",
+      "layout": "pokemon_full_art",
+      "language": "en",
+      "conditions": [
+        "sleeve",
+        "perspective",
+        "background"
+      ]
+    },
+    {
+      "id": "blast_0",
+      "page_url": "https://www.sportscardinvestor.com/cards/blastoise-ex-pokemon/2023-scarlet-violet-151-special-illustration-rare-200-165",
+      "image_url": "https://i.ebayimg.com/images/g/M50AAeSwaFdpvIx3/s-l1600.jpg",
+      "search_group": "blast",
+      "review_status": "visually_verified",
+      "expected_card_id": "en:sv03.5-200",
+      "visible_label": "Blastoise ex — MEW 200/165",
+      "layout": "pokemon_full_art",
+      "language": "en",
+      "conditions": [
+        "stand",
+        "glare",
+        "background"
+      ]
+    },
+    {
+      "id": "blast_1",
+      "page_url": "https://www.ebay.com/itm/358356348998",
+      "image_url": "https://i.ebayimg.com/images/g/9v0AAeSwLC9pve3A/s-l1200.jpg",
+      "search_group": "blast",
+      "review_status": "visually_verified",
+      "expected_card_id": "en:sv03.5-200",
+      "visible_label": "Blastoise ex — MEW 200/165",
+      "layout": "pokemon_full_art",
+      "language": "en",
+      "conditions": [
+        "stand",
+        "background",
+        "external_text"
+      ]
+    },
+    {
+      "id": "blast_7",
+      "page_url": "https://www.ebay.co.uk/itm/127098398103",
+      "image_url": "https://i.ebayimg.com/00/s/MTYwMFgxMjAw/z/vmEAAOSwcYxoG7Ic/%24_57.JPG?set_id=880000500F",
+      "search_group": "blast",
+      "review_status": "visually_verified",
+      "expected_card_id": "en:sv03.5-200",
+      "visible_label": "Blastoise ex — MEW 200/165",
+      "layout": "pokemon_full_art",
+      "language": "en",
+      "conditions": [
+        "glare",
+        "perspective",
+        "background"
+      ]
+    },
+    {
+      "id": "blast_9",
+      "page_url": "https://www.ebay.com/itm/336346907241",
+      "image_url": "https://i.ebayimg.com/images/g/l-cAAeSwKxdpQbrf/s-l960.jpg",
+      "search_group": "blast",
+      "review_status": "visually_verified",
+      "expected_card_id": "en:sv03.5-200",
+      "visible_label": "Blastoise ex — MEW 200/165",
+      "layout": "pokemon_full_art",
+      "language": "en",
+      "conditions": [
+        "perspective",
+        "background"
+      ]
+    },
+    {
+      "id": "blast_11",
+      "page_url": "https://www.ebay.com/itm/116407749778",
+      "image_url": "https://i.ebayimg.com/images/g/IbkAAOSwtWRnS-bR/s-l400.jpg",
+      "search_group": "blast",
+      "review_status": "visually_verified",
+      "expected_card_id": "en:sv03.5-200",
+      "visible_label": "Blastoise ex — MEW 200/165",
+      "layout": "pokemon_full_art",
+      "language": "en",
+      "conditions": [
+        "stand",
+        "background",
+        "low_resolution"
+      ]
+    },
+    {
+      "id": "gengar_0",
+      "page_url": "https://www.ebay.com/p/16050591995",
+      "image_url": "https://i.ebayimg.com/images/g/XtEAAeSwzgdpQjvA/s-l1200.jpg",
+      "search_group": "gengar",
+      "review_status": "visually_verified",
+      "expected_card_id": "en:swsh8-271",
+      "visible_label": "Gengar VMAX — 271/264",
+      "layout": "pokemon_full_art",
+      "language": "en",
+      "conditions": [
+        "holder",
+        "tight_framing"
+      ]
+    },
+    {
+      "id": "gengar_1",
+      "page_url": "https://www.ebay.com/p/16050591995",
+      "image_url": "https://i.ebayimg.com/images/g/WIgAAeSwvIdpk6GA/s-l1200.jpg",
+      "search_group": "gengar",
+      "review_status": "visually_verified",
+      "expected_card_id": "en:swsh8-271",
+      "visible_label": "Gengar VMAX — 271/264",
+      "layout": "pokemon_full_art",
+      "language": "en",
+      "conditions": [
+        "slab",
+        "background"
+      ]
+    },
+    {
+      "id": "gengar_2",
+      "page_url": "https://www.ebay.com/b/Gengar-VMAX-Pokemon-TCG-Cards/2536/bn_7124871591",
+      "image_url": "https://i.ebayimg.com/images/g/HysAAeSwDFNpvHg~/s-l1200.webp",
+      "search_group": "gengar",
+      "review_status": "visually_verified",
+      "expected_card_id": "en:swsh8-271",
+      "visible_label": "Gengar VMAX — 271/264",
+      "layout": "pokemon_full_art",
+      "language": "en",
+      "conditions": [
+        "glare",
+        "background"
+      ]
+    },
+    {
+      "id": "gengar_3",
+      "page_url": "https://www.ebay.com/itm/127764198868",
+      "image_url": "https://i.ebayimg.com/images/g/pVoAAeSwLW1pwHKQ/s-l400.jpg",
+      "search_group": "gengar",
+      "review_status": "visually_verified",
+      "expected_card_id": "en:swsh8-271",
+      "visible_label": "Gengar VMAX — 271/264",
+      "layout": "pokemon_full_art",
+      "language": "en",
+      "conditions": [
+        "slab",
+        "low_resolution",
+        "background"
+      ]
+    },
+    {
+      "id": "gengar_4",
+      "page_url": "https://www.ebay.com/itm/187916296562",
+      "image_url": "https://i.ebayimg.com/images/g/2ngAAeSwDUFpWzno/s-l960.jpg",
+      "search_group": "gengar",
+      "review_status": "visually_verified",
+      "expected_card_id": "en:swsh8-271",
+      "visible_label": "Gengar VMAX — 271/264",
+      "layout": "pokemon_full_art",
+      "language": "en",
+      "conditions": [
+        "slab",
+        "glare"
+      ]
+    },
+    {
+      "id": "gengar_7",
+      "page_url": "https://www.ebay.com/b/Gengar-VMAX-271-264-Swsh08-Fusion-Strike/2536/bn_7124868570",
+      "image_url": "https://i.ebayimg.com/images/g/aeMAAeSwQBFpwGji/s-l1200.webp",
+      "search_group": "gengar",
+      "review_status": "visually_verified",
+      "expected_card_id": "en:swsh8-271",
+      "visible_label": "Gengar VMAX — 271/264",
+      "layout": "pokemon_full_art",
+      "language": "en",
+      "conditions": [
+        "sleeve",
+        "glare",
+        "background"
+      ]
+    },
+    {
+      "id": "gengar_9",
+      "page_url": "https://bo.ebay.com/b/Gengar-VMAX-Pokemon-TCG-Cards/2536/bn_7124871591",
+      "image_url": "https://i.ebayimg.com/images/g/No4AAeSwVAppvAtR/s-l1200.webp",
+      "search_group": "gengar",
+      "review_status": "visually_verified",
+      "expected_card_id": "en:swsh8-271",
+      "visible_label": "Gengar VMAX — 271/264",
+      "layout": "pokemon_full_art",
+      "language": "en",
+      "conditions": [
+        "slab",
+        "external_graphics"
+      ]
+    },
+    {
+      "id": "umbreon_0",
+      "page_url": "https://www.ebay.com.au/itm/394951512373",
+      "image_url": "https://i.ebayimg.com/images/g/V30AAOSwjaFlNPpx/s-l1200.jpg",
+      "search_group": "umbreon",
+      "review_status": "visually_verified",
+      "expected_card_id": "en:swsh7-215",
+      "visible_label": "Umbreon VMAX — 215/203",
+      "layout": "pokemon_full_art",
+      "language": "en",
+      "conditions": [
+        "holder",
+        "background"
+      ]
+    },
+    {
+      "id": "umbreon_2",
+      "page_url": "https://www.ebay.com/itm/357303536813",
+      "image_url": "https://i.ebayimg.com/images/g/f3YAAeSwzz9oeXdP/s-l500.jpg",
+      "search_group": "umbreon",
+      "review_status": "visually_verified",
+      "expected_card_id": "en:swsh7-215",
+      "visible_label": "Umbreon VMAX — 215/203",
+      "layout": "pokemon_full_art",
+      "language": "en",
+      "conditions": [
+        "slab",
+        "glare",
+        "low_resolution"
+      ]
+    },
+    {
+      "id": "umbreon_3",
+      "page_url": "https://www.ebay.com/itm/206168080415",
+      "image_url": "https://i.ebayimg.com/images/g/RNMAAeSwG4ppxMIh/s-l1200.jpg",
+      "search_group": "umbreon",
+      "review_status": "visually_verified",
+      "expected_card_id": "en:swsh7-215",
+      "visible_label": "Umbreon VMAX — 215/203",
+      "layout": "pokemon_full_art",
+      "language": "en",
+      "conditions": [
+        "holder",
+        "hand",
+        "glare"
+      ]
+    },
+    {
+      "id": "umbreon_4",
+      "page_url": "https://www.ebay.com/b/Umbreon-VMAX-215-203-SWSH07-Evolving-Skies/2536/bn_7124870546",
+      "image_url": "https://i.ebayimg.com/images/g/2zcAAeSwSn9putvy/s-l1200.webp",
+      "search_group": "umbreon",
+      "review_status": "visually_verified",
+      "expected_card_id": "en:swsh7-215",
+      "visible_label": "Umbreon VMAX — 215/203",
+      "layout": "pokemon_full_art",
+      "language": "en",
+      "conditions": [
+        "slab",
+        "background"
+      ]
+    },
+    {
+      "id": "umbreon_8",
+      "page_url": "https://www.ebay.com/b/Umbreon-VMAX-215-203-SWSH07-Evolving-Skies/2536/bn_7124870546",
+      "image_url": "https://i.ebayimg.com/images/g/G5wAAOSwpAVnfF-w/s-l1200.webp",
+      "search_group": "umbreon",
+      "review_status": "visually_verified",
+      "expected_card_id": "en:swsh7-215",
+      "visible_label": "Umbreon VMAX — 215/203",
+      "layout": "pokemon_full_art",
+      "language": "en",
+      "conditions": [
+        "stand",
+        "background"
+      ]
+    },
+    {
+      "id": "lugia_2",
+      "page_url": "https://www.ebay.com/b/Lugia-V-186-195-Swsh12-Sword-Shield-Silver-Tempest/2536/bn_7124866982",
+      "image_url": "https://i.ebayimg.com/images/g/2M8AAeSwXMVpoAfW/s-l1200.webp",
+      "search_group": "lugia",
+      "review_status": "visually_verified",
+      "expected_card_id": "en:swsh12-186",
+      "visible_label": "Lugia V — 186/195",
+      "layout": "pokemon_full_art",
+      "language": "en",
+      "conditions": [
+        "holder",
+        "background"
+      ]
+    },
+    {
+      "id": "lugia_5",
+      "page_url": "https://www.ebay.co.uk/itm/156847314596",
+      "image_url": "https://i.ebayimg.com/images/g/MUkAAeSwulJn7W-Y/s-l500.jpg",
+      "search_group": "lugia",
+      "review_status": "visually_verified",
+      "expected_card_id": "en:swsh12-186",
+      "visible_label": "Lugia V — 186/195",
+      "layout": "pokemon_full_art",
+      "language": "en",
+      "conditions": [
+        "hand",
+        "external_text",
+        "low_resolution"
+      ]
+    },
+    {
+      "id": "lugia_7",
+      "page_url": "https://www.sportscardinvestor.com/cards/lugia-v-pokemon/2022-sword-shield-silver-tempest-holo-alternate-full-art-186-195",
+      "image_url": "https://i.ebayimg.com/images/g/lu8AAeSwscxpsXsU/s-l1600.jpg",
+      "search_group": "lugia",
+      "review_status": "visually_verified",
+      "expected_card_id": "en:swsh12-186",
+      "visible_label": "Lugia V — 186/195",
+      "layout": "pokemon_full_art",
+      "language": "en",
+      "conditions": [
+        "slab",
+        "background"
+      ]
+    },
+    {
+      "id": "lugia_8",
+      "page_url": "https://www.ebay.com/b/Ultra-Rare-Pokemon-Lugia-Individual-Cards/183454/bn_77024718",
+      "image_url": "https://i.ebayimg.com/images/g/uuQAAeSwE51pu6sA/s-l1200.webp",
+      "search_group": "lugia",
+      "review_status": "visually_verified",
+      "expected_card_id": "en:swsh12-186",
+      "visible_label": "Lugia V — 186/195",
+      "layout": "pokemon_full_art",
+      "language": "en",
+      "conditions": [
+        "glare",
+        "background"
+      ]
+    },
+    {
+      "id": "lugia_10",
+      "page_url": "https://pt.ebay.com/b/Ultra-Rare-Pokemon-Lugia-Individual-Cards/183454/bn_77024718",
+      "image_url": "https://i.ebayimg.com/images/g/HzgAAeSwbCppzt2T/s-l1200.webp",
+      "search_group": "lugia",
+      "review_status": "visually_verified",
+      "expected_card_id": "en:swsh12-186",
+      "visible_label": "Lugia V — 186/195",
+      "layout": "pokemon_full_art",
+      "language": "en",
+      "conditions": [
+        "perspective",
+        "background"
+      ]
+    },
+    {
+      "id": "trainer_2",
+      "page_url": "https://www.ebay.com/itm/296315243605",
+      "image_url": "https://i.ebayimg.com/images/g/LRgAAOSw5qVl~zXL/s-l1600.jpg",
+      "search_group": "trainer",
+      "review_status": "visually_verified",
+      "expected_card_id": "en:sv02-269",
+      "visible_label": "Iono — PAL 269/193",
+      "layout": "trainer_full_art",
+      "language": "en",
+      "conditions": [
+        "slab"
+      ]
+    },
+    {
+      "id": "trainer_5",
+      "page_url": "https://www.ebay.com/itm/126964425512",
+      "image_url": "https://i.ebayimg.com/images/g/VIkAAeSwTCRnv8xf/s-l1200.jpg",
+      "search_group": "trainer",
+      "review_status": "visually_verified",
+      "expected_card_id": "en:sv02-269",
+      "visible_label": "Iono — PAL 269/193",
+      "layout": "trainer_full_art",
+      "language": "en",
+      "conditions": [
+        "sleeve",
+        "background"
+      ]
+    },
+    {
+      "id": "trainer_7",
+      "page_url": "https://www.ebay.com/itm/366018145426",
+      "image_url": "https://i.ebayimg.com/images/g/BZ4AAeSwKJppJXF0/s-l1600.jpg",
+      "search_group": "trainer",
+      "review_status": "visually_verified",
+      "expected_card_id": "en:sv02-269",
+      "visible_label": "Iono — PAL 269/193",
+      "layout": "trainer_full_art",
+      "language": "en",
+      "conditions": [
+        "stand",
+        "background"
+      ]
+    },
+    {
+      "id": "trainer2_0",
+      "page_url": "https://www.ebay.com/itm/275589732947",
+      "image_url": "https://i.ebayimg.com/images/g/Kn8AAOSwlPpjpDDO/s-l1200.jpg",
+      "search_group": "trainer2",
+      "review_status": "visually_verified",
+      "expected_card_id": "en:swsh1-201",
+      "visible_label": "Professor's Research (Professor Magnolia) — 201/202",
+      "layout": "trainer_full_art",
+      "language": "en",
+      "conditions": [
+        "slab",
+        "background"
+      ]
+    },
+    {
+      "id": "trainer2_3",
+      "page_url": "https://www.ebay.com/itm/394446662244",
+      "image_url": "https://i.ebayimg.com/images/g/UzMAAOSwy9hj3qja/s-l1200.jpg",
+      "search_group": "trainer2",
+      "review_status": "visually_verified",
+      "expected_card_id": "en:swsh1-201",
+      "visible_label": "Professor's Research (Professor Magnolia) — 201/202",
+      "layout": "trainer_full_art",
+      "language": "en",
+      "conditions": [
+        "sleeve",
+        "perspective",
+        "background"
+      ]
+    },
+    {
+      "id": "trainer2_7",
+      "page_url": "https://www.ebay.ca/itm/355084270218",
+      "image_url": "https://i.ebayimg.com/images/g/D8sAAOSwEaxgOoK6/s-l1200.jpg",
+      "search_group": "trainer2",
+      "review_status": "visually_verified",
+      "expected_card_id": "en:swsh1-201",
+      "visible_label": "Professor's Research (Professor Magnolia) — 201/202",
+      "layout": "trainer_full_art",
+      "language": "en",
+      "conditions": [
+        "tight_framing",
+        "glare"
+      ]
+    },
+    {
+      "id": "trainer2_4",
+      "page_url": "https://www.ebay.com/itm/154521023297",
+      "image_url": "https://i.ebayimg.com/images/g/zkQAAOSwzc5g5K7q/s-l1200.jpg",
+      "search_group": "trainer2",
+      "review_status": "visually_verified",
+      "expected_card_id": "en:swsh1-209",
+      "visible_label": "Professor's Research (Professor Magnolia) — 209/202",
+      "layout": "trainer_full_art",
+      "language": "en",
+      "conditions": [
+        "hand",
+        "foil_texture"
+      ]
+    },
+    {
+      "id": "jp151_5",
+      "page_url": "https://www.ebay.com/itm/166211039818",
+      "image_url": "https://i.ebayimg.com/images/g/V8sAAOSwqHJki6Fv/s-l1600.jpg",
+      "search_group": "jp151",
+      "review_status": "visually_verified",
+      "expected_card_id": "ja:SV2a-173",
+      "visible_label": "ピカチュウ — SV2a 173/165 AR",
+      "layout": "pokemon_full_art",
+      "language": "ja",
+      "conditions": [
+        "tight_framing",
+        "glare"
+      ]
+    },
+    {
+      "id": "jp151_7",
+      "page_url": "https://www.ebay.com/itm/364701726399",
+      "image_url": "https://i.ebayimg.com/images/g/QVMAAOSwP8llsj9m/s-l1600.jpg",
+      "search_group": "jp151",
+      "review_status": "visually_verified",
+      "expected_card_id": "ja:SV2a-173",
+      "visible_label": "ピカチュウ — SV2a 173/165 AR",
+      "layout": "pokemon_full_art",
+      "language": "ja",
+      "conditions": [
+        "tight_framing",
+        "glare",
+        "haze"
+      ]
+    },
+    {
+      "id": "jp151_9",
+      "page_url": "https://www.ebay.com/itm/355879233485",
+      "image_url": "https://i.ebayimg.com/images/g/YpcAAOSwi6FmmHlQ/s-l1200.jpg",
+      "search_group": "jp151",
+      "review_status": "visually_verified",
+      "expected_card_id": "ja:SV2a-173",
+      "visible_label": "ピカチュウ — SV2a 173/165 AR",
+      "layout": "pokemon_full_art",
+      "language": "ja",
+      "conditions": [
+        "background"
+      ]
+    },
+    {
+      "id": "jpgraded_3",
+      "page_url": "https://www.ebay.com/itm/356482450465",
+      "image_url": "https://i.ebayimg.com/images/g/hAoAAOSwK8BnjDPQ/s-l1200.png",
+      "search_group": "jpgraded",
+      "review_status": "visually_verified",
+      "expected_card_id": "ja:SV2a-173",
+      "visible_label": "ピカチュウ — SV2a 173/165 AR",
+      "layout": "pokemon_full_art",
+      "language": "ja",
+      "conditions": [
+        "slab",
+        "external_text",
+        "background"
+      ]
+    },
+    {
+      "id": "jpgraded_7",
+      "page_url": "https://www.ebay.it/p/15073646281",
+      "image_url": "https://i.ebayimg.com/images/g/sIsAAeSwARhpdQPC/s-l1200.jpg",
+      "search_group": "jpgraded",
+      "review_status": "visually_verified",
+      "expected_card_id": "ja:SV2a-173",
+      "visible_label": "ピカチュウ — SV2a 173/165 AR",
+      "layout": "pokemon_full_art",
+      "language": "ja",
+      "conditions": [
+        "slab",
+        "glare",
+        "perspective"
+      ]
+    },
+    {
+      "id": "jpgraded_9",
+      "page_url": "https://www.ebay.com/itm/364697474610",
+      "image_url": "https://i.ebayimg.com/images/g/vMgAAOSwN~plsdY8/s-l1200.jpg",
+      "search_group": "jpgraded",
+      "review_status": "visually_verified",
+      "expected_card_id": "ja:SV2a-173",
+      "visible_label": "ピカチュウ — SV2a 173/165 AR",
+      "layout": "pokemon_full_art",
+      "language": "ja",
+      "conditions": [
+        "slab",
+        "stand",
+        "background"
+      ]
+    },
+    {
+      "id": "jpmew_1",
+      "page_url": "https://www.ebay.com/itm/405330296302",
+      "image_url": "https://i.ebayimg.com/images/g/TqcAAOSwbsBnKtCq/s-l1200.jpg",
+      "search_group": "jpmew",
+      "review_status": "visually_verified",
+      "expected_card_id": "ja:SV4a-347",
+      "visible_label": "ミュウex — SV4a 347/190 SAR",
+      "layout": "pokemon_full_art",
+      "language": "ja",
+      "conditions": [
+        "tight_framing",
+        "foil_texture"
+      ],
+      "catalogue_warning": "Catalogue set_name says Raging Surf; printed SV4a belongs to Shiny Treasure ex. Label uses visible SV4a/347, not the incorrect display name."
+    },
+    {
+      "id": "ereader_2",
+      "page_url": "https://www.ebay.com/itm/165001629699",
+      "image_url": "https://i.ebayimg.com/images/g/91IAAOSwST9hCyrv/s-l1200.jpg",
+      "search_group": "ereader",
+      "review_status": "visually_verified",
+      "expected_card_id": "en:ecard1-124",
+      "visible_label": "Pikachu — Expedition 124/165",
+      "layout": "e_reader",
+      "language": "en",
+      "conditions": [
+        "slab",
+        "background"
+      ]
+    },
+    {
+      "id": "ereader_3",
+      "page_url": "https://www.ebay.com/itm/235310399753",
+      "image_url": "https://i.ebayimg.com/images/g/qLQAAOSwia9lXj0J/s-l1200.jpg",
+      "search_group": "ereader",
+      "review_status": "visually_verified",
+      "expected_card_id": "en:ecard1-124",
+      "visible_label": "Pikachu — Expedition 124/165",
+      "layout": "e_reader",
+      "language": "en",
+      "conditions": [
+        "slab",
+        "background"
+      ]
+    },
+    {
+      "id": "ereader_5",
+      "page_url": "https://www.ebay.com/itm/167867496752",
+      "image_url": "https://i.ebayimg.com/images/g/SsYAAeSwuHZo8s~L/s-l1200.jpg",
+      "search_group": "ereader",
+      "review_status": "visually_verified",
+      "expected_card_id": "en:ecard1-124",
+      "visible_label": "Pikachu — Expedition 124/165",
+      "layout": "e_reader",
+      "language": "en",
+      "conditions": [
+        "slab",
+        "stand",
+        "background"
+      ]
+    },
+    {
+      "id": "ereader_6",
+      "page_url": "https://www.ebay.com.sg/b/Pikachu-Pokemon-TCG-Expedition-Base-Set-Individual-Collectible-Card-Game-Cards/183454/bn_95118497",
+      "image_url": "https://i.ebayimg.com/images/g/fjMAAOSwfMVlrlOM/s-l1200.webp",
+      "search_group": "ereader",
+      "review_status": "visually_verified",
+      "expected_card_id": "en:ecard1-124",
+      "visible_label": "Pikachu — Expedition 124/165",
+      "layout": "e_reader",
+      "language": "en",
+      "conditions": [
+        "slab",
+        "tight_framing"
+      ]
+    },
+    {
+      "id": "ereader_7",
+      "page_url": "https://www.ebay.com/itm/235310374487",
+      "image_url": "https://i.ebayimg.com/images/g/zuIAAOSw9MtlXkHN/s-l500.jpg",
+      "search_group": "ereader",
+      "review_status": "visually_verified",
+      "expected_card_id": "en:ecard1-124",
+      "visible_label": "Pikachu — Expedition 124/165",
+      "layout": "e_reader",
+      "language": "en",
+      "conditions": [
+        "slab",
+        "background"
+      ]
+    },
+    {
+      "id": "ereader_8",
+      "page_url": "https://www.ebay.com/itm/154779858875",
+      "image_url": "https://i.ebayimg.com/images/g/fxgAAOSwkgVh09bI/s-l1200.jpg",
+      "search_group": "ereader",
+      "review_status": "visually_verified",
+      "expected_card_id": "en:ecard1-124",
+      "visible_label": "Pikachu — Expedition 124/165",
+      "layout": "e_reader",
+      "language": "en",
+      "conditions": [
+        "slab",
+        "stand",
+        "background"
+      ]
+    },
+    {
+      "id": "energy_0",
+      "page_url": "https://www.ebay.com/itm/284190992409",
+      "image_url": "https://i.ebayimg.com/images/g/n6wAAOSwfhlgMGvO/s-l1200.jpg",
+      "search_group": "energy",
+      "review_status": "visually_verified",
+      "expected_card_id": "en:ex16-105",
+      "visible_label": "Water Energy — EX Power Keepers 105/108",
+      "layout": "energy",
+      "language": "en",
+      "conditions": [
+        "slab"
+      ]
+    },
+    {
+      "id": "energy_3",
+      "page_url": "https://www.ebay.com/itm/205387305895",
+      "image_url": "https://i.ebayimg.com/images/g/6lcAAeSwzrpn6WOi/s-l1200.jpg",
+      "search_group": "energy",
+      "review_status": "visually_verified",
+      "expected_card_id": "en:sv02-279",
+      "visible_label": "Basic Water Energy — PAL 279/193",
+      "layout": "energy",
+      "language": "en",
+      "conditions": [
+        "background"
+      ]
+    },
+    {
+      "id": "energy_9",
+      "page_url": "https://www.ebay.com.au/itm/376108863351",
+      "image_url": "https://i.ebayimg.com/images/g/xrwAAeSwbBVn57Do/s-l400.jpg",
+      "search_group": "energy",
+      "review_status": "visually_verified",
+      "expected_card_id": "en:sv03.5-207",
+      "visible_label": "Basic Psychic Energy — MEW 207/165",
+      "layout": "energy",
+      "language": "en",
+      "conditions": [
+        "holder",
+        "external_graphics",
+        "low_resolution"
+      ]
+    }
+  ],
+  "exclusions": [
+    {
+      "id": "blast_3",
+      "page_url": "https://www.ebay.com/itm/137131710304",
+      "image_url": "https://i.ebayimg.com/images/g/zOIAAeSwtj1ptZVF/s-l1200.jpg",
+      "search_group": "blast",
+      "review_status": "excluded",
+      "reason": "Reference-like product image; physical capture not independently established"
+    },
+    {
+      "id": "blast_5",
+      "page_url": "https://www.sportscardinvestor.com/cards/blastoise-ex-pokemon/2023-scarlet-violet-151-special-illustration-rare-200-165",
+      "image_url": "https://i.ebayimg.com/images/g/D8AAAOSwYkNnmfPm/s-l1600.jpg",
+      "search_group": "blast",
+      "review_status": "excluded",
+      "reason": "Reference-like product image; physical capture not independently established"
+    },
+    {
+      "id": "blast_10",
+      "page_url": "https://www.ebay.com/b/Blastoise-ex-200-165-Sv-Scarlet-Violet-151/2536/bn_7124585433",
+      "image_url": "https://i.ebayimg.com/images/g/l8MAAeSwAStpU4L7/s-l1200.webp",
+      "search_group": "blast",
+      "review_status": "excluded",
+      "reason": "Reference-like product image; physical capture not independently established"
+    },
+    {
+      "id": "mew_0",
+      "page_url": "https://www.ebay.com.au/itm/156031194720",
+      "image_url": "https://i.ebayimg.com/images/g/Fp8AAOSwggpltkmL/s-l500.jpg",
+      "search_group": "mew",
+      "review_status": "excluded",
+      "reason": "Gold Mew 205/165: paper versus metal material not independently proven; exact-printing ground truth withheld"
+    },
+    {
+      "id": "mew_1",
+      "page_url": "https://www.ebay.com/p/18062924411",
+      "image_url": "https://i.ebayimg.com/images/g/FfgAAeSw2yZo04cZ/s-l1200.jpg",
+      "search_group": "mew",
+      "review_status": "excluded",
+      "reason": "Gold Mew 205/165: paper versus metal material not independently proven; exact-printing ground truth withheld"
+    },
+    {
+      "id": "mew_2",
+      "page_url": "https://www.ebay.com/itm/267113596153",
+      "image_url": "https://i.ebayimg.com/images/g/XnwAAOSwssRndtxA/s-l500.jpg",
+      "search_group": "mew",
+      "review_status": "excluded",
+      "reason": "Gold Mew 205/165: paper versus metal material not independently proven; exact-printing ground truth withheld"
+    },
+    {
+      "id": "mew_6",
+      "page_url": "https://www.ebay.com/itm/157819560857",
+      "image_url": "https://i.ebayimg.com/images/g/fr8AAeSw171p1peZ/s-l500.jpg",
+      "search_group": "mew",
+      "review_status": "excluded",
+      "reason": "Gold Mew 205/165: paper versus metal material not independently proven; exact-printing ground truth withheld"
+    },
+    {
+      "id": "mew_8",
+      "page_url": "https://www.ebay.com/itm/177369766046",
+      "image_url": "https://i.ebayimg.com/images/g/7l8AAeSwMJFor1CE/s-l960.jpg",
+      "search_group": "mew",
+      "review_status": "excluded",
+      "reason": "Gold Mew 205/165: paper versus metal material not independently proven; exact-printing ground truth withheld"
+    },
+    {
+      "id": "mew_9",
+      "page_url": "https://www.sportscardinvestor.com/cards/mew-ex-pokemon/2023-scarlet-violet-151-hyper-rare-secret-205-165",
+      "image_url": "https://i.ebayimg.com/images/g/QJIAAeSwsSFpw-VY/s-l1600.jpg",
+      "search_group": "mew",
+      "review_status": "excluded",
+      "reason": "Gold Mew 205/165: paper versus metal material not independently proven; exact-printing ground truth withheld"
+    },
+    {
+      "id": "mew_10",
+      "page_url": "https://www.ebay.com/itm/166492672117",
+      "image_url": "https://i.ebayimg.com/images/g/InkAAOSwOkNldnzC/s-l1200.jpg",
+      "search_group": "mew",
+      "review_status": "excluded",
+      "reason": "Gold Mew 205/165: paper versus metal material not independently proven; exact-printing ground truth withheld"
+    },
+    {
+      "id": "gengar_6",
+      "page_url": "https://www.etsy.com/listing/1859391224/gengar-vmax-271264-fusion-strike",
+      "image_url": "https://i.etsystatic.com/55954419/r/il/26ec4c/6641036406/il_794xN.6641036406_gth3.jpg",
+      "search_group": "gengar",
+      "review_status": "excluded",
+      "reason": "Reference-like product image; physical capture not independently established"
+    },
+    {
+      "id": "gengar_8",
+      "page_url": "https://www.ebay.com/p/16050591995",
+      "image_url": "https://i.ebayimg.com/thumbs/images/g/nTYAAeSw1eRpJBQS/s-l1200.webp",
+      "search_group": "gengar",
+      "review_status": "excluded",
+      "reason": "Reference-like product image; physical capture not independently established"
+    },
+    {
+      "id": "lugia_6",
+      "page_url": "https://www.etsy.com/listing/1400002569/custom-jumbo-lugia-v-alt-art-sparkle",
+      "image_url": "https://i.etsystatic.com/38367145/r/il/b4d4f3/4622586137/il_fullxfull.4622586137_fwje.jpg",
+      "search_group": "lugia",
+      "review_status": "excluded",
+      "reason": "Custom jumbo/fan product, not a valid catalogue positive"
+    },
+    {
+      "id": "trainer2_6",
+      "page_url": "https://www.sportscardinvestor.com/cards/professor-s-research-pokemon/2020-sword-shield-holo-full-art-201-202",
+      "image_url": "https://i.ebayimg.com/images/g/NvMAAeSwhSNplZRK/s-l1600.jpg",
+      "search_group": "trainer2",
+      "review_status": "excluded",
+      "reason": "Reference-like product image; physical capture not independently established"
+    },
+    {
+      "id": "trainer2_9",
+      "page_url": "https://www.ebay.com/itm/185239319293",
+      "image_url": "https://i.ebayimg.com/images/g/~zkAAOSwj8Zh0PVB/s-l1600.jpg",
+      "search_group": "trainer2",
+      "review_status": "excluded",
+      "reason": "Multiple cards in frame; excluded from single-card positive benchmark"
+    },
+    {
+      "id": "trainer2_11",
+      "page_url": "https://www.ebay.com/itm/154521023297",
+      "image_url": "https://i.ebayimg.com/images/g/BYgAAOSwgtBg5K8o/s-l1200.jpg",
+      "search_group": "trainer2",
+      "review_status": "excluded",
+      "reason": "Suspected rescaled/reused capture; excluded conservatively"
+    },
+    {
+      "id": "jp151_1",
+      "page_url": "https://www.ebay.co.uk/itm/196019087031",
+      "image_url": "https://i.ebayimg.com/images/g/ddIAAOSwG5hlIpXV/s-l500.png",
+      "search_group": "jp151",
+      "review_status": "excluded",
+      "reason": "Reference-like product image; physical capture not independently established"
+    },
+    {
+      "id": "jp151_2",
+      "page_url": "https://www.ebay.com/itm/404583594503",
+      "image_url": "https://i.ebayimg.com/images/g/29kAAOSwiJ1lPzLF/s-l1200.jpg",
+      "search_group": "jp151",
+      "review_status": "excluded",
+      "reason": "Reference-like product image; physical capture not independently established"
+    },
+    {
+      "id": "jp151_4",
+      "page_url": "https://www.ebay.com/itm/235051704418",
+      "image_url": "https://i.ebayimg.com/00/s/MTYwMFgxNjAw/z/ZK4AAOSwfptki5Qp/%24_12.PNG?set_id=880000500F",
+      "search_group": "jp151",
+      "review_status": "excluded",
+      "reason": "Reference-like product image; physical capture not independently established"
+    },
+    {
+      "id": "jp151_8",
+      "page_url": "https://www.ebay.com/itm/397058217727",
+      "image_url": "https://i.ebayimg.com/images/g/cnkAAeSwKTJox829/s-l1200.jpg",
+      "search_group": "jp151",
+      "review_status": "excluded",
+      "reason": "Reference-like product image; physical capture not independently established"
+    },
+    {
+      "id": "jp151_10",
+      "page_url": "https://www.ebay.com/itm/166194924357",
+      "image_url": "https://i.ebayimg.com/images/g/YMYAAOSwhn1kjGDw/s-l1200.jpg",
+      "search_group": "jp151",
+      "review_status": "excluded",
+      "reason": "Suspected rescaled/reused capture; excluded conservatively"
+    },
+    {
+      "id": "jpmew_5",
+      "page_url": "https://www.ebay.com.hk/itm/235323823769",
+      "image_url": "https://i.ebayimg.com/images/g/e4QAAOSw9JllaX-T/s-l640.jpg",
+      "search_group": "jpmew",
+      "review_status": "excluded",
+      "reason": "Reference-like product image; physical capture not independently established"
+    },
+    {
+      "id": "jpmew_7",
+      "page_url": "https://www.ebay.com.au/p/8073644348",
+      "image_url": "https://i.ebayimg.com/images/g/eV8AAOSw8RdlaRDV/s-l1600.jpg",
+      "search_group": "jpmew",
+      "review_status": "excluded",
+      "reason": "Reference-like product image; physical capture not independently established"
+    },
+    {
+      "id": "ereader_9",
+      "page_url": "https://www.ebay.com/itm/154782446327",
+      "image_url": "https://i.ebayimg.com/images/g/wGcAAOSwBNFh1kCs/s-l400.jpg",
+      "search_group": "ereader",
+      "review_status": "excluded",
+      "reason": "Suspected rescaled/reused capture; excluded conservatively"
+    },
+    {
+      "id": "energy_1",
+      "page_url": "https://www.ebay.com/b/Energy-Holo-Pokemon-TCG-Common-Individual-Collectible-Card-Game-Cards-in-English/183454/bn_70085284",
+      "image_url": "https://i.ebayimg.com/images/g/SOMAAeSwcaZpXk1T/s-l1200.webp",
+      "search_group": "energy",
+      "review_status": "excluded",
+      "reason": "Different stamped Energy product; catalogue coverage/identity needs manual review"
+    },
+    {
+      "id": "energy_4",
+      "page_url": "https://www.ebay.com/itm/145861551458",
+      "image_url": "https://i.ebayimg.com/images/g/wxkAAOSw74pmgH0N/s-l1600.jpg",
+      "search_group": "energy",
+      "review_status": "excluded",
+      "reason": "Multiple cards in frame; excluded from single-card positive benchmark"
+    },
+    {
+      "id": "energy_6",
+      "page_url": "https://www.ebay.com/itm/126113002483",
+      "image_url": "https://i.ebayimg.com/images/g/mXQAAOSw2PdlJNxc/s-l1200.jpg",
+      "search_group": "energy",
+      "review_status": "excluded",
+      "reason": "Multiple cards in frame; excluded from single-card positive benchmark"
+    },
+    {
+      "id": "energy_7",
+      "page_url": "https://www.ebay.com/itm/225935219527",
+      "image_url": "https://i.ebayimg.com/00/s/MTYwMFgxMDg0/z/6rEAAOSwPlhljbz6/%24_57.JPG?set_id=880000500F",
+      "search_group": "energy",
+      "review_status": "excluded",
+      "reason": "Reference-like product image; physical capture not independently established"
+    },
+    {
+      "id": "jpgraded_2",
+      "page_url": "https://www.ebay.com/itm/364697474610",
+      "image_url": "https://i.ebayimg.com/00/s/MTYwMFgxNjAw/z/3fwAAOSwzY9lsdX8/%24_57.JPG?set_id=880000500F",
+      "search_group": "jpgraded",
+      "review_status": "excluded",
+      "reason": "Multiple cards in frame; excluded from single-card positive benchmark"
+    }
+  ]
+}

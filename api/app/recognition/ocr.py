@@ -72,6 +72,13 @@ NAME_BOILERPLATE = {
     "evolvesfrom",
     "hp",
     "tagteam",
+    "strike",
+    "fusion",
+    "rapid",
+    "single",
+    "fusionstrike",
+    "rapidstrike",
+    "singlestrike",
     "megaevolutionblackstar",
     "ultrapremiumcollection",
     "certifiedguarantycompany",
@@ -111,9 +118,22 @@ def _is_layout_badge(line: str) -> bool:
 
 
 def _pick_name_line(lines: list[str]) -> str | None:
+    evolution_continuation = False
+    split_strike_badge = any(_compact_latin(line) in {'fusion', 'rapid', 'single'} for line in lines)
     for line in lines:
         text = line.strip()
         if not text:
+            continue
+        compact = _compact_latin(text)
+        if evolution_continuation:
+            evolution_continuation = False
+            # A truncated instruction followed by its source Pokémon is one
+            # rule, not a second observed title. Do not consume a layout badge.
+            if not _is_layout_badge(text):
+                continue
+        if compact in {'evolves', 'evolvesf', 'evolvesfr', 'evolvesfro', 'evolvesfrom',
+                       'evolvest', 'evolvestr'}:
+            evolution_continuation = True
             continue
         lowered = text.lower()
         normalized = unicodedata.normalize('NFKC', text)
@@ -129,11 +149,13 @@ def _pick_name_line(lines: list[str]) -> str | None:
             continue
         if any(lowered.startswith(prefix) for prefix in NAME_PREFIX_SKIP):
             continue
-        compact = _compact_latin(text)
         # Whole supported issuer fields and dated set headings belong to a
         # holder, not the card title. Do not fuzzy-correct them into issuers.
         from app.recognition.grading import brand_company, _label_identity, _text
-        if (brand_company(text) or _label_identity(_text(text)) or compact.startswith('evolvesfrom')
+        # The evolution rule can be clipped or joined to its stage badge.
+        # It must remain neutral identity evidence even when OCR is confident.
+        if (brand_company(text) or _label_identity(_text(text)) or compact.startswith('evolves')
+                or re.match(r'^stage[12i]*evolv', compact)
                 or re.fullmatch(r'(?i)(?:CENTERING|CENTRING|CORNERS?|EDGES?|SURFACES?)\s+\d+(?:\.\d+)?',text)):
             continue
         if _is_layout_badge(text):
@@ -150,7 +172,7 @@ def _pick_name_line(lines: list[str]) -> str | None:
             or re.search(r"(?:\b\d{4}\s+POK[EÉ]MON\b|\bGEM\s*MT\b|\bPSA\b|\bGAME\s*FREAK\b|Nintendo|©|copyright)", text, re.I)
         ):
             continue
-        if compact in NAME_BOILERPLATE:
+        if compact in NAME_BOILERPLATE or (split_strike_badge and compact == 'astrike'):
             continue
         if compact in STAGE_ONLY and not _has_cjk(text):
             continue
@@ -691,6 +713,12 @@ class CardOcr:
         return texts, scores, regions
 
     def read(self, image: Image.Image, *, collector_retry_policy=None) -> OcrResult:
+        gate = getattr(self, 'auxiliary_gate', None)
+        with (gate.prioritize_card() if gate is not None and
+              getattr(self, 'card_priority', False) else nullcontext()):
+            return self._read(image, collector_retry_policy=collector_retry_policy)
+
+    def _read(self, image: Image.Image, *, collector_retry_policy=None) -> OcrResult:
         passes = []
         def run(patch, region, reason):
             started = time.perf_counter()
@@ -836,23 +864,69 @@ class CardOcr:
             if image.width >= 450 and name_text and name_confidence >= .85 and not has_identifier and retry_allowed:
                 collector_retry_used = True
                 bottom = _region(image, .88, 1.)
+                tiles = []
                 for left, right in ((0., .60), (.40, 1.)):
                     tile = bottom.crop((round(left * bottom.width), 0,
                                         round(right * bottom.width), bottom.height))
                     scale = min(3., 900 / tile.width)
                     tile = tile.resize((round(tile.width * scale), round(tile.height * scale)),
                                        Image.Resampling.LANCZOS)
+                    tiles.append(tile)
+                # The two unchanged patches are independent. Reuse the same
+                # isolated, bounded auxiliary lane as initial region OCR.
+                # Busy grading keeps the established serial path; no extra
+                # worker, model session or queue is introduced.
+                future = None
+                footer_record = {}
+                if (getattr(self, 'parallel_footer_halves', False) and reader is not None
+                        and executor is not None and gate is not None and gate.try_reserve_card()):
+                    def read_half():
+                        started = time.perf_counter()
+                        try:
+                            return reader._run(tiles[1]), None
+                        except Exception as error:
+                            return None, error
+                        finally:
+                            footer_record.update(region='collector', reason='footer_half',
+                                width=tiles[1].width, height=tiles[1].height,
+                                ms=round((time.perf_counter()-started)*1000, 2), parallel=True)
+                            gate.release_card()
                     try:
-                        retry_lines, retry_scores = run(tile, 'collector', 'footer_half')
-                        identifiers = [(text, score) for text, score in zip(retry_lines, retry_scores)
-                            if score is not None and score >= .85 and
-                            (COLLECTOR_FRACTION_RE.search(text) or
-                             re.fullmatch(r'[A-Z]{1,5}[- ]?\d{1,4}', text.strip()))]
-                        collector_retry_contributed |= bool(identifiers)
-                        number_lines.extend(text for text, _ in identifiers)
-                        number_scores.extend(score for _, score in identifiers)
-                    except Exception:  # noqa: BLE001 - optional retry cannot erase first read
-                        pass
+                        future = executor.submit(read_half)
+                    except Exception:
+                        gate.release_card()
+                        # Scheduling is optional; inference remains serial.
+                        future = None
+                observations = []
+                try:
+                    for index, tile in enumerate(tiles):
+                        try:
+                            if index == 1 and future is not None:
+                                observed, error = future.result()
+                                if error is not None:
+                                    raise error
+                                retry_lines, retry_scores = observed
+                            else:
+                                retry_lines, retry_scores = run(tile, 'collector', 'footer_half')
+                            observations.append((retry_lines, retry_scores))
+                        except Exception:  # noqa: BLE001 - preserve successful first/other half
+                            pass
+                finally:
+                    if future is not None:
+                        # Drain even on failures before mutable reader reuse.
+                        future.result()
+                        if footer_record:
+                            passes.append(footer_record)
+                    for tile in tiles:
+                        tile.close()
+                for retry_lines, retry_scores in observations:
+                    identifiers = [(text, score) for text, score in zip(retry_lines, retry_scores)
+                        if score is not None and score >= .85 and
+                        (COLLECTOR_FRACTION_RE.search(text) or
+                         re.fullmatch(r'[A-Z]{1,5}[- ]?\d{1,4}', text.strip()))]
+                    collector_retry_contributed |= bool(identifiers)
+                    number_lines.extend(text for text, _ in identifiers)
+                    number_scores.extend(score for _, score in identifiers)
             extra_lines: list[str] = []
             extra_scores: list[float | None] = []
             extra_regions: list[str] = []

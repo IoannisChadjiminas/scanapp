@@ -1,0 +1,413 @@
+{
+  "protocol": "Company and overall grade transcribed by visually reviewing actual photos before OCR. Titles not used as grade truth; ACE identifiable shield-only logos are manual brand evidence, not machine-readable text. Selected deterministically by grade diversity then discovery order, with per-company quotas. No scanner changes in this holdout.",
+  "cases": {
+    "label100_800174277078": {
+      "company": "psa",
+      "grade": 10
+    },
+    "label100_177973415542": {
+      "company": "psa",
+      "grade": 8
+    },
+    "label100_168250552726": {
+      "company": "psa",
+      "grade": 6
+    },
+    "label100_267711277755": {
+      "company": "psa",
+      "grade": 1
+    },
+    "label100_205041067257": {
+      "company": "psa",
+      "grade": 7
+    },
+    "label100_357846192192": {
+      "company": "psa",
+      "grade": 5
+    },
+    "label100_226991036392": {
+      "company": "psa",
+      "grade": 8
+    },
+    "label100_820030872349": {
+      "company": "psa",
+      "grade": 10
+    },
+    "label100_227063230477": {
+      "company": "psa",
+      "grade": 10
+    },
+    "label100_318515600273": {
+      "company": "psa",
+      "grade": 8
+    },
+    "label100_157946793643": {
+      "company": "psa",
+      "grade": 8
+    },
+    "label100_257751176286": {
+      "company": "psa",
+      "grade": 8
+    },
+    "label100_168474235776": {
+      "company": "psa",
+      "grade": 8
+    },
+    "label100_398302596329": {
+      "company": "psa",
+      "grade": 8
+    },
+    "label100_257730660039": {
+      "company": "psa",
+      "grade": 8
+    },
+    "label100_287610505898": {
+      "company": "psa",
+      "grade": 10
+    },
+    "label100_358464585522": {
+      "company": "psa",
+      "grade": 8
+    },
+    "label100_225598065196": {
+      "company": "beckett",
+      "grade": 9.5
+    },
+    "label100_117235965752": {
+      "company": "beckett",
+      "grade": 10
+    },
+    "label100_206285682378": {
+      "company": "beckett",
+      "grade": 8.5
+    },
+    "label100_406975129126": {
+      "company": "beckett",
+      "grade": 8
+    },
+    "label100_177539623440": {
+      "company": "beckett",
+      "grade": 9.5
+    },
+    "label100_389617271474": {
+      "company": "beckett",
+      "grade": 9.5
+    },
+    "label100_325791263472": {
+      "company": "beckett",
+      "grade": 10
+    },
+    "label100_407091750047": {
+      "company": "beckett",
+      "grade": 8.5
+    },
+    "label100_407246875903": {
+      "company": "beckett",
+      "grade": 8.5
+    },
+    "label100_116983141390": {
+      "company": "beckett",
+      "grade": 8
+    },
+    "label100_127844775326": {
+      "company": "beckett",
+      "grade": 8.5
+    },
+    "label100_257418127129": {
+      "company": "beckett",
+      "grade": 8.5
+    },
+    "label100_177788602827": {
+      "company": "beckett",
+      "grade": 8.5
+    },
+    "label100_306918554279": {
+      "company": "beckett",
+      "grade": 8.5
+    },
+    "label100_377055081311": {
+      "company": "beckett",
+      "grade": 9.5
+    },
+    "label100_226080076515": {
+      "company": "beckett",
+      "grade": 9.5
+    },
+    "label100_188157283019": {
+      "company": "cgc",
+      "grade": 9.5
+    },
+    "label100_147319021552": {
+      "company": "cgc",
+      "grade": 10
+    },
+    "label100_406888761226": {
+      "company": "cgc",
+      "grade": 9
+    },
+    "label100_377454420946": {
+      "company": "cgc",
+      "grade": 8.5
+    },
+    "label100_286931936416": {
+      "company": "cgc",
+      "grade": 7.5
+    },
+    "label100_227092531615": {
+      "company": "cgc",
+      "grade": 8
+    },
+    "label100_147245288873": {
+      "company": "cgc",
+      "grade": 10
+    },
+    "label100_117192519531": {
+      "company": "cgc",
+      "grade": 10
+    },
+    "label100_800716677202": {
+      "company": "cgc",
+      "grade": 10
+    },
+    "label100_406861147094": {
+      "company": "cgc",
+      "grade": 10
+    },
+    "label100_157534594084": {
+      "company": "cgc",
+      "grade": 10
+    },
+    "label100_326878079751": {
+      "company": "cgc",
+      "grade": 10
+    },
+    "label100_306950037783": {
+      "company": "cgc",
+      "grade": 10
+    },
+    "label100_227529618922": {
+      "company": "cgc",
+      "grade": 9
+    },
+    "label100_397833167240": {
+      "company": "cgc",
+      "grade": 8.5
+    },
+    "label100_297904518312": {
+      "company": "cgc",
+      "grade": 9.5
+    },
+    "label100_336154895497": {
+      "company": "cgc",
+      "grade": 8
+    },
+    "label100_287609263339": {
+      "company": "tag",
+      "grade": 10
+    },
+    "label100_168307084070": {
+      "company": "tag",
+      "grade": 6
+    },
+    "label100_137154472208": {
+      "company": "tag",
+      "grade": 9
+    },
+    "label100_127844524552": {
+      "company": "tag",
+      "grade": 10
+    },
+    "label100_267615603004": {
+      "company": "tag",
+      "grade": 10
+    },
+    "label100_205373770550": {
+      "company": "tag",
+      "grade": 10
+    },
+    "label100_407216799901": {
+      "company": "tag",
+      "grade": 10
+    },
+    "label100_336377025143": {
+      "company": "tag",
+      "grade": 10
+    },
+    "label100_800266885327": {
+      "company": "tag",
+      "grade": 10
+    },
+    "label100_178506051583": {
+      "company": "tag",
+      "grade": 10
+    },
+    "label100_397829935118": {
+      "company": "tag",
+      "grade": 10
+    },
+    "label100_306485570669": {
+      "company": "tag",
+      "grade": 10
+    },
+    "label100_398150162220": {
+      "company": "tag",
+      "grade": 10
+    },
+    "label100_357980484801": {
+      "company": "tag",
+      "grade": 10
+    },
+    "label100_117278078333": {
+      "company": "tag",
+      "grade": 10
+    },
+    "label100_407228091588": {
+      "company": "tag",
+      "grade": 9
+    },
+    "label100_137154472166": {
+      "company": "tag",
+      "grade": 9
+    },
+    "label100_147552021925": {
+      "company": "ace",
+      "grade": 10
+    },
+    "label100_317559256789": {
+      "company": "ace",
+      "grade": 6
+    },
+    "label100_187914531865": {
+      "company": "ace",
+      "grade": 7
+    },
+    "label100_227526033226": {
+      "company": "ace",
+      "grade": 8
+    },
+    "label100_407143628483": {
+      "company": "ace",
+      "grade": 2
+    },
+    "label100_137209581494": {
+      "company": "ace",
+      "grade": 9
+    },
+    "label100_287567779040": {
+      "company": "ace",
+      "grade": 10
+    },
+    "label100_397078152442": {
+      "company": "ace",
+      "grade": 10
+    },
+    "label100_287166531557": {
+      "company": "ace",
+      "grade": 10
+    },
+    "label100_358871960246": {
+      "company": "ace",
+      "grade": 10
+    },
+    "label100_318837968582": {
+      "company": "ace",
+      "grade": 10
+    },
+    "label100_298599062412": {
+      "company": "ace",
+      "grade": 7
+    },
+    "label100_366424401446": {
+      "company": "ace",
+      "grade": 10
+    },
+    "label100_197567930366": {
+      "company": "ace",
+      "grade": 10
+    },
+    "label100_267680041404": {
+      "company": "ace",
+      "grade": 7
+    },
+    "label100_257694517237": {
+      "company": "ace",
+      "grade": 7
+    },
+    "label100_800172916188": {
+      "company": "ags",
+      "grade": 9
+    },
+    "label100_306973107301": {
+      "company": "ags",
+      "grade": 10
+    },
+    "label100_147530310696": {
+      "company": "ags",
+      "grade": 9.5
+    },
+    "label100_287242611709": {
+      "company": "ags",
+      "grade": 9
+    },
+    "label100_326851003642": {
+      "company": "ags",
+      "grade": 10
+    },
+    "label100_189008029307": {
+      "company": "ags",
+      "grade": 10
+    },
+    "label100_267703865924": {
+      "company": "ags",
+      "grade": 10
+    },
+    "label100_147411952001": {
+      "company": "ags",
+      "grade": 9.5
+    },
+    "label100_168242458584": {
+      "company": "ags",
+      "grade": 9.5
+    },
+    "label100_227380521312": {
+      "company": "ags",
+      "grade": 9.5
+    },
+    "label100_146677125573": {
+      "company": "ags",
+      "grade": 10
+    },
+    "label100_166388396274": {
+      "company": "ags",
+      "grade": 9.5
+    },
+    "label100_376425702974": {
+      "company": "ags",
+      "grade": 10
+    },
+    "label100_318645515185": {
+      "company": "ags",
+      "grade": 9.5
+    },
+    "label100_117170692858": {
+      "company": "ags",
+      "grade": 10
+    },
+    "label100_389945389537": {
+      "company": "ags",
+      "grade": 9.5
+    },
+    "label100_196982574569": {
+      "company": "ags",
+      "grade": 9.5
+    }
+  },
+  "excluded": {
+    "label100_358046580511": "Unsupported PGC issuer, outside requested six",
+    "label100_376965637594": "Same CGC certification 6150344092 as label100_397833167240",
+    "label100_389660758403": "Raw card photograph, no slab label",
+    "label100_168712241309": "Raw card photograph, no slab label",
+    "label100_314664396719": "Raw Pikachu in holder without grading label"
+  },
+  "not_scored": "Raw physical condition, authenticity, certification digits, subgrades, TAG score and native condition descriptors are not quantified by this truth file."
+}

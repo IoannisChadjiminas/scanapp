@@ -1,0 +1,4161 @@
+{
+  "summary": {
+    "limitations": "Tuned convenience seller-photo diagnostic, not independent general accuracy. Physical samples cover PSA/CGC only; six graders have parser tests. No authentication, raw condition, subgrade or certification digit accuracy claim.",
+    "photos": 100,
+    "visually_reviewed_slabs": 20,
+    "supported_company_slabs": 18,
+    "company_correct": 17,
+    "grade_correct_supported": 18,
+    "grade_returned": 18,
+    "wrong_company": 0,
+    "wrong_grade": 0,
+    "false_slab_claims": 0,
+    "latency_ms": {
+      "median": 2297.04,
+      "p95": 4905.35
+    },
+    "grading_statuses": {
+      "unknown": 82,
+      "graded": 18
+    },
+    "manual_truth_sha256": "7c4c67ca407c66977e5f5ca92ef449d041b4ee42751b56f09c135b2a4adf876e",
+    "code_hashes": {
+      "app/recognition/grading.py": "169aac7dfd4d5616fbfb4c6121813bf85e13c3e1efada83c7f39d2345f8f4484",
+      "app/recognition/label_vision.py": "5894e7e5ff693e115379fbef014d60dab10724210a88246052f3870a43085f84",
+      "app/recognition/ocr.py": "77f4824f0e6e012c0d83d5c445c21a2dca37382f0a943823a3287e6d47e0326c",
+      "app/recognition/detect.py": "5a4052c7c7d611dd6577bca69f870b90464ec04fc52b7acb11e166bc4c64d2aa",
+      "app/schemas.py": "dfbea85b9005e80be99f539eb87bb61190c00a834ea8758a4d43e03a004343d1",
+      "scripts/probe_grading_labels.py": "fd4c9aa1c1c941221c17ff7a6d4ea20ded3fb257d67806e1a58830aee019852a",
+      "app/recognition/assets/grading-logos/ace-outline.png": "1d8b6887a69f70fe2e53426cf47f7e81173cdade8e598256e2f045fb79b05ba5",
+      "app/recognition/assets/grading-logos/ace.png": "c4a8777bde3e951e8fd10b231b95b3bc01dc8f1649a40b29fde2387230a5fae9",
+      "app/recognition/assets/grading-logos/ags.png": "1da72a5f5db0386eedff42ad684b9fc4bc9933b85263455d8cad0744b230ac3c",
+      "app/recognition/assets/grading-logos/beckett-emblem.png": "ce9b309f82fea40158dd2383a58907f4f08c6f44493bfb495980baecd42ca9a5",
+      "app/recognition/assets/grading-logos/beckett.png": "a9cebe2866b1e6ff8c9fd4a120c48779e607a81a58927b53e71b0e4c4de24698",
+      "app/recognition/assets/grading-logos/psa.png": "95ce6457c32365d2b3c5362c41c60511147f5efb3a223f3b9b47592a7c4c1982",
+      "app/recognition/assets/grading-logos/sources.json": "9cb9ee5abdce4d54459723c92b8a585a2070d77079692a7dc4c8cbf2269e88de",
+      "app/recognition/assets/grading-logos/tag.png": "fb6f9e7474b62bd2305fcbd03b2a8ef46095f46f5afc8e0fe27d191853d5c7a1"
+    },
+    "code_unchanged_during_probe": true
+  },
+  "cases": [
+    {
+      "id": "holdout3_002",
+      "conditions": [
+        "physical_background",
+        "foil_texture_or_reflection"
+      ],
+      "grading_ms": 2046.29,
+      "grading": {
+        "slab_detected": null,
+        "is_graded": null,
+        "grading_status": "unknown",
+        "company": null,
+        "company_source": "none",
+        "grade": null,
+        "condition_label": null,
+        "subgrades": {},
+        "tag_score": null,
+        "certification_number": null,
+        "qualifiers": [],
+        "raw_condition": "not_assessed",
+        "authenticity_verified": false,
+        "source": "none",
+        "requires_confirmation": true,
+        "label_text": [
+          "TyranitarV",
+          "230",
+          "BASIC",
+          "HP",
+          "SINGLE"
+        ],
+        "warnings": [
+          "no_supported_grading_label_detected",
+          "ungraded_status_not_proven"
+        ]
+      },
+      "manual_truth": null,
+      "wrong_company": false,
+      "wrong_grade": false,
+      "false_slab_claim": false
+    },
+    {
+      "id": "holdout3_004",
+      "conditions": [
+        "physical_background",
+        "foil_texture_or_reflection"
+      ],
+      "grading_ms": 1954.01,
+      "grading": {
+        "slab_detected": null,
+        "is_graded": null,
+        "grading_status": "unknown",
+        "company": null,
+        "company_source": "none",
+        "grade": null,
+        "condition_label": null,
+        "subgrades": {},
+        "tag_score": null,
+        "certification_number": null,
+        "qualifiers": [],
+        "raw_condition": "not_assessed",
+        "authenticity_verified": false,
+        "source": "none",
+        "requires_confirmation": true,
+        "label_text": [
+          "STAGE1",
+          "Scizor",
+          "140",
+          "HP",
+          "Evolves from Scyther"
+        ],
+        "warnings": [
+          "no_supported_grading_label_detected",
+          "ungraded_status_not_proven"
+        ]
+      },
+      "manual_truth": null,
+      "wrong_company": false,
+      "wrong_grade": false,
+      "false_slab_claim": false
+    },
+    {
+      "id": "holdout3_005",
+      "conditions": [
+        "physical_background",
+        "foil_texture_or_reflection",
+        "holder_or_sleeve",
+        "stand"
+      ],
+      "grading_ms": 1710.34,
+      "grading": {
+        "slab_detected": null,
+        "is_graded": null,
+        "grading_status": "unknown",
+        "company": null,
+        "company_source": "none",
+        "grade": null,
+        "condition_label": null,
+        "subgrades": {},
+        "tag_score": null,
+        "certification_number": null,
+        "qualifiers": [],
+        "raw_condition": "not_assessed",
+        "authenticity_verified": false,
+        "source": "none",
+        "requires_confirmation": true,
+        "label_text": [
+          "STAGE1",
+          "Scizor",
+          "140",
+          "Evolves from Scyther"
+        ],
+        "warnings": [
+          "no_supported_grading_label_detected",
+          "ungraded_status_not_proven"
+        ]
+      },
+      "manual_truth": null,
+      "wrong_company": false,
+      "wrong_grade": false,
+      "false_slab_claim": false
+    },
+    {
+      "id": "holdout3_006",
+      "conditions": [
+        "physical_background",
+        "foil_texture_or_reflection",
+        "perspective_or_handheld"
+      ],
+      "grading_ms": 1994.16,
+      "grading": {
+        "slab_detected": null,
+        "is_graded": null,
+        "grading_status": "unknown",
+        "company": null,
+        "company_source": "none",
+        "grade": null,
+        "condition_label": null,
+        "subgrades": {},
+        "tag_score": null,
+        "certification_number": null,
+        "qualifiers": [],
+        "raw_condition": "not_assessed",
+        "authenticity_verified": false,
+        "source": "none",
+        "requires_confirmation": true,
+        "label_text": [
+          "140",
+          "STAGE1",
+          "Scizor",
+          "HP",
+          "Evolves from Scyther"
+        ],
+        "warnings": [
+          "no_supported_grading_label_detected",
+          "ungraded_status_not_proven"
+        ]
+      },
+      "manual_truth": null,
+      "wrong_company": false,
+      "wrong_grade": false,
+      "false_slab_claim": false
+    },
+    {
+      "id": "holdout3_008",
+      "conditions": [
+        "physical_background",
+        "foil_texture_or_reflection",
+        "stand"
+      ],
+      "grading_ms": 3019.81,
+      "grading": {
+        "slab_detected": null,
+        "is_graded": null,
+        "grading_status": "unknown",
+        "company": null,
+        "company_source": "none",
+        "grade": null,
+        "condition_label": null,
+        "subgrades": {},
+        "tag_score": null,
+        "certification_number": null,
+        "qualifiers": [],
+        "raw_condition": "not_assessed",
+        "authenticity_verified": false,
+        "source": "none",
+        "requires_confirmation": true,
+        "label_text": [
+          "Lapras",
+          "130",
+          "BASIC",
+          "MP"
+        ],
+        "warnings": [
+          "no_supported_grading_label_detected",
+          "ungraded_status_not_proven"
+        ]
+      },
+      "manual_truth": null,
+      "wrong_company": false,
+      "wrong_grade": false,
+      "false_slab_claim": false
+    },
+    {
+      "id": "holdout3_009",
+      "conditions": [
+        "physical_background",
+        "foil_texture_or_reflection",
+        "holder_or_sleeve"
+      ],
+      "grading_ms": 3270.98,
+      "grading": {
+        "slab_detected": null,
+        "is_graded": null,
+        "grading_status": "unknown",
+        "company": null,
+        "company_source": "none",
+        "grade": null,
+        "condition_label": null,
+        "subgrades": {},
+        "tag_score": null,
+        "certification_number": null,
+        "qualifiers": [],
+        "raw_condition": "not_assessed",
+        "authenticity_verified": false,
+        "source": "none",
+        "requires_confirmation": true,
+        "label_text": [
+          "130",
+          "Lapras",
+          "BASIC",
+          "HP"
+        ],
+        "warnings": [
+          "no_supported_grading_label_detected",
+          "ungraded_status_not_proven"
+        ]
+      },
+      "manual_truth": null,
+      "wrong_company": false,
+      "wrong_grade": false,
+      "false_slab_claim": false
+    },
+    {
+      "id": "holdout3_010",
+      "conditions": [
+        "physical_background",
+        "foil_texture_or_reflection"
+      ],
+      "grading_ms": 4249.66,
+      "grading": {
+        "slab_detected": null,
+        "is_graded": null,
+        "grading_status": "unknown",
+        "company": null,
+        "company_source": "none",
+        "grade": null,
+        "condition_label": null,
+        "subgrades": {},
+        "tag_score": null,
+        "certification_number": null,
+        "qualifiers": [],
+        "raw_condition": "not_assessed",
+        "authenticity_verified": false,
+        "source": "none",
+        "requires_confirmation": true,
+        "label_text": [
+          "Lapras",
+          "BASIC",
+          "HP130"
+        ],
+        "warnings": [
+          "no_supported_grading_label_detected",
+          "ungraded_status_not_proven"
+        ]
+      },
+      "manual_truth": null,
+      "wrong_company": false,
+      "wrong_grade": false,
+      "false_slab_claim": false
+    },
+    {
+      "id": "holdout3_012",
+      "conditions": [
+        "physical_background",
+        "foil_texture_or_reflection"
+      ],
+      "grading_ms": 3962.78,
+      "grading": {
+        "slab_detected": null,
+        "is_graded": null,
+        "grading_status": "unknown",
+        "company": null,
+        "company_source": "none",
+        "grade": null,
+        "condition_label": null,
+        "subgrades": {},
+        "tag_score": null,
+        "certification_number": null,
+        "qualifiers": [],
+        "raw_condition": "not_assessed",
+        "authenticity_verified": false,
+        "source": "none",
+        "requires_confirmation": true,
+        "label_text": [
+          "DeoxysSTAR",
+          "270",
+          "VSTAR",
+          "HP",
+          "Evolves from Deoxys V"
+        ],
+        "warnings": [
+          "no_supported_grading_label_detected",
+          "ungraded_status_not_proven"
+        ]
+      },
+      "manual_truth": null,
+      "wrong_company": false,
+      "wrong_grade": false,
+      "false_slab_claim": false
+    },
+    {
+      "id": "holdout3_014",
+      "conditions": [
+        "physical_background",
+        "foil_texture_or_reflection"
+      ],
+      "grading_ms": 3821.17,
+      "grading": {
+        "slab_detected": null,
+        "is_graded": null,
+        "grading_status": "unknown",
+        "company": null,
+        "company_source": "none",
+        "grade": null,
+        "condition_label": null,
+        "subgrades": {},
+        "tag_score": null,
+        "certification_number": null,
+        "qualifiers": [],
+        "raw_condition": "not_assessed",
+        "authenticity_verified": false,
+        "source": "none",
+        "requires_confirmation": true,
+        "label_text": [
+          "DeoxysSTAR",
+          "270",
+          "VSTAR",
+          "HP",
+          "Evolves from Deoxys V"
+        ],
+        "warnings": [
+          "no_supported_grading_label_detected",
+          "ungraded_status_not_proven"
+        ]
+      },
+      "manual_truth": null,
+      "wrong_company": false,
+      "wrong_grade": false,
+      "false_slab_claim": false
+    },
+    {
+      "id": "holdout3_016",
+      "conditions": [
+        "physical_background",
+        "foil_texture_or_reflection",
+        "holder_or_sleeve"
+      ],
+      "grading_ms": 2554.78,
+      "grading": {
+        "slab_detected": null,
+        "is_graded": null,
+        "grading_status": "unknown",
+        "company": null,
+        "company_source": "none",
+        "grade": null,
+        "condition_label": null,
+        "subgrades": {},
+        "tag_score": null,
+        "certification_number": null,
+        "qualifiers": [],
+        "raw_condition": "not_assessed",
+        "authenticity_verified": false,
+        "source": "none",
+        "requires_confirmation": true,
+        "label_text": [
+          "Raikou",
+          "200",
+          "BASIC",
+          "HP"
+        ],
+        "warnings": [
+          "no_supported_grading_label_detected",
+          "ungraded_status_not_proven"
+        ]
+      },
+      "manual_truth": null,
+      "wrong_company": false,
+      "wrong_grade": false,
+      "false_slab_claim": false
+    },
+    {
+      "id": "holdout3_017",
+      "conditions": [
+        "physical_background",
+        "foil_texture_or_reflection",
+        "holder_or_sleeve"
+      ],
+      "grading_ms": 3914.67,
+      "grading": {
+        "slab_detected": null,
+        "is_graded": null,
+        "grading_status": "unknown",
+        "company": null,
+        "company_source": "none",
+        "grade": null,
+        "condition_label": null,
+        "subgrades": {},
+        "tag_score": null,
+        "certification_number": null,
+        "qualifiers": [],
+        "raw_condition": "not_assessed",
+        "authenticity_verified": false,
+        "source": "none",
+        "requires_confirmation": true,
+        "label_text": [
+          "Raikou",
+          "200",
+          "BASIC",
+          "HP"
+        ],
+        "warnings": [
+          "no_supported_grading_label_detected",
+          "ungraded_status_not_proven"
+        ]
+      },
+      "manual_truth": null,
+      "wrong_company": false,
+      "wrong_grade": false,
+      "false_slab_claim": false
+    },
+    {
+      "id": "holdout3_018",
+      "conditions": [
+        "physical_background",
+        "foil_texture_or_reflection"
+      ],
+      "grading_ms": 2860.39,
+      "grading": {
+        "slab_detected": null,
+        "is_graded": null,
+        "grading_status": "unknown",
+        "company": null,
+        "company_source": "none",
+        "grade": null,
+        "condition_label": null,
+        "subgrades": {},
+        "tag_score": null,
+        "certification_number": null,
+        "qualifiers": [],
+        "raw_condition": "not_assessed",
+        "authenticity_verified": false,
+        "source": "none",
+        "requires_confirmation": true,
+        "label_text": [
+          "BASIC RaikouV",
+          "200"
+        ],
+        "warnings": [
+          "no_supported_grading_label_detected",
+          "ungraded_status_not_proven"
+        ]
+      },
+      "manual_truth": null,
+      "wrong_company": false,
+      "wrong_grade": false,
+      "false_slab_claim": false
+    },
+    {
+      "id": "holdout3_021",
+      "conditions": [
+        "physical_background",
+        "foil_texture_or_reflection"
+      ],
+      "grading_ms": 2019.93,
+      "grading": {
+        "slab_detected": null,
+        "is_graded": null,
+        "grading_status": "unknown",
+        "company": null,
+        "company_source": "none",
+        "grade": null,
+        "condition_label": null,
+        "subgrades": {},
+        "tag_score": null,
+        "certification_number": null,
+        "qualifiers": [],
+        "raw_condition": "not_assessed",
+        "authenticity_verified": false,
+        "source": "none",
+        "requires_confirmation": true,
+        "label_text": [
+          "Hisuian Zoroark",
+          "270",
+          "VSTAR",
+          "STAR",
+          "HP",
+          "Evolves from Hisuian Zoroark V"
+        ],
+        "warnings": [
+          "no_supported_grading_label_detected",
+          "ungraded_status_not_proven"
+        ]
+      },
+      "manual_truth": null,
+      "wrong_company": false,
+      "wrong_grade": false,
+      "false_slab_claim": false
+    },
+    {
+      "id": "holdout3_022",
+      "conditions": [
+        "physical_background",
+        "foil_texture_or_reflection"
+      ],
+      "grading_ms": 2221.43,
+      "grading": {
+        "slab_detected": null,
+        "is_graded": null,
+        "grading_status": "unknown",
+        "company": null,
+        "company_source": "none",
+        "grade": null,
+        "condition_label": null,
+        "subgrades": {},
+        "tag_score": null,
+        "certification_number": null,
+        "qualifiers": [],
+        "raw_condition": "not_assessed",
+        "authenticity_verified": false,
+        "source": "none",
+        "requires_confirmation": true,
+        "label_text": [
+          "ZoroarkVSTAR",
+          "270",
+          "VSTAR",
+          "Hisuian",
+          "HP",
+          "Evolves from Hisuian ZoroarkV"
+        ],
+        "warnings": [
+          "no_supported_grading_label_detected",
+          "ungraded_status_not_proven"
+        ]
+      },
+      "manual_truth": null,
+      "wrong_company": false,
+      "wrong_grade": false,
+      "false_slab_claim": false
+    },
+    {
+      "id": "holdout3_023",
+      "conditions": [
+        "physical_background",
+        "foil_texture_or_reflection"
+      ],
+      "grading_ms": 1445.48,
+      "grading": {
+        "slab_detected": null,
+        "is_graded": null,
+        "grading_status": "unknown",
+        "company": null,
+        "company_source": "none",
+        "grade": null,
+        "condition_label": null,
+        "subgrades": {},
+        "tag_score": null,
+        "certification_number": null,
+        "qualifiers": [],
+        "raw_condition": "not_assessed",
+        "authenticity_verified": false,
+        "source": "none",
+        "requires_confirmation": true,
+        "label_text": [
+          "Supporter",
+          "TRAINER",
+          "Penny"
+        ],
+        "warnings": [
+          "no_supported_grading_label_detected",
+          "ungraded_status_not_proven"
+        ]
+      },
+      "manual_truth": null,
+      "wrong_company": false,
+      "wrong_grade": false,
+      "false_slab_claim": false
+    },
+    {
+      "id": "holdout3_024",
+      "conditions": [
+        "physical_background",
+        "foil_texture_or_reflection"
+      ],
+      "grading_ms": 3220.97,
+      "grading": {
+        "slab_detected": null,
+        "is_graded": null,
+        "grading_status": "unknown",
+        "company": null,
+        "company_source": "none",
+        "grade": null,
+        "condition_label": null,
+        "subgrades": {},
+        "tag_score": null,
+        "certification_number": null,
+        "qualifiers": [],
+        "raw_condition": "not_assessed",
+        "authenticity_verified": false,
+        "source": "none",
+        "requires_confirmation": true,
+        "label_text": [
+          "Supporter",
+          "TRAINER",
+          "Penny"
+        ],
+        "warnings": [
+          "no_supported_grading_label_detected",
+          "ungraded_status_not_proven"
+        ]
+      },
+      "manual_truth": null,
+      "wrong_company": false,
+      "wrong_grade": false,
+      "false_slab_claim": false
+    },
+    {
+      "id": "holdout3_025",
+      "conditions": [
+        "physical_background",
+        "foil_texture_or_reflection",
+        "holder_or_sleeve",
+        "slab"
+      ],
+      "grading_ms": 6322.42,
+      "grading": {
+        "slab_detected": true,
+        "is_graded": true,
+        "grading_status": "graded",
+        "company": "psa",
+        "company_source": "label_ocr",
+        "grade": 8.0,
+        "condition_label": "NM-MT",
+        "subgrades": {},
+        "tag_score": null,
+        "certification_number": "77125060",
+        "qualifiers": [],
+        "raw_condition": "not_assessed",
+        "authenticity_verified": false,
+        "source": "visible_label_ocr",
+        "requires_confirmation": true,
+        "label_text": [
+          "2023 POKEMON SVI EN",
+          "#252",
+          "PENNY",
+          "NM-MT",
+          "8",
+          "PA",
+          "77125060",
+          "2023 POKEMON SVI EN",
+          "#252",
+          "PENNY",
+          "NM-MT",
+          "8",
+          "PSA",
+          "77125060"
+        ],
+        "warnings": []
+      },
+      "manual_truth": {
+        "company": "psa",
+        "grade": 8
+      },
+      "wrong_company": false,
+      "wrong_grade": false,
+      "false_slab_claim": false
+    },
+    {
+      "id": "holdout3_027",
+      "conditions": [
+        "physical_background",
+        "foil_texture_or_reflection",
+        "holder_or_sleeve",
+        "perspective_or_handheld"
+      ],
+      "grading_ms": 2552.39,
+      "grading": {
+        "slab_detected": null,
+        "is_graded": null,
+        "grading_status": "unknown",
+        "company": null,
+        "company_source": "none",
+        "grade": null,
+        "condition_label": null,
+        "subgrades": {},
+        "tag_score": null,
+        "certification_number": null,
+        "qualifiers": [],
+        "raw_condition": "not_assessed",
+        "authenticity_verified": false,
+        "source": "none",
+        "requires_confirmation": true,
+        "label_text": [
+          "Supporter",
+          "TRAINER",
+          "Dendra"
+        ],
+        "warnings": [
+          "no_supported_grading_label_detected",
+          "ungraded_status_not_proven"
+        ]
+      },
+      "manual_truth": null,
+      "wrong_company": false,
+      "wrong_grade": false,
+      "false_slab_claim": false
+    },
+    {
+      "id": "holdout3_028",
+      "conditions": [
+        "physical_background",
+        "foil_texture_or_reflection",
+        "stand",
+        "perspective_or_handheld"
+      ],
+      "grading_ms": 3398.3,
+      "grading": {
+        "slab_detected": null,
+        "is_graded": null,
+        "grading_status": "unknown",
+        "company": null,
+        "company_source": "none",
+        "grade": null,
+        "condition_label": null,
+        "subgrades": {},
+        "tag_score": null,
+        "certification_number": null,
+        "qualifiers": [],
+        "raw_condition": "not_assessed",
+        "authenticity_verified": false,
+        "source": "none",
+        "requires_confirmation": true,
+        "label_text": [
+          "Supporter",
+          "TRAINER",
+          "Dendra"
+        ],
+        "warnings": [
+          "no_supported_grading_label_detected",
+          "ungraded_status_not_proven"
+        ]
+      },
+      "manual_truth": null,
+      "wrong_company": false,
+      "wrong_grade": false,
+      "false_slab_claim": false
+    },
+    {
+      "id": "holdout3_030",
+      "conditions": [
+        "physical_background",
+        "foil_texture_or_reflection",
+        "perspective_or_handheld"
+      ],
+      "grading_ms": 4704.42,
+      "grading": {
+        "slab_detected": null,
+        "is_graded": null,
+        "grading_status": "unknown",
+        "company": null,
+        "company_source": "none",
+        "grade": null,
+        "condition_label": null,
+        "subgrades": {},
+        "tag_score": null,
+        "certification_number": null,
+        "qualifiers": [],
+        "raw_condition": "not_assessed",
+        "authenticity_verified": false,
+        "source": "none",
+        "requires_confirmation": true,
+        "label_text": [
+          "Supporter",
+          "TRAINER",
+          "Dendra"
+        ],
+        "warnings": [
+          "no_supported_grading_label_detected",
+          "ungraded_status_not_proven"
+        ]
+      },
+      "manual_truth": null,
+      "wrong_company": false,
+      "wrong_grade": false,
+      "false_slab_claim": false
+    },
+    {
+      "id": "holdout3_031",
+      "conditions": [
+        "physical_background"
+      ],
+      "grading_ms": 1863.4,
+      "grading": {
+        "slab_detected": null,
+        "is_graded": null,
+        "grading_status": "unknown",
+        "company": null,
+        "company_source": "none",
+        "grade": null,
+        "condition_label": null,
+        "subgrades": {},
+        "tag_score": null,
+        "certification_number": null,
+        "qualifiers": [],
+        "raw_condition": "not_assessed",
+        "authenticity_verified": false,
+        "source": "none",
+        "requires_confirmation": true,
+        "label_text": [
+          "Basic Pok\u00e9mon",
+          "Tangela",
+          "50 HP"
+        ],
+        "warnings": [
+          "no_supported_grading_label_detected",
+          "ungraded_status_not_proven"
+        ]
+      },
+      "manual_truth": null,
+      "wrong_company": false,
+      "wrong_grade": false,
+      "false_slab_claim": false
+    },
+    {
+      "id": "holdout3_032",
+      "conditions": [
+        "physical_background"
+      ],
+      "grading_ms": 1866.28,
+      "grading": {
+        "slab_detected": null,
+        "is_graded": null,
+        "grading_status": "unknown",
+        "company": null,
+        "company_source": "none",
+        "grade": null,
+        "condition_label": null,
+        "subgrades": {},
+        "tag_score": null,
+        "certification_number": null,
+        "qualifiers": [],
+        "raw_condition": "not_assessed",
+        "authenticity_verified": false,
+        "source": "none",
+        "requires_confirmation": true,
+        "label_text": [
+          "Basic Pok\u00e9mon",
+          "Tangela",
+          "50 HP"
+        ],
+        "warnings": [
+          "no_supported_grading_label_detected",
+          "ungraded_status_not_proven"
+        ]
+      },
+      "manual_truth": null,
+      "wrong_company": false,
+      "wrong_grade": false,
+      "false_slab_claim": false
+    },
+    {
+      "id": "holdout3_035",
+      "conditions": [
+        "physical_background"
+      ],
+      "grading_ms": 1918.27,
+      "grading": {
+        "slab_detected": null,
+        "is_graded": null,
+        "grading_status": "unknown",
+        "company": null,
+        "company_source": "none",
+        "grade": null,
+        "condition_label": null,
+        "subgrades": {},
+        "tag_score": null,
+        "certification_number": null,
+        "qualifiers": [],
+        "raw_condition": "not_assessed",
+        "authenticity_verified": false,
+        "source": "none",
+        "requires_confirmation": true,
+        "label_text": [
+          "Basic Pok\u00e9mon",
+          "Magnemite",
+          "40 HP"
+        ],
+        "warnings": [
+          "no_supported_grading_label_detected",
+          "ungraded_status_not_proven"
+        ]
+      },
+      "manual_truth": null,
+      "wrong_company": false,
+      "wrong_grade": false,
+      "false_slab_claim": false
+    },
+    {
+      "id": "holdout3_037",
+      "conditions": [
+        "physical_background"
+      ],
+      "grading_ms": 1863.23,
+      "grading": {
+        "slab_detected": null,
+        "is_graded": null,
+        "grading_status": "unknown",
+        "company": null,
+        "company_source": "none",
+        "grade": null,
+        "condition_label": null,
+        "subgrades": {},
+        "tag_score": null,
+        "certification_number": null,
+        "qualifiers": [],
+        "raw_condition": "not_assessed",
+        "authenticity_verified": false,
+        "source": "none",
+        "requires_confirmation": true,
+        "label_text": [
+          "Basic Pok\u00e9mon",
+          "Magnemite",
+          "40 HP"
+        ],
+        "warnings": [
+          "no_supported_grading_label_detected",
+          "ungraded_status_not_proven"
+        ]
+      },
+      "manual_truth": null,
+      "wrong_company": false,
+      "wrong_grade": false,
+      "false_slab_claim": false
+    },
+    {
+      "id": "holdout3_039",
+      "conditions": [
+        "physical_background"
+      ],
+      "grading_ms": 2946.08,
+      "grading": {
+        "slab_detected": null,
+        "is_graded": null,
+        "grading_status": "unknown",
+        "company": null,
+        "company_source": "none",
+        "grade": null,
+        "condition_label": null,
+        "subgrades": {},
+        "tag_score": null,
+        "certification_number": null,
+        "qualifiers": [],
+        "raw_condition": "not_assessed",
+        "authenticity_verified": false,
+        "source": "none",
+        "requires_confirmation": true,
+        "label_text": [
+          "Basic Pok\u00e9mon",
+          "Ponyta",
+          "40 HP"
+        ],
+        "warnings": [
+          "no_supported_grading_label_detected",
+          "ungraded_status_not_proven"
+        ]
+      },
+      "manual_truth": null,
+      "wrong_company": false,
+      "wrong_grade": false,
+      "false_slab_claim": false
+    },
+    {
+      "id": "holdout3_040",
+      "conditions": [
+        "physical_background"
+      ],
+      "grading_ms": 1669.4,
+      "grading": {
+        "slab_detected": null,
+        "is_graded": null,
+        "grading_status": "unknown",
+        "company": null,
+        "company_source": "none",
+        "grade": null,
+        "condition_label": null,
+        "subgrades": {},
+        "tag_score": null,
+        "certification_number": null,
+        "qualifiers": [],
+        "raw_condition": "not_assessed",
+        "authenticity_verified": false,
+        "source": "none",
+        "requires_confirmation": true,
+        "label_text": [
+          "Basic Pok\u00e9mon",
+          "Ponyta",
+          "40"
+        ],
+        "warnings": [
+          "no_supported_grading_label_detected",
+          "ungraded_status_not_proven"
+        ]
+      },
+      "manual_truth": null,
+      "wrong_company": false,
+      "wrong_grade": false,
+      "false_slab_claim": false
+    },
+    {
+      "id": "holdout3_045",
+      "conditions": [
+        "physical_background"
+      ],
+      "grading_ms": 3220.59,
+      "grading": {
+        "slab_detected": null,
+        "is_graded": null,
+        "grading_status": "unknown",
+        "company": null,
+        "company_source": "none",
+        "grade": null,
+        "condition_label": null,
+        "subgrades": {},
+        "tag_score": null,
+        "certification_number": null,
+        "qualifiers": [],
+        "raw_condition": "not_assessed",
+        "authenticity_verified": false,
+        "source": "none",
+        "requires_confirmation": true,
+        "label_text": [
+          "Basic Pok\u00e9mon",
+          "Shellder",
+          "30 HP"
+        ],
+        "warnings": [
+          "no_supported_grading_label_detected",
+          "ungraded_status_not_proven"
+        ]
+      },
+      "manual_truth": null,
+      "wrong_company": false,
+      "wrong_grade": false,
+      "false_slab_claim": false
+    },
+    {
+      "id": "holdout3_056",
+      "conditions": [
+        "physical_background",
+        "foil_texture_or_reflection"
+      ],
+      "grading_ms": 2297.04,
+      "grading": {
+        "slab_detected": null,
+        "is_graded": null,
+        "grading_status": "unknown",
+        "company": null,
+        "company_source": "none",
+        "grade": null,
+        "condition_label": null,
+        "subgrades": {},
+        "tag_score": null,
+        "certification_number": null,
+        "qualifiers": [],
+        "raw_condition": "not_assessed",
+        "authenticity_verified": false,
+        "source": "none",
+        "requires_confirmation": true,
+        "label_text": [
+          "130",
+          "1\u9032\u5316",
+          "\u30b0\u30ec\u30f3\u30a2\u30eb\u30de",
+          "HP",
+          "\u30ab\u30eb\u30dc\u30a6\u304b\u3089\u9032\u5316"
+        ],
+        "warnings": [
+          "no_supported_grading_label_detected",
+          "ungraded_status_not_proven"
+        ]
+      },
+      "manual_truth": null,
+      "wrong_company": false,
+      "wrong_grade": false,
+      "false_slab_claim": false
+    },
+    {
+      "id": "holdout3_058",
+      "conditions": [
+        "physical_background",
+        "foil_texture_or_reflection"
+      ],
+      "grading_ms": 2419.35,
+      "grading": {
+        "slab_detected": null,
+        "is_graded": null,
+        "grading_status": "unknown",
+        "company": null,
+        "company_source": "none",
+        "grade": null,
+        "condition_label": null,
+        "subgrades": {},
+        "tag_score": null,
+        "certification_number": null,
+        "qualifiers": [],
+        "raw_condition": "not_assessed",
+        "authenticity_verified": false,
+        "source": "none",
+        "requires_confirmation": true,
+        "label_text": [
+          "1\u9032\u5316",
+          "\u30b0\u30ec\u30f3\u30a2\u30eb\u30de",
+          "130",
+          "HP",
+          "\u30ab\u30eb\u30dc\u30a6\u304b\u3089\u9032\u5316"
+        ],
+        "warnings": [
+          "no_supported_grading_label_detected",
+          "ungraded_status_not_proven"
+        ]
+      },
+      "manual_truth": null,
+      "wrong_company": false,
+      "wrong_grade": false,
+      "false_slab_claim": false
+    },
+    {
+      "id": "holdout3_065",
+      "conditions": [
+        "physical_background",
+        "foil_texture_or_reflection"
+      ],
+      "grading_ms": 1899.6,
+      "grading": {
+        "slab_detected": null,
+        "is_graded": null,
+        "grading_status": "unknown",
+        "company": null,
+        "company_source": "none",
+        "grade": null,
+        "condition_label": null,
+        "subgrades": {},
+        "tag_score": null,
+        "certification_number": null,
+        "qualifiers": [],
+        "raw_condition": "not_assessed",
+        "authenticity_verified": false,
+        "source": "none",
+        "requires_confirmation": true,
+        "label_text": [
+          "150",
+          "1\u9032\u5316",
+          "\u30a4\u30eb\u30ab\u30de\u30f3",
+          "\u571fE\u30a4ADUDA\u00f9"
+        ],
+        "warnings": [
+          "no_supported_grading_label_detected",
+          "ungraded_status_not_proven"
+        ]
+      },
+      "manual_truth": null,
+      "wrong_company": false,
+      "wrong_grade": false,
+      "false_slab_claim": false
+    },
+    {
+      "id": "holdout3_066",
+      "conditions": [
+        "physical_background"
+      ],
+      "grading_ms": 2319.68,
+      "grading": {
+        "slab_detected": null,
+        "is_graded": null,
+        "grading_status": "unknown",
+        "company": null,
+        "company_source": "none",
+        "grade": null,
+        "condition_label": null,
+        "subgrades": {},
+        "tag_score": null,
+        "certification_number": null,
+        "qualifiers": [],
+        "raw_condition": "not_assessed",
+        "authenticity_verified": false,
+        "source": "none",
+        "requires_confirmation": true,
+        "label_text": [
+          "1\u9032\u5316",
+          "150",
+          "\u30a4\u30eb\u30ab\u30de\u30f3",
+          "HP",
+          "\u30ca\u30df\u30a4\u30eb\u30ab\u304b\u3089\u9032\u5316"
+        ],
+        "warnings": [
+          "no_supported_grading_label_detected",
+          "ungraded_status_not_proven"
+        ]
+      },
+      "manual_truth": null,
+      "wrong_company": false,
+      "wrong_grade": false,
+      "false_slab_claim": false
+    },
+    {
+      "id": "holdout3_067",
+      "conditions": [
+        "physical_background",
+        "foil_texture_or_reflection",
+        "holder_or_sleeve",
+        "slab"
+      ],
+      "grading_ms": 2917.66,
+      "grading": {
+        "slab_detected": true,
+        "is_graded": true,
+        "grading_status": "graded",
+        "company": "cgc",
+        "company_source": "label_ocr",
+        "grade": 10.0,
+        "condition_label": "PRISTINE",
+        "subgrades": {},
+        "tag_score": null,
+        "certification_number": "4305413008",
+        "qualifiers": [],
+        "raw_condition": "not_assessed",
+        "authenticity_verified": false,
+        "source": "visible_label_ocr",
+        "requires_confirmation": true,
+        "label_text": [
+          "CERTIFIED GUARANTY COMPANY",
+          "PRISTINE",
+          "Ninetales",
+          "Pok\u00e9mon (2023) Japanese",
+          "Ruler of the Black Flame - 110/108",
+          "4305413008",
+          "CERTIFIED GUARANTY COMPANY",
+          "CGC",
+          "CERTIFIED GUARANTY COMPANY",
+          "PRISTINE",
+          "Ninetales",
+          "Pok\u00e9mon (2023) Japanese",
+          "Ruler of the Black Flame - 110/108",
+          "4305413008",
+          "10"
+        ],
+        "warnings": []
+      },
+      "manual_truth": {
+        "company": "cgc",
+        "grade": 10
+      },
+      "wrong_company": false,
+      "wrong_grade": false,
+      "false_slab_claim": false
+    },
+    {
+      "id": "holdout3_068",
+      "conditions": [
+        "physical_background",
+        "foil_texture_or_reflection",
+        "holder_or_sleeve",
+        "slab"
+      ],
+      "grading_ms": 3917.66,
+      "grading": {
+        "slab_detected": true,
+        "is_graded": true,
+        "grading_status": "graded",
+        "company": "cgc",
+        "company_source": "label_ocr",
+        "grade": 10.0,
+        "condition_label": "PRISTINE",
+        "subgrades": {},
+        "tag_score": null,
+        "certification_number": "6021467275",
+        "qualifiers": [],
+        "raw_condition": "not_assessed",
+        "authenticity_verified": false,
+        "source": "visible_label_ocr",
+        "requires_confirmation": true,
+        "label_text": [
+          "DCGC",
+          "CERTIFIED GUARANTY COMPANY",
+          "Ninetales",
+          "PRISTINE",
+          "Pok\u00e9mon (2023) Japanese",
+          "Ruler of the Black Flame - 110/108",
+          "Art Rare - Holo",
+          "6021467275",
+          "R",
+          "CERTIFIED GUARANTY COMPANY",
+          "ACGC",
+          "CERTIFIED GUARANTY COMPANY",
+          "Ninetales",
+          "PRISTINE",
+          "Pok\u00e9mon (2023) Japanese",
+          "Ruler of the Black Flame - 110/108",
+          "Art Rare - Holo",
+          "6021467275",
+          "10"
+        ],
+        "warnings": []
+      },
+      "manual_truth": {
+        "company": "cgc",
+        "grade": 10
+      },
+      "wrong_company": false,
+      "wrong_grade": false,
+      "false_slab_claim": false
+    },
+    {
+      "id": "holdout3_070",
+      "conditions": [
+        "physical_background",
+        "foil_texture_or_reflection",
+        "holder_or_sleeve",
+        "slab"
+      ],
+      "grading_ms": 1033.3,
+      "grading": {
+        "slab_detected": true,
+        "is_graded": true,
+        "grading_status": "graded",
+        "company": "cgc",
+        "company_source": "label_ocr",
+        "grade": 10.0,
+        "condition_label": "GEMMINT",
+        "subgrades": {},
+        "tag_score": null,
+        "certification_number": "6045955001",
+        "qualifiers": [],
+        "raw_condition": "not_assessed",
+        "authenticity_verified": false,
+        "source": "visible_label_ocr",
+        "requires_confirmation": true,
+        "label_text": [
+          "CGC",
+          "CERTIFIED GUARANTY COMPANY",
+          "Ninetales",
+          "GEMMINT",
+          "Pok\u00e9mon (2023) Japanese",
+          "10",
+          "Ruler of the Black Flame - 110/108",
+          "Art Rare-Holo",
+          "6045955001",
+          "1\u9032\u5316",
+          "\u30ad\u30b3\u30a6\u30b3\u30f3",
+          "120"
+        ],
+        "warnings": []
+      },
+      "manual_truth": {
+        "company": "cgc",
+        "grade": 10
+      },
+      "wrong_company": false,
+      "wrong_grade": false,
+      "false_slab_claim": false
+    },
+    {
+      "id": "holdout3_073",
+      "conditions": [
+        "physical_background",
+        "foil_texture_or_reflection"
+      ],
+      "grading_ms": 2367.81,
+      "grading": {
+        "slab_detected": null,
+        "is_graded": null,
+        "grading_status": "unknown",
+        "company": null,
+        "company_source": "none",
+        "grade": null,
+        "condition_label": null,
+        "subgrades": {},
+        "tag_score": null,
+        "certification_number": null,
+        "qualifiers": [],
+        "raw_condition": "not_assessed",
+        "authenticity_verified": false,
+        "source": "none",
+        "requires_confirmation": true,
+        "label_text": [
+          "2\u9032\u5316",
+          "\u30d4\u30b8\u30e7\u30c3\u30c8EX",
+          "280",
+          "HP",
+          "\u30d4\u30b8\u30e7\u30f3\u304b\u3089\u9032\u5316"
+        ],
+        "warnings": [
+          "no_supported_grading_label_detected",
+          "ungraded_status_not_proven"
+        ]
+      },
+      "manual_truth": null,
+      "wrong_company": false,
+      "wrong_grade": false,
+      "false_slab_claim": false
+    },
+    {
+      "id": "holdout3_075",
+      "conditions": [
+        "physical_background",
+        "foil_texture_or_reflection"
+      ],
+      "grading_ms": 2337.86,
+      "grading": {
+        "slab_detected": null,
+        "is_graded": null,
+        "grading_status": "unknown",
+        "company": null,
+        "company_source": "none",
+        "grade": null,
+        "condition_label": null,
+        "subgrades": {},
+        "tag_score": null,
+        "certification_number": null,
+        "qualifiers": [],
+        "raw_condition": "not_assessed",
+        "authenticity_verified": false,
+        "source": "none",
+        "requires_confirmation": true,
+        "label_text": [
+          "\u305f\u306d",
+          "\u30a4\u30fc\u30e61CX",
+          "190",
+          "HP"
+        ],
+        "warnings": [
+          "no_supported_grading_label_detected",
+          "ungraded_status_not_proven"
+        ]
+      },
+      "manual_truth": null,
+      "wrong_company": false,
+      "wrong_grade": false,
+      "false_slab_claim": false
+    },
+    {
+      "id": "holdout3_083",
+      "conditions": [
+        "physical_background",
+        "foil_texture_or_reflection"
+      ],
+      "grading_ms": 2252.36,
+      "grading": {
+        "slab_detected": null,
+        "is_graded": null,
+        "grading_status": "unknown",
+        "company": null,
+        "company_source": "none",
+        "grade": null,
+        "condition_label": null,
+        "subgrades": {},
+        "tag_score": null,
+        "certification_number": null,
+        "qualifiers": [],
+        "raw_condition": "not_assessed",
+        "authenticity_verified": false,
+        "source": "none",
+        "requires_confirmation": true,
+        "label_text": [
+          "2\u9053\u5316",
+          "\u30ad\u30f3\u30b0\u30c9\u30e9\u3068",
+          "310",
+          "\u30fc\u30c8\u30e9D\u3089\u5316"
+        ],
+        "warnings": [
+          "no_supported_grading_label_detected",
+          "ungraded_status_not_proven"
+        ]
+      },
+      "manual_truth": null,
+      "wrong_company": false,
+      "wrong_grade": false,
+      "false_slab_claim": false
+    },
+    {
+      "id": "holdout3_085",
+      "conditions": [
+        "physical_background",
+        "foil_texture_or_reflection",
+        "holder_or_sleeve"
+      ],
+      "grading_ms": 2902.84,
+      "grading": {
+        "slab_detected": null,
+        "is_graded": null,
+        "grading_status": "unknown",
+        "company": null,
+        "company_source": "none",
+        "grade": null,
+        "condition_label": null,
+        "subgrades": {},
+        "tag_score": null,
+        "certification_number": null,
+        "qualifiers": [],
+        "raw_condition": "not_assessed",
+        "authenticity_verified": false,
+        "source": "none",
+        "requires_confirmation": true,
+        "label_text": [
+          "150",
+          "BASIC",
+          "Snorlax",
+          "HP"
+        ],
+        "warnings": [
+          "no_supported_grading_label_detected",
+          "ungraded_status_not_proven"
+        ]
+      },
+      "manual_truth": null,
+      "wrong_company": false,
+      "wrong_grade": false,
+      "false_slab_claim": false
+    },
+    {
+      "id": "holdout3_086",
+      "conditions": [
+        "physical_background",
+        "foil_texture_or_reflection"
+      ],
+      "grading_ms": 3116.42,
+      "grading": {
+        "slab_detected": null,
+        "is_graded": null,
+        "grading_status": "unknown",
+        "company": null,
+        "company_source": "none",
+        "grade": null,
+        "condition_label": null,
+        "subgrades": {},
+        "tag_score": null,
+        "certification_number": null,
+        "qualifiers": [],
+        "raw_condition": "not_assessed",
+        "authenticity_verified": false,
+        "source": "none",
+        "requires_confirmation": true,
+        "label_text": [
+          "BASIC",
+          "Snorlax",
+          "150",
+          "HP"
+        ],
+        "warnings": [
+          "no_supported_grading_label_detected",
+          "ungraded_status_not_proven"
+        ]
+      },
+      "manual_truth": null,
+      "wrong_company": false,
+      "wrong_grade": false,
+      "false_slab_claim": false
+    },
+    {
+      "id": "holdout3_089",
+      "conditions": [
+        "physical_background",
+        "foil_texture_or_reflection",
+        "holder_or_sleeve"
+      ],
+      "grading_ms": 2151.49,
+      "grading": {
+        "slab_detected": null,
+        "is_graded": null,
+        "grading_status": "unknown",
+        "company": null,
+        "company_source": "none",
+        "grade": null,
+        "condition_label": null,
+        "subgrades": {},
+        "tag_score": null,
+        "certification_number": null,
+        "qualifiers": [],
+        "raw_condition": "not_assessed",
+        "authenticity_verified": false,
+        "source": "none",
+        "requires_confirmation": true,
+        "label_text": [
+          "EnteiV",
+          "BASIC",
+          "230",
+          "HP"
+        ],
+        "warnings": [
+          "no_supported_grading_label_detected",
+          "ungraded_status_not_proven"
+        ]
+      },
+      "manual_truth": null,
+      "wrong_company": false,
+      "wrong_grade": false,
+      "false_slab_claim": false
+    },
+    {
+      "id": "holdout3_091",
+      "conditions": [
+        "physical_background",
+        "foil_texture_or_reflection"
+      ],
+      "grading_ms": 2190.3,
+      "grading": {
+        "slab_detected": null,
+        "is_graded": null,
+        "grading_status": "unknown",
+        "company": null,
+        "company_source": "none",
+        "grade": null,
+        "condition_label": null,
+        "subgrades": {},
+        "tag_score": null,
+        "certification_number": null,
+        "qualifiers": [],
+        "raw_condition": "not_assessed",
+        "authenticity_verified": false,
+        "source": "none",
+        "requires_confirmation": true,
+        "label_text": [
+          "EnteiV",
+          "230",
+          "BASIC",
+          "HP"
+        ],
+        "warnings": [
+          "no_supported_grading_label_detected",
+          "ungraded_status_not_proven"
+        ]
+      },
+      "manual_truth": null,
+      "wrong_company": false,
+      "wrong_grade": false,
+      "false_slab_claim": false
+    },
+    {
+      "id": "holdout3_092",
+      "conditions": [
+        "physical_background",
+        "foil_texture_or_reflection",
+        "stand"
+      ],
+      "grading_ms": 2129.57,
+      "grading": {
+        "slab_detected": null,
+        "is_graded": null,
+        "grading_status": "unknown",
+        "company": null,
+        "company_source": "none",
+        "grade": null,
+        "condition_label": null,
+        "subgrades": {},
+        "tag_score": null,
+        "certification_number": null,
+        "qualifiers": [],
+        "raw_condition": "not_assessed",
+        "authenticity_verified": false,
+        "source": "none",
+        "requires_confirmation": true,
+        "label_text": [
+          "Regigigas",
+          "VSTAR",
+          ".300",
+          "STAR",
+          "HP",
+          "Evolves from Regigigas V"
+        ],
+        "warnings": [
+          "no_supported_grading_label_detected",
+          "ungraded_status_not_proven"
+        ]
+      },
+      "manual_truth": null,
+      "wrong_company": false,
+      "wrong_grade": false,
+      "false_slab_claim": false
+    },
+    {
+      "id": "holdout3_095",
+      "conditions": [
+        "physical_background",
+        "foil_texture_or_reflection"
+      ],
+      "grading_ms": 3972.14,
+      "grading": {
+        "slab_detected": null,
+        "is_graded": null,
+        "grading_status": "unknown",
+        "company": null,
+        "company_source": "none",
+        "grade": null,
+        "condition_label": null,
+        "subgrades": {},
+        "tag_score": null,
+        "certification_number": null,
+        "qualifiers": [],
+        "raw_condition": "not_assessed",
+        "authenticity_verified": false,
+        "source": "none",
+        "requires_confirmation": true,
+        "label_text": [
+          "RegigigasVSTAR",
+          "VSTAR",
+          "300",
+          "HP",
+          "Valves from Regigigas V"
+        ],
+        "warnings": [
+          "no_supported_grading_label_detected",
+          "ungraded_status_not_proven"
+        ]
+      },
+      "manual_truth": null,
+      "wrong_company": false,
+      "wrong_grade": false,
+      "false_slab_claim": false
+    },
+    {
+      "id": "holdout3_096",
+      "conditions": [
+        "physical_background",
+        "foil_texture_or_reflection",
+        "stand"
+      ],
+      "grading_ms": 2731.58,
+      "grading": {
+        "slab_detected": null,
+        "is_graded": null,
+        "grading_status": "unknown",
+        "company": null,
+        "company_source": "none",
+        "grade": null,
+        "condition_label": null,
+        "subgrades": {},
+        "tag_score": null,
+        "certification_number": null,
+        "qualifiers": [],
+        "raw_condition": "not_assessed",
+        "authenticity_verified": false,
+        "source": "none",
+        "requires_confirmation": true,
+        "label_text": [
+          "ZacianV",
+          "220",
+          "BASIC",
+          "HP"
+        ],
+        "warnings": [
+          "no_supported_grading_label_detected",
+          "ungraded_status_not_proven"
+        ]
+      },
+      "manual_truth": null,
+      "wrong_company": false,
+      "wrong_grade": false,
+      "false_slab_claim": false
+    },
+    {
+      "id": "holdout3_099",
+      "conditions": [
+        "physical_background",
+        "foil_texture_or_reflection",
+        "perspective_or_handheld"
+      ],
+      "grading_ms": 4905.35,
+      "grading": {
+        "slab_detected": null,
+        "is_graded": null,
+        "grading_status": "unknown",
+        "company": null,
+        "company_source": "none",
+        "grade": null,
+        "condition_label": null,
+        "subgrades": {},
+        "tag_score": null,
+        "certification_number": null,
+        "qualifiers": [],
+        "raw_condition": "not_assessed",
+        "authenticity_verified": false,
+        "source": "none",
+        "requires_confirmation": true,
+        "label_text": [
+          "Zacian",
+          "BASIC",
+          "220",
+          "HP"
+        ],
+        "warnings": [
+          "no_supported_grading_label_detected",
+          "ungraded_status_not_proven"
+        ]
+      },
+      "manual_truth": null,
+      "wrong_company": false,
+      "wrong_grade": false,
+      "false_slab_claim": false
+    },
+    {
+      "id": "holdout3_100",
+      "conditions": [
+        "physical_background",
+        "foil_texture_or_reflection",
+        "holder_or_sleeve",
+        "slab"
+      ],
+      "grading_ms": 886.4,
+      "grading": {
+        "slab_detected": true,
+        "is_graded": true,
+        "grading_status": "graded",
+        "company": "psa",
+        "company_source": "label_ocr",
+        "grade": 10.0,
+        "condition_label": "GEM MT",
+        "subgrades": {},
+        "tag_score": null,
+        "certification_number": "102118937",
+        "qualifiers": [],
+        "raw_condition": "not_assessed",
+        "authenticity_verified": false,
+        "source": "visible_label_ocr",
+        "requires_confirmation": true,
+        "label_text": [
+          "2023 POKEMON SV1V JP",
+          "#102",
+          "MIRAIDON ex",
+          "GEM MT",
+          "SPECIAL ART RARE",
+          "10",
+          "PSA",
+          "102118937",
+          "\u305f\u306d",
+          "\u30df\u30e9\u30a4\u30c9\u30f3\u30d3X",
+          "220"
+        ],
+        "warnings": []
+      },
+      "manual_truth": {
+        "company": "psa",
+        "grade": 10
+      },
+      "wrong_company": false,
+      "wrong_grade": false,
+      "false_slab_claim": false
+    },
+    {
+      "id": "holdout3_102",
+      "conditions": [
+        "physical_background",
+        "foil_texture_or_reflection",
+        "holder_or_sleeve",
+        "slab"
+      ],
+      "grading_ms": 3606.57,
+      "grading": {
+        "slab_detected": true,
+        "is_graded": true,
+        "grading_status": "graded",
+        "company": "psa",
+        "company_source": "verified_logo",
+        "grade": 10.0,
+        "condition_label": "GEM MT",
+        "subgrades": {},
+        "tag_score": null,
+        "certification_number": "73895318",
+        "qualifiers": [],
+        "raw_condition": "not_assessed",
+        "authenticity_verified": false,
+        "source": "visible_label_ocr",
+        "requires_confirmation": true,
+        "label_text": [
+          "2023 POKEMON SV1V JP",
+          "#102",
+          "MIRAIDON ex",
+          "GEM MT",
+          "10",
+          "73895318"
+        ],
+        "warnings": []
+      },
+      "manual_truth": {
+        "company": "psa",
+        "grade": 10
+      },
+      "wrong_company": false,
+      "wrong_grade": false,
+      "false_slab_claim": false
+    },
+    {
+      "id": "holdout3_103",
+      "conditions": [
+        "physical_background",
+        "foil_texture_or_reflection",
+        "holder_or_sleeve",
+        "slab",
+        "perspective_or_handheld",
+        "other_cards_in_background"
+      ],
+      "grading_ms": 4565.51,
+      "grading": {
+        "slab_detected": true,
+        "is_graded": true,
+        "grading_status": "graded",
+        "company": "psa",
+        "company_source": "verified_logo",
+        "grade": 10.0,
+        "condition_label": "GEMMT",
+        "subgrades": {},
+        "tag_score": null,
+        "certification_number": "78346540",
+        "qualifiers": [],
+        "raw_condition": "not_assessed",
+        "authenticity_verified": false,
+        "source": "visible_label_ocr",
+        "requires_confirmation": true,
+        "label_text": [
+          "2023 POKEMON SVP EN",
+          "#028",
+          "MIRAIDON ex",
+          "GEMMT",
+          "PALDEA LEGENDS TINS",
+          "10",
+          ". JAPANESE NEO",
+          "022 POKEN",
+          "ATR-HOLO",
+          "A/ORGNFR",
+          "10",
+          "78346540",
+          "FILE",
+          "STRALRA"
+        ],
+        "warnings": []
+      },
+      "manual_truth": {
+        "company": "psa",
+        "grade": 10
+      },
+      "wrong_company": false,
+      "wrong_grade": false,
+      "false_slab_claim": false
+    },
+    {
+      "id": "holdout3_107",
+      "conditions": [
+        "physical_background",
+        "foil_texture_or_reflection",
+        "holder_or_sleeve",
+        "slab",
+        "stand"
+      ],
+      "grading_ms": 991.06,
+      "grading": {
+        "slab_detected": true,
+        "is_graded": true,
+        "grading_status": "graded",
+        "company": "psa",
+        "company_source": "label_ocr",
+        "grade": 10.0,
+        "condition_label": "GEMMT",
+        "subgrades": {},
+        "tag_score": null,
+        "certification_number": null,
+        "qualifiers": [],
+        "raw_condition": "not_assessed",
+        "authenticity_verified": false,
+        "source": "visible_label_ocr",
+        "requires_confirmation": true,
+        "label_text": [
+          "2024 POKEMON SV7 JP",
+          "#131",
+          "LACEY",
+          "GEMMT",
+          "SPECIAL ART RARE",
+          "10",
+          "PSA",
+          "\u30b5\u30dd\u30fc\u30c8",
+          "\u30c8\u30ec\u30fc\u30ca\u30fc\u30b9",
+          "\u5915"
+        ],
+        "warnings": []
+      },
+      "manual_truth": {
+        "company": "psa",
+        "grade": 10
+      },
+      "wrong_company": false,
+      "wrong_grade": false,
+      "false_slab_claim": false
+    },
+    {
+      "id": "holdout3_106",
+      "conditions": [
+        "physical_background",
+        "foil_texture_or_reflection"
+      ],
+      "grading_ms": 1632.19,
+      "grading": {
+        "slab_detected": null,
+        "is_graded": null,
+        "grading_status": "unknown",
+        "company": null,
+        "company_source": "none",
+        "grade": null,
+        "condition_label": null,
+        "subgrades": {},
+        "tag_score": null,
+        "certification_number": null,
+        "qualifiers": [],
+        "raw_condition": "not_assessed",
+        "authenticity_verified": false,
+        "source": "none",
+        "requires_confirmation": true,
+        "label_text": [
+          "\u30b5\u30dd\u4e00\u30c8",
+          "\u30c8\u30ec\u30fc\u30ca\u30fc\u30ba"
+        ],
+        "warnings": [
+          "no_supported_grading_label_detected",
+          "ungraded_status_not_proven"
+        ]
+      },
+      "manual_truth": null,
+      "wrong_company": false,
+      "wrong_grade": false,
+      "false_slab_claim": false
+    },
+    {
+      "id": "holdout4_002",
+      "conditions": [
+        "physical_background",
+        "foil_texture_or_reflection",
+        "holder_or_sleeve",
+        "slab"
+      ],
+      "grading_ms": 1014.19,
+      "grading": {
+        "slab_detected": true,
+        "is_graded": true,
+        "grading_status": "graded",
+        "company": "psa",
+        "company_source": "label_ocr",
+        "grade": 10.0,
+        "condition_label": "GEM MT",
+        "subgrades": {},
+        "tag_score": null,
+        "certification_number": "109707863",
+        "qualifiers": [],
+        "raw_condition": "not_assessed",
+        "authenticity_verified": false,
+        "source": "visible_label_ocr",
+        "requires_confirmation": true,
+        "label_text": [
+          "2023 POKEMON SWSH",
+          "#GG38",
+          "FA/SUICUNE V",
+          "GEM MT",
+          "CROWN ZENITH",
+          "10",
+          "PSA",
+          "109707863",
+          "Suicune",
+          "BASIC",
+          "210",
+          "HP"
+        ],
+        "warnings": []
+      },
+      "manual_truth": {
+        "company": "psa",
+        "grade": 10
+      },
+      "wrong_company": false,
+      "wrong_grade": false,
+      "false_slab_claim": false
+    },
+    {
+      "id": "holdout4_003",
+      "conditions": [
+        "physical_background",
+        "foil_texture_or_reflection",
+        "holder_or_sleeve",
+        "slab"
+      ],
+      "grading_ms": 4099.53,
+      "grading": {
+        "slab_detected": null,
+        "is_graded": null,
+        "grading_status": "unknown",
+        "company": null,
+        "company_source": "none",
+        "grade": null,
+        "condition_label": null,
+        "subgrades": {},
+        "tag_score": null,
+        "certification_number": null,
+        "qualifiers": [],
+        "raw_condition": "not_assessed",
+        "authenticity_verified": false,
+        "source": "none",
+        "requires_confirmation": true,
+        "label_text": [
+          "PCG",
+          "Suicune V",
+          "MINT",
+          "S&S: Crown Zenith Galarian Gallery | Full Art Ultra Rare",
+          "9",
+          "9.5",
+          "10",
+          "CENTERING",
+          "CORNERS",
+          "EDGES",
+          "SURFACE",
+          "SuicuneV",
+          "2100",
+          "BASIC"
+        ],
+        "warnings": [
+          "no_supported_grading_label_detected",
+          "ungraded_status_not_proven"
+        ]
+      },
+      "manual_truth": {
+        "company": null,
+        "grade": 9,
+        "note": "PCG, unsupported issuer; do not infer another company"
+      },
+      "wrong_company": false,
+      "wrong_grade": false,
+      "false_slab_claim": false
+    },
+    {
+      "id": "holdout4_004",
+      "conditions": [
+        "physical_background",
+        "foil_texture_or_reflection",
+        "stand"
+      ],
+      "grading_ms": 3759.1,
+      "grading": {
+        "slab_detected": null,
+        "is_graded": null,
+        "grading_status": "unknown",
+        "company": null,
+        "company_source": "none",
+        "grade": null,
+        "condition_label": null,
+        "subgrades": {},
+        "tag_score": null,
+        "certification_number": null,
+        "qualifiers": [],
+        "raw_condition": "not_assessed",
+        "authenticity_verified": false,
+        "source": "none",
+        "requires_confirmation": true,
+        "label_text": [
+          "Suicune",
+          "210",
+          "BASIC"
+        ],
+        "warnings": [
+          "no_supported_grading_label_detected",
+          "ungraded_status_not_proven"
+        ]
+      },
+      "manual_truth": null,
+      "wrong_company": false,
+      "wrong_grade": false,
+      "false_slab_claim": false
+    },
+    {
+      "id": "holdout4_005",
+      "conditions": [
+        "physical_background",
+        "foil_texture_or_reflection",
+        "perspective_or_handheld"
+      ],
+      "grading_ms": 1968.19,
+      "grading": {
+        "slab_detected": null,
+        "is_graded": null,
+        "grading_status": "unknown",
+        "company": null,
+        "company_source": "none",
+        "grade": null,
+        "condition_label": null,
+        "subgrades": {},
+        "tag_score": null,
+        "certification_number": null,
+        "qualifiers": [],
+        "raw_condition": "not_assessed",
+        "authenticity_verified": false,
+        "source": "none",
+        "requires_confirmation": true,
+        "label_text": [
+          "210C",
+          "Suicune",
+          "BASIC",
+          "HP"
+        ],
+        "warnings": [
+          "no_supported_grading_label_detected",
+          "ungraded_status_not_proven"
+        ]
+      },
+      "manual_truth": null,
+      "wrong_company": false,
+      "wrong_grade": false,
+      "false_slab_claim": false
+    },
+    {
+      "id": "holdout4_006",
+      "conditions": [
+        "physical_background",
+        "foil_texture_or_reflection"
+      ],
+      "grading_ms": 3395.47,
+      "grading": {
+        "slab_detected": null,
+        "is_graded": null,
+        "grading_status": "unknown",
+        "company": null,
+        "company_source": "none",
+        "grade": null,
+        "condition_label": null,
+        "subgrades": {},
+        "tag_score": null,
+        "certification_number": null,
+        "qualifiers": [],
+        "raw_condition": "not_assessed",
+        "authenticity_verified": false,
+        "source": "none",
+        "requires_confirmation": true,
+        "label_text": [
+          "SuicuneV",
+          "2100",
+          "BASICA"
+        ],
+        "warnings": [
+          "no_supported_grading_label_detected",
+          "ungraded_status_not_proven"
+        ]
+      },
+      "manual_truth": null,
+      "wrong_company": false,
+      "wrong_grade": false,
+      "false_slab_claim": false
+    },
+    {
+      "id": "holdout4_009",
+      "conditions": [
+        "physical_background",
+        "foil_texture_or_reflection",
+        "perspective_or_handheld"
+      ],
+      "grading_ms": 3369.78,
+      "grading": {
+        "slab_detected": null,
+        "is_graded": null,
+        "grading_status": "unknown",
+        "company": null,
+        "company_source": "none",
+        "grade": null,
+        "condition_label": null,
+        "subgrades": {},
+        "tag_score": null,
+        "certification_number": null,
+        "qualifiers": [],
+        "raw_condition": "not_assessed",
+        "authenticity_verified": false,
+        "source": "none",
+        "requires_confirmation": true,
+        "label_text": [
+          "ZeraoraVAx",
+          "VMAX",
+          "320",
+          "Evolves from Zeraora V",
+          "Dynamax"
+        ],
+        "warnings": [
+          "no_supported_grading_label_detected",
+          "ungraded_status_not_proven"
+        ]
+      },
+      "manual_truth": null,
+      "wrong_company": false,
+      "wrong_grade": false,
+      "false_slab_claim": false
+    },
+    {
+      "id": "holdout4_010",
+      "conditions": [
+        "physical_background",
+        "foil_texture_or_reflection",
+        "holder_or_sleeve",
+        "slab"
+      ],
+      "grading_ms": 23802.2,
+      "grading": {
+        "slab_detected": null,
+        "is_graded": null,
+        "grading_status": "unknown",
+        "company": null,
+        "company_source": "none",
+        "grade": null,
+        "condition_label": null,
+        "subgrades": {},
+        "tag_score": null,
+        "certification_number": null,
+        "qualifiers": [],
+        "raw_condition": "not_assessed",
+        "authenticity_verified": false,
+        "source": "none",
+        "requires_confirmation": true,
+        "label_text": [
+          "2023 Pokemon Sword & Shield",
+          "Gem Mint",
+          "Crown Zenith",
+          "10",
+          "Zeraora VMAX",
+          "GG42/GG70",
+          "Galarian Gallery Full Art Holo",
+          "VMAX",
+          "Zeraora",
+          "VMAX",
+          "320",
+          "Evolves from Zeraora V",
+          "Dynamax"
+        ],
+        "warnings": [
+          "no_supported_grading_label_detected",
+          "ungraded_status_not_proven"
+        ]
+      },
+      "manual_truth": {
+        "company": null,
+        "grade": 10,
+        "note": "No recognizable company on visible front label"
+      },
+      "wrong_company": false,
+      "wrong_grade": false,
+      "false_slab_claim": false
+    },
+    {
+      "id": "holdout4_011",
+      "conditions": [
+        "physical_background",
+        "foil_texture_or_reflection",
+        "perspective_or_handheld"
+      ],
+      "grading_ms": 1970.17,
+      "grading": {
+        "slab_detected": null,
+        "is_graded": null,
+        "grading_status": "unknown",
+        "company": null,
+        "company_source": "none",
+        "grade": null,
+        "condition_label": null,
+        "subgrades": {},
+        "tag_score": null,
+        "certification_number": null,
+        "qualifiers": [],
+        "raw_condition": "not_assessed",
+        "authenticity_verified": false,
+        "source": "none",
+        "requires_confirmation": true,
+        "label_text": [
+          "ZeraoraVMAX",
+          "320",
+          "VMAX",
+          "Evolves from Zeraora V",
+          "Dynamax"
+        ],
+        "warnings": [
+          "no_supported_grading_label_detected",
+          "ungraded_status_not_proven"
+        ]
+      },
+      "manual_truth": null,
+      "wrong_company": false,
+      "wrong_grade": false,
+      "false_slab_claim": false
+    },
+    {
+      "id": "holdout4_013",
+      "conditions": [
+        "physical_background",
+        "foil_texture_or_reflection",
+        "holder_or_sleeve",
+        "perspective_or_handheld"
+      ],
+      "grading_ms": 4679.48,
+      "grading": {
+        "slab_detected": null,
+        "is_graded": null,
+        "grading_status": "unknown",
+        "company": null,
+        "company_source": "none",
+        "grade": null,
+        "condition_label": null,
+        "subgrades": {},
+        "tag_score": null,
+        "certification_number": null,
+        "qualifiers": [],
+        "raw_condition": "not_assessed",
+        "authenticity_verified": false,
+        "source": "none",
+        "requires_confirmation": true,
+        "label_text": [
+          "ZamazentaV",
+          "220",
+          "BASIC",
+          "HP"
+        ],
+        "warnings": [
+          "no_supported_grading_label_detected",
+          "ungraded_status_not_proven"
+        ]
+      },
+      "manual_truth": null,
+      "wrong_company": false,
+      "wrong_grade": false,
+      "false_slab_claim": false
+    },
+    {
+      "id": "holdout4_016",
+      "conditions": [
+        "physical_background",
+        "foil_texture_or_reflection",
+        "stand"
+      ],
+      "grading_ms": 2212.7,
+      "grading": {
+        "slab_detected": null,
+        "is_graded": null,
+        "grading_status": "unknown",
+        "company": null,
+        "company_source": "none",
+        "grade": null,
+        "condition_label": null,
+        "subgrades": {},
+        "tag_score": null,
+        "certification_number": null,
+        "qualifiers": [],
+        "raw_condition": "not_assessed",
+        "authenticity_verified": false,
+        "source": "none",
+        "requires_confirmation": true,
+        "label_text": [
+          "HattereneVMAX",
+          "320",
+          "VMAX",
+          "Evolves from Hatterene V",
+          "Gigantamax"
+        ],
+        "warnings": [
+          "no_supported_grading_label_detected",
+          "ungraded_status_not_proven"
+        ]
+      },
+      "manual_truth": null,
+      "wrong_company": false,
+      "wrong_grade": false,
+      "false_slab_claim": false
+    },
+    {
+      "id": "holdout4_017",
+      "conditions": [
+        "physical_background",
+        "foil_texture_or_reflection",
+        "holder_or_sleeve"
+      ],
+      "grading_ms": 3397.02,
+      "grading": {
+        "slab_detected": null,
+        "is_graded": null,
+        "grading_status": "unknown",
+        "company": null,
+        "company_source": "none",
+        "grade": null,
+        "condition_label": null,
+        "subgrades": {},
+        "tag_score": null,
+        "certification_number": null,
+        "qualifiers": [],
+        "raw_condition": "not_assessed",
+        "authenticity_verified": false,
+        "source": "none",
+        "requires_confirmation": true,
+        "label_text": [
+          "HattereneVMAX",
+          "H320",
+          "VMAX",
+          "Evolves fromHattereneV",
+          "Gigantamax"
+        ],
+        "warnings": [
+          "no_supported_grading_label_detected",
+          "ungraded_status_not_proven"
+        ]
+      },
+      "manual_truth": null,
+      "wrong_company": false,
+      "wrong_grade": false,
+      "false_slab_claim": false
+    },
+    {
+      "id": "holdout4_018",
+      "conditions": [
+        "physical_background",
+        "foil_texture_or_reflection",
+        "holder_or_sleeve",
+        "slab"
+      ],
+      "grading_ms": 6660.97,
+      "grading": {
+        "slab_detected": true,
+        "is_graded": true,
+        "grading_status": "graded",
+        "company": "psa",
+        "company_source": "label_ocr",
+        "grade": 10.0,
+        "condition_label": "GEMMT",
+        "subgrades": {},
+        "tag_score": null,
+        "certification_number": "122992409",
+        "qualifiers": [],
+        "raw_condition": "not_assessed",
+        "authenticity_verified": false,
+        "source": "visible_label_ocr",
+        "requires_confirmation": true,
+        "label_text": [
+          "2023 POKEMON SWSH",
+          "#GG47",
+          "FA/HATTERENE VMAX",
+          "GEMMT",
+          "CROWN ZENITH",
+          "10",
+          "122992409",
+          "PSA"
+        ],
+        "warnings": []
+      },
+      "manual_truth": {
+        "company": "psa",
+        "grade": 10
+      },
+      "wrong_company": false,
+      "wrong_grade": false,
+      "false_slab_claim": false
+    },
+    {
+      "id": "holdout4_022",
+      "conditions": [
+        "physical_background",
+        "foil_texture_or_reflection",
+        "holder_or_sleeve",
+        "slab"
+      ],
+      "grading_ms": 913.56,
+      "grading": {
+        "slab_detected": true,
+        "is_graded": true,
+        "grading_status": "graded",
+        "company": "psa",
+        "company_source": "label_ocr",
+        "grade": 10.0,
+        "condition_label": "GEM MT",
+        "subgrades": {},
+        "tag_score": null,
+        "certification_number": "77969512",
+        "qualifiers": [],
+        "raw_condition": "not_assessed",
+        "authenticity_verified": false,
+        "source": "visible_label_ocr",
+        "requires_confirmation": true,
+        "label_text": [
+          "2023 POKEMON SWSH",
+          "#GG64",
+          "FA/MELONY",
+          "GEM MT",
+          "CROWN ZENITH",
+          "10",
+          "PSA",
+          "77969512",
+          "TRAINER",
+          "Supporter"
+        ],
+        "warnings": []
+      },
+      "manual_truth": {
+        "company": "psa",
+        "grade": 10
+      },
+      "wrong_company": false,
+      "wrong_grade": false,
+      "false_slab_claim": false
+    },
+    {
+      "id": "holdout4_023",
+      "conditions": [
+        "physical_background",
+        "foil_texture_or_reflection",
+        "holder_or_sleeve",
+        "slab"
+      ],
+      "grading_ms": 965.61,
+      "grading": {
+        "slab_detected": true,
+        "is_graded": true,
+        "grading_status": "graded",
+        "company": "psa",
+        "company_source": "label_ocr",
+        "grade": 10.0,
+        "condition_label": "GEM MT",
+        "subgrades": {},
+        "tag_score": null,
+        "certification_number": "71772050",
+        "qualifiers": [],
+        "raw_condition": "not_assessed",
+        "authenticity_verified": false,
+        "source": "visible_label_ocr",
+        "requires_confirmation": true,
+        "label_text": [
+          "2023 POKEMON SWSH",
+          "#GG64",
+          "FA/MELONY",
+          "GEM MT",
+          "CROWN ZENITH",
+          "10",
+          "PSA",
+          "71772050",
+          "RAINEP",
+          "Supporter",
+          "Melony"
+        ],
+        "warnings": []
+      },
+      "manual_truth": {
+        "company": "psa",
+        "grade": 10
+      },
+      "wrong_company": false,
+      "wrong_grade": false,
+      "false_slab_claim": false
+    },
+    {
+      "id": "holdout4_024",
+      "conditions": [
+        "physical_background",
+        "foil_texture_or_reflection"
+      ],
+      "grading_ms": 1723.55,
+      "grading": {
+        "slab_detected": null,
+        "is_graded": null,
+        "grading_status": "unknown",
+        "company": null,
+        "company_source": "none",
+        "grade": null,
+        "condition_label": null,
+        "subgrades": {},
+        "tag_score": null,
+        "certification_number": null,
+        "qualifiers": [],
+        "raw_condition": "not_assessed",
+        "authenticity_verified": false,
+        "source": "none",
+        "requires_confirmation": true,
+        "label_text": [
+          "TRAINER",
+          "Supporter",
+          "Melony"
+        ],
+        "warnings": [
+          "no_supported_grading_label_detected",
+          "ungraded_status_not_proven"
+        ]
+      },
+      "manual_truth": null,
+      "wrong_company": false,
+      "wrong_grade": false,
+      "false_slab_claim": false
+    },
+    {
+      "id": "holdout4_026",
+      "conditions": [
+        "physical_background",
+        "foil_texture_or_reflection",
+        "holder_or_sleeve",
+        "slab"
+      ],
+      "grading_ms": 997.24,
+      "grading": {
+        "slab_detected": true,
+        "is_graded": true,
+        "grading_status": "graded",
+        "company": "cgc",
+        "company_source": "label_ocr",
+        "grade": 10.0,
+        "condition_label": "GEMMINT",
+        "subgrades": {},
+        "tag_score": null,
+        "certification_number": "1401008886009",
+        "qualifiers": [],
+        "raw_condition": "not_assessed",
+        "authenticity_verified": false,
+        "source": "visible_label_ocr",
+        "requires_confirmation": true,
+        "label_text": [
+          "200000000",
+          "CERTIFIED GUARANTY COMPANY",
+          "Roxanne",
+          "GEMMINT",
+          "Pok\u00e9mon (2023)",
+          "10",
+          "Crown Zenith - GG66/GG70",
+          "1401008886009",
+          "TRAINER",
+          "Supporter"
+        ],
+        "warnings": []
+      },
+      "manual_truth": {
+        "company": "cgc",
+        "grade": 10
+      },
+      "wrong_company": false,
+      "wrong_grade": false,
+      "false_slab_claim": false
+    },
+    {
+      "id": "holdout4_027",
+      "conditions": [
+        "physical_background",
+        "foil_texture_or_reflection",
+        "stand"
+      ],
+      "grading_ms": 3888.65,
+      "grading": {
+        "slab_detected": null,
+        "is_graded": null,
+        "grading_status": "unknown",
+        "company": null,
+        "company_source": "none",
+        "grade": null,
+        "condition_label": null,
+        "subgrades": {},
+        "tag_score": null,
+        "certification_number": null,
+        "qualifiers": [],
+        "raw_condition": "not_assessed",
+        "authenticity_verified": false,
+        "source": "none",
+        "requires_confirmation": true,
+        "label_text": [
+          "TRAINER",
+          "Supporter",
+          "Roxanne"
+        ],
+        "warnings": [
+          "no_supported_grading_label_detected",
+          "ungraded_status_not_proven"
+        ]
+      },
+      "manual_truth": null,
+      "wrong_company": false,
+      "wrong_grade": false,
+      "false_slab_claim": false
+    },
+    {
+      "id": "holdout4_028",
+      "conditions": [
+        "physical_background",
+        "foil_texture_or_reflection"
+      ],
+      "grading_ms": 1803.84,
+      "grading": {
+        "slab_detected": null,
+        "is_graded": null,
+        "grading_status": "unknown",
+        "company": null,
+        "company_source": "none",
+        "grade": null,
+        "condition_label": null,
+        "subgrades": {},
+        "tag_score": null,
+        "certification_number": null,
+        "qualifiers": [],
+        "raw_condition": "not_assessed",
+        "authenticity_verified": false,
+        "source": "none",
+        "requires_confirmation": true,
+        "label_text": [
+          "TRAINER",
+          "Supporter",
+          "Roxanne"
+        ],
+        "warnings": [
+          "no_supported_grading_label_detected",
+          "ungraded_status_not_proven"
+        ]
+      },
+      "manual_truth": null,
+      "wrong_company": false,
+      "wrong_grade": false,
+      "false_slab_claim": false
+    },
+    {
+      "id": "holdout4_029",
+      "conditions": [
+        "physical_background",
+        "foil_texture_or_reflection"
+      ],
+      "grading_ms": 3182.01,
+      "grading": {
+        "slab_detected": null,
+        "is_graded": null,
+        "grading_status": "unknown",
+        "company": null,
+        "company_source": "none",
+        "grade": null,
+        "condition_label": null,
+        "subgrades": {},
+        "tag_score": null,
+        "certification_number": null,
+        "qualifiers": [],
+        "raw_condition": "not_assessed",
+        "authenticity_verified": false,
+        "source": "none",
+        "requires_confirmation": true,
+        "label_text": [
+          "TRAINER",
+          "Supporter",
+          "Roxanne"
+        ],
+        "warnings": [
+          "no_supported_grading_label_detected",
+          "ungraded_status_not_proven"
+        ]
+      },
+      "manual_truth": null,
+      "wrong_company": false,
+      "wrong_grade": false,
+      "false_slab_claim": false
+    },
+    {
+      "id": "holdout4_031",
+      "conditions": [
+        "physical_background",
+        "foil_texture_or_reflection",
+        "holder_or_sleeve"
+      ],
+      "grading_ms": 1649.05,
+      "grading": {
+        "slab_detected": null,
+        "is_graded": null,
+        "grading_status": "unknown",
+        "company": null,
+        "company_source": "none",
+        "grade": null,
+        "condition_label": null,
+        "subgrades": {},
+        "tag_score": null,
+        "certification_number": null,
+        "qualifiers": [],
+        "raw_condition": "not_assessed",
+        "authenticity_verified": false,
+        "source": "none",
+        "requires_confirmation": true,
+        "label_text": [
+          "TRAINER",
+          "Supporter",
+          "Roxanne"
+        ],
+        "warnings": [
+          "no_supported_grading_label_detected",
+          "ungraded_status_not_proven"
+        ]
+      },
+      "manual_truth": null,
+      "wrong_company": false,
+      "wrong_grade": false,
+      "false_slab_claim": false
+    },
+    {
+      "id": "holdout4_036",
+      "conditions": [
+        "physical_background",
+        "foil_texture_or_reflection",
+        "holder_or_sleeve",
+        "slab"
+      ],
+      "grading_ms": 946.17,
+      "grading": {
+        "slab_detected": true,
+        "is_graded": true,
+        "grading_status": "graded",
+        "company": "psa",
+        "company_source": "label_ocr",
+        "grade": 10.0,
+        "condition_label": "GEM MT",
+        "subgrades": {},
+        "tag_score": null,
+        "certification_number": "85933135",
+        "qualifiers": [],
+        "raw_condition": "not_assessed",
+        "authenticity_verified": false,
+        "source": "visible_label_ocr",
+        "requires_confirmation": true,
+        "label_text": [
+          "2023 POKEMON SWSH",
+          "#GG61",
+          "FA/GARDENIA'S VIGOR",
+          "GEM MT",
+          "CROWN ZENITH",
+          "10",
+          "PSA",
+          "85933135",
+          "TRAINER",
+          "Supporter"
+        ],
+        "warnings": []
+      },
+      "manual_truth": {
+        "company": "psa",
+        "grade": 10
+      },
+      "wrong_company": false,
+      "wrong_grade": false,
+      "false_slab_claim": false
+    },
+    {
+      "id": "holdout4_039",
+      "conditions": [
+        "physical_background",
+        "foil_texture_or_reflection"
+      ],
+      "grading_ms": 2165.62,
+      "grading": {
+        "slab_detected": null,
+        "is_graded": null,
+        "grading_status": "unknown",
+        "company": null,
+        "company_source": "none",
+        "grade": null,
+        "condition_label": null,
+        "subgrades": {},
+        "tag_score": null,
+        "certification_number": null,
+        "qualifiers": [],
+        "raw_condition": "not_assessed",
+        "authenticity_verified": false,
+        "source": "none",
+        "requires_confirmation": true,
+        "label_text": [
+          "Dunsparce",
+          "P60",
+          "BASIC"
+        ],
+        "warnings": [
+          "no_supported_grading_label_detected",
+          "ungraded_status_not_proven"
+        ]
+      },
+      "manual_truth": null,
+      "wrong_company": false,
+      "wrong_grade": false,
+      "false_slab_claim": false
+    },
+    {
+      "id": "holdout4_041",
+      "conditions": [
+        "physical_background",
+        "foil_texture_or_reflection",
+        "stand"
+      ],
+      "grading_ms": 3673.08,
+      "grading": {
+        "slab_detected": null,
+        "is_graded": null,
+        "grading_status": "unknown",
+        "company": null,
+        "company_source": "none",
+        "grade": null,
+        "condition_label": null,
+        "subgrades": {},
+        "tag_score": null,
+        "certification_number": null,
+        "qualifiers": [],
+        "raw_condition": "not_assessed",
+        "authenticity_verified": false,
+        "source": "none",
+        "requires_confirmation": true,
+        "label_text": [
+          "Dunsparce",
+          "BASIC",
+          "H60"
+        ],
+        "warnings": [
+          "no_supported_grading_label_detected",
+          "ungraded_status_not_proven"
+        ]
+      },
+      "manual_truth": null,
+      "wrong_company": false,
+      "wrong_grade": false,
+      "false_slab_claim": false
+    },
+    {
+      "id": "holdout4_043",
+      "conditions": [
+        "physical_background",
+        "foil_texture_or_reflection",
+        "holder_or_sleeve",
+        "slab"
+      ],
+      "grading_ms": 1329.27,
+      "grading": {
+        "slab_detected": true,
+        "is_graded": true,
+        "grading_status": "graded",
+        "company": "psa",
+        "company_source": "label_ocr",
+        "grade": 9.0,
+        "condition_label": "MINT",
+        "subgrades": {},
+        "tag_score": null,
+        "certification_number": "76219128",
+        "qualifiers": [],
+        "raw_condition": "not_assessed",
+        "authenticity_verified": false,
+        "source": "visible_label_ocr",
+        "requires_confirmation": true,
+        "label_text": [
+          "2023 POKEMON SWSH",
+          "#GG22",
+          "FA/DITTO",
+          "MINT",
+          "CROWN ZENITH",
+          "9",
+          "PSA",
+          "76219128",
+          "BASIC",
+          "Ditto",
+          "Hp70"
+        ],
+        "warnings": []
+      },
+      "manual_truth": {
+        "company": "psa",
+        "grade": 9
+      },
+      "wrong_company": false,
+      "wrong_grade": false,
+      "false_slab_claim": false
+    },
+    {
+      "id": "holdout4_045",
+      "conditions": [
+        "physical_background",
+        "foil_texture_or_reflection",
+        "holder_or_sleeve",
+        "slab"
+      ],
+      "grading_ms": 897.73,
+      "grading": {
+        "slab_detected": true,
+        "is_graded": true,
+        "grading_status": "graded",
+        "company": "psa",
+        "company_source": "label_ocr",
+        "grade": 10.0,
+        "condition_label": "GEM MT",
+        "subgrades": {},
+        "tag_score": null,
+        "certification_number": "98261248",
+        "qualifiers": [],
+        "raw_condition": "not_assessed",
+        "authenticity_verified": false,
+        "source": "visible_label_ocr",
+        "requires_confirmation": true,
+        "label_text": [
+          "2023 POKEMON SWSH",
+          "#GG22",
+          "FA/DITTO",
+          "GEM MT",
+          "CROWN ZENITH",
+          "10",
+          "PSA",
+          "98261248",
+          "Ditto",
+          "Hp70",
+          "BASIC"
+        ],
+        "warnings": []
+      },
+      "manual_truth": {
+        "company": "psa",
+        "grade": 10
+      },
+      "wrong_company": false,
+      "wrong_grade": false,
+      "false_slab_claim": false
+    },
+    {
+      "id": "holdout4_046",
+      "conditions": [
+        "physical_background",
+        "foil_texture_or_reflection",
+        "perspective_or_handheld"
+      ],
+      "grading_ms": 3502.55,
+      "grading": {
+        "slab_detected": null,
+        "is_graded": null,
+        "grading_status": "unknown",
+        "company": null,
+        "company_source": "none",
+        "grade": null,
+        "condition_label": null,
+        "subgrades": {},
+        "tag_score": null,
+        "certification_number": null,
+        "qualifiers": [],
+        "raw_condition": "not_assessed",
+        "authenticity_verified": false,
+        "source": "none",
+        "requires_confirmation": true,
+        "label_text": [
+          "Turtwig",
+          "BASIC",
+          "HP80"
+        ],
+        "warnings": [
+          "no_supported_grading_label_detected",
+          "ungraded_status_not_proven"
+        ]
+      },
+      "manual_truth": null,
+      "wrong_company": false,
+      "wrong_grade": false,
+      "false_slab_claim": false
+    },
+    {
+      "id": "holdout4_047",
+      "conditions": [
+        "physical_background",
+        "foil_texture_or_reflection"
+      ],
+      "grading_ms": 3068.05,
+      "grading": {
+        "slab_detected": null,
+        "is_graded": null,
+        "grading_status": "unknown",
+        "company": null,
+        "company_source": "none",
+        "grade": null,
+        "condition_label": null,
+        "subgrades": {},
+        "tag_score": null,
+        "certification_number": null,
+        "qualifiers": [],
+        "raw_condition": "not_assessed",
+        "authenticity_verified": false,
+        "source": "none",
+        "requires_confirmation": true,
+        "label_text": [
+          "Turtwig",
+          "m80",
+          "BASIC"
+        ],
+        "warnings": [
+          "no_supported_grading_label_detected",
+          "ungraded_status_not_proven"
+        ]
+      },
+      "manual_truth": null,
+      "wrong_company": false,
+      "wrong_grade": false,
+      "false_slab_claim": false
+    },
+    {
+      "id": "holdout4_049",
+      "conditions": [
+        "physical_background"
+      ],
+      "grading_ms": 1847.55,
+      "grading": {
+        "slab_detected": null,
+        "is_graded": null,
+        "grading_status": "unknown",
+        "company": null,
+        "company_source": "none",
+        "grade": null,
+        "condition_label": null,
+        "subgrades": {},
+        "tag_score": null,
+        "certification_number": null,
+        "qualifiers": [],
+        "raw_condition": "not_assessed",
+        "authenticity_verified": false,
+        "source": "none",
+        "requires_confirmation": true,
+        "label_text": [
+          "Basic Pok\u00e9mon",
+          "Electabuzz",
+          "70 HP"
+        ],
+        "warnings": [
+          "no_supported_grading_label_detected",
+          "ungraded_status_not_proven"
+        ]
+      },
+      "manual_truth": null,
+      "wrong_company": false,
+      "wrong_grade": false,
+      "false_slab_claim": false
+    },
+    {
+      "id": "holdout4_050",
+      "conditions": [
+        "physical_background",
+        "perspective_or_handheld"
+      ],
+      "grading_ms": 1835.49,
+      "grading": {
+        "slab_detected": null,
+        "is_graded": null,
+        "grading_status": "unknown",
+        "company": null,
+        "company_source": "none",
+        "grade": null,
+        "condition_label": null,
+        "subgrades": {},
+        "tag_score": null,
+        "certification_number": null,
+        "qualifiers": [],
+        "raw_condition": "not_assessed",
+        "authenticity_verified": false,
+        "source": "none",
+        "requires_confirmation": true,
+        "label_text": [
+          "Basic Pok\u00e9mon",
+          "Electabuzz",
+          "70 HP"
+        ],
+        "warnings": [
+          "no_supported_grading_label_detected",
+          "ungraded_status_not_proven"
+        ]
+      },
+      "manual_truth": null,
+      "wrong_company": false,
+      "wrong_grade": false,
+      "false_slab_claim": false
+    },
+    {
+      "id": "holdout4_051",
+      "conditions": [
+        "physical_background"
+      ],
+      "grading_ms": 4585.35,
+      "grading": {
+        "slab_detected": null,
+        "is_graded": null,
+        "grading_status": "unknown",
+        "company": null,
+        "company_source": "none",
+        "grade": null,
+        "condition_label": null,
+        "subgrades": {},
+        "tag_score": null,
+        "certification_number": null,
+        "qualifiers": [],
+        "raw_condition": "not_assessed",
+        "authenticity_verified": false,
+        "source": "none",
+        "requires_confirmation": true,
+        "label_text": [
+          "Basic Pok\u00e9mon",
+          "Electabuzz",
+          "70 HP"
+        ],
+        "warnings": [
+          "no_supported_grading_label_detected",
+          "ungraded_status_not_proven"
+        ]
+      },
+      "manual_truth": null,
+      "wrong_company": false,
+      "wrong_grade": false,
+      "false_slab_claim": false
+    },
+    {
+      "id": "holdout4_058",
+      "conditions": [
+        "physical_background",
+        "holder_or_sleeve"
+      ],
+      "grading_ms": 1883.61,
+      "grading": {
+        "slab_detected": null,
+        "is_graded": null,
+        "grading_status": "unknown",
+        "company": null,
+        "company_source": "none",
+        "grade": null,
+        "condition_label": null,
+        "subgrades": {},
+        "tag_score": null,
+        "certification_number": null,
+        "qualifiers": [],
+        "raw_condition": "not_assessed",
+        "authenticity_verified": false,
+        "source": "none",
+        "requires_confirmation": true,
+        "label_text": [
+          "Basic Pok\u00e9mon",
+          "Staryu",
+          "40 HP"
+        ],
+        "warnings": [
+          "no_supported_grading_label_detected",
+          "ungraded_status_not_proven"
+        ]
+      },
+      "manual_truth": null,
+      "wrong_company": false,
+      "wrong_grade": false,
+      "false_slab_claim": false
+    },
+    {
+      "id": "holdout4_060",
+      "conditions": [
+        "physical_background",
+        "stand"
+      ],
+      "grading_ms": 1872.96,
+      "grading": {
+        "slab_detected": null,
+        "is_graded": null,
+        "grading_status": "unknown",
+        "company": null,
+        "company_source": "none",
+        "grade": null,
+        "condition_label": null,
+        "subgrades": {},
+        "tag_score": null,
+        "certification_number": null,
+        "qualifiers": [],
+        "raw_condition": "not_assessed",
+        "authenticity_verified": false,
+        "source": "none",
+        "requires_confirmation": true,
+        "label_text": [
+          "Basic Pok\u00e9mon",
+          "Staryu",
+          "40 HP"
+        ],
+        "warnings": [
+          "no_supported_grading_label_detected",
+          "ungraded_status_not_proven"
+        ]
+      },
+      "manual_truth": null,
+      "wrong_company": false,
+      "wrong_grade": false,
+      "false_slab_claim": false
+    },
+    {
+      "id": "holdout4_063",
+      "conditions": [
+        "physical_background",
+        "perspective_or_handheld"
+      ],
+      "grading_ms": 1746.29,
+      "grading": {
+        "slab_detected": null,
+        "is_graded": null,
+        "grading_status": "unknown",
+        "company": null,
+        "company_source": "none",
+        "grade": null,
+        "condition_label": null,
+        "subgrades": {},
+        "tag_score": null,
+        "certification_number": null,
+        "qualifiers": [],
+        "raw_condition": "not_assessed",
+        "authenticity_verified": false,
+        "source": "none",
+        "requires_confirmation": true,
+        "label_text": [
+          "Basic Pok\u00e9mon",
+          "Abra",
+          "30 HP"
+        ],
+        "warnings": [
+          "no_supported_grading_label_detected",
+          "ungraded_status_not_proven"
+        ]
+      },
+      "manual_truth": null,
+      "wrong_company": false,
+      "wrong_grade": false,
+      "false_slab_claim": false
+    },
+    {
+      "id": "holdout4_064",
+      "conditions": [
+        "physical_background",
+        "stand"
+      ],
+      "grading_ms": 1709.98,
+      "grading": {
+        "slab_detected": null,
+        "is_graded": null,
+        "grading_status": "unknown",
+        "company": null,
+        "company_source": "none",
+        "grade": null,
+        "condition_label": null,
+        "subgrades": {},
+        "tag_score": null,
+        "certification_number": null,
+        "qualifiers": [],
+        "raw_condition": "not_assessed",
+        "authenticity_verified": false,
+        "source": "none",
+        "requires_confirmation": true,
+        "label_text": [
+          "Basic Pok\u00e9mon",
+          "Abra",
+          "30 HP"
+        ],
+        "warnings": [
+          "no_supported_grading_label_detected",
+          "ungraded_status_not_proven"
+        ]
+      },
+      "manual_truth": null,
+      "wrong_company": false,
+      "wrong_grade": false,
+      "false_slab_claim": false
+    },
+    {
+      "id": "holdout4_067",
+      "conditions": [
+        "physical_background",
+        "holder_or_sleeve",
+        "slab"
+      ],
+      "grading_ms": 8984.02,
+      "grading": {
+        "slab_detected": true,
+        "is_graded": true,
+        "grading_status": "graded",
+        "company": null,
+        "company_source": "none",
+        "grade": 10.0,
+        "condition_label": "GEM MT",
+        "subgrades": {},
+        "tag_score": null,
+        "certification_number": "27975008",
+        "qualifiers": [],
+        "raw_condition": "not_assessed",
+        "authenticity_verified": false,
+        "source": "visible_label_ocr",
+        "requires_confirmation": true,
+        "label_text": [
+          "1999 POKEMON GAME",
+          "#43",
+          "ABRA",
+          "GEM MT",
+          "10",
+          "27975008",
+          "Balc Pokiman",
+          "Abra"
+        ],
+        "warnings": [
+          "grading_company_unreadable_or_unsupported"
+        ]
+      },
+      "manual_truth": {
+        "company": "psa",
+        "grade": 10
+      },
+      "wrong_company": false,
+      "wrong_grade": false,
+      "false_slab_claim": false
+    },
+    {
+      "id": "holdout4_068",
+      "conditions": [
+        "physical_background",
+        "holder_or_sleeve",
+        "perspective_or_handheld"
+      ],
+      "grading_ms": 3908.89,
+      "grading": {
+        "slab_detected": null,
+        "is_graded": null,
+        "grading_status": "unknown",
+        "company": null,
+        "company_source": "none",
+        "grade": null,
+        "condition_label": null,
+        "subgrades": {},
+        "tag_score": null,
+        "certification_number": null,
+        "qualifiers": [],
+        "raw_condition": "not_assessed",
+        "authenticity_verified": false,
+        "source": "none",
+        "requires_confirmation": true,
+        "label_text": [
+          "Basic Pok\u00e9mon",
+          "Oddish",
+          "50 HP"
+        ],
+        "warnings": [
+          "no_supported_grading_label_detected",
+          "ungraded_status_not_proven"
+        ]
+      },
+      "manual_truth": null,
+      "wrong_company": false,
+      "wrong_grade": false,
+      "false_slab_claim": false
+    },
+    {
+      "id": "holdout4_070",
+      "conditions": [
+        "physical_background"
+      ],
+      "grading_ms": 1879.74,
+      "grading": {
+        "slab_detected": null,
+        "is_graded": null,
+        "grading_status": "unknown",
+        "company": null,
+        "company_source": "none",
+        "grade": null,
+        "condition_label": null,
+        "subgrades": {},
+        "tag_score": null,
+        "certification_number": null,
+        "qualifiers": [],
+        "raw_condition": "not_assessed",
+        "authenticity_verified": false,
+        "source": "none",
+        "requires_confirmation": true,
+        "label_text": [
+          "Basic Pok\u00e9mon",
+          "Oddish",
+          "50 HP"
+        ],
+        "warnings": [
+          "no_supported_grading_label_detected",
+          "ungraded_status_not_proven"
+        ]
+      },
+      "manual_truth": null,
+      "wrong_company": false,
+      "wrong_grade": false,
+      "false_slab_claim": false
+    },
+    {
+      "id": "holdout4_072",
+      "conditions": [
+        "physical_background",
+        "holder_or_sleeve",
+        "perspective_or_handheld",
+        "busy_packaging_background"
+      ],
+      "grading_ms": 2279.36,
+      "grading": {
+        "slab_detected": null,
+        "is_graded": null,
+        "grading_status": "unknown",
+        "company": null,
+        "company_source": "none",
+        "grade": null,
+        "condition_label": null,
+        "subgrades": {},
+        "tag_score": null,
+        "certification_number": null,
+        "qualifiers": [],
+        "raw_condition": "not_assessed",
+        "authenticity_verified": false,
+        "source": "none",
+        "requires_confirmation": true,
+        "label_text": [
+          "GARDBOARD",
+          "Basic Pok\u00e9mon",
+          "Oddish",
+          "50 HP",
+          "RT",
+          "A1"
+        ],
+        "warnings": [
+          "no_supported_grading_label_detected",
+          "ungraded_status_not_proven"
+        ]
+      },
+      "manual_truth": null,
+      "wrong_company": false,
+      "wrong_grade": false,
+      "false_slab_claim": false
+    },
+    {
+      "id": "holdout4_078",
+      "conditions": [
+        "physical_background"
+      ],
+      "grading_ms": 1710.21,
+      "grading": {
+        "slab_detected": null,
+        "is_graded": null,
+        "grading_status": "unknown",
+        "company": null,
+        "company_source": "none",
+        "grade": null,
+        "condition_label": null,
+        "subgrades": {},
+        "tag_score": null,
+        "certification_number": null,
+        "qualifiers": [],
+        "raw_condition": "not_assessed",
+        "authenticity_verified": false,
+        "source": "none",
+        "requires_confirmation": true,
+        "label_text": [
+          "Basic Pok\u00e9mon",
+          "Vulpix",
+          "HP 50"
+        ],
+        "warnings": [
+          "no_supported_grading_label_detected",
+          "ungraded_status_not_proven"
+        ]
+      },
+      "manual_truth": null,
+      "wrong_company": false,
+      "wrong_grade": false,
+      "false_slab_claim": false
+    },
+    {
+      "id": "holdout4_080",
+      "conditions": [
+        "physical_background",
+        "perspective_or_handheld"
+      ],
+      "grading_ms": 1594.09,
+      "grading": {
+        "slab_detected": null,
+        "is_graded": null,
+        "grading_status": "unknown",
+        "company": null,
+        "company_source": "none",
+        "grade": null,
+        "condition_label": null,
+        "subgrades": {},
+        "tag_score": null,
+        "certification_number": null,
+        "qualifiers": [],
+        "raw_condition": "not_assessed",
+        "authenticity_verified": false,
+        "source": "none",
+        "requires_confirmation": true,
+        "label_text": [
+          "HP 50",
+          "Basic Pok\u00e9mon",
+          "Vulpix"
+        ],
+        "warnings": [
+          "no_supported_grading_label_detected",
+          "ungraded_status_not_proven"
+        ]
+      },
+      "manual_truth": null,
+      "wrong_company": false,
+      "wrong_grade": false,
+      "false_slab_claim": false
+    },
+    {
+      "id": "holdout4_084",
+      "conditions": [
+        "physical_background",
+        "holder_or_sleeve"
+      ],
+      "grading_ms": 2030.1,
+      "grading": {
+        "slab_detected": null,
+        "is_graded": null,
+        "grading_status": "unknown",
+        "company": null,
+        "company_source": "none",
+        "grade": null,
+        "condition_label": null,
+        "subgrades": {},
+        "tag_score": null,
+        "certification_number": null,
+        "qualifiers": [],
+        "raw_condition": "not_assessed",
+        "authenticity_verified": false,
+        "source": "none",
+        "requires_confirmation": true,
+        "label_text": [
+          "Basic Pok\u00e9mon",
+          "Sandshrew",
+          "40 HP"
+        ],
+        "warnings": [
+          "no_supported_grading_label_detected",
+          "ungraded_status_not_proven"
+        ]
+      },
+      "manual_truth": null,
+      "wrong_company": false,
+      "wrong_grade": false,
+      "false_slab_claim": false
+    },
+    {
+      "id": "holdout4_085",
+      "conditions": [
+        "physical_background",
+        "holder_or_sleeve",
+        "perspective_or_handheld"
+      ],
+      "grading_ms": 1911.57,
+      "grading": {
+        "slab_detected": null,
+        "is_graded": null,
+        "grading_status": "unknown",
+        "company": null,
+        "company_source": "none",
+        "grade": null,
+        "condition_label": null,
+        "subgrades": {},
+        "tag_score": null,
+        "certification_number": null,
+        "qualifiers": [],
+        "raw_condition": "not_assessed",
+        "authenticity_verified": false,
+        "source": "none",
+        "requires_confirmation": true,
+        "label_text": [
+          "Basic Pok\u00e9mon",
+          "40 HP",
+          "Sandshrew"
+        ],
+        "warnings": [
+          "no_supported_grading_label_detected",
+          "ungraded_status_not_proven"
+        ]
+      },
+      "manual_truth": null,
+      "wrong_company": false,
+      "wrong_grade": false,
+      "false_slab_claim": false
+    },
+    {
+      "id": "holdout4_086",
+      "conditions": [
+        "physical_background",
+        "foil_texture_or_reflection",
+        "perspective_or_handheld"
+      ],
+      "grading_ms": 2445.33,
+      "grading": {
+        "slab_detected": null,
+        "is_graded": null,
+        "grading_status": "unknown",
+        "company": null,
+        "company_source": "none",
+        "grade": null,
+        "condition_label": null,
+        "subgrades": {},
+        "tag_score": null,
+        "certification_number": null,
+        "qualifiers": [],
+        "raw_condition": "not_assessed",
+        "authenticity_verified": false,
+        "source": "none",
+        "requires_confirmation": true,
+        "label_text": [
+          "2\u9032\u5316",
+          "\u30b2\u30c3\u30b3\u30a6\u30ac3",
+          "310",
+          "\u30b2\u30b3\u30ab\u30b7\u30e9\u304b\u3089\u9032\u5316",
+          "\u3053\u306e\u30dd\u30b1\u30e2\u30f3\u306f\u3001\u30d9\u30f3\u30c1\u306b\u3044\u308b\u304b\u304d\u308a\u3001\u30ef\u30b6\u306e\u30c0\u30e1\u30fc\u30b8\u3092\u53d7\u3051\u306a\u3044\u3002"
+        ],
+        "warnings": [
+          "no_supported_grading_label_detected",
+          "ungraded_status_not_proven"
+        ]
+      },
+      "manual_truth": null,
+      "wrong_company": false,
+      "wrong_grade": false,
+      "false_slab_claim": false
+    },
+    {
+      "id": "holdout4_090",
+      "conditions": [
+        "physical_background",
+        "foil_texture_or_reflection",
+        "stand"
+      ],
+      "grading_ms": 3192.39,
+      "grading": {
+        "slab_detected": null,
+        "is_graded": null,
+        "grading_status": "unknown",
+        "company": null,
+        "company_source": "none",
+        "grade": null,
+        "condition_label": null,
+        "subgrades": {},
+        "tag_score": null,
+        "certification_number": null,
+        "qualifiers": [],
+        "raw_condition": "not_assessed",
+        "authenticity_verified": false,
+        "source": "none",
+        "requires_confirmation": true,
+        "label_text": [
+          "2\u5316",
+          "\u30b2\u30c3\u30b3\u30a6\u30ac",
+          "310",
+          "HD",
+          "\u30b0\u30b3\u30ac\u30b7\u30e9\u304bG\u901a\u5316",
+          "\u30c6\u30e9\u30b9\u30bf\u30eb",
+          "\u3053\u306e\u30dc\u30b1\u30e2\u30f3\u306f\u3001\u30d9\u30f3\u30c1\u306b\u3044\u308b\u304b\u3067\u308a\u3001\u30ef\u30bd\u306e\u30c0\u30e1\u30fc\u30ea\u3092\u611b\u3051\u306a\u3044\u3002"
+        ],
+        "warnings": [
+          "no_supported_grading_label_detected",
+          "ungraded_status_not_proven"
+        ]
+      },
+      "manual_truth": null,
+      "wrong_company": false,
+      "wrong_grade": false,
+      "false_slab_claim": false
+    },
+    {
+      "id": "holdout4_097",
+      "conditions": [
+        "physical_background",
+        "foil_texture_or_reflection"
+      ],
+      "grading_ms": 3012.52,
+      "grading": {
+        "slab_detected": null,
+        "is_graded": null,
+        "grading_status": "unknown",
+        "company": null,
+        "company_source": "none",
+        "grade": null,
+        "condition_label": null,
+        "subgrades": {},
+        "tag_score": null,
+        "certification_number": null,
+        "qualifiers": [],
+        "raw_condition": "not_assessed",
+        "authenticity_verified": false,
+        "source": "none",
+        "requires_confirmation": true,
+        "label_text": [
+          "\u305f\u306d",
+          "\u30c6\u30c4\u30ce\u30ab\u30a4\u30caEX",
+          "230",
+          "HP",
+          "\u672a\u6765\u529est1"
+        ],
+        "warnings": [
+          "no_supported_grading_label_detected",
+          "ungraded_status_not_proven"
+        ]
+      },
+      "manual_truth": null,
+      "wrong_company": false,
+      "wrong_grade": false,
+      "false_slab_claim": false
+    },
+    {
+      "id": "holdout4_099",
+      "conditions": [
+        "physical_background",
+        "foil_texture_or_reflection",
+        "stand"
+      ],
+      "grading_ms": 3925.74,
+      "grading": {
+        "slab_detected": null,
+        "is_graded": null,
+        "grading_status": "unknown",
+        "company": null,
+        "company_source": "none",
+        "grade": null,
+        "condition_label": null,
+        "subgrades": {},
+        "tag_score": null,
+        "certification_number": null,
+        "qualifiers": [],
+        "raw_condition": "not_assessed",
+        "authenticity_verified": false,
+        "source": "none",
+        "requires_confirmation": true,
+        "label_text": [
+          "\u305f\u306d",
+          "\u30c6\u30c4\u30ce\u30ab\u30b7\u30e9EX",
+          "220",
+          "HP",
+          "\u672a\u6765",
+          "\u307f\u3089\u3044"
+        ],
+        "warnings": [
+          "no_supported_grading_label_detected",
+          "ungraded_status_not_proven"
+        ]
+      },
+      "manual_truth": null,
+      "wrong_company": false,
+      "wrong_grade": false,
+      "false_slab_claim": false
+    },
+    {
+      "id": "holdout4_105",
+      "conditions": [
+        "physical_background",
+        "foil_texture_or_reflection",
+        "perspective_or_handheld"
+      ],
+      "grading_ms": 4676.24,
+      "grading": {
+        "slab_detected": null,
+        "is_graded": null,
+        "grading_status": "unknown",
+        "company": null,
+        "company_source": "none",
+        "grade": null,
+        "condition_label": null,
+        "subgrades": {},
+        "tag_score": null,
+        "certification_number": null,
+        "qualifiers": [],
+        "raw_condition": "not_assessed",
+        "authenticity_verified": false,
+        "source": "none",
+        "requires_confirmation": true,
+        "label_text": [
+          "220",
+          "\u30c6\u30c4\u30ce\u30ab\u30b7\u30e9\u533aX",
+          "HD"
+        ],
+        "warnings": [
+          "no_supported_grading_label_detected",
+          "ungraded_status_not_proven"
+        ]
+      },
+      "manual_truth": null,
+      "wrong_company": false,
+      "wrong_grade": false,
+      "false_slab_claim": false
+    },
+    {
+      "id": "holdout4_111",
+      "conditions": [
+        "physical_background",
+        "foil_texture_or_reflection",
+        "holder_or_sleeve"
+      ],
+      "grading_ms": 2173.21,
+      "grading": {
+        "slab_detected": null,
+        "is_graded": null,
+        "grading_status": "unknown",
+        "company": null,
+        "company_source": "none",
+        "grade": null,
+        "condition_label": null,
+        "subgrades": {},
+        "tag_score": null,
+        "certification_number": null,
+        "qualifiers": [],
+        "raw_condition": "not_assessed",
+        "authenticity_verified": false,
+        "source": "none",
+        "requires_confirmation": true,
+        "label_text": [
+          "\u305f\u306d",
+          "\u30a6\u30ac\u30c4\u30db\u30e0\u30e9\u30d3\u30b9",
+          "230",
+          "HP",
+          "\u53e4\u4ee3",
+          "\u3053\u3060\u3044"
+        ],
+        "warnings": [
+          "no_supported_grading_label_detected",
+          "ungraded_status_not_proven"
+        ]
+      },
+      "manual_truth": null,
+      "wrong_company": false,
+      "wrong_grade": false,
+      "false_slab_claim": false
+    },
+    {
+      "id": "holdout4_112",
+      "conditions": [
+        "physical_background",
+        "foil_texture_or_reflection",
+        "perspective_or_handheld"
+      ],
+      "grading_ms": 2204.27,
+      "grading": {
+        "slab_detected": null,
+        "is_graded": null,
+        "grading_status": "unknown",
+        "company": null,
+        "company_source": "none",
+        "grade": null,
+        "condition_label": null,
+        "subgrades": {},
+        "tag_score": null,
+        "certification_number": null,
+        "qualifiers": [],
+        "raw_condition": "not_assessed",
+        "authenticity_verified": false,
+        "source": "none",
+        "requires_confirmation": true,
+        "label_text": [
+          "\u305f\u306d",
+          "230",
+          "\u30a6\u30ac\u30c4\u30db\u30e0\u30e9",
+          "HP",
+          "\u53e4\u4ee3",
+          "\u3053\u3060\u3044"
+        ],
+        "warnings": [
+          "no_supported_grading_label_detected",
+          "ungraded_status_not_proven"
+        ]
+      },
+      "manual_truth": null,
+      "wrong_company": false,
+      "wrong_grade": false,
+      "false_slab_claim": false
+    },
+    {
+      "id": "holdout4_113",
+      "conditions": [
+        "physical_background",
+        "foil_texture_or_reflection",
+        "holder_or_sleeve",
+        "slab",
+        "stand"
+      ],
+      "grading_ms": 1071.91,
+      "grading": {
+        "slab_detected": true,
+        "is_graded": true,
+        "grading_status": "graded",
+        "company": "cgc",
+        "company_source": "label_ocr",
+        "grade": 10.0,
+        "condition_label": "GEMMINT",
+        "subgrades": {},
+        "tag_score": null,
+        "certification_number": "6077794255",
+        "qualifiers": [],
+        "raw_condition": "not_assessed",
+        "authenticity_verified": false,
+        "source": "visible_label_ocr",
+        "requires_confirmation": true,
+        "label_text": [
+          "CGC",
+          "CERTIFIED GUARANTY COMPANY",
+          "Gouging Fire ex",
+          "GEMMINT",
+          "Pok\u00e9mon (2024) Japanese",
+          "10",
+          "Wild Force - 093/071",
+          "Special Art Rare - Holo",
+          "6077794255"
+        ],
+        "warnings": []
+      },
+      "manual_truth": {
+        "company": "cgc",
+        "grade": 10
+      },
+      "wrong_company": false,
+      "wrong_grade": false,
+      "false_slab_claim": false
+    }
+  ]
+}

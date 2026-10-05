@@ -1,0 +1,7 @@
+{
+  "scope": "Additional official English assets: set/name/collector identity, not finish authentication",
+  "approved_sheets": ["review-00.png", "review-01.png", "review-02.png", "review-03.png", "review-04.png", "review-05.png", "review-06.png", "review-07.png", "review-08.png", "review-09.png", "review-10.png", "review-11.png", "review-12.png", "review-13.png", "review-14.png", "review-15.png", "review-16.png", "review-17.png"],
+  "pending_card_ids": ["en:svp-211", "en:swshp-SWSH287", "en:swshp-SWSH288", "en:swshp-SWSH289", "en:swshp-SWSH290"],
+  "pending_reason": "Printed identifiers too small for unambiguous visual verification in this pass. V-UNION needs individual panel identification, not a name-only match.",
+  "supplemental_images_inspected": ["v-union-full.png", "gothitelle-number.png"]
+}

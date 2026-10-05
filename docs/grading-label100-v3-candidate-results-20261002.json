@@ -1,0 +1,5148 @@
+{
+  "summary": {
+    "photos": 100,
+    "company_correct": 88,
+    "company_missing": 12,
+    "company_wrong": 0,
+    "grade_correct": 90,
+    "grade_missing": 10,
+    "grade_wrong": 0,
+    "both_correct": 86,
+    "any_wrong_field": 0,
+    "incomplete_without_wrong_field": 14,
+    "slab_detected": 97,
+    "by_company": {
+      "psa": {
+        "photos": 17,
+        "company_correct": 17,
+        "company_missing": 0,
+        "company_wrong": 0,
+        "grade_correct": 17,
+        "grade_missing": 0,
+        "grade_wrong": 0,
+        "both_correct": 17,
+        "any_wrong_field": 0,
+        "incomplete_without_wrong_field": 0,
+        "slab_detected": 17
+      },
+      "beckett": {
+        "photos": 16,
+        "company_correct": 15,
+        "company_missing": 1,
+        "company_wrong": 0,
+        "grade_correct": 16,
+        "grade_missing": 0,
+        "grade_wrong": 0,
+        "both_correct": 15,
+        "any_wrong_field": 0,
+        "incomplete_without_wrong_field": 1,
+        "slab_detected": 16
+      },
+      "cgc": {
+        "photos": 17,
+        "company_correct": 17,
+        "company_missing": 0,
+        "company_wrong": 0,
+        "grade_correct": 15,
+        "grade_missing": 2,
+        "grade_wrong": 0,
+        "both_correct": 15,
+        "any_wrong_field": 0,
+        "incomplete_without_wrong_field": 2,
+        "slab_detected": 17
+      },
+      "tag": {
+        "photos": 17,
+        "company_correct": 16,
+        "company_missing": 1,
+        "company_wrong": 0,
+        "grade_correct": 16,
+        "grade_missing": 1,
+        "grade_wrong": 0,
+        "both_correct": 16,
+        "any_wrong_field": 0,
+        "incomplete_without_wrong_field": 1,
+        "slab_detected": 16
+      },
+      "ace": {
+        "photos": 16,
+        "company_correct": 8,
+        "company_missing": 8,
+        "company_wrong": 0,
+        "grade_correct": 9,
+        "grade_missing": 7,
+        "grade_wrong": 0,
+        "both_correct": 8,
+        "any_wrong_field": 0,
+        "incomplete_without_wrong_field": 8,
+        "slab_detected": 14
+      },
+      "ags": {
+        "photos": 17,
+        "company_correct": 15,
+        "company_missing": 2,
+        "company_wrong": 0,
+        "grade_correct": 17,
+        "grade_missing": 0,
+        "grade_wrong": 0,
+        "both_correct": 15,
+        "any_wrong_field": 0,
+        "incomplete_without_wrong_field": 2,
+        "slab_detected": 17
+      }
+    },
+    "latency_ms": {
+      "median": 1516.68,
+      "p95": 8448.37,
+      "max": 11376.66
+    },
+    "statuses": {
+      "graded": 90,
+      "unknown": 10
+    },
+    "warnings": {
+      "grading_company_unreadable_or_unsupported": 9,
+      "overall_grade_unreadable_or_ambiguous": 6,
+      "no_supported_grading_label_detected": 3,
+      "ungraded_status_not_proven": 3,
+      "conflicting_condition_labels": 1,
+      "certification_number_ambiguous": 1
+    },
+    "code_hashes": {
+      "app/recognition/grading.py": "de48dd7b40b5841a570b3f3ba661594553c9c59eade0ba41fb9dc96b4aa9c3c7",
+      "app/recognition/label_vision.py": "9c37a54b72b2937b29d1518471d1c9278022254cda406a99fdd3a26744290750",
+      "app/recognition/ocr.py": "815b1aaa1b0dcb15f1c5d5f8fd28cec898df8b913dda97e3bd9b83118c55be74",
+      "app/recognition/detect.py": "5a4052c7c7d611dd6577bca69f870b90464ec04fc52b7acb11e166bc4c64d2aa",
+      "app/schemas.py": "dfbea85b9005e80be99f539eb87bb61190c00a834ea8758a4d43e03a004343d1",
+      "scripts/probe_grading_labels.py": "fd4c9aa1c1c941221c17ff7a6d4ea20ded3fb257d67806e1a58830aee019852a",
+      "app/recognition/assets/grading-logos/ace-outline.png": "1d8b6887a69f70fe2e53426cf47f7e81173cdade8e598256e2f045fb79b05ba5",
+      "app/recognition/assets/grading-logos/ace.png": "c4a8777bde3e951e8fd10b231b95b3bc01dc8f1649a40b29fde2387230a5fae9",
+      "app/recognition/assets/grading-logos/ags.png": "1da72a5f5db0386eedff42ad684b9fc4bc9933b85263455d8cad0744b230ac3c",
+      "app/recognition/assets/grading-logos/beckett-emblem.png": "ce9b309f82fea40158dd2383a58907f4f08c6f44493bfb495980baecd42ca9a5",
+      "app/recognition/assets/grading-logos/beckett.png": "a9cebe2866b1e6ff8c9fd4a120c48779e607a81a58927b53e71b0e4c4de24698",
+      "app/recognition/assets/grading-logos/psa.png": "95ce6457c32365d2b3c5362c41c60511147f5efb3a223f3b9b47592a7c4c1982",
+      "app/recognition/assets/grading-logos/sources.json": "9cb9ee5abdce4d54459723c92b8a585a2070d77079692a7dc4c8cbf2269e88de",
+      "app/recognition/assets/grading-logos/tag.png": "fb6f9e7474b62bd2305fcbd03b2a8ef46095f46f5afc8e0fe27d191853d5c7a1"
+    },
+    "evaluation_kind": "tuned_regression",
+    "code_and_truth_unchanged_after_freeze": false,
+    "code_unchanged_during_probe": true,
+    "truth_and_photos_unchanged_after_freeze": true,
+    "raw_results_sha256": "7d1aa62c10ed23498eba97c6aee0459d7166f27beac16f93c16b8f5a87b600f4",
+    "frozen_sources_sha256": "3f9ee849c9217a0515e38d1712cc64be723189cf8966156f86a639b89fd571f7",
+    "limitations": [
+      "Reused tuning/regression photos; not unseen accuracy or an estimate of all camera scans.",
+      "Only company and overall numeric grade have independent scored truth.",
+      "Null fields are abstentions/missing output, not necessarily unreadable to a human.",
+      "No authentication, physical raw-condition, native descriptor, certification digit, subgrade or TAG-score accuracy claim.",
+      "Isolated local label component, not staging API HTTP/end-to-end card matching latency.",
+      "Photos retain original backgrounds, glare and framing; contact-sheet crops were for manual review only."
+    ]
+  },
+  "cases": [
+    {
+      "id": "label100_800174277078",
+      "conditions": [
+        "slab",
+        "public_seller_photo"
+      ],
+      "grading_ms": 3890.11,
+      "grading": {
+        "slab_detected": true,
+        "is_graded": true,
+        "grading_status": "graded",
+        "company": "psa",
+        "company_source": "verified_logo",
+        "grade": 10.0,
+        "condition_label": "GEM MT",
+        "subgrades": {},
+        "tag_score": null,
+        "certification_number": "70308211",
+        "qualifiers": [],
+        "raw_condition": "not_assessed",
+        "authenticity_verified": false,
+        "source": "visible_label_ocr",
+        "requires_confirmation": true,
+        "label_text": [
+          "2022 POKEMON JPN. SV -P",
+          "#001",
+          "PIKACHU",
+          "GEM MT",
+          "SCARLET/VIOLET PRE-ORDER",
+          "10",
+          "PA",
+          "70308211"
+        ],
+        "warnings": []
+      },
+      "manual_truth": {
+        "company": "psa",
+        "grade": 10
+      },
+      "source_page": "https://www.ebay.com/itm/800174277078",
+      "image_sha256": "5f70b690ed2494c3593d36c9d176891e530021c06a76c796fc1870725e420518",
+      "company_correct": true,
+      "grade_correct": true,
+      "company_wrong": false,
+      "grade_wrong": false
+    },
+    {
+      "id": "label100_177973415542",
+      "conditions": [
+        "slab",
+        "public_seller_photo"
+      ],
+      "grading_ms": 803.76,
+      "grading": {
+        "slab_detected": true,
+        "is_graded": true,
+        "grading_status": "graded",
+        "company": "psa",
+        "company_source": "label_ocr",
+        "grade": 8.0,
+        "condition_label": "NM-MT",
+        "subgrades": {},
+        "tag_score": null,
+        "certification_number": "74399905",
+        "qualifiers": [],
+        "raw_condition": "not_assessed",
+        "authenticity_verified": false,
+        "source": "visible_label_ocr",
+        "requires_confirmation": true,
+        "label_text": [
+          "1999 POKEMON GAME",
+          "#43",
+          "ABRA",
+          "NM-MT",
+          "1ST EDITION",
+          "8",
+          "PSA",
+          "74399905",
+          "Basic Pok\u00e9mon",
+          "Abra",
+          "30 HP"
+        ],
+        "warnings": []
+      },
+      "manual_truth": {
+        "company": "psa",
+        "grade": 8
+      },
+      "source_page": "https://www.ebay.com/itm/177973415542",
+      "image_sha256": "180f6da67e5004b4e76c9df1b52002f2dc3a8eaf6b68eb7c38a26040ba365fc7",
+      "company_correct": true,
+      "grade_correct": true,
+      "company_wrong": false,
+      "grade_wrong": false
+    },
+    {
+      "id": "label100_168250552726",
+      "conditions": [
+        "slab",
+        "public_seller_photo"
+      ],
+      "grading_ms": 857.4,
+      "grading": {
+        "slab_detected": true,
+        "is_graded": true,
+        "grading_status": "graded",
+        "company": "psa",
+        "company_source": "label_ocr",
+        "grade": 6.0,
+        "condition_label": "EX-MT",
+        "subgrades": {},
+        "tag_score": null,
+        "certification_number": "126515940",
+        "qualifiers": [],
+        "raw_condition": "not_assessed",
+        "authenticity_verified": false,
+        "source": "visible_label_ocr",
+        "requires_confirmation": true,
+        "label_text": [
+          "2021 POKEMON JAPANESE",
+          "#001",
+          "FA/PIKACHU",
+          "EX-MT",
+          "25TH ANNIVERSARY COLL.",
+          "6",
+          "PSA",
+          "126515940",
+          "\u30d2\u30ab\u30c1\u30e5\u30a6",
+          "w60",
+          "\u305f\u306d"
+        ],
+        "warnings": []
+      },
+      "manual_truth": {
+        "company": "psa",
+        "grade": 6
+      },
+      "source_page": "https://www.ebay.com/itm/168250552726",
+      "image_sha256": "d517dab53e35ea3a887859902d14ca580e6ac813a006093f35ae3193210946db",
+      "company_correct": true,
+      "grade_correct": true,
+      "company_wrong": false,
+      "grade_wrong": false
+    },
+    {
+      "id": "label100_267711277755",
+      "conditions": [
+        "slab",
+        "public_seller_photo"
+      ],
+      "grading_ms": 1346.06,
+      "grading": {
+        "slab_detected": true,
+        "is_graded": true,
+        "grading_status": "graded",
+        "company": "psa",
+        "company_source": "label_ocr",
+        "grade": 1.0,
+        "condition_label": "PR",
+        "subgrades": {},
+        "tag_score": null,
+        "certification_number": "164797818",
+        "qualifiers": [],
+        "raw_condition": "not_assessed",
+        "authenticity_verified": false,
+        "source": "visible_label_ocr",
+        "requires_confirmation": true,
+        "label_text": [
+          "2019 POKEMON JPN. S-P",
+          "#002",
+          "SHIBUYA'S PIKACHU",
+          "PR",
+          "PM CENTER SHIBUYA OPENING",
+          "1",
+          "PSA",
+          "164797818",
+          "\u305f\u306d",
+          "\u30a2\u30e3\u306e\u30d2\u30ab\u30c1\u30b3\u30a6",
+          "60"
+        ],
+        "warnings": []
+      },
+      "manual_truth": {
+        "company": "psa",
+        "grade": 1
+      },
+      "source_page": "https://www.ebay.com/itm/267711277755",
+      "image_sha256": "ba641763c72732f28d9e8530994eea151b442714debff5951eef299ae99049c7",
+      "company_correct": true,
+      "grade_correct": true,
+      "company_wrong": false,
+      "grade_wrong": false
+    },
+    {
+      "id": "label100_205041067257",
+      "conditions": [
+        "slab",
+        "public_seller_photo"
+      ],
+      "grading_ms": 4095.16,
+      "grading": {
+        "slab_detected": true,
+        "is_graded": true,
+        "grading_status": "graded",
+        "company": "psa",
+        "company_source": "verified_logo",
+        "grade": 7.0,
+        "condition_label": "NM",
+        "subgrades": {},
+        "tag_score": null,
+        "certification_number": "148265533",
+        "qualifiers": [],
+        "raw_condition": "not_assessed",
+        "authenticity_verified": false,
+        "source": "visible_label_ocr",
+        "requires_confirmation": true,
+        "label_text": [
+          "2020 POKEMON JPN.SWSH",
+          "#009",
+          "CELEBI",
+          "NM",
+          "LEGENDARY HEARTBEAT",
+          "7",
+          "148265533"
+        ],
+        "warnings": []
+      },
+      "manual_truth": {
+        "company": "psa",
+        "grade": 7
+      },
+      "source_page": "https://www.ebay.com/itm/205041067257",
+      "image_sha256": "b225e2021441f404ad9955dfdc463f2e0dea9da6f00b877c8df60392804066d0",
+      "company_correct": true,
+      "grade_correct": true,
+      "company_wrong": false,
+      "grade_wrong": false
+    },
+    {
+      "id": "label100_357846192192",
+      "conditions": [
+        "slab",
+        "public_seller_photo"
+      ],
+      "grading_ms": 3748.4,
+      "grading": {
+        "slab_detected": true,
+        "is_graded": true,
+        "grading_status": "graded",
+        "company": "psa",
+        "company_source": "verified_logo",
+        "grade": 5.0,
+        "condition_label": "EX",
+        "subgrades": {},
+        "tag_score": null,
+        "certification_number": "155835053",
+        "qualifiers": [],
+        "raw_condition": "not_assessed",
+        "authenticity_verified": false,
+        "source": "visible_label_ocr",
+        "requires_confirmation": true,
+        "label_text": [
+          "#27",
+          "1999 POKEMON JUNGLE",
+          "EX",
+          "SNORLAX",
+          "5",
+          "155835053"
+        ],
+        "warnings": []
+      },
+      "manual_truth": {
+        "company": "psa",
+        "grade": 5
+      },
+      "source_page": "https://www.ebay.co.uk/itm/357846192192",
+      "image_sha256": "41afa61ca9316a652e3a345c712dfacc5c1766491d8db4963aa25c114052940c",
+      "company_correct": true,
+      "grade_correct": true,
+      "company_wrong": false,
+      "grade_wrong": false
+    },
+    {
+      "id": "label100_226991036392",
+      "conditions": [
+        "slab",
+        "public_seller_photo"
+      ],
+      "grading_ms": 830.05,
+      "grading": {
+        "slab_detected": true,
+        "is_graded": true,
+        "grading_status": "graded",
+        "company": "psa",
+        "company_source": "label_ocr",
+        "grade": 8.0,
+        "condition_label": "NM-MT",
+        "subgrades": {},
+        "tag_score": null,
+        "certification_number": "49117087",
+        "qualifiers": [],
+        "raw_condition": "not_assessed",
+        "authenticity_verified": false,
+        "source": "visible_label_ocr",
+        "requires_confirmation": true,
+        "label_text": [
+          "1999 POKEMON GAME",
+          "#53",
+          "MAGNEMITE",
+          "NM-MT",
+          "1ST EDITION",
+          "8",
+          "PSA",
+          "49117087",
+          "Basic Pok\u00e9mon",
+          "Magnemite",
+          "40 HP"
+        ],
+        "warnings": []
+      },
+      "manual_truth": {
+        "company": "psa",
+        "grade": 8
+      },
+      "source_page": "https://www.ebay.com/itm/226991036392",
+      "image_sha256": "d9cad5f640fbabdd88ea6de3703053399fd259799bc1c81a42ace40b95087695",
+      "company_correct": true,
+      "grade_correct": true,
+      "company_wrong": false,
+      "grade_wrong": false
+    },
+    {
+      "id": "label100_820030872349",
+      "conditions": [
+        "slab",
+        "public_seller_photo"
+      ],
+      "grading_ms": 2955.43,
+      "grading": {
+        "slab_detected": true,
+        "is_graded": true,
+        "grading_status": "graded",
+        "company": "psa",
+        "company_source": "verified_logo",
+        "grade": 10.0,
+        "condition_label": "GEMMT",
+        "subgrades": {},
+        "tag_score": null,
+        "certification_number": "157962768",
+        "qualifiers": [],
+        "raw_condition": "not_assessed",
+        "authenticity_verified": false,
+        "source": "visible_label_ocr",
+        "requires_confirmation": true,
+        "label_text": [
+          "2018 P.M. JPN. SUN & MOON",
+          "#073",
+          "FARFETCH'D",
+          "GEMMT",
+          "TAG BOLT",
+          "10",
+          "157962768"
+        ],
+        "warnings": []
+      },
+      "manual_truth": {
+        "company": "psa",
+        "grade": 10
+      },
+      "source_page": "https://www.ebay.com/itm/820030872349",
+      "image_sha256": "e05e4e0770447705ac304aa83bc07fdecd1f96c7a3781eec0aecf6c5e802dfa8",
+      "company_correct": true,
+      "grade_correct": true,
+      "company_wrong": false,
+      "grade_wrong": false
+    },
+    {
+      "id": "label100_227063230477",
+      "conditions": [
+        "slab",
+        "public_seller_photo"
+      ],
+      "grading_ms": 865.7,
+      "grading": {
+        "slab_detected": true,
+        "is_graded": true,
+        "grading_status": "graded",
+        "company": "psa",
+        "company_source": "label_ocr",
+        "grade": 10.0,
+        "condition_label": "GEMMT",
+        "subgrades": {},
+        "tag_score": null,
+        "certification_number": "111194668",
+        "qualifiers": [],
+        "raw_condition": "not_assessed",
+        "authenticity_verified": false,
+        "source": "visible_label_ocr",
+        "requires_confirmation": true,
+        "label_text": [
+          "2025 POKEMON SVP EN",
+          "#173",
+          "EEVEE",
+          "GEMMT",
+          "PRISMATIC EVOLUTIONS ETB",
+          "10",
+          "PSA",
+          "111194668",
+          "BASIC",
+          "Eevee",
+          "50"
+        ],
+        "warnings": []
+      },
+      "manual_truth": {
+        "company": "psa",
+        "grade": 10
+      },
+      "source_page": "https://www.ebay.com/itm/227063230477",
+      "image_sha256": "7e792d32a1f99e7f5321baa83ce26501e95dfe9438b141b496f28b1e140e4239",
+      "company_correct": true,
+      "grade_correct": true,
+      "company_wrong": false,
+      "grade_wrong": false
+    },
+    {
+      "id": "label100_318515600273",
+      "conditions": [
+        "slab",
+        "public_seller_photo"
+      ],
+      "grading_ms": 955.69,
+      "grading": {
+        "slab_detected": true,
+        "is_graded": true,
+        "grading_status": "graded",
+        "company": "psa",
+        "company_source": "label_ocr",
+        "grade": 8.0,
+        "condition_label": "NM-MT",
+        "subgrades": {},
+        "tag_score": null,
+        "certification_number": "131938099",
+        "qualifiers": [],
+        "raw_condition": "not_assessed",
+        "authenticity_verified": false,
+        "source": "visible_label_ocr",
+        "requires_confirmation": true,
+        "label_text": [
+          "2019 P.M.SM BLACK STAR",
+          "#SM214",
+          "MEWTWO-HOLO",
+          "NM-MT",
+          "PRM-HDDN.FTS.PIN COLL.",
+          "8",
+          "PSA",
+          "131938099",
+          "Mewtwo",
+          "BASIC",
+          "120",
+          "HP"
+        ],
+        "warnings": []
+      },
+      "manual_truth": {
+        "company": "psa",
+        "grade": 8
+      },
+      "source_page": "https://www.ebay.com/itm/318515600273",
+      "image_sha256": "222b9a1287d18b629801057fe891b685d5bf943323e4381b6957b4babcb241ca",
+      "company_correct": true,
+      "grade_correct": true,
+      "company_wrong": false,
+      "grade_wrong": false
+    },
+    {
+      "id": "label100_157946793643",
+      "conditions": [
+        "slab",
+        "public_seller_photo"
+      ],
+      "grading_ms": 865.12,
+      "grading": {
+        "slab_detected": true,
+        "is_graded": true,
+        "grading_status": "graded",
+        "company": "psa",
+        "company_source": "label_ocr",
+        "grade": 8.0,
+        "condition_label": "NM-MT",
+        "subgrades": {},
+        "tag_score": null,
+        "certification_number": "150657855",
+        "qualifiers": [],
+        "raw_condition": "not_assessed",
+        "authenticity_verified": false,
+        "source": "visible_label_ocr",
+        "requires_confirmation": true,
+        "label_text": [
+          "2019 P.M. SM BLACK STAR",
+          "#SM191",
+          "FA/MEWTWO & MEW GX",
+          "NM-MT",
+          "PROMO-PWR.PRTNRSHP.TINS",
+          "8",
+          "PSA",
+          "150657855"
+        ],
+        "warnings": []
+      },
+      "manual_truth": {
+        "company": "psa",
+        "grade": 8
+      },
+      "source_page": "https://www.ebay.com/itm/157946793643",
+      "image_sha256": "b67c73b6351a2f165afc6d5d21d6a1968fe61d80cb49922e7985075db7bcedb3",
+      "company_correct": true,
+      "grade_correct": true,
+      "company_wrong": false,
+      "grade_wrong": false
+    },
+    {
+      "id": "label100_257751176286",
+      "conditions": [
+        "slab",
+        "public_seller_photo"
+      ],
+      "grading_ms": 997.8,
+      "grading": {
+        "slab_detected": true,
+        "is_graded": true,
+        "grading_status": "graded",
+        "company": "psa",
+        "company_source": "label_ocr",
+        "grade": 8.0,
+        "condition_label": "NM-MT",
+        "subgrades": {},
+        "tag_score": null,
+        "certification_number": "54871444",
+        "qualifiers": [],
+        "raw_condition": "not_assessed",
+        "authenticity_verified": false,
+        "source": "visible_label_ocr",
+        "requires_confirmation": true,
+        "label_text": [
+          "1999 POKEMON GAME",
+          "#10",
+          "MEWTWO-HOLO",
+          "NM-MT",
+          "8",
+          "PSA",
+          "54871444",
+          "Basic Pok\u00e9mon",
+          "Mewtwo",
+          "60HR"
+        ],
+        "warnings": []
+      },
+      "manual_truth": {
+        "company": "psa",
+        "grade": 8
+      },
+      "source_page": "https://www.ebay.com/itm/257751176286",
+      "image_sha256": "d91a59f1f9a4dff30ea37d6c82564808dea6c134ce3a4df478955271608ed04a",
+      "company_correct": true,
+      "grade_correct": true,
+      "company_wrong": false,
+      "grade_wrong": false
+    },
+    {
+      "id": "label100_168474235776",
+      "conditions": [
+        "slab",
+        "public_seller_photo"
+      ],
+      "grading_ms": 793.7,
+      "grading": {
+        "slab_detected": true,
+        "is_graded": true,
+        "grading_status": "graded",
+        "company": "psa",
+        "company_source": "label_ocr",
+        "grade": 8.0,
+        "condition_label": "NM-MT",
+        "subgrades": {},
+        "tag_score": null,
+        "certification_number": "126677514",
+        "qualifiers": [],
+        "raw_condition": "not_assessed",
+        "authenticity_verified": false,
+        "source": "visible_label_ocr",
+        "requires_confirmation": true,
+        "label_text": [
+          "#10",
+          "1999 POKEMON GAME",
+          "NM-MT",
+          "MEWTWO-HOLO",
+          "8",
+          "PSA",
+          "126677514",
+          "Basic Pok\u00e9mon",
+          "60 HP",
+          "Mowtwo"
+        ],
+        "warnings": []
+      },
+      "manual_truth": {
+        "company": "psa",
+        "grade": 8
+      },
+      "source_page": "https://www.ebay.com/itm/168474235776",
+      "image_sha256": "1d9db8a55b3159d6f48449cc7263dc5eabb56dba7f28429e6fa3e8cd5e33cf2c",
+      "company_correct": true,
+      "grade_correct": true,
+      "company_wrong": false,
+      "grade_wrong": false
+    },
+    {
+      "id": "label100_398302596329",
+      "conditions": [
+        "slab",
+        "public_seller_photo"
+      ],
+      "grading_ms": 812.08,
+      "grading": {
+        "slab_detected": true,
+        "is_graded": true,
+        "grading_status": "graded",
+        "company": "psa",
+        "company_source": "label_ocr",
+        "grade": 8.0,
+        "condition_label": "NM-MT",
+        "subgrades": {},
+        "tag_score": null,
+        "certification_number": "120024010",
+        "qualifiers": [],
+        "raw_condition": "not_assessed",
+        "authenticity_verified": false,
+        "source": "visible_label_ocr",
+        "requires_confirmation": true,
+        "label_text": [
+          "2000 POKEMON PROMO",
+          "#14",
+          "MEWTWO",
+          "NM-MT",
+          "BLACK STAR",
+          "8",
+          "PSA",
+          "120024010",
+          "Basic Pok\u00e9mon",
+          "Mewtwo",
+          "70 HP"
+        ],
+        "warnings": []
+      },
+      "manual_truth": {
+        "company": "psa",
+        "grade": 8
+      },
+      "source_page": "https://www.ebay.com/itm/398302596329",
+      "image_sha256": "4e227deb9046dcdbfb81170dfc906b7cd6cfec089aea9a936e7a20b0326fb1bb",
+      "company_correct": true,
+      "grade_correct": true,
+      "company_wrong": false,
+      "grade_wrong": false
+    },
+    {
+      "id": "label100_257730660039",
+      "conditions": [
+        "slab",
+        "public_seller_photo"
+      ],
+      "grading_ms": 3472.49,
+      "grading": {
+        "slab_detected": true,
+        "is_graded": true,
+        "grading_status": "graded",
+        "company": "psa",
+        "company_source": "verified_logo",
+        "grade": 8.0,
+        "condition_label": "NM-MT",
+        "subgrades": {},
+        "tag_score": null,
+        "certification_number": "70953824",
+        "qualifiers": [],
+        "raw_condition": "not_assessed",
+        "authenticity_verified": false,
+        "source": "visible_label_ocr",
+        "requires_confirmation": true,
+        "label_text": [
+          "1999 POKEMON GAME",
+          "#10",
+          "MEWTWO-HOLO",
+          "NM-MT",
+          "8",
+          "PA",
+          "70953824"
+        ],
+        "warnings": []
+      },
+      "manual_truth": {
+        "company": "psa",
+        "grade": 8
+      },
+      "source_page": "https://www.ebay.com/itm/257730660039",
+      "image_sha256": "8926e323193a06f2b6e7a7c29f4808e48c54c6993d460f9fcd081b864b9bafe5",
+      "company_correct": true,
+      "grade_correct": true,
+      "company_wrong": false,
+      "grade_wrong": false
+    },
+    {
+      "id": "label100_287610505898",
+      "conditions": [
+        "slab",
+        "public_seller_photo"
+      ],
+      "grading_ms": 3911.14,
+      "grading": {
+        "slab_detected": true,
+        "is_graded": true,
+        "grading_status": "graded",
+        "company": "psa",
+        "company_source": "verified_logo",
+        "grade": 10.0,
+        "condition_label": "GEM MT",
+        "subgrades": {},
+        "tag_score": null,
+        "certification_number": "103745031",
+        "qualifiers": [],
+        "raw_condition": "not_assessed",
+        "authenticity_verified": false,
+        "source": "visible_label_ocr",
+        "requires_confirmation": true,
+        "label_text": [
+          "2025 POKEMON SVP EN",
+          "#173",
+          "EEVEE",
+          "GEM MT",
+          "PRISMATIC EVOLUTIONS P.C. ETB",
+          "10",
+          "FSA",
+          "103745031"
+        ],
+        "warnings": []
+      },
+      "manual_truth": {
+        "company": "psa",
+        "grade": 10
+      },
+      "source_page": "https://www.ebay.com/itm/287610505898",
+      "image_sha256": "43e128f1ee8504d34b732cdbf95ea8bb541d4c944b9fafddb80268d5a41e0a14",
+      "company_correct": true,
+      "grade_correct": true,
+      "company_wrong": false,
+      "grade_wrong": false
+    },
+    {
+      "id": "label100_358464585522",
+      "conditions": [
+        "slab",
+        "public_seller_photo"
+      ],
+      "grading_ms": 977.11,
+      "grading": {
+        "slab_detected": true,
+        "is_graded": true,
+        "grading_status": "graded",
+        "company": "psa",
+        "company_source": "label_ocr",
+        "grade": 8.0,
+        "condition_label": "NM-MT",
+        "subgrades": {},
+        "tag_score": null,
+        "certification_number": "127678813",
+        "qualifiers": [],
+        "raw_condition": "not_assessed",
+        "authenticity_verified": false,
+        "source": "visible_label_ocr",
+        "requires_confirmation": true,
+        "label_text": [
+          "1999 POKEMON GAME",
+          "#10",
+          "MEWTWO-HOLO",
+          "NM-MT",
+          "8",
+          "PSA",
+          "127678813",
+          "Basic Pok\u00e9mon",
+          "Mowtuer"
+        ],
+        "warnings": []
+      },
+      "manual_truth": {
+        "company": "psa",
+        "grade": 8
+      },
+      "source_page": "https://www.ebay.com/itm/358464585522",
+      "image_sha256": "fc737fc91d591b5059dd7af69779b28a0fe04e5ff05df7dd0bc0641be373c430",
+      "company_correct": true,
+      "grade_correct": true,
+      "company_wrong": false,
+      "grade_wrong": false
+    },
+    {
+      "id": "label100_225598065196",
+      "conditions": [
+        "slab",
+        "public_seller_photo"
+      ],
+      "grading_ms": 1030.12,
+      "grading": {
+        "slab_detected": true,
+        "is_graded": true,
+        "grading_status": "graded",
+        "company": "beckett",
+        "company_source": "label_ocr",
+        "grade": 9.5,
+        "condition_label": "GEM MINT",
+        "subgrades": {
+          "corners": 9.0
+        },
+        "tag_score": null,
+        "certification_number": "0015668374",
+        "qualifiers": [],
+        "raw_condition": "not_assessed",
+        "authenticity_verified": false,
+        "source": "visible_label_ocr",
+        "requires_confirmation": true,
+        "label_text": [
+          "2000 GYM CHALLENGE",
+          "9.5",
+          "B",
+          "1ST EDITION",
+          "#2 BLAINE'S CHARIZARD",
+          "HOLOR",
+          "CENTERING",
+          "CORNERS 9",
+          "GEM MINT",
+          "9.5",
+          "BECKETT\u00ae",
+          "EDGES",
+          "9.5",
+          "SURFACE",
+          "9.5",
+          "0015668374"
+        ],
+        "warnings": []
+      },
+      "manual_truth": {
+        "company": "beckett",
+        "grade": 9.5
+      },
+      "source_page": "https://www.ebay.com/itm/225598065196",
+      "image_sha256": "0480b471b9801cba402f83432fd6c26373f79f01ed72c89f2217b3a43e4621b4",
+      "company_correct": true,
+      "grade_correct": true,
+      "company_wrong": false,
+      "grade_wrong": false
+    },
+    {
+      "id": "label100_117235965752",
+      "conditions": [
+        "slab",
+        "public_seller_photo"
+      ],
+      "grading_ms": 1178.22,
+      "grading": {
+        "slab_detected": true,
+        "is_graded": true,
+        "grading_status": "graded",
+        "company": "beckett",
+        "company_source": "label_ocr",
+        "grade": 10.0,
+        "condition_label": "PRISTINE",
+        "subgrades": {
+          "centering": 10.0,
+          "corners": 10.0,
+          "surface": 9.5
+        },
+        "tag_score": null,
+        "certification_number": "0018143911",
+        "qualifiers": [],
+        "raw_condition": "not_assessed",
+        "authenticity_verified": false,
+        "source": "visible_label_ocr",
+        "requires_confirmation": true,
+        "label_text": [
+          "2024 SCARLET & VIOLET",
+          "10",
+          "B",
+          "TERASTAL FESTIVAL EX HIGH",
+          "CLASS EXPANSION JAPANESE",
+          "#021 FLAREON",
+          "CENTERING 10",
+          "CORNERS 10",
+          "PRISTINE",
+          "BECKETT\u00ae",
+          "EDGES",
+          "10",
+          "SURFACE 9.5",
+          "0018143911",
+          "1\u9032\u5316",
+          "\u30d6\u30fc\u30b9\u30bf\u30fc",
+          "130",
+          "HP",
+          "\u30a4\u30fc\u30d6\u30a4\u304b\u3089\u9032\u5316"
+        ],
+        "warnings": []
+      },
+      "manual_truth": {
+        "company": "beckett",
+        "grade": 10
+      },
+      "source_page": "https://www.ebay.com/itm/117235965752",
+      "image_sha256": "0dd22713e7cbb874916db5af091c19ada9651252a17657fd9c24a2927d56782e",
+      "company_correct": true,
+      "grade_correct": true,
+      "company_wrong": false,
+      "grade_wrong": false
+    },
+    {
+      "id": "label100_206285682378",
+      "conditions": [
+        "slab",
+        "public_seller_photo"
+      ],
+      "grading_ms": 4222.33,
+      "grading": {
+        "slab_detected": true,
+        "is_graded": true,
+        "grading_status": "graded",
+        "company": "beckett",
+        "company_source": "label_ocr",
+        "grade": 8.5,
+        "condition_label": "NM-MT+",
+        "subgrades": {
+          "centering": 9.5,
+          "corners": 8.5,
+          "surface": 8.5,
+          "edges": 8.5
+        },
+        "tag_score": null,
+        "certification_number": "0019946190",
+        "qualifiers": [],
+        "raw_condition": "not_assessed",
+        "authenticity_verified": false,
+        "source": "visible_label_ocr",
+        "requires_confirmation": true,
+        "label_text": [
+          "1999-03 WIZARDS OF THE COAST",
+          "8.5",
+          "B",
+          "BLACK STAR PROMOS",
+          "#9 MEW HOLO",
+          "POKEMON LEAGUE",
+          "NM-MT+",
+          "CENTERING 9.5",
+          "CORNERS 8.5",
+          "EDGES",
+          "8.5",
+          "SURFACE 8.5",
+          "0019946190",
+          "BECKETT\u00ae"
+        ],
+        "warnings": []
+      },
+      "manual_truth": {
+        "company": "beckett",
+        "grade": 8.5
+      },
+      "source_page": "https://www.ebay.com/itm/206285682378",
+      "image_sha256": "243ce1925a462be46270cb3e8e423e2b16e20186b068f9ec9247bc6400bd6eda",
+      "company_correct": true,
+      "grade_correct": true,
+      "company_wrong": false,
+      "grade_wrong": false
+    },
+    {
+      "id": "label100_406975129126",
+      "conditions": [
+        "slab",
+        "public_seller_photo"
+      ],
+      "grading_ms": 5912.56,
+      "grading": {
+        "slab_detected": true,
+        "is_graded": true,
+        "grading_status": "graded",
+        "company": null,
+        "company_source": "none",
+        "grade": 8.0,
+        "condition_label": "NM-MT",
+        "subgrades": {},
+        "tag_score": null,
+        "certification_number": "0012622704",
+        "qualifiers": [],
+        "raw_condition": "not_assessed",
+        "authenticity_verified": false,
+        "source": "visible_label_ocr",
+        "requires_confirmation": true,
+        "label_text": [
+          "1999 BASEUNLIMITED",
+          "8",
+          "#4CHARIZARD HOLO R",
+          "NM-MT",
+          "0012622704",
+          "BECKETTs",
+          "Evolves from Chermeleen Put Charaant on the Soage Ice",
+          "Charizard",
+          "120H"
+        ],
+        "warnings": [
+          "grading_company_unreadable_or_unsupported"
+        ]
+      },
+      "manual_truth": {
+        "company": "beckett",
+        "grade": 8
+      },
+      "source_page": "https://www.ebay.com/itm/406975129126",
+      "image_sha256": "d61594f8cc8982f9d5564c51d328f3a8b8c1d81918412a550fa740866069482b",
+      "company_correct": false,
+      "grade_correct": true,
+      "company_wrong": false,
+      "grade_wrong": false
+    },
+    {
+      "id": "label100_177539623440",
+      "conditions": [
+        "slab",
+        "public_seller_photo"
+      ],
+      "grading_ms": 1023.21,
+      "grading": {
+        "slab_detected": true,
+        "is_graded": true,
+        "grading_status": "graded",
+        "company": "beckett",
+        "company_source": "label_ocr",
+        "grade": 9.5,
+        "condition_label": "GEM MINT",
+        "subgrades": {
+          "corners": 9.5,
+          "surface": 10.0
+        },
+        "tag_score": null,
+        "certification_number": "0009476882",
+        "qualifiers": [],
+        "raw_condition": "not_assessed",
+        "authenticity_verified": false,
+        "source": "visible_label_ocr",
+        "requires_confirmation": true,
+        "label_text": [
+          "1999 BASE 1ST EDITION",
+          "9.5",
+          "B",
+          "#31JYNX U",
+          "GEM MINT",
+          "CENTERING",
+          "9.5",
+          "CORNERS 9.5",
+          "BECKETT\u00ae",
+          "EDGES",
+          "9.5",
+          "SURFACE 10",
+          "0009476882",
+          "Basic Pok\u00e9mon",
+          "Jynx",
+          "70 HP"
+        ],
+        "warnings": []
+      },
+      "manual_truth": {
+        "company": "beckett",
+        "grade": 9.5
+      },
+      "source_page": "https://www.ebay.com/itm/177539623440",
+      "image_sha256": "dcc704b1eb25d1a130322fd9a9080c737fe9d7760e91f79b1d991a5351bdac6b",
+      "company_correct": true,
+      "grade_correct": true,
+      "company_wrong": false,
+      "grade_wrong": false
+    },
+    {
+      "id": "label100_389617271474",
+      "conditions": [
+        "slab",
+        "public_seller_photo"
+      ],
+      "grading_ms": 1054.32,
+      "grading": {
+        "slab_detected": true,
+        "is_graded": true,
+        "grading_status": "graded",
+        "company": "beckett",
+        "company_source": "label_ocr",
+        "grade": 9.5,
+        "condition_label": "GEM MINT",
+        "subgrades": {
+          "corners": 9.5,
+          "surface": 10.0
+        },
+        "tag_score": null,
+        "certification_number": "0009955865",
+        "qualifiers": [],
+        "raw_condition": "not_assessed",
+        "authenticity_verified": false,
+        "source": "visible_label_ocr",
+        "requires_confirmation": true,
+        "label_text": [
+          "1999 BASE 1ST EDITION",
+          "9.5",
+          "B",
+          "#4 CHARIZARD HOLO R",
+          "GEM MINT",
+          "CENTERING",
+          "9.5",
+          "CORNERS 9.5",
+          "SURFACE 10",
+          "0009955865",
+          "BECKETT\u00ae",
+          "EDGES",
+          "10",
+          "Evolves from Charmeleon",
+          "Put Charizard on the Stage I card",
+          "STAGE 2",
+          "Charizard",
+          "120 HP"
+        ],
+        "warnings": []
+      },
+      "manual_truth": {
+        "company": "beckett",
+        "grade": 9.5
+      },
+      "source_page": "https://www.ebay.com/itm/389617271474",
+      "image_sha256": "cbfcca322fa1efa7b22886770d2bbe77c94212f05ffd709dad9159efb4b1799a",
+      "company_correct": true,
+      "grade_correct": true,
+      "company_wrong": false,
+      "grade_wrong": false
+    },
+    {
+      "id": "label100_325791263472",
+      "conditions": [
+        "slab",
+        "public_seller_photo"
+      ],
+      "grading_ms": 1211.18,
+      "grading": {
+        "slab_detected": true,
+        "is_graded": true,
+        "grading_status": "graded",
+        "company": "beckett",
+        "company_source": "label_ocr",
+        "grade": 10.0,
+        "condition_label": "PRISTINE",
+        "subgrades": {
+          "centering": 9.5,
+          "corners": 10.0,
+          "surface": 10.0,
+          "edges": 10.0
+        },
+        "tag_score": null,
+        "certification_number": "0015731280",
+        "qualifiers": [],
+        "raw_condition": "not_assessed",
+        "authenticity_verified": false,
+        "source": "visible_label_ocr",
+        "requires_confirmation": true,
+        "label_text": [
+          "2018 SUN & MOON",
+          "10",
+          "B",
+          "TAG BOLT",
+          "#109 SABRINA'S SUGGESTION SR",
+          "CENTERING 9.5",
+          "CORNERS 10",
+          "PRISTINE",
+          "BECKETT\u00ae",
+          "EDGES",
+          "10",
+          "SURFACE 10",
+          "0015731280",
+          "TRAINER'S",
+          "\u30b5\u30dd\u30fc\u30c8",
+          "\u30ca\u30c4\u30e1\u306e\u6697\u793a"
+        ],
+        "warnings": []
+      },
+      "manual_truth": {
+        "company": "beckett",
+        "grade": 10
+      },
+      "source_page": "https://www.ebay.com/itm/325791263472",
+      "image_sha256": "53f4b9a7fb0ea6d8ba8a3cb38dedcaa53197867045fd4a5e14ef87cb01680595",
+      "company_correct": true,
+      "grade_correct": true,
+      "company_wrong": false,
+      "grade_wrong": false
+    },
+    {
+      "id": "label100_407091750047",
+      "conditions": [
+        "slab",
+        "public_seller_photo"
+      ],
+      "grading_ms": 1097.29,
+      "grading": {
+        "slab_detected": true,
+        "is_graded": true,
+        "grading_status": "graded",
+        "company": "beckett",
+        "company_source": "label_ocr",
+        "grade": 8.5,
+        "condition_label": "NM-MT+",
+        "subgrades": {
+          "centering": 9.5,
+          "edges": 8.5
+        },
+        "tag_score": null,
+        "certification_number": "0018252634",
+        "qualifiers": [],
+        "raw_condition": "not_assessed",
+        "authenticity_verified": false,
+        "source": "visible_label_ocr",
+        "requires_confirmation": true,
+        "label_text": [
+          "2004 BANDAI CARDDASS",
+          "8.5",
+          "B",
+          "ZUKAN",
+          "#147 RAICHU HOLO",
+          "NM-MT+",
+          "CENTERING 9.5",
+          "CORNERS",
+          "9",
+          "0018252634",
+          "8.5",
+          "SURFACE",
+          "8",
+          "EDGES",
+          "BECKETT"
+        ],
+        "warnings": []
+      },
+      "manual_truth": {
+        "company": "beckett",
+        "grade": 8.5
+      },
+      "source_page": "https://www.ebay.com/itm/407091750047",
+      "image_sha256": "96252bac9ebf35bd2f77ca7519c913d89fcd15cf1bc82f62b9813b26b8cae920",
+      "company_correct": true,
+      "grade_correct": true,
+      "company_wrong": false,
+      "grade_wrong": false
+    },
+    {
+      "id": "label100_407246875903",
+      "conditions": [
+        "slab",
+        "public_seller_photo"
+      ],
+      "grading_ms": 1581.22,
+      "grading": {
+        "slab_detected": true,
+        "is_graded": true,
+        "grading_status": "graded",
+        "company": "beckett",
+        "company_source": "label_ocr",
+        "grade": 8.5,
+        "condition_label": "NM-MT+",
+        "subgrades": {
+          "edges": 8.5
+        },
+        "tag_score": null,
+        "certification_number": "0018023638",
+        "qualifiers": [],
+        "raw_condition": "not_assessed",
+        "authenticity_verified": false,
+        "source": "visible_label_ocr",
+        "requires_confirmation": true,
+        "label_text": [
+          "2001 NEO DISCOVERY UNLIMITED",
+          "B",
+          "#11 SMEARGLE HOLO R",
+          "8.5",
+          "CENTERING",
+          "8.5",
+          "CORNERS",
+          "9",
+          "NM-MT+",
+          "BECKETT",
+          "EDGES",
+          "8.5",
+          "SURFACE",
+          "8",
+          "0018023638",
+          "Smeargle",
+          "50 HP",
+          "Basic Pok\u00e9mon"
+        ],
+        "warnings": []
+      },
+      "manual_truth": {
+        "company": "beckett",
+        "grade": 8.5
+      },
+      "source_page": "https://www.ebay.com/itm/407246875903",
+      "image_sha256": "4c6cad0e187ed65b398075c08c3cdc861d82235f30808a0142a185e4daf93537",
+      "company_correct": true,
+      "grade_correct": true,
+      "company_wrong": false,
+      "grade_wrong": false
+    },
+    {
+      "id": "label100_116983141390",
+      "conditions": [
+        "slab",
+        "public_seller_photo"
+      ],
+      "grading_ms": 1107.34,
+      "grading": {
+        "slab_detected": true,
+        "is_graded": true,
+        "grading_status": "graded",
+        "company": "beckett",
+        "company_source": "label_ocr",
+        "grade": 8.0,
+        "condition_label": "NM-MT",
+        "subgrades": {
+          "centering": 9.0,
+          "corners": 8.0,
+          "surface": 8.5
+        },
+        "tag_score": null,
+        "certification_number": "0018123226",
+        "qualifiers": [],
+        "raw_condition": "not_assessed",
+        "authenticity_verified": false,
+        "source": "visible_label_ocr",
+        "requires_confirmation": true,
+        "label_text": [
+          "1999 BASE SHADOWLESS",
+          "8",
+          "B",
+          "#4 CHARIZARD HOLO R",
+          "NM-MT",
+          "CENTERING 9",
+          "CORNERS 8",
+          "EDGES",
+          "7.5",
+          "SURFACE  8.5",
+          "0018123226",
+          "BECKETT\u00ae",
+          "Evolves from Charmeleon",
+          "Put Charizard on the Stage I card",
+          "STAGE 2",
+          "Charizard",
+          "120 HP"
+        ],
+        "warnings": []
+      },
+      "manual_truth": {
+        "company": "beckett",
+        "grade": 8
+      },
+      "source_page": "https://www.ebay.com/itm/116983141390",
+      "image_sha256": "93804d5976863cb0a4613005ded8fdd01712c4bff70c68d6c1353f31961453e6",
+      "company_correct": true,
+      "grade_correct": true,
+      "company_wrong": false,
+      "grade_wrong": false
+    },
+    {
+      "id": "label100_127844775326",
+      "conditions": [
+        "slab",
+        "public_seller_photo"
+      ],
+      "grading_ms": 912.15,
+      "grading": {
+        "slab_detected": true,
+        "is_graded": true,
+        "grading_status": "graded",
+        "company": "beckett",
+        "company_source": "label_ocr",
+        "grade": 8.5,
+        "condition_label": "NM-MT+",
+        "subgrades": {
+          "corners": 8.5,
+          "surface": 9.0,
+          "centering": 8.0,
+          "edges": 8.0
+        },
+        "tag_score": null,
+        "certification_number": "0017246754",
+        "qualifiers": [],
+        "raw_condition": "not_assessed",
+        "authenticity_verified": false,
+        "source": "visible_label_ocr",
+        "requires_confirmation": true,
+        "label_text": [
+          "1999 BASE UNLIMITED",
+          "#13 POLIWRATH HOLO R",
+          "8.5",
+          "B",
+          "CENTERING",
+          "8",
+          "CORNERS 8.5",
+          "NM-MT+",
+          "BECKETT",
+          "EDGES",
+          "SURFACE 9",
+          "0017246754",
+          "Poliwrath"
+        ],
+        "warnings": []
+      },
+      "manual_truth": {
+        "company": "beckett",
+        "grade": 8.5
+      },
+      "source_page": "https://www.ebay.com/itm/127844775326",
+      "image_sha256": "a23165268a3fb325d869bc6bbc66296b04ea739927457deac9a22add4387d198",
+      "company_correct": true,
+      "grade_correct": true,
+      "company_wrong": false,
+      "grade_wrong": false
+    },
+    {
+      "id": "label100_257418127129",
+      "conditions": [
+        "slab",
+        "public_seller_photo"
+      ],
+      "grading_ms": 7656.79,
+      "grading": {
+        "slab_detected": true,
+        "is_graded": true,
+        "grading_status": "graded",
+        "company": "beckett",
+        "company_source": "label_ocr",
+        "grade": 8.5,
+        "condition_label": "NM-MT+",
+        "subgrades": {
+          "centering": 9.0,
+          "corners": 8.5,
+          "surface": 9.0
+        },
+        "tag_score": null,
+        "certification_number": "0017652381",
+        "qualifiers": [],
+        "raw_condition": "not_assessed",
+        "authenticity_verified": false,
+        "source": "visible_label_ocr",
+        "requires_confirmation": true,
+        "label_text": [
+          "1999 BASE UNLIMITED",
+          "8.5",
+          "ITALIAN",
+          "#15 VENUSAUR HOLO R",
+          "CENTERING 9",
+          "CORNERS 8.5",
+          "NM-MT+",
+          "EDGES",
+          "8.5",
+          "SURFACE 9",
+          "0017652381",
+          "1999 BASE UNLIMITED",
+          "8.5",
+          "ITALIAN",
+          "#15 VENUSAUR HOLO R",
+          "CENTERING 9",
+          "CORNERS 8.5",
+          "NM-MT+",
+          "EDGES",
+          "8.5",
+          "SURFACE 9",
+          "0017652381",
+          "BECKETT\u00ae"
+        ],
+        "warnings": []
+      },
+      "manual_truth": {
+        "company": "beckett",
+        "grade": 8.5
+      },
+      "source_page": "https://www.ebay.com/itm/257418127129",
+      "image_sha256": "408f19106e1e571ed6fe4dd2b4dda6c3132b242528082e319bf6c8bc02618a7a",
+      "company_correct": true,
+      "grade_correct": true,
+      "company_wrong": false,
+      "grade_wrong": false
+    },
+    {
+      "id": "label100_177788602827",
+      "conditions": [
+        "slab",
+        "public_seller_photo"
+      ],
+      "grading_ms": 1250.02,
+      "grading": {
+        "slab_detected": true,
+        "is_graded": true,
+        "grading_status": "graded",
+        "company": "beckett",
+        "company_source": "label_ocr",
+        "grade": 8.5,
+        "condition_label": "NM-MT+",
+        "subgrades": {
+          "centering": 9.0,
+          "corners": 9.0,
+          "surface": 8.0,
+          "edges": 8.5
+        },
+        "tag_score": null,
+        "certification_number": "0013313877",
+        "qualifiers": [],
+        "raw_condition": "not_assessed",
+        "authenticity_verified": false,
+        "source": "visible_label_ocr",
+        "requires_confirmation": true,
+        "label_text": [
+          "(B)",
+          "1999 GYM BOOSTER 2",
+          "8.5",
+          "CHALLENGE FROM THE DARKNESS",
+          "JAPANESE",
+          "#6 BLAINE'S CHARIZARO HOLO R",
+          "CENTERING 9",
+          "CORNERS 9",
+          "NM-MT+",
+          "BECKETT",
+          "EDGES",
+          "8.5",
+          "SURFACE 8",
+          "0013313877",
+          "2\u6ecb\u5316\u30ab\u30f39\u306e\u30ea\u30b6\u30fc\u30c8\u304b6\u901a\u5316",
+          "ERYaLIE",
+          "\u30ab\u30c4\u30e9\u306e\u30ea\u30b6\u30fc\u30c9\u30f3",
+          "LV.5o HP100"
+        ],
+        "warnings": []
+      },
+      "manual_truth": {
+        "company": "beckett",
+        "grade": 8.5
+      },
+      "source_page": "https://www.ebay.com/itm/177788602827",
+      "image_sha256": "0126124715936755c0336ae36bc150fa4e8e2b0328693167e85dc1609f61743a",
+      "company_correct": true,
+      "grade_correct": true,
+      "company_wrong": false,
+      "grade_wrong": false
+    },
+    {
+      "id": "label100_306918554279",
+      "conditions": [
+        "slab",
+        "public_seller_photo"
+      ],
+      "grading_ms": 1111.91,
+      "grading": {
+        "slab_detected": true,
+        "is_graded": true,
+        "grading_status": "graded",
+        "company": "beckett",
+        "company_source": "label_ocr",
+        "grade": 8.5,
+        "condition_label": "NM-MT+",
+        "subgrades": {
+          "centering": 8.5,
+          "corners": 8.5,
+          "edges": 8.5,
+          "surface": 8.5
+        },
+        "tag_score": null,
+        "certification_number": "0018270806",
+        "qualifiers": [],
+        "raw_condition": "not_assessed",
+        "authenticity_verified": false,
+        "source": "visible_label_ocr",
+        "requires_confirmation": true,
+        "label_text": [
+          "8.5",
+          "1999 BASE UNLIMITED",
+          "B",
+          "#13 POLIWRATH HOLO R",
+          "NM-MT+",
+          "CENTERING 8.5",
+          "CORNERS",
+          "0018270806",
+          "EDGES",
+          "8.5",
+          "SURFACE",
+          "BECKETT",
+          "Put"
+        ],
+        "warnings": []
+      },
+      "manual_truth": {
+        "company": "beckett",
+        "grade": 8.5
+      },
+      "source_page": "https://www.ebay.com/itm/306918554279",
+      "image_sha256": "8c227d40ef1295940b57e2bbcb05b90b5a4d51b0b163fc651e720af744e67ae6",
+      "company_correct": true,
+      "grade_correct": true,
+      "company_wrong": false,
+      "grade_wrong": false
+    },
+    {
+      "id": "label100_377055081311",
+      "conditions": [
+        "slab",
+        "public_seller_photo"
+      ],
+      "grading_ms": 4422.37,
+      "grading": {
+        "slab_detected": true,
+        "is_graded": true,
+        "grading_status": "graded",
+        "company": "beckett",
+        "company_source": "label_ocr",
+        "grade": 9.5,
+        "condition_label": "GEM MINT",
+        "subgrades": {
+          "corners": 9.5,
+          "surface": 10.0
+        },
+        "tag_score": null,
+        "certification_number": "0013415757",
+        "qualifiers": [],
+        "raw_condition": "not_assessed",
+        "authenticity_verified": false,
+        "source": "visible_label_ocr",
+        "requires_confirmation": true,
+        "label_text": [
+          "9.5",
+          "2020 POKEMON SWORD & SHIELD",
+          "B",
+          "CHAMPION'S PATH",
+          "ELITE TRAINER BOX PROMO",
+          "#SWSH050 CHARIZARD V",
+          "GEM MINT",
+          "CENTERING",
+          "G10",
+          "CORNERS 9.5",
+          "0013415757",
+          "BECKETT\u00ae",
+          "EDGES",
+          "SURFACE 10"
+        ],
+        "warnings": []
+      },
+      "manual_truth": {
+        "company": "beckett",
+        "grade": 9.5
+      },
+      "source_page": "https://www.ebay.com/itm/377055081311",
+      "image_sha256": "6b784328ec8c699e52e4558f3f78ffb330dfb41696ebe911ba1fd939a1a57da9",
+      "company_correct": true,
+      "grade_correct": true,
+      "company_wrong": false,
+      "grade_wrong": false
+    },
+    {
+      "id": "label100_226080076515",
+      "conditions": [
+        "slab",
+        "public_seller_photo"
+      ],
+      "grading_ms": 2509.81,
+      "grading": {
+        "slab_detected": true,
+        "is_graded": true,
+        "grading_status": "graded",
+        "company": "beckett",
+        "company_source": "label_ocr",
+        "grade": 9.5,
+        "condition_label": "GEMMINT",
+        "subgrades": {
+          "centering": 9.5,
+          "corners": 9.5,
+          "surface": 9.5
+        },
+        "tag_score": null,
+        "certification_number": "0007385358",
+        "qualifiers": [],
+        "raw_condition": "not_assessed",
+        "authenticity_verified": false,
+        "source": "visible_label_ocr",
+        "requires_confirmation": true,
+        "label_text": [
+          "199O BASE UNLIMITED",
+          "B",
+          "9.5",
+          "#4 CHAF3ZARD PHOLO) (R)",
+          "GEMMINT",
+          "CENTERING 9.5",
+          "CORNERS 9.5",
+          "BECKETT",
+          "EDGES",
+          "SURFACE 9.5",
+          "0007385358"
+        ],
+        "warnings": []
+      },
+      "manual_truth": {
+        "company": "beckett",
+        "grade": 9.5
+      },
+      "source_page": "https://www.ebay.com/itm/226080076515",
+      "image_sha256": "9f5213465d313cf450e0d2b5afa6913432822de772613aec1e122e30c0761de0",
+      "company_correct": true,
+      "grade_correct": true,
+      "company_wrong": false,
+      "grade_wrong": false
+    },
+    {
+      "id": "label100_188157283019",
+      "conditions": [
+        "slab",
+        "public_seller_photo"
+      ],
+      "grading_ms": 1041.62,
+      "grading": {
+        "slab_detected": true,
+        "is_graded": true,
+        "grading_status": "graded",
+        "company": "cgc",
+        "company_source": "label_ocr",
+        "grade": 9.5,
+        "condition_label": "GEM MINT",
+        "subgrades": {},
+        "tag_score": null,
+        "certification_number": null,
+        "qualifiers": [],
+        "raw_condition": "not_assessed",
+        "authenticity_verified": false,
+        "source": "visible_label_ocr",
+        "requires_confirmation": true,
+        "label_text": [
+          "CGCUNIVERSAL GRADE",
+          "Gem Mint",
+          "Pikachu",
+          "9.5",
+          "Pok\u00e9mon (2022) T. Chinese",
+          "Scarlet & Violet Promos - 001/SV-P",
+          "Scarlet & Violet Pre-Order",
+          "\u57fa\u790e",
+          "\u4e2d\u4e0a\u540e",
+          "60"
+        ],
+        "warnings": []
+      },
+      "manual_truth": {
+        "company": "cgc",
+        "grade": 9.5
+      },
+      "source_page": "https://www.ebay.com/itm/188157283019",
+      "image_sha256": "dd0b0cb8e4dd40e84c8d0d3ebe9aa83ba667591a7750e8c34571dbafb0693f22",
+      "company_correct": true,
+      "grade_correct": true,
+      "company_wrong": false,
+      "grade_wrong": false
+    },
+    {
+      "id": "label100_147319021552",
+      "conditions": [
+        "slab",
+        "public_seller_photo"
+      ],
+      "grading_ms": 1044.05,
+      "grading": {
+        "slab_detected": true,
+        "is_graded": true,
+        "grading_status": "graded",
+        "company": "cgc",
+        "company_source": "label_ocr",
+        "grade": 10.0,
+        "condition_label": "PRISTINE",
+        "subgrades": {},
+        "tag_score": null,
+        "certification_number": "6107895008",
+        "qualifiers": [],
+        "raw_condition": "not_assessed",
+        "authenticity_verified": false,
+        "source": "visible_label_ocr",
+        "requires_confirmation": true,
+        "label_text": [
+          "CGC",
+          "CERTIFIED GUARANTY COMPANY",
+          "Charizard",
+          "PRISTINE",
+          "10",
+          "Pok\u00e9mon (2018) Japanese",
+          "Tag Bolt - 013/095",
+          "Holo",
+          "6107895008",
+          "2\u9032\u5316",
+          "\u30ea\u30b6\u30fc\u30c9\u30f3",
+          "150",
+          "HP"
+        ],
+        "warnings": []
+      },
+      "manual_truth": {
+        "company": "cgc",
+        "grade": 10
+      },
+      "source_page": "https://www.ebay.com/itm/147319021552",
+      "image_sha256": "c5772315a8e90c8cefd202486152554e58ab8441bf01c27f412ed2568d4ae3a2",
+      "company_correct": true,
+      "grade_correct": true,
+      "company_wrong": false,
+      "grade_wrong": false
+    },
+    {
+      "id": "label100_406888761226",
+      "conditions": [
+        "slab",
+        "public_seller_photo"
+      ],
+      "grading_ms": 1244.67,
+      "grading": {
+        "slab_detected": true,
+        "is_graded": true,
+        "grading_status": "graded",
+        "company": "cgc",
+        "company_source": "label_ocr",
+        "grade": 9.0,
+        "condition_label": "MINT",
+        "subgrades": {},
+        "tag_score": null,
+        "certification_number": "1401036163008",
+        "qualifiers": [],
+        "raw_condition": "not_assessed",
+        "authenticity_verified": false,
+        "source": "visible_label_ocr",
+        "requires_confirmation": true,
+        "label_text": [
+          "QCGC",
+          "CERTIFIED GUARANTY COMPANY",
+          "Magikarp & Wailord GX",
+          "MINT",
+          "Pok\u00e9mon (2018) Japanese",
+          "9",
+          "Tag Bolt-019/095",
+          "1401036163008",
+          "\u305f\u306d",
+          "\u30b3\u30a4\u30ad\u30f3\u30b0&\u30db\u30a8\u30eb\u30aa\u30fc",
+          "GXH300"
+        ],
+        "warnings": []
+      },
+      "manual_truth": {
+        "company": "cgc",
+        "grade": 9
+      },
+      "source_page": "https://www.ebay.com/itm/406888761226",
+      "image_sha256": "ad34eb2a9a6a93b43a2d76f8afb5de84e5f92faac15ab996aa402e9bcb84072e",
+      "company_correct": true,
+      "grade_correct": true,
+      "company_wrong": false,
+      "grade_wrong": false
+    },
+    {
+      "id": "label100_377454420946",
+      "conditions": [
+        "slab",
+        "public_seller_photo"
+      ],
+      "grading_ms": 1286.54,
+      "grading": {
+        "slab_detected": true,
+        "is_graded": true,
+        "grading_status": "graded",
+        "company": "cgc",
+        "company_source": "label_ocr",
+        "grade": 8.5,
+        "condition_label": "NM/MINT+",
+        "subgrades": {},
+        "tag_score": null,
+        "certification_number": "6141729027",
+        "qualifiers": [],
+        "raw_condition": "not_assessed",
+        "authenticity_verified": false,
+        "source": "visible_label_ocr",
+        "requires_confirmation": true,
+        "label_text": [
+          "CGC",
+          "CERTIFIED GUARANTY COMPANY",
+          "Gengar",
+          "8.5",
+          "NM/MINT+",
+          "Pok\u00e9mon (2023) Japanese",
+          "Pok\u00e9mon Card 151-094/165",
+          "Holo",
+          "6141729027",
+          "2\u9032\u5316",
+          "\u30b2\u30f3\u30ac\u30fc",
+          "130",
+          "HP",
+          "\u30fc\u30b9\u30c8\u304b\u3089\u9032\u5316"
+        ],
+        "warnings": []
+      },
+      "manual_truth": {
+        "company": "cgc",
+        "grade": 8.5
+      },
+      "source_page": "https://www.ebay.com/itm/377454420946",
+      "image_sha256": "89d1fce5de21c6f01143379b9ca0f84fee4c7b57e5721b8105c163a15d7f420b",
+      "company_correct": true,
+      "grade_correct": true,
+      "company_wrong": false,
+      "grade_wrong": false
+    },
+    {
+      "id": "label100_286931936416",
+      "conditions": [
+        "slab",
+        "public_seller_photo"
+      ],
+      "grading_ms": 925.71,
+      "grading": {
+        "slab_detected": true,
+        "is_graded": true,
+        "grading_status": "graded",
+        "company": "cgc",
+        "company_source": "label_ocr",
+        "grade": 7.5,
+        "condition_label": "NEAR MINT+",
+        "subgrades": {},
+        "tag_score": null,
+        "certification_number": "6083953069",
+        "qualifiers": [],
+        "raw_condition": "not_assessed",
+        "authenticity_verified": false,
+        "source": "visible_label_ocr",
+        "requires_confirmation": true,
+        "label_text": [
+          "&CGC",
+          "CERTIFIED GUARANTY COMPANY",
+          "Porygon",
+          "NEAR MINT+",
+          "7.5",
+          "Pok\u00e9mon (1999)",
+          "Base Set - 1st Ed. - 39/102",
+          "6083953069",
+          "Basic Pok\u00e9mon",
+          "30 HP"
+        ],
+        "warnings": []
+      },
+      "manual_truth": {
+        "company": "cgc",
+        "grade": 7.5
+      },
+      "source_page": "https://www.ebay.com/itm/286931936416",
+      "image_sha256": "0bcf6db661b406ebee2d9fdf0a3e6620ca9363d7c26a8d65241ebd1a37f53f2b",
+      "company_correct": true,
+      "grade_correct": true,
+      "company_wrong": false,
+      "grade_wrong": false
+    },
+    {
+      "id": "label100_227092531615",
+      "conditions": [
+        "slab",
+        "public_seller_photo"
+      ],
+      "grading_ms": 1070.25,
+      "grading": {
+        "slab_detected": true,
+        "is_graded": true,
+        "grading_status": "graded",
+        "company": "cgc",
+        "company_source": "label_ocr",
+        "grade": 8.0,
+        "condition_label": "NM/MINT",
+        "subgrades": {},
+        "tag_score": null,
+        "certification_number": "6042552002",
+        "qualifiers": [],
+        "raw_condition": "not_assessed",
+        "authenticity_verified": false,
+        "source": "visible_label_ocr",
+        "requires_confirmation": true,
+        "label_text": [
+          "LCGC",
+          "CERTIFIED GUARANTY COMPANY",
+          "Venusaur",
+          "NM/MINT",
+          "Pok\u00e9mon (1999)",
+          "8",
+          "Base Set-15/102",
+          "Holo",
+          "6042552002",
+          "Evolves from Ivysaur",
+          "Put Venusaur on the Stage I card",
+          "STAGE 2",
+          "Venusaur",
+          "100 HP"
+        ],
+        "warnings": []
+      },
+      "manual_truth": {
+        "company": "cgc",
+        "grade": 8
+      },
+      "source_page": "https://www.ebay.com/itm/227092531615",
+      "image_sha256": "25279cf5f76eb26c83660623163b2783368099ebdbe82e463d18170e539cbeb9",
+      "company_correct": true,
+      "grade_correct": true,
+      "company_wrong": false,
+      "grade_wrong": false
+    },
+    {
+      "id": "label100_147245288873",
+      "conditions": [
+        "slab",
+        "public_seller_photo"
+      ],
+      "grading_ms": 11376.66,
+      "grading": {
+        "slab_detected": true,
+        "is_graded": null,
+        "grading_status": "unknown",
+        "company": "cgc",
+        "company_source": "label_ocr",
+        "grade": null,
+        "condition_label": "PRISTINE",
+        "subgrades": {},
+        "tag_score": null,
+        "certification_number": "4310885287",
+        "qualifiers": [],
+        "raw_condition": "not_assessed",
+        "authenticity_verified": false,
+        "source": "visible_label_ocr",
+        "requires_confirmation": true,
+        "label_text": [
+          "SOCGC",
+          "CERTIFIED GUARANTY COMPANY",
+          "Charizard",
+          "PRISTINE",
+          "Pok\u00e9mon (2018) Japanese",
+          "Tag Bolt - 013/095",
+          "Holo",
+          "4310885287"
+        ],
+        "warnings": [
+          "overall_grade_unreadable_or_ambiguous"
+        ]
+      },
+      "manual_truth": {
+        "company": "cgc",
+        "grade": 10
+      },
+      "source_page": "https://www.ebay.com/itm/147245288873",
+      "image_sha256": "750381682766a99506dc51e3662396304d2c8401087765134ade32a40128ab03",
+      "company_correct": true,
+      "grade_correct": false,
+      "company_wrong": false,
+      "grade_wrong": false
+    },
+    {
+      "id": "label100_117192519531",
+      "conditions": [
+        "slab",
+        "public_seller_photo"
+      ],
+      "grading_ms": 1064.14,
+      "grading": {
+        "slab_detected": true,
+        "is_graded": true,
+        "grading_status": "graded",
+        "company": "cgc",
+        "company_source": "label_ocr",
+        "grade": 10.0,
+        "condition_label": "PRISTINE",
+        "subgrades": {},
+        "tag_score": null,
+        "certification_number": "6093158001",
+        "qualifiers": [],
+        "raw_condition": "not_assessed",
+        "authenticity_verified": false,
+        "source": "visible_label_ocr",
+        "requires_confirmation": true,
+        "label_text": [
+          "CGC",
+          "CERTIFIED GUARANTY COMPANY",
+          "Porygon-Z GX",
+          "PRISTINE",
+          "Pok\u00e9mon (2019) Japanese",
+          "10",
+          "Sun & Moon Promos - 317/SM-P",
+          "Mar. - May 2019 Gym Pack",
+          "6093158001",
+          "2\u9032\u5316",
+          "\u30dd\u30ea\u30b4\u30f3ZGX",
+          "HP240"
+        ],
+        "warnings": []
+      },
+      "manual_truth": {
+        "company": "cgc",
+        "grade": 10
+      },
+      "source_page": "https://www.ebay.com/itm/117192519531",
+      "image_sha256": "ae2f2e6c99724e211599eab471bdeb6fbbd86f656368351b3a1bb700d1873f23",
+      "company_correct": true,
+      "grade_correct": true,
+      "company_wrong": false,
+      "grade_wrong": false
+    },
+    {
+      "id": "label100_800716677202",
+      "conditions": [
+        "slab",
+        "public_seller_photo"
+      ],
+      "grading_ms": 6599.1,
+      "grading": {
+        "slab_detected": true,
+        "is_graded": null,
+        "grading_status": "unknown",
+        "company": "cgc",
+        "company_source": "label_ocr",
+        "grade": null,
+        "condition_label": "PRISTINE",
+        "subgrades": {},
+        "tag_score": null,
+        "certification_number": "6028200260",
+        "qualifiers": [],
+        "raw_condition": "not_assessed",
+        "authenticity_verified": false,
+        "source": "visible_label_ocr",
+        "requires_confirmation": true,
+        "label_text": [
+          "&CGC",
+          "CERTIFIED GUARANTY COMPANY",
+          "Doduo",
+          "Pok\u00e9mon (2023) Japanese",
+          "PRISTINE",
+          "Trading Card Game Classic - 013/032",
+          "Venusaur & Lugla ex Deck - Holo",
+          "6028200260",
+          "\u305f"
+        ],
+        "warnings": [
+          "overall_grade_unreadable_or_ambiguous"
+        ]
+      },
+      "manual_truth": {
+        "company": "cgc",
+        "grade": 10
+      },
+      "source_page": "https://www.ebay.com/itm/800716677202",
+      "image_sha256": "7a5c40b33ac9e773e6c94c3fec9f6b9c9e5b1d60e1085d546b44908360605d2a",
+      "company_correct": true,
+      "grade_correct": false,
+      "company_wrong": false,
+      "grade_wrong": false
+    },
+    {
+      "id": "label100_406861147094",
+      "conditions": [
+        "slab",
+        "public_seller_photo"
+      ],
+      "grading_ms": 850.0,
+      "grading": {
+        "slab_detected": true,
+        "is_graded": true,
+        "grading_status": "graded",
+        "company": "cgc",
+        "company_source": "label_ocr",
+        "grade": 10.0,
+        "condition_label": "PRISTINE",
+        "subgrades": {},
+        "tag_score": null,
+        "certification_number": null,
+        "qualifiers": [],
+        "raw_condition": "not_assessed",
+        "authenticity_verified": false,
+        "source": "visible_label_ocr",
+        "requires_confirmation": true,
+        "label_text": [
+          "CGCUNIVERSALGRADE",
+          "Pristine",
+          "Golduck",
+          "10",
+          "Pok\u00e9mon (1999)",
+          "Fossil - 1st Edition - 35/62",
+          "Evolves from Psyduck",
+          "Put Golduck on the Basic Pok\u00e9mon",
+          "STAGE",
+          "Golduck",
+          "70 HP"
+        ],
+        "warnings": []
+      },
+      "manual_truth": {
+        "company": "cgc",
+        "grade": 10
+      },
+      "source_page": "https://www.ebay.com/itm/406861147094",
+      "image_sha256": "af8dac71ba46dc7d5a25e929d585172a2baf2aaa80a04d11000d0bb9b178e429",
+      "company_correct": true,
+      "grade_correct": true,
+      "company_wrong": false,
+      "grade_wrong": false
+    },
+    {
+      "id": "label100_157534594084",
+      "conditions": [
+        "slab",
+        "public_seller_photo"
+      ],
+      "grading_ms": 8564.05,
+      "grading": {
+        "slab_detected": true,
+        "is_graded": true,
+        "grading_status": "graded",
+        "company": "cgc",
+        "company_source": "label_ocr",
+        "grade": 10.0,
+        "condition_label": "PRISTINE",
+        "subgrades": {},
+        "tag_score": null,
+        "certification_number": "1401025353022",
+        "qualifiers": [],
+        "raw_condition": "not_assessed",
+        "authenticity_verified": false,
+        "source": "visible_label_ocr",
+        "requires_confirmation": true,
+        "label_text": [
+          "SDCGC",
+          "CERTIFIED GUARANTY COMPANY",
+          "Pikachu",
+          "PRISTINE",
+          "Pok\u00e9mon (2023)",
+          "Trading Card Game Classic - 008/034",
+          "Holo - Charizard & Ho-Oh ex Deck",
+          "1401025353022",
+          "CERTIFIED GUARANTY COMPANY",
+          "SDCGC",
+          "CERTIFIED GUARANTY COMPANY",
+          "Pikachu",
+          "PRISTINE",
+          "Pok\u00e9mon (2023)",
+          "Trading Card Game Classic - 008/034",
+          "Holo - Charizard & Ho-Oh ex Deck",
+          "1401025353022",
+          "10"
+        ],
+        "warnings": []
+      },
+      "manual_truth": {
+        "company": "cgc",
+        "grade": 10
+      },
+      "source_page": "https://www.ebay.com/itm/157534594084",
+      "image_sha256": "92d98f7ac1ad5e99343bef9cf1fbed4f0771c450bb58357066b273ab4903f786",
+      "company_correct": true,
+      "grade_correct": true,
+      "company_wrong": false,
+      "grade_wrong": false
+    },
+    {
+      "id": "label100_326878079751",
+      "conditions": [
+        "slab",
+        "public_seller_photo"
+      ],
+      "grading_ms": 2850.36,
+      "grading": {
+        "slab_detected": true,
+        "is_graded": true,
+        "grading_status": "graded",
+        "company": "cgc",
+        "company_source": "label_ocr",
+        "grade": 10.0,
+        "condition_label": "PRISTINE",
+        "subgrades": {},
+        "tag_score": null,
+        "certification_number": null,
+        "qualifiers": [],
+        "raw_condition": "not_assessed",
+        "authenticity_verified": false,
+        "source": "visible_label_ocr",
+        "requires_confirmation": true,
+        "label_text": [
+          "CGC UNIVERSAL GRADE",
+          "Venusaur",
+          "Pok\u00e9mon Topps (1999)",
+          "Pok\u00e9mon the First Movie - E3",
+          "Second Print",
+          "CGC UNIVERSAL GRADE",
+          "Pristine",
+          "Venusaur",
+          "Pok\u00e9mon Topps (1999)",
+          "Pok\u00e9mon the First Movie - E3",
+          "Second Print",
+          "10"
+        ],
+        "warnings": []
+      },
+      "manual_truth": {
+        "company": "cgc",
+        "grade": 10
+      },
+      "source_page": "https://www.ebay.com/itm/326878079751",
+      "image_sha256": "89752f0f3b3c7c1634543e2695cdd77bb4350f07a6db232b5b5e3aaaaea820f3",
+      "company_correct": true,
+      "grade_correct": true,
+      "company_wrong": false,
+      "grade_wrong": false
+    },
+    {
+      "id": "label100_306950037783",
+      "conditions": [
+        "slab",
+        "public_seller_photo"
+      ],
+      "grading_ms": 924.18,
+      "grading": {
+        "slab_detected": true,
+        "is_graded": true,
+        "grading_status": "graded",
+        "company": "cgc",
+        "company_source": "label_ocr",
+        "grade": 10.0,
+        "condition_label": "GEMMINT",
+        "subgrades": {},
+        "tag_score": null,
+        "certification_number": "6075227132",
+        "qualifiers": [],
+        "raw_condition": "not_assessed",
+        "authenticity_verified": false,
+        "source": "visible_label_ocr",
+        "requires_confirmation": true,
+        "label_text": [
+          "SDCGC",
+          "CERTIFIED GUARANTY COMPANY",
+          "Pikachu",
+          "GEMMINT",
+          "10",
+          "Pok\u00e9mon (2025)",
+          "Black Star Promos - 214",
+          "Illustration Contest 2024 Winner",
+          "6075227132",
+          "BASIC",
+          "Pikachu",
+          "60",
+          "HP"
+        ],
+        "warnings": []
+      },
+      "manual_truth": {
+        "company": "cgc",
+        "grade": 10
+      },
+      "source_page": "https://www.ebay.com/itm/306950037783",
+      "image_sha256": "e90d4eaabc943851ccebba8550c3546fa654f09c1436b4022e9acb07c627ee44",
+      "company_correct": true,
+      "grade_correct": true,
+      "company_wrong": false,
+      "grade_wrong": false
+    },
+    {
+      "id": "label100_227529618922",
+      "conditions": [
+        "slab",
+        "public_seller_photo"
+      ],
+      "grading_ms": 1038.45,
+      "grading": {
+        "slab_detected": true,
+        "is_graded": true,
+        "grading_status": "graded",
+        "company": "cgc",
+        "company_source": "label_ocr",
+        "grade": 9.0,
+        "condition_label": "MINT",
+        "subgrades": {},
+        "tag_score": null,
+        "certification_number": "6120508234",
+        "qualifiers": [],
+        "raw_condition": "not_assessed",
+        "authenticity_verified": false,
+        "source": "visible_label_ocr",
+        "requires_confirmation": true,
+        "label_text": [
+          "OCGC",
+          "CERTIFIED GUARANTY COMPANY",
+          "Charizard",
+          "Pok\u00e9mon (2018) Japanese",
+          "MINT",
+          "Tag Bolt -013/095",
+          "9",
+          "Holo",
+          "6120508234"
+        ],
+        "warnings": []
+      },
+      "manual_truth": {
+        "company": "cgc",
+        "grade": 9
+      },
+      "source_page": "https://www.ebay.com/itm/227529618922",
+      "image_sha256": "92c3bacc0ce541c0266e2b40439ba8a238dd67387852325c4ccda3fa1eb73704",
+      "company_correct": true,
+      "grade_correct": true,
+      "company_wrong": false,
+      "grade_wrong": false
+    },
+    {
+      "id": "label100_397833167240",
+      "conditions": [
+        "slab",
+        "public_seller_photo"
+      ],
+      "grading_ms": 744.3,
+      "grading": {
+        "slab_detected": true,
+        "is_graded": true,
+        "grading_status": "graded",
+        "company": "cgc",
+        "company_source": "label_ocr",
+        "grade": 8.5,
+        "condition_label": "NM/MINT+",
+        "subgrades": {},
+        "tag_score": null,
+        "certification_number": "6150344092",
+        "qualifiers": [],
+        "raw_condition": "not_assessed",
+        "authenticity_verified": false,
+        "source": "visible_label_ocr",
+        "requires_confirmation": true,
+        "label_text": [
+          "JOCGC",
+          "CERTIFIED GUARANTY COMPANY",
+          "Mewtwo",
+          "NM/MINT+",
+          "Pok\u00e9mon (2023) Japanese",
+          "8.5",
+          "Pok\u00e9mon Card 151 - 150/165",
+          "Holo",
+          "6150344092"
+        ],
+        "warnings": []
+      },
+      "manual_truth": {
+        "company": "cgc",
+        "grade": 8.5
+      },
+      "source_page": "https://www.ebay.com/itm/397833167240",
+      "image_sha256": "0f20dd9d0c0e1fba05121789b7269f2bb6b9350b8ec2841616f6b296609e7cd3",
+      "company_correct": true,
+      "grade_correct": true,
+      "company_wrong": false,
+      "grade_wrong": false
+    },
+    {
+      "id": "label100_297904518312",
+      "conditions": [
+        "slab",
+        "public_seller_photo"
+      ],
+      "grading_ms": 1195.22,
+      "grading": {
+        "slab_detected": true,
+        "is_graded": true,
+        "grading_status": "graded",
+        "company": "cgc",
+        "company_source": "label_ocr",
+        "grade": 9.5,
+        "condition_label": "MINT+",
+        "subgrades": {},
+        "tag_score": null,
+        "certification_number": "6130710172",
+        "qualifiers": [],
+        "raw_condition": "not_assessed",
+        "authenticity_verified": false,
+        "source": "visible_label_ocr",
+        "requires_confirmation": true,
+        "label_text": [
+          "4CG",
+          "CERTIFIED GUARANTY COMPANY",
+          "Shiinotic",
+          "9.5",
+          "MINT+",
+          "Pok\u00e9mon (2024) Japanese",
+          "Paradise Dragona - 066/064",
+          "Art Rare - Holo",
+          "6130710172",
+          "1\u9053\u5316",
+          "\u30de\u30b7\u30a7\u30fc\u30c9",
+          "110",
+          "HP"
+        ],
+        "warnings": []
+      },
+      "manual_truth": {
+        "company": "cgc",
+        "grade": 9.5
+      },
+      "source_page": "https://www.ebay.com/itm/297904518312",
+      "image_sha256": "6df5ff434238b64c165290ceeb25861f48e6f378bf1e521d571ea9e9a1b8bec5",
+      "company_correct": true,
+      "grade_correct": true,
+      "company_wrong": false,
+      "grade_wrong": false
+    },
+    {
+      "id": "label100_336154895497",
+      "conditions": [
+        "slab",
+        "public_seller_photo"
+      ],
+      "grading_ms": 856.78,
+      "grading": {
+        "slab_detected": true,
+        "is_graded": true,
+        "grading_status": "graded",
+        "company": "cgc",
+        "company_source": "label_ocr",
+        "grade": 8.0,
+        "condition_label": "NM/MINT",
+        "subgrades": {},
+        "tag_score": null,
+        "certification_number": null,
+        "qualifiers": [],
+        "raw_condition": "not_assessed",
+        "authenticity_verified": false,
+        "source": "visible_label_ocr",
+        "requires_confirmation": true,
+        "label_text": [
+          "CGCUNIVERSAL GRADE",
+          "NM/Mint",
+          "Golbat",
+          "8",
+          "Pok\u00e9mon (1999)",
+          "Fossil-Unlimited-34/62",
+          "Evolves from Zubat",
+          "Put Golbat on the Basic Pok\u00e9mon",
+          "STAGE 1"
+        ],
+        "warnings": []
+      },
+      "manual_truth": {
+        "company": "cgc",
+        "grade": 8
+      },
+      "source_page": "https://www.ebay.com/itm/336154895497",
+      "image_sha256": "f48d168ead364a6f793cc138f9a7ae4704a2fcf77c5294c0cf3b06dc7a3f6f62",
+      "company_correct": true,
+      "grade_correct": true,
+      "company_wrong": false,
+      "grade_wrong": false
+    },
+    {
+      "id": "label100_287609263339",
+      "conditions": [
+        "slab",
+        "public_seller_photo"
+      ],
+      "grading_ms": 947.83,
+      "grading": {
+        "slab_detected": true,
+        "is_graded": true,
+        "grading_status": "graded",
+        "company": "tag",
+        "company_source": "label_ocr",
+        "grade": 10.0,
+        "condition_label": "GEM MINT",
+        "subgrades": {},
+        "tag_score": null,
+        "certification_number": "D9239120",
+        "qualifiers": [],
+        "raw_condition": "not_assessed",
+        "authenticity_verified": false,
+        "source": "visible_label_ocr",
+        "requires_confirmation": true,
+        "label_text": [
+          "TAG",
+          "GIRATINA VSTAR",
+          "10",
+          "D9239120",
+          "2023 POK\u00c9MON SWORD & SHIELD",
+          "TAG",
+          "CROWN ZENITH #GG69",
+          "GALARIAN GALLERY ALT ART GOLD",
+          "GEM MINT",
+          "Giratina",
+          "2800",
+          "VSTAR",
+          "STAR",
+          "HP",
+          "Evolves from Giratina V"
+        ],
+        "warnings": []
+      },
+      "manual_truth": {
+        "company": "tag",
+        "grade": 10
+      },
+      "source_page": "https://www.ebay.com/itm/287609263339",
+      "image_sha256": "91ddb72372573f57ffa98e0c7baf9f455d6542f4bd5935ec7b948218522f6c9e",
+      "company_correct": true,
+      "grade_correct": true,
+      "company_wrong": false,
+      "grade_wrong": false
+    },
+    {
+      "id": "label100_168307084070",
+      "conditions": [
+        "slab",
+        "public_seller_photo"
+      ],
+      "grading_ms": 2631.51,
+      "grading": {
+        "slab_detected": true,
+        "is_graded": true,
+        "grading_status": "graded",
+        "company": "tag",
+        "company_source": "label_ocr",
+        "grade": 6.0,
+        "condition_label": "EX MT",
+        "subgrades": {},
+        "tag_score": null,
+        "certification_number": "S8930510",
+        "qualifiers": [],
+        "raw_condition": "not_assessed",
+        "authenticity_verified": false,
+        "source": "visible_label_ocr",
+        "requires_confirmation": true,
+        "label_text": [
+          "TAG",
+          "NIDOKING",
+          "S8930510",
+          "1999 WOTC POK\u00c9MON",
+          "BASE SET #11/102",
+          "HOLOGRAPHIC",
+          "EX MT",
+          "TAG",
+          "NIDOKING",
+          "1999 WOTC POK\u00c9MON",
+          "BASE SET #11/102",
+          "HOLOGRAPHIC",
+          "EX MT",
+          "6"
+        ],
+        "warnings": []
+      },
+      "manual_truth": {
+        "company": "tag",
+        "grade": 6
+      },
+      "source_page": "https://www.ebay.com/itm/168307084070",
+      "image_sha256": "d1997f27977f7cbf954ead9e39e619b61ff53082d7469e8c0c252c742529ec84",
+      "company_correct": true,
+      "grade_correct": true,
+      "company_wrong": false,
+      "grade_wrong": false
+    },
+    {
+      "id": "label100_137154472208",
+      "conditions": [
+        "slab",
+        "public_seller_photo"
+      ],
+      "grading_ms": 4994.25,
+      "grading": {
+        "slab_detected": true,
+        "is_graded": true,
+        "grading_status": "graded",
+        "company": "tag",
+        "company_source": "verified_logo",
+        "grade": 9.0,
+        "condition_label": "MINT",
+        "subgrades": {},
+        "tag_score": null,
+        "certification_number": "H2369154",
+        "qualifiers": [],
+        "raw_condition": "not_assessed",
+        "authenticity_verified": false,
+        "source": "visible_label_ocr",
+        "requires_confirmation": true,
+        "label_text": [
+          "TAG",
+          "CHARIZARD",
+          "H2369154",
+          "2019 POK\u00c9MON SUN & MOON",
+          "DETECTIVE PIKACHU #5/18",
+          "TAG",
+          "HOLOGRAPHIC",
+          "MINT",
+          "TAC",
+          "CHARIZARD",
+          "H2369154",
+          "9",
+          "2019 POK\u00c9MON SUN & MOON",
+          "DETECTIVE PIKACHU #5/18",
+          "HOLOGRAPHIC",
+          "MINT"
+        ],
+        "warnings": []
+      },
+      "manual_truth": {
+        "company": "tag",
+        "grade": 9
+      },
+      "source_page": "https://www.ebay.com/itm/137154472208",
+      "image_sha256": "5b1548f4041f9a1fc5121a65b9bf849e90ab61c66046818113a96fda890766d1",
+      "company_correct": true,
+      "grade_correct": true,
+      "company_wrong": false,
+      "grade_wrong": false
+    },
+    {
+      "id": "label100_127844524552",
+      "conditions": [
+        "slab",
+        "public_seller_photo"
+      ],
+      "grading_ms": 3491.47,
+      "grading": {
+        "slab_detected": true,
+        "is_graded": true,
+        "grading_status": "graded",
+        "company": "tag",
+        "company_source": "verified_logo",
+        "grade": 10.0,
+        "condition_label": "PRISTINE",
+        "subgrades": {},
+        "tag_score": null,
+        "certification_number": "S1884087",
+        "qualifiers": [],
+        "raw_condition": "not_assessed",
+        "authenticity_verified": false,
+        "source": "visible_label_ocr",
+        "requires_confirmation": true,
+        "label_text": [
+          "TAG",
+          "INE",
+          "\u30ea\u30b6\u30fc\u30c9\u30f3|CHARIZARD",
+          "10",
+          "S1884087",
+          "2018 POK\u00c9MON SUN & MOON JPN",
+          "TAG BOLT #013/095",
+          "HOLOGRAPHIC",
+          "PRISTINE"
+        ],
+        "warnings": []
+      },
+      "manual_truth": {
+        "company": "tag",
+        "grade": 10
+      },
+      "source_page": "https://www.ebay.com/itm/127844524552",
+      "image_sha256": "c06df9c0b43a77e323306d128e783d237a4e21a7ac694754df4775417c4c0328",
+      "company_correct": true,
+      "grade_correct": true,
+      "company_wrong": false,
+      "grade_wrong": false
+    },
+    {
+      "id": "label100_267615603004",
+      "conditions": [
+        "slab",
+        "public_seller_photo"
+      ],
+      "grading_ms": 3515.4,
+      "grading": {
+        "slab_detected": true,
+        "is_graded": true,
+        "grading_status": "graded",
+        "company": "tag",
+        "company_source": "verified_logo",
+        "grade": 10.0,
+        "condition_label": "PRISTINE",
+        "subgrades": {},
+        "tag_score": null,
+        "certification_number": "T8032477",
+        "qualifiers": [],
+        "raw_condition": "not_assessed",
+        "authenticity_verified": false,
+        "source": "visible_label_ocr",
+        "requires_confirmation": true,
+        "label_text": [
+          "TAG",
+          "T",
+          "INE",
+          "\u88c2\u7a7a\u306e\u30c7\u30aa\u30ad\u30b7\u30b9",
+          "10",
+          "T8032477",
+          "(SKY-SPLITTING DEOXYS)",
+          "2004 POK\u00c9MON ADV JPN",
+          "TA",
+          "MOVIE COMM. VS PACK #002/019",
+          "PRISTINE"
+        ],
+        "warnings": []
+      },
+      "manual_truth": {
+        "company": "tag",
+        "grade": 10
+      },
+      "source_page": "https://www.ebay.com/itm/267615603004",
+      "image_sha256": "5af680b66068263eb5b7653ef4ed05f6522b23c31ccb400f58a20e457d71ff4c",
+      "company_correct": true,
+      "grade_correct": true,
+      "company_wrong": false,
+      "grade_wrong": false
+    },
+    {
+      "id": "label100_205373770550",
+      "conditions": [
+        "slab",
+        "public_seller_photo"
+      ],
+      "grading_ms": 870.42,
+      "grading": {
+        "slab_detected": null,
+        "is_graded": null,
+        "grading_status": "unknown",
+        "company": null,
+        "company_source": "none",
+        "grade": null,
+        "condition_label": null,
+        "subgrades": {},
+        "tag_score": null,
+        "certification_number": null,
+        "qualifiers": [],
+        "raw_condition": "not_assessed",
+        "authenticity_verified": false,
+        "source": "none",
+        "requires_confirmation": true,
+        "label_text": [
+          "10"
+        ],
+        "warnings": [
+          "no_supported_grading_label_detected",
+          "ungraded_status_not_proven"
+        ]
+      },
+      "manual_truth": {
+        "company": "tag",
+        "grade": 10
+      },
+      "source_page": "https://www.ebay.com/itm/205373770550",
+      "image_sha256": "87846e114a4cdf39cebd753967740850c85bb5b01c3bda7d6aaa6effcfda3452",
+      "company_correct": false,
+      "grade_correct": false,
+      "company_wrong": false,
+      "grade_wrong": false
+    },
+    {
+      "id": "label100_407216799901",
+      "conditions": [
+        "slab",
+        "public_seller_photo"
+      ],
+      "grading_ms": 877.6,
+      "grading": {
+        "slab_detected": true,
+        "is_graded": true,
+        "grading_status": "graded",
+        "company": "tag",
+        "company_source": "label_ocr",
+        "grade": 10.0,
+        "condition_label": "GEM MINT",
+        "subgrades": {},
+        "tag_score": null,
+        "certification_number": "K2039454",
+        "qualifiers": [],
+        "raw_condition": "not_assessed",
+        "authenticity_verified": false,
+        "source": "visible_label_ocr",
+        "requires_confirmation": true,
+        "label_text": [
+          "TAG",
+          "\u30d4\u30ab\u30c1\u30e5\u30a6|PIKACHU",
+          "10",
+          "K2039454",
+          "2025 POK\u00c9MON MEGA JAPANESE",
+          "MCDONALD'S COLL. #020/M-P",
+          "PROMO",
+          "GEM MINT",
+          "\u305f\u306d",
+          "70",
+          "\u30d4\u30ab\u30c1\u30e5\u30a6",
+          "HP"
+        ],
+        "warnings": []
+      },
+      "manual_truth": {
+        "company": "tag",
+        "grade": 10
+      },
+      "source_page": "https://www.ebay.com/itm/407216799901",
+      "image_sha256": "783c682234fbb656d0bfa0b4518e639f840793e3ca24de19c847ec88ab1686cb",
+      "company_correct": true,
+      "grade_correct": true,
+      "company_wrong": false,
+      "grade_wrong": false
+    },
+    {
+      "id": "label100_336377025143",
+      "conditions": [
+        "slab",
+        "public_seller_photo"
+      ],
+      "grading_ms": 976.92,
+      "grading": {
+        "slab_detected": true,
+        "is_graded": true,
+        "grading_status": "graded",
+        "company": "tag",
+        "company_source": "label_ocr",
+        "grade": 10.0,
+        "condition_label": "PRISTINE",
+        "subgrades": {},
+        "tag_score": null,
+        "certification_number": null,
+        "qualifiers": [],
+        "raw_condition": "not_assessed",
+        "authenticity_verified": false,
+        "source": "visible_label_ocr",
+        "requires_confirmation": true,
+        "label_text": [
+          "TAG",
+          "PRISTINE",
+          "\u30ef\u30fc\u30baVAPOREONEX",
+          "10",
+          "ST",
+          "2024 POK\u00c9MON SV JAPANESE",
+          "TERASTAL FEST EX #205/187",
+          "SPECIAL ART RARE",
+          "PRISTINE",
+          "10",
+          "\u30b7\u30e3\u30ef\u30fc\u30ba\u30b9",
+          "280",
+          "95290"
+        ],
+        "warnings": []
+      },
+      "manual_truth": {
+        "company": "tag",
+        "grade": 10
+      },
+      "source_page": "https://www.ebay.com/itm/336377025143",
+      "image_sha256": "79628492182b2595b79746794cb9962aa541f6e562b79899e27d0797a485ca6e",
+      "company_correct": true,
+      "grade_correct": true,
+      "company_wrong": false,
+      "grade_wrong": false
+    },
+    {
+      "id": "label100_800266885327",
+      "conditions": [
+        "slab",
+        "public_seller_photo"
+      ],
+      "grading_ms": 1135.01,
+      "grading": {
+        "slab_detected": true,
+        "is_graded": true,
+        "grading_status": "graded",
+        "company": "tag",
+        "company_source": "label_ocr",
+        "grade": 10.0,
+        "condition_label": "GEM MINT",
+        "subgrades": {},
+        "tag_score": null,
+        "certification_number": null,
+        "qualifiers": [],
+        "raw_condition": "not_assessed",
+        "authenticity_verified": false,
+        "source": "visible_label_ocr",
+        "requires_confirmation": true,
+        "label_text": [
+          "TAG",
+          "UMBREON VMAX",
+          "10",
+          "2022 POK\u00c9MON SWORD & SHIELD",
+          "BRILLIANT STARS #TG23",
+          "TRAINER GALLERY - ALT ART UR",
+          "GEM MINT",
+          "UmbreonVAx",
+          "3100",
+          "VMAX",
+          "Evalvesfrom UmtireonV",
+          "Dynamax"
+        ],
+        "warnings": []
+      },
+      "manual_truth": {
+        "company": "tag",
+        "grade": 10
+      },
+      "source_page": "https://www.ebay.com/itm/800266885327",
+      "image_sha256": "9edacb612338cbe4c31866b5e4f48830fa66fce779e49b7218f1ffe76ddb1388",
+      "company_correct": true,
+      "grade_correct": true,
+      "company_wrong": false,
+      "grade_wrong": false
+    },
+    {
+      "id": "label100_178506051583",
+      "conditions": [
+        "slab",
+        "public_seller_photo"
+      ],
+      "grading_ms": 961.43,
+      "grading": {
+        "slab_detected": true,
+        "is_graded": true,
+        "grading_status": "graded",
+        "company": "tag",
+        "company_source": "label_ocr",
+        "grade": 10.0,
+        "condition_label": "GEM MINT",
+        "subgrades": {},
+        "tag_score": null,
+        "certification_number": null,
+        "qualifiers": [],
+        "raw_condition": "not_assessed",
+        "authenticity_verified": false,
+        "source": "visible_label_ocr",
+        "requires_confirmation": true,
+        "label_text": [
+          "TAG",
+          "MEGA GENGAR EX",
+          "10",
+          "2026 POK\u00c9MON MEGA EVOLUTION",
+          "ASCENDED HEROES #284/217",
+          "SPECIAL ILLUSTRATION RARE",
+          "n",
+          "GEM MINT"
+        ],
+        "warnings": []
+      },
+      "manual_truth": {
+        "company": "tag",
+        "grade": 10
+      },
+      "source_page": "https://www.ebay.com/itm/178506051583",
+      "image_sha256": "0b9509548e8afcae97b967170efa0a338b397bccd74493e02af5aef11b4ba117",
+      "company_correct": true,
+      "grade_correct": true,
+      "company_wrong": false,
+      "grade_wrong": false
+    },
+    {
+      "id": "label100_397829935118",
+      "conditions": [
+        "slab",
+        "public_seller_photo"
+      ],
+      "grading_ms": 729.05,
+      "grading": {
+        "slab_detected": true,
+        "is_graded": true,
+        "grading_status": "graded",
+        "company": "tag",
+        "company_source": "label_ocr",
+        "grade": 10.0,
+        "condition_label": "GEM.MINT",
+        "subgrades": {},
+        "tag_score": null,
+        "certification_number": null,
+        "qualifiers": [],
+        "raw_condition": "not_assessed",
+        "authenticity_verified": false,
+        "source": "visible_label_ocr",
+        "requires_confirmation": true,
+        "label_text": [
+          "TAG",
+          "MEGA GENGAR EX",
+          "10",
+          "2026 POK\u00c9MONMEGA EVOLUTION",
+          "ASCENDED HEROES #269/217",
+          "MEGA AITACK RARE",
+          "GEM.MINT",
+          "Mega Gengarex",
+          "350"
+        ],
+        "warnings": []
+      },
+      "manual_truth": {
+        "company": "tag",
+        "grade": 10
+      },
+      "source_page": "https://www.ebay.com/itm/397829935118",
+      "image_sha256": "5eaefde0146ca2bce9a7615f887fccfcf1c92f4d46a1e9192824309e0444beb6",
+      "company_correct": true,
+      "grade_correct": true,
+      "company_wrong": false,
+      "grade_wrong": false
+    },
+    {
+      "id": "label100_306485570669",
+      "conditions": [
+        "slab",
+        "public_seller_photo"
+      ],
+      "grading_ms": 918.34,
+      "grading": {
+        "slab_detected": true,
+        "is_graded": true,
+        "grading_status": "graded",
+        "company": "tag",
+        "company_source": "label_ocr",
+        "grade": 10.0,
+        "condition_label": "GEM MINT",
+        "subgrades": {},
+        "tag_score": null,
+        "certification_number": "X6042997",
+        "qualifiers": [],
+        "raw_condition": "not_assessed",
+        "authenticity_verified": false,
+        "source": "visible_label_ocr",
+        "requires_confirmation": true,
+        "label_text": [
+          "TAG",
+          "UMBREON EX",
+          "X6042997",
+          "10",
+          "2025 POK\u00c9MON SCARLET & VIOLET",
+          "PRISMATIC EVO SURPRISE #060/131",
+          "DOUBLE RARE - 'PRISMATIC' STAMP",
+          "GEM MINT",
+          "STAGE1",
+          "Umbreonex",
+          "280"
+        ],
+        "warnings": []
+      },
+      "manual_truth": {
+        "company": "tag",
+        "grade": 10
+      },
+      "source_page": "https://www.ebay.com/itm/306485570669",
+      "image_sha256": "8f9fda0011b53f5149232e33ba923ceeb43afcb06081ab272d4aa8c66d5f60ff",
+      "company_correct": true,
+      "grade_correct": true,
+      "company_wrong": false,
+      "grade_wrong": false
+    },
+    {
+      "id": "label100_398150162220",
+      "conditions": [
+        "slab",
+        "public_seller_photo"
+      ],
+      "grading_ms": 3572.92,
+      "grading": {
+        "slab_detected": true,
+        "is_graded": true,
+        "grading_status": "graded",
+        "company": "tag",
+        "company_source": "verified_logo",
+        "grade": 10.0,
+        "condition_label": "GEM MINT",
+        "subgrades": {},
+        "tag_score": null,
+        "certification_number": "X5522404",
+        "qualifiers": [],
+        "raw_condition": "not_assessed",
+        "authenticity_verified": false,
+        "source": "visible_label_ocr",
+        "requires_confirmation": true,
+        "label_text": [
+          "TAG",
+          "GENGAR VMAX",
+          "10",
+          "X5522404",
+          "2021 POK\u00c9MON SWORD & SHIELD",
+          "FUSION STRIKE #271/264",
+          "ALTERNATE ART - SECRET RARE",
+          "GEM MINT"
+        ],
+        "warnings": []
+      },
+      "manual_truth": {
+        "company": "tag",
+        "grade": 10
+      },
+      "source_page": "https://www.ebay.com/itm/398150162220",
+      "image_sha256": "8781d5bb67b68c6c49db337924d11a35b4488bcb59f7a6a7fb521fde5172c4a8",
+      "company_correct": true,
+      "grade_correct": true,
+      "company_wrong": false,
+      "grade_wrong": false
+    },
+    {
+      "id": "label100_357980484801",
+      "conditions": [
+        "slab",
+        "public_seller_photo"
+      ],
+      "grading_ms": 995.88,
+      "grading": {
+        "slab_detected": true,
+        "is_graded": true,
+        "grading_status": "graded",
+        "company": "tag",
+        "company_source": "label_ocr",
+        "grade": 10.0,
+        "condition_label": "GEM MINT",
+        "subgrades": {},
+        "tag_score": null,
+        "certification_number": "W3537171",
+        "qualifiers": [],
+        "raw_condition": "not_assessed",
+        "authenticity_verified": false,
+        "source": "visible_label_ocr",
+        "requires_confirmation": true,
+        "label_text": [
+          "TAG",
+          "BLASTOISE VMAX",
+          "10",
+          "W3537171",
+          "2021 POK\u00c9MON SWORD & SHIELD",
+          "VMAX BATTLE BOX #SWSH103",
+          "GEM MINT",
+          "BLACK STAR PROMO - FULL ART UR",
+          "BlastoiseVMAX",
+          "330",
+          "VMAX",
+          "Evolves from Blastoise V",
+          "Gigantamax"
+        ],
+        "warnings": []
+      },
+      "manual_truth": {
+        "company": "tag",
+        "grade": 10
+      },
+      "source_page": "https://www.ebay.com/itm/357980484801",
+      "image_sha256": "a629fd635f340eae11dcedbb24e926bbb5ad3596c5c92411d977250bc325012e",
+      "company_correct": true,
+      "grade_correct": true,
+      "company_wrong": false,
+      "grade_wrong": false
+    },
+    {
+      "id": "label100_117278078333",
+      "conditions": [
+        "slab",
+        "public_seller_photo"
+      ],
+      "grading_ms": 3568.47,
+      "grading": {
+        "slab_detected": true,
+        "is_graded": true,
+        "grading_status": "graded",
+        "company": "tag",
+        "company_source": "verified_logo",
+        "grade": 10.0,
+        "condition_label": "GEM MINT",
+        "subgrades": {},
+        "tag_score": null,
+        "certification_number": "Y999625",
+        "qualifiers": [],
+        "raw_condition": "not_assessed",
+        "authenticity_verified": false,
+        "source": "visible_label_ocr",
+        "requires_confirmation": true,
+        "label_text": [
+          "TAG",
+          "MEGA GENGAR EX",
+          "10",
+          "2026 POK\u00c9MON MEGA EVOLUTION",
+          "Y999625",
+          "ASCENDED HEROES #269/217",
+          "MEGA ATTACK RARE",
+          "GEM MINT"
+        ],
+        "warnings": []
+      },
+      "manual_truth": {
+        "company": "tag",
+        "grade": 10
+      },
+      "source_page": "https://www.ebay.com/itm/117278078333",
+      "image_sha256": "244f6bfaff1b9f33e401e4c7fe9a97db50036b32ddbcd27f50ec624f3fb1142a",
+      "company_correct": true,
+      "grade_correct": true,
+      "company_wrong": false,
+      "grade_wrong": false
+    },
+    {
+      "id": "label100_407228091588",
+      "conditions": [
+        "slab",
+        "public_seller_photo"
+      ],
+      "grading_ms": 4850.33,
+      "grading": {
+        "slab_detected": true,
+        "is_graded": true,
+        "grading_status": "graded",
+        "company": "tag",
+        "company_source": "label_ocr",
+        "grade": 9.0,
+        "condition_label": "MINT",
+        "subgrades": {},
+        "tag_score": null,
+        "certification_number": "K8315251",
+        "qualifiers": [],
+        "raw_condition": "not_assessed",
+        "authenticity_verified": false,
+        "source": "visible_label_ocr",
+        "requires_confirmation": true,
+        "label_text": [
+          "TAG",
+          "TTEWWOYMTWO",
+          "K8315251",
+          "2023 POK\u00c9MON JAPANESE",
+          "TCG CLASSIC #014/032",
+          "HOLO - WATER DECK",
+          "MINT",
+          "TAG",
+          "\u30df\u30e5\u30a6\u30c3\u30fc|MEWTWO",
+          "K8315251",
+          "2023 POK\u00c9MON JAPANESE",
+          "TCG CLASSIC #014/032",
+          "HOLO - WATER DECK",
+          "MINT",
+          "9"
+        ],
+        "warnings": []
+      },
+      "manual_truth": {
+        "company": "tag",
+        "grade": 9
+      },
+      "source_page": "https://www.ebay.com/itm/407228091588",
+      "image_sha256": "22bd8ab033059d2a877cc5cf1ab79ede4f779857e61b2123b248e1aa30535fc0",
+      "company_correct": true,
+      "grade_correct": true,
+      "company_wrong": false,
+      "grade_wrong": false
+    },
+    {
+      "id": "label100_137154472166",
+      "conditions": [
+        "slab",
+        "public_seller_photo"
+      ],
+      "grading_ms": 1133.99,
+      "grading": {
+        "slab_detected": true,
+        "is_graded": true,
+        "grading_status": "graded",
+        "company": "tag",
+        "company_source": "label_ocr",
+        "grade": 9.0,
+        "condition_label": "MINT",
+        "subgrades": {},
+        "tag_score": null,
+        "certification_number": null,
+        "qualifiers": [],
+        "raw_condition": "not_assessed",
+        "authenticity_verified": false,
+        "source": "visible_label_ocr",
+        "requires_confirmation": true,
+        "label_text": [
+          "TA",
+          "MEWTWO GX",
+          "9",
+          "2017 POK\u00c9MON SUN & MOON",
+          "SHINING LEGENDS #39/73",
+          "TAG",
+          "ULTRA RARE",
+          "MINT",
+          "BASIC",
+          "Mewtwo",
+          "GX",
+          "HP190"
+        ],
+        "warnings": []
+      },
+      "manual_truth": {
+        "company": "tag",
+        "grade": 9
+      },
+      "source_page": "https://www.ebay.com/itm/137154472166",
+      "image_sha256": "4c52b86fd964a94329232bd6c1e4405e6a913d3160a2886d2c0688c80c4b2301",
+      "company_correct": true,
+      "grade_correct": true,
+      "company_wrong": false,
+      "grade_wrong": false
+    },
+    {
+      "id": "label100_147552021925",
+      "conditions": [
+        "slab",
+        "public_seller_photo"
+      ],
+      "grading_ms": 10103.46,
+      "grading": {
+        "slab_detected": true,
+        "is_graded": null,
+        "grading_status": "unknown",
+        "company": null,
+        "company_source": "none",
+        "grade": null,
+        "condition_label": "GEMMINT",
+        "subgrades": {},
+        "tag_score": null,
+        "certification_number": "1293861",
+        "qualifiers": [],
+        "raw_condition": "not_assessed",
+        "authenticity_verified": false,
+        "source": "visible_label_ocr",
+        "requires_confirmation": true,
+        "label_text": [
+          "2026 ASCENDEDHEROES",
+          "0",
+          "N'SZOROARKEX",
+          "SPECIALILLUSTRATIONRARE",
+          "#286",
+          "GEMMINT",
+          "1293861",
+          "STAGE1",
+          "N'sZoroark",
+          "280",
+          "Evolves from N's Zorua"
+        ],
+        "warnings": [
+          "grading_company_unreadable_or_unsupported",
+          "overall_grade_unreadable_or_ambiguous"
+        ]
+      },
+      "manual_truth": {
+        "company": "ace",
+        "grade": 10
+      },
+      "source_page": "https://www.ebay.co.uk/itm/147552021925",
+      "image_sha256": "d41dcaef01dca110a9d8c546b1692b88686daece42bb5be0fdc82a3ae6307b5e",
+      "company_correct": false,
+      "grade_correct": false,
+      "company_wrong": false,
+      "grade_wrong": false
+    },
+    {
+      "id": "label100_317559256789",
+      "conditions": [
+        "slab",
+        "public_seller_photo"
+      ],
+      "grading_ms": 3322.14,
+      "grading": {
+        "slab_detected": null,
+        "is_graded": null,
+        "grading_status": "unknown",
+        "company": null,
+        "company_source": "none",
+        "grade": null,
+        "condition_label": null,
+        "subgrades": {},
+        "tag_score": null,
+        "certification_number": null,
+        "qualifiers": [],
+        "raw_condition": "not_assessed",
+        "authenticity_verified": false,
+        "source": "none",
+        "requires_confirmation": true,
+        "label_text": [
+          "EVOLUTION",
+          "MEGA",
+          "1999JUNGLE1ST EDITION",
+          "PIKACHU",
+          "#60",
+          "EX-MT"
+        ],
+        "warnings": [
+          "no_supported_grading_label_detected",
+          "ungraded_status_not_proven"
+        ]
+      },
+      "manual_truth": {
+        "company": "ace",
+        "grade": 6
+      },
+      "source_page": "https://www.ebay.co.uk/itm/317559256789",
+      "image_sha256": "03952dc50a6a17fc6c0f0838a249035373f6f60500026e5dfd0ee2732c300238",
+      "company_correct": false,
+      "grade_correct": false,
+      "company_wrong": false,
+      "grade_wrong": false
+    },
+    {
+      "id": "label100_187914531865",
+      "conditions": [
+        "slab",
+        "public_seller_photo"
+      ],
+      "grading_ms": 9235.42,
+      "grading": {
+        "slab_detected": true,
+        "is_graded": null,
+        "grading_status": "unknown",
+        "company": null,
+        "company_source": "none",
+        "grade": null,
+        "condition_label": null,
+        "subgrades": {},
+        "tag_score": null,
+        "certification_number": "467411",
+        "qualifiers": [],
+        "raw_condition": "not_assessed",
+        "authenticity_verified": false,
+        "source": "visible_label_ocr",
+        "requires_confirmation": true,
+        "label_text": [
+          "2016 GENERATIONS",
+          "7",
+          "MBLASTOISEEX",
+          "O10H",
+          "#18",
+          "NEARMINT",
+          "467411",
+          "MEGA",
+          "MBlastoise",
+          "EX",
+          "HP220",
+          "Evolves from Blastoise-EX",
+          "2016 GENERATIONS",
+          "MBLASTOISE EX",
+          "HOLO",
+          "#18",
+          "NEARMINT",
+          "467411",
+          "MEGA",
+          "MBlastoise",
+          "HP220",
+          "Evolves from Blastoise-EX"
+        ],
+        "warnings": [
+          "grading_company_unreadable_or_unsupported",
+          "conflicting_condition_labels"
+        ]
+      },
+      "manual_truth": {
+        "company": "ace",
+        "grade": 7
+      },
+      "source_page": "https://www.ebay.co.uk/itm/187914531865",
+      "image_sha256": "55ad143b5bd1387c98f2e4b903873a12791d4b8c39a71ff8c5226a36fe1f01c9",
+      "company_correct": false,
+      "grade_correct": false,
+      "company_wrong": false,
+      "grade_wrong": false
+    },
+    {
+      "id": "label100_227526033226",
+      "conditions": [
+        "slab",
+        "public_seller_photo"
+      ],
+      "grading_ms": 978.99,
+      "grading": {
+        "slab_detected": true,
+        "is_graded": null,
+        "grading_status": "unknown",
+        "company": null,
+        "company_source": "none",
+        "grade": null,
+        "condition_label": "NM-MT",
+        "subgrades": {},
+        "tag_score": null,
+        "certification_number": null,
+        "qualifiers": [],
+        "raw_condition": "not_assessed",
+        "authenticity_verified": false,
+        "source": "visible_label_ocr",
+        "requires_confirmation": true,
+        "label_text": [
+          "P",
+          "POKE",
+          "POK\u00c9",
+          "PA",
+          "PACKS",
+          "2023151",
+          "CHARIZARDEX",
+          "SPECIALILLUSTRATIONRARE",
+          "661#",
+          "NM-MT",
+          "\u533a",
+          "1437667"
+        ],
+        "warnings": [
+          "grading_company_unreadable_or_unsupported",
+          "overall_grade_unreadable_or_ambiguous",
+          "certification_number_ambiguous"
+        ]
+      },
+      "manual_truth": {
+        "company": "ace",
+        "grade": 8
+      },
+      "source_page": "https://www.ebay.co.uk/itm/227526033226",
+      "image_sha256": "78654ecbec27e322715d476618f3ca2aec04e9cca3f3310d85fa845096bf4245",
+      "company_correct": false,
+      "grade_correct": false,
+      "company_wrong": false,
+      "grade_wrong": false
+    },
+    {
+      "id": "label100_407143628483",
+      "conditions": [
+        "slab",
+        "public_seller_photo"
+      ],
+      "grading_ms": 8448.37,
+      "grading": {
+        "slab_detected": true,
+        "is_graded": true,
+        "grading_status": "graded",
+        "company": null,
+        "company_source": "none",
+        "grade": 2.0,
+        "condition_label": "FAIR",
+        "subgrades": {},
+        "tag_score": null,
+        "certification_number": "1136207",
+        "qualifiers": [],
+        "raw_condition": "not_assessed",
+        "authenticity_verified": false,
+        "source": "visible_label_ocr",
+        "requires_confirmation": true,
+        "label_text": [
+          "2022 BRILLIANT STARS",
+          "2",
+          "EEVEE",
+          "SPECIALART",
+          "FAIR",
+          "WTG11",
+          "1136207",
+          "GASTIC",
+          "Favee",
+          "70"
+        ],
+        "warnings": [
+          "grading_company_unreadable_or_unsupported"
+        ]
+      },
+      "manual_truth": {
+        "company": "ace",
+        "grade": 2
+      },
+      "source_page": "https://www.ebay.co.uk/itm/407143628483",
+      "image_sha256": "36f98abf54c170a6a76c36a18592f4aa4f01826427ea023808e0f4aa0b0a08fb",
+      "company_correct": false,
+      "grade_correct": true,
+      "company_wrong": false,
+      "grade_wrong": false
+    },
+    {
+      "id": "label100_137209581494",
+      "conditions": [
+        "slab",
+        "public_seller_photo"
+      ],
+      "grading_ms": 8846.31,
+      "grading": {
+        "slab_detected": true,
+        "is_graded": null,
+        "grading_status": "unknown",
+        "company": null,
+        "company_source": "none",
+        "grade": null,
+        "condition_label": "MINT",
+        "subgrades": {},
+        "tag_score": null,
+        "certification_number": "1476665",
+        "qualifiers": [],
+        "raw_condition": "not_assessed",
+        "authenticity_verified": false,
+        "source": "visible_label_ocr",
+        "requires_confirmation": true,
+        "label_text": [
+          "2017SHININGLEGENDS",
+          "SHININGMEW",
+          "HOLO",
+          "MINT",
+          "#40",
+          "1476665",
+          "Shining Mew",
+          "BASIC",
+          "30"
+        ],
+        "warnings": [
+          "grading_company_unreadable_or_unsupported",
+          "overall_grade_unreadable_or_ambiguous"
+        ]
+      },
+      "manual_truth": {
+        "company": "ace",
+        "grade": 9
+      },
+      "source_page": "https://www.ebay.co.uk/itm/137209581494",
+      "image_sha256": "c9a2546128085e11575a79a9e779008fae262ae13fb767c73d703729dbf992df",
+      "company_correct": false,
+      "grade_correct": false,
+      "company_wrong": false,
+      "grade_wrong": false
+    },
+    {
+      "id": "label100_287567779040",
+      "conditions": [
+        "slab",
+        "public_seller_photo"
+      ],
+      "grading_ms": 8111.7,
+      "grading": {
+        "slab_detected": null,
+        "is_graded": null,
+        "grading_status": "unknown",
+        "company": null,
+        "company_source": "none",
+        "grade": null,
+        "condition_label": null,
+        "subgrades": {},
+        "tag_score": null,
+        "certification_number": null,
+        "qualifiers": [],
+        "raw_condition": "not_assessed",
+        "authenticity_verified": false,
+        "source": "none",
+        "requires_confirmation": true,
+        "label_text": [
+          "2022 BRILLIANT STARS",
+          "10",
+          "ARCEUS VSTAR",
+          "SECRET RARE",
+          "#176",
+          "GEMMINT",
+          "VSTAR",
+          "ArceusSTAR",
+          "280",
+          "volves from Arcms V"
+        ],
+        "warnings": [
+          "no_supported_grading_label_detected",
+          "ungraded_status_not_proven"
+        ]
+      },
+      "manual_truth": {
+        "company": "ace",
+        "grade": 10
+      },
+      "source_page": "https://www.ebay.co.uk/itm/287567779040",
+      "image_sha256": "d7223e0b3e9cde86a7502476343ba25ba7d3cfbc32ea7224e3e2cba18143a8a9",
+      "company_correct": false,
+      "grade_correct": false,
+      "company_wrong": false,
+      "grade_wrong": false
+    },
+    {
+      "id": "label100_397078152442",
+      "conditions": [
+        "slab",
+        "public_seller_photo"
+      ],
+      "grading_ms": 3951.7,
+      "grading": {
+        "slab_detected": true,
+        "is_graded": true,
+        "grading_status": "graded",
+        "company": "ace",
+        "company_source": "verified_logo",
+        "grade": 10.0,
+        "condition_label": "GEMMINT",
+        "subgrades": {},
+        "tag_score": null,
+        "certification_number": "377877",
+        "qualifiers": [],
+        "raw_condition": "not_assessed",
+        "authenticity_verified": false,
+        "source": "visible_label_ocr",
+        "requires_confirmation": true,
+        "label_text": [
+          "10",
+          "2023CROWNZENITH",
+          "PIKACHU",
+          "SPECIAL ART",
+          "GEMMINT",
+          "#160",
+          "377877"
+        ],
+        "warnings": []
+      },
+      "manual_truth": {
+        "company": "ace",
+        "grade": 10
+      },
+      "source_page": "https://www.ebay.co.uk/itm/397078152442",
+      "image_sha256": "2f4b4e91e4ef1f5c28aeb1a6c4d9d49911c6c38584f879efd2b70316fe7cc3a9",
+      "company_correct": true,
+      "grade_correct": true,
+      "company_wrong": false,
+      "grade_wrong": false
+    },
+    {
+      "id": "label100_287166531557",
+      "conditions": [
+        "slab",
+        "public_seller_photo"
+      ],
+      "grading_ms": 4051.31,
+      "grading": {
+        "slab_detected": true,
+        "is_graded": true,
+        "grading_status": "graded",
+        "company": "ace",
+        "company_source": "verified_logo",
+        "grade": 10.0,
+        "condition_label": "GEMMINT",
+        "subgrades": {},
+        "tag_score": null,
+        "certification_number": "403596",
+        "qualifiers": [],
+        "raw_condition": "not_assessed",
+        "authenticity_verified": false,
+        "source": "visible_label_ocr",
+        "requires_confirmation": true,
+        "label_text": [
+          "2023 CROWN ZENITH",
+          "10",
+          "GIRATINA VSTAR",
+          "SPECIALART",
+          "#GG69",
+          "GEMMINT",
+          "403596"
+        ],
+        "warnings": []
+      },
+      "manual_truth": {
+        "company": "ace",
+        "grade": 10
+      },
+      "source_page": "https://www.ebay.co.uk/itm/287166531557",
+      "image_sha256": "7f291aee2c8732a477dd78614dcd682b468ad6cd1b9fd7b4039ee263e695104b",
+      "company_correct": true,
+      "grade_correct": true,
+      "company_wrong": false,
+      "grade_wrong": false
+    },
+    {
+      "id": "label100_358871960246",
+      "conditions": [
+        "slab",
+        "public_seller_photo"
+      ],
+      "grading_ms": 4006.9,
+      "grading": {
+        "slab_detected": true,
+        "is_graded": true,
+        "grading_status": "graded",
+        "company": "ace",
+        "company_source": "verified_logo",
+        "grade": 10.0,
+        "condition_label": "GEMMINT",
+        "subgrades": {},
+        "tag_score": null,
+        "certification_number": "662624",
+        "qualifiers": [],
+        "raw_condition": "not_assessed",
+        "authenticity_verified": false,
+        "source": "visible_label_ocr",
+        "requires_confirmation": true,
+        "label_text": [
+          "2016 GENERATIONS",
+          "10",
+          "MBLASTOISE EX",
+          "O10H",
+          "#18",
+          "GEMMINT",
+          "662624"
+        ],
+        "warnings": []
+      },
+      "manual_truth": {
+        "company": "ace",
+        "grade": 10
+      },
+      "source_page": "https://www.ebay.co.uk/itm/358871960246",
+      "image_sha256": "69dc598edffe41c15f0c8489a043c629ef5f5403d9ce00ad994905b4411304ab",
+      "company_correct": true,
+      "grade_correct": true,
+      "company_wrong": false,
+      "grade_wrong": false
+    },
+    {
+      "id": "label100_318837968582",
+      "conditions": [
+        "slab",
+        "public_seller_photo"
+      ],
+      "grading_ms": 2186.37,
+      "grading": {
+        "slab_detected": true,
+        "is_graded": true,
+        "grading_status": "graded",
+        "company": "ace",
+        "company_source": "verified_logo",
+        "grade": 10.0,
+        "condition_label": "GEMMINT",
+        "subgrades": {},
+        "tag_score": null,
+        "certification_number": "1417843",
+        "qualifiers": [],
+        "raw_condition": "not_assessed",
+        "authenticity_verified": false,
+        "source": "visible_label_ocr",
+        "requires_confirmation": true,
+        "label_text": [
+          "2026 PITCH BLACK",
+          "10",
+          "MORPEKO EX",
+          "SPECIALILLUSTRATIONRARE",
+          "GEMMINT",
+          "#117",
+          "1417843"
+        ],
+        "warnings": []
+      },
+      "manual_truth": {
+        "company": "ace",
+        "grade": 10
+      },
+      "source_page": "https://www.ebay.co.uk/itm/318837968582",
+      "image_sha256": "aba5577ac76454ea7c1a9b274deb14e9593f343488c1aac8a0692704fe07e4b6",
+      "company_correct": true,
+      "grade_correct": true,
+      "company_wrong": false,
+      "grade_wrong": false
+    },
+    {
+      "id": "label100_298599062412",
+      "conditions": [
+        "slab",
+        "public_seller_photo"
+      ],
+      "grading_ms": 7991.43,
+      "grading": {
+        "slab_detected": true,
+        "is_graded": null,
+        "grading_status": "unknown",
+        "company": null,
+        "company_source": "none",
+        "grade": null,
+        "condition_label": "NEAR MINT",
+        "subgrades": {},
+        "tag_score": null,
+        "certification_number": "1119966",
+        "qualifiers": [],
+        "raw_condition": "not_assessed",
+        "authenticity_verified": false,
+        "source": "visible_label_ocr",
+        "requires_confirmation": true,
+        "label_text": [
+          "1999 BLACKSTAR PROMO",
+          "PIKACHU",
+          "#4",
+          "MOVIEPROMO",
+          "NEAR MINT",
+          "1119966",
+          "Basic Pok\u00e9mon",
+          "Pileehw",
+          "5OHRA"
+        ],
+        "warnings": [
+          "grading_company_unreadable_or_unsupported",
+          "overall_grade_unreadable_or_ambiguous"
+        ]
+      },
+      "manual_truth": {
+        "company": "ace",
+        "grade": 7
+      },
+      "source_page": "https://www.ebay.co.uk/itm/298599062412",
+      "image_sha256": "b7160c23fd7225f171d11b17465b5eac92d697f69985836bfdda488f5a472ba3",
+      "company_correct": false,
+      "grade_correct": false,
+      "company_wrong": false,
+      "grade_wrong": false
+    },
+    {
+      "id": "label100_366424401446",
+      "conditions": [
+        "slab",
+        "public_seller_photo"
+      ],
+      "grading_ms": 3932.63,
+      "grading": {
+        "slab_detected": true,
+        "is_graded": true,
+        "grading_status": "graded",
+        "company": "ace",
+        "company_source": "verified_logo",
+        "grade": 10.0,
+        "condition_label": "GEMMINT",
+        "subgrades": {},
+        "tag_score": null,
+        "certification_number": "324759",
+        "qualifiers": [],
+        "raw_condition": "not_assessed",
+        "authenticity_verified": false,
+        "source": "visible_label_ocr",
+        "requires_confirmation": true,
+        "label_text": [
+          "2025BATTLEPARTNERS",
+          "10",
+          "N'S ZORUA",
+          "ARTRARE",
+          "GEMMINT",
+          "#108JPN",
+          "324759"
+        ],
+        "warnings": []
+      },
+      "manual_truth": {
+        "company": "ace",
+        "grade": 10
+      },
+      "source_page": "https://www.ebay.co.uk/itm/366424401446",
+      "image_sha256": "e4ce8b5fa161be7756e3502a06495500d9f5712fdaca5f5262d0eca46cd71ec4",
+      "company_correct": true,
+      "grade_correct": true,
+      "company_wrong": false,
+      "grade_wrong": false
+    },
+    {
+      "id": "label100_197567930366",
+      "conditions": [
+        "slab",
+        "public_seller_photo"
+      ],
+      "grading_ms": 4636.87,
+      "grading": {
+        "slab_detected": true,
+        "is_graded": true,
+        "grading_status": "graded",
+        "company": "ace",
+        "company_source": "verified_logo",
+        "grade": 10.0,
+        "condition_label": "GEMMINT",
+        "subgrades": {},
+        "tag_score": null,
+        "certification_number": "399070",
+        "qualifiers": [],
+        "raw_condition": "not_assessed",
+        "authenticity_verified": false,
+        "source": "visible_label_ocr",
+        "requires_confirmation": true,
+        "label_text": [
+          "2025 PRISMATIC EVOLUTIONS",
+          "10",
+          "JOLTEONEX",
+          "HOLO",
+          "#030",
+          "GEMMINT",
+          "SURPRISEBOX",
+          "399070"
+        ],
+        "warnings": []
+      },
+      "manual_truth": {
+        "company": "ace",
+        "grade": 10
+      },
+      "source_page": "https://www.ebay.co.uk/itm/197567930366",
+      "image_sha256": "17cd7a26a258558b57610ac8636b60314acd4fe068771b9a131567bf738dee31",
+      "company_correct": true,
+      "grade_correct": true,
+      "company_wrong": false,
+      "grade_wrong": false
+    },
+    {
+      "id": "label100_267680041404",
+      "conditions": [
+        "slab",
+        "public_seller_photo"
+      ],
+      "grading_ms": 2788.97,
+      "grading": {
+        "slab_detected": true,
+        "is_graded": true,
+        "grading_status": "graded",
+        "company": "ace",
+        "company_source": "verified_logo",
+        "grade": 7.0,
+        "condition_label": "NEARMINT",
+        "subgrades": {},
+        "tag_score": null,
+        "certification_number": "954664",
+        "qualifiers": [],
+        "raw_condition": "not_assessed",
+        "authenticity_verified": false,
+        "source": "visible_label_ocr",
+        "requires_confirmation": true,
+        "label_text": [
+          "L",
+          "2000 BASE SET 2",
+          "CHARIZARD",
+          "HOLO",
+          "NEARMINT",
+          "#4",
+          "954664",
+          "2000 BASE SET 2",
+          "L",
+          "CHARIZARD",
+          "HOLO",
+          "NEARIMINT",
+          "#4",
+          "954664",
+          "7"
+        ],
+        "warnings": []
+      },
+      "manual_truth": {
+        "company": "ace",
+        "grade": 7
+      },
+      "source_page": "https://www.ebay.co.uk/itm/267680041404",
+      "image_sha256": "39f683f0f0b6d70c7894c57f35e3adeff4b8bb85a08f1150cc5aa68476d545ab",
+      "company_correct": true,
+      "grade_correct": true,
+      "company_wrong": false,
+      "grade_wrong": false
+    },
+    {
+      "id": "label100_257694517237",
+      "conditions": [
+        "slab",
+        "public_seller_photo"
+      ],
+      "grading_ms": 3699.04,
+      "grading": {
+        "slab_detected": true,
+        "is_graded": true,
+        "grading_status": "graded",
+        "company": "ace",
+        "company_source": "verified_logo",
+        "grade": 7.0,
+        "condition_label": "NEAR MINT",
+        "subgrades": {},
+        "tag_score": null,
+        "certification_number": "1368440",
+        "qualifiers": [],
+        "raw_condition": "not_assessed",
+        "authenticity_verified": false,
+        "source": "visible_label_ocr",
+        "requires_confirmation": true,
+        "label_text": [
+          "7",
+          "2001NEODISCOVERY",
+          "UMBREON",
+          "#32",
+          "NEAR MINT",
+          "1368440"
+        ],
+        "warnings": []
+      },
+      "manual_truth": {
+        "company": "ace",
+        "grade": 7
+      },
+      "source_page": "https://www.ebay.co.uk/itm/257694517237",
+      "image_sha256": "4866b3835f47df4c0e0ae0e281b9f3b1404433c97f140a9e3bb6b2cc79f38edd",
+      "company_correct": true,
+      "grade_correct": true,
+      "company_wrong": false,
+      "grade_wrong": false
+    },
+    {
+      "id": "label100_800172916188",
+      "conditions": [
+        "slab",
+        "public_seller_photo"
+      ],
+      "grading_ms": 1452.14,
+      "grading": {
+        "slab_detected": true,
+        "is_graded": true,
+        "grading_status": "graded",
+        "company": "ags",
+        "company_source": "label_ocr",
+        "grade": 9.0,
+        "condition_label": "MINT",
+        "subgrades": {},
+        "tag_score": null,
+        "certification_number": "00605845",
+        "qualifiers": [],
+        "raw_condition": "not_assessed",
+        "authenticity_verified": false,
+        "source": "visible_label_ocr",
+        "requires_confirmation": true,
+        "label_text": [
+          "1999 POKEMON JUNGLE",
+          "MINT",
+          "AGS",
+          "EXEGGUTOR",
+          "9",
+          "#35",
+          "AGS",
+          "00605845",
+          "00605845",
+          "STAGE",
+          "Evolves from Exeggcute Put Exeggucor on the Basic Polu\u00e9mon",
+          "Exeggutor",
+          "80 HP"
+        ],
+        "warnings": []
+      },
+      "manual_truth": {
+        "company": "ags",
+        "grade": 9
+      },
+      "source_page": "https://www.ebay.com/itm/800172916188",
+      "image_sha256": "5269b7e7f8a79356873ba76e00500b3b56baa454d79d8c4c693826e37f33023c",
+      "company_correct": true,
+      "grade_correct": true,
+      "company_wrong": false,
+      "grade_wrong": false
+    },
+    {
+      "id": "label100_306973107301",
+      "conditions": [
+        "slab",
+        "public_seller_photo"
+      ],
+      "grading_ms": 3938.69,
+      "grading": {
+        "slab_detected": true,
+        "is_graded": true,
+        "grading_status": "graded",
+        "company": "ags",
+        "company_source": "verified_logo",
+        "grade": 10.0,
+        "condition_label": "GEM-MT",
+        "subgrades": {},
+        "tag_score": null,
+        "certification_number": "00121520",
+        "qualifiers": [],
+        "raw_condition": "not_assessed",
+        "authenticity_verified": false,
+        "source": "visible_label_ocr",
+        "requires_confirmation": true,
+        "label_text": [
+          "GEM-MT",
+          "2022 POKEMON SWSH",
+          "10",
+          "FA/PIKACHU",
+          "LOSTORIGIN",
+          "\u7535\u4e34\u7535\u9986",
+          "00121520",
+          "#TG05"
+        ],
+        "warnings": []
+      },
+      "manual_truth": {
+        "company": "ags",
+        "grade": 10
+      },
+      "source_page": "https://www.ebay.com/itm/306973107301",
+      "image_sha256": "e59f82fea3577132f94cbb79b23da5cb54c01c4e0c48a3765cb43c64931722cd",
+      "company_correct": true,
+      "grade_correct": true,
+      "company_wrong": false,
+      "grade_wrong": false
+    },
+    {
+      "id": "label100_147530310696",
+      "conditions": [
+        "slab",
+        "public_seller_photo"
+      ],
+      "grading_ms": 3762.7,
+      "grading": {
+        "slab_detected": true,
+        "is_graded": true,
+        "grading_status": "graded",
+        "company": "ags",
+        "company_source": "verified_logo",
+        "grade": 9.5,
+        "condition_label": "MINT+",
+        "subgrades": {},
+        "tag_score": null,
+        "certification_number": "00158840",
+        "qualifiers": [],
+        "raw_condition": "not_assessed",
+        "authenticity_verified": false,
+        "source": "visible_label_ocr",
+        "requires_confirmation": true,
+        "label_text": [
+          "2016 POKEMON XY",
+          "MINT+",
+          "CHARIZARD- HOLO",
+          "9.5",
+          "EVOLUTIONS",
+          "#11",
+          "00158840",
+          "SDV"
+        ],
+        "warnings": []
+      },
+      "manual_truth": {
+        "company": "ags",
+        "grade": 9.5
+      },
+      "source_page": "https://www.ebay.com/itm/147530310696",
+      "image_sha256": "b2184c467019288f3d3a5fe5911639381db905a97f9ae4431e797b62b4e579f1",
+      "company_correct": true,
+      "grade_correct": true,
+      "company_wrong": false,
+      "grade_wrong": false
+    },
+    {
+      "id": "label100_287242611709",
+      "conditions": [
+        "slab",
+        "public_seller_photo"
+      ],
+      "grading_ms": 3844.03,
+      "grading": {
+        "slab_detected": true,
+        "is_graded": true,
+        "grading_status": "graded",
+        "company": "ags",
+        "company_source": "verified_logo",
+        "grade": 9.0,
+        "condition_label": "MINT",
+        "subgrades": {},
+        "tag_score": null,
+        "certification_number": "00599707",
+        "qualifiers": [],
+        "raw_condition": "not_assessed",
+        "authenticity_verified": false,
+        "source": "visible_label_ocr",
+        "requires_confirmation": true,
+        "label_text": [
+          "YXLXAXV",
+          "2025 POKEMON SV PROMO",
+          "MINT",
+          "EEVEE- COSMOS REV. HOLO",
+          "9",
+          "2025 POKEMON DAY STAMP",
+          "#074",
+          "00599707"
+        ],
+        "warnings": []
+      },
+      "manual_truth": {
+        "company": "ags",
+        "grade": 9
+      },
+      "source_page": "https://www.ebay.co.uk/itm/287242611709",
+      "image_sha256": "a50cd3582100bdbcd0b63438bfd7875111e12b0791d4c7c918acf5d9c34b836c",
+      "company_correct": true,
+      "grade_correct": true,
+      "company_wrong": false,
+      "grade_wrong": false
+    },
+    {
+      "id": "label100_326851003642",
+      "conditions": [
+        "slab",
+        "public_seller_photo"
+      ],
+      "grading_ms": 3719.85,
+      "grading": {
+        "slab_detected": true,
+        "is_graded": true,
+        "grading_status": "graded",
+        "company": "ags",
+        "company_source": "verified_logo",
+        "grade": 10.0,
+        "condition_label": "GEM-MT",
+        "subgrades": {},
+        "tag_score": null,
+        "certification_number": "00445631",
+        "qualifiers": [],
+        "raw_condition": "not_assessed",
+        "authenticity_verified": false,
+        "source": "visible_label_ocr",
+        "requires_confirmation": true,
+        "label_text": [
+          "2021 P.M.CELEBRATIONS",
+          "GEM-MT",
+          "FA/PIKACHU",
+          "10",
+          "25THANNIVERSARY",
+          "#005",
+          "00445631",
+          "A"
+        ],
+        "warnings": []
+      },
+      "manual_truth": {
+        "company": "ags",
+        "grade": 10
+      },
+      "source_page": "https://www.ebay.com/itm/326851003642",
+      "image_sha256": "182b21853e4973af6f80960c03fcc3221bb60b40b4789d1d1998942a2ae310a9",
+      "company_correct": true,
+      "grade_correct": true,
+      "company_wrong": false,
+      "grade_wrong": false
+    },
+    {
+      "id": "label100_189008029307",
+      "conditions": [
+        "slab",
+        "public_seller_photo"
+      ],
+      "grading_ms": 936.42,
+      "grading": {
+        "slab_detected": true,
+        "is_graded": true,
+        "grading_status": "graded",
+        "company": "ags",
+        "company_source": "label_ocr",
+        "grade": 10.0,
+        "condition_label": "GEM-MT",
+        "subgrades": {},
+        "tag_score": null,
+        "certification_number": "00155503",
+        "qualifiers": [],
+        "raw_condition": "not_assessed",
+        "authenticity_verified": false,
+        "source": "visible_label_ocr",
+        "requires_confirmation": true,
+        "label_text": [
+          "2023 POKEMON SV PROMO",
+          "GEM-MT",
+          "FA/PIKACHU W. GREY FELT HAT",
+          "10",
+          "P.M. XVAN GOGH MSM. EXCL.",
+          "#085",
+          "00155503",
+          "AGS",
+          "BASIC",
+          "Pikachu with Grey Felt Hat",
+          "60"
+        ],
+        "warnings": []
+      },
+      "manual_truth": {
+        "company": "ags",
+        "grade": 10
+      },
+      "source_page": "https://www.ebay.com/itm/189008029307",
+      "image_sha256": "4e913974b77b670a902e718fc8110a32a0b8577b4fd90a68ddd42cfb9324c792",
+      "company_correct": true,
+      "grade_correct": true,
+      "company_wrong": false,
+      "grade_wrong": false
+    },
+    {
+      "id": "label100_267703865924",
+      "conditions": [
+        "slab",
+        "public_seller_photo"
+      ],
+      "grading_ms": 4229.78,
+      "grading": {
+        "slab_detected": true,
+        "is_graded": true,
+        "grading_status": "graded",
+        "company": "ags",
+        "company_source": "verified_logo",
+        "grade": 10.0,
+        "condition_label": "GEM-MT",
+        "subgrades": {},
+        "tag_score": null,
+        "certification_number": "00776375",
+        "qualifiers": [],
+        "raw_condition": "not_assessed",
+        "authenticity_verified": false,
+        "source": "visible_label_ocr",
+        "requires_confirmation": true,
+        "label_text": [
+          "2025 P.M. JAPANESE MEGA",
+          "GEM-MT",
+          "FATEAM ROCKET'S DUGTRIO",
+          "10",
+          "MEGA DREAM EX-SECRET",
+          "#206",
+          "00776375",
+          "AGS"
+        ],
+        "warnings": []
+      },
+      "manual_truth": {
+        "company": "ags",
+        "grade": 10
+      },
+      "source_page": "https://www.ebay.co.uk/itm/267703865924",
+      "image_sha256": "073b4026fe1119b248cbe69d1eb8edb588432a7683c1e6bd3c7617e179c6c27a",
+      "company_correct": true,
+      "grade_correct": true,
+      "company_wrong": false,
+      "grade_wrong": false
+    },
+    {
+      "id": "label100_147411952001",
+      "conditions": [
+        "slab",
+        "public_seller_photo"
+      ],
+      "grading_ms": 3923.07,
+      "grading": {
+        "slab_detected": true,
+        "is_graded": true,
+        "grading_status": "graded",
+        "company": "ags",
+        "company_source": "verified_logo",
+        "grade": 9.5,
+        "condition_label": "MINT+",
+        "subgrades": {},
+        "tag_score": null,
+        "certification_number": "00121810",
+        "qualifiers": [],
+        "raw_condition": "not_assessed",
+        "authenticity_verified": false,
+        "source": "visible_label_ocr",
+        "requires_confirmation": true,
+        "label_text": [
+          "MINT+",
+          "2023 POKEMON SWSH",
+          "CHARIZARDVSTAR",
+          "9.5",
+          "CROWN ZENITH",
+          "#019",
+          "00121810",
+          "SDV"
+        ],
+        "warnings": []
+      },
+      "manual_truth": {
+        "company": "ags",
+        "grade": 9.5
+      },
+      "source_page": "https://www.ebay.com/itm/147411952001",
+      "image_sha256": "0275e20057db31168547abf43b872e8280a32f416182204d36d277750ae8e833",
+      "company_correct": true,
+      "grade_correct": true,
+      "company_wrong": false,
+      "grade_wrong": false
+    },
+    {
+      "id": "label100_168242458584",
+      "conditions": [
+        "slab",
+        "public_seller_photo"
+      ],
+      "grading_ms": 6971.51,
+      "grading": {
+        "slab_detected": true,
+        "is_graded": true,
+        "grading_status": "graded",
+        "company": null,
+        "company_source": "none",
+        "grade": 9.5,
+        "condition_label": "MINT+",
+        "subgrades": {},
+        "tag_score": null,
+        "certification_number": "00538426",
+        "qualifiers": [],
+        "raw_condition": "not_assessed",
+        "authenticity_verified": false,
+        "source": "visible_label_ocr",
+        "requires_confirmation": true,
+        "label_text": [
+          "2021 PM.CELEBRATIONS",
+          "MINT+",
+          "FLYING PIKACHUV",
+          "9.5",
+          "25THANNIVERSARY",
+          "#006",
+          "00538426",
+          "BASIC",
+          "Flying Pikachu",
+          "190"
+        ],
+        "warnings": [
+          "grading_company_unreadable_or_unsupported"
+        ]
+      },
+      "manual_truth": {
+        "company": "ags",
+        "grade": 9.5
+      },
+      "source_page": "https://www.ebay.com/itm/168242458584",
+      "image_sha256": "09a1c4a95efc8e6216a54f4c2d3621d6e5cd5926d9e598b2196ccf76b52dade3",
+      "company_correct": false,
+      "grade_correct": true,
+      "company_wrong": false,
+      "grade_wrong": false
+    },
+    {
+      "id": "label100_227380521312",
+      "conditions": [
+        "slab",
+        "public_seller_photo"
+      ],
+      "grading_ms": 3749.48,
+      "grading": {
+        "slab_detected": true,
+        "is_graded": true,
+        "grading_status": "graded",
+        "company": "ags",
+        "company_source": "verified_logo",
+        "grade": 9.5,
+        "condition_label": "MINT+",
+        "subgrades": {},
+        "tag_score": null,
+        "certification_number": "00759702",
+        "qualifiers": [],
+        "raw_condition": "not_assessed",
+        "authenticity_verified": false,
+        "source": "visible_label_ocr",
+        "requires_confirmation": true,
+        "label_text": [
+          "2016 POKEMON XY",
+          "MINT+",
+          "MEWTWO",
+          "9.5",
+          "EVOLUTIONS",
+          "#51",
+          "00759702",
+          "AGS"
+        ],
+        "warnings": []
+      },
+      "manual_truth": {
+        "company": "ags",
+        "grade": 9.5
+      },
+      "source_page": "https://www.ebay.com/itm/227380521312",
+      "image_sha256": "ca22a5c5f14ea88b064a594bb14f562e27a931dbb9ac2defd6bc3ce1f04f9868",
+      "company_correct": true,
+      "grade_correct": true,
+      "company_wrong": false,
+      "grade_wrong": false
+    },
+    {
+      "id": "label100_146677125573",
+      "conditions": [
+        "slab",
+        "public_seller_photo"
+      ],
+      "grading_ms": 1104.34,
+      "grading": {
+        "slab_detected": true,
+        "is_graded": true,
+        "grading_status": "graded",
+        "company": "ags",
+        "company_source": "label_ocr",
+        "grade": 10.0,
+        "condition_label": "LEGENDARY",
+        "subgrades": {},
+        "tag_score": null,
+        "certification_number": "00301841",
+        "qualifiers": [],
+        "raw_condition": "not_assessed",
+        "authenticity_verified": false,
+        "source": "visible_label_ocr",
+        "requires_confirmation": true,
+        "label_text": [
+          "2023 P.M. JAPANESE SV",
+          "LEGENDARY",
+          "MEWTWO- HOLO",
+          "10",
+          "POKEMON 151",
+          "#150",
+          "00301841",
+          "AGS",
+          "\u305f\u306d",
+          "\u30df\u30e5\u30a6\u30c4\u30fc",
+          "130",
+          "HP"
+        ],
+        "warnings": []
+      },
+      "manual_truth": {
+        "company": "ags",
+        "grade": 10
+      },
+      "source_page": "https://www.ebay.com/itm/146677125573",
+      "image_sha256": "2fdd4fd2a77b8ba2db0b19436fa03172df23806d58b792cd38edd4fb8c3d1875",
+      "company_correct": true,
+      "grade_correct": true,
+      "company_wrong": false,
+      "grade_wrong": false
+    },
+    {
+      "id": "label100_166388396274",
+      "conditions": [
+        "slab",
+        "public_seller_photo"
+      ],
+      "grading_ms": 910.18,
+      "grading": {
+        "slab_detected": true,
+        "is_graded": true,
+        "grading_status": "graded",
+        "company": "ags",
+        "company_source": "label_ocr",
+        "grade": 9.5,
+        "condition_label": "MINT+",
+        "subgrades": {},
+        "tag_score": null,
+        "certification_number": "00112218",
+        "qualifiers": [],
+        "raw_condition": "not_assessed",
+        "authenticity_verified": false,
+        "source": "visible_label_ocr",
+        "requires_confirmation": true,
+        "label_text": [
+          "2023 P.M. JAPANESE SV",
+          "MINT+",
+          "FA/MEWTWO",
+          "9.5",
+          "POKEMON 151-SECRET",
+          "#183",
+          "00112218",
+          "AGS",
+          "\u305f\u306d",
+          "\u30df\u30e5\u30a6\u30c4\u30fc",
+          "130",
+          "HP"
+        ],
+        "warnings": []
+      },
+      "manual_truth": {
+        "company": "ags",
+        "grade": 9.5
+      },
+      "source_page": "https://www.ebay.com/itm/166388396274",
+      "image_sha256": "d404ef972f3130bb0b5feb92b330a8c8d260b23f5511ed01b47ca909f4813f07",
+      "company_correct": true,
+      "grade_correct": true,
+      "company_wrong": false,
+      "grade_wrong": false
+    },
+    {
+      "id": "label100_376425702974",
+      "conditions": [
+        "slab",
+        "public_seller_photo"
+      ],
+      "grading_ms": 3756.54,
+      "grading": {
+        "slab_detected": true,
+        "is_graded": true,
+        "grading_status": "graded",
+        "company": "ags",
+        "company_source": "verified_logo",
+        "grade": 10.0,
+        "condition_label": "GEM-MT",
+        "subgrades": {},
+        "tag_score": null,
+        "certification_number": "00146522",
+        "qualifiers": [],
+        "raw_condition": "not_assessed",
+        "authenticity_verified": false,
+        "source": "visible_label_ocr",
+        "requires_confirmation": true,
+        "label_text": [
+          "GEM-MT",
+          "2019 P.M.JAPANESE SM",
+          "MEWTWO-HOLO",
+          "10",
+          "TAGTEAM GX ALL STARS",
+          "00146522",
+          "#054"
+        ],
+        "warnings": []
+      },
+      "manual_truth": {
+        "company": "ags",
+        "grade": 10
+      },
+      "source_page": "https://www.ebay.com/itm/376425702974",
+      "image_sha256": "9e626ee6bf41ed99bec6122af241bb418d7fbde805605812d321652e7d6c26f9",
+      "company_correct": true,
+      "grade_correct": true,
+      "company_wrong": false,
+      "grade_wrong": false
+    },
+    {
+      "id": "label100_318645515185",
+      "conditions": [
+        "slab",
+        "public_seller_photo"
+      ],
+      "grading_ms": 3926.9,
+      "grading": {
+        "slab_detected": true,
+        "is_graded": true,
+        "grading_status": "graded",
+        "company": "ags",
+        "company_source": "verified_logo",
+        "grade": 9.5,
+        "condition_label": "MINT+",
+        "subgrades": {},
+        "tag_score": null,
+        "certification_number": "00717041",
+        "qualifiers": [],
+        "raw_condition": "not_assessed",
+        "authenticity_verified": false,
+        "source": "visible_label_ocr",
+        "requires_confirmation": true,
+        "label_text": [
+          "2023 POKEMON SV",
+          "MINT+",
+          "GENGAR-HOLO",
+          "9.5",
+          "POKEMON 151",
+          "40#",
+          "00717041"
+        ],
+        "warnings": []
+      },
+      "manual_truth": {
+        "company": "ags",
+        "grade": 9.5
+      },
+      "source_page": "https://www.ebay.com/itm/318645515185",
+      "image_sha256": "0f1a646b19b76b78dc1b0275f9396e3972389c88b6cfc37316c1a43c8eafa2f4",
+      "company_correct": true,
+      "grade_correct": true,
+      "company_wrong": false,
+      "grade_wrong": false
+    },
+    {
+      "id": "label100_117170692858",
+      "conditions": [
+        "slab",
+        "public_seller_photo"
+      ],
+      "grading_ms": 910.3,
+      "grading": {
+        "slab_detected": true,
+        "is_graded": true,
+        "grading_status": "graded",
+        "company": "ags",
+        "company_source": "label_ocr",
+        "grade": 10.0,
+        "condition_label": "GEM-MT",
+        "subgrades": {},
+        "tag_score": null,
+        "certification_number": "00673123",
+        "qualifiers": [],
+        "raw_condition": "not_assessed",
+        "authenticity_verified": false,
+        "source": "visible_label_ocr",
+        "requires_confirmation": true,
+        "label_text": [
+          "GEM-MT",
+          "2026 POKEMON SV",
+          "10",
+          "LUGIAEX",
+          "PRISMATIC EVOLUTIONS",
+          "00673123",
+          "#082",
+          "AGS",
+          "220*",
+          "OASIC",
+          "Lugia"
+        ],
+        "warnings": []
+      },
+      "manual_truth": {
+        "company": "ags",
+        "grade": 10
+      },
+      "source_page": "https://www.ebay.com/itm/117170692858",
+      "image_sha256": "d03c50ecbeac65533dcccea9952537e12156fce30c10fef6664bc0d9b3830e24",
+      "company_correct": true,
+      "grade_correct": true,
+      "company_wrong": false,
+      "grade_wrong": false
+    },
+    {
+      "id": "label100_389945389537",
+      "conditions": [
+        "slab",
+        "public_seller_photo"
+      ],
+      "grading_ms": 3472.56,
+      "grading": {
+        "slab_detected": true,
+        "is_graded": true,
+        "grading_status": "graded",
+        "company": "ags",
+        "company_source": "verified_logo",
+        "grade": 9.5,
+        "condition_label": "MINT+",
+        "subgrades": {},
+        "tag_score": null,
+        "certification_number": "00693992",
+        "qualifiers": [],
+        "raw_condition": "not_assessed",
+        "authenticity_verified": false,
+        "source": "visible_label_ocr",
+        "requires_confirmation": true,
+        "label_text": [
+          "2023 P.M. JAPANESE SV",
+          "MINT+",
+          "LUGIA EX",
+          "9.5",
+          "G/S DK: LUGIA/TYRANITAR EX",
+          "#097",
+          "00693992"
+        ],
+        "warnings": []
+      },
+      "manual_truth": {
+        "company": "ags",
+        "grade": 9.5
+      },
+      "source_page": "https://www.ebay.com/itm/389945389537",
+      "image_sha256": "9fb811dbf60989a1199a15ebba64e2ff7335f45741714821542a7b234b24bb5d",
+      "company_correct": true,
+      "grade_correct": true,
+      "company_wrong": false,
+      "grade_wrong": false
+    },
+    {
+      "id": "label100_196982574569",
+      "conditions": [
+        "slab",
+        "public_seller_photo"
+      ],
+      "grading_ms": 8370.63,
+      "grading": {
+        "slab_detected": true,
+        "is_graded": true,
+        "grading_status": "graded",
+        "company": null,
+        "company_source": "none",
+        "grade": 9.5,
+        "condition_label": "MINT+",
+        "subgrades": {},
+        "tag_score": null,
+        "certification_number": "00236262",
+        "qualifiers": [],
+        "raw_condition": "not_assessed",
+        "authenticity_verified": false,
+        "source": "visible_label_ocr",
+        "requires_confirmation": true,
+        "label_text": [
+          "QUALITY",
+          "azn Plun",
+          "MINT+",
+          "d Signature\" is prou",
+          "2022 POKEMON SWSH",
+          "unsweer Dried Plu",
+          "LUGIAV",
+          "9.5",
+          "a plum is just a plum",
+          "SILVERTEMPEST",
+          "weet's fantastic flavo",
+          "00236262",
+          "#138",
+          "sweet and irresi",
+          "d and live a liutle",
+          "Or add prunes",
+          "220",
+          "LugiaV",
+          "BASIC",
+          "HP",
+          "plum"
+        ],
+        "warnings": [
+          "grading_company_unreadable_or_unsupported"
+        ]
+      },
+      "manual_truth": {
+        "company": "ags",
+        "grade": 9.5
+      },
+      "source_page": "https://www.ebay.com/itm/196982574569",
+      "image_sha256": "fbb49b965d09459d1bb860dd3540a735788c5ca789cef03d9b3ea899af6140ce",
+      "company_correct": false,
+      "grade_correct": true,
+      "company_wrong": false,
+      "grade_wrong": false
+    }
+  ]
+}

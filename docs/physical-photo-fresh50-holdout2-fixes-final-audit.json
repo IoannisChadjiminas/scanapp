@@ -1,0 +1,2101 @@
+{
+  "scope": "Tuned 50-photo regression, NOT fresh holdout accuracy. Local offline API recognition, not deployed Flutter/camera/HTTP tests. Exact set/number/language evaluated; finish/authenticity not ground truth.",
+  "counts": {
+    "photos": 50,
+    "best_match_correct": 50,
+    "best_match_wrong": 0,
+    "no_best_match": 0,
+    "correct_in_best_or_alternatives": 50,
+    "automatic_matches": 11,
+    "wrong_automatic_matches": 0,
+    "statuses": {
+      "uncertain": 31,
+      "matched": 11,
+      "printing_ambiguous": 8
+    }
+  },
+  "full_card_only": {
+    "photos": 50,
+    "best_match_correct": 49,
+    "best_match_wrong": 0,
+    "no_best_match": 1,
+    "correct_in_best_or_alternatives": 49,
+    "automatic_matches": 11,
+    "wrong_automatic_matches": 0,
+    "statuses": {
+      "uncertain": 32,
+      "matched": 11,
+      "printing_ambiguous": 6,
+      "retake": 1
+    }
+  },
+  "distinct_printing_ids": 11,
+  "strata": {
+    "language:en": {
+      "photos": 39,
+      "best_match_correct": 39,
+      "best_match_wrong": 0,
+      "no_best_match": 0,
+      "correct_in_best_or_alternatives": 39,
+      "automatic_matches": 7,
+      "wrong_automatic_matches": 0,
+      "statuses": {
+        "uncertain": 25,
+        "matched": 7,
+        "printing_ambiguous": 7
+      }
+    },
+    "language:ja": {
+      "photos": 11,
+      "best_match_correct": 11,
+      "best_match_wrong": 0,
+      "no_best_match": 0,
+      "correct_in_best_or_alternatives": 11,
+      "automatic_matches": 4,
+      "wrong_automatic_matches": 0,
+      "statuses": {
+        "matched": 4,
+        "uncertain": 6,
+        "printing_ambiguous": 1
+      }
+    },
+    "layout:pokemon_full_art": {
+      "photos": 37,
+      "best_match_correct": 37,
+      "best_match_wrong": 0,
+      "no_best_match": 0,
+      "correct_in_best_or_alternatives": 37,
+      "automatic_matches": 10,
+      "wrong_automatic_matches": 0,
+      "statuses": {
+        "uncertain": 24,
+        "matched": 10,
+        "printing_ambiguous": 3
+      }
+    },
+    "layout:standard_frame": {
+      "photos": 5,
+      "best_match_correct": 5,
+      "best_match_wrong": 0,
+      "no_best_match": 0,
+      "correct_in_best_or_alternatives": 5,
+      "automatic_matches": 0,
+      "wrong_automatic_matches": 0,
+      "statuses": {
+        "printing_ambiguous": 5
+      }
+    },
+    "layout:trainer_full_art": {
+      "photos": 8,
+      "best_match_correct": 8,
+      "best_match_wrong": 0,
+      "no_best_match": 0,
+      "correct_in_best_or_alternatives": 8,
+      "automatic_matches": 1,
+      "wrong_automatic_matches": 0,
+      "statuses": {
+        "uncertain": 7,
+        "matched": 1
+      }
+    },
+    "artwork_covered:False": {
+      "photos": 5,
+      "best_match_correct": 5,
+      "best_match_wrong": 0,
+      "no_best_match": 0,
+      "correct_in_best_or_alternatives": 5,
+      "automatic_matches": 1,
+      "wrong_automatic_matches": 0,
+      "statuses": {
+        "printing_ambiguous": 1,
+        "uncertain": 3,
+        "matched": 1
+      }
+    },
+    "artwork_covered:True": {
+      "photos": 45,
+      "best_match_correct": 45,
+      "best_match_wrong": 0,
+      "no_best_match": 0,
+      "correct_in_best_or_alternatives": 45,
+      "automatic_matches": 10,
+      "wrong_automatic_matches": 0,
+      "statuses": {
+        "uncertain": 28,
+        "matched": 10,
+        "printing_ambiguous": 7
+      }
+    }
+  },
+  "code_unchanged_from_generic_fix_regression": false,
+  "regression_run": true,
+  "changed_code_files": [
+    "app/recognition/pipeline.py",
+    "app/recognition/rank.py",
+    "app/config.py",
+    "app/recognition/ocr.py"
+  ],
+  "source_labels_sha256": "4bc9bb83dfd7f4290b57cdb75d1173acd89c5909585e47cd8410a85c3a3eb76a",
+  "all_50_retained": true,
+  "failures": [],
+  "wrong_automatic_cases": [],
+  "negatives": [
+    {
+      "name": "blank",
+      "before": {
+        "status": "retake",
+        "suggestions": 0,
+        "automatic_claim": false
+      },
+      "after": {
+        "status": "retake",
+        "suggestions": 0,
+        "automatic_claim": false
+      }
+    },
+    {
+      "name": "noise",
+      "before": {
+        "status": "no_match",
+        "suggestions": 0,
+        "automatic_claim": false
+      },
+      "after": {
+        "status": "no_match",
+        "suggestions": 0,
+        "automatic_claim": false
+      }
+    }
+  ],
+  "cases": [
+    {
+      "photo": "fresh_001",
+      "expected_id": "en:swsh11-180",
+      "best_match_id": "en:swsh11-180",
+      "best_match_correct": true,
+      "correct_in_best_or_alternatives": true,
+      "status": "uncertain",
+      "match_state": "likely",
+      "automatic_wrong_match": false,
+      "artwork_covered": true,
+      "language": "en",
+      "layout": "pokemon_full_art",
+      "page_url": "https://www.ebay.co.uk/p/17056216177",
+      "full_shortlist_recall": true,
+      "artwork_shortlist_recall": true,
+      "identity_evidence": {
+        "collector_conflict": false,
+        "structured_collector_conflict": false,
+        "strong_name_conflict": false,
+        "language_conflict": false
+      },
+      "ocr": {
+        "name_text": "AerodactylV",
+        "collector_text": "180/196",
+        "failed": false,
+        "collector_retry_used": false,
+        "collector_retry_contributed": false
+      },
+      "query_size": [
+        730,
+        1020
+      ],
+      "frame_selection": {
+        "profile": "window_0.85",
+        "alternate_hypotheses": 2
+      },
+      "best_cardmarket_url": null
+    },
+    {
+      "photo": "fresh_002",
+      "expected_id": "en:swsh11-180",
+      "best_match_id": "en:swsh11-180",
+      "best_match_correct": true,
+      "correct_in_best_or_alternatives": true,
+      "status": "uncertain",
+      "match_state": "likely",
+      "automatic_wrong_match": false,
+      "artwork_covered": true,
+      "language": "en",
+      "layout": "pokemon_full_art",
+      "page_url": "https://www.sportscardinvestor.com/cards/aerodactyl-v-pokemon/2022-sword-shield-lost-origin-holo-alternate-full-art-180-196",
+      "full_shortlist_recall": true,
+      "artwork_shortlist_recall": true,
+      "identity_evidence": {
+        "collector_conflict": false,
+        "structured_collector_conflict": false,
+        "strong_name_conflict": false,
+        "language_conflict": false
+      },
+      "ocr": {
+        "name_text": "resistance",
+        "collector_text": "your opponent takes 2 Prize cards.",
+        "failed": false,
+        "collector_retry_used": false,
+        "collector_retry_contributed": false
+      },
+      "query_size": [
+        465,
+        620
+      ],
+      "frame_selection": {
+        "profile": "loose_0",
+        "alternate_hypotheses": 5
+      },
+      "best_cardmarket_url": null
+    },
+    {
+      "photo": "fresh_003",
+      "expected_id": "en:swsh11-180",
+      "best_match_id": "en:swsh11-180",
+      "best_match_correct": true,
+      "correct_in_best_or_alternatives": true,
+      "status": "uncertain",
+      "match_state": "likely",
+      "automatic_wrong_match": false,
+      "artwork_covered": true,
+      "language": "en",
+      "layout": "pokemon_full_art",
+      "page_url": "https://www.ebay.com/itm/256657882198",
+      "full_shortlist_recall": true,
+      "artwork_shortlist_recall": true,
+      "identity_evidence": {
+        "collector_conflict": false,
+        "structured_collector_conflict": false,
+        "strong_name_conflict": false,
+        "language_conflict": false
+      },
+      "ocr": {
+        "name_text": "scard an",
+        "collector_text": "When your Pokémon Kis Knocke",
+        "failed": false,
+        "collector_retry_used": false,
+        "collector_retry_contributed": false
+      },
+      "query_size": [
+        802,
+        1120
+      ],
+      "frame_selection": {
+        "profile": "window_0.70",
+        "alternate_hypotheses": 3
+      },
+      "best_cardmarket_url": null
+    },
+    {
+      "photo": "fresh_004",
+      "expected_id": "en:swsh11-180",
+      "best_match_id": "en:swsh11-180",
+      "best_match_correct": true,
+      "correct_in_best_or_alternatives": true,
+      "status": "uncertain",
+      "match_state": "likely",
+      "automatic_wrong_match": false,
+      "artwork_covered": true,
+      "language": "en",
+      "layout": "pokemon_full_art",
+      "page_url": "https://www.ebay.com/itm/146913362687",
+      "full_shortlist_recall": true,
+      "artwork_shortlist_recall": true,
+      "identity_evidence": {
+        "collector_conflict": false,
+        "structured_collector_conflict": false,
+        "strong_name_conflict": false,
+        "language_conflict": false
+      },
+      "ocr": {
+        "name_text": "AerodactylV",
+        "collector_text": "180/196",
+        "failed": false,
+        "collector_retry_used": true,
+        "collector_retry_contributed": true
+      },
+      "query_size": [
+        1075,
+        1524
+      ],
+      "frame_selection": {
+        "profile": "primary",
+        "alternate_hypotheses": 0
+      },
+      "best_cardmarket_url": null
+    },
+    {
+      "photo": "fresh_005",
+      "expected_id": "en:swsh11-180",
+      "best_match_id": "en:swsh11-180",
+      "best_match_correct": true,
+      "correct_in_best_or_alternatives": true,
+      "status": "matched",
+      "match_state": "matched",
+      "automatic_wrong_match": false,
+      "artwork_covered": true,
+      "language": "en",
+      "layout": "pokemon_full_art",
+      "page_url": "https://www.ebay.com/itm/126170568284",
+      "full_shortlist_recall": true,
+      "artwork_shortlist_recall": true,
+      "identity_evidence": {
+        "collector_conflict": false,
+        "structured_collector_conflict": false,
+        "strong_name_conflict": false,
+        "language_conflict": false
+      },
+      "ocr": {
+        "name_text": "Aerodactyl",
+        "collector_text": "180/196",
+        "failed": false,
+        "collector_retry_used": false,
+        "collector_retry_contributed": false
+      },
+      "query_size": [
+        1117,
+        1566
+      ],
+      "frame_selection": {
+        "profile": "primary",
+        "alternate_hypotheses": 0
+      },
+      "best_cardmarket_url": null
+    },
+    {
+      "photo": "fresh_006",
+      "expected_id": "en:swsh11-180",
+      "best_match_id": "en:swsh11-180",
+      "best_match_correct": true,
+      "correct_in_best_or_alternatives": true,
+      "status": "uncertain",
+      "match_state": "likely",
+      "automatic_wrong_match": false,
+      "artwork_covered": true,
+      "language": "en",
+      "layout": "pokemon_full_art",
+      "page_url": "https://www.ebay.com/itm/146109296320",
+      "full_shortlist_recall": true,
+      "artwork_shortlist_recall": true,
+      "identity_evidence": {
+        "collector_conflict": false,
+        "structured_collector_conflict": false,
+        "strong_name_conflict": false,
+        "language_conflict": false
+      },
+      "ocr": {
+        "name_text": "AerodactylV",
+        "collector_text": "your opponent takes 2 Prize cards.",
+        "failed": false,
+        "collector_retry_used": true,
+        "collector_retry_contributed": false
+      },
+      "query_size": [
+        534,
+        675
+      ],
+      "frame_selection": {
+        "profile": "loose_0",
+        "alternate_hypotheses": 3
+      },
+      "best_cardmarket_url": null
+    },
+    {
+      "photo": "fresh_009",
+      "expected_id": "en:swsh11-186",
+      "best_match_id": "en:swsh11-186",
+      "best_match_correct": true,
+      "correct_in_best_or_alternatives": true,
+      "status": "uncertain",
+      "match_state": "likely",
+      "automatic_wrong_match": false,
+      "artwork_covered": true,
+      "language": "en",
+      "layout": "pokemon_full_art",
+      "page_url": "https://www.ebay.com/itm/316147194366",
+      "full_shortlist_recall": true,
+      "artwork_shortlist_recall": true,
+      "identity_evidence": {
+        "collector_conflict": false,
+        "structured_collector_conflict": false,
+        "strong_name_conflict": false,
+        "language_conflict": false
+      },
+      "ocr": {
+        "name_text": "GiratinaV",
+        "collector_text": "186/196",
+        "failed": false,
+        "collector_retry_used": false,
+        "collector_retry_contributed": false
+      },
+      "query_size": [
+        689,
+        990
+      ],
+      "frame_selection": {
+        "profile": "loose_0",
+        "alternate_hypotheses": 5
+      },
+      "best_cardmarket_url": "https://www.cardmarket.com/en/Pokemon/Products/Singles/Lost-Origin/Giratina-V-V3-LOR186"
+    },
+    {
+      "photo": "fresh_010",
+      "expected_id": "en:base1-58",
+      "best_match_id": "base1-58",
+      "best_match_correct": true,
+      "correct_in_best_or_alternatives": true,
+      "status": "printing_ambiguous",
+      "match_state": "likely",
+      "automatic_wrong_match": false,
+      "artwork_covered": true,
+      "language": "en",
+      "layout": "standard_frame",
+      "page_url": "https://www.ebay.com/itm/405470689945",
+      "full_shortlist_recall": true,
+      "artwork_shortlist_recall": true,
+      "identity_evidence": {
+        "collector_conflict": false,
+        "structured_collector_conflict": false,
+        "strong_name_conflict": false,
+        "language_conflict": false
+      },
+      "ocr": {
+        "name_text": "Pikachu",
+        "collector_text": "58/102",
+        "failed": false,
+        "collector_retry_used": false,
+        "collector_retry_contributed": false
+      },
+      "query_size": [
+        693,
+        938
+      ],
+      "frame_selection": {
+        "profile": "primary",
+        "alternate_hypotheses": 0
+      },
+      "best_cardmarket_url": "https://www.cardmarket.com/en/Pokemon/Products/Singles/Base-Set/Pikachu-V1-BS58"
+    },
+    {
+      "photo": "fresh_011",
+      "expected_id": "en:base1-58",
+      "best_match_id": "base1-58",
+      "best_match_correct": true,
+      "correct_in_best_or_alternatives": true,
+      "status": "printing_ambiguous",
+      "match_state": "likely",
+      "automatic_wrong_match": false,
+      "artwork_covered": true,
+      "language": "en",
+      "layout": "standard_frame",
+      "page_url": "https://www.ebay.com/itm/193771437844",
+      "full_shortlist_recall": true,
+      "artwork_shortlist_recall": true,
+      "identity_evidence": {
+        "collector_conflict": false,
+        "structured_collector_conflict": false,
+        "strong_name_conflict": false,
+        "language_conflict": false
+      },
+      "ocr": {
+        "name_text": "Pikachu",
+        "collector_text": "58/102",
+        "failed": false,
+        "collector_retry_used": false,
+        "collector_retry_contributed": false
+      },
+      "query_size": [
+        619,
+        871
+      ],
+      "frame_selection": {
+        "profile": "primary",
+        "alternate_hypotheses": 0
+      },
+      "best_cardmarket_url": "https://www.cardmarket.com/en/Pokemon/Products/Singles/Base-Set/Pikachu-V1-BS58"
+    },
+    {
+      "photo": "fresh_012",
+      "expected_id": "en:base1-58",
+      "best_match_id": "en:base1-58",
+      "best_match_correct": true,
+      "correct_in_best_or_alternatives": true,
+      "status": "printing_ambiguous",
+      "match_state": "likely",
+      "automatic_wrong_match": false,
+      "artwork_covered": true,
+      "language": "en",
+      "layout": "standard_frame",
+      "page_url": "https://www.ebay.com/itm/396262766898",
+      "full_shortlist_recall": true,
+      "artwork_shortlist_recall": true,
+      "identity_evidence": {
+        "collector_conflict": false,
+        "structured_collector_conflict": false,
+        "strong_name_conflict": false,
+        "language_conflict": false
+      },
+      "ocr": {
+        "name_text": "Pikachu",
+        "collector_text": "58/102",
+        "failed": false,
+        "collector_retry_used": false,
+        "collector_retry_contributed": false
+      },
+      "query_size": [
+        826,
+        1069
+      ],
+      "frame_selection": {
+        "profile": "primary",
+        "alternate_hypotheses": 0
+      },
+      "best_cardmarket_url": null
+    },
+    {
+      "photo": "fresh_013",
+      "expected_id": "en:base1-58",
+      "best_match_id": "en:base1-58",
+      "best_match_correct": true,
+      "correct_in_best_or_alternatives": true,
+      "status": "printing_ambiguous",
+      "match_state": "likely",
+      "automatic_wrong_match": false,
+      "artwork_covered": true,
+      "language": "en",
+      "layout": "standard_frame",
+      "page_url": "https://www.ebay.com/itm/353774647514",
+      "full_shortlist_recall": true,
+      "artwork_shortlist_recall": true,
+      "identity_evidence": {
+        "collector_conflict": false,
+        "structured_collector_conflict": false,
+        "strong_name_conflict": false,
+        "language_conflict": false
+      },
+      "ocr": {
+        "name_text": "Pikachu",
+        "collector_text": "58/102",
+        "failed": false,
+        "collector_retry_used": false,
+        "collector_retry_contributed": false
+      },
+      "query_size": [
+        828,
+        1155
+      ],
+      "frame_selection": {
+        "profile": "primary",
+        "alternate_hypotheses": 0
+      },
+      "best_cardmarket_url": null
+    },
+    {
+      "photo": "fresh_018",
+      "expected_id": "en:base1-58",
+      "best_match_id": "base1-58",
+      "best_match_correct": true,
+      "correct_in_best_or_alternatives": true,
+      "status": "printing_ambiguous",
+      "match_state": "likely",
+      "automatic_wrong_match": false,
+      "artwork_covered": true,
+      "language": "en",
+      "layout": "standard_frame",
+      "page_url": "https://www.ebay.com/itm/167307030719",
+      "full_shortlist_recall": true,
+      "artwork_shortlist_recall": true,
+      "identity_evidence": {
+        "collector_conflict": false,
+        "structured_collector_conflict": false,
+        "strong_name_conflict": false,
+        "language_conflict": false
+      },
+      "ocr": {
+        "name_text": "Pikachu",
+        "collector_text": "FOLIO",
+        "failed": false,
+        "collector_retry_used": true,
+        "collector_retry_contributed": true
+      },
+      "query_size": [
+        730,
+        1020
+      ],
+      "frame_selection": {
+        "profile": "window_0.85",
+        "alternate_hypotheses": 4
+      },
+      "best_cardmarket_url": "https://www.cardmarket.com/en/Pokemon/Products/Singles/Base-Set/Pikachu-V1-BS58"
+    },
+    {
+      "photo": "fresh_014",
+      "expected_id": "en:sv03.5-203",
+      "best_match_id": "en:sv03.5-203",
+      "best_match_correct": true,
+      "correct_in_best_or_alternatives": true,
+      "status": "uncertain",
+      "match_state": "likely",
+      "automatic_wrong_match": false,
+      "artwork_covered": true,
+      "language": "en",
+      "layout": "trainer_full_art",
+      "page_url": "https://www.ebay.com/itm/126984332888",
+      "full_shortlist_recall": true,
+      "artwork_shortlist_recall": true,
+      "identity_evidence": {
+        "collector_conflict": false,
+        "structured_collector_conflict": false,
+        "strong_name_conflict": false,
+        "language_conflict": false
+      },
+      "ocr": {
+        "name_text": "Erika's Invitation",
+        "collector_text": "203/165",
+        "failed": false,
+        "collector_retry_used": false,
+        "collector_retry_contributed": false
+      },
+      "query_size": [
+        786,
+        1106
+      ],
+      "frame_selection": {
+        "profile": "loose_0",
+        "alternate_hypotheses": 3
+      },
+      "best_cardmarket_url": "https://www.cardmarket.com/en/Pokemon/Products/Singles/151/Erikas-Invitation-V3-MEW203"
+    },
+    {
+      "photo": "fresh_015",
+      "expected_id": "en:sv03.5-203",
+      "best_match_id": "en:sv03.5-203",
+      "best_match_correct": true,
+      "correct_in_best_or_alternatives": true,
+      "status": "uncertain",
+      "match_state": "likely",
+      "automatic_wrong_match": false,
+      "artwork_covered": true,
+      "language": "en",
+      "layout": "trainer_full_art",
+      "page_url": "https://www.ebay.com/itm/176213887291",
+      "full_shortlist_recall": true,
+      "artwork_shortlist_recall": true,
+      "identity_evidence": {
+        "collector_conflict": false,
+        "structured_collector_conflict": false,
+        "strong_name_conflict": false,
+        "language_conflict": false
+      },
+      "ocr": {
+        "name_text": "Erika's Invitation",
+        "collector_text": "203/165",
+        "failed": false,
+        "collector_retry_used": false,
+        "collector_retry_contributed": false
+      },
+      "query_size": [
+        601,
+        840
+      ],
+      "frame_selection": {
+        "profile": "window_0.70",
+        "alternate_hypotheses": 4
+      },
+      "best_cardmarket_url": "https://www.cardmarket.com/en/Pokemon/Products/Singles/151/Erikas-Invitation-V3-MEW203"
+    },
+    {
+      "photo": "fresh_017",
+      "expected_id": "en:sv03.5-203",
+      "best_match_id": "en:sv03.5-203",
+      "best_match_correct": true,
+      "correct_in_best_or_alternatives": true,
+      "status": "uncertain",
+      "match_state": "likely",
+      "automatic_wrong_match": false,
+      "artwork_covered": true,
+      "language": "en",
+      "layout": "trainer_full_art",
+      "page_url": "https://www.ebay.com/itm/155997959387",
+      "full_shortlist_recall": true,
+      "artwork_shortlist_recall": true,
+      "identity_evidence": {
+        "collector_conflict": false,
+        "structured_collector_conflict": false,
+        "strong_name_conflict": false,
+        "language_conflict": false
+      },
+      "ocr": {
+        "name_text": "Erika's Invitation",
+        "collector_text": "203/165",
+        "failed": false,
+        "collector_retry_used": false,
+        "collector_retry_contributed": false
+      },
+      "query_size": [
+        645,
+        789
+      ],
+      "frame_selection": {
+        "profile": "primary",
+        "alternate_hypotheses": 0
+      },
+      "best_cardmarket_url": "https://www.cardmarket.com/en/Pokemon/Products/Singles/151/Erikas-Invitation-V3-MEW203"
+    },
+    {
+      "photo": "fresh_019",
+      "expected_id": "en:sv03.5-203",
+      "best_match_id": "en:sv03.5-203",
+      "best_match_correct": true,
+      "correct_in_best_or_alternatives": true,
+      "status": "uncertain",
+      "match_state": "likely",
+      "automatic_wrong_match": false,
+      "artwork_covered": true,
+      "language": "en",
+      "layout": "trainer_full_art",
+      "page_url": "https://www.ebay.ca/itm/305331784037",
+      "full_shortlist_recall": true,
+      "artwork_shortlist_recall": true,
+      "identity_evidence": {
+        "collector_conflict": false,
+        "structured_collector_conflict": false,
+        "strong_name_conflict": false,
+        "language_conflict": false
+      },
+      "ocr": {
+        "name_text": "Erika's Invitation",
+        "collector_text": "203/165",
+        "failed": false,
+        "collector_retry_used": false,
+        "collector_retry_contributed": false
+      },
+      "query_size": [
+        744,
+        1010
+      ],
+      "frame_selection": {
+        "profile": "loose_0",
+        "alternate_hypotheses": 3
+      },
+      "best_cardmarket_url": "https://www.cardmarket.com/en/Pokemon/Products/Singles/151/Erikas-Invitation-V3-MEW203"
+    },
+    {
+      "photo": "fresh_066",
+      "expected_id": "en:sv03.5-203",
+      "best_match_id": "en:sv03.5-203",
+      "best_match_correct": true,
+      "correct_in_best_or_alternatives": true,
+      "status": "uncertain",
+      "match_state": "tentative",
+      "automatic_wrong_match": false,
+      "artwork_covered": true,
+      "language": "en",
+      "layout": "trainer_full_art",
+      "page_url": "https://www.ebay.co.uk/itm/186161803680",
+      "full_shortlist_recall": true,
+      "artwork_shortlist_recall": true,
+      "identity_evidence": {
+        "collector_conflict": false,
+        "structured_collector_conflict": false,
+        "strong_name_conflict": true,
+        "language_conflict": false
+      },
+      "ocr": {
+        "name_text": "INER",
+        "collector_text": "203/165",
+        "failed": false,
+        "collector_retry_used": false,
+        "collector_retry_contributed": false
+      },
+      "query_size": [
+        802,
+        1120
+      ],
+      "frame_selection": {
+        "profile": "window_0.70",
+        "alternate_hypotheses": 3
+      },
+      "best_cardmarket_url": "https://www.cardmarket.com/en/Pokemon/Products/Singles/151/Erikas-Invitation-V3-MEW203"
+    },
+    {
+      "photo": "fresh_067",
+      "expected_id": "en:sv03.5-203",
+      "best_match_id": "en:sv03.5-203",
+      "best_match_correct": true,
+      "correct_in_best_or_alternatives": true,
+      "status": "matched",
+      "match_state": "matched",
+      "automatic_wrong_match": false,
+      "artwork_covered": true,
+      "language": "en",
+      "layout": "trainer_full_art",
+      "page_url": "https://www.ebay.com/itm/127282635883",
+      "full_shortlist_recall": true,
+      "artwork_shortlist_recall": true,
+      "identity_evidence": {
+        "collector_conflict": false,
+        "structured_collector_conflict": false,
+        "strong_name_conflict": false,
+        "language_conflict": false
+      },
+      "ocr": {
+        "name_text": "Erika's Invitation",
+        "collector_text": "203/165",
+        "failed": false,
+        "collector_retry_used": false,
+        "collector_retry_contributed": false
+      },
+      "query_size": [
+        393,
+        500
+      ],
+      "frame_selection": {
+        "profile": "as_supplied",
+        "alternate_hypotheses": 4
+      },
+      "best_cardmarket_url": "https://www.cardmarket.com/en/Pokemon/Products/Singles/151/Erikas-Invitation-V3-MEW203"
+    },
+    {
+      "photo": "fresh_068",
+      "expected_id": "en:sv03.5-203",
+      "best_match_id": "en:sv03.5-203",
+      "best_match_correct": true,
+      "correct_in_best_or_alternatives": true,
+      "status": "uncertain",
+      "match_state": "likely",
+      "automatic_wrong_match": false,
+      "artwork_covered": true,
+      "language": "en",
+      "layout": "trainer_full_art",
+      "page_url": "https://www.ebay.com/itm/267174043958",
+      "full_shortlist_recall": true,
+      "artwork_shortlist_recall": true,
+      "identity_evidence": {
+        "collector_conflict": false,
+        "structured_collector_conflict": false,
+        "strong_name_conflict": false,
+        "language_conflict": false
+      },
+      "ocr": {
+        "name_text": "You may play only I Supporter card during",
+        "collector_text": "203/165",
+        "failed": false,
+        "collector_retry_used": false,
+        "collector_retry_contributed": false
+      },
+      "query_size": [
+        911,
+        1142
+      ],
+      "frame_selection": {
+        "profile": "loose_0",
+        "alternate_hypotheses": 3
+      },
+      "best_cardmarket_url": "https://www.cardmarket.com/en/Pokemon/Products/Singles/151/Erikas-Invitation-V3-MEW203"
+    },
+    {
+      "photo": "fresh_069",
+      "expected_id": "en:sv03.5-203",
+      "best_match_id": "en:sv03.5-203",
+      "best_match_correct": true,
+      "correct_in_best_or_alternatives": true,
+      "status": "uncertain",
+      "match_state": "likely",
+      "automatic_wrong_match": false,
+      "artwork_covered": true,
+      "language": "en",
+      "layout": "trainer_full_art",
+      "page_url": "https://www.ebay.com/itm/166350759051",
+      "full_shortlist_recall": false,
+      "artwork_shortlist_recall": true,
+      "identity_evidence": {
+        "collector_conflict": false,
+        "structured_collector_conflict": false,
+        "strong_name_conflict": false,
+        "language_conflict": false
+      },
+      "ocr": {
+        "name_text": "Erika's Invitation",
+        "collector_text": "203/165",
+        "failed": false,
+        "collector_retry_used": false,
+        "collector_retry_contributed": false
+      },
+      "query_size": [
+        527,
+        757
+      ],
+      "frame_selection": {
+        "profile": "primary",
+        "alternate_hypotheses": 3
+      },
+      "best_cardmarket_url": "https://www.cardmarket.com/en/Pokemon/Products/Singles/151/Erikas-Invitation-V3-MEW203"
+    },
+    {
+      "photo": "fresh_020",
+      "expected_id": "en:swsh12.5gg-GG44",
+      "best_match_id": "en:swsh12.5gg-GG44",
+      "best_match_correct": true,
+      "correct_in_best_or_alternatives": true,
+      "status": "uncertain",
+      "match_state": "likely",
+      "automatic_wrong_match": false,
+      "artwork_covered": true,
+      "language": "en",
+      "layout": "pokemon_full_art",
+      "page_url": "https://www.ebay.ca/b/Mewtwo-VSTAR-GG44-GG70-Crown-Zenith-Galarian-Gallery/2536/bn_7124868771",
+      "full_shortlist_recall": true,
+      "artwork_shortlist_recall": true,
+      "identity_evidence": {
+        "collector_conflict": false,
+        "structured_collector_conflict": false,
+        "strong_name_conflict": false,
+        "language_conflict": false
+      },
+      "ocr": {
+        "name_text": "Mewtwo",
+        "collector_text": "©2023 Pokemon/Nintendo/Creatures/GAME FREAK",
+        "failed": false,
+        "collector_retry_used": false,
+        "collector_retry_contributed": false
+      },
+      "query_size": [
+        730,
+        1073
+      ],
+      "frame_selection": {
+        "profile": "loose_0",
+        "alternate_hypotheses": 4
+      },
+      "best_cardmarket_url": "https://www.cardmarket.com/en/Pokemon/Products/Singles/Crown-Zenith/Mewtwo-VSTAR-CRZGG44"
+    },
+    {
+      "photo": "fresh_021",
+      "expected_id": "en:swsh12.5gg-GG44",
+      "best_match_id": "en:swsh12.5gg-GG44",
+      "best_match_correct": true,
+      "correct_in_best_or_alternatives": true,
+      "status": "printing_ambiguous",
+      "match_state": "likely",
+      "automatic_wrong_match": false,
+      "artwork_covered": true,
+      "language": "en",
+      "layout": "pokemon_full_art",
+      "page_url": "https://www.ebay.com/itm/306685017241",
+      "full_shortlist_recall": true,
+      "artwork_shortlist_recall": true,
+      "identity_evidence": {
+        "collector_conflict": false,
+        "structured_collector_conflict": false,
+        "strong_name_conflict": false,
+        "language_conflict": false
+      },
+      "ocr": {
+        "name_text": "MewtwosTAR",
+        "collector_text": null,
+        "failed": false,
+        "collector_retry_used": true,
+        "collector_retry_contributed": false
+      },
+      "query_size": [
+        601,
+        840
+      ],
+      "frame_selection": {
+        "profile": "window_0.70",
+        "alternate_hypotheses": 3
+      },
+      "best_cardmarket_url": "https://www.cardmarket.com/en/Pokemon/Products/Singles/Crown-Zenith/Mewtwo-VSTAR-CRZGG44"
+    },
+    {
+      "photo": "fresh_022",
+      "expected_id": "en:swsh12.5gg-GG44",
+      "best_match_id": "en:swsh12.5gg-GG44",
+      "best_match_correct": true,
+      "correct_in_best_or_alternatives": true,
+      "status": "matched",
+      "match_state": "matched",
+      "automatic_wrong_match": false,
+      "artwork_covered": true,
+      "language": "en",
+      "layout": "pokemon_full_art",
+      "page_url": "https://www.ebay.com/b/Mewtwo-VSTAR-Pokemon-TCG-Cards/2536/bn_7124854606",
+      "full_shortlist_recall": true,
+      "artwork_shortlist_recall": true,
+      "identity_evidence": {
+        "collector_conflict": false,
+        "structured_collector_conflict": false,
+        "strong_name_conflict": false,
+        "language_conflict": false
+      },
+      "ocr": {
+        "name_text": "MewtwoSTAR",
+        "collector_text": "©2023 Pokemon /Nintendo/Creatures/GAME FREAK",
+        "failed": false,
+        "collector_retry_used": false,
+        "collector_retry_contributed": false
+      },
+      "query_size": [
+        915,
+        1200
+      ],
+      "frame_selection": {
+        "profile": "primary",
+        "alternate_hypotheses": 0
+      },
+      "best_cardmarket_url": "https://www.cardmarket.com/en/Pokemon/Products/Singles/Crown-Zenith/Mewtwo-VSTAR-CRZGG44"
+    },
+    {
+      "photo": "fresh_024",
+      "expected_id": "en:swsh12.5gg-GG44",
+      "best_match_id": "en:swsh12.5gg-GG44",
+      "best_match_correct": true,
+      "correct_in_best_or_alternatives": true,
+      "status": "matched",
+      "match_state": "matched",
+      "automatic_wrong_match": false,
+      "artwork_covered": true,
+      "language": "en",
+      "layout": "pokemon_full_art",
+      "page_url": "https://www.ebay.com/b/Mewtwo-VSTAR-GG44-GG70-Crown-Zenith-Galarian-Gallery/2536/bn_7124868771",
+      "full_shortlist_recall": true,
+      "artwork_shortlist_recall": true,
+      "identity_evidence": {
+        "collector_conflict": false,
+        "structured_collector_conflict": false,
+        "strong_name_conflict": false,
+        "language_conflict": false
+      },
+      "ocr": {
+        "name_text": "MewtwoVSTAR",
+        "collector_text": "©2023 Pokémon/Nintendo/Creatures/GAME FREAK",
+        "failed": false,
+        "collector_retry_used": false,
+        "collector_retry_contributed": false
+      },
+      "query_size": [
+        830,
+        1135
+      ],
+      "frame_selection": {
+        "profile": "primary",
+        "alternate_hypotheses": 0
+      },
+      "best_cardmarket_url": "https://www.cardmarket.com/en/Pokemon/Products/Singles/Crown-Zenith/Mewtwo-VSTAR-CRZGG44"
+    },
+    {
+      "photo": "fresh_025",
+      "expected_id": "en:swsh12.5gg-GG44",
+      "best_match_id": "en:swsh12.5gg-GG44",
+      "best_match_correct": true,
+      "correct_in_best_or_alternatives": true,
+      "status": "uncertain",
+      "match_state": "tentative",
+      "automatic_wrong_match": false,
+      "artwork_covered": true,
+      "language": "en",
+      "layout": "pokemon_full_art",
+      "page_url": "https://www.ebay.com/itm/406267924628",
+      "full_shortlist_recall": true,
+      "artwork_shortlist_recall": true,
+      "identity_evidence": {
+        "collector_conflict": true,
+        "structured_collector_conflict": false,
+        "strong_name_conflict": false,
+        "language_conflict": false
+      },
+      "ocr": {
+        "name_text": "nipuas",
+        "collector_text": "retreat",
+        "failed": false,
+        "collector_retry_used": false,
+        "collector_retry_contributed": false
+      },
+      "query_size": [
+        601,
+        840
+      ],
+      "frame_selection": {
+        "profile": "window_0.70",
+        "alternate_hypotheses": 2
+      },
+      "best_cardmarket_url": "https://www.cardmarket.com/en/Pokemon/Products/Singles/Crown-Zenith/Mewtwo-VSTAR-CRZGG44"
+    },
+    {
+      "photo": "fresh_026",
+      "expected_id": "en:swsh12.5gg-GG44",
+      "best_match_id": "en:swsh12.5gg-GG44",
+      "best_match_correct": true,
+      "correct_in_best_or_alternatives": true,
+      "status": "uncertain",
+      "match_state": "likely",
+      "automatic_wrong_match": false,
+      "artwork_covered": true,
+      "language": "en",
+      "layout": "pokemon_full_art",
+      "page_url": "https://www.sportscardinvestor.com/cards/mewtwo-vstar-pokemon/2023-sword-shield-crown-zenith-galarian-gallery-gg44-gg70",
+      "full_shortlist_recall": true,
+      "artwork_shortlist_recall": true,
+      "identity_evidence": {
+        "collector_conflict": false,
+        "structured_collector_conflict": false,
+        "strong_name_conflict": false,
+        "language_conflict": false
+      },
+      "ocr": {
+        "name_text": "MewtwoVsTAR",
+        "collector_text": "is Knocked Out, your epponent takes 2 Prize cards.",
+        "failed": false,
+        "collector_retry_used": true,
+        "collector_retry_contributed": true
+      },
+      "query_size": [
+        856,
+        1214
+      ],
+      "frame_selection": {
+        "profile": "loose_0",
+        "alternate_hypotheses": 4
+      },
+      "best_cardmarket_url": "https://www.cardmarket.com/en/Pokemon/Products/Singles/Crown-Zenith/Mewtwo-VSTAR-CRZGG44"
+    },
+    {
+      "photo": "fresh_027",
+      "expected_id": "en:swsh12.5gg-GG44",
+      "best_match_id": "en:swsh12.5gg-GG44",
+      "best_match_correct": true,
+      "correct_in_best_or_alternatives": true,
+      "status": "uncertain",
+      "match_state": "tentative",
+      "automatic_wrong_match": false,
+      "artwork_covered": true,
+      "language": "en",
+      "layout": "pokemon_full_art",
+      "page_url": "https://www.ebay.com/b/Mewtwo-VSTAR-GG44-GG70-Crown-Zenith-Galarian-Gallery/2536/bn_7124868771",
+      "full_shortlist_recall": true,
+      "artwork_shortlist_recall": true,
+      "identity_evidence": {
+        "collector_conflict": true,
+        "structured_collector_conflict": false,
+        "strong_name_conflict": false,
+        "language_conflict": false
+      },
+      "ocr": {
+        "name_text": "This",
+        "collector_text": "retreat",
+        "failed": false,
+        "collector_retry_used": false,
+        "collector_retry_contributed": false
+      },
+      "query_size": [
+        601,
+        840
+      ],
+      "frame_selection": {
+        "profile": "window_0.70",
+        "alternate_hypotheses": 5
+      },
+      "best_cardmarket_url": "https://www.cardmarket.com/en/Pokemon/Products/Singles/Crown-Zenith/Mewtwo-VSTAR-CRZGG44"
+    },
+    {
+      "photo": "fresh_028",
+      "expected_id": "en:swsh12.5gg-GG44",
+      "best_match_id": "en:swsh12.5gg-GG44",
+      "best_match_correct": true,
+      "correct_in_best_or_alternatives": true,
+      "status": "uncertain",
+      "match_state": "tentative",
+      "automatic_wrong_match": false,
+      "artwork_covered": true,
+      "language": "en",
+      "layout": "pokemon_full_art",
+      "page_url": "https://www.ebay.co.uk/itm/126924542731",
+      "full_shortlist_recall": true,
+      "artwork_shortlist_recall": true,
+      "identity_evidence": {
+        "collector_conflict": true,
+        "structured_collector_conflict": false,
+        "strong_name_conflict": false,
+        "language_conflict": false
+      },
+      "ocr": {
+        "name_text": "oya s  s a ss",
+        "collector_text": "When your Pokémon VSTAA",
+        "failed": false,
+        "collector_retry_used": false,
+        "collector_retry_contributed": false
+      },
+      "query_size": [
+        802,
+        1120
+      ],
+      "frame_selection": {
+        "profile": "window_0.70",
+        "alternate_hypotheses": 3
+      },
+      "best_cardmarket_url": "https://www.cardmarket.com/en/Pokemon/Products/Singles/Crown-Zenith/Mewtwo-VSTAR-CRZGG44"
+    },
+    {
+      "photo": "fresh_031",
+      "expected_id": "ja:SV2a-205",
+      "best_match_id": "ja:SV2a-205",
+      "best_match_correct": true,
+      "correct_in_best_or_alternatives": true,
+      "status": "matched",
+      "match_state": "matched",
+      "automatic_wrong_match": false,
+      "artwork_covered": true,
+      "language": "ja",
+      "layout": "pokemon_full_art",
+      "page_url": "https://www.ebay.com/itm/256150299844",
+      "full_shortlist_recall": true,
+      "artwork_shortlist_recall": true,
+      "identity_evidence": {
+        "collector_conflict": false,
+        "structured_collector_conflict": false,
+        "strong_name_conflict": false,
+        "language_conflict": false
+      },
+      "ocr": {
+        "name_text": "Eュウ",
+        "collector_text": "205/165",
+        "failed": false,
+        "collector_retry_used": false,
+        "collector_retry_contributed": false
+      },
+      "query_size": [
+        444,
+        625
+      ],
+      "frame_selection": {
+        "profile": "primary",
+        "alternate_hypotheses": 0
+      },
+      "best_cardmarket_url": null
+    },
+    {
+      "photo": "fresh_032",
+      "expected_id": "ja:SV2a-205",
+      "best_match_id": "ja:SV2a-205",
+      "best_match_correct": true,
+      "correct_in_best_or_alternatives": true,
+      "status": "uncertain",
+      "match_state": "likely",
+      "automatic_wrong_match": false,
+      "artwork_covered": true,
+      "language": "ja",
+      "layout": "pokemon_full_art",
+      "page_url": "https://www.ebay.com/itm/356852644743",
+      "full_shortlist_recall": true,
+      "artwork_shortlist_recall": true,
+      "identity_evidence": {
+        "collector_conflict": false,
+        "structured_collector_conflict": false,
+        "strong_name_conflict": false,
+        "language_conflict": false
+      },
+      "ocr": {
+        "name_text": "Eュウex",
+        "collector_text": "205/165",
+        "failed": false,
+        "collector_retry_used": false,
+        "collector_retry_contributed": false
+      },
+      "query_size": [
+        649,
+        898
+      ],
+      "frame_selection": {
+        "profile": "primary",
+        "alternate_hypotheses": 4
+      },
+      "best_cardmarket_url": null
+    },
+    {
+      "photo": "fresh_033",
+      "expected_id": "ja:SV2a-205",
+      "best_match_id": "ja:SV2a-205",
+      "best_match_correct": true,
+      "correct_in_best_or_alternatives": true,
+      "status": "matched",
+      "match_state": "matched",
+      "automatic_wrong_match": false,
+      "artwork_covered": true,
+      "language": "ja",
+      "layout": "pokemon_full_art",
+      "page_url": "https://www.sportscardinvestor.com/cards/mew-ex-pokemon/2023-japanese-scarlet-violet-151-special-art-rare-205-165",
+      "full_shortlist_recall": true,
+      "artwork_shortlist_recall": true,
+      "identity_evidence": {
+        "collector_conflict": false,
+        "structured_collector_conflict": false,
+        "strong_name_conflict": false,
+        "language_conflict": false
+      },
+      "ocr": {
+        "name_text": "三ュウ",
+        "collector_text": "205/165",
+        "failed": false,
+        "collector_retry_used": false,
+        "collector_retry_contributed": false
+      },
+      "query_size": [
+        856,
+        1197
+      ],
+      "frame_selection": {
+        "profile": "primary",
+        "alternate_hypotheses": 5
+      },
+      "best_cardmarket_url": null
+    },
+    {
+      "photo": "fresh_034",
+      "expected_id": "ja:SV2a-205",
+      "best_match_id": "ja:SV2a-205",
+      "best_match_correct": true,
+      "correct_in_best_or_alternatives": true,
+      "status": "matched",
+      "match_state": "matched",
+      "automatic_wrong_match": false,
+      "artwork_covered": true,
+      "language": "ja",
+      "layout": "pokemon_full_art",
+      "page_url": "https://www.ebay.com/itm/387064850111",
+      "full_shortlist_recall": true,
+      "artwork_shortlist_recall": true,
+      "identity_evidence": {
+        "collector_conflict": false,
+        "structured_collector_conflict": false,
+        "strong_name_conflict": false,
+        "language_conflict": false
+      },
+      "ocr": {
+        "name_text": "ミュウ",
+        "collector_text": "205/165",
+        "failed": false,
+        "collector_retry_used": false,
+        "collector_retry_contributed": false
+      },
+      "query_size": [
+        695,
+        947
+      ],
+      "frame_selection": {
+        "profile": "primary",
+        "alternate_hypotheses": 4
+      },
+      "best_cardmarket_url": null
+    },
+    {
+      "photo": "fresh_035",
+      "expected_id": "ja:SV2a-205",
+      "best_match_id": "ja:SV2a-205",
+      "best_match_correct": true,
+      "correct_in_best_or_alternatives": true,
+      "status": "uncertain",
+      "match_state": "likely",
+      "automatic_wrong_match": false,
+      "artwork_covered": true,
+      "language": "ja",
+      "layout": "pokemon_full_art",
+      "page_url": "https://www.ebay.com/itm/225807713830",
+      "full_shortlist_recall": true,
+      "artwork_shortlist_recall": true,
+      "identity_evidence": {
+        "collector_conflict": false,
+        "structured_collector_conflict": false,
+        "strong_name_conflict": false,
+        "language_conflict": false
+      },
+      "ocr": {
+        "name_text": "ュウ",
+        "collector_text": "205/165",
+        "failed": false,
+        "collector_retry_used": false,
+        "collector_retry_contributed": false
+      },
+      "query_size": [
+        675,
+        912
+      ],
+      "frame_selection": {
+        "profile": "loose_0",
+        "alternate_hypotheses": 5
+      },
+      "best_cardmarket_url": null
+    },
+    {
+      "photo": "fresh_036",
+      "expected_id": "ja:SV2a-205",
+      "best_match_id": "ja:SV2a-205",
+      "best_match_correct": true,
+      "correct_in_best_or_alternatives": true,
+      "status": "uncertain",
+      "match_state": "likely",
+      "automatic_wrong_match": false,
+      "artwork_covered": true,
+      "language": "ja",
+      "layout": "pokemon_full_art",
+      "page_url": "https://www.ebay.pl/itm/325695571977",
+      "full_shortlist_recall": true,
+      "artwork_shortlist_recall": true,
+      "identity_evidence": {
+        "collector_conflict": false,
+        "structured_collector_conflict": false,
+        "strong_name_conflict": false,
+        "language_conflict": false
+      },
+      "ocr": {
+        "name_text": "Eウex",
+        "collector_text": "205/165",
+        "failed": false,
+        "collector_retry_used": false,
+        "collector_retry_contributed": false
+      },
+      "query_size": [
+        880,
+        1079
+      ],
+      "frame_selection": {
+        "profile": "primary",
+        "alternate_hypotheses": 3
+      },
+      "best_cardmarket_url": null
+    },
+    {
+      "photo": "fresh_040",
+      "expected_id": "ja:SV1a-080",
+      "best_match_id": "ja:SV1a-080",
+      "best_match_correct": true,
+      "correct_in_best_or_alternatives": true,
+      "status": "printing_ambiguous",
+      "match_state": "likely",
+      "automatic_wrong_match": false,
+      "artwork_covered": false,
+      "language": "ja",
+      "layout": "pokemon_full_art",
+      "page_url": "https://www.ebay.com/itm/386916944711",
+      "full_shortlist_recall": true,
+      "artwork_shortlist_recall": false,
+      "identity_evidence": {
+        "collector_conflict": false,
+        "structured_collector_conflict": false,
+        "strong_name_conflict": false,
+        "language_conflict": false
+      },
+      "ocr": {
+        "name_text": "抵抗力",
+        "collector_text": "080/073",
+        "failed": false,
+        "collector_retry_used": false,
+        "collector_retry_contributed": false
+      },
+      "query_size": [
+        708,
+        1003
+      ],
+      "frame_selection": {
+        "profile": "loose_0",
+        "alternate_hypotheses": 5
+      },
+      "best_cardmarket_url": null
+    },
+    {
+      "photo": "fresh_041",
+      "expected_id": "en:sv03.5-201",
+      "best_match_id": "en:sv03.5-201",
+      "best_match_correct": true,
+      "correct_in_best_or_alternatives": true,
+      "status": "uncertain",
+      "match_state": "tentative",
+      "automatic_wrong_match": false,
+      "artwork_covered": true,
+      "language": "en",
+      "layout": "pokemon_full_art",
+      "page_url": "https://www.ebay.com/itm/297614154440",
+      "full_shortlist_recall": true,
+      "artwork_shortlist_recall": true,
+      "identity_evidence": {
+        "collector_conflict": true,
+        "structured_collector_conflict": false,
+        "strong_name_conflict": false,
+        "language_conflict": false
+      },
+      "ocr": {
+        "name_text": "Alakazam",
+        "collector_text": "MEWEN",
+        "failed": false,
+        "collector_retry_used": true,
+        "collector_retry_contributed": false
+      },
+      "query_size": [
+        893,
+        1286
+      ],
+      "frame_selection": {
+        "profile": "primary",
+        "alternate_hypotheses": 0
+      },
+      "best_cardmarket_url": "https://www.cardmarket.com/en/Pokemon/Products/Singles/151/Alakazam-ex-V3-MEW201"
+    },
+    {
+      "photo": "fresh_042",
+      "expected_id": "en:sv03.5-201",
+      "best_match_id": "en:sv03.5-201",
+      "best_match_correct": true,
+      "correct_in_best_or_alternatives": true,
+      "status": "matched",
+      "match_state": "matched",
+      "automatic_wrong_match": false,
+      "artwork_covered": true,
+      "language": "en",
+      "layout": "pokemon_full_art",
+      "page_url": "https://www.ebay.com/b/Alakazam-Ex-201-165-Sv-Scarlet-Violet-151/2536/bn_7124868359",
+      "full_shortlist_recall": true,
+      "artwork_shortlist_recall": true,
+      "identity_evidence": {
+        "collector_conflict": false,
+        "structured_collector_conflict": false,
+        "strong_name_conflict": false,
+        "language_conflict": false
+      },
+      "ocr": {
+        "name_text": "Alakazam",
+        "collector_text": "201/165",
+        "failed": false,
+        "collector_retry_used": false,
+        "collector_retry_contributed": false
+      },
+      "query_size": [
+        740,
+        943
+      ],
+      "frame_selection": {
+        "profile": "primary",
+        "alternate_hypotheses": 3
+      },
+      "best_cardmarket_url": "https://www.cardmarket.com/en/Pokemon/Products/Singles/151/Alakazam-ex-V3-MEW201"
+    },
+    {
+      "photo": "fresh_045",
+      "expected_id": "en:sv03.5-201",
+      "best_match_id": "en:sv03.5-201",
+      "best_match_correct": true,
+      "correct_in_best_or_alternatives": true,
+      "status": "matched",
+      "match_state": "matched",
+      "automatic_wrong_match": false,
+      "artwork_covered": true,
+      "language": "en",
+      "layout": "pokemon_full_art",
+      "page_url": "https://www.ebay.com/itm/157405284782",
+      "full_shortlist_recall": true,
+      "artwork_shortlist_recall": true,
+      "identity_evidence": {
+        "collector_conflict": false,
+        "structured_collector_conflict": false,
+        "strong_name_conflict": false,
+        "language_conflict": false
+      },
+      "ocr": {
+        "name_text": "Alakazam",
+        "collector_text": "201/165",
+        "failed": false,
+        "collector_retry_used": false,
+        "collector_retry_contributed": false
+      },
+      "query_size": [
+        935,
+        1248
+      ],
+      "frame_selection": {
+        "profile": "primary",
+        "alternate_hypotheses": 4
+      },
+      "best_cardmarket_url": "https://www.cardmarket.com/en/Pokemon/Products/Singles/151/Alakazam-ex-V3-MEW201"
+    },
+    {
+      "photo": "fresh_046",
+      "expected_id": "en:sv03.5-201",
+      "best_match_id": "en:sv03.5-201",
+      "best_match_correct": true,
+      "correct_in_best_or_alternatives": true,
+      "status": "printing_ambiguous",
+      "match_state": "likely",
+      "automatic_wrong_match": false,
+      "artwork_covered": true,
+      "language": "en",
+      "layout": "pokemon_full_art",
+      "page_url": "https://www.ebay.com/itm/135970264301",
+      "full_shortlist_recall": true,
+      "artwork_shortlist_recall": true,
+      "identity_evidence": {
+        "collector_conflict": false,
+        "structured_collector_conflict": false,
+        "strong_name_conflict": false,
+        "language_conflict": false
+      },
+      "ocr": {
+        "name_text": "Alakazam",
+        "collector_text": "201/16",
+        "failed": false,
+        "collector_retry_used": false,
+        "collector_retry_contributed": false
+      },
+      "query_size": [
+        251,
+        350
+      ],
+      "frame_selection": {
+        "profile": "window_0.70",
+        "alternate_hypotheses": 3
+      },
+      "best_cardmarket_url": "https://www.cardmarket.com/en/Pokemon/Products/Singles/151/Alakazam-ex-V3-MEW201"
+    },
+    {
+      "photo": "fresh_048",
+      "expected_id": "en:sv03.5-201",
+      "best_match_id": "en:sv03.5-201",
+      "best_match_correct": true,
+      "correct_in_best_or_alternatives": true,
+      "status": "matched",
+      "match_state": "matched",
+      "automatic_wrong_match": false,
+      "artwork_covered": true,
+      "language": "en",
+      "layout": "pokemon_full_art",
+      "page_url": "https://www.sportscardinvestor.com/cards/alakazam-ex-pokemon/2023-scarlet-violet-151-special-illustration-rare-201-165",
+      "full_shortlist_recall": true,
+      "artwork_shortlist_recall": true,
+      "identity_evidence": {
+        "collector_conflict": false,
+        "structured_collector_conflict": false,
+        "strong_name_conflict": false,
+        "language_conflict": false
+      },
+      "ocr": {
+        "name_text": "Alakazam",
+        "collector_text": "201/165",
+        "failed": false,
+        "collector_retry_used": false,
+        "collector_retry_contributed": false
+      },
+      "query_size": [
+        780,
+        1097
+      ],
+      "frame_selection": {
+        "profile": "primary",
+        "alternate_hypotheses": 3
+      },
+      "best_cardmarket_url": "https://www.cardmarket.com/en/Pokemon/Products/Singles/151/Alakazam-ex-V3-MEW201"
+    },
+    {
+      "photo": "fresh_049",
+      "expected_id": "en:sv03.5-201",
+      "best_match_id": "en:sv03.5-201",
+      "best_match_correct": true,
+      "correct_in_best_or_alternatives": true,
+      "status": "uncertain",
+      "match_state": "likely",
+      "automatic_wrong_match": false,
+      "artwork_covered": true,
+      "language": "en",
+      "layout": "pokemon_full_art",
+      "page_url": "https://www.ebay.com/b/Alakazam-Ex-201-165-Sv-Scarlet-Violet-151/2536/bn_7124868359",
+      "full_shortlist_recall": true,
+      "artwork_shortlist_recall": true,
+      "identity_evidence": {
+        "collector_conflict": false,
+        "structured_collector_conflict": false,
+        "strong_name_conflict": false,
+        "language_conflict": false
+      },
+      "ocr": {
+        "name_text": "Alakazam",
+        "collector_text": "201/165",
+        "failed": false,
+        "collector_retry_used": false,
+        "collector_retry_contributed": false
+      },
+      "query_size": [
+        730,
+        1020
+      ],
+      "frame_selection": {
+        "profile": "window_0.85",
+        "alternate_hypotheses": 2
+      },
+      "best_cardmarket_url": "https://www.cardmarket.com/en/Pokemon/Products/Singles/151/Alakazam-ex-V3-MEW201"
+    },
+    {
+      "photo": "fresh_051",
+      "expected_id": "en:sv03.5-202",
+      "best_match_id": "en:sv03.5-202",
+      "best_match_correct": true,
+      "correct_in_best_or_alternatives": true,
+      "status": "uncertain",
+      "match_state": "tentative",
+      "automatic_wrong_match": false,
+      "artwork_covered": true,
+      "language": "en",
+      "layout": "pokemon_full_art",
+      "page_url": "https://www.ebay.com/itm/188192062361",
+      "full_shortlist_recall": true,
+      "artwork_shortlist_recall": true,
+      "identity_evidence": {
+        "collector_conflict": false,
+        "structured_collector_conflict": false,
+        "strong_name_conflict": true,
+        "language_conflict": false
+      },
+      "ocr": {
+        "name_text": "ASIC",
+        "collector_text": "202/165",
+        "failed": false,
+        "collector_retry_used": false,
+        "collector_retry_contributed": false
+      },
+      "query_size": [
+        802,
+        1120
+      ],
+      "frame_selection": {
+        "profile": "window_0.70",
+        "alternate_hypotheses": 3
+      },
+      "best_cardmarket_url": "https://www.cardmarket.com/en/Pokemon/Products/Singles/151/Zapdos-ex-V3-MEW202"
+    },
+    {
+      "photo": "fresh_052",
+      "expected_id": "en:sv01-245",
+      "best_match_id": "sv01-245",
+      "best_match_correct": true,
+      "correct_in_best_or_alternatives": true,
+      "status": "uncertain",
+      "match_state": "likely",
+      "automatic_wrong_match": false,
+      "artwork_covered": true,
+      "language": "en",
+      "layout": "pokemon_full_art",
+      "page_url": "https://www.sportscardinvestor.com/cards/gardevoir-ex-pokemon/2023-scarlet-violet-special-illustration-rare-245-198",
+      "full_shortlist_recall": true,
+      "artwork_shortlist_recall": true,
+      "identity_evidence": {
+        "collector_conflict": false,
+        "structured_collector_conflict": false,
+        "strong_name_conflict": false,
+        "language_conflict": false
+      },
+      "ocr": {
+        "name_text": "Garuevoir",
+        "collector_text": "245/198",
+        "failed": false,
+        "collector_retry_used": false,
+        "collector_retry_contributed": false
+      },
+      "query_size": [
+        710,
+        974
+      ],
+      "frame_selection": {
+        "profile": "loose_0",
+        "alternate_hypotheses": 3
+      },
+      "best_cardmarket_url": "https://www.cardmarket.com/en/Pokemon/Products/Singles/Scarlet-Violet/Gardevoir-ex-V3-SVI245"
+    },
+    {
+      "photo": "fresh_053",
+      "expected_id": "en:sv01-245",
+      "best_match_id": "en:sv01-245",
+      "best_match_correct": true,
+      "correct_in_best_or_alternatives": true,
+      "status": "uncertain",
+      "match_state": "likely",
+      "automatic_wrong_match": false,
+      "artwork_covered": true,
+      "language": "en",
+      "layout": "pokemon_full_art",
+      "page_url": "https://www.ebay.com/itm/266198180095",
+      "full_shortlist_recall": true,
+      "artwork_shortlist_recall": true,
+      "identity_evidence": {
+        "collector_conflict": false,
+        "structured_collector_conflict": false,
+        "strong_name_conflict": false,
+        "language_conflict": false
+      },
+      "ocr": {
+        "name_text": "Gardevoirex",
+        "collector_text": "245/198",
+        "failed": false,
+        "collector_retry_used": false,
+        "collector_retry_contributed": false
+      },
+      "query_size": [
+        444,
+        624
+      ],
+      "frame_selection": {
+        "profile": "primary",
+        "alternate_hypotheses": 0
+      },
+      "best_cardmarket_url": null
+    },
+    {
+      "photo": "fresh_058",
+      "expected_id": "en:sv01-245",
+      "best_match_id": "en:sv01-245",
+      "best_match_correct": true,
+      "correct_in_best_or_alternatives": true,
+      "status": "uncertain",
+      "match_state": "likely",
+      "automatic_wrong_match": false,
+      "artwork_covered": true,
+      "language": "en",
+      "layout": "pokemon_full_art",
+      "page_url": "https://www.ebay.com/itm/297556051476",
+      "full_shortlist_recall": true,
+      "artwork_shortlist_recall": true,
+      "identity_evidence": {
+        "collector_conflict": false,
+        "structured_collector_conflict": false,
+        "strong_name_conflict": false,
+        "language_conflict": false
+      },
+      "ocr": {
+        "name_text": "Gardevoir",
+        "collector_text": "245/198",
+        "failed": false,
+        "collector_retry_used": false,
+        "collector_retry_contributed": false
+      },
+      "query_size": [
+        424,
+        596
+      ],
+      "frame_selection": {
+        "profile": "primary",
+        "alternate_hypotheses": 6
+      },
+      "best_cardmarket_url": null
+    },
+    {
+      "photo": "fresh_060",
+      "expected_id": "en:sv01-245",
+      "best_match_id": "en:sv01-245",
+      "best_match_correct": true,
+      "correct_in_best_or_alternatives": true,
+      "status": "uncertain",
+      "match_state": "likely",
+      "automatic_wrong_match": false,
+      "artwork_covered": true,
+      "language": "en",
+      "layout": "pokemon_full_art",
+      "page_url": "https://www.ebay.com/itm/187416051452",
+      "full_shortlist_recall": false,
+      "artwork_shortlist_recall": true,
+      "identity_evidence": {
+        "collector_conflict": false,
+        "structured_collector_conflict": false,
+        "strong_name_conflict": false,
+        "language_conflict": false
+      },
+      "ocr": {
+        "name_text": "Gardevoir",
+        "collector_text": null,
+        "failed": false,
+        "collector_retry_used": true,
+        "collector_retry_contributed": false
+      },
+      "query_size": [
+        900,
+        1200
+      ],
+      "frame_selection": {
+        "profile": "primary",
+        "alternate_hypotheses": 2
+      },
+      "best_cardmarket_url": null
+    },
+    {
+      "photo": "fresh_070",
+      "expected_id": "ja:SV1S-101",
+      "best_match_id": "ja:SV1S-101",
+      "best_match_correct": true,
+      "correct_in_best_or_alternatives": true,
+      "status": "uncertain",
+      "match_state": "likely",
+      "automatic_wrong_match": false,
+      "artwork_covered": false,
+      "language": "ja",
+      "layout": "pokemon_full_art",
+      "page_url": "https://www.ebay.de/itm/395753468767",
+      "full_shortlist_recall": true,
+      "artwork_shortlist_recall": false,
+      "identity_evidence": {
+        "collector_conflict": false,
+        "structured_collector_conflict": false,
+        "strong_name_conflict": false,
+        "language_conflict": false
+      },
+      "ocr": {
+        "name_text": "サーナイトビマ",
+        "collector_text": "101/078",
+        "failed": false,
+        "collector_retry_used": false,
+        "collector_retry_contributed": false
+      },
+      "query_size": [
+        1080,
+        1080
+      ],
+      "frame_selection": {
+        "profile": "primary",
+        "alternate_hypotheses": 2
+      },
+      "best_cardmarket_url": null
+    },
+    {
+      "photo": "fresh_071",
+      "expected_id": "ja:SV1S-101",
+      "best_match_id": "ja:SV1S-101",
+      "best_match_correct": true,
+      "correct_in_best_or_alternatives": true,
+      "status": "matched",
+      "match_state": "matched",
+      "automatic_wrong_match": false,
+      "artwork_covered": false,
+      "language": "ja",
+      "layout": "pokemon_full_art",
+      "page_url": "https://www.ebay.com/itm/356650792633",
+      "full_shortlist_recall": true,
+      "artwork_shortlist_recall": false,
+      "identity_evidence": {
+        "collector_conflict": false,
+        "structured_collector_conflict": false,
+        "strong_name_conflict": false,
+        "language_conflict": false
+      },
+      "ocr": {
+        "name_text": "サーナイトEX",
+        "collector_text": "101/078",
+        "failed": false,
+        "collector_retry_used": false,
+        "collector_retry_contributed": false
+      },
+      "query_size": [
+        783,
+        1103
+      ],
+      "frame_selection": {
+        "profile": "primary",
+        "alternate_hypotheses": 4
+      },
+      "best_cardmarket_url": null
+    },
+    {
+      "photo": "fresh_073",
+      "expected_id": "ja:SV1S-101",
+      "best_match_id": "ja:SV1S-101",
+      "best_match_correct": true,
+      "correct_in_best_or_alternatives": true,
+      "status": "uncertain",
+      "match_state": "likely",
+      "automatic_wrong_match": false,
+      "artwork_covered": false,
+      "language": "ja",
+      "layout": "pokemon_full_art",
+      "page_url": "https://www.sportscardinvestor.com/cards/gardevoir-ex-pokemon/2023-japanese-scarlet-violet-scarlet-ex-special-art-rare-101-078",
+      "full_shortlist_recall": true,
+      "artwork_shortlist_recall": false,
+      "identity_evidence": {
+        "collector_conflict": false,
+        "structured_collector_conflict": false,
+        "strong_name_conflict": false,
+        "language_conflict": false
+      },
+      "ocr": {
+        "name_text": "サーナイト",
+        "collector_text": null,
+        "failed": false,
+        "collector_retry_used": true,
+        "collector_retry_contributed": false
+      },
+      "query_size": [
+        788,
+        1289
+      ],
+      "frame_selection": {
+        "profile": "loose_0",
+        "alternate_hypotheses": 6
+      },
+      "best_cardmarket_url": null
+    },
+    {
+      "photo": "fresh_074",
+      "expected_id": "ja:SV1S-101",
+      "best_match_id": "ja:SV1S-101",
+      "best_match_correct": true,
+      "correct_in_best_or_alternatives": true,
+      "status": "uncertain",
+      "match_state": "tentative",
+      "automatic_wrong_match": false,
+      "artwork_covered": false,
+      "language": "ja",
+      "layout": "pokemon_full_art",
+      "page_url": "https://www.ebay.com/itm/396984686776",
+      "full_shortlist_recall": true,
+      "artwork_shortlist_recall": false,
+      "identity_evidence": {
+        "collector_conflict": true,
+        "structured_collector_conflict": false,
+        "strong_name_conflict": false,
+        "language_conflict": false
+      },
+      "ocr": {
+        "name_text": "サーナイ区に",
+        "collector_text": "exル一ル",
+        "failed": false,
+        "collector_retry_used": false,
+        "collector_retry_contributed": false
+      },
+      "query_size": [
+        289,
+        377
+      ],
+      "frame_selection": {
+        "profile": "primary",
+        "alternate_hypotheses": 3
+      },
+      "best_cardmarket_url": null
+    }
+  ],
+  "latency_ms": {
+    "median": 4474.51,
+    "sample_p95_nearest_rank": 9348.49,
+    "max": 10045.52,
+    "stage_medians": {
+      "detect_ms": 19.93,
+      "frame_proposal_ms": 54.98,
+      "embed_ms": 646.23,
+      "artwork_embed_ms": 261.7,
+      "artwork_retrieve_ms": 4.56,
+      "ocr_ms": 2270.01,
+      "local_artwork_ms": 0.0,
+      "cardmarket_ms": 1131.39,
+      "boundary_proposal_ms": 0.0,
+      "boundary_selection_ms": 0.0,
+      "boundary_retry_ms": 0.0,
+      "first_pass_ms": 0.0
+    }
+  },
+  "catalogue_missing_reference_truths": [],
+  "catalogue_missing_cardmarket_truths": [
+    "en:swsh11-180",
+    "en:base1-58",
+    "ja:SV2a-205",
+    "ja:SV1a-080",
+    "en:sv01-245",
+    "ja:SV1S-101"
+  ],
+  "limitations": "Internet listing photos, not independently captured app-camera input. Seller authenticity, finish, editing and model-pretraining overlap unverified. Repeated identities/listing-category sources reduce statistical independence. Finish is not a truth label. No rescan, tuning or indexing of holdout images."
+}

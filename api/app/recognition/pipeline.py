@@ -32,7 +32,7 @@ from app.recognition.confidence import confidence_payload
 from app.recognition.presentation import match_presentation
 from app.recognition.language import confident_language_texts, expand_language, language_label, resolve_search_languages
 from app.recognition.ocr import OcrResult, inverted_card_layout
-from app.recognition.ocr_framing import complete_frame_probe_allowed, complete_frame_identity_supported, normalize_complete_frame_footer
+from app.recognition.ocr_framing import complete_frame_probe_allowed, complete_frame_identity_supported, complete_frame_title_supported, normalize_complete_frame_footer, original_footer_supports_skip
 from app.recognition.ocr_cache import RequestOcrCache
 from app.recognition.ocr_budget import footer_retry_required, VERSION as OCR_BUDGET_VERSION
 from app.recognition.stamp_printing import stamp_printing_hint
@@ -41,7 +41,7 @@ from app.recognition.grading_parallel import GradingJob, parallel_grading_scope
 from app.recognition.holder_printing import holder_printing_hint
 from app.recognition.orientation import retrieve_oriented
 from app.recognition.printing import PrintingDecision, assess_printings
-from app.recognition.rank import artwork_evidence_compatible, decide_status, extract_collector_candidates, rerank
+from app.recognition.rank import artwork_evidence_compatible, decide_status, extract_collector_candidates, fraction_named_printing, rerank
 from app.recognition.rank import name_match
 from app.recognition.runtime import Runtime
 from app.schemas import (
@@ -60,6 +60,28 @@ def _now() -> str:
 
 def _card_image_url(row: Any) -> str:
     return display_image_url(row) or f"/api/v1/cards/{row['id']}/image"
+
+
+def prefer_unproven_visual_match(ranked: list[dict[str, Any]], members, *, min_gap: float = 0.04) -> None:
+    """Show the closest image when a printing group is still unproven.
+
+    A small visual gap stays with the current display order. A clear gap is
+    the picture itself, so the closest image in the group replaces a
+    combined-score leader that has no collector number and no stamp.
+    """
+    if len(ranked) < 2 or ranked[0].get("visual_score") is None:
+        return
+    member_ids = {row.get("card_id") for row in members}
+    eligible = [row for row in ranked if row.get("card_id") in member_ids
+                and row.get("visual_score") is not None]
+    if len(eligible) < 2:
+        return
+    preferred = max(eligible, key=lambda row: float(row["visual_score"]))
+    if preferred.get("card_id") == ranked[0].get("card_id"):
+        return
+    if float(preferred["visual_score"]) - float(ranked[0]["visual_score"]) < min_gap:
+        return
+    ranked.sort(key=lambda row: row.get("card_id") == preferred.get("card_id"), reverse=True)
 
 
 def _lookup_cards(conn: sqlite3.Connection, card_ids: list[str]) -> dict[str, sqlite3.Row]:
@@ -108,6 +130,7 @@ def _recognize_bytes_once(
     store_capture: bool | None = None,
     _frame_override: tuple[str, Any] | None = None,
     _input_observer: Callable | None = None,
+    _progress_observer: Callable | None = None,
     _ocr_cache: RequestOcrCache | None = None,
 ) -> _ScanEvaluation:
     started = time.perf_counter()
@@ -175,6 +198,25 @@ def _recognize_bytes_once(
     too_small = min(image.size) < settings.threshold_min_side
     too_blurry = blur < settings.threshold_blur
     retake = too_small or too_blurry
+    if (_progress_observer is not None and not retake and len(scores)
+            and float(scores[0]) >= settings.threshold_min_visual):
+        # Weak visual neighbours must wait for the OCR-assisted rescue. A
+        # preview is not a way to expose below-threshold guesses as a match.
+        preview_ids = [str(snapshot.card_ids[i]) for i, score in zip(indices, scores)
+                       if float(score) >= settings.threshold_min_visual_ocr][:3]
+        preview_rows = _lookup_cards(catalog, preview_ids)
+        previews = [dict(card_id=cid, name=preview_rows[cid]['name'],
+                         image_url=display_image_url(preview_rows[cid]))
+                    for cid in preview_ids if cid in preview_rows]
+        if previews:
+            try:
+                _progress_observer(dict(candidates=previews, provisional=True,
+                    printing_confirmed=False, requires_confirmation=True,
+                    elapsed_ms=round((time.perf_counter()-started)*1000, 2)))
+            except Exception as error:
+                # Optional UI progress cannot change recognition or its evidence.
+                logging.getLogger('scan.diagnostics').warning(
+                    'scan_preview_failed error_type=%s', type(error).__name__)
     artwork_hits = []
     artwork_index = getattr(runtime, "artwork_index", None)
     adaptive_footer = bool(getattr(settings, 'ocr_adaptive_footer', False))
@@ -198,10 +240,34 @@ def _recognize_bytes_once(
     ocr_passes = []
     ocr_cache_hits = []
     def read_card(frame, scope):
+        nonlocal original_ocr
         options = {}
         if adaptive_footer and scope == 'selected' and frame is artwork_image:
             options['collector_retry_policy'] = lambda observed: footer_retry_required(
                 observed, full_candidates, artwork_hits, image_size=frame.size)
+        if (getattr(settings, 'ocr_staged_original', False) and scope == 'selected'
+                and inferred_frame and frame is not input_image
+                and timings.get('orientation_degrees', 0) == 0
+                and .62 <= input_image.width / input_image.height <= .80
+                and min(input_image.size) >= 450):
+            established_policy = options.get('collector_retry_policy')
+            def staged_retry(observed):
+                nonlocal original_ocr
+                # An existing two-stream policy may already omit this work.
+                if established_policy is not None and not established_policy(observed):
+                    return False
+                # Do not add a new original read when an initial identifier is
+                # already present. Keep it for the existing contradiction path.
+                if extract_collector_candidates([], hits=observed.hits):
+                    return True
+                if original_ocr is None:
+                    original_ocr = read_card(input_image, 'original_staged')
+                rows = _lookup_cards(catalog, [str(snapshot.card_ids[i]) for i in indices])
+                supported = original_footer_supports_skip(observed, original_ocr, rows.values())
+                frame_selection['ocr_staged_original_used'] = True
+                frame_selection['ocr_staged_footer_supported'] = supported
+                return not supported
+            options['collector_retry_policy'] = staged_retry
         observed, cached = (_ocr_cache.read(ocr_engine, frame, **options) if _ocr_cache is not None
                             else (ocr_engine.read(frame, **options), False))
         if cached:
@@ -225,6 +291,10 @@ def _recognize_bytes_once(
             leading = _lookup_cards(catalog, [str(snapshot.card_ids[i]) for i in indices])
             original_identity_used = complete_frame_identity_supported(original_ocr,
                 [row['name'] for row in leading.values()])
+            title_only = not original_identity_used and complete_frame_title_supported(
+                original_ocr, [row['name'] for row in leading.values()])
+            frame_selection['ocr_complete_frame_title_only'] = title_only
+            original_identity_used = original_identity_used or title_only
         ocr = original_ocr if original_identity_used else read_card(image, 'selected')
         frame_selection['ocr_complete_frame_used'] = original_identity_used
         if inverted_card_layout(ocr):
@@ -549,7 +619,7 @@ def _recognize_bytes_once(
     )
     printing_review = None
     stamp_hint = None
-    if likely_identity_supported and not framing_review_supported and not printing.ambiguous and not retake:
+    if (likely_identity_supported or frame_selection.get('ocr_complete_frame_title_only')) and not framing_review_supported and not printing.ambiguous and not retake:
         # Even a single retrieved printing isn't proof that no reprints exist.
         # Require explicit selection using the existing review/feedback contract.
         printing = PrintingDecision(True, reason='likely_identity_printing_unverified',
@@ -558,9 +628,9 @@ def _recognize_bytes_once(
             guidance='Likely card identified. Confirm the exact set, collector number and finish, or retake with the full card visible.')
     if printing.ambiguous:
         status = "printing_ambiguous"
-        # Geometry verifies shared artwork, not the winning reprint. Once
-        # siblings are explicitly retained as ambiguous, use their existing
-        # OCR/global scores for display order rather than keypoint survival.
+        # Geometry verifies shared artwork, not the winning reprint. Drop
+        # keypoint survival in favour of the OCR/global score, then let a
+        # stamp or the closest image make the final display choice.
         if local_matches and not .62<=ratio<=.80 and not any(h.region=='collector' and h.confidence is not None
                 and h.confidence>=.85 and ('/' in h.text or any(c.isalpha() for c in h.text)) for h in numbers):
             sibling_ids={r['card_id'] for r in printing.members}
@@ -580,6 +650,19 @@ def _recognize_bytes_once(
                 reference_identity = dict(combined[0])
         except (OSError, ValueError, KeyError, cv2.error):
             logging.getLogger(__name__).exception('Optional stamp ordering failed')
+        named = fraction_named_printing(combined, printing.members, numbers)
+        if named:
+            combined.sort(key=lambda row: row.get('card_id') == named, reverse=True)
+            if combined:
+                reference_identity = dict(combined[0])
+        elif not stamp_hint and not printing.collector_evidence:
+            prefer_unproven_visual_match(combined, printing.members,
+                                          min_gap=settings.threshold_min_gap)
+            if combined:
+                reference_identity = dict(combined[0])
+        shown_printing = combined[0]["card_id"] if combined else None
+        review_members = sorted(
+            printing.members, key=lambda row: row.get("card_id") != shown_printing)
         printing_review = PrintingReview(
             reason=printing.reason, candidate_group_id=printing.candidate_group_id,
             reference_coverage_complete=printing.reference_coverage_complete,
@@ -590,7 +673,7 @@ def _recognize_bytes_once(
                 "language": str(row.get("language") or ""),
                 "image_url": row.get("image_url") or _card_image_url(row),
                 "cardmarket_url": row.get("cardmarket_url"),
-            } for row in printing.members],
+            } for row in review_members],
             guidance=printing.guidance,
         )
     elif local_matches and not framing_review_supported and not artwork_evidence_compatible(
@@ -648,6 +731,7 @@ def _recognize_bytes_once(
     versions = runtime.versions()
     versions['presentation'] = 'best-match-v1'
     versions['stamp_ordering'] = 'play-stamp-review-v1'
+    versions['unproven_printing_order'] = 'visual-leader-v1'
     versions['ocr_cache'] = 'request-pixels-v1'
     if adaptive_footer:
         versions['ocr_budget'] = OCR_BUDGET_VERSION
@@ -815,6 +899,7 @@ def recognize_bytes(
     language: str = "auto",
     store_capture: bool | None = None,
     _grading_job: GradingJob | None = None,
+    _progress_observer: Callable | None = None,
 ) -> ScanResponse:
     """Evaluate first, then persist exactly one result and optional capture.
 
@@ -830,6 +915,8 @@ def recognize_bytes(
                   crop_y=crop_y, crop_w=crop_w, crop_h=crop_h, rotation=rotation,
                   skip_detect=skip_detect, language=language, store_capture=store_capture)
     kwargs['_ocr_cache'] = ocr_cache
+    if _progress_observer is not None:
+        kwargs['_progress_observer'] = _progress_observer
     if _grading_job is not None:
         kwargs['_input_observer'] = _grading_job.start
     first = _recognize_bytes_once(data, **kwargs)

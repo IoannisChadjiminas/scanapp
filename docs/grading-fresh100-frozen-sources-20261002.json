@@ -1,0 +1,2651 @@
+{
+  "frozen_at": "2026-10-02T16:18:02.777247+00:00",
+  "selection": "Manual visual truth before inference; fixed 50 raw / 50 slabs, six grader quotas, identity/grade round-robin.",
+  "limitations": "Convenience seller-photo sample; not random population or live Flutter/camera tests. Distinct photos may share cards, sellers or physical copies. Authenticity, editing and model-pretraining overlap unverified. Finish/raw condition not scored.",
+  "exact_prior_asset_overlap": 0,
+  "near_duplicate_flags": [],
+  "deduplication_method": "SHA256, normalized marketplace asset URL and 256-bit whole-image dHash; not exhaustive crop reuse detection.",
+  "strata": {
+    "raw": 50,
+    "psa": 10,
+    "beckett": 8,
+    "cgc": 8,
+    "tag": 8,
+    "ace": 7,
+    "ags": 9
+  },
+  "exclusions": [
+    {
+      "id": "fresh100_355853966331",
+      "reason": "prior_or_duplicate_photo_asset"
+    },
+    {
+      "id": "fresh100_267151817166",
+      "reason": "prior_or_duplicate_photo_asset"
+    },
+    {
+      "id": "fresh100_178087990028",
+      "reason": "unreviewed_or_reserve_not_selected_before_inference"
+    },
+    {
+      "id": "fresh100_267368874387",
+      "reason": "unreviewed_or_reserve_not_selected_before_inference"
+    },
+    {
+      "id": "fresh100_236447320708",
+      "reason": "unreviewed_or_reserve_not_selected_before_inference"
+    },
+    {
+      "id": "fresh100_366085176895",
+      "reason": "unreviewed_or_reserve_not_selected_before_inference"
+    },
+    {
+      "id": "fresh100_167810490349",
+      "reason": "unreviewed_or_reserve_not_selected_before_inference"
+    },
+    {
+      "id": "fresh100_407091750047",
+      "reason": "unreviewed_or_reserve_not_selected_before_inference"
+    },
+    {
+      "id": "freshimg_0_1007228164",
+      "reason": "unreviewed_or_reserve_not_selected_before_inference"
+    },
+    {
+      "id": "freshimg_0_1203037452",
+      "reason": "unreviewed_or_reserve_not_selected_before_inference"
+    },
+    {
+      "id": "fresh100_388305477523",
+      "reason": "unreviewed_or_reserve_not_selected_before_inference"
+    },
+    {
+      "id": "fresh100_326094892616",
+      "reason": "unreviewed_or_reserve_not_selected_before_inference"
+    },
+    {
+      "id": "fresh100_177612742339",
+      "reason": "unreviewed_or_reserve_not_selected_before_inference"
+    },
+    {
+      "id": "fresh100_187993176526",
+      "reason": "unreviewed_or_reserve_not_selected_before_inference"
+    },
+    {
+      "id": "fresh100_206055540623",
+      "reason": "unreviewed_or_reserve_not_selected_before_inference"
+    },
+    {
+      "id": "fresh100_206060579125",
+      "reason": "unreviewed_or_reserve_not_selected_before_inference"
+    },
+    {
+      "id": "fresh100_366459685595",
+      "reason": "unreviewed_or_reserve_not_selected_before_inference"
+    },
+    {
+      "id": "fresh100_398068974928",
+      "reason": "unreviewed_or_reserve_not_selected_before_inference"
+    },
+    {
+      "id": "fresh100_365854708166",
+      "reason": "unreviewed_or_reserve_not_selected_before_inference"
+    },
+    {
+      "id": "fresh100_116907292888",
+      "reason": "unreviewed_or_reserve_not_selected_before_inference"
+    },
+    {
+      "id": "fresh100_358068344977",
+      "reason": "unreviewed_or_reserve_not_selected_before_inference"
+    },
+    {
+      "id": "freshimg_4_1765261997",
+      "reason": "unreviewed_or_reserve_not_selected_before_inference"
+    },
+    {
+      "id": "freshimg_5_2027366318",
+      "reason": "unreviewed_or_reserve_not_selected_before_inference"
+    },
+    {
+      "id": "fresh100_156493270982",
+      "reason": "unreviewed_or_reserve_not_selected_before_inference"
+    },
+    {
+      "id": "freshimg_5_1451798792",
+      "reason": "unreviewed_or_reserve_not_selected_before_inference"
+    },
+    {
+      "id": "freshimg_5_577153367",
+      "reason": "unreviewed_or_reserve_not_selected_before_inference"
+    },
+    {
+      "id": "fresh100_336424686337",
+      "reason": "unreviewed_or_reserve_not_selected_before_inference"
+    },
+    {
+      "id": "fresh100_146465112424",
+      "reason": "unreviewed_or_reserve_not_selected_before_inference"
+    },
+    {
+      "id": "freshimg_5_1560645209",
+      "reason": "unreviewed_or_reserve_not_selected_before_inference"
+    },
+    {
+      "id": "freshimg_5_1252583193",
+      "reason": "unreviewed_or_reserve_not_selected_before_inference"
+    },
+    {
+      "id": "freshimg_5_1907963727",
+      "reason": "unreviewed_or_reserve_not_selected_before_inference"
+    },
+    {
+      "id": "freshimg_5_589674585",
+      "reason": "unreviewed_or_reserve_not_selected_before_inference"
+    },
+    {
+      "id": "fresh100_145525486490",
+      "reason": "unreviewed_or_reserve_not_selected_before_inference"
+    },
+    {
+      "id": "fresh100_186821236291",
+      "reason": "unreviewed_or_reserve_not_selected_before_inference"
+    },
+    {
+      "id": "freshraw_3_1153690412",
+      "reason": "unreviewed_or_reserve_not_selected_before_inference"
+    },
+    {
+      "id": "fresh100_185962407163",
+      "reason": "unreviewed_or_reserve_not_selected_before_inference"
+    },
+    {
+      "id": "fresh100_177746909243",
+      "reason": "unreviewed_or_reserve_not_selected_before_inference"
+    },
+    {
+      "id": "fresh100_178019237584",
+      "reason": "unreviewed_or_reserve_not_selected_before_inference"
+    },
+    {
+      "id": "freshextra_1_577540562",
+      "reason": "unreviewed_or_reserve_not_selected_before_inference"
+    },
+    {
+      "id": "freshextra_1_596156461",
+      "reason": "unreviewed_or_reserve_not_selected_before_inference"
+    },
+    {
+      "id": "fresh100_196775894930",
+      "reason": "unreviewed_or_reserve_not_selected_before_inference"
+    },
+    {
+      "id": "freshextra_1_1951077684",
+      "reason": "unreviewed_or_reserve_not_selected_before_inference"
+    },
+    {
+      "id": "freshextra_1_2110376533",
+      "reason": "unreviewed_or_reserve_not_selected_before_inference"
+    },
+    {
+      "id": "freshextra_1_1172724396",
+      "reason": "unreviewed_or_reserve_not_selected_before_inference"
+    },
+    {
+      "id": "freshextra_2_1556180249",
+      "reason": "unreviewed_or_reserve_not_selected_before_inference"
+    },
+    {
+      "id": "freshextra_2_1348774565",
+      "reason": "unreviewed_or_reserve_not_selected_before_inference"
+    },
+    {
+      "id": "fresh100_125928495640",
+      "reason": "unreviewed_or_reserve_not_selected_before_inference"
+    },
+    {
+      "id": "fresh100_196456123374",
+      "reason": "unreviewed_or_reserve_not_selected_before_inference"
+    },
+    {
+      "id": "freshextra_3_647787468",
+      "reason": "unreviewed_or_reserve_not_selected_before_inference"
+    },
+    {
+      "id": "fresh100_196448052647",
+      "reason": "unreviewed_or_reserve_not_selected_before_inference"
+    },
+    {
+      "id": "fresh100_297135056911",
+      "reason": "unreviewed_or_reserve_not_selected_before_inference"
+    },
+    {
+      "id": "freshextra_4_1999278983",
+      "reason": "unreviewed_or_reserve_not_selected_before_inference"
+    },
+    {
+      "id": "fresh100_147104549601",
+      "reason": "unreviewed_or_reserve_not_selected_before_inference"
+    },
+    {
+      "id": "fresh100_196984359163",
+      "reason": "unreviewed_or_reserve_not_selected_before_inference"
+    },
+    {
+      "id": "fresh100_267467530001",
+      "reason": "unreviewed_or_reserve_not_selected_before_inference"
+    },
+    {
+      "id": "fresh100_196349384096",
+      "reason": "unreviewed_or_reserve_not_selected_before_inference"
+    },
+    {
+      "id": "freshextra_4_1723211630",
+      "reason": "unreviewed_or_reserve_not_selected_before_inference"
+    },
+    {
+      "id": "fresh100_406258833168",
+      "reason": "unreviewed_or_reserve_not_selected_before_inference"
+    },
+    {
+      "id": "fresh100_306610054910",
+      "reason": "unreviewed_or_reserve_not_selected_before_inference"
+    },
+    {
+      "id": "fresh100_317455780011",
+      "reason": "unreviewed_or_reserve_not_selected_before_inference"
+    },
+    {
+      "id": "freshextra_5_1247516731",
+      "reason": "unreviewed_or_reserve_not_selected_before_inference"
+    },
+    {
+      "id": "fresh100_357459200113",
+      "reason": "unreviewed_or_reserve_not_selected_before_inference"
+    },
+    {
+      "id": "fresh100_306090760612",
+      "reason": "unreviewed_or_reserve_not_selected_before_inference"
+    },
+    {
+      "id": "freshextra_6_848581152",
+      "reason": "unreviewed_or_reserve_not_selected_before_inference"
+    }
+  ],
+  "photos": [
+    {
+      "id": "fresh100_327234085023",
+      "page_url": "https://www.ebay.com/itm/327234085023",
+      "image_url": "https://i.ebayimg.com/images/g/-DsAAeSwWkxowcm8/s-l1600.webp",
+      "title": "Blastoise 14/100 EX Crystal Guardians Reverse Holo for sale online | eBay (https://www.ebay.com/itm/327234085023)",
+      "alt": "Picture 1 of 2",
+      "path": "datasets/review/grading-fresh100-20261002/frozen-photos/fresh100_327234085023.jpg",
+      "sha256": "2dd2daa97fbdca8c81173025352496cc0ffe2e8b0148e0a25f1087ede70f583c",
+      "bytes": 542010,
+      "download_status": "downloaded",
+      "conditions": [
+        "raw_card"
+      ],
+      "review_status": "visually_verified",
+      "manual_truth": {
+        "kind": "raw",
+        "company": null,
+        "grade": null,
+        "name": "Blastoise",
+        "number": "14/100",
+        "language": "en"
+      }
+    },
+    {
+      "id": "fresh100_388751795697",
+      "page_url": "https://www.ebay.com/itm/388751795697",
+      "image_url": "https://i.ebayimg.com/images/g/UFkAAeSwv8xohxJG/s-l1600.webp",
+      "title": "Dragonite Holo R 065/095 SM9 Tag Bolt Japanese Pokemon Card | eBay (https://www.ebay.com/itm/388751795697)",
+      "alt": "Dragonite holo R card 065/095 SM9, orange dragon with gold accents, in protective case.",
+      "path": "datasets/review/grading-fresh100-20261002/frozen-photos/fresh100_388751795697.jpg",
+      "sha256": "7ca7b0a949420c8a7de44af44c40b84c7e1d418f9b6bc48c5a63009ba185b1ac",
+      "bytes": 405546,
+      "download_status": "downloaded",
+      "conditions": [
+        "raw_card"
+      ],
+      "review_status": "visually_verified",
+      "manual_truth": {
+        "kind": "raw",
+        "company": null,
+        "grade": null,
+        "name": "Dragonite",
+        "number": "065/095",
+        "language": "ja"
+      }
+    },
+    {
+      "id": "freshraw_0_299404800",
+      "page_url": "https://www.sportscardinvestor.com/cards/marill-pokemon/2023-scarlet-violet-paldea-evolved-illustration-rare-204-193",
+      "image_url": "https://i.ebayimg.com/images/g/M8wAAeSw1hlpveLm/s-l1600.jpg",
+      "title": "Marill 2023 Scarlet & Violet: Paldea Evolved #204/193 Illustration Rare Price Guide - Sports Card Investor (https://www.sportscardinvestor.com/cards/marill-pokemon/2023-scarlet-violet-paldea-evolved-illustration-rare-204-193)",
+      "discovery": "image_search",
+      "query": "Pokemon Marill 204/193 card ebay",
+      "path": "datasets/review/grading-fresh100-20261002/frozen-photos/freshraw_0_299404800.jpg",
+      "sha256": "392e377a5ba436781ebc04cb135b9eac355ad8a4a281e6a304a1dbfaa50b5aef",
+      "bytes": 752934,
+      "download_status": "downloaded",
+      "conditions": [
+        "raw_card"
+      ],
+      "review_status": "visually_verified",
+      "manual_truth": {
+        "kind": "raw",
+        "company": null,
+        "grade": null,
+        "name": "Marill",
+        "number": "204/193",
+        "language": "en"
+      }
+    },
+    {
+      "id": "fresh100_227232802112",
+      "page_url": "https://www.ebay.com/itm/227232802112",
+      "image_url": "https://i.ebayimg.com/images/g/XUkAAeSwR21pn7m7/s-l1200.jpg",
+      "title": "Armarouge 203/198 Scarlet & Violet Illustration Rare Pokemon TCG Card NM | eBay (https://www.ebay.com/itm/227232802112)",
+      "discovery": "image_search",
+      "query": "Pokemon Armarouge 203/198 card ebay",
+      "path": "datasets/review/grading-fresh100-20261002/frozen-photos/fresh100_227232802112.jpg",
+      "sha256": "ba4a0eef410b7f9d78647da2facf7446ece67e351c19da30fa5bec88c0c06ecf",
+      "bytes": 270363,
+      "download_status": "downloaded",
+      "conditions": [
+        "raw_card"
+      ],
+      "review_status": "visually_verified",
+      "manual_truth": {
+        "kind": "raw",
+        "company": null,
+        "grade": null,
+        "name": "Armarouge",
+        "number": "203/198",
+        "language": "en"
+      }
+    },
+    {
+      "id": "fresh100_135663917530",
+      "page_url": "https://www.ebay.com/itm/135663917530",
+      "image_url": "https://i.ebayimg.com/images/g/rloAAOSw7fJn6y4-/s-l400.jpg",
+      "title": "Pokemon English TCG Card Obsidian Flames Scizor 205/197 Full Art | eBay (https://www.ebay.com/itm/135663917530)",
+      "discovery": "image_search",
+      "query": "Pokemon Scizor 205/197 card ebay",
+      "path": "datasets/review/grading-fresh100-20261002/frozen-photos/fresh100_135663917530.jpg",
+      "sha256": "94a11b60d6ac3915d3ccfb579c51f258ccf4596eef9438804f5dabf578ad05e2",
+      "bytes": 43584,
+      "download_status": "downloaded",
+      "conditions": [
+        "raw_card"
+      ],
+      "review_status": "visually_verified",
+      "manual_truth": {
+        "kind": "raw",
+        "company": null,
+        "grade": null,
+        "name": "Scizor",
+        "number": "205/197",
+        "language": "en"
+      }
+    },
+    {
+      "id": "fresh100_396269138140",
+      "page_url": "https://www.ebay.com/itm/396269138140",
+      "image_url": "https://i.ebayimg.com/images/g/wtIAAOSwL91nxTEs/s-l400.jpg",
+      "title": "Kirlia 212/198 Sv01: Scarlet & Violet Holofoil Illustration Rare Pokemon TCG *B1 | eBay (https://www.ebay.com/itm/396269138140)",
+      "discovery": "image_search",
+      "query": "Pokemon Kirlia 212/198 card ebay",
+      "path": "datasets/review/grading-fresh100-20261002/frozen-photos/fresh100_396269138140.jpg",
+      "sha256": "d5aecae788e0b5749b7dc83ae7319f17169d5e959e4ebc1986e55d95604c5918",
+      "bytes": 74912,
+      "download_status": "downloaded",
+      "conditions": [
+        "raw_card"
+      ],
+      "review_status": "visually_verified",
+      "manual_truth": {
+        "kind": "raw",
+        "company": null,
+        "grade": null,
+        "name": "Kirlia",
+        "number": "212/198",
+        "language": "en"
+      }
+    },
+    {
+      "id": "fresh100_167458253135",
+      "page_url": "https://www.ebay.com.au/itm/167458253135",
+      "image_url": "https://i.ebayimg.com/images/g/lvgAAOSwjDRn1-Zw/s-l1200.jpg",
+      "title": "Drowzee 210/198 SV Base Set Holo Illustration Rare IR Ultra Pokemon Card ZZ1  | eBay Australia (https://www.ebay.com.au/itm/167458253135)",
+      "discovery": "image_search",
+      "query": "Pokemon Drowzee 210/198 card ebay",
+      "path": "datasets/review/grading-fresh100-20261002/frozen-photos/fresh100_167458253135.jpg",
+      "sha256": "3611ca4f095e4f41095c5e496df433d41b8b8c670a6f80850cf98f48560800c4",
+      "bytes": 358077,
+      "download_status": "downloaded",
+      "conditions": [
+        "raw_card"
+      ],
+      "review_status": "visually_verified",
+      "manual_truth": {
+        "kind": "raw",
+        "company": null,
+        "grade": null,
+        "name": "Drowzee",
+        "number": "210/198",
+        "language": "en"
+      }
+    },
+    {
+      "id": "fresh100_116249576361",
+      "page_url": "https://www.ebay.com/itm/116249576361",
+      "image_url": "https://i.ebayimg.com/00/s/MTYwMFgxMTY3/z/t4UAAOSwywZmopIG/%24_57.JPG?set_id=880000500F",
+      "title": "Nidoking Illustration Rare NM 174/165 Scarlet & Violet 151 Pokemon Card | eBay (https://www.ebay.com/itm/116249576361)",
+      "discovery": "image_search",
+      "query": "Pokemon Nidoking 174/165 card ebay",
+      "path": "datasets/review/grading-fresh100-20261002/frozen-photos/fresh100_116249576361.jpg",
+      "sha256": "80799a7ffe35e4d6d8718bdddee26445c72b9df158fd86a0999c8ba5268046af",
+      "bytes": 600631,
+      "download_status": "downloaded",
+      "conditions": [
+        "raw_card"
+      ],
+      "review_status": "visually_verified",
+      "manual_truth": {
+        "kind": "raw",
+        "company": null,
+        "grade": null,
+        "name": "Nidoking",
+        "number": "174/165",
+        "language": "en"
+      }
+    },
+    {
+      "id": "fresh100_116219612870",
+      "page_url": "https://www.ebay.com/itm/116219612870",
+      "image_url": "https://i.ebayimg.com/images/g/AkMAAOSw~pJmopFN/s-l1200.png",
+      "title": "Dragonair Illustration Rare NM 181/165 Scarlet & Violet 151 Pokemon Card | eBay (https://www.ebay.com/itm/116219612870)",
+      "discovery": "image_search",
+      "query": "Pokemon Dragonair 181/165 card ebay",
+      "path": "datasets/review/grading-fresh100-20261002/frozen-photos/fresh100_116219612870.jpg",
+      "sha256": "4790babbffcef99eb153c1095b144d99e0e3abd49d31ee76cf634543fc3148ab",
+      "bytes": 2805580,
+      "download_status": "downloaded",
+      "conditions": [
+        "raw_card"
+      ],
+      "review_status": "visually_verified",
+      "manual_truth": {
+        "kind": "raw",
+        "company": null,
+        "grade": null,
+        "name": "Dragonair",
+        "number": "181/165",
+        "language": "en"
+      }
+    },
+    {
+      "id": "fresh100_387647223051",
+      "page_url": "https://www.ebay.co.uk/itm/387647223051",
+      "image_url": "https://i.ebayimg.com/00/s/MTYwMFgxMjAw/z/7PEAAOSwryZnQ-el/%24_57.JPG?set_id=880000500F",
+      "title": "HOLO Parasect TG01/TG30 NM Lost Origin Trainer Gallery Pokemon Card Oswaldo KATO  | eBay UK (https://www.ebay.co.uk/itm/387647223051)",
+      "discovery": "image_search",
+      "query": "Pokemon Parasect TG01 card ebay",
+      "path": "datasets/review/grading-fresh100-20261002/frozen-photos/fresh100_387647223051.jpg",
+      "sha256": "989e5c443df2a42be754a4926c0a7bf247d2186e757c0e46625518c5b58732a4",
+      "bytes": 527540,
+      "download_status": "downloaded",
+      "conditions": [
+        "raw_card"
+      ],
+      "review_status": "visually_verified",
+      "manual_truth": {
+        "kind": "raw",
+        "company": null,
+        "grade": null,
+        "name": "Parasect",
+        "number": "TG01/TG30",
+        "language": "en"
+      }
+    },
+    {
+      "id": "fresh100_156890431856",
+      "page_url": "https://www.ebay.com/itm/156890431856",
+      "image_url": "https://i.ebayimg.com/images/g/yEgAAOSwaOJn~Iqv/s-l1200.jpg",
+      "title": "Lechonk 209/197 Obsidian Flames Illustration Rare Holo Pokemon TCG Card NM | eBay (https://www.ebay.com/itm/156890431856)",
+      "discovery": "image_search",
+      "query": "Pokemon Lechonk 209/197 card eBay",
+      "path": "datasets/review/grading-fresh100-20261002/frozen-photos/fresh100_156890431856.jpg",
+      "sha256": "99d1fafdbee5fad8712917d149acb32639b3d7e379fe5c6cf6d909024051eefc",
+      "bytes": 341196,
+      "download_status": "downloaded",
+      "conditions": [
+        "raw_card"
+      ],
+      "review_status": "visually_verified",
+      "manual_truth": {
+        "kind": "raw",
+        "company": null,
+        "grade": null,
+        "name": "Lechonk",
+        "number": "209/197",
+        "language": "en"
+      }
+    },
+    {
+      "id": "fresh100_127005898900",
+      "page_url": "https://www.ebay.com/itm/127005898900",
+      "image_url": "https://i.ebayimg.com/images/g/wocAAOSwSNZn3NYw/s-l1200.jpg",
+      "title": "Tangela 178/165 Scarlet & Violet 151 Illustration Rare Holo Pokemon Card | eBay (https://www.ebay.com/itm/127005898900)",
+      "discovery": "image_search",
+      "query": "Pokemon Tangela 178/165 card eBay",
+      "path": "datasets/review/grading-fresh100-20261002/frozen-photos/fresh100_127005898900.jpg",
+      "sha256": "6f184d812635f578241d69aad689d1a2c20c0f391922e67714b6a5444d948a61",
+      "bytes": 345524,
+      "download_status": "downloaded",
+      "conditions": [
+        "raw_card"
+      ],
+      "review_status": "visually_verified",
+      "manual_truth": {
+        "kind": "raw",
+        "company": null,
+        "grade": null,
+        "name": "Tangela",
+        "number": "178/165",
+        "language": "en"
+      }
+    },
+    {
+      "id": "fresh100_316758938735",
+      "page_url": "https://www.ebay.com/itm/316758938735",
+      "image_url": "https://i.ebayimg.com/images/g/5CYAAeSwX8JoF~cY/s-l1200.jpg",
+      "title": "Marill - Pokemon TCG Paldea Evolved - 204/193 NM EN | eBay (https://www.ebay.com/itm/316758938735)",
+      "discovery": "image_search",
+      "query": "Pokemon Marill 204/193 card ebay",
+      "path": "datasets/review/grading-fresh100-20261002/frozen-photos/fresh100_316758938735.jpg",
+      "sha256": "3f5b63b0116908ef18f92aff7313e067121d1ce9d9777e5af4d8de59735472b3",
+      "bytes": 263931,
+      "download_status": "downloaded",
+      "conditions": [
+        "raw_card"
+      ],
+      "review_status": "visually_verified",
+      "manual_truth": {
+        "kind": "raw",
+        "company": null,
+        "grade": null,
+        "name": "Marill",
+        "number": "204/193",
+        "language": "en"
+      }
+    },
+    {
+      "id": "freshraw_1_925085473",
+      "page_url": "https://www.sportscardinvestor.com/cards/armarouge-pokemon/2023-scarlet-violet-illustration-rare-203-198",
+      "image_url": "https://i.ebayimg.com/images/g/C94AAeSwir1pPv7G/s-l1600.jpg",
+      "title": "Armarouge 2023 Scarlet & Violet #203/198 Illustration Rare Price Guide - Sports Card Investor (https://www.sportscardinvestor.com/cards/armarouge-pokemon/2023-scarlet-violet-illustration-rare-203-198)",
+      "discovery": "image_search",
+      "query": "Pokemon Armarouge 203/198 card ebay",
+      "path": "datasets/review/grading-fresh100-20261002/frozen-photos/freshraw_1_925085473.jpg",
+      "sha256": "94e8ce78b0b4d38ea69aeefee3a4dd8f5e92af11fe2225a9ee5dd2612aa5a7d7",
+      "bytes": 129000,
+      "download_status": "downloaded",
+      "conditions": [
+        "raw_card"
+      ],
+      "review_status": "visually_verified",
+      "manual_truth": {
+        "kind": "raw",
+        "company": null,
+        "grade": null,
+        "name": "Armarouge",
+        "number": "203/198",
+        "language": "en"
+      }
+    },
+    {
+      "id": "freshraw_2_1235899331",
+      "page_url": "https://www.sportscardinvestor.com/cards/scizor-pokemon/2023-scarlet-violet-obsidian-flames-illustration-rare-205-197",
+      "image_url": "https://i.ebayimg.com/images/g/t3kAAeSwWaZpiU73/s-l1600.jpg",
+      "title": "Scizor 2023 Scarlet & Violet: Obsidian Flames #205/197 Illustration Rare Price Guide - Sports Card Investor (https://www.sportscardinvestor.com/cards/scizor-pokemon/2023-scarlet-violet-obsidian-flames-illustration-rare-205-197)",
+      "discovery": "image_search",
+      "query": "Pokemon Scizor 205/197 card ebay",
+      "path": "datasets/review/grading-fresh100-20261002/frozen-photos/freshraw_2_1235899331.jpg",
+      "sha256": "c76a8e93861d8673b56dbadfb3763dcd91e64a49847307a3ca40fbc94c0e9f46",
+      "bytes": 203170,
+      "download_status": "downloaded",
+      "conditions": [
+        "raw_card"
+      ],
+      "review_status": "visually_verified",
+      "manual_truth": {
+        "kind": "raw",
+        "company": null,
+        "grade": null,
+        "name": "Scizor",
+        "number": "205/197",
+        "language": "en"
+      }
+    },
+    {
+      "id": "fresh100_127125641244",
+      "page_url": "https://www.ebay.co.uk/itm/127125641244",
+      "image_url": "https://i.ebayimg.com/images/g/WwcAAeSwFXxoLby-/s-l1200.jpg",
+      "title": "Pok\u00e9mon TCG Kirlia 212/198  | eBay UK (https://www.ebay.co.uk/itm/127125641244)",
+      "discovery": "image_search",
+      "query": "Pokemon Kirlia 212/198 card ebay",
+      "path": "datasets/review/grading-fresh100-20261002/frozen-photos/fresh100_127125641244.jpg",
+      "sha256": "e563ecdf0f4042be87b1ae8503d7b71dc6e8e3031556892ba158618182c0e3b6",
+      "bytes": 300617,
+      "download_status": "downloaded",
+      "conditions": [
+        "raw_card"
+      ],
+      "review_status": "visually_verified",
+      "manual_truth": {
+        "kind": "raw",
+        "company": null,
+        "grade": null,
+        "name": "Kirlia",
+        "number": "212/198",
+        "language": "en"
+      }
+    },
+    {
+      "id": "fresh100_226992725275",
+      "page_url": "https://www.ebay.com/itm/226992725275",
+      "image_url": "https://i.ebayimg.com/images/g/EXQAAeSwkq9o1bDi/s-l1200.jpg",
+      "title": "Pokemon Drowzee 210/198 Scarlet & Violet Illustration Rare Holo NM | eBay (https://www.ebay.com/itm/226992725275)",
+      "discovery": "image_search",
+      "query": "Pokemon Drowzee 210/198 card ebay",
+      "path": "datasets/review/grading-fresh100-20261002/frozen-photos/fresh100_226992725275.jpg",
+      "sha256": "933e5e3f66dd976f14b47e6e72b43cc9affdebbe39ffef690e82877d3de70d66",
+      "bytes": 414954,
+      "download_status": "downloaded",
+      "conditions": [
+        "raw_card"
+      ],
+      "review_status": "visually_verified",
+      "manual_truth": {
+        "kind": "raw",
+        "company": null,
+        "grade": null,
+        "name": "Drowzee",
+        "number": "210/198",
+        "language": "en"
+      }
+    },
+    {
+      "id": "fresh100_197071758287",
+      "page_url": "https://www.ebay.com/itm/197071758287",
+      "image_url": "https://i.ebayimg.com/images/g/NfoAAOSwrmdnxQke/s-l1200.png",
+      "title": "Pok\u00e9mon 151 TCG Nidoking 174/165 Holo Illustration Rare NM or better | eBay (https://www.ebay.com/itm/197071758287)",
+      "discovery": "image_search",
+      "query": "Pokemon Nidoking 174/165 card ebay",
+      "path": "datasets/review/grading-fresh100-20261002/frozen-photos/fresh100_197071758287.jpg",
+      "sha256": "a34f21ce6c0a8442aa4ab2579c5e1ba63628dc72d3f573bfb0645012ab4c27c4",
+      "bytes": 2944182,
+      "download_status": "downloaded",
+      "conditions": [
+        "raw_card"
+      ],
+      "review_status": "visually_verified",
+      "manual_truth": {
+        "kind": "raw",
+        "company": null,
+        "grade": null,
+        "name": "Nidoking",
+        "number": "174/165",
+        "language": "en"
+      }
+    },
+    {
+      "id": "fresh100_186821197401",
+      "page_url": "https://www.ebay.com/itm/186821197401",
+      "image_url": "https://i.ebayimg.com/images/g/Bj0AAeSwjlJpteXs/s-l1200.jpg",
+      "title": "Dragonair 181/165 Pokemon 151 Illustration Full Art Holo Pokemon Card * New * | eBay (https://www.ebay.com/itm/186821197401)",
+      "discovery": "image_search",
+      "query": "Pokemon Dragonair 181/165 card ebay",
+      "path": "datasets/review/grading-fresh100-20261002/frozen-photos/fresh100_186821197401.jpg",
+      "sha256": "bfce6ecfc1d5321d31ae2bca50e6ab6bea9d6785e235b0fa1fa85b862fb6bca3",
+      "bytes": 205372,
+      "download_status": "downloaded",
+      "conditions": [
+        "raw_card"
+      ],
+      "review_status": "visually_verified",
+      "manual_truth": {
+        "kind": "raw",
+        "company": null,
+        "grade": null,
+        "name": "Dragonair",
+        "number": "181/165",
+        "language": "en"
+      }
+    },
+    {
+      "id": "freshraw_7_316441841",
+      "page_url": "https://www.ebay.com/b/Parasect-TG01-TG30-Swsh11-Lost-Origin-Trainer-Gallery/2536/bn_7124575457",
+      "image_url": "https://i.ebayimg.com/images/g/1WcAAeSw7mppuKKk/s-l1200.webp",
+      "title": "Parasect TG01/TG30 Swsh11: Lost Origin Trainer Gallery for sale | eBay (https://www.ebay.com/b/Parasect-TG01-TG30-Swsh11-Lost-Origin-Trainer-Gallery/2536/bn_7124575457)",
+      "discovery": "image_search",
+      "query": "Pokemon Parasect TG01 card ebay",
+      "path": "datasets/review/grading-fresh100-20261002/frozen-photos/freshraw_7_316441841.jpg",
+      "sha256": "3ebb6ddf9c75836bea64116b28902eb2c5d510d66b5fbc2a4686c876542d75d0",
+      "bytes": 273346,
+      "download_status": "downloaded",
+      "conditions": [
+        "raw_card"
+      ],
+      "review_status": "visually_verified",
+      "manual_truth": {
+        "kind": "raw",
+        "company": null,
+        "grade": null,
+        "name": "Parasect",
+        "number": "TG01/TG30",
+        "language": "en"
+      }
+    },
+    {
+      "id": "fresh100_167884982800",
+      "page_url": "https://www.ebay.com/itm/167884982800",
+      "image_url": "https://i.ebayimg.com/images/g/TXYAAeSwfuBo~TcZ/s-l1200.png",
+      "title": "Lechonk 209/197 Obsidian Flames Full Art Illustration Rare Holo MINT UNPLAYED | eBay (https://www.ebay.com/itm/167884982800)",
+      "discovery": "image_search",
+      "query": "Pokemon Lechonk 209/197 card eBay",
+      "path": "datasets/review/grading-fresh100-20261002/frozen-photos/fresh100_167884982800.jpg",
+      "sha256": "1c84413fad36e95a4afca00df3ea04025de76a85fb0d37b8038b2fe840fb6bcd",
+      "bytes": 2160463,
+      "download_status": "downloaded",
+      "conditions": [
+        "raw_card"
+      ],
+      "review_status": "visually_verified",
+      "manual_truth": {
+        "kind": "raw",
+        "company": null,
+        "grade": null,
+        "name": "Lechonk",
+        "number": "209/197",
+        "language": "en"
+      }
+    },
+    {
+      "id": "fresh100_134878995437",
+      "page_url": "https://www.ebay.com/itm/134878995437",
+      "image_url": "https://i.ebayimg.com/images/g/II8AAOSwFkplmDHU/s-l1200.jpg",
+      "title": "Pok\u00e9mon TCG Tangela Scarlet & Violet - 151 178/165 Holo Illustration Rare | eBay (https://www.ebay.com/itm/134878995437)",
+      "discovery": "image_search",
+      "query": "Pokemon Tangela 178/165 card eBay",
+      "path": "datasets/review/grading-fresh100-20261002/frozen-photos/fresh100_134878995437.jpg",
+      "sha256": "543549cfda49cd9c61e174157c0a8bf0a5c1f7e59c0fcdac66039e8750b9bb4a",
+      "bytes": 445184,
+      "download_status": "downloaded",
+      "conditions": [
+        "raw_card"
+      ],
+      "review_status": "visually_verified",
+      "manual_truth": {
+        "kind": "raw",
+        "company": null,
+        "grade": null,
+        "name": "Tangela",
+        "number": "178/165",
+        "language": "en"
+      }
+    },
+    {
+      "id": "fresh100_177223455994",
+      "page_url": "https://www.ebay.com/itm/177223455994",
+      "image_url": "https://i.ebayimg.com/00/s/MTYwMFgxMjEw/z/eB8AAOSwyEtnoOlw/%24_57.JPG?set_id=880000500F",
+      "title": "Pokemon Marill 204/193 Paldea Evolved IR Illustration Rare TCG | eBay (https://www.ebay.com/itm/177223455994)",
+      "discovery": "image_search",
+      "query": "Pokemon Marill 204/193 card ebay",
+      "path": "datasets/review/grading-fresh100-20261002/frozen-photos/fresh100_177223455994.jpg",
+      "sha256": "1e26c249f50a9c566fbc958cd8a075ed281033f278ec2271caa8975b1d2814b9",
+      "bytes": 859908,
+      "download_status": "downloaded",
+      "conditions": [
+        "raw_card"
+      ],
+      "review_status": "visually_verified",
+      "manual_truth": {
+        "kind": "raw",
+        "company": null,
+        "grade": null,
+        "name": "Marill",
+        "number": "204/193",
+        "language": "en"
+      }
+    },
+    {
+      "id": "fresh100_185962385461",
+      "page_url": "https://www.ebay.com/itm/185962385461",
+      "image_url": "https://i.ebayimg.com/images/g/~HUAAeSwLwxo4S~-/s-l1200.jpg",
+      "title": "Armarouge 203/198 Scarlet & Violet Illustration Rare Holo Pokemon Card * New * | eBay (https://www.ebay.com/itm/185962385461)",
+      "discovery": "image_search",
+      "query": "Pokemon Armarouge 203/198 card ebay",
+      "path": "datasets/review/grading-fresh100-20261002/frozen-photos/fresh100_185962385461.jpg",
+      "sha256": "71d43a410ed7c5151fa682861d1d3a094fc986751d0db492fcf7bf26156ec88f",
+      "bytes": 207263,
+      "download_status": "downloaded",
+      "conditions": [
+        "raw_card"
+      ],
+      "review_status": "visually_verified",
+      "manual_truth": {
+        "kind": "raw",
+        "company": null,
+        "grade": null,
+        "name": "Armarouge",
+        "number": "203/198",
+        "language": "en"
+      }
+    },
+    {
+      "id": "fresh100_186598235842",
+      "page_url": "https://www.ebay.co.uk/itm/186598235842",
+      "image_url": "https://i.ebayimg.com/images/g/pGIAAeSwtYtn3rpx/s-l1600.jpg",
+      "title": "Scizor 205/197 Obsidian Flames Illustration Rare Holo Pokemon Card  | eBay UK (https://www.ebay.co.uk/itm/186598235842)",
+      "discovery": "image_search",
+      "query": "Pokemon Scizor 205/197 card ebay",
+      "path": "datasets/review/grading-fresh100-20261002/frozen-photos/fresh100_186598235842.jpg",
+      "sha256": "4a7d299035bba25c995819c617858809b872f9291bcaf17e3474fcb8c71b8176",
+      "bytes": 305443,
+      "download_status": "downloaded",
+      "conditions": [
+        "raw_card"
+      ],
+      "review_status": "visually_verified",
+      "manual_truth": {
+        "kind": "raw",
+        "company": null,
+        "grade": null,
+        "name": "Scizor",
+        "number": "205/197",
+        "language": "en"
+      }
+    },
+    {
+      "id": "fresh100_356618307865",
+      "page_url": "https://www.ebay.com/itm/356618307865",
+      "image_url": "https://i.ebayimg.com/images/g/y3AAAOSwFfdnwWBj/s-l1200.png",
+      "title": "Kirlia Pokemon TCG Scarlet & Violet 212/198 Illustration Rare!  Near Mint! | eBay (https://www.ebay.com/itm/356618307865)",
+      "discovery": "image_search",
+      "query": "Pokemon Kirlia 212/198 card ebay",
+      "path": "datasets/review/grading-fresh100-20261002/frozen-photos/fresh100_356618307865.jpg",
+      "sha256": "fb1b1c08557934e4492cc586a891d958ebd3535a56226eff5a4c221de17b27cc",
+      "bytes": 3344126,
+      "download_status": "downloaded",
+      "conditions": [
+        "raw_card"
+      ],
+      "review_status": "visually_verified",
+      "manual_truth": {
+        "kind": "raw",
+        "company": null,
+        "grade": null,
+        "name": "Kirlia",
+        "number": "212/198",
+        "language": "en"
+      }
+    },
+    {
+      "id": "fresh100_235971735451",
+      "page_url": "https://www.ebay.co.uk/itm/235971735451",
+      "image_url": "https://i.ebayimg.com/00/s/MTYwMFgxMTYw/z/fPwAAOSwWM9nubmk/%24_57.JPG?set_id=880000500F",
+      "title": "Drowzee - 210/198 - Illustration Rare - Scarlet & Violet Base - Pokemon Card (1)  | eBay UK (https://www.ebay.co.uk/itm/235971735451)",
+      "discovery": "image_search",
+      "query": "Pokemon Drowzee 210/198 card ebay",
+      "path": "datasets/review/grading-fresh100-20261002/frozen-photos/fresh100_235971735451.jpg",
+      "sha256": "5c72c208f9f7ae7c3ffdc993d914cb2213eb20bb4341a1da30264dd3fe0d1bb8",
+      "bytes": 781073,
+      "download_status": "downloaded",
+      "conditions": [
+        "raw_card"
+      ],
+      "review_status": "visually_verified",
+      "manual_truth": {
+        "kind": "raw",
+        "company": null,
+        "grade": null,
+        "name": "Drowzee",
+        "number": "210/198",
+        "language": "en"
+      }
+    },
+    {
+      "id": "fresh100_397434208029",
+      "page_url": "https://www.ebay.com/itm/397434208029",
+      "image_url": "https://i.ebayimg.com/images/g/V~oAAeSwx~1pT0FN/s-l1200.jpg",
+      "title": "Nidoking Illustration Rare  SV: Scarlet & Violet 151 174/165 NM | eBay (https://www.ebay.com/itm/397434208029)",
+      "discovery": "image_search",
+      "query": "Pokemon Nidoking 174/165 card ebay",
+      "path": "datasets/review/grading-fresh100-20261002/frozen-photos/fresh100_397434208029.jpg",
+      "sha256": "97e8477e3487e857f82c498850643b4003e39d0ea6d3d086b74057653312404e",
+      "bytes": 231421,
+      "download_status": "downloaded",
+      "conditions": [
+        "raw_card"
+      ],
+      "review_status": "visually_verified",
+      "manual_truth": {
+        "kind": "raw",
+        "company": null,
+        "grade": null,
+        "name": "Nidoking",
+        "number": "174/165",
+        "language": "en"
+      }
+    },
+    {
+      "id": "freshraw_7_795209806",
+      "page_url": "https://www.ebay.com/b/Parasect-TG01-TG30-Swsh11-Lost-Origin-Trainer-Gallery/2536/bn_7124575457",
+      "image_url": "https://i.ebayimg.com/images/g/CTAAAeSwcrlpuaDG/s-l1200.webp",
+      "title": "Parasect TG01/TG30 Swsh11: Lost Origin Trainer Gallery for sale | eBay (https://www.ebay.com/b/Parasect-TG01-TG30-Swsh11-Lost-Origin-Trainer-Gallery/2536/bn_7124575457)",
+      "discovery": "image_search",
+      "query": "Pokemon Parasect TG01 card ebay",
+      "path": "datasets/review/grading-fresh100-20261002/frozen-photos/freshraw_7_795209806.jpg",
+      "sha256": "b494a9cd3c26e1d0f891ee9d1e39e7133e317915d2fdda89bc4b9b972697bba3",
+      "bytes": 387084,
+      "download_status": "downloaded",
+      "conditions": [
+        "raw_card"
+      ],
+      "review_status": "visually_verified",
+      "manual_truth": {
+        "kind": "raw",
+        "company": null,
+        "grade": null,
+        "name": "Parasect",
+        "number": "TG01/TG30",
+        "language": "en"
+      }
+    },
+    {
+      "id": "freshextra_6_1736995038",
+      "page_url": "https://www.sportscardinvestor.com/cards/lechonk-pokemon/2023-scarlet-violet-obsidian-flames-illustration-rare-209-197",
+      "image_url": "https://i.ebayimg.com/images/g/2AgAAeSwDoBpkkrr/s-l1600.jpg",
+      "title": "Lechonk 2023 Scarlet & Violet: Obsidian Flames #209/197 Illustration Rare Price Guide - Sports Card Investor (https://www.sportscardinvestor.com/cards/lechonk-pokemon/2023-scarlet-violet-obsidian-flames-illustration-rare-209-197)",
+      "discovery": "image_search",
+      "query": "Pokemon Lechonk 209/197 card eBay",
+      "path": "datasets/review/grading-fresh100-20261002/frozen-photos/freshextra_6_1736995038.jpg",
+      "sha256": "42374abd6d989f24c87f95cbfb0295f4162daf94839361406fefdbe956e84557",
+      "bytes": 561312,
+      "download_status": "downloaded",
+      "conditions": [
+        "raw_card"
+      ],
+      "review_status": "visually_verified",
+      "manual_truth": {
+        "kind": "raw",
+        "company": null,
+        "grade": null,
+        "name": "Lechonk",
+        "number": "209/197",
+        "language": "en"
+      }
+    },
+    {
+      "id": "fresh100_336501773626",
+      "page_url": "https://www.ebay.com/itm/336501773626",
+      "image_url": "https://i.ebayimg.com/images/g/WWoAAeSwOgBpxUyS/s-l1200.jpg",
+      "title": "Pokemon TCG - Tangela - 178/165 - Scarlet And Violet 151 - Illustration Rare | eBay (https://www.ebay.com/itm/336501773626)",
+      "discovery": "image_search",
+      "query": "Pokemon Tangela 178/165 card eBay",
+      "path": "datasets/review/grading-fresh100-20261002/frozen-photos/fresh100_336501773626.jpg",
+      "sha256": "e54bf00006cd48f0922c4cb94da651873508b2dfab59d810c006720ada35e443",
+      "bytes": 338046,
+      "download_status": "downloaded",
+      "conditions": [
+        "raw_card"
+      ],
+      "review_status": "visually_verified",
+      "manual_truth": {
+        "kind": "raw",
+        "company": null,
+        "grade": null,
+        "name": "Tangela",
+        "number": "178/165",
+        "language": "en"
+      }
+    },
+    {
+      "id": "freshraw_0_1109460011",
+      "page_url": "https://www.sportscardinvestor.com/cards/marill-pokemon/2023-scarlet-violet-paldea-evolved-illustration-rare-204-193",
+      "image_url": "https://i.ebayimg.com/images/g/65QAAeSwT3xpvcCE/s-l1600.jpg",
+      "title": "Marill 2023 Scarlet & Violet: Paldea Evolved #204/193 Illustration Rare Price Guide - Sports Card Investor (https://www.sportscardinvestor.com/cards/marill-pokemon/2023-scarlet-violet-paldea-evolved-illustration-rare-204-193)",
+      "discovery": "image_search",
+      "query": "Pokemon Marill 204/193 card ebay",
+      "path": "datasets/review/grading-fresh100-20261002/frozen-photos/freshraw_0_1109460011.jpg",
+      "sha256": "7273f9d368fb3aeee3208a96211e974ada3d79aa3d71ee535dc9416e88636b45",
+      "bytes": 558646,
+      "download_status": "downloaded",
+      "conditions": [
+        "raw_card"
+      ],
+      "review_status": "visually_verified",
+      "manual_truth": {
+        "kind": "raw",
+        "company": null,
+        "grade": null,
+        "name": "Marill",
+        "number": "204/193",
+        "language": "en"
+      }
+    },
+    {
+      "id": "fresh100_236504673185",
+      "page_url": "https://www.ebay.com/itm/236504673185",
+      "image_url": "https://i.ebayimg.com/images/g/v10AAeSwF0RpL7Ws/s-l1200.jpg",
+      "title": "Armarouge Illustration Rare SV01: Scarlet & Violet Base Set 203/198 NM | eBay (https://www.ebay.com/itm/236504673185)",
+      "discovery": "image_search",
+      "query": "Pokemon Armarouge 203/198 card ebay",
+      "path": "datasets/review/grading-fresh100-20261002/frozen-photos/fresh100_236504673185.jpg",
+      "sha256": "6166c50c6e57ded9ef95ced93ba44d582d3dedb2f038d2fc62854dc9f80f6375",
+      "bytes": 231337,
+      "download_status": "downloaded",
+      "conditions": [
+        "raw_card"
+      ],
+      "review_status": "visually_verified",
+      "manual_truth": {
+        "kind": "raw",
+        "company": null,
+        "grade": null,
+        "name": "Armarouge",
+        "number": "203/198",
+        "language": "en"
+      }
+    },
+    {
+      "id": "fresh100_396170517118",
+      "page_url": "https://www.ebay.com.au/itm/396170517118",
+      "image_url": "https://i.ebayimg.com/00/s/MTYwMFgxMjAw/z/068AAOSwLUNnoHx5/%24_57.JPG?set_id=880000500F",
+      "title": "KIRLIA 212/198 S&V BASE POKEMON CARD ENGLISH SPECIAL ILLUSTRATION RARE  | eBay Australia (https://www.ebay.com.au/itm/396170517118)",
+      "discovery": "image_search",
+      "query": "Pokemon Kirlia 212/198 card ebay",
+      "path": "datasets/review/grading-fresh100-20261002/frozen-photos/fresh100_396170517118.jpg",
+      "sha256": "0aa7718eff692f3cfaeed3f6173508f8a68379ff03629270055e4b6d6540d1f8",
+      "bytes": 668324,
+      "download_status": "downloaded",
+      "conditions": [
+        "raw_card"
+      ],
+      "review_status": "visually_verified",
+      "manual_truth": {
+        "kind": "raw",
+        "company": null,
+        "grade": null,
+        "name": "Kirlia",
+        "number": "212/198",
+        "language": "en"
+      }
+    },
+    {
+      "id": "freshraw_4_1318482242",
+      "page_url": "https://www.ebay.ca/b/Drowzee-210-198-SV01-Scarlet-Violet-Base-Set/2536/bn_7124580318",
+      "image_url": "https://i.ebayimg.com/images/g/PCgAAeSw9aZppJVP/s-l1200.webp",
+      "title": "Drowzee 210/198 SV01: Scarlet & Violet Base Set for sale | eBay (https://www.ebay.ca/b/Drowzee-210-198-SV01-Scarlet-Violet-Base-Set/2536/bn_7124580318)",
+      "discovery": "image_search",
+      "query": "Pokemon Drowzee 210/198 card ebay",
+      "path": "datasets/review/grading-fresh100-20261002/frozen-photos/freshraw_4_1318482242.jpg",
+      "sha256": "620e367a7c14effd804a445bfccb815f5d8d401fbbf9b2d79f50e23ef429e3ba",
+      "bytes": 417406,
+      "download_status": "downloaded",
+      "conditions": [
+        "raw_card"
+      ],
+      "review_status": "visually_verified",
+      "manual_truth": {
+        "kind": "raw",
+        "company": null,
+        "grade": null,
+        "name": "Drowzee",
+        "number": "210/198",
+        "language": "en"
+      }
+    },
+    {
+      "id": "fresh100_125514764134",
+      "page_url": "https://www.ebay.com/itm/125514764134",
+      "image_url": "https://i.ebayimg.com/images/g/dKAAAOSw~ytjI31i/s-l1200.jpg",
+      "title": "Parasect - TG01/TG30 - Holo Rare Lost Origin Pokemon TCG Near Mint | eBay (https://www.ebay.com/itm/125514764134)",
+      "discovery": "image_search",
+      "query": "Pokemon Parasect TG01 card ebay",
+      "path": "datasets/review/grading-fresh100-20261002/frozen-photos/fresh100_125514764134.jpg",
+      "sha256": "38dfb489c1a30957a309fc0e0cd91a4f3efe03e844bbe78026c1be192ffcea35",
+      "bytes": 334036,
+      "download_status": "downloaded",
+      "conditions": [
+        "raw_card"
+      ],
+      "review_status": "visually_verified",
+      "manual_truth": {
+        "kind": "raw",
+        "company": null,
+        "grade": null,
+        "name": "Parasect",
+        "number": "TG01/TG30",
+        "language": "en"
+      }
+    },
+    {
+      "id": "fresh100_205836607918",
+      "page_url": "https://www.ebay.com/itm/205836607918",
+      "image_url": "https://i.ebayimg.com/images/g/zaYAAeSw8sRpENl8/s-l1200.jpg",
+      "title": "Marill 204/193 Paldea Evolved Illustration Rare Full Art Holo | eBay (https://www.ebay.com/itm/205836607918)",
+      "discovery": "image_search",
+      "query": "Pokemon Marill 204/193 card ebay",
+      "path": "datasets/review/grading-fresh100-20261002/frozen-photos/fresh100_205836607918.jpg",
+      "sha256": "5d6cf0c717d8a1f10b2804f9419b23cb9377897610d5ed88d6208fdf4efd636d",
+      "bytes": 271966,
+      "download_status": "downloaded",
+      "conditions": [
+        "raw_card"
+      ],
+      "review_status": "visually_verified",
+      "manual_truth": {
+        "kind": "raw",
+        "company": null,
+        "grade": null,
+        "name": "Marill",
+        "number": "204/193",
+        "language": "en"
+      }
+    },
+    {
+      "id": "fresh100_235982624286",
+      "page_url": "https://www.ebay.co.uk/itm/235982624286",
+      "image_url": "https://i.ebayimg.com/00/s/MTYwMFgxMTYy/z/SEUAAOSwnQdnwaSw/%24_57.JPG?set_id=880000500F",
+      "title": "Armarouge - 203/198 - Illustration Rare - Scarlet & Violet Base - Pokemon Card 2  | eBay UK (https://www.ebay.co.uk/itm/235982624286)",
+      "discovery": "image_search",
+      "query": "Pokemon Armarouge 203/198 card ebay",
+      "path": "datasets/review/grading-fresh100-20261002/frozen-photos/fresh100_235982624286.jpg",
+      "sha256": "266054eee1eb7ab42e8b980c762176bf66e464d41a19033831964e021a99a570",
+      "bytes": 654828,
+      "download_status": "downloaded",
+      "conditions": [
+        "raw_card"
+      ],
+      "review_status": "visually_verified",
+      "manual_truth": {
+        "kind": "raw",
+        "company": null,
+        "grade": null,
+        "name": "Armarouge",
+        "number": "203/198",
+        "language": "en"
+      }
+    },
+    {
+      "id": "fresh100_135586143350",
+      "page_url": "https://www.ebay.com/itm/135586143350",
+      "image_url": "https://i.ebayimg.com/images/g/22gAAeSwOelnwRjH/s-l1200.jpg",
+      "title": "Pokemon TCG Scarlet & Violet Kirlia 212/198 Illustration Rare | eBay (https://www.ebay.com/itm/135586143350)",
+      "discovery": "image_search",
+      "query": "Pokemon Kirlia 212/198 card ebay",
+      "path": "datasets/review/grading-fresh100-20261002/frozen-photos/fresh100_135586143350.jpg",
+      "sha256": "daac7597fa1636505b794a171fbe425f50cb6735cf9a2fb84373575948fe8ec4",
+      "bytes": 398636,
+      "download_status": "downloaded",
+      "conditions": [
+        "raw_card"
+      ],
+      "review_status": "visually_verified",
+      "manual_truth": {
+        "kind": "raw",
+        "company": null,
+        "grade": null,
+        "name": "Kirlia",
+        "number": "212/198",
+        "language": "en"
+      }
+    },
+    {
+      "id": "fresh100_267406776028",
+      "page_url": "https://www.ebay.com/itm/267406776028",
+      "image_url": "https://i.ebayimg.com/images/g/r5wAAeSwT7Joyv5R/s-l1200.jpg",
+      "title": "Pok\u00e9mon TCG Scarlet and Violet Drowzee Card 210/198 Illustration Rare | eBay (https://www.ebay.com/itm/267406776028)",
+      "discovery": "image_search",
+      "query": "Pokemon Drowzee 210/198 card ebay",
+      "path": "datasets/review/grading-fresh100-20261002/frozen-photos/fresh100_267406776028.jpg",
+      "sha256": "5df35014b4db9b91c464f429cb11f6fa000304434edf4c8b18202585f83a5467",
+      "bytes": 402988,
+      "download_status": "downloaded",
+      "conditions": [
+        "raw_card"
+      ],
+      "review_status": "visually_verified",
+      "manual_truth": {
+        "kind": "raw",
+        "company": null,
+        "grade": null,
+        "name": "Drowzee",
+        "number": "210/198",
+        "language": "en"
+      }
+    },
+    {
+      "id": "fresh100_334557743755",
+      "page_url": "https://www.ebay.com/itm/334557743755",
+      "image_url": "https://i.ebayimg.com/images/g/L-MAAOSwG4tjHRNZ/s-l1600.png",
+      "title": "Parasect TG01/TG30 Swsh11: Lost Origin Trainer Gallery Holo for sale online | eBay (https://www.ebay.com/itm/334557743755)",
+      "discovery": "image_search",
+      "query": "Pokemon Parasect TG01 card ebay",
+      "path": "datasets/review/grading-fresh100-20261002/frozen-photos/fresh100_334557743755.jpg",
+      "sha256": "663e32c1ffe0d9f8d19fdb81b329db5b85bf234e7c40a93f8122d62ebcb50f85",
+      "bytes": 910402,
+      "download_status": "downloaded",
+      "conditions": [
+        "raw_card"
+      ],
+      "review_status": "visually_verified",
+      "manual_truth": {
+        "kind": "raw",
+        "company": null,
+        "grade": null,
+        "name": "Parasect",
+        "number": "TG01/TG30",
+        "language": "en"
+      }
+    },
+    {
+      "id": "freshraw_0_1861309623",
+      "page_url": "https://www.sportscardinvestor.com/cards/marill-pokemon/2023-scarlet-violet-paldea-evolved-illustration-rare-204-193",
+      "image_url": "https://i.ebayimg.com/images/g/zzcAAeSw0ShpKyww/s-l1600.jpg",
+      "title": "Marill 2023 Scarlet & Violet: Paldea Evolved #204/193 Illustration Rare Price Guide - Sports Card Investor (https://www.sportscardinvestor.com/cards/marill-pokemon/2023-scarlet-violet-paldea-evolved-illustration-rare-204-193)",
+      "discovery": "image_search",
+      "query": "Pokemon Marill 204/193 card ebay",
+      "path": "datasets/review/grading-fresh100-20261002/frozen-photos/freshraw_0_1861309623.jpg",
+      "sha256": "9bafbe769e205cd7757b35ca331ef68cd25de1bf27e2df35daf380df0ae3faf9",
+      "bytes": 383941,
+      "download_status": "downloaded",
+      "conditions": [
+        "raw_card"
+      ],
+      "review_status": "visually_verified",
+      "manual_truth": {
+        "kind": "raw",
+        "company": null,
+        "grade": null,
+        "name": "Marill",
+        "number": "204/193",
+        "language": "en"
+      }
+    },
+    {
+      "id": "freshraw_1_2051404991",
+      "page_url": "https://www.sportscardinvestor.com/cards/armarouge-pokemon/2023-scarlet-violet-illustration-rare-203-198",
+      "image_url": "https://i.ebayimg.com/images/g/tJYAAeSwZS9pcDUg/s-l1600.jpg",
+      "title": "Armarouge 2023 Scarlet & Violet #203/198 Illustration Rare Price Guide - Sports Card Investor (https://www.sportscardinvestor.com/cards/armarouge-pokemon/2023-scarlet-violet-illustration-rare-203-198)",
+      "discovery": "image_search",
+      "query": "Pokemon Armarouge 203/198 card ebay",
+      "path": "datasets/review/grading-fresh100-20261002/frozen-photos/freshraw_1_2051404991.jpg",
+      "sha256": "c3e762411b8bfb77cd3cb076b14c0cc827ac27d8227287d74dcc8706818d5390",
+      "bytes": 665293,
+      "download_status": "downloaded",
+      "conditions": [
+        "raw_card"
+      ],
+      "review_status": "visually_verified",
+      "manual_truth": {
+        "kind": "raw",
+        "company": null,
+        "grade": null,
+        "name": "Armarouge",
+        "number": "203/198",
+        "language": "en"
+      }
+    },
+    {
+      "id": "freshraw_3_1376470916",
+      "page_url": "https://www.sportscardinvestor.com/cards/kirlia-pokemon/2023-scarlet-violet-illustration-rare-212-198",
+      "image_url": "https://i.ebayimg.com/images/g/Wp8AAeSwykppq3GU/s-l1600.jpg",
+      "title": "Kirlia 2023 Scarlet & Violet #212/198 Illustration Rare Price Guide - Sports Card Investor (https://www.sportscardinvestor.com/cards/kirlia-pokemon/2023-scarlet-violet-illustration-rare-212-198)",
+      "discovery": "image_search",
+      "query": "Pokemon Kirlia 212/198 card ebay",
+      "path": "datasets/review/grading-fresh100-20261002/frozen-photos/freshraw_3_1376470916.jpg",
+      "sha256": "0df07c56e28b48e7498f868a0fb75d88ef352c48f310ab728d22b82b5da83bb8",
+      "bytes": 797987,
+      "download_status": "downloaded",
+      "conditions": [
+        "raw_card"
+      ],
+      "review_status": "visually_verified",
+      "manual_truth": {
+        "kind": "raw",
+        "company": null,
+        "grade": null,
+        "name": "Kirlia",
+        "number": "212/198",
+        "language": "en"
+      }
+    },
+    {
+      "id": "freshraw_4_123815526",
+      "page_url": "https://www.sportscardinvestor.com/cards/drowzee-pokemon/2023-scarlet-violet-illustration-rare-210-198",
+      "image_url": "https://i.ebayimg.com/images/g/aYkAAeSwboRpYTjP/s-l1600.jpg",
+      "title": "Drowzee 2023 Scarlet & Violet #210/198 Illustration Rare Price Guide - Sports Card Investor (https://www.sportscardinvestor.com/cards/drowzee-pokemon/2023-scarlet-violet-illustration-rare-210-198)",
+      "discovery": "image_search",
+      "query": "Pokemon Drowzee 210/198 card ebay",
+      "path": "datasets/review/grading-fresh100-20261002/frozen-photos/freshraw_4_123815526.jpg",
+      "sha256": "c093523f07a638d3a76af8b8d5bd72828f252108aa1921c2df062a969ea9bad3",
+      "bytes": 504769,
+      "download_status": "downloaded",
+      "conditions": [
+        "raw_card"
+      ],
+      "review_status": "visually_verified",
+      "manual_truth": {
+        "kind": "raw",
+        "company": null,
+        "grade": null,
+        "name": "Drowzee",
+        "number": "210/198",
+        "language": "en"
+      }
+    },
+    {
+      "id": "fresh100_235278936401",
+      "page_url": "https://www.ebay.com/itm/235278936401",
+      "image_url": "https://i.ebayimg.com/00/s/MTU5OVgxMTYy/z/HM8AAOSwzm9n76Zw/%24_57.JPG?set_id=880000500F",
+      "title": "Parasect - TG01/TG30 - Full Art Trainer Gallery - Lost Origin - Pokemon Card | eBay (https://www.ebay.com/itm/235278936401)",
+      "discovery": "image_search",
+      "query": "Pokemon Parasect TG01 card ebay",
+      "path": "datasets/review/grading-fresh100-20261002/frozen-photos/fresh100_235278936401.jpg",
+      "sha256": "e1519f63a3b8e2a27e9c40159fb79cff02def6c4ee854a93b79e5b791bc6681c",
+      "bytes": 613083,
+      "download_status": "downloaded",
+      "conditions": [
+        "raw_card"
+      ],
+      "review_status": "visually_verified",
+      "manual_truth": {
+        "kind": "raw",
+        "company": null,
+        "grade": null,
+        "name": "Parasect",
+        "number": "TG01/TG30",
+        "language": "en"
+      }
+    },
+    {
+      "id": "freshraw_0_1807925107",
+      "page_url": "https://www.sportscardinvestor.com/cards/marill-pokemon/2023-scarlet-violet-paldea-evolved-illustration-rare-204-193",
+      "image_url": "https://i.ebayimg.com/images/g/XGUAAeSwp25pn4RG/s-l1600.jpg",
+      "title": "Marill 2023 Scarlet & Violet: Paldea Evolved #204/193 Illustration Rare Price Guide - Sports Card Investor (https://www.sportscardinvestor.com/cards/marill-pokemon/2023-scarlet-violet-paldea-evolved-illustration-rare-204-193)",
+      "discovery": "image_search",
+      "query": "Pokemon Marill 204/193 card ebay",
+      "path": "datasets/review/grading-fresh100-20261002/frozen-photos/freshraw_0_1807925107.jpg",
+      "sha256": "cd540ec9c5cfb6fa98a4e526dfdbcbe280f19e7bc5f34c6a527c011f937daf0e",
+      "bytes": 218658,
+      "download_status": "downloaded",
+      "conditions": [
+        "raw_card"
+      ],
+      "review_status": "visually_verified",
+      "manual_truth": {
+        "kind": "raw",
+        "company": null,
+        "grade": null,
+        "name": "Marill",
+        "number": "204/193",
+        "language": "en"
+      }
+    },
+    {
+      "id": "fresh100_286467766284",
+      "page_url": "https://www.ebay.com/itm/286467766284",
+      "image_url": "https://i.ebayimg.com/images/g/M28AAeSwjiVn81lc/s-l1200.jpg",
+      "title": "Armarouge 203/198 - Scarlet & Violet Base Set Holo Illustration Rare - NM/MT | eBay (https://www.ebay.com/itm/286467766284)",
+      "discovery": "image_search",
+      "query": "Pokemon Armarouge 203/198 card ebay",
+      "path": "datasets/review/grading-fresh100-20261002/frozen-photos/fresh100_286467766284.jpg",
+      "sha256": "dd2a778f499cf16c2a9cfeb0bde557f11318d0e0a29b0bd8e86e8e5e02a61a85",
+      "bytes": 390685,
+      "download_status": "downloaded",
+      "conditions": [
+        "raw_card"
+      ],
+      "review_status": "visually_verified",
+      "manual_truth": {
+        "kind": "raw",
+        "company": null,
+        "grade": null,
+        "name": "Armarouge",
+        "number": "203/198",
+        "language": "en"
+      }
+    },
+    {
+      "id": "fresh100_365490414711",
+      "page_url": "https://www.ebay.com/itm/365490414711",
+      "image_url": "https://i.ebayimg.com/images/g/0g0AAeSwiBpn50z8/s-l1200.jpg",
+      "title": "Kirlia - Pokemon Scarlet and Violet Illustration Rare Full Art 212/198 Holo NM | eBay (https://www.ebay.com/itm/365490414711)",
+      "discovery": "image_search",
+      "query": "Pokemon Kirlia 212/198 card ebay",
+      "path": "datasets/review/grading-fresh100-20261002/frozen-photos/fresh100_365490414711.jpg",
+      "sha256": "aed4b242eb0b52211538921bbd8f5c2ff04fe67528ae21f6c052c43c573e9d1b",
+      "bytes": 275277,
+      "download_status": "downloaded",
+      "conditions": [
+        "raw_card"
+      ],
+      "review_status": "visually_verified",
+      "manual_truth": {
+        "kind": "raw",
+        "company": null,
+        "grade": null,
+        "name": "Kirlia",
+        "number": "212/198",
+        "language": "en"
+      }
+    },
+    {
+      "id": "freshraw_4_343408992",
+      "page_url": "https://www.sportscardinvestor.com/cards/drowzee-pokemon/2023-scarlet-violet-illustration-rare-210-198",
+      "image_url": "https://i.ebayimg.com/images/g/Rj0AAeSw-M9pgvA2/s-l1600.jpg",
+      "title": "Drowzee 2023 Scarlet & Violet #210/198 Illustration Rare Price Guide - Sports Card Investor (https://www.sportscardinvestor.com/cards/drowzee-pokemon/2023-scarlet-violet-illustration-rare-210-198)",
+      "discovery": "image_search",
+      "query": "Pokemon Drowzee 210/198 card ebay",
+      "path": "datasets/review/grading-fresh100-20261002/frozen-photos/freshraw_4_343408992.jpg",
+      "sha256": "68ec6b77e26f33331332679220d5a6325c9a57d728488046e6282c871fde2f39",
+      "bytes": 615148,
+      "download_status": "downloaded",
+      "conditions": [
+        "raw_card"
+      ],
+      "review_status": "visually_verified",
+      "manual_truth": {
+        "kind": "raw",
+        "company": null,
+        "grade": null,
+        "name": "Drowzee",
+        "number": "210/198",
+        "language": "en"
+      }
+    },
+    {
+      "id": "fresh100_397747206164",
+      "page_url": "https://www.ebay.com/itm/397747206164",
+      "image_url": "https://i.ebayimg.com/images/g/oJEAAeSw~7pqi6oM/s-l1600.webp",
+      "title": "Gengar & Mimikyu GX 038/095 Sm9: Tag Bolt Holo (Japanese) for sale online | eBay (https://www.ebay.com/itm/397747206164)",
+      "alt": "PSA 8 Gengar & Mimikyu GX 038/095 RR SM9 Tag Bolt Japanese 2018 Pok\u00e9mon card with holographic artwork, Japanese text, and PSA label.",
+      "path": "datasets/review/grading-fresh100-20261002/frozen-photos/fresh100_397747206164.jpg",
+      "sha256": "5ff107d2badfb21c4f811cd2658614b8d9aae7933c29bf122cb95b995d89bfc4",
+      "bytes": 477102,
+      "download_status": "downloaded",
+      "conditions": [
+        "slab"
+      ],
+      "review_status": "visually_verified",
+      "manual_truth": {
+        "kind": "slab",
+        "company": "psa",
+        "grade": 8,
+        "name": "Gengar & Mimikyu GX",
+        "number": "038/095",
+        "language": "ja"
+      }
+    },
+    {
+      "id": "fresh100_406359778998",
+      "page_url": "https://www.ebay.com/itm/406359778998",
+      "image_url": "https://i.ebayimg.com/images/g/xvQAAeSwOzFqcfmY/s-l1600.webp",
+      "title": "Dragonite 065/095 Sm9: Tag Bolt Holo (Japanese) for sale online | eBay (https://www.ebay.com/itm/406359778998)",
+      "alt": "2018 Japanese Pok\u00e9mon Sun & Moon Tag Bolt #065 Dragonite-Holo PSA 9, brown dragon with gold accents on blue background.",
+      "path": "datasets/review/grading-fresh100-20261002/frozen-photos/fresh100_406359778998.jpg",
+      "sha256": "6645cee37806e721d503de10aa97e9c248c83f45b1d452c7de9a313b92f726d0",
+      "bytes": 446230,
+      "download_status": "downloaded",
+      "conditions": [
+        "slab"
+      ],
+      "review_status": "visually_verified",
+      "manual_truth": {
+        "kind": "slab",
+        "company": "psa",
+        "grade": 9,
+        "name": "Dragonite",
+        "number": "065/095",
+        "language": "ja"
+      }
+    },
+    {
+      "id": "fresh100_277613285848",
+      "page_url": "https://www.ebay.com/itm/277613285848",
+      "image_url": "https://i.ebayimg.com/images/g/2qYAAeSwMc1pUtqP/s-l1200.jpg",
+      "title": "PSA 8 NM-MINT Mew Ex SVP053 ALTERNATE ART HOLO 151 UPC PROMO Pokemon Card | eBay (https://www.ebay.com/itm/277613285848)",
+      "discovery": "image_search",
+      "query": "Pokemon PSA graded slab front label 8 eBay",
+      "path": "datasets/review/grading-fresh100-20261002/frozen-photos/fresh100_277613285848.jpg",
+      "sha256": "3629fa0d30cb4220be3464d1a961f6eb6c9acfdec7313ca307381e4526084104",
+      "bytes": 396995,
+      "download_status": "downloaded",
+      "conditions": [
+        "slab"
+      ],
+      "review_status": "visually_verified",
+      "manual_truth": {
+        "kind": "slab",
+        "company": "psa",
+        "grade": 8,
+        "name": "Mew ex",
+        "number": "SVP053",
+        "language": "en"
+      }
+    },
+    {
+      "id": "freshimg_0_995976121",
+      "page_url": "https://www.ebay.com/p/28062931363",
+      "image_url": "https://i.ebayimg.com/images/g/2zoAAeSw8tFpyDlL/s-l1200.jpg",
+      "title": "",
+      "discovery": "image_search",
+      "query": "Pokemon PSA graded slab front label 8 eBay",
+      "path": "datasets/review/grading-fresh100-20261002/frozen-photos/freshimg_0_995976121.jpg",
+      "sha256": "156f024a757e6b4e978558cdb3d757f0ab46ed44d831b50a356afed3db4a8f7a",
+      "bytes": 213637,
+      "download_status": "downloaded",
+      "conditions": [
+        "slab"
+      ],
+      "review_status": "visually_verified",
+      "manual_truth": {
+        "kind": "slab",
+        "company": "psa",
+        "grade": 8,
+        "name": "Blastoise ex",
+        "number": "200/165",
+        "language": "en"
+      }
+    },
+    {
+      "id": "freshimg_0_1677673688",
+      "page_url": "https://www.ebay.com/p/26063212569",
+      "image_url": "https://i.ebayimg.com/images/g/AWMAAeSwIXxpzWWe/s-l1200.jpg",
+      "title": "",
+      "discovery": "image_search",
+      "query": "Pokemon PSA graded slab front label 8 eBay",
+      "path": "datasets/review/grading-fresh100-20261002/frozen-photos/freshimg_0_1677673688.jpg",
+      "sha256": "3962ddf26ea4ec2efeec32ff07b39f3b76038bf914ce108775e1b47fe8d68fba",
+      "bytes": 290654,
+      "download_status": "downloaded",
+      "conditions": [
+        "slab"
+      ],
+      "review_status": "visually_verified",
+      "manual_truth": {
+        "kind": "slab",
+        "company": "psa",
+        "grade": 8,
+        "name": "Mewtwo",
+        "number": "SVP052",
+        "language": "en"
+      }
+    },
+    {
+      "id": "freshimg_0_1212241946",
+      "page_url": "https://www.ebay.com/p/17062924371",
+      "image_url": "https://i.ebayimg.com/images/g/ytEAAeSwxi9pESx0/s-l400.jpg",
+      "title": "",
+      "discovery": "image_search",
+      "query": "Pokemon PSA graded slab front label 8 eBay",
+      "path": "datasets/review/grading-fresh100-20261002/frozen-photos/freshimg_0_1212241946.jpg",
+      "sha256": "cdf037826ce0d55b156083b681311ad4bd2bef66a736ae67f682a599d1d7a604",
+      "bytes": 56778,
+      "download_status": "downloaded",
+      "conditions": [
+        "slab"
+      ],
+      "review_status": "visually_verified",
+      "manual_truth": {
+        "kind": "slab",
+        "company": "psa",
+        "grade": 8,
+        "name": "Charizard ex",
+        "number": "199/165",
+        "language": "en"
+      }
+    },
+    {
+      "id": "freshimg_0_967558432",
+      "page_url": "https://www.ebay.com/b/Pikachu-Pokemon-TCG-Generations-Ultra-Rare-Individual-Collectible-Card-Game-Cards/183454/bn_84948685",
+      "image_url": "https://i.ebayimg.com/images/g/S~IAAeSwAPJplV76/s-l1200.webp",
+      "title": "",
+      "discovery": "image_search",
+      "query": "Pokemon PSA graded slab front label 8 eBay",
+      "path": "datasets/review/grading-fresh100-20261002/frozen-photos/freshimg_0_967558432.jpg",
+      "sha256": "cd6bfd6c573667fb4a472b17413a337cabf5ca4dba79d85b9d148693af7f368d",
+      "bytes": 256426,
+      "download_status": "downloaded",
+      "conditions": [
+        "slab"
+      ],
+      "review_status": "visually_verified",
+      "manual_truth": {
+        "kind": "slab",
+        "company": "psa",
+        "grade": 8,
+        "name": "Pikachu",
+        "number": "RC29/RC32",
+        "language": "en"
+      }
+    },
+    {
+      "id": "freshimg_0_1142638013",
+      "page_url": "https://www.ebay.com/p/14043372310",
+      "image_url": "https://i.ebayimg.com/images/g/UW8AAeSwKOdqBg4Z/s-l1200.jpg",
+      "title": "",
+      "discovery": "image_search",
+      "query": "Pokemon PSA graded slab front label 8 eBay",
+      "path": "datasets/review/grading-fresh100-20261002/frozen-photos/freshimg_0_1142638013.jpg",
+      "sha256": "255b099b0eebe98376556f91f375641614607e85b0ebf184209109f34f0dc63e",
+      "bytes": 325557,
+      "download_status": "downloaded",
+      "conditions": [
+        "slab"
+      ],
+      "review_status": "visually_verified",
+      "manual_truth": {
+        "kind": "slab",
+        "company": "psa",
+        "grade": 8,
+        "name": "Pikachu",
+        "number": "SWSH020",
+        "language": "en"
+      }
+    },
+    {
+      "id": "fresh100_137339181702",
+      "page_url": "https://www.ebay.com/itm/137339181702",
+      "image_url": "https://i.ebayimg.com/images/g/YgcAAOSwhC9f1FeS/s-l1600.webp",
+      "title": "Venusaur 15/102 Base Set (Shadowless) Holo for sale online | eBay (https://www.ebay.com/itm/137339181702)",
+      "alt": "Picture 1 of 6",
+      "discovery_note": "Removed separator colon mistakenly captured after public image URL; prior placeholder excluded.",
+      "path": "datasets/review/grading-fresh100-20261002/frozen-photos/fresh100_137339181702.jpg",
+      "sha256": "30fac2ab04bef7aff75b7732ddfe1fb2468e597bebc13b80ed97a1ef589cfa07",
+      "bytes": 331612,
+      "download_status": "downloaded",
+      "conditions": [
+        "slab"
+      ],
+      "review_status": "visually_verified",
+      "manual_truth": {
+        "kind": "slab",
+        "company": "psa",
+        "grade": 9,
+        "name": "Venusaur",
+        "number": "15/102",
+        "language": "en"
+      }
+    },
+    {
+      "id": "fresh100_336762686851",
+      "page_url": "https://www.ebay.com/itm/336762686851",
+      "image_url": "https://i.ebayimg.com/images/g/imQAAeSwg41o9psZ/s-l1600.webp",
+      "title": "Snorlax 055/078 Pok\u00e9mon GO Holo for sale online | eBay (https://www.ebay.com/itm/336762686851)",
+      "alt": "Graded PSA 8 2022 Pok\u00e9mon GO Snorlax-HOLO #055 with gold border, showing Snorlax in a city street with rainbow background.",
+      "discovery_note": "Removed separator colon mistakenly captured after public image URL; prior placeholder excluded.",
+      "path": "datasets/review/grading-fresh100-20261002/frozen-photos/fresh100_336762686851.jpg",
+      "sha256": "704e3611184333d500cac50d75d97d14e3788444e2e1e4d5f429183faa7b074e",
+      "bytes": 445698,
+      "download_status": "downloaded",
+      "conditions": [
+        "slab"
+      ],
+      "review_status": "visually_verified",
+      "manual_truth": {
+        "kind": "slab",
+        "company": "psa",
+        "grade": 8,
+        "name": "Snorlax",
+        "number": "055/078",
+        "language": "en"
+      }
+    },
+    {
+      "id": "freshimg_1_113190404",
+      "page_url": "https://www.ebay.ca/p/22065243991",
+      "image_url": "https://i.ebayimg.com/images/g/KN8AAeSwtqRpsILo/s-l1200.jpg",
+      "title": "Buy Mew ex 232/091 SV: Paldean Fates Holo online | eBay (https://www.ebay.ca/p/22065243991)",
+      "discovery": "image_search",
+      "query": "Pokemon Beckett BGS graded slab front label 9 eBay",
+      "path": "datasets/review/grading-fresh100-20261002/frozen-photos/freshimg_1_113190404.jpg",
+      "sha256": "2b76bed4d929074d59c70e5f3611a5285182a079a4c79b73a1a2cc6f47e409c9",
+      "bytes": 138623,
+      "download_status": "downloaded",
+      "conditions": [
+        "slab"
+      ],
+      "review_status": "visually_verified",
+      "manual_truth": {
+        "kind": "slab",
+        "company": "beckett",
+        "grade": 9,
+        "name": "Mew ex",
+        "number": "232/091",
+        "language": "en"
+      }
+    },
+    {
+      "id": "fresh100_277888034880",
+      "page_url": "https://www.ebay.com/itm/277888034880",
+      "image_url": "https://i.ebayimg.com/images/g/UUAAAeSwOqpp3D~8/s-l1200.jpg",
+      "title": "",
+      "discovery": "image_search",
+      "query": "Pokemon Beckett BGS graded slab front label 9 eBay",
+      "path": "datasets/review/grading-fresh100-20261002/frozen-photos/fresh100_277888034880.jpg",
+      "sha256": "bb686430fba807af147d8a662db99b8166db3d0752bf53c86f3d6016c0922661",
+      "bytes": 312479,
+      "download_status": "downloaded",
+      "conditions": [
+        "slab"
+      ],
+      "review_status": "visually_verified",
+      "manual_truth": {
+        "kind": "slab",
+        "company": "beckett",
+        "grade": 9,
+        "name": "Charizard ex",
+        "number": "199/165",
+        "language": "en"
+      }
+    },
+    {
+      "id": "fresh100_157312218315",
+      "page_url": "https://www.ebay.com/itm/157312218315",
+      "image_url": "https://i.ebayimg.com/images/g/OaQAAeSwdrZowkjX/s-l1200.jpg",
+      "title": "",
+      "discovery": "image_search",
+      "query": "Pokemon Beckett BGS graded slab front label 9 eBay",
+      "path": "datasets/review/grading-fresh100-20261002/frozen-photos/fresh100_157312218315.jpg",
+      "sha256": "b4a72113e2138b496715378db1189b4704875a8cbf0f398f270e49223d32f455",
+      "bytes": 227328,
+      "download_status": "downloaded",
+      "conditions": [
+        "slab"
+      ],
+      "review_status": "visually_verified",
+      "manual_truth": {
+        "kind": "slab",
+        "company": "beckett",
+        "grade": 9,
+        "name": "Pikachu",
+        "number": "051/162",
+        "language": "en"
+      }
+    },
+    {
+      "id": "fresh100_196431506881",
+      "page_url": "https://www.ebay.com/itm/196431506881",
+      "image_url": "https://i.ebayimg.com/images/g/UDAAAOSwfZJmYtOG/s-l1200.jpg",
+      "title": "",
+      "discovery": "image_search",
+      "query": "Pokemon Beckett BGS graded slab front label 9 eBay",
+      "path": "datasets/review/grading-fresh100-20261002/frozen-photos/fresh100_196431506881.jpg",
+      "sha256": "6ad03280d5fbf7f89927056aac1d28556487a345a0ef7dd3e7dd3b88a36899b1",
+      "bytes": 400341,
+      "download_status": "downloaded",
+      "conditions": [
+        "slab"
+      ],
+      "review_status": "visually_verified",
+      "manual_truth": {
+        "kind": "slab",
+        "company": "beckett",
+        "grade": 9,
+        "name": "Pikachu",
+        "number": "15/17",
+        "language": "en"
+      }
+    },
+    {
+      "id": "fresh100_276983335602",
+      "page_url": "https://www.ebay.com/itm/276983335602",
+      "image_url": "https://i.ebayimg.com/images/g/Pc8AAOSwXbFnp7Q-/s-l1200.jpg",
+      "title": "",
+      "discovery": "image_search",
+      "query": "Pokemon Beckett BGS graded slab front label 9 eBay",
+      "path": "datasets/review/grading-fresh100-20261002/frozen-photos/fresh100_276983335602.jpg",
+      "sha256": "1a16b58ba3f16a7f307acf9af1590e899a181a3a7d87cadabdac7c9d0ee38b25",
+      "bytes": 464135,
+      "download_status": "downloaded",
+      "conditions": [
+        "slab"
+      ],
+      "review_status": "visually_verified",
+      "manual_truth": {
+        "kind": "slab",
+        "company": "beckett",
+        "grade": 9,
+        "name": "Pikachu ex",
+        "number": "247/191",
+        "language": "en"
+      }
+    },
+    {
+      "id": "fresh100_116749113357",
+      "page_url": "https://www.ebay.com/itm/116749113357",
+      "image_url": "https://i.ebayimg.com/images/g/so0AAeSwaFhoq4wy/s-l1200.jpg",
+      "title": "",
+      "discovery": "image_search",
+      "query": "Pokemon Beckett BGS graded slab front label 9 eBay",
+      "path": "datasets/review/grading-fresh100-20261002/frozen-photos/fresh100_116749113357.jpg",
+      "sha256": "13c72043198bdeb4b476edfa6928e4eff7bdf24b57a073a5c3fe802a39b81019",
+      "bytes": 353073,
+      "download_status": "downloaded",
+      "conditions": [
+        "slab"
+      ],
+      "review_status": "visually_verified",
+      "manual_truth": {
+        "kind": "slab",
+        "company": "beckett",
+        "grade": 9,
+        "name": "Zekrom ex",
+        "number": "166/086",
+        "language": "en"
+      }
+    },
+    {
+      "id": "fresh100_206285662050",
+      "page_url": "https://www.ebay.com/itm/206285662050",
+      "image_url": "https://i.ebayimg.com/images/g/mdAAAeSwsj1qDNxN/s-l1600.webp",
+      "title": "Pok\u00e9mon TCG Mega Charizard X EX Promo #23 Beckett 8.5 | eBay (https://www.ebay.com/itm/206285662050)",
+      "alt": "Picture 1 of 2",
+      "path": "datasets/review/grading-fresh100-20261002/frozen-photos/fresh100_206285662050.jpg",
+      "sha256": "5d89ceb369f29b8072ee171958e9f6e26d31e153e30dbfd0122bbc9f06e1d214",
+      "bytes": 517614,
+      "download_status": "downloaded",
+      "conditions": [
+        "slab"
+      ],
+      "review_status": "visually_verified",
+      "manual_truth": {
+        "kind": "slab",
+        "company": "beckett",
+        "grade": 8.5,
+        "name": "Mega Charizard X ex",
+        "number": "MOP023",
+        "language": "en"
+      }
+    },
+    {
+      "id": "fresh100_126873299285",
+      "page_url": "https://www.ebay.com/itm/126873299285",
+      "image_url": "https://i.ebayimg.com/images/g/KrgAAOSw0Utnfuct/s-l1600.webp",
+      "title": "Pok\u00e9mon TCG - Venusaur (015/102) - 1999 Base Set (1st Edition) - Beckett 8.5 | eBay (https://www.ebay.com/itm/126873299285)",
+      "alt": "Beckett 8.5 1999 Pok\u00e9mon TCG Venusaur card, green with fiery background, yellow border, in protective case.",
+      "path": "datasets/review/grading-fresh100-20261002/frozen-photos/fresh100_126873299285.jpg",
+      "sha256": "999d6a1e20a11e0ccfa7a0878e87398cf22d8e85cabbfcdec3919c0eb8eed3bb",
+      "bytes": 297042,
+      "download_status": "downloaded",
+      "conditions": [
+        "slab"
+      ],
+      "review_status": "visually_verified",
+      "manual_truth": {
+        "kind": "slab",
+        "company": "beckett",
+        "grade": 8.5,
+        "name": "Venusaur",
+        "number": "15/102",
+        "language": "en"
+      }
+    },
+    {
+      "id": "fresh100_305430906935",
+      "page_url": "https://www.ebay.com/itm/305430906935",
+      "image_url": "https://i.ebayimg.com/images/g/ctIAAOSwA7Zl5PWZ/s-l1600.webp",
+      "title": "Gardevoir V Pok\u00e9mon TCG 2020 Champions Path 016/073 CGC 8.5 | eBay (https://www.ebay.com/itm/305430906935)",
+      "alt": "Gardevoir V Pok\u00e9mon TCG 2020 Champions Path card 016/073 graded CGC 8.5, featuring holographic artwork of Gardevoir in space.",
+      "path": "datasets/review/grading-fresh100-20261002/frozen-photos/fresh100_305430906935.jpg",
+      "sha256": "c37669c8fbfddb9bbfe28449adfe63fd7c84b2abfeefb088f7f78419d630cfc5",
+      "bytes": 583782,
+      "download_status": "downloaded",
+      "conditions": [
+        "slab"
+      ],
+      "review_status": "visually_verified",
+      "manual_truth": {
+        "kind": "slab",
+        "company": "cgc",
+        "grade": 8.5,
+        "name": "Gardevoir V",
+        "number": "016/073",
+        "language": "en"
+      }
+    },
+    {
+      "id": "fresh100_326079637741",
+      "page_url": "https://www.ebay.com/itm/326079637741",
+      "image_url": "https://i.ebayimg.com/images/g/Gd0AAOSwZg5mEJOX/s-l1600.jpg",
+      "title": "",
+      "discovery": "image_search",
+      "query": "Pokemon CGC pristine graded slab front label eBay",
+      "path": "datasets/review/grading-fresh100-20261002/frozen-photos/fresh100_326079637741.jpg",
+      "sha256": "ca0e148bdb7425e8d5005a48384f0bdae1c71ccafb8e00cdad7b784ec02a18f6",
+      "bytes": 303286,
+      "download_status": "downloaded",
+      "conditions": [
+        "slab"
+      ],
+      "review_status": "visually_verified",
+      "manual_truth": {
+        "kind": "slab",
+        "company": "cgc",
+        "grade": 10,
+        "name": "Treecko",
+        "number": "8/168",
+        "language": "en"
+      }
+    },
+    {
+      "id": "fresh100_135116047131",
+      "page_url": "https://www.ebay.com/itm/135116047131",
+      "image_url": "https://i.ebayimg.com/images/g/UzQAAOSwc39mdx~o/s-l1200.jpg",
+      "title": "",
+      "discovery": "image_search",
+      "query": "Pokemon CGC pristine graded slab front label eBay",
+      "path": "datasets/review/grading-fresh100-20261002/frozen-photos/fresh100_135116047131.jpg",
+      "sha256": "92785c8e317f5d56d71369600bfee8330649f2e963d485c1543cc844ba26940e",
+      "bytes": 179522,
+      "download_status": "downloaded",
+      "conditions": [
+        "slab"
+      ],
+      "review_status": "visually_verified",
+      "manual_truth": {
+        "kind": "slab",
+        "company": "cgc",
+        "grade": 10,
+        "name": "Professor Oak",
+        "number": "026/032",
+        "language": "ja"
+      }
+    },
+    {
+      "id": "fresh100_326160477186",
+      "page_url": "https://www.ebay.com/itm/326160477186",
+      "image_url": "https://i.ebayimg.com/images/g/LYoAAOSw3iBmaZb6/s-l1200.jpg",
+      "title": "",
+      "discovery": "image_search",
+      "query": "Pokemon CGC pristine graded slab front label eBay",
+      "path": "datasets/review/grading-fresh100-20261002/frozen-photos/fresh100_326160477186.jpg",
+      "sha256": "f0342a25c7736d7030ba03335e5fd1c3f8c55db6e775b848a04da131e50b08ab",
+      "bytes": 184841,
+      "download_status": "downloaded",
+      "conditions": [
+        "slab"
+      ],
+      "review_status": "visually_verified",
+      "manual_truth": {
+        "kind": "slab",
+        "company": "cgc",
+        "grade": 10,
+        "name": "Abra",
+        "number": "63/165",
+        "language": "en"
+      }
+    },
+    {
+      "id": "fresh100_326075712447",
+      "page_url": "https://www.ebay.com/itm/326075712447",
+      "image_url": "https://i.ebayimg.com/images/g/W7sAAOSw8xVmDDwz/s-l400.jpg",
+      "title": "",
+      "discovery": "image_search",
+      "query": "Pokemon CGC pristine graded slab front label eBay",
+      "path": "datasets/review/grading-fresh100-20261002/frozen-photos/fresh100_326075712447.jpg",
+      "sha256": "1fbea6450037449adfdc1308813a94a8da8f8b907d1c0b570cd37d75aff52ad7",
+      "bytes": 31749,
+      "download_status": "downloaded",
+      "conditions": [
+        "slab"
+      ],
+      "review_status": "visually_verified",
+      "manual_truth": {
+        "kind": "slab",
+        "company": "cgc",
+        "grade": 10,
+        "name": "Shaymin V",
+        "number": "013/172",
+        "language": "en"
+      }
+    },
+    {
+      "id": "fresh100_287247791643",
+      "page_url": "https://www.ebay.com/itm/287247791643",
+      "image_url": "https://i.ebayimg.com/images/g/oP8AAeSw3bppzafy/s-l1200.jpg",
+      "title": "",
+      "discovery": "image_search",
+      "query": "Pokemon CGC pristine graded slab front label eBay",
+      "path": "datasets/review/grading-fresh100-20261002/frozen-photos/fresh100_287247791643.jpg",
+      "sha256": "089a25bbd4deb0f68ba984d6d899e3aa32ad60cd2c89b7cf031c9259a0453537",
+      "bytes": 239107,
+      "download_status": "downloaded",
+      "conditions": [
+        "slab"
+      ],
+      "review_status": "visually_verified",
+      "manual_truth": {
+        "kind": "slab",
+        "company": "cgc",
+        "grade": 10,
+        "name": "Pikachu with Grey Felt Hat",
+        "number": "SVP085",
+        "language": "en"
+      }
+    },
+    {
+      "id": "fresh100_177390016065",
+      "page_url": "https://www.ebay.com/itm/177390016065",
+      "image_url": "https://i.ebayimg.com/images/g/5XkAAeSwIOxoqibt/s-l1200.jpg",
+      "title": "",
+      "discovery": "image_search",
+      "query": "Pokemon CGC pristine graded slab front label eBay",
+      "path": "datasets/review/grading-fresh100-20261002/frozen-photos/fresh100_177390016065.jpg",
+      "sha256": "d833c3186fdfac3c80aecd1e75635d70ecd9a36c22dbdebf10f56957b12fd967",
+      "bytes": 388805,
+      "download_status": "downloaded",
+      "conditions": [
+        "slab"
+      ],
+      "review_status": "visually_verified",
+      "manual_truth": {
+        "kind": "slab",
+        "company": "cgc",
+        "grade": 10,
+        "name": "Mewtwo GX",
+        "number": "SV59/SV94",
+        "language": "en"
+      }
+    },
+    {
+      "id": "fresh100_407246892266",
+      "page_url": "https://www.ebay.com/itm/407246892266",
+      "image_url": "https://i.ebayimg.com/images/g/rQgAAeSwDWBqt5LP/s-l1600.webp",
+      "title": "Pokemon Card Card Gardevoir Gardevoir Holo Ex Ruby Saphire japanese CGC 7.5 | eBay (https://www.ebay.com/itm/407246892266)",
+      "alt": "Holo Ex Ruby Saphire Japanese Pok\u00e9mon card of Gardevoir with white gown, purple border, in case, graded CGC 7.5.",
+      "discovery_note": "Removed separator colon mistakenly captured after public image URL; prior placeholder excluded.",
+      "path": "datasets/review/grading-fresh100-20261002/frozen-photos/fresh100_407246892266.jpg",
+      "sha256": "88daf290429c4986f8669381d24eb359d19c78da716751e303bf8b17b88fa224",
+      "bytes": 171046,
+      "download_status": "downloaded",
+      "conditions": [
+        "slab"
+      ],
+      "review_status": "visually_verified",
+      "manual_truth": {
+        "kind": "slab",
+        "company": "cgc",
+        "grade": 7.5,
+        "name": "Gardevoir",
+        "number": "029/055",
+        "language": "ja"
+      }
+    },
+    {
+      "id": "fresh100_377526701873",
+      "page_url": "https://www.ebay.com/itm/377526701873",
+      "image_url": "https://i.ebayimg.com/images/g/zZEAAeSw3XxquSTH/s-l1600.webp",
+      "title": "TAG GRADED Lucario & Melmetal GX SM192 Holo Japanese Tag Team | eBay (https://www.ebay.com/itm/377526701873)",
+      "alt": "Japanese holofoil TAG GRADED Lucario & Melmetal GX SM192 with Japanese text, HP 260, and visible attack patterns.",
+      "path": "datasets/review/grading-fresh100-20261002/frozen-photos/fresh100_377526701873.jpg",
+      "sha256": "2c3c24591d0ba360af2bcbf46e86b983ff501b042c5ca8c6280b5a1f1c220d39",
+      "bytes": 649426,
+      "download_status": "downloaded",
+      "conditions": [
+        "slab"
+      ],
+      "review_status": "visually_verified",
+      "manual_truth": {
+        "kind": "slab",
+        "company": "tag",
+        "grade": 10,
+        "name": "Lucario & Melmetal GX",
+        "number": "083/173",
+        "language": "ja"
+      }
+    },
+    {
+      "id": "fresh100_298706855994",
+      "page_url": "https://www.ebay.com/itm/298706855994",
+      "image_url": "https://i.ebayimg.com/images/g/XNIAAeSwHn1qf865/s-l1600.webp",
+      "title": "1999 Pokemon Base Set Shadowless 1st Edition Holo Magneton #9 Rare TAG Graded 6 | eBay (https://www.ebay.com/itm/298706855994)",
+      "alt": "1999 Pok\u00e9mon Base Set Shadowless 1st Ed holo Magneton #9, yellow border, 60 HP, in case.",
+      "path": "datasets/review/grading-fresh100-20261002/frozen-photos/fresh100_298706855994.jpg",
+      "sha256": "cf3ce16f3dfb439da5a62718074b399501dc7daca246a8b4551122c7a41c2d80",
+      "bytes": 201232,
+      "download_status": "downloaded",
+      "conditions": [
+        "slab"
+      ],
+      "review_status": "visually_verified",
+      "manual_truth": {
+        "kind": "slab",
+        "company": "tag",
+        "grade": 6,
+        "name": "Magneton",
+        "number": "9/102",
+        "language": "en"
+      }
+    },
+    {
+      "id": "fresh100_336794948594",
+      "page_url": "https://www.ebay.com/itm/336794948594",
+      "image_url": "https://i.ebayimg.com/images/g/rDkAAeSwvx5qqV02/s-l1600.webp",
+      "title": "Pok\u00e9mon TAG Graded TCG Timburr Sv6 Transformation Mask Art Rare JPN | eBay (https://www.ebay.com/itm/336794948594)",
+      "alt": "Japanese Pok\u00e9mon TAG graded TCG Timburr Sv6 card with wooden base, village scene artwork, and gold border in protective case.",
+      "path": "datasets/review/grading-fresh100-20261002/frozen-photos/fresh100_336794948594.jpg",
+      "sha256": "8f88a6c4e2167a365630357ebd3d4c8ae3b2d7dc1876dc749e13d4858e488c8f",
+      "bytes": 465326,
+      "download_status": "downloaded",
+      "conditions": [
+        "slab"
+      ],
+      "review_status": "visually_verified",
+      "manual_truth": {
+        "kind": "slab",
+        "company": "tag",
+        "grade": 9,
+        "name": "Timburr",
+        "number": "109/101",
+        "language": "ja"
+      }
+    },
+    {
+      "id": "fresh100_168302185613",
+      "page_url": "https://www.ebay.com/itm/168302185613",
+      "image_url": "https://i.ebayimg.com/images/g/6y0AAeSw3uFp2pZX/s-l1200.jpg",
+      "title": "",
+      "discovery": "image_search",
+      "query": "Pokemon TAG graded slab front label eBay",
+      "path": "datasets/review/grading-fresh100-20261002/frozen-photos/fresh100_168302185613.jpg",
+      "sha256": "557b38a59ef9ba18e54cfa1ddd6872e5a4f91dee9fed9903981cefc87a0dfcc1",
+      "bytes": 275255,
+      "download_status": "downloaded",
+      "conditions": [
+        "slab"
+      ],
+      "review_status": "visually_verified",
+      "manual_truth": {
+        "kind": "slab",
+        "company": "tag",
+        "grade": 9,
+        "name": "Pikachu & Zekrom GX",
+        "number": "041/173",
+        "language": "ja"
+      }
+    },
+    {
+      "id": "freshextra_0_70889495",
+      "page_url": "https://www.ebay.com/p/4074368147",
+      "image_url": "https://i.ebayimg.com/images/g/uxsAAeSwrYpo~B9U/s-l1600.jpg",
+      "title": "Eevee ex 075/131 Sv: Prismatic Evolutions Holo for sale online | eBay (https://www.ebay.com/p/4074368147)",
+      "discovery": "image_search",
+      "query": "Eevee ACE 9 graded Pokemon eBay",
+      "path": "datasets/review/grading-fresh100-20261002/frozen-photos/freshextra_0_70889495.jpg",
+      "sha256": "47e8727c6445fd91320a981668e77a76f13257db693c99bd7904a9b71ae75376",
+      "bytes": 306579,
+      "download_status": "downloaded",
+      "conditions": [
+        "slab"
+      ],
+      "review_status": "visually_verified",
+      "manual_truth": {
+        "kind": "slab",
+        "company": "tag",
+        "grade": 9,
+        "name": "Eevee ex",
+        "number": "075/131",
+        "language": "en"
+      }
+    },
+    {
+      "id": "fresh100_127464063628",
+      "page_url": "https://www.ebay.com/itm/127464063628",
+      "image_url": "https://i.ebayimg.com/images/g/lPEAAeSwwHxo-XZh/s-l1200.jpg",
+      "title": "Gardevoir ex 245/198 SV01: Scarlet & Violet Base Set Holo for sale online | eBay (https://www.ebay.com/itm/127464063628)",
+      "discovery": "image_search",
+      "query": "TAG Gardevoir graded Pokemon eBay",
+      "path": "datasets/review/grading-fresh100-20261002/frozen-photos/fresh100_127464063628.jpg",
+      "sha256": "b9adca307a41982bde186b3bd9a655a77dc97acc83ace38871f61f8c5a5186fa",
+      "bytes": 357535,
+      "download_status": "downloaded",
+      "conditions": [
+        "slab"
+      ],
+      "review_status": "visually_verified",
+      "manual_truth": {
+        "kind": "slab",
+        "company": "tag",
+        "grade": 8.5,
+        "name": "Gardevoir ex",
+        "number": "245/198",
+        "language": "en"
+      }
+    },
+    {
+      "id": "freshextra_5_636235657",
+      "page_url": "https://www.ebay.com/b/Gardevoir-TG05-TG30-Swsh12-Sword-Shield-Silver-Tempest-Trainer-Gallery/2536/bn_7124584442",
+      "image_url": "https://i.ebayimg.com/images/g/iScAAeSwh6hpsfHa/s-l1200.webp",
+      "title": "Gardevoir TG05/TG30 Swsh12: Sword & Shield - Silver Tempest Trainer Gallery for sale | eBay (https://www.ebay.com/b/Gardevoir-TG05-TG30-Swsh12-Sword-Shield-Silver-Tempest-Trainer-Gallery/2536/bn_7124584442)",
+      "discovery": "image_search",
+      "query": "TAG Gardevoir graded Pokemon eBay",
+      "path": "datasets/review/grading-fresh100-20261002/frozen-photos/freshextra_5_636235657.jpg",
+      "sha256": "7cd82d77548777fdbd0b9288a67839faafdf8460f19185a1bc5dfdedff3c4370",
+      "bytes": 163664,
+      "download_status": "downloaded",
+      "conditions": [
+        "slab"
+      ],
+      "review_status": "visually_verified",
+      "manual_truth": {
+        "kind": "slab",
+        "company": "tag",
+        "grade": 10,
+        "name": "Gardevoir",
+        "number": "TG05/TG30",
+        "language": "en"
+      }
+    },
+    {
+      "id": "fresh100_197768683572",
+      "page_url": "https://www.ebay.com/itm/197768683572",
+      "image_url": "https://i.ebayimg.com/images/g/PvUAAeSw39xo7F2K/s-l1200.jpg",
+      "title": "TAG 9 Gardevoir ex 233/091 SIR Pokemon TCG Paldean Fates | eBay (https://www.ebay.com/itm/197768683572)",
+      "discovery": "image_search",
+      "query": "TAG Gardevoir graded Pokemon eBay",
+      "path": "datasets/review/grading-fresh100-20261002/frozen-photos/fresh100_197768683572.jpg",
+      "sha256": "4774dce902065e35840ff49f0834ee38f6d62c205b506cf166fdf1a93aaeea1c",
+      "bytes": 240130,
+      "download_status": "downloaded",
+      "conditions": [
+        "slab"
+      ],
+      "review_status": "visually_verified",
+      "manual_truth": {
+        "kind": "slab",
+        "company": "tag",
+        "grade": 9,
+        "name": "Gardevoir ex",
+        "number": "233/091",
+        "language": "en"
+      }
+    },
+    {
+      "id": "fresh100_178061679870",
+      "page_url": "https://www.ebay.com/itm/178061679870",
+      "image_url": "https://i.ebayimg.com/images/g/YLAAAeSwDeVp5Nce/s-l1600.webp",
+      "title": "Pok\u00e9mon TCG Pikachu Arceus 71/99 Common ACE (not psa) GRADING GEM MINT 10 | eBay (https://www.ebay.com/itm/178061679870)",
+      "alt": "Picture 1 of 2",
+      "path": "datasets/review/grading-fresh100-20261002/frozen-photos/fresh100_178061679870.jpg",
+      "sha256": "25f2309979ad5805e58e24cc25da6acf1febfad1ea0b9e6740d16ad74a1cd47b",
+      "bytes": 229198,
+      "download_status": "downloaded",
+      "conditions": [
+        "slab"
+      ],
+      "review_status": "visually_verified",
+      "manual_truth": {
+        "kind": "slab",
+        "company": "ace",
+        "grade": 10,
+        "name": "Pikachu",
+        "number": "71/99",
+        "language": "en"
+      }
+    },
+    {
+      "id": "fresh100_205408031074",
+      "page_url": "https://www.ebay.co.uk/itm/205408031074",
+      "image_url": "https://i.ebayimg.com/images/g/bRMAAeSwvUhn97nh/s-l1200.jpg",
+      "title": "Eevee - 188/167 - Illustration Rare - Twilight Mascarade - ACE 9 Mint  | eBay UK (https://www.ebay.co.uk/itm/205408031074)",
+      "discovery": "image_search",
+      "query": "Eevee ACE 9 graded Pokemon eBay",
+      "path": "datasets/review/grading-fresh100-20261002/frozen-photos/fresh100_205408031074.jpg",
+      "sha256": "3717db2d07fcbcace2da3ea4996ded969709583abde7d99ed7f754358a0c6abf",
+      "bytes": 267603,
+      "download_status": "downloaded",
+      "conditions": [
+        "slab"
+      ],
+      "review_status": "visually_verified",
+      "manual_truth": {
+        "kind": "slab",
+        "company": "ace",
+        "grade": 9,
+        "name": "Eevee",
+        "number": "188/167",
+        "language": "en"
+      }
+    },
+    {
+      "id": "fresh100_407246154199",
+      "page_url": "https://www.ebay.com/itm/407246154199",
+      "image_url": "https://i.ebayimg.com/images/g/NcwAAeSweiRqtyn2/s-l1600.webp",
+      "path": "datasets/review/grading-fresh100-20261002/frozen-photos/fresh100_407246154199.jpg",
+      "sha256": "8338bce2e94ed358819ccfb5dcba3cb7dfeb72d7e89e8a56497fe959dcc1e4ed",
+      "bytes": 420618,
+      "download_status": "downloaded",
+      "conditions": [
+        "slab"
+      ],
+      "review_status": "visually_verified",
+      "manual_truth": {
+        "kind": "slab",
+        "company": "ace",
+        "grade": 8,
+        "name": "Eevee ex",
+        "number": "174",
+        "language": "en"
+      }
+    },
+    {
+      "id": "fresh100_307061782471",
+      "page_url": "https://www.ebay.com/itm/307061782471",
+      "image_url": "https://i.ebayimg.com/images/g/RggAAeSwgBVqIaU9/s-l1600.webp",
+      "path": "datasets/review/grading-fresh100-20261002/frozen-photos/fresh100_307061782471.jpg",
+      "sha256": "347b16fbec8c3b9f4e83b8b7eccdab79ddd6124a426de41d2a54af3e5d6a7a96",
+      "bytes": 318220,
+      "download_status": "downloaded",
+      "conditions": [
+        "slab"
+      ],
+      "review_status": "visually_verified",
+      "manual_truth": {
+        "kind": "slab",
+        "company": "ace",
+        "grade": 8,
+        "name": "M Gyarados EX",
+        "number": "115/122",
+        "language": "en"
+      }
+    },
+    {
+      "id": "fresh100_227337115305",
+      "page_url": "https://www.ebay.com/itm/227337115305",
+      "image_url": "https://i.ebayimg.com/images/g/x84AAeSwB3Fp~32s/s-l1600.webp",
+      "path": "datasets/review/grading-fresh100-20261002/frozen-photos/fresh100_227337115305.jpg",
+      "sha256": "b6c39ed2c8cfa9fd89e80f39cc98c678e35a11739335659e4344dc8fd49237e4",
+      "bytes": 600882,
+      "download_status": "downloaded",
+      "conditions": [
+        "slab"
+      ],
+      "review_status": "visually_verified",
+      "manual_truth": {
+        "kind": "slab",
+        "company": "ace",
+        "grade": 8,
+        "name": "Dark Charizard",
+        "number": "21/82",
+        "language": "en"
+      }
+    },
+    {
+      "id": "fresh100_287264323565",
+      "page_url": "https://www.ebay.com/itm/287264323565",
+      "image_url": "https://i.ebayimg.com/images/g/jgUAAeSwm7lp2P5c/s-l1600.webp",
+      "path": "datasets/review/grading-fresh100-20261002/frozen-photos/fresh100_287264323565.jpg",
+      "sha256": "886d8abdf7c6b0f4eb89c01e49d98bfdc3f1cd29ade30b2a473f7579996b88bf",
+      "bytes": 142106,
+      "download_status": "downloaded",
+      "conditions": [
+        "slab"
+      ],
+      "review_status": "visually_verified",
+      "manual_truth": {
+        "kind": "slab",
+        "company": "ace",
+        "grade": 8,
+        "name": "Rayquaza",
+        "number": "9/106",
+        "language": "en"
+      }
+    },
+    {
+      "id": "fresh100_336576388984",
+      "page_url": "https://www.ebay.com/itm/336576388984",
+      "image_url": "https://i.ebayimg.com/images/g/yaQAAeSwm5BqACeO/s-l1600.webp",
+      "path": "datasets/review/grading-fresh100-20261002/frozen-photos/fresh100_336576388984.jpg",
+      "sha256": "809490870a146b3ab6f83eba7805f1b28953315a3573e82aec03a4096b784af7",
+      "bytes": 161242,
+      "download_status": "downloaded",
+      "conditions": [
+        "slab"
+      ],
+      "review_status": "visually_verified",
+      "manual_truth": {
+        "kind": "slab",
+        "company": "ace",
+        "grade": 8,
+        "name": "Charizard VMAX",
+        "number": "SWSH261",
+        "language": "en"
+      }
+    },
+    {
+      "id": "fresh100_145662665211",
+      "page_url": "https://www.ebay.com/itm/145662665211",
+      "image_url": "https://i.ebayimg.com/images/g/LCUAAOSwqoxl8STl/s-l1600.webp",
+      "title": "Pokemon SM Hidden Fates Gyarados GX 16/68 AGS Mint+ 9.5 Full Art Holo Rare 2019 | eBay (https://www.ebay.com/itm/145662665211)",
+      "alt": "Pokemon SM Hidden Fates Gyarados GX 16/68 full art holo rare card graded AGS Mint 9.5, featuring stormy sea artwork.",
+      "path": "datasets/review/grading-fresh100-20261002/frozen-photos/fresh100_145662665211.jpg",
+      "sha256": "9ddd9de871ae5d5f01105cce305f778724c7721431ca4894ee488f332efd176a",
+      "bytes": 365566,
+      "download_status": "downloaded",
+      "conditions": [
+        "slab"
+      ],
+      "review_status": "visually_verified",
+      "manual_truth": {
+        "kind": "slab",
+        "company": "ags",
+        "grade": 9.5,
+        "name": "Gyarados GX",
+        "number": "16/68",
+        "language": "en"
+      }
+    },
+    {
+      "id": "fresh100_198196929850",
+      "page_url": "https://www.ebay.com/itm/198196929850",
+      "image_url": "https://i.ebayimg.com/images/g/I5cAAOSwxT5nYJFC/s-l1600.webp",
+      "title": "Vintage 2000 POKEMON ROCKET 1ST EDITION #25 DARK GYARADOS Graded AGS 8 | eBay (https://www.ebay.com/itm/198196929850)",
+      "alt": "2000 Pok\u00e9mon ROCKET 1st Ed. #25 Dark Gyarados, purple with yellow belly, in case, graded AGS 8.",
+      "discovery_note": "Removed separator colon mistakenly captured after public image URL; prior placeholder excluded.",
+      "path": "datasets/review/grading-fresh100-20261002/frozen-photos/fresh100_198196929850.jpg",
+      "sha256": "1529e659503a0c005750a96277d23eb24db7e8ca869dcc99acfc6f869c87084b",
+      "bytes": 349334,
+      "download_status": "downloaded",
+      "conditions": [
+        "slab"
+      ],
+      "review_status": "visually_verified",
+      "manual_truth": {
+        "kind": "slab",
+        "company": "ags",
+        "grade": 8,
+        "name": "Dark Gyarados",
+        "number": "25/82",
+        "language": "en"
+      }
+    },
+    {
+      "id": "fresh100_376009575543",
+      "page_url": "https://www.ebay.com/itm/376009575543",
+      "image_url": "https://i.ebayimg.com/images/g/aq0AAeSwy7tntsmp/s-l1200.jpg",
+      "title": "Eevee 188/167 Illustration Rare Twilight Masquerade Graded AGS 9 Mint | eBay (https://www.ebay.com/itm/376009575543)",
+      "discovery": "image_search",
+      "query": "Eevee ACE 9 graded Pokemon eBay",
+      "path": "datasets/review/grading-fresh100-20261002/frozen-photos/fresh100_376009575543.jpg",
+      "sha256": "ee33dee9c70b0b7c3157ad61f77d14700d523e48daf2340b7feddfa106eae0b8",
+      "bytes": 290355,
+      "download_status": "downloaded",
+      "conditions": [
+        "slab"
+      ],
+      "review_status": "visually_verified",
+      "manual_truth": {
+        "kind": "slab",
+        "company": "ags",
+        "grade": 9,
+        "name": "Eevee",
+        "number": "188/167",
+        "language": "en"
+      }
+    },
+    {
+      "id": "freshextra_1_1957211138",
+      "page_url": "https://www.ebay.com/p/16043369495",
+      "image_url": "https://i.ebayimg.com/images/g/UHQAAeSwMlNozaBz/s-l1200.jpg",
+      "title": "Squirtle 68/82 Team Rocket Regular for sale online | eBay (https://www.ebay.com/p/16043369495)",
+      "discovery": "image_search",
+      "query": "Squirtle ACE Grading 8 Pokemon eBay",
+      "path": "datasets/review/grading-fresh100-20261002/frozen-photos/freshextra_1_1957211138.jpg",
+      "sha256": "51ab9692fcc67ebe543177cdc74920101a72b03fd459d99abd6047f944bbdfe2",
+      "bytes": 166864,
+      "download_status": "downloaded",
+      "conditions": [
+        "slab"
+      ],
+      "review_status": "visually_verified",
+      "manual_truth": {
+        "kind": "slab",
+        "company": "ags",
+        "grade": 8.5,
+        "name": "Squirtle",
+        "number": "68/82",
+        "language": "en"
+      }
+    },
+    {
+      "id": "fresh100_146365926690",
+      "page_url": "https://www.ebay.com/itm/146365926690",
+      "image_url": "https://i.ebayimg.com/images/g/024AAOSw31dnoFlj/s-l1200.png",
+      "title": "Pokemon Paldean Fates Raichu 132/091 AGS Mint+ 9.5 Shiny Holo Secret Rare 2024 | eBay (https://www.ebay.com/itm/146365926690)",
+      "discovery": "image_search",
+      "query": "Raichu ACE Grading Pokemon eBay",
+      "path": "datasets/review/grading-fresh100-20261002/frozen-photos/fresh100_146365926690.jpg",
+      "sha256": "7cf927769eff692de32141548fbf92372cd16dc8068b02ba517243dbb2001b3e",
+      "bytes": 2514217,
+      "download_status": "downloaded",
+      "conditions": [
+        "slab"
+      ],
+      "review_status": "visually_verified",
+      "manual_truth": {
+        "kind": "slab",
+        "company": "ags",
+        "grade": 9.5,
+        "name": "Raichu",
+        "number": "132/091",
+        "language": "en"
+      }
+    },
+    {
+      "id": "fresh100_196323744191",
+      "page_url": "https://www.ebay.com/itm/196323744191",
+      "image_url": "https://i.ebayimg.com/images/g/jNwAAOSwXo1mCtEV/s-l1200.jpg",
+      "title": "VINTAGE 1999 Pok\u00e9mon Gyarados Base Set 6/102 Holo Unlimited Graded AGS 8.5 MT+ | eBay (https://www.ebay.com/itm/196323744191)",
+      "discovery": "image_search",
+      "query": "AGS Gyarados graded Pokemon eBay",
+      "path": "datasets/review/grading-fresh100-20261002/frozen-photos/fresh100_196323744191.jpg",
+      "sha256": "7733b064bf77a2ca3bc3654e54fa8a0047b623d49d0e9ebd87c9b86009faae1a",
+      "bytes": 303718,
+      "download_status": "downloaded",
+      "conditions": [
+        "slab"
+      ],
+      "review_status": "visually_verified",
+      "manual_truth": {
+        "kind": "slab",
+        "company": "ags",
+        "grade": 8.5,
+        "name": "Gyarados",
+        "number": "6/102",
+        "language": "en"
+      }
+    },
+    {
+      "id": "fresh100_145701209354",
+      "page_url": "https://www.ebay.com/itm/145701209354",
+      "image_url": "https://i.ebayimg.com/images/g/u6QAAOSww3tmDL7b/s-l1200.png",
+      "title": "Pokemon SWSH Evolving Skies Gyarados VMAX 029/203 AGS GEM-MT 10 Holo Rare 2021 | eBay (https://www.ebay.com/itm/145701209354)",
+      "discovery": "image_search",
+      "query": "AGS Gyarados graded Pokemon eBay",
+      "path": "datasets/review/grading-fresh100-20261002/frozen-photos/fresh100_145701209354.jpg",
+      "sha256": "21a95b30185d9100da61c2ce55e009aef97db78b1ac35a00f93ca7fa8564ffaf",
+      "bytes": 2642138,
+      "download_status": "downloaded",
+      "conditions": [
+        "slab"
+      ],
+      "review_status": "visually_verified",
+      "manual_truth": {
+        "kind": "slab",
+        "company": "ags",
+        "grade": 10,
+        "name": "Gyarados VMAX",
+        "number": "029/203",
+        "language": "en"
+      }
+    },
+    {
+      "id": "fresh100_205148259527",
+      "page_url": "https://www.ebay.com/itm/205148259527",
+      "image_url": "https://i.ebayimg.com/images/g/80UAAOSwcDVnUjj3/s-l1200.jpg",
+      "title": "GYARADOS 007/034 ACG 10 GOLD CLB POKEMON CARD CLASSIC COLLECTION HOLO ENGLISH | eBay (https://www.ebay.com/itm/205148259527)",
+      "discovery": "image_search",
+      "query": "AGS Gyarados graded Pokemon eBay",
+      "path": "datasets/review/grading-fresh100-20261002/frozen-photos/fresh100_205148259527.jpg",
+      "sha256": "f5ff7653329dafa7dd67580f03e3236cf01158adf09f88dbce3ed400c8b925d5",
+      "bytes": 263237,
+      "download_status": "downloaded",
+      "conditions": [
+        "slab"
+      ],
+      "review_status": "visually_verified",
+      "manual_truth": {
+        "kind": "slab",
+        "company": "ags",
+        "grade": 10,
+        "name": "Gyarados",
+        "number": "007/034",
+        "language": "en"
+      }
+    },
+    {
+      "id": "fresh100_146314372000",
+      "page_url": "https://www.ebay.com/itm/146314372000",
+      "image_url": "https://i.ebayimg.com/00/s/MTA4MFgxMDgw/z/5u0AAOSwSw9neNgy/%24_57.PNG?set_id=880000500F",
+      "title": "Pokemon XY Evolutions Dragonite EX 106/108 AGS Mint+ 9.5 FA Full Art Holo 2016 | eBay (https://www.ebay.com/itm/146314372000)",
+      "discovery": "image_search",
+      "query": "AGS Dragonite graded Pokemon eBay",
+      "path": "datasets/review/grading-fresh100-20261002/frozen-photos/fresh100_146314372000.jpg",
+      "sha256": "f4a2b70071cc2e7e014d331190da8a96df14d78f7d12f6532fcb23570ad40897",
+      "bytes": 2708780,
+      "download_status": "downloaded",
+      "conditions": [
+        "slab"
+      ],
+      "review_status": "visually_verified",
+      "manual_truth": {
+        "kind": "slab",
+        "company": "ags",
+        "grade": 9.5,
+        "name": "Dragonite EX",
+        "number": "106/108",
+        "language": "en"
+      }
+    }
+  ],
+  "truth_sha256": "bd75dadedfe32adcb6420b61999ad9caf44567fffad4aa166349aba412b5dabb"
+}

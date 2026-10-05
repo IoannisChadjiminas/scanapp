@@ -16,6 +16,24 @@ class AuxiliaryWorkGate:
         self.condition = Condition()
         self.active = False
         self.card_waiters = 0
+        self.card_priority = 0
+
+    @contextmanager
+    def prioritize_card(self):
+        """Yield optional grading between calls, without delaying foreground OCR.
+
+        An already running inference is allowed to finish. This is a scheduling
+        reservation, not a lane reservation: the isolated footer reader can
+        still acquire the auxiliary lane while the main reader runs.
+        """
+        with self.condition:
+            self.card_priority += 1
+        try:
+            yield
+        finally:
+            with self.condition:
+                self.card_priority -= 1
+                self.condition.notify_all()
 
     def try_reserve_card(self):
         """Never make a card read wait behind an optional grading call."""
@@ -51,7 +69,7 @@ class AuxiliaryWorkGate:
     @contextmanager
     def grading(self):
         with self.condition:
-            while self.active or self.card_waiters:
+            while self.active or self.card_waiters or self.card_priority:
                 check_grading_cancelled()
                 self.condition.wait(.05)
             check_grading_cancelled()

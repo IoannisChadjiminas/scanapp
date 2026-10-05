@@ -1,0 +1,2103 @@
+{
+  "scope": "Tuned 50-photo regression, NOT fresh holdout accuracy. Local offline API recognition, not deployed Flutter/camera/HTTP tests. Exact set/number/language evaluated; finish/authenticity not ground truth.",
+  "counts": {
+    "photos": 50,
+    "best_match_correct": 50,
+    "best_match_wrong": 0,
+    "no_best_match": 0,
+    "correct_in_best_or_alternatives": 50,
+    "automatic_matches": 14,
+    "wrong_automatic_matches": 0,
+    "statuses": {
+      "matched": 14,
+      "uncertain": 28,
+      "printing_ambiguous": 8
+    }
+  },
+  "full_card_only": null,
+  "previous_frozen_enabled": {
+    "photos": 50,
+    "best_match_correct": 45,
+    "best_match_wrong": 1,
+    "no_best_match": 4,
+    "correct_in_best_or_alternatives": 46,
+    "automatic_matches": 13,
+    "wrong_automatic_matches": 0,
+    "statuses": {
+      "matched": 13,
+      "uncertain": 26,
+      "retake": 4,
+      "printing_ambiguous": 7
+    }
+  },
+  "distinct_printing_ids": 20,
+  "strata": {
+    "language:en": {
+      "photos": 42,
+      "best_match_correct": 42,
+      "best_match_wrong": 0,
+      "no_best_match": 0,
+      "correct_in_best_or_alternatives": 42,
+      "automatic_matches": 12,
+      "wrong_automatic_matches": 0,
+      "statuses": {
+        "matched": 12,
+        "uncertain": 22,
+        "printing_ambiguous": 8
+      }
+    },
+    "language:ja": {
+      "photos": 8,
+      "best_match_correct": 8,
+      "best_match_wrong": 0,
+      "no_best_match": 0,
+      "correct_in_best_or_alternatives": 8,
+      "automatic_matches": 2,
+      "wrong_automatic_matches": 0,
+      "statuses": {
+        "uncertain": 6,
+        "matched": 2
+      }
+    },
+    "layout:pokemon_full_art": {
+      "photos": 26,
+      "best_match_correct": 26,
+      "best_match_wrong": 0,
+      "no_best_match": 0,
+      "correct_in_best_or_alternatives": 26,
+      "automatic_matches": 9,
+      "wrong_automatic_matches": 0,
+      "statuses": {
+        "matched": 9,
+        "uncertain": 17
+      }
+    },
+    "layout:standard_frame": {
+      "photos": 15,
+      "best_match_correct": 15,
+      "best_match_wrong": 0,
+      "no_best_match": 0,
+      "correct_in_best_or_alternatives": 15,
+      "automatic_matches": 1,
+      "wrong_automatic_matches": 0,
+      "statuses": {
+        "printing_ambiguous": 8,
+        "uncertain": 6,
+        "matched": 1
+      }
+    },
+    "layout:trainer_full_art": {
+      "photos": 9,
+      "best_match_correct": 9,
+      "best_match_wrong": 0,
+      "no_best_match": 0,
+      "correct_in_best_or_alternatives": 9,
+      "automatic_matches": 4,
+      "wrong_automatic_matches": 0,
+      "statuses": {
+        "uncertain": 5,
+        "matched": 4
+      }
+    },
+    "artwork_covered:False": {
+      "photos": 18,
+      "best_match_correct": 18,
+      "best_match_wrong": 0,
+      "no_best_match": 0,
+      "correct_in_best_or_alternatives": 18,
+      "automatic_matches": 2,
+      "wrong_automatic_matches": 0,
+      "statuses": {
+        "printing_ambiguous": 8,
+        "uncertain": 8,
+        "matched": 2
+      }
+    },
+    "artwork_covered:True": {
+      "photos": 32,
+      "best_match_correct": 32,
+      "best_match_wrong": 0,
+      "no_best_match": 0,
+      "correct_in_best_or_alternatives": 32,
+      "automatic_matches": 12,
+      "wrong_automatic_matches": 0,
+      "statuses": {
+        "matched": 12,
+        "uncertain": 20
+      }
+    }
+  },
+  "code_unchanged_from_generic_fix_regression": false,
+  "regression_run": true,
+  "limitations_context": "The inherited source limitations describe the original untouched holdout. This report is a tuned regression: failure photos informed generic fixes but were not indexed as catalogue references.",
+  "changed_code_files": [
+    "app/recognition/pipeline.py",
+    "app/recognition/local_match.py",
+    "app/recognition/rank.py",
+    "app/recognition/frame_fallback.py",
+    "app/config.py",
+    "app/recognition/ocr.py",
+    "app/recognition/language.py"
+  ],
+  "source_labels_sha256": "1e9694734f266f342b8db205dbe1ced5ec6f3df690b9008e071d1a6d566702a0",
+  "all_50_retained": true,
+  "failures": [],
+  "wrong_automatic_cases": [],
+  "negatives": [
+    {
+      "name": "blank",
+      "before": {
+        "status": "retake",
+        "suggestions": 0,
+        "automatic_claim": false
+      },
+      "after": {
+        "status": "retake",
+        "suggestions": 0,
+        "automatic_claim": false
+      }
+    },
+    {
+      "name": "noise",
+      "before": {
+        "status": "no_match",
+        "suggestions": 0,
+        "automatic_claim": false
+      },
+      "after": {
+        "status": "no_match",
+        "suggestions": 0,
+        "automatic_claim": false
+      }
+    }
+  ],
+  "cases": [
+    {
+      "photo": "holdout4_002",
+      "expected_id": "en:swsh12.5gg-GG38",
+      "best_match_id": "en:swsh12.5gg-GG38",
+      "best_match_correct": true,
+      "correct_in_best_or_alternatives": true,
+      "status": "matched",
+      "match_state": "matched",
+      "automatic_wrong_match": false,
+      "artwork_covered": true,
+      "language": "en",
+      "layout": "pokemon_full_art",
+      "page_url": "https://www.ebay.ca/itm/285610271855",
+      "full_shortlist_recall": true,
+      "artwork_shortlist_recall": true,
+      "identity_evidence": {
+        "collector_conflict": false,
+        "structured_collector_conflict": false,
+        "strong_name_conflict": false,
+        "language_conflict": false
+      },
+      "ocr": {
+        "name_text": "Suicune",
+        "collector_text": "©2023 Pokemon /Nintendo/Creatures/ GAME FREAK",
+        "failed": false,
+        "collector_retry_used": true,
+        "collector_retry_contributed": false
+      },
+      "query_size": [
+        583,
+        807
+      ],
+      "frame_selection": {
+        "profile": "primary",
+        "alternate_hypotheses": 0
+      },
+      "best_cardmarket_url": "https://www.cardmarket.com/en/Pokemon/Products/Singles/Crown-Zenith/Suicune-V-CRZGG38"
+    },
+    {
+      "photo": "holdout4_003",
+      "expected_id": "en:swsh12.5gg-GG38",
+      "best_match_id": "en:swsh12.5gg-GG38",
+      "best_match_correct": true,
+      "correct_in_best_or_alternatives": true,
+      "status": "uncertain",
+      "match_state": "likely",
+      "automatic_wrong_match": false,
+      "artwork_covered": true,
+      "language": "en",
+      "layout": "pokemon_full_art",
+      "page_url": "https://www.ebay.com/itm/336269330019",
+      "full_shortlist_recall": true,
+      "artwork_shortlist_recall": true,
+      "identity_evidence": {
+        "collector_conflict": false,
+        "structured_collector_conflict": false,
+        "strong_name_conflict": false,
+        "language_conflict": false
+      },
+      "ocr": {
+        "name_text": "Suicune",
+        "collector_text": "©2023 Pokémon /Nintendo/Creatures/GAME FREAK",
+        "failed": false,
+        "collector_retry_used": false,
+        "collector_retry_contributed": false
+      },
+      "query_size": [
+        527,
+        714
+      ],
+      "frame_selection": {
+        "profile": "loose_0",
+        "alternate_hypotheses": 5
+      },
+      "best_cardmarket_url": "https://www.cardmarket.com/en/Pokemon/Products/Singles/Crown-Zenith/Suicune-V-CRZGG38"
+    },
+    {
+      "photo": "holdout4_004",
+      "expected_id": "en:swsh12.5gg-GG38",
+      "best_match_id": "en:swsh12.5gg-GG38",
+      "best_match_correct": true,
+      "correct_in_best_or_alternatives": true,
+      "status": "uncertain",
+      "match_state": "likely",
+      "automatic_wrong_match": false,
+      "artwork_covered": true,
+      "language": "en",
+      "layout": "pokemon_full_art",
+      "page_url": "https://www.ebay.com/b/Suicune-Holo-Pokemon-TCG-Individual-Collectible-Card-Game-Cards/183454/bn_7117021603",
+      "full_shortlist_recall": true,
+      "artwork_shortlist_recall": true,
+      "identity_evidence": {
+        "collector_conflict": false,
+        "structured_collector_conflict": false,
+        "strong_name_conflict": false,
+        "language_conflict": false
+      },
+      "ocr": {
+        "name_text": "Suicune",
+        "collector_text": null,
+        "failed": false,
+        "collector_retry_used": true,
+        "collector_retry_contributed": false
+      },
+      "query_size": [
+        730,
+        1020
+      ],
+      "frame_selection": {
+        "profile": "window_0.85",
+        "alternate_hypotheses": 4
+      },
+      "best_cardmarket_url": "https://www.cardmarket.com/en/Pokemon/Products/Singles/Crown-Zenith/Suicune-V-CRZGG38"
+    },
+    {
+      "photo": "holdout4_005",
+      "expected_id": "en:swsh12.5gg-GG38",
+      "best_match_id": "en:swsh12.5gg-GG38",
+      "best_match_correct": true,
+      "correct_in_best_or_alternatives": true,
+      "status": "uncertain",
+      "match_state": "likely",
+      "automatic_wrong_match": false,
+      "artwork_covered": true,
+      "language": "en",
+      "layout": "pokemon_full_art",
+      "page_url": "https://www.ebay.com/itm/357920487400",
+      "full_shortlist_recall": true,
+      "artwork_shortlist_recall": true,
+      "identity_evidence": {
+        "collector_conflict": false,
+        "structured_collector_conflict": false,
+        "strong_name_conflict": false,
+        "language_conflict": false
+      },
+      "ocr": {
+        "name_text": null,
+        "collector_text": "retreat",
+        "failed": false,
+        "collector_retry_used": false,
+        "collector_retry_contributed": false
+      },
+      "query_size": [
+        601,
+        840
+      ],
+      "frame_selection": {
+        "profile": "window_0.70",
+        "alternate_hypotheses": 3
+      },
+      "best_cardmarket_url": "https://www.cardmarket.com/en/Pokemon/Products/Singles/Crown-Zenith/Suicune-V-CRZGG38"
+    },
+    {
+      "photo": "holdout4_006",
+      "expected_id": "en:swsh12.5gg-GG38",
+      "best_match_id": "en:swsh12.5gg-GG38",
+      "best_match_correct": true,
+      "correct_in_best_or_alternatives": true,
+      "status": "uncertain",
+      "match_state": "likely",
+      "automatic_wrong_match": false,
+      "artwork_covered": true,
+      "language": "en",
+      "layout": "pokemon_full_art",
+      "page_url": "https://www.ebay.com/itm/146375366854",
+      "full_shortlist_recall": true,
+      "artwork_shortlist_recall": false,
+      "identity_evidence": {
+        "collector_conflict": false,
+        "structured_collector_conflict": false,
+        "strong_name_conflict": false,
+        "language_conflict": false
+      },
+      "ocr": {
+        "name_text": "SuicuneV",
+        "collector_text": "AEFREAK",
+        "failed": false,
+        "collector_retry_used": true,
+        "collector_retry_contributed": false
+      },
+      "query_size": [
+        500,
+        500
+      ],
+      "frame_selection": {
+        "profile": "primary",
+        "alternate_hypotheses": 2
+      },
+      "best_cardmarket_url": "https://www.cardmarket.com/en/Pokemon/Products/Singles/Crown-Zenith/Suicune-V-CRZGG38"
+    },
+    {
+      "photo": "holdout4_009",
+      "expected_id": "en:swsh12.5gg-GG42",
+      "best_match_id": "en:swsh12.5gg-GG42",
+      "best_match_correct": true,
+      "correct_in_best_or_alternatives": true,
+      "status": "uncertain",
+      "match_state": "likely",
+      "automatic_wrong_match": false,
+      "artwork_covered": true,
+      "language": "en",
+      "layout": "pokemon_full_art",
+      "page_url": "https://www.ebay.com/itm/234868042242",
+      "full_shortlist_recall": true,
+      "artwork_shortlist_recall": true,
+      "identity_evidence": {
+        "collector_conflict": false,
+        "structured_collector_conflict": false,
+        "strong_name_conflict": false,
+        "language_conflict": false
+      },
+      "ocr": {
+        "name_text": null,
+        "collector_text": "GAMEFREAK",
+        "failed": false,
+        "collector_retry_used": false,
+        "collector_retry_contributed": false
+      },
+      "query_size": [
+        583,
+        815
+      ],
+      "frame_selection": {
+        "profile": "slab_interior",
+        "alternate_hypotheses": 5
+      },
+      "best_cardmarket_url": "https://www.cardmarket.com/en/Pokemon/Products/Singles/Crown-Zenith/Zeraora-VMAX-V2-CRZGG42"
+    },
+    {
+      "photo": "holdout4_010",
+      "expected_id": "en:swsh12.5gg-GG42",
+      "best_match_id": "en:swsh12.5gg-GG42",
+      "best_match_correct": true,
+      "correct_in_best_or_alternatives": true,
+      "status": "uncertain",
+      "match_state": "likely",
+      "automatic_wrong_match": false,
+      "artwork_covered": true,
+      "language": "en",
+      "layout": "pokemon_full_art",
+      "page_url": "https://www.ebay.com/itm/188314499593",
+      "full_shortlist_recall": true,
+      "artwork_shortlist_recall": true,
+      "identity_evidence": {
+        "collector_conflict": false,
+        "structured_collector_conflict": false,
+        "strong_name_conflict": false,
+        "language_conflict": false
+      },
+      "ocr": {
+        "name_text": "ZeraoraVMAX",
+        "collector_text": "02023 Pokémon/Nintenda/ Creatures / GAM",
+        "failed": false,
+        "collector_retry_used": false,
+        "collector_retry_contributed": false
+      },
+      "query_size": [
+        583,
+        815
+      ],
+      "frame_selection": {
+        "profile": "slab_interior",
+        "alternate_hypotheses": 4
+      },
+      "best_cardmarket_url": "https://www.cardmarket.com/en/Pokemon/Products/Singles/Crown-Zenith/Zeraora-VMAX-V2-CRZGG42"
+    },
+    {
+      "photo": "holdout4_011",
+      "expected_id": "en:swsh12.5gg-GG42",
+      "best_match_id": "en:swsh12.5gg-GG42",
+      "best_match_correct": true,
+      "correct_in_best_or_alternatives": true,
+      "status": "uncertain",
+      "match_state": "likely",
+      "automatic_wrong_match": false,
+      "artwork_covered": true,
+      "language": "en",
+      "layout": "pokemon_full_art",
+      "page_url": "https://www.ebay.co.uk/itm/334842178952",
+      "full_shortlist_recall": true,
+      "artwork_shortlist_recall": true,
+      "identity_evidence": {
+        "collector_conflict": false,
+        "structured_collector_conflict": false,
+        "strong_name_conflict": false,
+        "language_conflict": false
+      },
+      "ocr": {
+        "name_text": "ZeraoraVMAX",
+        "collector_text": "©2023 Pokémon/Nintendo/ Creatures/GAME FREAK",
+        "failed": false,
+        "collector_retry_used": false,
+        "collector_retry_contributed": false
+      },
+      "query_size": [
+        599,
+        736
+      ],
+      "frame_selection": {
+        "profile": "loose_0",
+        "alternate_hypotheses": 4
+      },
+      "best_cardmarket_url": "https://www.cardmarket.com/en/Pokemon/Products/Singles/Crown-Zenith/Zeraora-VMAX-V2-CRZGG42"
+    },
+    {
+      "photo": "holdout4_013",
+      "expected_id": "en:swsh12.5gg-GG54",
+      "best_match_id": "en:swsh12.5gg-GG54",
+      "best_match_correct": true,
+      "correct_in_best_or_alternatives": true,
+      "status": "uncertain",
+      "match_state": "tentative",
+      "automatic_wrong_match": false,
+      "artwork_covered": true,
+      "language": "en",
+      "layout": "pokemon_full_art",
+      "page_url": "https://www.ebay.com/itm/116695713820",
+      "full_shortlist_recall": true,
+      "artwork_shortlist_recall": true,
+      "identity_evidence": {
+        "collector_conflict": true,
+        "structured_collector_conflict": false,
+        "strong_name_conflict": false,
+        "language_conflict": false
+      },
+      "ocr": {
+        "name_text": null,
+        "collector_text": "your opponent takes 2 Prize cards.",
+        "failed": false,
+        "collector_retry_used": false,
+        "collector_retry_contributed": false
+      },
+      "query_size": [
+        590,
+        824
+      ],
+      "frame_selection": {
+        "profile": "window_0.70",
+        "alternate_hypotheses": 3
+      },
+      "best_cardmarket_url": "https://www.cardmarket.com/en/Pokemon/Products/Singles/Crown-Zenith/Zamazenta-V-V2-CRZGG54"
+    },
+    {
+      "photo": "holdout4_016",
+      "expected_id": "en:swsh12.5gg-GG47",
+      "best_match_id": "en:swsh12.5gg-GG47",
+      "best_match_correct": true,
+      "correct_in_best_or_alternatives": true,
+      "status": "matched",
+      "match_state": "matched",
+      "automatic_wrong_match": false,
+      "artwork_covered": true,
+      "language": "en",
+      "layout": "pokemon_full_art",
+      "page_url": "https://www.ebay.com/itm/115711191525",
+      "full_shortlist_recall": true,
+      "artwork_shortlist_recall": true,
+      "identity_evidence": {
+        "collector_conflict": false,
+        "structured_collector_conflict": false,
+        "strong_name_conflict": false,
+        "language_conflict": false
+      },
+      "ocr": {
+        "name_text": "HattereneVMAX",
+        "collector_text": "©2023 Pokémon/Nintendo/ Creatures/GAME FREAK",
+        "failed": false,
+        "collector_retry_used": false,
+        "collector_retry_contributed": false
+      },
+      "query_size": [
+        678,
+        1050
+      ],
+      "frame_selection": {
+        "profile": "primary",
+        "alternate_hypotheses": 0
+      },
+      "best_cardmarket_url": "https://www.cardmarket.com/en/Pokemon/Products/Singles/Crown-Zenith/Hatterene-VMAX-V2-CRZGG47"
+    },
+    {
+      "photo": "holdout4_017",
+      "expected_id": "en:swsh12.5gg-GG47",
+      "best_match_id": "en:swsh12.5gg-GG47",
+      "best_match_correct": true,
+      "correct_in_best_or_alternatives": true,
+      "status": "uncertain",
+      "match_state": "likely",
+      "automatic_wrong_match": false,
+      "artwork_covered": true,
+      "language": "en",
+      "layout": "pokemon_full_art",
+      "page_url": "https://www.ebay.com/itm/394583968440",
+      "full_shortlist_recall": true,
+      "artwork_shortlist_recall": true,
+      "identity_evidence": {
+        "collector_conflict": false,
+        "structured_collector_conflict": false,
+        "strong_name_conflict": false,
+        "language_conflict": false
+      },
+      "ocr": {
+        "name_text": "HattereneVMAX",
+        "collector_text": "GG47/GG70",
+        "failed": false,
+        "collector_retry_used": false,
+        "collector_retry_contributed": false
+      },
+      "query_size": [
+        974,
+        1360
+      ],
+      "frame_selection": {
+        "profile": "window_0.85",
+        "alternate_hypotheses": 4
+      },
+      "best_cardmarket_url": "https://www.cardmarket.com/en/Pokemon/Products/Singles/Crown-Zenith/Hatterene-VMAX-V2-CRZGG47"
+    },
+    {
+      "photo": "holdout4_018",
+      "expected_id": "en:swsh12.5gg-GG47",
+      "best_match_id": "en:swsh12.5gg-GG47",
+      "best_match_correct": true,
+      "correct_in_best_or_alternatives": true,
+      "status": "uncertain",
+      "match_state": "likely",
+      "automatic_wrong_match": false,
+      "artwork_covered": true,
+      "language": "en",
+      "layout": "pokemon_full_art",
+      "page_url": "https://www.ebay.com/itm/297653162320",
+      "full_shortlist_recall": true,
+      "artwork_shortlist_recall": true,
+      "identity_evidence": {
+        "collector_conflict": false,
+        "structured_collector_conflict": false,
+        "strong_name_conflict": false,
+        "language_conflict": false
+      },
+      "ocr": {
+        "name_text": "HattereneVHAX",
+        "collector_text": "tendo/ Creatures / GAME FREAK",
+        "failed": false,
+        "collector_retry_used": false,
+        "collector_retry_contributed": false
+      },
+      "query_size": [
+        601,
+        840
+      ],
+      "frame_selection": {
+        "profile": "window_0.70",
+        "alternate_hypotheses": 4
+      },
+      "best_cardmarket_url": "https://www.cardmarket.com/en/Pokemon/Products/Singles/Crown-Zenith/Hatterene-VMAX-V2-CRZGG47"
+    },
+    {
+      "photo": "holdout4_022",
+      "expected_id": "en:swsh12.5gg-GG64",
+      "best_match_id": "en:swsh12.5gg-GG64",
+      "best_match_correct": true,
+      "correct_in_best_or_alternatives": true,
+      "status": "uncertain",
+      "match_state": "likely",
+      "automatic_wrong_match": false,
+      "artwork_covered": true,
+      "language": "en",
+      "layout": "trainer_full_art",
+      "page_url": "https://www.ebay.com/itm/394844159840",
+      "full_shortlist_recall": true,
+      "artwork_shortlist_recall": true,
+      "identity_evidence": {
+        "collector_conflict": false,
+        "structured_collector_conflict": false,
+        "strong_name_conflict": false,
+        "language_conflict": false
+      },
+      "ocr": {
+        "name_text": "Melony",
+        "collector_text": "GG64/GG70",
+        "failed": false,
+        "collector_retry_used": false,
+        "collector_retry_contributed": false
+      },
+      "query_size": [
+        502,
+        716
+      ],
+      "frame_selection": {
+        "profile": "loose_0",
+        "alternate_hypotheses": 5
+      },
+      "best_cardmarket_url": "https://www.cardmarket.com/en/Pokemon/Products/Singles/Crown-Zenith/Melony-CRZGG64"
+    },
+    {
+      "photo": "holdout4_023",
+      "expected_id": "en:swsh12.5gg-GG64",
+      "best_match_id": "en:swsh12.5gg-GG64",
+      "best_match_correct": true,
+      "correct_in_best_or_alternatives": true,
+      "status": "uncertain",
+      "match_state": "likely",
+      "automatic_wrong_match": false,
+      "artwork_covered": true,
+      "language": "en",
+      "layout": "trainer_full_art",
+      "page_url": "https://www.ebay.com/itm/364183662928",
+      "full_shortlist_recall": true,
+      "artwork_shortlist_recall": true,
+      "identity_evidence": {
+        "collector_conflict": false,
+        "structured_collector_conflict": false,
+        "strong_name_conflict": false,
+        "language_conflict": false
+      },
+      "ocr": {
+        "name_text": "FA/MELONY",
+        "collector_text": "GAMEFREAK",
+        "failed": false,
+        "collector_retry_used": true,
+        "collector_retry_contributed": true
+      },
+      "query_size": [
+        572,
+        807
+      ],
+      "frame_selection": {
+        "profile": "line_7",
+        "alternate_hypotheses": 0
+      },
+      "best_cardmarket_url": "https://www.cardmarket.com/en/Pokemon/Products/Singles/Crown-Zenith/Melony-CRZGG64"
+    },
+    {
+      "photo": "holdout4_024",
+      "expected_id": "en:swsh12.5gg-GG64",
+      "best_match_id": "en:swsh12.5gg-GG64",
+      "best_match_correct": true,
+      "correct_in_best_or_alternatives": true,
+      "status": "matched",
+      "match_state": "matched",
+      "automatic_wrong_match": false,
+      "artwork_covered": true,
+      "language": "en",
+      "layout": "trainer_full_art",
+      "page_url": "https://www.ebay.com/b/Melony-GG64-GG70-Crown-Zenith-Galarian-Gallery/2536/bn_7124584951",
+      "full_shortlist_recall": true,
+      "artwork_shortlist_recall": true,
+      "identity_evidence": {
+        "collector_conflict": false,
+        "structured_collector_conflict": false,
+        "strong_name_conflict": false,
+        "language_conflict": false
+      },
+      "ocr": {
+        "name_text": "Melony",
+        "collector_text": "©2023Pokemon/Nintendo/Creatures/GAMEEREAK",
+        "failed": false,
+        "collector_retry_used": false,
+        "collector_retry_contributed": false
+      },
+      "query_size": [
+        814,
+        1149
+      ],
+      "frame_selection": {
+        "profile": "primary",
+        "alternate_hypotheses": 0
+      },
+      "best_cardmarket_url": "https://www.cardmarket.com/en/Pokemon/Products/Singles/Crown-Zenith/Melony-CRZGG64"
+    },
+    {
+      "photo": "holdout4_026",
+      "expected_id": "en:swsh12.5gg-GG66",
+      "best_match_id": "en:swsh12.5gg-GG66",
+      "best_match_correct": true,
+      "correct_in_best_or_alternatives": true,
+      "status": "uncertain",
+      "match_state": "likely",
+      "automatic_wrong_match": false,
+      "artwork_covered": true,
+      "language": "en",
+      "layout": "trainer_full_art",
+      "page_url": "https://www.ebay.com/itm/204551605133",
+      "full_shortlist_recall": true,
+      "artwork_shortlist_recall": true,
+      "identity_evidence": {
+        "collector_conflict": false,
+        "structured_collector_conflict": false,
+        "strong_name_conflict": false,
+        "language_conflict": false
+      },
+      "ocr": {
+        "name_text": "Roxanne",
+        "collector_text": "GG66/GG70",
+        "failed": false,
+        "collector_retry_used": false,
+        "collector_retry_contributed": false
+      },
+      "query_size": [
+        400,
+        558
+      ],
+      "frame_selection": {
+        "profile": "loose_0",
+        "alternate_hypotheses": 7
+      },
+      "best_cardmarket_url": "https://www.cardmarket.com/en/Pokemon/Products/Singles/Crown-Zenith/Roxanne-CRZGG66"
+    },
+    {
+      "photo": "holdout4_027",
+      "expected_id": "en:swsh12.5gg-GG66",
+      "best_match_id": "en:swsh12.5gg-GG66",
+      "best_match_correct": true,
+      "correct_in_best_or_alternatives": true,
+      "status": "uncertain",
+      "match_state": "tentative",
+      "automatic_wrong_match": false,
+      "artwork_covered": true,
+      "language": "en",
+      "layout": "trainer_full_art",
+      "page_url": "https://www.ebay.com/itm/135498640971",
+      "full_shortlist_recall": true,
+      "artwork_shortlist_recall": true,
+      "identity_evidence": {
+        "collector_conflict": true,
+        "structured_collector_conflict": false,
+        "strong_name_conflict": false,
+        "language_conflict": false
+      },
+      "ocr": {
+        "name_text": "Roxanne",
+        "collector_text": "©2023 Pokemon7Nintendo/Creatures/GAME FREAK",
+        "failed": false,
+        "collector_retry_used": false,
+        "collector_retry_contributed": false
+      },
+      "query_size": [
+        730,
+        1020
+      ],
+      "frame_selection": {
+        "profile": "window_0.85",
+        "alternate_hypotheses": 5
+      },
+      "best_cardmarket_url": "https://www.cardmarket.com/en/Pokemon/Products/Singles/Crown-Zenith/Roxanne-CRZGG66"
+    },
+    {
+      "photo": "holdout4_028",
+      "expected_id": "en:swsh12.5gg-GG66",
+      "best_match_id": "en:swsh12.5gg-GG66",
+      "best_match_correct": true,
+      "correct_in_best_or_alternatives": true,
+      "status": "matched",
+      "match_state": "matched",
+      "automatic_wrong_match": false,
+      "artwork_covered": true,
+      "language": "en",
+      "layout": "trainer_full_art",
+      "page_url": "https://www.ebay.com/itm/115714913529",
+      "full_shortlist_recall": true,
+      "artwork_shortlist_recall": true,
+      "identity_evidence": {
+        "collector_conflict": false,
+        "structured_collector_conflict": false,
+        "strong_name_conflict": false,
+        "language_conflict": false
+      },
+      "ocr": {
+        "name_text": "Roxanne",
+        "collector_text": "mon/Nintendo/Creat",
+        "failed": false,
+        "collector_retry_used": false,
+        "collector_retry_contributed": false
+      },
+      "query_size": [
+        789,
+        1091
+      ],
+      "frame_selection": {
+        "profile": "primary",
+        "alternate_hypotheses": 4
+      },
+      "best_cardmarket_url": "https://www.cardmarket.com/en/Pokemon/Products/Singles/Crown-Zenith/Roxanne-CRZGG66"
+    },
+    {
+      "photo": "holdout4_029",
+      "expected_id": "en:swsh12.5gg-GG66",
+      "best_match_id": "en:swsh12.5gg-GG66",
+      "best_match_correct": true,
+      "correct_in_best_or_alternatives": true,
+      "status": "matched",
+      "match_state": "matched",
+      "automatic_wrong_match": false,
+      "artwork_covered": true,
+      "language": "en",
+      "layout": "trainer_full_art",
+      "page_url": "https://www.ebay.com/itm/256621890812",
+      "full_shortlist_recall": true,
+      "artwork_shortlist_recall": true,
+      "identity_evidence": {
+        "collector_conflict": false,
+        "structured_collector_conflict": false,
+        "strong_name_conflict": false,
+        "language_conflict": false
+      },
+      "ocr": {
+        "name_text": "Roxanne",
+        "collector_text": "©2023 Pokemon/Nintendo/Creatures/GAME FREAK",
+        "failed": false,
+        "collector_retry_used": false,
+        "collector_retry_contributed": false
+      },
+      "query_size": [
+        896,
+        1194
+      ],
+      "frame_selection": {
+        "profile": "primary",
+        "alternate_hypotheses": 5
+      },
+      "best_cardmarket_url": "https://www.cardmarket.com/en/Pokemon/Products/Singles/Crown-Zenith/Roxanne-CRZGG66"
+    },
+    {
+      "photo": "holdout4_031",
+      "expected_id": "en:swsh12.5gg-GG66",
+      "best_match_id": "en:swsh12.5gg-GG66",
+      "best_match_correct": true,
+      "correct_in_best_or_alternatives": true,
+      "status": "uncertain",
+      "match_state": "likely",
+      "automatic_wrong_match": false,
+      "artwork_covered": true,
+      "language": "en",
+      "layout": "trainer_full_art",
+      "page_url": "https://www.ebay.com/itm/286014859614",
+      "full_shortlist_recall": false,
+      "artwork_shortlist_recall": false,
+      "identity_evidence": {
+        "collector_conflict": false,
+        "structured_collector_conflict": false,
+        "strong_name_conflict": false,
+        "language_conflict": false
+      },
+      "ocr": {
+        "name_text": "Roxanne",
+        "collector_text": "your turn.",
+        "failed": false,
+        "collector_retry_used": false,
+        "collector_retry_contributed": false
+      },
+      "query_size": [
+        900,
+        1200
+      ],
+      "frame_selection": {
+        "profile": "as_supplied",
+        "alternate_hypotheses": 4
+      },
+      "best_cardmarket_url": "https://www.cardmarket.com/en/Pokemon/Products/Singles/Crown-Zenith/Roxanne-CRZGG66"
+    },
+    {
+      "photo": "holdout4_036",
+      "expected_id": "en:swsh12.5gg-GG61",
+      "best_match_id": "en:swsh12.5gg-GG61",
+      "best_match_correct": true,
+      "correct_in_best_or_alternatives": true,
+      "status": "matched",
+      "match_state": "matched",
+      "automatic_wrong_match": false,
+      "artwork_covered": true,
+      "language": "en",
+      "layout": "trainer_full_art",
+      "page_url": "https://www.ebay.com/itm/235464395977",
+      "full_shortlist_recall": true,
+      "artwork_shortlist_recall": true,
+      "identity_evidence": {
+        "collector_conflict": false,
+        "structured_collector_conflict": false,
+        "strong_name_conflict": false,
+        "language_conflict": false
+      },
+      "ocr": {
+        "name_text": "Gardenia's Vigor",
+        "collector_text": "FGG61/GG70",
+        "failed": false,
+        "collector_retry_used": false,
+        "collector_retry_contributed": false
+      },
+      "query_size": [
+        573,
+        731
+      ],
+      "frame_selection": {
+        "profile": "primary",
+        "alternate_hypotheses": 6
+      },
+      "best_cardmarket_url": "https://www.cardmarket.com/en/Pokemon/Products/Singles/Crown-Zenith/Gardenias-Vigor-CRZGG61"
+    },
+    {
+      "photo": "holdout4_039",
+      "expected_id": "en:swsh12.5gg-GG23",
+      "best_match_id": "en:swsh12.5gg-GG23",
+      "best_match_correct": true,
+      "correct_in_best_or_alternatives": true,
+      "status": "matched",
+      "match_state": "matched",
+      "automatic_wrong_match": false,
+      "artwork_covered": true,
+      "language": "en",
+      "layout": "pokemon_full_art",
+      "page_url": "https://www.ebay.com/itm/235649054311",
+      "full_shortlist_recall": true,
+      "artwork_shortlist_recall": true,
+      "identity_evidence": {
+        "collector_conflict": false,
+        "structured_collector_conflict": false,
+        "strong_name_conflict": false,
+        "language_conflict": false
+      },
+      "ocr": {
+        "name_text": "Dunsparce",
+        "collector_text": "©2023 Pokémon /Nintendo/ Creatures/GAME FREAK",
+        "failed": false,
+        "collector_retry_used": false,
+        "collector_retry_contributed": false
+      },
+      "query_size": [
+        1079,
+        1494
+      ],
+      "frame_selection": {
+        "profile": "primary",
+        "alternate_hypotheses": 6
+      },
+      "best_cardmarket_url": "https://www.cardmarket.com/en/Pokemon/Products/Singles/Crown-Zenith/Dunsparce-CRZGG23"
+    },
+    {
+      "photo": "holdout4_041",
+      "expected_id": "en:swsh12.5gg-GG23",
+      "best_match_id": "en:swsh12.5gg-GG23",
+      "best_match_correct": true,
+      "correct_in_best_or_alternatives": true,
+      "status": "matched",
+      "match_state": "matched",
+      "automatic_wrong_match": false,
+      "artwork_covered": true,
+      "language": "en",
+      "layout": "pokemon_full_art",
+      "page_url": "https://www.ebay.com/itm/115875708028",
+      "full_shortlist_recall": true,
+      "artwork_shortlist_recall": true,
+      "identity_evidence": {
+        "collector_conflict": false,
+        "structured_collector_conflict": false,
+        "strong_name_conflict": false,
+        "language_conflict": false
+      },
+      "ocr": {
+        "name_text": "Dunsparce",
+        "collector_text": "findone, consideryourselflucky.",
+        "failed": false,
+        "collector_retry_used": false,
+        "collector_retry_contributed": false
+      },
+      "query_size": [
+        714,
+        997
+      ],
+      "frame_selection": {
+        "profile": "primary",
+        "alternate_hypotheses": 4
+      },
+      "best_cardmarket_url": "https://www.cardmarket.com/en/Pokemon/Products/Singles/Crown-Zenith/Dunsparce-CRZGG23"
+    },
+    {
+      "photo": "holdout4_043",
+      "expected_id": "en:swsh12.5gg-GG22",
+      "best_match_id": "en:swsh12.5gg-GG22",
+      "best_match_correct": true,
+      "correct_in_best_or_alternatives": true,
+      "status": "matched",
+      "match_state": "matched",
+      "automatic_wrong_match": false,
+      "artwork_covered": true,
+      "language": "en",
+      "layout": "pokemon_full_art",
+      "page_url": "https://www.ebay.com/itm/155774334055",
+      "full_shortlist_recall": true,
+      "artwork_shortlist_recall": true,
+      "identity_evidence": {
+        "collector_conflict": false,
+        "structured_collector_conflict": false,
+        "strong_name_conflict": false,
+        "language_conflict": false
+      },
+      "ocr": {
+        "name_text": "Ditto",
+        "collector_text": "GG22/GG70",
+        "failed": false,
+        "collector_retry_used": false,
+        "collector_retry_contributed": false
+      },
+      "query_size": [
+        613,
+        882
+      ],
+      "frame_selection": {
+        "profile": "frame_1",
+        "alternate_hypotheses": 6
+      },
+      "best_cardmarket_url": "https://www.cardmarket.com/en/Pokemon/Products/Singles/Crown-Zenith/Ditto-V2-CRZGG22"
+    },
+    {
+      "photo": "holdout4_045",
+      "expected_id": "en:swsh12.5gg-GG22",
+      "best_match_id": "en:swsh12.5gg-GG22",
+      "best_match_correct": true,
+      "correct_in_best_or_alternatives": true,
+      "status": "matched",
+      "match_state": "matched",
+      "automatic_wrong_match": false,
+      "artwork_covered": true,
+      "language": "en",
+      "layout": "pokemon_full_art",
+      "page_url": "https://www.ebay.com/itm/226448576997",
+      "full_shortlist_recall": true,
+      "artwork_shortlist_recall": true,
+      "identity_evidence": {
+        "collector_conflict": false,
+        "structured_collector_conflict": false,
+        "strong_name_conflict": false,
+        "language_conflict": false
+      },
+      "ocr": {
+        "name_text": "Ditto",
+        "collector_text": "@2023 Pokémon/Nintendo/Creatures/GAME FREAK",
+        "failed": false,
+        "collector_retry_used": false,
+        "collector_retry_contributed": false
+      },
+      "query_size": [
+        724,
+        1016
+      ],
+      "frame_selection": {
+        "profile": "primary",
+        "alternate_hypotheses": 0
+      },
+      "best_cardmarket_url": "https://www.cardmarket.com/en/Pokemon/Products/Singles/Crown-Zenith/Ditto-V2-CRZGG22"
+    },
+    {
+      "photo": "holdout4_046",
+      "expected_id": "en:swsh12.5gg-GG31",
+      "best_match_id": "en:swsh12.5gg-GG31",
+      "best_match_correct": true,
+      "correct_in_best_or_alternatives": true,
+      "status": "uncertain",
+      "match_state": "likely",
+      "automatic_wrong_match": false,
+      "artwork_covered": true,
+      "language": "en",
+      "layout": "pokemon_full_art",
+      "page_url": "https://www.ebay.com/itm/297535859373",
+      "full_shortlist_recall": false,
+      "artwork_shortlist_recall": true,
+      "identity_evidence": {
+        "collector_conflict": false,
+        "structured_collector_conflict": false,
+        "strong_name_conflict": false,
+        "language_conflict": false
+      },
+      "ocr": {
+        "name_text": "Turtwig",
+        "collector_text": "©2023 Pokémon/Nintendo/Creatures/GAME FREAK",
+        "failed": false,
+        "collector_retry_used": false,
+        "collector_retry_contributed": false
+      },
+      "query_size": [
+        668,
+        939
+      ],
+      "frame_selection": {
+        "profile": "loose_0",
+        "alternate_hypotheses": 4
+      },
+      "best_cardmarket_url": "https://www.cardmarket.com/en/Pokemon/Products/Singles/Crown-Zenith/Turtwig-CRZGG31"
+    },
+    {
+      "photo": "holdout4_047",
+      "expected_id": "en:swsh12.5gg-GG31",
+      "best_match_id": "en:swsh12.5gg-GG31",
+      "best_match_correct": true,
+      "correct_in_best_or_alternatives": true,
+      "status": "matched",
+      "match_state": "matched",
+      "automatic_wrong_match": false,
+      "artwork_covered": true,
+      "language": "en",
+      "layout": "pokemon_full_art",
+      "page_url": "https://www.ebay.com/itm/295989641482",
+      "full_shortlist_recall": true,
+      "artwork_shortlist_recall": true,
+      "identity_evidence": {
+        "collector_conflict": false,
+        "structured_collector_conflict": false,
+        "strong_name_conflict": false,
+        "language_conflict": false
+      },
+      "ocr": {
+        "name_text": "Turtwig",
+        "collector_text": "©2023 Pokémon/Nintendo/Creatures/GAME FREAK",
+        "failed": false,
+        "collector_retry_used": false,
+        "collector_retry_contributed": false
+      },
+      "query_size": [
+        1262,
+        1600
+      ],
+      "frame_selection": {
+        "profile": "as_supplied",
+        "alternate_hypotheses": 5
+      },
+      "best_cardmarket_url": "https://www.cardmarket.com/en/Pokemon/Products/Singles/Crown-Zenith/Turtwig-CRZGG31"
+    },
+    {
+      "photo": "holdout4_049",
+      "expected_id": "en:base1-20",
+      "best_match_id": "en:base1-20",
+      "best_match_correct": true,
+      "correct_in_best_or_alternatives": true,
+      "status": "printing_ambiguous",
+      "match_state": "likely",
+      "automatic_wrong_match": false,
+      "artwork_covered": false,
+      "language": "en",
+      "layout": "standard_frame",
+      "page_url": "https://www.ebay.co.uk/itm/403846203504",
+      "full_shortlist_recall": true,
+      "artwork_shortlist_recall": false,
+      "identity_evidence": {
+        "collector_conflict": false,
+        "structured_collector_conflict": false,
+        "strong_name_conflict": false,
+        "language_conflict": false
+      },
+      "ocr": {
+        "name_text": "Electabuzz",
+        "collector_text": "20/102",
+        "failed": false,
+        "collector_retry_used": false,
+        "collector_retry_contributed": false
+      },
+      "query_size": [
+        646,
+        913
+      ],
+      "frame_selection": {
+        "profile": "primary",
+        "alternate_hypotheses": 0
+      },
+      "best_cardmarket_url": "https://www.cardmarket.com/en/Pokemon/Products/Singles/Base-Set/Electabuzz-V2-BS20"
+    },
+    {
+      "photo": "holdout4_050",
+      "expected_id": "en:base1-20",
+      "best_match_id": "base1-20",
+      "best_match_correct": true,
+      "correct_in_best_or_alternatives": true,
+      "status": "printing_ambiguous",
+      "match_state": "likely",
+      "automatic_wrong_match": false,
+      "artwork_covered": false,
+      "language": "en",
+      "layout": "standard_frame",
+      "page_url": "https://www.ebay.com.au/itm/127680769675",
+      "full_shortlist_recall": true,
+      "artwork_shortlist_recall": false,
+      "identity_evidence": {
+        "collector_conflict": false,
+        "structured_collector_conflict": false,
+        "strong_name_conflict": false,
+        "language_conflict": false
+      },
+      "ocr": {
+        "name_text": "Electabuzz",
+        "collector_text": "20/102",
+        "failed": false,
+        "collector_retry_used": false,
+        "collector_retry_contributed": false
+      },
+      "query_size": [
+        477,
+        656
+      ],
+      "frame_selection": {
+        "profile": "loose_0",
+        "alternate_hypotheses": 7
+      },
+      "best_cardmarket_url": "https://www.cardmarket.com/en/Pokemon/Products/Singles/Base-Set/Electabuzz-V1-BS20"
+    },
+    {
+      "photo": "holdout4_051",
+      "expected_id": "en:base1-20",
+      "best_match_id": "base1-20",
+      "best_match_correct": true,
+      "correct_in_best_or_alternatives": true,
+      "status": "printing_ambiguous",
+      "match_state": "likely",
+      "automatic_wrong_match": false,
+      "artwork_covered": false,
+      "language": "en",
+      "layout": "standard_frame",
+      "page_url": "https://www.ebay.com/itm/364065432677",
+      "full_shortlist_recall": true,
+      "artwork_shortlist_recall": false,
+      "identity_evidence": {
+        "collector_conflict": false,
+        "structured_collector_conflict": false,
+        "strong_name_conflict": false,
+        "language_conflict": false
+      },
+      "ocr": {
+        "name_text": "Electabuzz",
+        "collector_text": "retreat cost",
+        "failed": false,
+        "collector_retry_used": true,
+        "collector_retry_contributed": true
+      },
+      "query_size": [
+        601,
+        840
+      ],
+      "frame_selection": {
+        "profile": "window_0.70",
+        "alternate_hypotheses": 5
+      },
+      "best_cardmarket_url": "https://www.cardmarket.com/en/Pokemon/Products/Singles/Base-Set/Electabuzz-V1-BS20"
+    },
+    {
+      "photo": "holdout4_058",
+      "expected_id": "en:base1-65",
+      "best_match_id": "base1-65",
+      "best_match_correct": true,
+      "correct_in_best_or_alternatives": true,
+      "status": "printing_ambiguous",
+      "match_state": "likely",
+      "automatic_wrong_match": false,
+      "artwork_covered": false,
+      "language": "en",
+      "layout": "standard_frame",
+      "page_url": "https://www.ebay.com/itm/176169588591",
+      "full_shortlist_recall": true,
+      "artwork_shortlist_recall": false,
+      "identity_evidence": {
+        "collector_conflict": false,
+        "structured_collector_conflict": false,
+        "strong_name_conflict": false,
+        "language_conflict": false
+      },
+      "ocr": {
+        "name_text": null,
+        "collector_text": "enigmatic Pokémon that can effortlessly regene",
+        "failed": false,
+        "collector_retry_used": false,
+        "collector_retry_contributed": false
+      },
+      "query_size": [
+        237,
+        333
+      ],
+      "frame_selection": {
+        "profile": "line_3",
+        "alternate_hypotheses": 0
+      },
+      "best_cardmarket_url": "https://www.cardmarket.com/en/Pokemon/Products/Singles/Base-Set/Staryu-V1-BS65"
+    },
+    {
+      "photo": "holdout4_060",
+      "expected_id": "en:base1-65",
+      "best_match_id": "en:base1-65",
+      "best_match_correct": true,
+      "correct_in_best_or_alternatives": true,
+      "status": "printing_ambiguous",
+      "match_state": "likely",
+      "automatic_wrong_match": false,
+      "artwork_covered": false,
+      "language": "en",
+      "layout": "standard_frame",
+      "page_url": "https://www.ebay.com/itm/176336704961",
+      "full_shortlist_recall": true,
+      "artwork_shortlist_recall": false,
+      "identity_evidence": {
+        "collector_conflict": false,
+        "structured_collector_conflict": false,
+        "strong_name_conflict": false,
+        "language_conflict": false
+      },
+      "ocr": {
+        "name_text": "Staryu",
+        "collector_text": "65/102",
+        "failed": false,
+        "collector_retry_used": false,
+        "collector_retry_contributed": false
+      },
+      "query_size": [
+        868,
+        1137
+      ],
+      "frame_selection": {
+        "profile": "primary",
+        "alternate_hypotheses": 0
+      },
+      "best_cardmarket_url": "https://www.cardmarket.com/en/Pokemon/Products/Singles/Base-Set/Staryu-V1-BS65"
+    },
+    {
+      "photo": "holdout4_063",
+      "expected_id": "en:base1-43",
+      "best_match_id": "en:base1-43",
+      "best_match_correct": true,
+      "correct_in_best_or_alternatives": true,
+      "status": "uncertain",
+      "match_state": "likely",
+      "automatic_wrong_match": false,
+      "artwork_covered": false,
+      "language": "en",
+      "layout": "standard_frame",
+      "page_url": "https://www.ebay.com/itm/233914367524",
+      "full_shortlist_recall": true,
+      "artwork_shortlist_recall": false,
+      "identity_evidence": {
+        "collector_conflict": false,
+        "structured_collector_conflict": false,
+        "strong_name_conflict": false,
+        "language_conflict": false
+      },
+      "ocr": {
+        "name_text": "Abra",
+        "collector_text": "43/102",
+        "failed": false,
+        "collector_retry_used": false,
+        "collector_retry_contributed": false
+      },
+      "query_size": [
+        845,
+        1192
+      ],
+      "frame_selection": {
+        "profile": "primary",
+        "alternate_hypotheses": 0
+      },
+      "best_cardmarket_url": "https://www.cardmarket.com/en/Pokemon/Products/Singles/Base-Set/Abra-V1-BS43"
+    },
+    {
+      "photo": "holdout4_064",
+      "expected_id": "en:base1-43",
+      "best_match_id": "en:base1-43",
+      "best_match_correct": true,
+      "correct_in_best_or_alternatives": true,
+      "status": "uncertain",
+      "match_state": "likely",
+      "automatic_wrong_match": false,
+      "artwork_covered": false,
+      "language": "en",
+      "layout": "standard_frame",
+      "page_url": "https://www.ebay.com/itm/265376811905",
+      "full_shortlist_recall": true,
+      "artwork_shortlist_recall": false,
+      "identity_evidence": {
+        "collector_conflict": false,
+        "structured_collector_conflict": false,
+        "strong_name_conflict": false,
+        "language_conflict": false
+      },
+      "ocr": {
+        "name_text": "Abra",
+        "collector_text": "43/102",
+        "failed": false,
+        "collector_retry_used": false,
+        "collector_retry_contributed": false
+      },
+      "query_size": [
+        756,
+        1039
+      ],
+      "frame_selection": {
+        "profile": "loose_0",
+        "alternate_hypotheses": 5
+      },
+      "best_cardmarket_url": "https://www.cardmarket.com/en/Pokemon/Products/Singles/Base-Set/Abra-V1-BS43"
+    },
+    {
+      "photo": "holdout4_067",
+      "expected_id": "en:base1-43",
+      "best_match_id": "base1-43",
+      "best_match_correct": true,
+      "correct_in_best_or_alternatives": true,
+      "status": "printing_ambiguous",
+      "match_state": "likely",
+      "automatic_wrong_match": false,
+      "artwork_covered": false,
+      "language": "en",
+      "layout": "standard_frame",
+      "page_url": "https://www.ebay.co.uk/itm/365909128525",
+      "full_shortlist_recall": true,
+      "artwork_shortlist_recall": false,
+      "identity_evidence": {
+        "collector_conflict": false,
+        "structured_collector_conflict": false,
+        "strong_name_conflict": false,
+        "language_conflict": false
+      },
+      "ocr": {
+        "name_text": "ABRA",
+        "collector_text": "31107",
+        "failed": false,
+        "collector_retry_used": false,
+        "collector_retry_contributed": false
+      },
+      "query_size": [
+        232,
+        319
+      ],
+      "frame_selection": {
+        "profile": "aligned_reference",
+        "alternate_hypotheses": 0
+      },
+      "best_cardmarket_url": "https://www.cardmarket.com/en/Pokemon/Products/Singles/Base-Set/Abra-V1-BS43"
+    },
+    {
+      "photo": "holdout4_068",
+      "expected_id": "en:base2-58",
+      "best_match_id": "en:base2-58",
+      "best_match_correct": true,
+      "correct_in_best_or_alternatives": true,
+      "status": "matched",
+      "match_state": "matched",
+      "automatic_wrong_match": false,
+      "artwork_covered": false,
+      "language": "en",
+      "layout": "standard_frame",
+      "page_url": "https://www.ebay.co.uk/itm/235766711445",
+      "full_shortlist_recall": true,
+      "artwork_shortlist_recall": false,
+      "identity_evidence": {
+        "collector_conflict": false,
+        "structured_collector_conflict": false,
+        "strong_name_conflict": false,
+        "language_conflict": false
+      },
+      "ocr": {
+        "name_text": "odddish",
+        "collector_text": "58/64",
+        "failed": false,
+        "collector_retry_used": false,
+        "collector_retry_contributed": false
+      },
+      "query_size": [
+        773,
+        1044
+      ],
+      "frame_selection": {
+        "profile": "primary",
+        "alternate_hypotheses": 0
+      },
+      "best_cardmarket_url": "https://www.cardmarket.com/en/Pokemon/Products/Singles/Jungle/Oddish-JU58"
+    },
+    {
+      "photo": "holdout4_070",
+      "expected_id": "en:base2-58",
+      "best_match_id": "en:base2-58",
+      "best_match_correct": true,
+      "correct_in_best_or_alternatives": true,
+      "status": "uncertain",
+      "match_state": "likely",
+      "automatic_wrong_match": false,
+      "artwork_covered": false,
+      "language": "en",
+      "layout": "standard_frame",
+      "page_url": "https://www.ebay.com/itm/165723243760",
+      "full_shortlist_recall": true,
+      "artwork_shortlist_recall": false,
+      "identity_evidence": {
+        "collector_conflict": false,
+        "structured_collector_conflict": false,
+        "strong_name_conflict": false,
+        "language_conflict": false
+      },
+      "ocr": {
+        "name_text": "Oddsh",
+        "collector_text": "58/64",
+        "failed": false,
+        "collector_retry_used": false,
+        "collector_retry_contributed": false
+      },
+      "query_size": [
+        956,
+        1346
+      ],
+      "frame_selection": {
+        "profile": "loose_1",
+        "alternate_hypotheses": 5
+      },
+      "best_cardmarket_url": "https://www.cardmarket.com/en/Pokemon/Products/Singles/Jungle/Oddish-JU58"
+    },
+    {
+      "photo": "holdout4_072",
+      "expected_id": "en:base2-58",
+      "best_match_id": "en:base2-58",
+      "best_match_correct": true,
+      "correct_in_best_or_alternatives": true,
+      "status": "uncertain",
+      "match_state": "likely",
+      "automatic_wrong_match": false,
+      "artwork_covered": false,
+      "language": "en",
+      "layout": "standard_frame",
+      "page_url": "https://www.ebay.com/itm/395449009259",
+      "full_shortlist_recall": true,
+      "artwork_shortlist_recall": false,
+      "identity_evidence": {
+        "collector_conflict": false,
+        "structured_collector_conflict": false,
+        "strong_name_conflict": false,
+        "language_conflict": false
+      },
+      "ocr": {
+        "name_text": "Oddish",
+        "collector_text": "attack if your Bench is full.)",
+        "failed": false,
+        "collector_retry_used": true,
+        "collector_retry_contributed": true
+      },
+      "query_size": [
+        500,
+        698
+      ],
+      "frame_selection": {
+        "profile": "line_5",
+        "alternate_hypotheses": 0
+      },
+      "best_cardmarket_url": "https://www.cardmarket.com/en/Pokemon/Products/Singles/Jungle/Oddish-JU58"
+    },
+    {
+      "photo": "holdout4_078",
+      "expected_id": "en:base1-68",
+      "best_match_id": "en:base1-68",
+      "best_match_correct": true,
+      "correct_in_best_or_alternatives": true,
+      "status": "printing_ambiguous",
+      "match_state": "likely",
+      "automatic_wrong_match": false,
+      "artwork_covered": false,
+      "language": "en",
+      "layout": "standard_frame",
+      "page_url": "https://www.ebay.fr/itm/203262058975",
+      "full_shortlist_recall": true,
+      "artwork_shortlist_recall": false,
+      "identity_evidence": {
+        "collector_conflict": false,
+        "structured_collector_conflict": false,
+        "strong_name_conflict": false,
+        "language_conflict": false
+      },
+      "ocr": {
+        "name_text": "Vulpix",
+        "collector_text": "68/102",
+        "failed": false,
+        "collector_retry_used": false,
+        "collector_retry_contributed": false
+      },
+      "query_size": [
+        716,
+        972
+      ],
+      "frame_selection": {
+        "profile": "loose_0",
+        "alternate_hypotheses": 5
+      },
+      "best_cardmarket_url": "https://www.cardmarket.com/en/Pokemon/Products/Singles/Base-Set/Vulpix-V1-BS68"
+    },
+    {
+      "photo": "holdout4_080",
+      "expected_id": "en:base1-68",
+      "best_match_id": "base1-68",
+      "best_match_correct": true,
+      "correct_in_best_or_alternatives": true,
+      "status": "printing_ambiguous",
+      "match_state": "likely",
+      "automatic_wrong_match": false,
+      "artwork_covered": false,
+      "language": "en",
+      "layout": "standard_frame",
+      "page_url": "https://www.ebay.com/itm/184199328841",
+      "full_shortlist_recall": true,
+      "artwork_shortlist_recall": false,
+      "identity_evidence": {
+        "collector_conflict": false,
+        "structured_collector_conflict": false,
+        "strong_name_conflict": false,
+        "language_conflict": false
+      },
+      "ocr": {
+        "name_text": "Vulpix",
+        "collector_text": "68/102",
+        "failed": false,
+        "collector_retry_used": false,
+        "collector_retry_contributed": false
+      },
+      "query_size": [
+        551,
+        754
+      ],
+      "frame_selection": {
+        "profile": "primary",
+        "alternate_hypotheses": 0
+      },
+      "best_cardmarket_url": "https://www.cardmarket.com/en/Pokemon/Products/Singles/Base-Set/Vulpix-V1-BS68"
+    },
+    {
+      "photo": "holdout4_084",
+      "expected_id": "en:base1-62",
+      "best_match_id": "base1-62",
+      "best_match_correct": true,
+      "correct_in_best_or_alternatives": true,
+      "status": "uncertain",
+      "match_state": "likely",
+      "automatic_wrong_match": false,
+      "artwork_covered": false,
+      "language": "en",
+      "layout": "standard_frame",
+      "page_url": "https://www.ebay.com.au/itm/364172638912",
+      "full_shortlist_recall": true,
+      "artwork_shortlist_recall": false,
+      "identity_evidence": {
+        "collector_conflict": false,
+        "structured_collector_conflict": false,
+        "strong_name_conflict": false,
+        "language_conflict": false
+      },
+      "ocr": {
+        "name_text": "Sandshrew",
+        "collector_text": "62/102",
+        "failed": false,
+        "collector_retry_used": false,
+        "collector_retry_contributed": false
+      },
+      "query_size": [
+        775,
+        1047
+      ],
+      "frame_selection": {
+        "profile": "primary",
+        "alternate_hypotheses": 0
+      },
+      "best_cardmarket_url": "https://www.cardmarket.com/en/Pokemon/Products/Singles/Base-Set/Sandshrew-V1-BS62"
+    },
+    {
+      "photo": "holdout4_085",
+      "expected_id": "en:base1-62",
+      "best_match_id": "en:base1-62",
+      "best_match_correct": true,
+      "correct_in_best_or_alternatives": true,
+      "status": "uncertain",
+      "match_state": "likely",
+      "automatic_wrong_match": false,
+      "artwork_covered": false,
+      "language": "en",
+      "layout": "standard_frame",
+      "page_url": "https://www.ebay.co.uk/itm/196608245355",
+      "full_shortlist_recall": true,
+      "artwork_shortlist_recall": false,
+      "identity_evidence": {
+        "collector_conflict": false,
+        "structured_collector_conflict": false,
+        "strong_name_conflict": false,
+        "language_conflict": false
+      },
+      "ocr": {
+        "name_text": "Sandshrew",
+        "collector_text": "62/102",
+        "failed": false,
+        "collector_retry_used": false,
+        "collector_retry_contributed": false
+      },
+      "query_size": [
+        708,
+        982
+      ],
+      "frame_selection": {
+        "profile": "frame_1",
+        "alternate_hypotheses": 7
+      },
+      "best_cardmarket_url": "https://www.cardmarket.com/en/Pokemon/Products/Singles/Base-Set/Sandshrew-V2-BS62"
+    },
+    {
+      "photo": "holdout4_086",
+      "expected_id": "ja:SV5a-090",
+      "best_match_id": "ja:SV5a-090",
+      "best_match_correct": true,
+      "correct_in_best_or_alternatives": true,
+      "status": "uncertain",
+      "match_state": "tentative",
+      "automatic_wrong_match": false,
+      "artwork_covered": false,
+      "language": "ja",
+      "layout": "pokemon_full_art",
+      "page_url": "https://www.ebay.com/b/Greninja-Ex-090-066-Sv5a-Crimson-Haze/2536/bn_7124866731",
+      "full_shortlist_recall": true,
+      "artwork_shortlist_recall": false,
+      "identity_evidence": {
+        "collector_conflict": false,
+        "structured_collector_conflict": false,
+        "strong_name_conflict": true,
+        "language_conflict": false
+      },
+      "ocr": {
+        "name_text": "このポケモンは、ヘンチにいるかきり、ワザのダメージを受けない。",
+        "collector_text": "090/066",
+        "failed": false,
+        "collector_retry_used": false,
+        "collector_retry_contributed": false
+      },
+      "query_size": [
+        765,
+        1020
+      ],
+      "frame_selection": {
+        "profile": "primary",
+        "alternate_hypotheses": 0
+      },
+      "best_cardmarket_url": null
+    },
+    {
+      "photo": "holdout4_090",
+      "expected_id": "ja:SV5a-090",
+      "best_match_id": "ja:SV5a-090",
+      "best_match_correct": true,
+      "correct_in_best_or_alternatives": true,
+      "status": "uncertain",
+      "match_state": "tentative",
+      "automatic_wrong_match": false,
+      "artwork_covered": false,
+      "language": "ja",
+      "layout": "pokemon_full_art",
+      "page_url": "https://www.ebay.com/itm/226059102120",
+      "full_shortlist_recall": true,
+      "artwork_shortlist_recall": false,
+      "identity_evidence": {
+        "collector_conflict": false,
+        "structured_collector_conflict": false,
+        "strong_name_conflict": true,
+        "language_conflict": false
+      },
+      "ocr": {
+        "name_text": "テラスタル",
+        "collector_text": "090/066",
+        "failed": false,
+        "collector_retry_used": false,
+        "collector_retry_contributed": false
+      },
+      "query_size": [
+        944,
+        1318
+      ],
+      "frame_selection": {
+        "profile": "window_0.85",
+        "alternate_hypotheses": 4
+      },
+      "best_cardmarket_url": null
+    },
+    {
+      "photo": "holdout4_097",
+      "expected_id": "ja:SV4M-088",
+      "best_match_id": "ja:SV4M-088",
+      "best_match_correct": true,
+      "correct_in_best_or_alternatives": true,
+      "status": "matched",
+      "match_state": "matched",
+      "automatic_wrong_match": false,
+      "artwork_covered": false,
+      "language": "ja",
+      "layout": "pokemon_full_art",
+      "page_url": "https://www.ebay.com/itm/394963090456",
+      "full_shortlist_recall": true,
+      "artwork_shortlist_recall": false,
+      "identity_evidence": {
+        "collector_conflict": false,
+        "structured_collector_conflict": false,
+        "strong_name_conflict": false,
+        "language_conflict": false
+      },
+      "ocr": {
+        "name_text": "テツノカイナEX",
+        "collector_text": "088/066",
+        "failed": false,
+        "collector_retry_used": false,
+        "collector_retry_contributed": false
+      },
+      "query_size": [
+        500,
+        705
+      ],
+      "frame_selection": {
+        "profile": "primary",
+        "alternate_hypotheses": 0
+      },
+      "best_cardmarket_url": null
+    },
+    {
+      "photo": "holdout4_099",
+      "expected_id": "ja:SV5M-094",
+      "best_match_id": "ja:SV5M-094",
+      "best_match_correct": true,
+      "correct_in_best_or_alternatives": true,
+      "status": "uncertain",
+      "match_state": "tentative",
+      "automatic_wrong_match": false,
+      "artwork_covered": true,
+      "language": "ja",
+      "layout": "pokemon_full_art",
+      "page_url": "https://www.ebay.co.uk/itm/204791538373",
+      "full_shortlist_recall": true,
+      "artwork_shortlist_recall": true,
+      "identity_evidence": {
+        "collector_conflict": false,
+        "structured_collector_conflict": false,
+        "strong_name_conflict": true,
+        "language_conflict": false
+      },
+      "ocr": {
+        "name_text": "未来",
+        "collector_text": "HIGAME",
+        "failed": false,
+        "collector_retry_used": true,
+        "collector_retry_contributed": false
+      },
+      "query_size": [
+        603,
+        882
+      ],
+      "frame_selection": {
+        "profile": "primary",
+        "alternate_hypotheses": 6
+      },
+      "best_cardmarket_url": null
+    },
+    {
+      "photo": "holdout4_105",
+      "expected_id": "ja:SV5M-094",
+      "best_match_id": "ja:SV5M-094",
+      "best_match_correct": true,
+      "correct_in_best_or_alternatives": true,
+      "status": "uncertain",
+      "match_state": "tentative",
+      "automatic_wrong_match": false,
+      "artwork_covered": true,
+      "language": "ja",
+      "layout": "pokemon_full_art",
+      "page_url": "https://www.ebay.com/itm/404774417904",
+      "full_shortlist_recall": true,
+      "artwork_shortlist_recall": true,
+      "identity_evidence": {
+        "collector_conflict": true,
+        "structured_collector_conflict": false,
+        "strong_name_conflict": false,
+        "language_conflict": false
+      },
+      "ocr": {
+        "name_text": "テツノカシラX",
+        "collector_text": "ex>-",
+        "failed": false,
+        "collector_retry_used": true,
+        "collector_retry_contributed": false
+      },
+      "query_size": [
+        249,
+        344
+      ],
+      "frame_selection": {
+        "profile": "loose_0",
+        "alternate_hypotheses": 3
+      },
+      "best_cardmarket_url": null
+    },
+    {
+      "photo": "holdout4_111",
+      "expected_id": "ja:SV5K-093",
+      "best_match_id": "ja:SV5K-093",
+      "best_match_correct": true,
+      "correct_in_best_or_alternatives": true,
+      "status": "uncertain",
+      "match_state": "tentative",
+      "automatic_wrong_match": false,
+      "artwork_covered": true,
+      "language": "ja",
+      "layout": "pokemon_full_art",
+      "page_url": "https://www.ebay.com/itm/166978813978",
+      "full_shortlist_recall": true,
+      "artwork_shortlist_recall": true,
+      "identity_evidence": {
+        "collector_conflict": false,
+        "structured_collector_conflict": false,
+        "strong_name_conflict": true,
+        "language_conflict": false
+      },
+      "ocr": {
+        "name_text": "古代こだい",
+        "collector_text": "093/071",
+        "failed": false,
+        "collector_retry_used": false,
+        "collector_retry_contributed": false
+      },
+      "query_size": [
+        602,
+        824
+      ],
+      "frame_selection": {
+        "profile": "primary",
+        "alternate_hypotheses": 0
+      },
+      "best_cardmarket_url": null
+    },
+    {
+      "photo": "holdout4_112",
+      "expected_id": "ja:SV5K-093",
+      "best_match_id": "ja:SV5K-093",
+      "best_match_correct": true,
+      "correct_in_best_or_alternatives": true,
+      "status": "matched",
+      "match_state": "matched",
+      "automatic_wrong_match": false,
+      "artwork_covered": true,
+      "language": "ja",
+      "layout": "pokemon_full_art",
+      "page_url": "https://www.ebay.com/itm/315561794063",
+      "full_shortlist_recall": true,
+      "artwork_shortlist_recall": true,
+      "identity_evidence": {
+        "collector_conflict": false,
+        "structured_collector_conflict": false,
+        "strong_name_conflict": false,
+        "language_conflict": false
+      },
+      "ocr": {
+        "name_text": "ウガツホムラ",
+        "collector_text": "093/071",
+        "failed": false,
+        "collector_retry_used": false,
+        "collector_retry_contributed": false
+      },
+      "query_size": [
+        744,
+        1023
+      ],
+      "frame_selection": {
+        "profile": "primary",
+        "alternate_hypotheses": 0
+      },
+      "best_cardmarket_url": null
+    },
+    {
+      "photo": "holdout4_113",
+      "expected_id": "ja:SV5K-093",
+      "best_match_id": "ja:SV5K-093",
+      "best_match_correct": true,
+      "correct_in_best_or_alternatives": true,
+      "status": "uncertain",
+      "match_state": "likely",
+      "automatic_wrong_match": false,
+      "artwork_covered": true,
+      "language": "ja",
+      "layout": "pokemon_full_art",
+      "page_url": "https://www.ebay.com/itm/267495727650",
+      "full_shortlist_recall": true,
+      "artwork_shortlist_recall": true,
+      "identity_evidence": {
+        "collector_conflict": false,
+        "structured_collector_conflict": false,
+        "strong_name_conflict": false,
+        "language_conflict": false
+      },
+      "ocr": {
+        "name_text": "ウガツホムラ",
+        "collector_text": "093/071",
+        "failed": false,
+        "collector_retry_used": false,
+        "collector_retry_contributed": false
+      },
+      "query_size": [
+        638,
+        886
+      ],
+      "frame_selection": {
+        "profile": "line_2",
+        "alternate_hypotheses": 0
+      },
+      "best_cardmarket_url": null
+    }
+  ],
+  "latency_ms": {
+    "median": 5175.61,
+    "sample_p95_nearest_rank": 14112.57,
+    "max": 19241.86,
+    "stage_medians": {
+      "detect_ms": 16.82,
+      "frame_proposal_ms": 45.82,
+      "embed_ms": 758.35,
+      "artwork_embed_ms": 273.58,
+      "artwork_retrieve_ms": 3.61,
+      "ocr_ms": 2428.39,
+      "local_artwork_ms": 0.01,
+      "cardmarket_ms": 1290.05,
+      "boundary_proposal_ms": 0.0,
+      "boundary_selection_ms": 0.0,
+      "boundary_retry_ms": 0.0,
+      "first_pass_ms": 0.0
+    }
+  },
+  "catalogue_missing_reference_truths": [],
+  "catalogue_missing_cardmarket_truths": [
+    "ja:SV5a-090",
+    "ja:SV4M-088",
+    "ja:SV5M-094",
+    "ja:SV5K-093"
+  ],
+  "limitations": "Convenience marketplace sample; repeated identities, not population-random sampling. Physical authenticity, finish, copy independence and model-pretraining overlap unverified. Local API pipeline, not Flutter camera end-to-end. Internet test photos never indexed or used to tune this run."
+}

@@ -1,0 +1,1657 @@
+{
+  "summary": {
+    "probes": 30,
+    "top_correct": 15,
+    "candidate_recalled": 19,
+    "negative_probes": 2,
+    "false_specific_claims": 0,
+    "printing_ambiguous": 11,
+    "baseline_candidate_recalled": 10,
+    "regressed_candidate_recall": 1,
+    "source": "local read-only SQLite/reference/vector volume; not PlanetScale or live staging",
+    "visualization_font_setup_disabled": true,
+    "note": "Synthetic reference crops. Low-resolution retakes count as retrieval misses; no confidence calibration claim."
+  },
+  "cases": [
+    {
+      "expected_id": "en:base1-58",
+      "condition": "full",
+      "status": "printing_ambiguous",
+      "top_id": "base1-58",
+      "top_correct": true,
+      "candidate_recalled": true,
+      "false_specific_claim": false,
+      "printing_review": {
+        "reason": "shared_printing_identifier",
+        "candidate_group_id": "reference-group:eff16d1d6d9477b7",
+        "grouping_basis": "reference_similarity_or_near_tied_retrieval",
+        "reference_coverage_complete": false,
+        "collector_evidence": [
+          "58/102"
+        ],
+        "plausible_printings": [
+          {
+            "card_id": "base1-58",
+            "name": "Pikachu",
+            "set_name": "Base Set",
+            "collector_number": "58",
+            "language": "en",
+            "image_url": "https://assets.tcgdex.net/en/base/base1/58/high.webp",
+            "cardmarket_url": "https://www.cardmarket.com/en/Pokemon/Products/Singles/Base-Set/Pikachu-V1-BS58"
+          },
+          {
+            "card_id": "en:30th-c-014",
+            "name": "Pikachu",
+            "set_name": "30th Classic Collection",
+            "collector_number": "014",
+            "language": "en",
+            "image_url": "/api/v1/cards/en:30th-c-014/image",
+            "cardmarket_url": "https://www.cardmarket.com/en/Pokemon/Products/Singles/30th-Celebration/Pikachu-30CBS-58"
+          },
+          {
+            "card_id": "en:base4-87",
+            "name": "Pikachu",
+            "set_name": "Base Set 2",
+            "collector_number": "87",
+            "language": "en",
+            "image_url": "https://assets.tcgdex.net/en/base/base4/87/high.webp",
+            "cardmarket_url": null
+          }
+        ],
+        "guidance": "These printings may share artwork or printed numbers. Choose the exact set manually, or retake with all four corners, the collector number and any printing stamps visible."
+      },
+      "local_artwork_matches": [],
+      "ocr_failed": false,
+      "before": {
+        "status": "uncertain",
+        "top_id": "base1-58",
+        "candidate_recalled": true
+      },
+      "timings_ms": {
+        "decode_ms": 11.97,
+        "detect_ms": 0.0,
+        "embed_ms": 126.27,
+        "retrieve_ms": 1.67,
+        "orientation_degrees": 0.0,
+        "ocr_ms": 2136.44,
+        "local_artwork_ms": 0.01,
+        "cardmarket_ms": 704.33,
+        "printing_review_ms": 638.21,
+        "total_ms": 3621.87
+      },
+      "elapsed_ms": 3627.97
+    },
+    {
+      "expected_id": "en:base1-58",
+      "condition": "art_only",
+      "status": "printing_ambiguous",
+      "top_id": "en:base4-87",
+      "top_correct": false,
+      "candidate_recalled": true,
+      "false_specific_claim": false,
+      "printing_review": {
+        "reason": "printing_not_proven",
+        "candidate_group_id": "reference-group:1a67d013ae4fa863",
+        "grouping_basis": "reference_similarity_or_near_tied_retrieval",
+        "reference_coverage_complete": false,
+        "collector_evidence": [],
+        "plausible_printings": [
+          {
+            "card_id": "en:base4-87",
+            "name": "Pikachu",
+            "set_name": "Base Set 2",
+            "collector_number": "87",
+            "language": "en",
+            "image_url": "https://assets.tcgdex.net/en/base/base4/87/high.webp",
+            "cardmarket_url": null
+          },
+          {
+            "card_id": "base1-58",
+            "name": "Pikachu",
+            "set_name": "Base Set",
+            "collector_number": "58",
+            "language": "en",
+            "image_url": "https://assets.tcgdex.net/en/base/base1/58/high.webp",
+            "cardmarket_url": "https://www.cardmarket.com/en/Pokemon/Products/Singles/Base-Set/Pikachu-V1-BS58"
+          },
+          {
+            "card_id": "en:30th-c-014",
+            "name": "Pikachu",
+            "set_name": "30th Classic Collection",
+            "collector_number": "014",
+            "language": "en",
+            "image_url": "/api/v1/cards/en:30th-c-014/image",
+            "cardmarket_url": "https://www.cardmarket.com/en/Pokemon/Products/Singles/30th-Celebration/Pikachu-30CBS-58"
+          },
+          {
+            "card_id": "en:A1-094",
+            "name": "Pikachu",
+            "set_name": "Genetic Apex",
+            "collector_number": "094",
+            "language": "en",
+            "image_url": "https://assets.tcgdex.net/en/tcgp/A1/094/high.webp",
+            "cardmarket_url": null
+          },
+          {
+            "card_id": "en:xy12-35",
+            "name": "Pikachu",
+            "set_name": "Evolutions",
+            "collector_number": "35",
+            "language": "en",
+            "image_url": "https://assets.tcgdex.net/en/xy/xy12/35/high.webp",
+            "cardmarket_url": "https://www.cardmarket.com/en/Pokemon/Products/Singles/Evolutions/Pikachu-EVO35"
+          },
+          {
+            "card_id": "extra-pikachu-classic-clc008",
+            "name": "Pikachu",
+            "set_name": "Pokémon Trading Card Game Classic — Charizard & Ho-Oh ex Deck",
+            "collector_number": "008/034",
+            "language": "en",
+            "image_url": "/api/v1/cards/extra-pikachu-classic-clc008/image",
+            "cardmarket_url": "https://www.cardmarket.com/en/Pokemon/Products/Singles/Pokemon-Trading-Card-Game-Classic-Charizard-Ho-Oh-ex-Deck/Pikachu-CLC008"
+          }
+        ],
+        "guidance": "These printings may share artwork or printed numbers. Choose the exact set manually, or retake with all four corners, the collector number and any printing stamps visible."
+      },
+      "local_artwork_matches": [
+        {
+          "card_id": "en:base4-87",
+          "inliers": 24,
+          "artwork_inliers": 24,
+          "query_coverage": 0.392
+        },
+        {
+          "card_id": "en:xy12-35",
+          "inliers": 22,
+          "artwork_inliers": 22,
+          "query_coverage": 0.267
+        },
+        {
+          "card_id": "base1-58",
+          "inliers": 20,
+          "artwork_inliers": 20,
+          "query_coverage": 0.399
+        }
+      ],
+      "ocr_failed": false,
+      "before": {
+        "status": "uncertain",
+        "top_id": "base1-58",
+        "candidate_recalled": true
+      },
+      "timings_ms": {
+        "decode_ms": 11.14,
+        "detect_ms": 0.0,
+        "embed_ms": 374.97,
+        "retrieve_ms": 5.01,
+        "orientation_degrees": 0.0,
+        "ocr_ms": 2048.67,
+        "local_artwork_ms": 239.05,
+        "cardmarket_ms": 695.48,
+        "printing_review_ms": 0.76,
+        "total_ms": 3376.54
+      },
+      "elapsed_ms": 3382.42
+    },
+    {
+      "expected_id": "en:base1-58",
+      "condition": "top_half",
+      "status": "printing_ambiguous",
+      "top_id": "en:A1-094",
+      "top_correct": false,
+      "candidate_recalled": true,
+      "false_specific_claim": false,
+      "printing_review": {
+        "reason": "printing_not_proven",
+        "candidate_group_id": "reference-group:d78d5e0d35cab565",
+        "grouping_basis": "reference_similarity_or_near_tied_retrieval",
+        "reference_coverage_complete": false,
+        "collector_evidence": [],
+        "plausible_printings": [
+          {
+            "card_id": "en:A1-094",
+            "name": "Pikachu",
+            "set_name": "Genetic Apex",
+            "collector_number": "094",
+            "language": "en",
+            "image_url": "https://assets.tcgdex.net/en/tcgp/A1/094/high.webp",
+            "cardmarket_url": null
+          },
+          {
+            "card_id": "base1-58",
+            "name": "Pikachu",
+            "set_name": "Base Set",
+            "collector_number": "58",
+            "language": "en",
+            "image_url": "https://assets.tcgdex.net/en/base/base1/58/high.webp",
+            "cardmarket_url": "https://www.cardmarket.com/en/Pokemon/Products/Singles/Base-Set/Pikachu-V1-BS58"
+          },
+          {
+            "card_id": "en:30th-c-014",
+            "name": "Pikachu",
+            "set_name": "30th Classic Collection",
+            "collector_number": "014",
+            "language": "en",
+            "image_url": "/api/v1/cards/en:30th-c-014/image",
+            "cardmarket_url": "https://www.cardmarket.com/en/Pokemon/Products/Singles/30th-Celebration/Pikachu-30CBS-58"
+          },
+          {
+            "card_id": "en:base4-87",
+            "name": "Pikachu",
+            "set_name": "Base Set 2",
+            "collector_number": "87",
+            "language": "en",
+            "image_url": "https://assets.tcgdex.net/en/base/base4/87/high.webp",
+            "cardmarket_url": null
+          },
+          {
+            "card_id": "extra-pikachu-classic-clc008",
+            "name": "Pikachu",
+            "set_name": "Pokémon Trading Card Game Classic — Charizard & Ho-Oh ex Deck",
+            "collector_number": "008/034",
+            "language": "en",
+            "image_url": "/api/v1/cards/extra-pikachu-classic-clc008/image",
+            "cardmarket_url": "https://www.cardmarket.com/en/Pokemon/Products/Singles/Pokemon-Trading-Card-Game-Classic-Charizard-Ho-Oh-ex-Deck/Pikachu-CLC008"
+          }
+        ],
+        "guidance": "These printings may share artwork or printed numbers. Choose the exact set manually, or retake with all four corners, the collector number and any printing stamps visible."
+      },
+      "local_artwork_matches": [
+        {
+          "card_id": "en:A1-094",
+          "inliers": 80,
+          "artwork_inliers": 80,
+          "query_coverage": 0.235
+        },
+        {
+          "card_id": "en:base1-58",
+          "inliers": 23,
+          "artwork_inliers": 23,
+          "query_coverage": 0.182
+        },
+        {
+          "card_id": "en:base4-87",
+          "inliers": 23,
+          "artwork_inliers": 23,
+          "query_coverage": 0.159
+        },
+        {
+          "card_id": "en:30th-c-014",
+          "inliers": 21,
+          "artwork_inliers": 21,
+          "query_coverage": 0.173
+        },
+        {
+          "card_id": "extra-pikachu-classic-clc008",
+          "inliers": 21,
+          "artwork_inliers": 21,
+          "query_coverage": 0.114
+        }
+      ],
+      "ocr_failed": false,
+      "before": {
+        "status": "uncertain",
+        "top_id": "en:base1-58",
+        "candidate_recalled": true
+      },
+      "timings_ms": {
+        "decode_ms": 15.88,
+        "detect_ms": 0.0,
+        "embed_ms": 381.38,
+        "retrieve_ms": 4.89,
+        "orientation_degrees": 0.0,
+        "ocr_ms": 2871.79,
+        "local_artwork_ms": 108.08,
+        "cardmarket_ms": 679.07,
+        "printing_review_ms": 0.96,
+        "total_ms": 4064.44
+      },
+      "elapsed_ms": 4069.99
+    },
+    {
+      "expected_id": "en:base1-58",
+      "condition": "bottom_half",
+      "status": "retake",
+      "top_id": "en:base5-58",
+      "top_correct": false,
+      "candidate_recalled": false,
+      "false_specific_claim": false,
+      "printing_review": null,
+      "local_artwork_matches": [],
+      "ocr_failed": false,
+      "before": {
+        "status": "uncertain",
+        "top_id": "en:base5-58",
+        "candidate_recalled": false
+      },
+      "timings_ms": {
+        "decode_ms": 12.14,
+        "detect_ms": 0.0,
+        "embed_ms": 377.77,
+        "retrieve_ms": 5.2,
+        "orientation_degrees": 0.0,
+        "ocr_ms": 4375.82,
+        "local_artwork_ms": 385.07,
+        "cardmarket_ms": 1091.54,
+        "printing_review_ms": 0.25,
+        "total_ms": 6253.13
+      },
+      "elapsed_ms": 6265.32
+    },
+    {
+      "expected_id": "en:base1-58",
+      "condition": "partial_crop",
+      "status": "retake",
+      "top_id": "en:base1-58",
+      "top_correct": true,
+      "candidate_recalled": false,
+      "false_specific_claim": false,
+      "printing_review": null,
+      "local_artwork_matches": [],
+      "ocr_failed": false,
+      "before": {
+        "status": "uncertain",
+        "top_id": "en:base1-58",
+        "candidate_recalled": true
+      },
+      "timings_ms": {
+        "decode_ms": 16.19,
+        "detect_ms": 0.0,
+        "embed_ms": 130.27,
+        "retrieve_ms": 2.97,
+        "orientation_degrees": 0.0,
+        "ocr_ms": 2636.26,
+        "local_artwork_ms": 33.13,
+        "cardmarket_ms": 877.21,
+        "printing_review_ms": 0.04,
+        "total_ms": 3698.75
+      },
+      "elapsed_ms": 3707.62
+    },
+    {
+      "expected_id": "en:base1-58",
+      "condition": "central_patch",
+      "status": "no_match",
+      "top_id": "en:hgss1-38",
+      "top_correct": false,
+      "candidate_recalled": false,
+      "false_specific_claim": false,
+      "printing_review": null,
+      "local_artwork_matches": [],
+      "ocr_failed": false,
+      "before": {
+        "status": "no_match",
+        "top_id": "en:hgss1-38",
+        "candidate_recalled": false
+      },
+      "timings_ms": {
+        "decode_ms": 37.75,
+        "detect_ms": 0.0,
+        "embed_ms": 303.84,
+        "retrieve_ms": 34.34,
+        "orientation_degrees": 0.0,
+        "ocr_ms": 1549.83,
+        "local_artwork_ms": 151.25,
+        "cardmarket_ms": 706.24,
+        "printing_review_ms": 0.01,
+        "total_ms": 2785.13
+      },
+      "elapsed_ms": 2790.92
+    },
+    {
+      "expected_id": "en:30th-c-014",
+      "condition": "full",
+      "status": "printing_ambiguous",
+      "top_id": "en:30th-c-014",
+      "top_correct": true,
+      "candidate_recalled": true,
+      "false_specific_claim": false,
+      "printing_review": {
+        "reason": "printing_not_proven",
+        "candidate_group_id": "reference-group:bd91311a51b6cd36",
+        "grouping_basis": "reference_similarity_or_near_tied_retrieval",
+        "reference_coverage_complete": false,
+        "collector_evidence": [
+          "58/102"
+        ],
+        "plausible_printings": [
+          {
+            "card_id": "en:30th-c-014",
+            "name": "Pikachu",
+            "set_name": "30th Classic Collection",
+            "collector_number": "014",
+            "language": "en",
+            "image_url": "/api/v1/cards/en:30th-c-014/image",
+            "cardmarket_url": "https://www.cardmarket.com/en/Pokemon/Products/Singles/30th-Celebration/Pikachu-30CBS-58"
+          },
+          {
+            "card_id": "base1-58",
+            "name": "Pikachu",
+            "set_name": "Base Set",
+            "collector_number": "58",
+            "language": "en",
+            "image_url": "https://assets.tcgdex.net/en/base/base1/58/high.webp",
+            "cardmarket_url": "https://www.cardmarket.com/en/Pokemon/Products/Singles/Base-Set/Pikachu-V1-BS58"
+          },
+          {
+            "card_id": "en:base4-87",
+            "name": "Pikachu",
+            "set_name": "Base Set 2",
+            "collector_number": "87",
+            "language": "en",
+            "image_url": "https://assets.tcgdex.net/en/base/base4/87/high.webp",
+            "cardmarket_url": null
+          },
+          {
+            "card_id": "extra-pikachu-classic-clc008",
+            "name": "Pikachu",
+            "set_name": "Pokémon Trading Card Game Classic — Charizard & Ho-Oh ex Deck",
+            "collector_number": "008/034",
+            "language": "en",
+            "image_url": "/api/v1/cards/extra-pikachu-classic-clc008/image",
+            "cardmarket_url": "https://www.cardmarket.com/en/Pokemon/Products/Singles/Pokemon-Trading-Card-Game-Classic-Charizard-Ho-Oh-ex-Deck/Pikachu-CLC008"
+          }
+        ],
+        "guidance": "These printings may share artwork or printed numbers. Choose the exact set manually, or retake with all four corners, the collector number and any printing stamps visible."
+      },
+      "local_artwork_matches": [],
+      "ocr_failed": false,
+      "before": {
+        "status": "matched",
+        "top_id": "en:30th-c-014",
+        "candidate_recalled": true
+      },
+      "timings_ms": {
+        "decode_ms": 13.97,
+        "detect_ms": 0.0,
+        "embed_ms": 128.33,
+        "retrieve_ms": 1.83,
+        "orientation_degrees": 0.0,
+        "ocr_ms": 2094.06,
+        "local_artwork_ms": 0.0,
+        "cardmarket_ms": 692.6,
+        "printing_review_ms": 2.67,
+        "total_ms": 2936.85
+      },
+      "elapsed_ms": 2942.7
+    },
+    {
+      "expected_id": "en:30th-c-014",
+      "condition": "art_only",
+      "status": "printing_ambiguous",
+      "top_id": "en:xy12-35",
+      "top_correct": false,
+      "candidate_recalled": true,
+      "false_specific_claim": false,
+      "printing_review": {
+        "reason": "printing_not_proven",
+        "candidate_group_id": "reference-group:1a67d013ae4fa863",
+        "grouping_basis": "reference_similarity_or_near_tied_retrieval",
+        "reference_coverage_complete": false,
+        "collector_evidence": [],
+        "plausible_printings": [
+          {
+            "card_id": "en:xy12-35",
+            "name": "Pikachu",
+            "set_name": "Evolutions",
+            "collector_number": "35",
+            "language": "en",
+            "image_url": "https://assets.tcgdex.net/en/xy/xy12/35/high.webp",
+            "cardmarket_url": "https://www.cardmarket.com/en/Pokemon/Products/Singles/Evolutions/Pikachu-EVO35"
+          },
+          {
+            "card_id": "base1-58",
+            "name": "Pikachu",
+            "set_name": "Base Set",
+            "collector_number": "58",
+            "language": "en",
+            "image_url": "https://assets.tcgdex.net/en/base/base1/58/high.webp",
+            "cardmarket_url": "https://www.cardmarket.com/en/Pokemon/Products/Singles/Base-Set/Pikachu-V1-BS58"
+          },
+          {
+            "card_id": "en:30th-c-014",
+            "name": "Pikachu",
+            "set_name": "30th Classic Collection",
+            "collector_number": "014",
+            "language": "en",
+            "image_url": "/api/v1/cards/en:30th-c-014/image",
+            "cardmarket_url": "https://www.cardmarket.com/en/Pokemon/Products/Singles/30th-Celebration/Pikachu-30CBS-58"
+          },
+          {
+            "card_id": "en:A1-094",
+            "name": "Pikachu",
+            "set_name": "Genetic Apex",
+            "collector_number": "094",
+            "language": "en",
+            "image_url": "https://assets.tcgdex.net/en/tcgp/A1/094/high.webp",
+            "cardmarket_url": null
+          },
+          {
+            "card_id": "en:base4-87",
+            "name": "Pikachu",
+            "set_name": "Base Set 2",
+            "collector_number": "87",
+            "language": "en",
+            "image_url": "https://assets.tcgdex.net/en/base/base4/87/high.webp",
+            "cardmarket_url": null
+          },
+          {
+            "card_id": "extra-pikachu-classic-clc008",
+            "name": "Pikachu",
+            "set_name": "Pokémon Trading Card Game Classic — Charizard & Ho-Oh ex Deck",
+            "collector_number": "008/034",
+            "language": "en",
+            "image_url": "/api/v1/cards/extra-pikachu-classic-clc008/image",
+            "cardmarket_url": "https://www.cardmarket.com/en/Pokemon/Products/Singles/Pokemon-Trading-Card-Game-Classic-Charizard-Ho-Oh-ex-Deck/Pikachu-CLC008"
+          }
+        ],
+        "guidance": "These printings may share artwork or printed numbers. Choose the exact set manually, or retake with all four corners, the collector number and any printing stamps visible."
+      },
+      "local_artwork_matches": [
+        {
+          "card_id": "en:xy12-35",
+          "inliers": 23,
+          "artwork_inliers": 23,
+          "query_coverage": 0.337
+        },
+        {
+          "card_id": "en:base4-87",
+          "inliers": 22,
+          "artwork_inliers": 22,
+          "query_coverage": 0.259
+        },
+        {
+          "card_id": "extra-pikachu-classic-clc008",
+          "inliers": 19,
+          "artwork_inliers": 19,
+          "query_coverage": 0.142
+        },
+        {
+          "card_id": "en:base1-58",
+          "inliers": 14,
+          "artwork_inliers": 14,
+          "query_coverage": 0.224
+        }
+      ],
+      "ocr_failed": false,
+      "before": {
+        "status": "no_match",
+        "top_id": "en:cel25-5",
+        "candidate_recalled": false
+      },
+      "timings_ms": {
+        "decode_ms": 12.84,
+        "detect_ms": 0.0,
+        "embed_ms": 406.41,
+        "retrieve_ms": 6.72,
+        "orientation_degrees": 0.0,
+        "ocr_ms": 2250.6,
+        "local_artwork_ms": 19.42,
+        "cardmarket_ms": 723.73,
+        "printing_review_ms": 1.28,
+        "total_ms": 3423.29
+      },
+      "elapsed_ms": 3429.28
+    },
+    {
+      "expected_id": "en:30th-c-014",
+      "condition": "top_half",
+      "status": "printing_ambiguous",
+      "top_id": "en:A1-094",
+      "top_correct": false,
+      "candidate_recalled": true,
+      "false_specific_claim": false,
+      "printing_review": {
+        "reason": "printing_not_proven",
+        "candidate_group_id": "reference-group:1a67d013ae4fa863",
+        "grouping_basis": "reference_similarity_or_near_tied_retrieval",
+        "reference_coverage_complete": false,
+        "collector_evidence": [],
+        "plausible_printings": [
+          {
+            "card_id": "en:A1-094",
+            "name": "Pikachu",
+            "set_name": "Genetic Apex",
+            "collector_number": "094",
+            "language": "en",
+            "image_url": "https://assets.tcgdex.net/en/tcgp/A1/094/high.webp",
+            "cardmarket_url": null
+          },
+          {
+            "card_id": "base1-58",
+            "name": "Pikachu",
+            "set_name": "Base Set",
+            "collector_number": "58",
+            "language": "en",
+            "image_url": "https://assets.tcgdex.net/en/base/base1/58/high.webp",
+            "cardmarket_url": "https://www.cardmarket.com/en/Pokemon/Products/Singles/Base-Set/Pikachu-V1-BS58"
+          },
+          {
+            "card_id": "en:30th-c-014",
+            "name": "Pikachu",
+            "set_name": "30th Classic Collection",
+            "collector_number": "014",
+            "language": "en",
+            "image_url": "/api/v1/cards/en:30th-c-014/image",
+            "cardmarket_url": "https://www.cardmarket.com/en/Pokemon/Products/Singles/30th-Celebration/Pikachu-30CBS-58"
+          },
+          {
+            "card_id": "en:base4-87",
+            "name": "Pikachu",
+            "set_name": "Base Set 2",
+            "collector_number": "87",
+            "language": "en",
+            "image_url": "https://assets.tcgdex.net/en/base/base4/87/high.webp",
+            "cardmarket_url": null
+          },
+          {
+            "card_id": "en:xy12-35",
+            "name": "Pikachu",
+            "set_name": "Evolutions",
+            "collector_number": "35",
+            "language": "en",
+            "image_url": "https://assets.tcgdex.net/en/xy/xy12/35/high.webp",
+            "cardmarket_url": "https://www.cardmarket.com/en/Pokemon/Products/Singles/Evolutions/Pikachu-EVO35"
+          },
+          {
+            "card_id": "extra-pikachu-classic-clc008",
+            "name": "Pikachu",
+            "set_name": "Pokémon Trading Card Game Classic — Charizard & Ho-Oh ex Deck",
+            "collector_number": "008/034",
+            "language": "en",
+            "image_url": "/api/v1/cards/extra-pikachu-classic-clc008/image",
+            "cardmarket_url": "https://www.cardmarket.com/en/Pokemon/Products/Singles/Pokemon-Trading-Card-Game-Classic-Charizard-Ho-Oh-ex-Deck/Pikachu-CLC008"
+          }
+        ],
+        "guidance": "These printings may share artwork or printed numbers. Choose the exact set manually, or retake with all four corners, the collector number and any printing stamps visible."
+      },
+      "local_artwork_matches": [
+        {
+          "card_id": "en:A1-094",
+          "inliers": 44,
+          "artwork_inliers": 44,
+          "query_coverage": 0.187
+        },
+        {
+          "card_id": "en:30th-c-014",
+          "inliers": 33,
+          "artwork_inliers": 33,
+          "query_coverage": 0.192
+        },
+        {
+          "card_id": "en:xy12-35",
+          "inliers": 24,
+          "artwork_inliers": 24,
+          "query_coverage": 0.126
+        },
+        {
+          "card_id": "en:base4-87",
+          "inliers": 24,
+          "artwork_inliers": 24,
+          "query_coverage": 0.15
+        },
+        {
+          "card_id": "base1-58",
+          "inliers": 19,
+          "artwork_inliers": 19,
+          "query_coverage": 0.126
+        }
+      ],
+      "ocr_failed": false,
+      "before": {
+        "status": "uncertain",
+        "top_id": "en:cel25-5",
+        "candidate_recalled": false
+      },
+      "timings_ms": {
+        "decode_ms": 12.95,
+        "detect_ms": 0.0,
+        "embed_ms": 377.65,
+        "retrieve_ms": 5.14,
+        "orientation_degrees": 0.0,
+        "ocr_ms": 3346.44,
+        "local_artwork_ms": 36.86,
+        "cardmarket_ms": 687.25,
+        "printing_review_ms": 1.09,
+        "total_ms": 4470.32
+      },
+      "elapsed_ms": 4476.32
+    },
+    {
+      "expected_id": "en:30th-c-014",
+      "condition": "bottom_half",
+      "status": "retake",
+      "top_id": "en:swsh10-015",
+      "top_correct": false,
+      "candidate_recalled": false,
+      "false_specific_claim": false,
+      "printing_review": null,
+      "local_artwork_matches": [],
+      "ocr_failed": false,
+      "before": {
+        "status": "uncertain",
+        "top_id": "en:swsh12.5-004",
+        "candidate_recalled": false
+      },
+      "timings_ms": {
+        "decode_ms": 12.19,
+        "detect_ms": 0.0,
+        "embed_ms": 441.51,
+        "retrieve_ms": 24.39,
+        "orientation_degrees": 0.0,
+        "ocr_ms": 4084.2,
+        "local_artwork_ms": 174.99,
+        "cardmarket_ms": 713.76,
+        "printing_review_ms": 0.01,
+        "total_ms": 5454.67
+      },
+      "elapsed_ms": 5460.68
+    },
+    {
+      "expected_id": "en:30th-c-014",
+      "condition": "partial_crop",
+      "status": "retake",
+      "top_id": "en:base1-58",
+      "top_correct": false,
+      "candidate_recalled": false,
+      "false_specific_claim": false,
+      "printing_review": null,
+      "local_artwork_matches": [],
+      "ocr_failed": false,
+      "before": {
+        "status": "uncertain",
+        "top_id": "en:base1-58",
+        "candidate_recalled": false
+      },
+      "timings_ms": {
+        "decode_ms": 13.26,
+        "detect_ms": 0.0,
+        "embed_ms": 128.18,
+        "retrieve_ms": 1.97,
+        "orientation_degrees": 0.0,
+        "ocr_ms": 2250.82,
+        "local_artwork_ms": 34.24,
+        "cardmarket_ms": 682.97,
+        "printing_review_ms": 0.01,
+        "total_ms": 3114.28
+      },
+      "elapsed_ms": 3120.18
+    },
+    {
+      "expected_id": "en:30th-c-014",
+      "condition": "central_patch",
+      "status": "no_match",
+      "top_id": "en:base4-87",
+      "top_correct": false,
+      "candidate_recalled": false,
+      "false_specific_claim": false,
+      "printing_review": null,
+      "local_artwork_matches": [],
+      "ocr_failed": false,
+      "before": {
+        "status": "no_match",
+        "top_id": "en:base4-87",
+        "candidate_recalled": false
+      },
+      "timings_ms": {
+        "decode_ms": 11.4,
+        "detect_ms": 0.0,
+        "embed_ms": 251.1,
+        "retrieve_ms": 3.72,
+        "orientation_degrees": 0.0,
+        "ocr_ms": 1615.84,
+        "local_artwork_ms": 8.45,
+        "cardmarket_ms": 689.91,
+        "printing_review_ms": 0.01,
+        "total_ms": 2582.07
+      },
+      "elapsed_ms": 2587.96
+    },
+    {
+      "expected_id": "en:PPS2-BRS-121",
+      "condition": "full",
+      "status": "printing_ambiguous",
+      "top_id": "en:PPS2-BRS-121",
+      "top_correct": true,
+      "candidate_recalled": true,
+      "false_specific_claim": false,
+      "printing_review": {
+        "reason": "shared_printing_identifier",
+        "candidate_group_id": "reference-group:a0294fc01c9ac590",
+        "grouping_basis": "reference_similarity_or_near_tied_retrieval",
+        "reference_coverage_complete": false,
+        "collector_evidence": [
+          "121/172"
+        ],
+        "plausible_printings": [
+          {
+            "card_id": "en:PPS2-BRS-121",
+            "name": "Bibarel",
+            "set_name": "Play! Pokémon Prize Pack Series Two",
+            "collector_number": "121",
+            "language": "en",
+            "image_url": "https://pokemasterstcg.com/assets/images/cards/PPS2/172_C27268.jpg",
+            "cardmarket_url": "https://www.cardmarket.com/en/Pokemon/Products/Singles/Play-Pokemon-Prize-Pack-Series-Two/Bibarel-V1-PPS2BRS-121"
+          },
+          {
+            "card_id": "en:PPS3-BRS-121",
+            "name": "Bibarel",
+            "set_name": "Play! Pokémon Prize Pack Series Three",
+            "collector_number": "121",
+            "language": "en",
+            "image_url": "https://pokemasterstcg.com/assets/images/cards/PPS3/172_C27371.jpg",
+            "cardmarket_url": "https://www.cardmarket.com/en/Pokemon/Products/Singles/Play-Pokemon-Prize-Pack-Series-Three/Bibarel-V1-PPS3BRS-121"
+          },
+          {
+            "card_id": "en:swsh9-121",
+            "name": "Bibarel",
+            "set_name": "Brilliant Stars",
+            "collector_number": "121",
+            "language": "en",
+            "image_url": "https://assets.tcgdex.net/en/swsh/swsh9/121/high.webp",
+            "cardmarket_url": "https://www.cardmarket.com/en/Pokemon/Products/Singles/Brilliant-Stars/Bibarel-V1-BRS121"
+          }
+        ],
+        "guidance": "These printings may share artwork or printed numbers. Choose the exact set manually, or retake with all four corners, the collector number and any printing stamps visible."
+      },
+      "local_artwork_matches": [],
+      "ocr_failed": false,
+      "before": {
+        "status": "uncertain",
+        "top_id": "en:PPS2-BRS-121",
+        "candidate_recalled": true
+      },
+      "timings_ms": {
+        "decode_ms": 12.35,
+        "detect_ms": 0.0,
+        "embed_ms": 126.25,
+        "retrieve_ms": 1.8,
+        "orientation_degrees": 0.0,
+        "ocr_ms": 2220.15,
+        "local_artwork_ms": 0.0,
+        "cardmarket_ms": 676.42,
+        "printing_review_ms": 75.17,
+        "total_ms": 3114.5
+      },
+      "elapsed_ms": 3120.67
+    },
+    {
+      "expected_id": "en:PPS2-BRS-121",
+      "condition": "art_only",
+      "status": "printing_ambiguous",
+      "top_id": "en:PPS2-BRS-121",
+      "top_correct": true,
+      "candidate_recalled": true,
+      "false_specific_claim": false,
+      "printing_review": {
+        "reason": "printing_not_proven",
+        "candidate_group_id": "reference-group:a0294fc01c9ac590",
+        "grouping_basis": "reference_similarity_or_near_tied_retrieval",
+        "reference_coverage_complete": false,
+        "collector_evidence": [],
+        "plausible_printings": [
+          {
+            "card_id": "en:PPS2-BRS-121",
+            "name": "Bibarel",
+            "set_name": "Play! Pokémon Prize Pack Series Two",
+            "collector_number": "121",
+            "language": "en",
+            "image_url": "https://pokemasterstcg.com/assets/images/cards/PPS2/172_C27268.jpg",
+            "cardmarket_url": "https://www.cardmarket.com/en/Pokemon/Products/Singles/Play-Pokemon-Prize-Pack-Series-Two/Bibarel-V1-PPS2BRS-121"
+          },
+          {
+            "card_id": "en:PPS3-BRS-121",
+            "name": "Bibarel",
+            "set_name": "Play! Pokémon Prize Pack Series Three",
+            "collector_number": "121",
+            "language": "en",
+            "image_url": "https://pokemasterstcg.com/assets/images/cards/PPS3/172_C27371.jpg",
+            "cardmarket_url": "https://www.cardmarket.com/en/Pokemon/Products/Singles/Play-Pokemon-Prize-Pack-Series-Three/Bibarel-V1-PPS3BRS-121"
+          },
+          {
+            "card_id": "en:swsh9-121",
+            "name": "Bibarel",
+            "set_name": "Brilliant Stars",
+            "collector_number": "121",
+            "language": "en",
+            "image_url": "https://assets.tcgdex.net/en/swsh/swsh9/121/high.webp",
+            "cardmarket_url": "https://www.cardmarket.com/en/Pokemon/Products/Singles/Brilliant-Stars/Bibarel-V1-BRS121"
+          }
+        ],
+        "guidance": "These printings may share artwork or printed numbers. Choose the exact set manually, or retake with all four corners, the collector number and any printing stamps visible."
+      },
+      "local_artwork_matches": [
+        {
+          "card_id": "en:PPS2-BRS-121",
+          "inliers": 132,
+          "artwork_inliers": 132,
+          "query_coverage": 0.673
+        },
+        {
+          "card_id": "en:PPS3-BRS-121",
+          "inliers": 132,
+          "artwork_inliers": 132,
+          "query_coverage": 0.673
+        },
+        {
+          "card_id": "en:swsh9-121",
+          "inliers": 82,
+          "artwork_inliers": 82,
+          "query_coverage": 0.645
+        }
+      ],
+      "ocr_failed": false,
+      "before": {
+        "status": "no_match",
+        "top_id": "en:swsh9-121",
+        "candidate_recalled": false
+      },
+      "timings_ms": {
+        "decode_ms": 11.86,
+        "detect_ms": 0.0,
+        "embed_ms": 375.4,
+        "retrieve_ms": 5.06,
+        "orientation_degrees": 0.0,
+        "ocr_ms": 2139.19,
+        "local_artwork_ms": 246.93,
+        "cardmarket_ms": 714.99,
+        "printing_review_ms": 0.26,
+        "total_ms": 3494.97
+      },
+      "elapsed_ms": 3500.91
+    },
+    {
+      "expected_id": "en:PPS2-BRS-121",
+      "condition": "top_half",
+      "status": "printing_ambiguous",
+      "top_id": "en:PPS3-BRS-121",
+      "top_correct": false,
+      "candidate_recalled": true,
+      "false_specific_claim": false,
+      "printing_review": {
+        "reason": "printing_not_proven",
+        "candidate_group_id": "reference-group:a0294fc01c9ac590",
+        "grouping_basis": "reference_similarity_or_near_tied_retrieval",
+        "reference_coverage_complete": false,
+        "collector_evidence": [],
+        "plausible_printings": [
+          {
+            "card_id": "en:PPS3-BRS-121",
+            "name": "Bibarel",
+            "set_name": "Play! Pokémon Prize Pack Series Three",
+            "collector_number": "121",
+            "language": "en",
+            "image_url": "https://pokemasterstcg.com/assets/images/cards/PPS3/172_C27371.jpg",
+            "cardmarket_url": "https://www.cardmarket.com/en/Pokemon/Products/Singles/Play-Pokemon-Prize-Pack-Series-Three/Bibarel-V1-PPS3BRS-121"
+          },
+          {
+            "card_id": "en:PPS2-BRS-121",
+            "name": "Bibarel",
+            "set_name": "Play! Pokémon Prize Pack Series Two",
+            "collector_number": "121",
+            "language": "en",
+            "image_url": "https://pokemasterstcg.com/assets/images/cards/PPS2/172_C27268.jpg",
+            "cardmarket_url": "https://www.cardmarket.com/en/Pokemon/Products/Singles/Play-Pokemon-Prize-Pack-Series-Two/Bibarel-V1-PPS2BRS-121"
+          },
+          {
+            "card_id": "en:swsh9-121",
+            "name": "Bibarel",
+            "set_name": "Brilliant Stars",
+            "collector_number": "121",
+            "language": "en",
+            "image_url": "https://assets.tcgdex.net/en/swsh/swsh9/121/high.webp",
+            "cardmarket_url": "https://www.cardmarket.com/en/Pokemon/Products/Singles/Brilliant-Stars/Bibarel-V1-BRS121"
+          }
+        ],
+        "guidance": "These printings may share artwork or printed numbers. Choose the exact set manually, or retake with all four corners, the collector number and any printing stamps visible."
+      },
+      "local_artwork_matches": [
+        {
+          "card_id": "en:PPS3-BRS-121",
+          "inliers": 134,
+          "artwork_inliers": 134,
+          "query_coverage": 0.254
+        },
+        {
+          "card_id": "en:PPS2-BRS-121",
+          "inliers": 134,
+          "artwork_inliers": 134,
+          "query_coverage": 0.254
+        },
+        {
+          "card_id": "en:swsh9-121",
+          "inliers": 77,
+          "artwork_inliers": 77,
+          "query_coverage": 0.232
+        }
+      ],
+      "ocr_failed": false,
+      "before": {
+        "status": "uncertain",
+        "top_id": "en:swsh9-121",
+        "candidate_recalled": false
+      },
+      "timings_ms": {
+        "decode_ms": 11.95,
+        "detect_ms": 0.0,
+        "embed_ms": 373.53,
+        "retrieve_ms": 4.76,
+        "orientation_degrees": 0.0,
+        "ocr_ms": 3242.77,
+        "local_artwork_ms": 127.35,
+        "cardmarket_ms": 713.56,
+        "printing_review_ms": 0.23,
+        "total_ms": 4476.39
+      },
+      "elapsed_ms": 4482.66
+    },
+    {
+      "expected_id": "en:PPS2-BRS-121",
+      "condition": "bottom_half",
+      "status": "retake",
+      "top_id": "en:xy1-107",
+      "top_correct": false,
+      "candidate_recalled": false,
+      "false_specific_claim": false,
+      "printing_review": null,
+      "local_artwork_matches": [],
+      "ocr_failed": false,
+      "before": {
+        "status": "uncertain",
+        "top_id": "en:xy1-107",
+        "candidate_recalled": false
+      },
+      "timings_ms": {
+        "decode_ms": 17.36,
+        "detect_ms": 0.0,
+        "embed_ms": 383.68,
+        "retrieve_ms": 6.28,
+        "orientation_degrees": 0.0,
+        "ocr_ms": 3933.29,
+        "local_artwork_ms": 152.23,
+        "cardmarket_ms": 678.56,
+        "printing_review_ms": 0.01,
+        "total_ms": 5173.68
+      },
+      "elapsed_ms": 5179.75
+    },
+    {
+      "expected_id": "en:PPS2-BRS-121",
+      "condition": "partial_crop",
+      "status": "printing_ambiguous",
+      "top_id": "en:PPS2-BRS-121",
+      "top_correct": true,
+      "candidate_recalled": true,
+      "false_specific_claim": false,
+      "printing_review": {
+        "reason": "printing_not_proven",
+        "candidate_group_id": "reference-group:a0294fc01c9ac590",
+        "grouping_basis": "reference_similarity_or_near_tied_retrieval",
+        "reference_coverage_complete": false,
+        "collector_evidence": [],
+        "plausible_printings": [
+          {
+            "card_id": "en:PPS2-BRS-121",
+            "name": "Bibarel",
+            "set_name": "Play! Pokémon Prize Pack Series Two",
+            "collector_number": "121",
+            "language": "en",
+            "image_url": "https://pokemasterstcg.com/assets/images/cards/PPS2/172_C27268.jpg",
+            "cardmarket_url": "https://www.cardmarket.com/en/Pokemon/Products/Singles/Play-Pokemon-Prize-Pack-Series-Two/Bibarel-V1-PPS2BRS-121"
+          },
+          {
+            "card_id": "en:PPS3-BRS-121",
+            "name": "Bibarel",
+            "set_name": "Play! Pokémon Prize Pack Series Three",
+            "collector_number": "121",
+            "language": "en",
+            "image_url": "https://pokemasterstcg.com/assets/images/cards/PPS3/172_C27371.jpg",
+            "cardmarket_url": "https://www.cardmarket.com/en/Pokemon/Products/Singles/Play-Pokemon-Prize-Pack-Series-Three/Bibarel-V1-PPS3BRS-121"
+          },
+          {
+            "card_id": "en:swsh9-121",
+            "name": "Bibarel",
+            "set_name": "Brilliant Stars",
+            "collector_number": "121",
+            "language": "en",
+            "image_url": "https://assets.tcgdex.net/en/swsh/swsh9/121/high.webp",
+            "cardmarket_url": "https://www.cardmarket.com/en/Pokemon/Products/Singles/Brilliant-Stars/Bibarel-V1-BRS121"
+          }
+        ],
+        "guidance": "These printings may share artwork or printed numbers. Choose the exact set manually, or retake with all four corners, the collector number and any printing stamps visible."
+      },
+      "local_artwork_matches": [
+        {
+          "card_id": "en:PPS2-BRS-121",
+          "inliers": 134,
+          "artwork_inliers": 134,
+          "query_coverage": 0.167
+        },
+        {
+          "card_id": "en:PPS3-BRS-121",
+          "inliers": 134,
+          "artwork_inliers": 134,
+          "query_coverage": 0.167
+        },
+        {
+          "card_id": "en:swsh9-121",
+          "inliers": 76,
+          "artwork_inliers": 76,
+          "query_coverage": 0.152
+        }
+      ],
+      "ocr_failed": false,
+      "before": {
+        "status": "uncertain",
+        "top_id": "en:swsh9-121",
+        "candidate_recalled": false
+      },
+      "timings_ms": {
+        "decode_ms": 12.19,
+        "detect_ms": 0.0,
+        "embed_ms": 125.5,
+        "retrieve_ms": 1.74,
+        "orientation_degrees": 0.0,
+        "ocr_ms": 1993.18,
+        "local_artwork_ms": 148.42,
+        "cardmarket_ms": 697.62,
+        "printing_review_ms": 0.24,
+        "total_ms": 2980.86
+      },
+      "elapsed_ms": 2986.88
+    },
+    {
+      "expected_id": "en:PPS2-BRS-121",
+      "condition": "central_patch",
+      "status": "printing_ambiguous",
+      "top_id": "en:PPS2-BRS-121",
+      "top_correct": true,
+      "candidate_recalled": true,
+      "false_specific_claim": false,
+      "printing_review": {
+        "reason": "printing_not_proven",
+        "candidate_group_id": "reference-group:a0294fc01c9ac590",
+        "grouping_basis": "reference_similarity_or_near_tied_retrieval",
+        "reference_coverage_complete": false,
+        "collector_evidence": [],
+        "plausible_printings": [
+          {
+            "card_id": "en:PPS2-BRS-121",
+            "name": "Bibarel",
+            "set_name": "Play! Pokémon Prize Pack Series Two",
+            "collector_number": "121",
+            "language": "en",
+            "image_url": "https://pokemasterstcg.com/assets/images/cards/PPS2/172_C27268.jpg",
+            "cardmarket_url": "https://www.cardmarket.com/en/Pokemon/Products/Singles/Play-Pokemon-Prize-Pack-Series-Two/Bibarel-V1-PPS2BRS-121"
+          },
+          {
+            "card_id": "en:PPS3-BRS-121",
+            "name": "Bibarel",
+            "set_name": "Play! Pokémon Prize Pack Series Three",
+            "collector_number": "121",
+            "language": "en",
+            "image_url": "https://pokemasterstcg.com/assets/images/cards/PPS3/172_C27371.jpg",
+            "cardmarket_url": "https://www.cardmarket.com/en/Pokemon/Products/Singles/Play-Pokemon-Prize-Pack-Series-Three/Bibarel-V1-PPS3BRS-121"
+          },
+          {
+            "card_id": "en:swsh9-121",
+            "name": "Bibarel",
+            "set_name": "Brilliant Stars",
+            "collector_number": "121",
+            "language": "en",
+            "image_url": "https://assets.tcgdex.net/en/swsh/swsh9/121/high.webp",
+            "cardmarket_url": "https://www.cardmarket.com/en/Pokemon/Products/Singles/Brilliant-Stars/Bibarel-V1-BRS121"
+          }
+        ],
+        "guidance": "These printings may share artwork or printed numbers. Choose the exact set manually, or retake with all four corners, the collector number and any printing stamps visible."
+      },
+      "local_artwork_matches": [
+        {
+          "card_id": "en:PPS2-BRS-121",
+          "inliers": 29,
+          "artwork_inliers": 29,
+          "query_coverage": 0.105
+        },
+        {
+          "card_id": "en:PPS3-BRS-121",
+          "inliers": 29,
+          "artwork_inliers": 29,
+          "query_coverage": 0.105
+        }
+      ],
+      "ocr_failed": false,
+      "before": {
+        "status": "uncertain",
+        "top_id": "en:swsh9-121",
+        "candidate_recalled": false
+      },
+      "timings_ms": {
+        "decode_ms": 11.93,
+        "detect_ms": 0.0,
+        "embed_ms": 248.76,
+        "retrieve_ms": 3.26,
+        "orientation_degrees": 0.0,
+        "ocr_ms": 1593.36,
+        "local_artwork_ms": 144.34,
+        "cardmarket_ms": 676.89,
+        "printing_review_ms": 0.21,
+        "total_ms": 2679.98
+      },
+      "elapsed_ms": 2686.08
+    },
+    {
+      "expected_id": "en:sv01-036",
+      "condition": "full",
+      "status": "uncertain",
+      "top_id": "en:sv01-036",
+      "top_correct": true,
+      "candidate_recalled": true,
+      "false_specific_claim": false,
+      "printing_review": null,
+      "local_artwork_matches": [],
+      "ocr_failed": false,
+      "before": {
+        "status": "uncertain",
+        "top_id": "en:sv01-036",
+        "candidate_recalled": true
+      },
+      "timings_ms": {
+        "decode_ms": 14.32,
+        "detect_ms": 0.0,
+        "embed_ms": 132.52,
+        "retrieve_ms": 2.93,
+        "orientation_degrees": 0.0,
+        "ocr_ms": 2544.29,
+        "local_artwork_ms": 0.02,
+        "cardmarket_ms": 848.02,
+        "printing_review_ms": 66.83,
+        "total_ms": 3612.19
+      },
+      "elapsed_ms": 3620.19
+    },
+    {
+      "expected_id": "en:sv01-036",
+      "condition": "art_only",
+      "status": "retake",
+      "top_id": "en:swsh4.5-70",
+      "top_correct": false,
+      "candidate_recalled": false,
+      "false_specific_claim": false,
+      "printing_review": null,
+      "local_artwork_matches": [],
+      "ocr_failed": false,
+      "before": {
+        "status": "no_match",
+        "top_id": "en:swsh4.5-70",
+        "candidate_recalled": false
+      },
+      "timings_ms": {
+        "decode_ms": 11.52,
+        "detect_ms": 0.0,
+        "embed_ms": 373.63,
+        "retrieve_ms": 4.97,
+        "orientation_degrees": 0.0,
+        "ocr_ms": 1803.65,
+        "local_artwork_ms": 254.6,
+        "cardmarket_ms": 676.02,
+        "printing_review_ms": 0.01,
+        "total_ms": 3125.96
+      },
+      "elapsed_ms": 3131.77
+    },
+    {
+      "expected_id": "en:sv01-036",
+      "condition": "top_half",
+      "status": "uncertain",
+      "top_id": "sv01-036",
+      "top_correct": true,
+      "candidate_recalled": true,
+      "false_specific_claim": false,
+      "printing_review": null,
+      "local_artwork_matches": [
+        {
+          "card_id": "sv01-036",
+          "inliers": 191,
+          "artwork_inliers": 191,
+          "query_coverage": 0.286
+        }
+      ],
+      "ocr_failed": false,
+      "before": {
+        "status": "uncertain",
+        "top_id": "en:swsh10-070",
+        "candidate_recalled": false
+      },
+      "timings_ms": {
+        "decode_ms": 12.13,
+        "detect_ms": 0.0,
+        "embed_ms": 373.65,
+        "retrieve_ms": 5.0,
+        "orientation_degrees": 0.0,
+        "ocr_ms": 3085.82,
+        "local_artwork_ms": 253.37,
+        "cardmarket_ms": 674.46,
+        "printing_review_ms": 0.12,
+        "total_ms": 4407.22
+      },
+      "elapsed_ms": 4413.36
+    },
+    {
+      "expected_id": "en:sv01-036",
+      "condition": "bottom_half",
+      "status": "retake",
+      "top_id": "en:me02.5-011",
+      "top_correct": false,
+      "candidate_recalled": false,
+      "false_specific_claim": false,
+      "printing_review": null,
+      "local_artwork_matches": [],
+      "ocr_failed": false,
+      "before": {
+        "status": "uncertain",
+        "top_id": "en:me02.5-011",
+        "candidate_recalled": false
+      },
+      "timings_ms": {
+        "decode_ms": 20.94,
+        "detect_ms": 0.0,
+        "embed_ms": 538.11,
+        "retrieve_ms": 58.31,
+        "orientation_degrees": 0.0,
+        "ocr_ms": 4918.11,
+        "local_artwork_ms": 211.8,
+        "cardmarket_ms": 751.31,
+        "printing_review_ms": 0.02,
+        "total_ms": 6504.29
+      },
+      "elapsed_ms": 6510.83
+    },
+    {
+      "expected_id": "en:sv01-036",
+      "condition": "partial_crop",
+      "status": "uncertain",
+      "top_id": "sv01-036",
+      "top_correct": true,
+      "candidate_recalled": true,
+      "false_specific_claim": false,
+      "printing_review": null,
+      "local_artwork_matches": [
+        {
+          "card_id": "sv01-036",
+          "inliers": 180,
+          "artwork_inliers": 180,
+          "query_coverage": 0.169
+        }
+      ],
+      "ocr_failed": false,
+      "before": {
+        "status": "uncertain",
+        "top_id": "sv01-036",
+        "candidate_recalled": true
+      },
+      "timings_ms": {
+        "decode_ms": 14.97,
+        "detect_ms": 0.0,
+        "embed_ms": 131.08,
+        "retrieve_ms": 1.83,
+        "orientation_degrees": 0.0,
+        "ocr_ms": 2282.43,
+        "local_artwork_ms": 277.42,
+        "cardmarket_ms": 707.42,
+        "printing_review_ms": 0.19,
+        "total_ms": 3417.67
+      },
+      "elapsed_ms": 3423.75
+    },
+    {
+      "expected_id": "en:sv01-036",
+      "condition": "central_patch",
+      "status": "uncertain",
+      "top_id": "sv01-036",
+      "top_correct": true,
+      "candidate_recalled": true,
+      "false_specific_claim": false,
+      "printing_review": null,
+      "local_artwork_matches": [
+        {
+          "card_id": "sv01-036",
+          "inliers": 55,
+          "artwork_inliers": 55,
+          "query_coverage": 0.243
+        }
+      ],
+      "ocr_failed": false,
+      "before": {
+        "status": "no_match",
+        "top_id": "en:hgss1-3",
+        "candidate_recalled": false
+      },
+      "timings_ms": {
+        "decode_ms": 11.85,
+        "detect_ms": 0.0,
+        "embed_ms": 281.09,
+        "retrieve_ms": 7.72,
+        "orientation_degrees": 0.0,
+        "ocr_ms": 2016.73,
+        "local_artwork_ms": 198.62,
+        "cardmarket_ms": 685.25,
+        "printing_review_ms": 0.12,
+        "total_ms": 3203.5
+      },
+      "elapsed_ms": 3209.82
+    },
+    {
+      "expected_id": "ja:SV-P-051",
+      "condition": "full",
+      "status": "matched",
+      "top_id": "ja:SV-P-051",
+      "top_correct": true,
+      "candidate_recalled": true,
+      "false_specific_claim": false,
+      "printing_review": null,
+      "local_artwork_matches": [],
+      "ocr_failed": false,
+      "before": {
+        "status": "matched",
+        "top_id": "ja:SV-P-051",
+        "candidate_recalled": true
+      },
+      "timings_ms": {
+        "decode_ms": 14.21,
+        "detect_ms": 0.0,
+        "embed_ms": 127.4,
+        "retrieve_ms": 1.62,
+        "orientation_degrees": 0.0,
+        "ocr_ms": 2582.2,
+        "local_artwork_ms": 0.0,
+        "cardmarket_ms": 683.15,
+        "printing_review_ms": 36.31,
+        "total_ms": 3448.62
+      },
+      "elapsed_ms": 3454.78
+    },
+    {
+      "expected_id": "ja:SV-P-051",
+      "condition": "art_only",
+      "status": "uncertain",
+      "top_id": "ja:SV-P-051",
+      "top_correct": true,
+      "candidate_recalled": true,
+      "false_specific_claim": false,
+      "printing_review": null,
+      "local_artwork_matches": [
+        {
+          "card_id": "ja:SV-P-051",
+          "inliers": 132,
+          "artwork_inliers": 132,
+          "query_coverage": 0.776
+        }
+      ],
+      "ocr_failed": false,
+      "before": {
+        "status": "no_match",
+        "top_id": "ja:S5I-046",
+        "candidate_recalled": false
+      },
+      "timings_ms": {
+        "decode_ms": 11.57,
+        "detect_ms": 0.0,
+        "embed_ms": 374.5,
+        "retrieve_ms": 4.91,
+        "orientation_degrees": 0.0,
+        "ocr_ms": 1788.92,
+        "local_artwork_ms": 277.26,
+        "cardmarket_ms": 669.32,
+        "printing_review_ms": 0.1,
+        "total_ms": 3128.38
+      },
+      "elapsed_ms": 3134.39
+    },
+    {
+      "expected_id": "ja:SV-P-051",
+      "condition": "top_half",
+      "status": "uncertain",
+      "top_id": "ja:SV-P-051",
+      "top_correct": true,
+      "candidate_recalled": true,
+      "false_specific_claim": false,
+      "printing_review": null,
+      "local_artwork_matches": [
+        {
+          "card_id": "ja:SV-P-051",
+          "inliers": 140,
+          "artwork_inliers": 140,
+          "query_coverage": 0.299
+        }
+      ],
+      "ocr_failed": false,
+      "before": {
+        "status": "uncertain",
+        "top_id": "ja:SM12a-090",
+        "candidate_recalled": false
+      },
+      "timings_ms": {
+        "decode_ms": 12.97,
+        "detect_ms": 0.0,
+        "embed_ms": 378.35,
+        "retrieve_ms": 4.62,
+        "orientation_degrees": 0.0,
+        "ocr_ms": 3433.08,
+        "local_artwork_ms": 227.79,
+        "cardmarket_ms": 682.28,
+        "printing_review_ms": 0.12,
+        "total_ms": 4743.25
+      },
+      "elapsed_ms": 4749.63
+    },
+    {
+      "expected_id": "ja:SV-P-051",
+      "condition": "bottom_half",
+      "status": "retake",
+      "top_id": "ja:SV-P-063",
+      "top_correct": false,
+      "candidate_recalled": false,
+      "false_specific_claim": false,
+      "printing_review": null,
+      "local_artwork_matches": [],
+      "ocr_failed": false,
+      "before": {
+        "status": "uncertain",
+        "top_id": "ja:SV-P-063",
+        "candidate_recalled": false
+      },
+      "timings_ms": {
+        "decode_ms": 12.35,
+        "detect_ms": 0.0,
+        "embed_ms": 376.24,
+        "retrieve_ms": 5.1,
+        "orientation_degrees": 0.0,
+        "ocr_ms": 4377.63,
+        "local_artwork_ms": 266.03,
+        "cardmarket_ms": 721.79,
+        "printing_review_ms": 0.01,
+        "total_ms": 5762.78
+      },
+      "elapsed_ms": 5769.07
+    },
+    {
+      "expected_id": "ja:SV-P-051",
+      "condition": "partial_crop",
+      "status": "uncertain",
+      "top_id": "ja:SV-P-051",
+      "top_correct": true,
+      "candidate_recalled": true,
+      "false_specific_claim": false,
+      "printing_review": null,
+      "local_artwork_matches": [
+        {
+          "card_id": "ja:SV-P-051",
+          "inliers": 122,
+          "artwork_inliers": 122,
+          "query_coverage": 0.193
+        }
+      ],
+      "ocr_failed": false,
+      "before": {
+        "status": "matched",
+        "top_id": "ja:SV-P-051",
+        "candidate_recalled": true
+      },
+      "timings_ms": {
+        "decode_ms": 14.48,
+        "detect_ms": 0.0,
+        "embed_ms": 126.5,
+        "retrieve_ms": 1.76,
+        "orientation_degrees": 0.0,
+        "ocr_ms": 1982.46,
+        "local_artwork_ms": 210.23,
+        "cardmarket_ms": 726.48,
+        "printing_review_ms": 0.1,
+        "total_ms": 3065.22
+      },
+      "elapsed_ms": 3071.41
+    },
+    {
+      "expected_id": "ja:SV-P-051",
+      "condition": "central_patch",
+      "status": "no_match",
+      "top_id": "ja:SM11b-053",
+      "top_correct": false,
+      "candidate_recalled": false,
+      "false_specific_claim": false,
+      "printing_review": null,
+      "local_artwork_matches": [],
+      "ocr_failed": false,
+      "before": {
+        "status": "no_match",
+        "top_id": "ja:SM11b-053",
+        "candidate_recalled": false
+      },
+      "timings_ms": {
+        "decode_ms": 12.22,
+        "detect_ms": 0.0,
+        "embed_ms": 321.02,
+        "retrieve_ms": 121.97,
+        "orientation_degrees": 0.0,
+        "ocr_ms": 2098.32,
+        "local_artwork_ms": 243.37,
+        "cardmarket_ms": 745.48,
+        "printing_review_ms": 0.02,
+        "total_ms": 3592.83
+      },
+      "elapsed_ms": 3599.3
+    }
+  ],
+  "negatives": [
+    {
+      "condition": "blank",
+      "status": "retake",
+      "false_specific_claim": false
+    },
+    {
+      "condition": "random_noise",
+      "status": "no_match",
+      "false_specific_claim": false
+    }
+  ]
+}

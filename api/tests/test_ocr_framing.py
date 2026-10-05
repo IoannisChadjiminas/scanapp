@@ -7,6 +7,8 @@ from app.recognition.ocr_framing import complete_frame_probe_allowed, complete_f
 
 @pytest.mark.parametrize('profile,angle,size,allowed', [
     ('window_0.70',0,(1000,1400),True), ('window_0.85',0,(1000,1400),True),
+    ('loose_1',0,(1000,1400),True), ('loose_1',180,(1000,1400),False),
+    ('loose_0',0,(1400,1000),False), ('loose_0',0,(600,1000),False),
     ('primary',0,(1000,1400),False), ('slab_interior',0,(1000,1400),False),
     ('window_0.70',180,(1000,1400),False), ('window_0.70',0,(1400,1000),False),
     ('window_0.70',0,(600,1000),False), ('window_0.70',0,(250,350),False),
@@ -34,6 +36,30 @@ def test_wrong_number_remains_observed_for_normal_printing_contradiction_checks(
     result = evidence(number='35/109')
     assert complete_frame_identity_supported(result,['Pikachu'])
     assert result.hits[1].text == '35/109'
+
+
+def test_title_only_probe_requires_strong_literal_visual_agreement():
+    from app.recognition.ocr_framing import complete_frame_title_supported
+    observed = evidence(number='35', number_confidence=.6)
+    assert complete_frame_title_supported(observed, ['Pikachu'])
+    assert not complete_frame_identity_supported(observed, ['Pikachu'])
+    assert not complete_frame_title_supported(observed, ['Raichu'])
+    assert not complete_frame_title_supported(evidence(name_confidence=.94), ['Pikachu'])
+    assert not complete_frame_title_supported(OcrResult(failed=True), ['Pikachu'])
+
+
+def test_staged_footer_requires_agreeing_catalogue_backed_original_fields():
+    from app.recognition.ocr_framing import original_footer_supports_skip
+    selected = OcrResult(name_text='Pikachu', hits=[OcrHit('Pikachu', .99, 'name')])
+    row = dict(name='Pikachu', collector_number='35', printed_collector_number='35/108', language='en')
+    assert original_footer_supports_skip(selected, evidence(), [row])
+    for original in (evidence(name='Raichu'), evidence(number='35/109'),
+                     evidence(number='35'), evidence(number_confidence=.94),
+                     evidence(name_confidence=.94), evidence(region='holder_collector'),
+                     OcrResult(failed=True)):
+        assert not original_footer_supports_skip(selected, original, [row])
+    selected.hits.append(OcrHit('35', .6, 'collector'))
+    assert not original_footer_supports_skip(selected, evidence(), [row])
 
 
 @pytest.mark.parametrize('token,expected',[('35/108X','35/108'),('077/146C','077/146'),
@@ -71,7 +97,7 @@ def test_read_pass_telemetry_records_failed_regions_without_text(monkeypatch):
     assert 'text' not in result.passes[0] and 'error' not in result.passes[0]
 
 
-@pytest.mark.parametrize('accepted',[True,False])
+@pytest.mark.parametrize('accepted',[True,False,'title_only'])
 def test_pipeline_uses_complete_identity_or_reuses_failed_probe_without_duplicate_read(tmp_path,monkeypatch,accepted):
     import io
     import json
@@ -90,7 +116,8 @@ def test_pipeline_uses_complete_identity_or_reuses_failed_probe_without_duplicat
     def read(image):
         calls.append(image.size)
         if image.width==600:
-            return evidence() if accepted else OcrResult(failed=True)
+            return (evidence(number='35',number_confidence=.6) if accepted=='title_only' else
+                    evidence() if accepted else OcrResult(failed=True))
         return evidence(number='35',number_confidence=.6)
     image=Image.fromarray(np.random.default_rng(9).integers(0,255,(840,600,3),dtype=np.uint8))
     monkeypatch.setattr(pipeline,'detect_and_rectify',lambda im:(im,False))
@@ -114,6 +141,11 @@ def test_pipeline_uses_complete_identity_or_reuses_failed_probe_without_duplicat
             catalog=catalog,results=results,session_id='test')
         assert calls==([(600,840)] if accepted else [(600,840),(420,588)])
         saved=json.loads(results.execute('SELECT ocr_json FROM scans WHERE id=?',(response.id,)).fetchone()[0])
-        assert saved['frame_selection']['ocr_complete_frame_used'] is accepted
+        assert saved['frame_selection']['ocr_complete_frame_used'] is bool(accepted)
+        if accepted == 'title_only':
+            assert saved['frame_selection']['ocr_complete_frame_title_only']
+            assert response.status.value == 'printing_ambiguous'
+            assert response.confidence.printing == 'ambiguous'
+            assert response.confidence.requires_confirmation
     finally:
         catalog.close();results.close()

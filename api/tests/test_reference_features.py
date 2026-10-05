@@ -147,6 +147,63 @@ def test_corrupt_file_and_unsupported_profile_never_fallback(features):
         store.features('base', rows[0]['image_path'], ART_BOX, 1000, .04)
 
 
+def test_decoded_cache_keeps_checksums_and_returns_independent_mappings(features, monkeypatch):
+    _, _, rows, bundle = features
+    store = ReferenceFeatureStore.load(bundle, rows)
+    first = store.read('base', rows[0]['image_path'])
+    with monkeypatch.context() as patch:
+        patch.setattr(np, 'load', lambda *a, **k: pytest.fail('Identical record decompressed twice'))
+        second = store.read('base', rows[0]['image_path'])
+    assert second is not first
+    assert second['thumbnail'] is first['thumbnail']
+    first.pop('thumbnail')
+    assert 'thumbnail' in store.read('base', rows[0]['image_path'])
+    file = bundle / store.manifest['records']['base']['filename']
+    file.write_bytes(b'corrupt-after-cache-hit')
+    with pytest.raises(ArtifactError, match='checksum mismatch'):
+        store.read('base', rows[0]['image_path'])
+
+
+def test_decoded_cache_is_bounded_and_evicted_records_reload(features):
+    _, _, rows, bundle = features
+    store = ReferenceFeatureStore.load(bundle, rows)
+    store.read('base', rows[0]['image_path'])
+    store._arrays_limit = store._arrays_bytes
+    store.read('full', rows[1]['image_path'])
+    assert store._arrays_bytes <= store._arrays_limit
+    assert len(store._arrays) <= 1
+    store.read('base', rows[0]['image_path'])
+    assert store._arrays_bytes <= store._arrays_limit
+
+
+def test_query_cache_is_exact_pixel_profile_bound_and_does_not_cache_geometry(features, monkeypatch):
+    data_dir, image, rows, _ = features
+    verifier = LocalArtworkVerifier(data_dir)
+    pixels = _pixels(image)
+    detector = cv2.SIFT_create(nfeatures=1000, contrastThreshold=.04)
+    calls = []
+    class Counter:
+        def detectAndCompute(self, pixels, mask):
+            calls.append(pixels.copy())
+            return detector.detectAndCompute(pixels, mask)
+    first = verifier._query_features(pixels, Counter(), 1000, .04)
+    second = verifier._query_features(pixels.copy(), Counter(), 1000, .04)
+    assert len(calls) == 1 and second is first
+    assert not second[1].flags.writeable
+    changed = pixels.copy(); changed[0, 0] ^= 1
+    verifier._query_features(changed, Counter(), 1000, .04)
+    verifier._query_features(pixels, Counter(), 2000, .02)
+    assert len(calls) == 3
+    verifier._query_cache_limit = 1
+    verifier._query_features(pixels[:, :-1].copy(), Counter(), 1000, .04)
+    # Oversize insertions must not grow the cache.
+    assert len(calls) == 4
+    cv2.setRNGSeed(19)
+    expected = LocalArtworkVerifier(data_dir).verify(image, [('base', rows[0]['image_path'])])
+    cv2.setRNGSeed(19)
+    assert verifier.verify(image, [('base', rows[0]['image_path'])]) == expected
+
+
 def test_bundle_cannot_overwrite_existing_directory(features):
     data_dir, _, rows, bundle = features
     with pytest.raises(FileExistsError):

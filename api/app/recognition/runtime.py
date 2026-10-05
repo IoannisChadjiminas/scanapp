@@ -68,6 +68,8 @@ class Runtime:
                         intra_threads=self.settings.ort_intra_threads,
                         inter_threads=self.settings.ort_inter_threads,
                     )
+                    ocr.parallel_footer_halves = self.settings.ocr_parallel_footer_halves
+                    ocr.card_priority = self.settings.ocr_card_priority
                     if self.settings.use_grading and (self.settings.parallel_grading
                                                       or self.settings.grading_at_card_deadline):
                         grading_ocr = CardOcr(
@@ -212,8 +214,14 @@ class Runtime:
             versions['ocr'] += '+complete-frame-first-v1'
         if self.settings.use_ocr and self.settings.ocr_adaptive_footer:
             versions['ocr'] += '+supported-identity-footer-v1'
+        if self.settings.use_ocr and self.settings.ocr_staged_original:
+            versions['ocr'] += '+staged-original-v1'
+        if self.settings.use_ocr and self.settings.ocr_card_priority:
+            versions['ocr'] += '+card-priority-v1'
         if self.settings.use_ocr and self.settings.ocr_parallel_regions:
             versions['ocr'] += '+bounded-regions-v1'
+            if self.settings.ocr_parallel_footer_halves:
+                versions['ocr'] += '+bounded-footer-halves-v1'
         if self.artwork_index is not None:
             versions["artwork"] = (self.artwork_index.manifest["schema_version"] + ":" +
                                     self.artwork_index.manifest["records_sha256"][:12])

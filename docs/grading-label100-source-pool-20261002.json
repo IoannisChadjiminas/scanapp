@@ -1,0 +1,1657 @@
+{
+  "purpose": "Independent visible-label OCR baseline; source titles are not ground truth",
+  "photos": [
+    {
+      "id": "label100_225598065196",
+      "company_hint": "beckett",
+      "title": "Pokemon Gym Challenge 1st edition Blaine's Charizard Bgs 9.5 🔥 | eBay",
+      "page_url": "https://www.ebay.com/itm/225598065196",
+      "ref_id": "turn315view0",
+      "link_id": 29,
+      "caption": "Picture 1 of 2",
+      "image_url": "https://i.ebayimg.com/images/g/qA8AAOSwmfZkdqT3/s-l1600.webp",
+      "conditions": [
+        "slab",
+        "public_seller_photo"
+      ]
+    },
+    {
+      "id": "label100_177539623440",
+      "company_hint": "beckett",
+      "title": "Pokemon 1999 Base Set 1st Edition Shadowless BGS 9.5 Quad + Jynx 31/102 GMT | eBay",
+      "page_url": "https://www.ebay.com/itm/177539623440",
+      "ref_id": "turn315view1",
+      "link_id": 29,
+      "caption": "BGS 9.5 1999 Pokémon Base Set Shadowless Jynx card with purple border, yellow frame, and foil accents.",
+      "image_url": "https://i.ebayimg.com/images/g/IvYAAOSwV~lf8O6B/s-l1600.webp",
+      "conditions": [
+        "slab",
+        "public_seller_photo"
+      ]
+    },
+    {
+      "id": "label100_389617271474",
+      "company_hint": "beckett",
+      "title": "Pokemon 1st Ed. Base Set Shadowless Charizard Holo BGS 9.5 MBA SILVER DIAMOND | eBay",
+      "page_url": "https://www.ebay.com/itm/389617271474",
+      "ref_id": "turn315view2",
+      "link_id": 33,
+      "caption": "Charizard holo 1st Ed. Base Set Shadowless, BGS 9.5 MBA, orange dragon with fiery background.",
+      "image_url": "https://i.ebayimg.com/images/g/hE8AAeSwD~Vpj04U/s-l1600.webp",
+      "conditions": [
+        "slab",
+        "public_seller_photo"
+      ]
+    },
+    {
+      "id": "label100_800174277078",
+      "company_hint": "psa",
+      "title": "Pikachu PSA 10 Holo 001/SV-P SV-P Promo Japanese Pokémon TCG | eBay",
+      "page_url": "https://www.ebay.com/itm/800174277078",
+      "ref_id": "turn317view0",
+      "link_id": 29,
+      "caption": "PSA 10 holo Japanese Pokémon TCG card featuring Pikachu, Blazile, and Japanese grass types in a scenic landscape.",
+      "image_url": "https://i.ebayimg.com/images/g/XwcAAeSwQ15pz0XQ/s-l1600.webp",
+      "conditions": [
+        "slab",
+        "public_seller_photo"
+      ]
+    },
+    {
+      "id": "label100_177973415542",
+      "company_hint": "psa",
+      "title": "Pokémon Card 1st Edition Abra PSA 8 NM-Mint, Base Set #43, WOTC 1999 | eBay",
+      "page_url": "https://www.ebay.com/itm/177973415542",
+      "ref_id": "turn317view1",
+      "link_id": 29,
+      "caption": "PSA 8 1st Edition Abra Pokémon card, yellow border, tree Abra, 30 HP, WOTC 1999.",
+      "image_url": "https://i.ebayimg.com/images/g/64cAAeSwlvBpu3ga/s-l1600.webp",
+      "conditions": [
+        "slab",
+        "public_seller_photo"
+      ]
+    },
+    {
+      "id": "label100_226991036392",
+      "company_hint": "psa",
+      "title": "1999 Pokemon 1st Edition Shadowless Magnemite #53 PSA 8 | eBay",
+      "page_url": "https://www.ebay.com/itm/226991036392",
+      "ref_id": "turn317view2",
+      "link_id": 29,
+      "caption": "1999 Pokémon 1st Ed Shadowless Magnemite #53, PSA 8, blue-gold magnet with “Thunder Wave” & “Selfdestruct” attacks.",
+      "image_url": "https://i.ebayimg.com/images/g/AjgAAeSwVvho1JBO/s-l1600.webp",
+      "conditions": [
+        "slab",
+        "public_seller_photo"
+      ]
+    },
+    {
+      "id": "label100_147552021925",
+      "company_hint": "ace",
+      "title": "Pokémon TCG N's Zoroark Ascended Heroes SIR ACE 10 GEM MINT GREAT SUB GRADE | eBay UK",
+      "page_url": "https://www.ebay.co.uk/itm/147552021925",
+      "ref_id": "turn318view1",
+      "link_id": 35,
+      "caption": "Picture 1 of 11",
+      "image_url": "https://i.ebayimg.com/images/g/BvUAAeSw2ZtqnBAl/s-l1600.webp",
+      "conditions": [
+        "slab",
+        "public_seller_photo"
+      ]
+    },
+    {
+      "id": "label100_287567779040",
+      "company_hint": "ace",
+      "title": "Pokémon Arceus V Star 176/172 ACE 10 NO OFFERS - Free P&P | eBay UK",
+      "page_url": "https://www.ebay.co.uk/itm/287567779040",
+      "ref_id": "turn318view2",
+      "link_id": 28,
+      "caption": "Picture 1 of 4",
+      "image_url": "https://i.ebayimg.com/images/g/xqQAAeSwXeFqnFyj/s-l1600.webp",
+      "conditions": [
+        "slab",
+        "public_seller_photo"
+      ]
+    },
+    {
+      "id": "label100_397078152442",
+      "company_hint": "ace",
+      "title": "Pikachu ACE 10 PERFECT 10 160/159 - Crown Zenith - Pokemon TCG ACE GRADED | eBay UK",
+      "page_url": "https://www.ebay.co.uk/itm/397078152442",
+      "ref_id": "turn319view0",
+      "link_id": 26,
+      "caption": "Picture 1 of 2",
+      "image_url": "https://i.ebayimg.com/images/g/BcoAAeSwEY9oz-TX/s-l1600.webp",
+      "conditions": [
+        "slab",
+        "public_seller_photo"
+      ]
+    },
+    {
+      "id": "label100_317559256789",
+      "company_hint": "ace",
+      "title": "Pokémon TCG Pikachu First Edition Jungle Ace 6 Graded Card 1999 | eBay UK",
+      "page_url": "https://www.ebay.co.uk/itm/317559256789",
+      "ref_id": "turn320view0",
+      "link_id": 24,
+      "caption": "Picture 1 of 1",
+      "image_url": "https://i.ebayimg.com/images/g/Xl4AAeSwj2ZpHb~I/s-l1600.webp",
+      "conditions": [
+        "slab",
+        "public_seller_photo"
+      ]
+    },
+    {
+      "id": "label100_287166531557",
+      "company_hint": "ace",
+      "title": "Pokemon TCG Giratina VSTAR GG69/GG70 Crown Zenith ACE 10 - Perfect Subgrades | eBay UK",
+      "page_url": "https://www.ebay.co.uk/itm/287166531557",
+      "ref_id": "turn320view2",
+      "link_id": 27,
+      "caption": "Picture 1 of 3",
+      "image_url": "https://i.ebayimg.com/images/g/xxIAAeSwIyxpWoCx/s-l1600.webp",
+      "conditions": [
+        "slab",
+        "public_seller_photo"
+      ]
+    },
+    {
+      "id": "label100_358871960246",
+      "company_hint": "ace",
+      "title": "2016 Pokemon Generations M Blastoise EX 18/83 Holo ACE 10 Perfect Subgrades | eBay UK",
+      "page_url": "https://www.ebay.co.uk/itm/358871960246",
+      "ref_id": "turn321view0",
+      "link_id": 26,
+      "caption": "Picture 1 of 2",
+      "image_url": "https://i.ebayimg.com/images/g/GigAAeSwOk1qblyN/s-l1600.webp",
+      "conditions": [
+        "slab",
+        "public_seller_photo"
+      ]
+    },
+    {
+      "id": "label100_820030872349",
+      "company_hint": "tag",
+      "title": "PSA10 Farfetch'd Tag Bolt Japanese Pokémon Card Graded | eBay",
+      "page_url": "https://www.ebay.com/itm/820030872349",
+      "ref_id": "turn321view2",
+      "link_id": 29,
+      "caption": "Picture 1 of 2",
+      "image_url": "https://i.ebayimg.com/images/g/ALgAAeSwPgVqiDiW/s-l1600.webp",
+      "conditions": [
+        "slab",
+        "public_seller_photo"
+      ]
+    },
+    {
+      "id": "label100_287609263339",
+      "company_hint": "tag",
+      "title": "Pokemon Giratina VSTAR Crown Zenith Galarian Gallery GG69 TAG 10 Gem Mint | eBay",
+      "page_url": "https://www.ebay.com/itm/287609263339",
+      "ref_id": "turn322view1",
+      "link_id": 29,
+      "caption": "Giratina VSTAR Crown Zenith GG69 card, 10 gem mint, gold border, lost impact & star requiem text.",
+      "image_url": "https://i.ebayimg.com/images/g/5xwAAeSwFkVqty8y/s-l1600.webp",
+      "conditions": [
+        "slab",
+        "public_seller_photo"
+      ]
+    },
+    {
+      "id": "label100_127844524552",
+      "company_hint": "tag",
+      "title": "2018 Pokemon SM TAG Bolt Japanese 013/095 Charizard Holo TAG 10 Pristine (991) | eBay",
+      "page_url": "https://www.ebay.com/itm/127844524552",
+      "ref_id": "turn323view0",
+      "link_id": 30,
+      "caption": "Picture 1 of 3",
+      "image_url": "https://i.ebayimg.com/images/g/xukAAeSwsL5p98gd/s-l1600.webp",
+      "conditions": [
+        "slab",
+        "public_seller_photo"
+      ]
+    },
+    {
+      "id": "label100_117235965752",
+      "company_hint": "beckett",
+      "title": "Pokemon SV Terastal Festival High Class Flareon #021 Holo BGS 10 PRISTINE | eBay",
+      "page_url": "https://www.ebay.com/itm/117235965752",
+      "ref_id": "turn323view1",
+      "link_id": 31,
+      "caption": "Holo BGS 10 Pristine Pokémon SV Terastal Festival Flareon card with fiery orange background, 130 HP, and visible attack text.",
+      "image_url": "https://i.ebayimg.com/images/g/2S8AAeSw7SlqJUxi/s-l1600.webp",
+      "conditions": [
+        "slab",
+        "public_seller_photo"
+      ]
+    },
+    {
+      "id": "label100_168307084070",
+      "company_hint": "tag",
+      "title": "1999 Pokémon Nidoking Base Set #11/102 Holographic TAG Graded 6 | eBay",
+      "page_url": "https://www.ebay.com/itm/168307084070",
+      "ref_id": "turn323view2",
+      "link_id": 35,
+      "caption": "1999 Pokémon Nidoking Base Set holographic card graded 6, featuring purple Nidoking with gold chest in protective case.",
+      "image_url": "https://i.ebayimg.com/images/g/bRMAAeSwmvtp3YJT/s-l1600.webp",
+      "conditions": [
+        "slab",
+        "public_seller_photo"
+      ]
+    },
+    {
+      "id": "label100_800172916188",
+      "company_hint": "ags",
+      "title": "1999 Pokemon Jungle Exeggutor AGS 9 | eBay",
+      "page_url": "https://www.ebay.com/itm/800172916188",
+      "ref_id": "turn324view1",
+      "link_id": 32,
+      "caption": "1999 Pokémon Jungle Exeggutor AGS 9, front with cartoon, white border, purple background, in protective case.",
+      "image_url": "https://i.ebayimg.com/images/g/ZNYAAeSweFNqLYsA/s-l1600.webp",
+      "conditions": [
+        "slab",
+        "public_seller_photo"
+      ]
+    },
+    {
+      "id": "label100_287242611709",
+      "company_hint": "ags",
+      "title": "Pokémon TCG - AGS 9 Mint Eevee Pokémon Day 2025b | eBay UK",
+      "page_url": "https://www.ebay.co.uk/itm/287242611709",
+      "ref_id": "turn324view2",
+      "link_id": 26,
+      "caption": "Picture 1 of 2",
+      "image_url": "https://i.ebayimg.com/images/g/Q7oAAeSwa5xp869-/s-l1600.webp",
+      "conditions": [
+        "slab",
+        "public_seller_photo"
+      ]
+    },
+    {
+      "id": "label100_168250552726",
+      "company_hint": "ags",
+      "title": "2021 POKEMON CELEBRATIONS #005 FULL ART/PIKACHU AGS 10 | eBay",
+      "page_url": "https://www.ebay.com/itm/168250552726",
+      "ref_id": "turn325view0",
+      "link_id": 28,
+      "caption": "2021 Japanese Pokémon JPN 25th Anniversary Collection #001 Full Art/Pikachu PSA 6 on same frame.",
+      "image_url": "https://i.ebayimg.com/images/g/1gQAAeSwJm5ph83G/s-l500.webp",
+      "conditions": [
+        "slab",
+        "public_seller_photo"
+      ]
+    },
+    {
+      "id": "label100_306973107301",
+      "company_hint": "ags",
+      "title": "Pikachu TG05/TG30 Swsh11: Lost Origin Trainer Gallery Holo AGS 10 | eBay",
+      "page_url": "https://www.ebay.com/itm/306973107301",
+      "ref_id": "turn325view1",
+      "link_id": 31,
+      "caption": "Lost Origin Trainer Gallery holo AGS 10, featuring Pikachu in red outfit with white mask, held in hand against blue-patterned background.",
+      "image_url": "https://i.ebayimg.com/images/g/C2MAAeSwui5qG4Ht/s-l1600.webp",
+      "conditions": [
+        "slab",
+        "public_seller_photo"
+      ]
+    },
+    {
+      "id": "label100_147530310696",
+      "company_hint": "ags",
+      "title": "Pokemon XY Evolutions Charizard 11/108 AGS Mint+ 9.5 Holo Rare 2016 | eBay",
+      "page_url": "https://www.ebay.com/itm/147530310696",
+      "ref_id": "turn325view2",
+      "link_id": 29,
+      "caption": "Charizard 11/108 Pokémon XY Evolutions holo rare graded AGS Mint 9.5, orange dragon with fiery background.",
+      "image_url": "https://i.ebayimg.com/images/g/LlUAAeSwzbZqj9cj/s-l1600.webp",
+      "conditions": [
+        "slab",
+        "public_seller_photo"
+      ]
+    },
+    {
+      "id": "label100_326851003642",
+      "company_hint": "ags",
+      "title": "2021 POKEMON CELEBRATIONS #005 FULL ART/PIKACHU AGS 10 GEM-MT 💎 | eBay",
+      "page_url": "https://www.ebay.com/itm/326851003642",
+      "ref_id": "turn326view0",
+      "link_id": 30,
+      "caption": "2021 Pokémon CELEBRATIONS #005 Full Art/Pikachu AGS 10 GEM-MT, Pikachu in forest with lightning, PSA slab.",
+      "image_url": "https://i.ebayimg.com/images/g/sd0AAeSwjIlpC6Jq/s-l1600.webp",
+      "conditions": [
+        "slab",
+        "public_seller_photo"
+      ]
+    },
+    {
+      "id": "label100_189008029307",
+      "company_hint": "ags",
+      "title": "AGS 10 Pikachu With Grey Felt Hat Promo (not PSA, BGS, CGC) Promo | eBay",
+      "page_url": "https://www.ebay.com/itm/189008029307",
+      "ref_id": "turn326view2",
+      "link_id": 32,
+      "caption": "AGS 10 promo card of Pikachu with grey felt hat, blue background, orange eyes, in case, PSA BGS CGC.",
+      "image_url": "https://i.ebayimg.com/images/g/MrwAAeSwm~Fquz~T/s-l1600.webp",
+      "conditions": [
+        "slab",
+        "public_seller_photo"
+      ]
+    },
+    {
+      "id": "label100_267703865924",
+      "company_hint": "ags",
+      "title": "Pokemon TCG Team Rocket’s Dugtrio AGS 10 | eBay UK",
+      "page_url": "https://www.ebay.co.uk/itm/267703865924",
+      "ref_id": "turn327view0",
+      "link_id": 26,
+      "caption": "Picture 1 of 2",
+      "image_url": "https://i.ebayimg.com/images/g/AZ0AAeSwiXBqNVDh/s-l1600.webp",
+      "conditions": [
+        "slab",
+        "public_seller_photo"
+      ]
+    },
+    {
+      "id": "label100_147411952001",
+      "company_hint": "ags",
+      "title": "Pokemon Crown Zenith Charizard VSTAR 019/159 AGS Mint+ 9.5 Holo Ultra Rare 2023 | eBay",
+      "page_url": "https://www.ebay.com/itm/147411952001",
+      "ref_id": "turn327view1",
+      "link_id": 29,
+      "caption": "Charizard VSTAR 019/159 AGS Mint+ 9.5 Ultra Rare 2023 Pokémon Crown Zenith with explosive fire and star blaze.",
+      "image_url": "https://i.ebayimg.com/images/g/me8AAeSwBLNqRqJf/s-l1600.webp",
+      "conditions": [
+        "slab",
+        "public_seller_photo"
+      ]
+    },
+    {
+      "id": "label100_188157283019",
+      "company_hint": "ags",
+      "title": "AGS 10 Pikachu Promo Holo 004/SV-P Chinese SV 2025 Pokémon Card | eBay",
+      "page_url": "https://www.ebay.com/itm/188157283019",
+      "ref_id": "turn328view0",
+      "link_id": 29,
+      "caption": "Japanese holofoil Pokémon card 001/SV-P featuring Pikachu, Charizard, Blastoise, and Arcanine in a vibrant battle scene.",
+      "image_url": "https://i.ebayimg.com/images/g/j9YAAeSwkXBqEJCc/s-l1600.webp",
+      "conditions": [
+        "slab",
+        "public_seller_photo"
+      ]
+    },
+    {
+      "id": "label100_168242458584",
+      "company_hint": "ags",
+      "title": "Pokémon TCG Flying Pikachu 25th Anniversary AGS 9.5 | eBay",
+      "page_url": "https://www.ebay.com/itm/168242458584",
+      "ref_id": "turn328view1",
+      "link_id": 29,
+      "caption": "Flying Pikachu 25th Anniversary Pokémon TCG card graded AGS 9.5, featuring yellow Pikachu with balloons in a blue-pink sky.",
+      "image_url": "https://i.ebayimg.com/images/g/3vYAAeSw3FNpuf4J/s-l1600.webp",
+      "conditions": [
+        "slab",
+        "public_seller_photo"
+      ]
+    },
+    {
+      "id": "label100_267615603004",
+      "company_hint": "tag",
+      "title": "Pokemon Card Space Fissure's Deoxys 002/019 Movie Comm. VS Pack TAG 10 Pristine | eBay",
+      "page_url": "https://www.ebay.com/itm/267615603004",
+      "ref_id": "turn328view2",
+      "link_id": 29,
+      "caption": "Pokemon Space Fissure’s Deoxys 002/019 holo card graded TAG 10 Pristine, featuring blue-spotted Deoxys artwork.",
+      "image_url": "https://i.ebayimg.com/images/g/ZxUAAeSwCnpoylPC/s-l1600.webp",
+      "conditions": [
+        "slab",
+        "public_seller_photo"
+      ]
+    },
+    {
+      "id": "label100_205373770550",
+      "company_hint": "tag",
+      "title": "Pokémon Terastal Fest. FLAREON EX 202/187 Special Art Rare **TAG 10 PRISTINE** | eBay",
+      "page_url": "https://www.ebay.com/itm/205373770550",
+      "ref_id": "turn329view0",
+      "link_id": 27,
+      "caption": "Picture 1 of 3",
+      "image_url": "https://i.ebayimg.com/images/g/a9MAAeSwfGRn4LmV/s-l140.webp",
+      "conditions": [
+        "slab",
+        "public_seller_photo"
+      ]
+    },
+    {
+      "id": "label100_147319021552",
+      "company_hint": "cgc",
+      "title": "CGC Pristine 10 Japanese Pokemon Charizard 013/095 SM9: Tag Bolt Holo | eBay",
+      "page_url": "https://www.ebay.com/itm/147319021552",
+      "ref_id": "turn329view2",
+      "link_id": 29,
+      "caption": "Picture 1 of 2",
+      "image_url": "https://i.ebayimg.com/images/g/bSMAAeSwaZBqDK1F/s-l1600.webp",
+      "conditions": [
+        "slab",
+        "public_seller_photo"
+      ]
+    },
+    {
+      "id": "label100_406888761226",
+      "company_hint": "cgc",
+      "title": "PRISTINE CGC 10 MAGIKARP & WAILORD GX 019 TAG BOLT JAPANESE TAG TEAM POKEMON | eBay",
+      "page_url": "https://www.ebay.com/itm/406888761226",
+      "ref_id": "turn330view0",
+      "link_id": 34,
+      "caption": "CGC 9 Magikarp & Wailord GX 019/095 Japanese holo card with rainbow foil, 300 HP, and visible attack text.",
+      "image_url": "https://i.ebayimg.com/images/g/te4AAeSwsotp4Hyw/s-l1600.webp",
+      "conditions": [
+        "slab",
+        "public_seller_photo"
+      ]
+    },
+    {
+      "id": "label100_407216799901",
+      "company_hint": "tag",
+      "title": "Pokemon 2025 Pikachu 020/M-P Promo McDonald's Japanese GEM MINT TAG 10 | eBay",
+      "page_url": "https://www.ebay.com/itm/407216799901",
+      "ref_id": "turn330view1",
+      "link_id": 30,
+      "caption": "Japanese Pokémon 2025 promo card featuring Pikachu eating a burger, fries, and soda, with “M” logo in top right corner.",
+      "image_url": "https://i.ebayimg.com/images/g/dGUAAeSw7U5qqFsk/s-l1600.webp",
+      "conditions": [
+        "slab",
+        "public_seller_photo"
+      ]
+    },
+    {
+      "id": "label100_147245288873",
+      "company_hint": "cgc",
+      "title": "Charizard CGC Pristine 10 - Tag Bolt Holo Rare 013/095 - Japanese Pokemon 2018 | eBay",
+      "page_url": "https://www.ebay.com/itm/147245288873",
+      "ref_id": "turn331view1",
+      "link_id": 30,
+      "caption": "Charizard CGC Pristine 10 Japanese holo rare card 013/095 with Japanese text, orange dragon with gold accents.",
+      "image_url": "https://i.ebayimg.com/images/g/QfkAAeSwXsFob~8v/s-l1600.webp",
+      "conditions": [
+        "slab",
+        "public_seller_photo"
+      ]
+    },
+    {
+      "id": "label100_336377025143",
+      "company_hint": "tag",
+      "title": "Pokemon Japanese Terastal Festival Vaporeon EX 205/187 TAG 10 PRISTINE 992/1000 | eBay",
+      "page_url": "https://www.ebay.com/itm/336377025143",
+      "ref_id": "turn331view2",
+      "link_id": 26,
+      "caption": "Pokemon Japanese Terastal Festival Vaporeon EX 205/187 TAG 10 PRISTINE 992/1000",
+      "image_url": "https://i.ebayimg.com/images/g/zdQAAeSwzLRpXLE0/s-l500.jpg",
+      "conditions": [
+        "slab",
+        "public_seller_photo"
+      ]
+    },
+    {
+      "id": "label100_325791263472",
+      "company_hint": "beckett",
+      "title": "Pokemon - Sabrina's Suggestion - BGS 10 - Pristine - sm9 Tag Bolt - Japanese | eBay",
+      "page_url": "https://www.ebay.com/itm/325791263472",
+      "ref_id": "turn332view0",
+      "link_id": 29,
+      "caption": "Sabrina’s Suggestion BGS 10 Pristine Japanese Pokémon card with sm9 Bolt, silver border, and visible attack text.",
+      "image_url": "https://i.ebayimg.com/images/g/5ZcAAOSwCPRk7OVR/s-l1600.webp",
+      "conditions": [
+        "slab",
+        "public_seller_photo"
+      ]
+    },
+    {
+      "id": "label100_187914531865",
+      "company_hint": "ace",
+      "title": "Pokémon TCG Mega M Blastoise EX 18/83 Generations Holo ACE Graded 7 Not PSA | eBay UK",
+      "page_url": "https://www.ebay.co.uk/itm/187914531865",
+      "ref_id": "turn332view2",
+      "link_id": 31,
+      "caption": "Picture 1 of 7",
+      "image_url": "https://i.ebayimg.com/images/g/9~oAAeSwMCVpWo-n/s-l1600.webp",
+      "conditions": [
+        "slab",
+        "public_seller_photo"
+      ]
+    },
+    {
+      "id": "label100_318837968582",
+      "company_hint": "ace",
+      "title": "Pokémon TCG ACE 10 Morpeko ex 117/084 Pitch Black SIR Perfect Subgrades | eBay UK",
+      "page_url": "https://www.ebay.co.uk/itm/318837968582",
+      "ref_id": "turn333view0",
+      "link_id": 23,
+      "caption": "Pokémon TCG ACE 10 Morpeko ex 117/084 Pitch Black SIR Perfect Subgrades",
+      "image_url": "https://i.ebayimg.com/images/g/7o8AAeSw0fJqnorW/s-l500.jpg",
+      "conditions": [
+        "slab",
+        "public_seller_photo"
+      ]
+    },
+    {
+      "id": "label100_298599062412",
+      "company_hint": "ace",
+      "title": "Pokemon TCG Pikachu 4 Black Star Promo Movie Promo Card WOTC 1999 - ACE 7 | eBay UK",
+      "page_url": "https://www.ebay.co.uk/itm/298599062412",
+      "ref_id": "turn333view1",
+      "link_id": 26,
+      "caption": "Picture 1 of 2",
+      "image_url": "https://i.ebayimg.com/images/g/LZwAAeSwPQNqMBGB/s-l1600.webp",
+      "conditions": [
+        "slab",
+        "public_seller_photo"
+      ]
+    },
+    {
+      "id": "label100_366424401446",
+      "company_hint": "ace",
+      "title": "Pokémon TCG N’s Zorua AR 2025 Battle Partners Ace 10 | eBay UK",
+      "page_url": "https://www.ebay.co.uk/itm/366424401446",
+      "ref_id": "turn334view0",
+      "link_id": 26,
+      "caption": "Picture 1 of 2",
+      "image_url": "https://i.ebayimg.com/images/g/YkMAAeSwwatqDxbD/s-l1600.webp",
+      "conditions": [
+        "slab",
+        "public_seller_photo"
+      ]
+    },
+    {
+      "id": "label100_389885073632",
+      "company_hint": "ace",
+      "title": "🌟✨ Pokémon TCG – Jirachi RC13/RC32 Radiant Collection (2016) – Holo – ACE 8 | eBay UK",
+      "page_url": "https://www.ebay.co.uk/itm/389885073632",
+      "ref_id": "turn334view2",
+      "link_id": 26,
+      "caption": "Picture 1 of 2",
+      "image_url": "https://i.ebayimg.com/images/g/BXsAAeSwJnBqJ1t7/s-l1600.webp",
+      "conditions": [
+        "slab",
+        "public_seller_photo"
+      ]
+    },
+    {
+      "id": "label100_197567930366",
+      "company_hint": "ace",
+      "title": "Pokemon - Prismatic Evolutions - Jolteon ex - Surprise box stamped - Ace 10 | eBay UK",
+      "page_url": "https://www.ebay.co.uk/itm/197567930366",
+      "ref_id": "turn335view0",
+      "link_id": 24,
+      "caption": "Picture 1 of 1",
+      "image_url": "https://i.ebayimg.com/images/g/gaMAAeSwlmZohh7P/s-l1600.webp",
+      "conditions": [
+        "slab",
+        "public_seller_photo"
+      ]
+    },
+    {
+      "id": "label100_267680041404",
+      "company_hint": "ace",
+      "title": "Pokémon TCG Charizard Base Set 2 4/130 Holo Ace 7 Near Mint. | eBay UK",
+      "page_url": "https://www.ebay.co.uk/itm/267680041404",
+      "ref_id": "turn335view2",
+      "link_id": 23,
+      "caption": "Pokémon TCG Charizard Base Set 2 4/130 Holo Ace 7 Near Mint. ",
+      "image_url": "https://i.ebayimg.com/images/g/zmAAAeSwcnFp38Qn/s-l500.jpg",
+      "conditions": [
+        "slab",
+        "public_seller_photo"
+      ]
+    },
+    {
+      "id": "label100_377454420946",
+      "company_hint": "ags",
+      "title": "Pokémon Gengar Pokemon Card 151 #094 Holo (Japanese) AGS 10 130 HP | eBay",
+      "page_url": "https://www.ebay.com/itm/377454420946",
+      "ref_id": "turn336view2",
+      "link_id": 29,
+      "caption": "Gengar 094/165 Sv2a Japanese holo Pokémon card with purple border, in case, graded CGC 8.5, Japanese text at bottom.",
+      "image_url": "https://i.ebayimg.com/images/g/czQAAeSwQtRqXTnL/s-l1600.webp",
+      "conditions": [
+        "slab",
+        "public_seller_photo"
+      ]
+    },
+    {
+      "id": "label100_227380521312",
+      "company_hint": "ags",
+      "title": "2016 Pokemon XY Evolutions Mewtwo 51/108 Non Holo Graded AGS 9.5 Mint+ | eBay",
+      "page_url": "https://www.ebay.com/itm/227380521312",
+      "ref_id": "turn337view1",
+      "link_id": 29,
+      "caption": "2016 Pokémon XY Evolutions Mewtwo 51/108 non holo card graded AGS 9.5 Mint+, featuring Mewtwo artwork with purple accents.",
+      "image_url": "https://i.ebayimg.com/images/g/lFsAAeSwh75qKCSL/s-l1600.webp",
+      "conditions": [
+        "slab",
+        "public_seller_photo"
+      ]
+    },
+    {
+      "id": "label100_146677125573",
+      "company_hint": "ags",
+      "title": "Pokemon Japanese SV 151 Mewtwo 150/165 AGS Legendary 10 Holo Rare 2023 | eBay",
+      "page_url": "https://www.ebay.com/itm/146677125573",
+      "ref_id": "turn337view2",
+      "link_id": 32,
+      "caption": "Japanese Pokémon SV 151 Mewtwo 150/165 AGS Legendary 10 holo rare card with rainbow foil background in 2023.",
+      "image_url": "https://i.ebayimg.com/images/g/veAAAeSwnqdoX2xx/s-l1600.webp",
+      "conditions": [
+        "slab",
+        "public_seller_photo"
+      ]
+    },
+    {
+      "id": "label100_166388396274",
+      "company_hint": "ags",
+      "title": "2023 Pokémon 151 Mewtwo 183/165 AGS 9.5 Mint | eBay",
+      "page_url": "https://www.ebay.com/itm/166388396274",
+      "ref_id": "turn338view1",
+      "link_id": 29,
+      "caption": "2023 Pokémon 151 Mewtwo card 183/165 AGS 9.5, Japanese text, holographic Mewtwo with gold accents.",
+      "image_url": "https://i.ebayimg.com/images/g/G~gAAOSw1VllV9uM/s-l1600.webp",
+      "conditions": [
+        "slab",
+        "public_seller_photo"
+      ]
+    },
+    {
+      "id": "label100_376425702974",
+      "company_hint": "ags",
+      "title": "Pokémon TCG Mewtwo Japanese SM12a 2019 Card #054/173 Tag Team GX AllStars AGS 10 | eBay",
+      "page_url": "https://www.ebay.com/itm/376425702974",
+      "ref_id": "turn338view2",
+      "link_id": 29,
+      "caption": "Japanese Pokémon TCG Mewtwo holographic card #054/173, purple border, in PSA GEM MT 10 case.",
+      "image_url": "https://i.ebayimg.com/images/g/m2QAAeSwoNZogHS~/s-l1600.webp",
+      "conditions": [
+        "slab",
+        "public_seller_photo"
+      ]
+    },
+    {
+      "id": "label100_318645515185",
+      "company_hint": "ags",
+      "title": "Gengar 2023 Pokémon 151 Holo #094 English AGS 9.5 | eBay",
+      "page_url": "https://www.ebay.com/itm/318645515185",
+      "ref_id": "turn339view0",
+      "link_id": 32,
+      "caption": "Picture 1 of 3",
+      "image_url": "https://i.ebayimg.com/images/g/NhIAAeSwQ7dqYr1Y/s-l1600.webp",
+      "conditions": [
+        "slab",
+        "public_seller_photo"
+      ]
+    },
+    {
+      "id": "label100_206285682378",
+      "company_hint": "beckett",
+      "title": "Pokémon TCG Mew Promo Holo #9 Beckett 8.5 NM-MT Black Star | eBay",
+      "page_url": "https://www.ebay.com/itm/206285682378",
+      "ref_id": "turn339view1",
+      "link_id": 29,
+      "caption": "Beckett 8.5 Mew Promo Holo Pokémon card with gold border, purple background, and white Mew artwork in protective case.",
+      "image_url": "https://i.ebayimg.com/images/g/s4AAAeSwBb1qDOEw/s-l1600.webp",
+      "conditions": [
+        "slab",
+        "public_seller_photo"
+      ]
+    },
+    {
+      "id": "label100_407091750047",
+      "company_hint": "beckett",
+      "title": "Pokemon Card Japanese Zukan Bandai Carddass BGS Beckett 8.5 Raichu Holo 2004 | eBay",
+      "page_url": "https://www.ebay.com/itm/407091750047",
+      "ref_id": "turn339view2",
+      "link_id": 37,
+      "caption": "Picture 1 of 8",
+      "image_url": "https://i.ebayimg.com/images/g/3XUAAeSwVlNo377s/s-l1600.webp",
+      "conditions": [
+        "slab",
+        "public_seller_photo"
+      ]
+    },
+    {
+      "id": "label100_407246875903",
+      "company_hint": "beckett",
+      "title": "Pokemon Card Smeargle Color Eagle Holo Neo Discovery English Beckett BGS 8.5 | eBay",
+      "page_url": "https://www.ebay.com/itm/407246875903",
+      "ref_id": "turn340view0",
+      "link_id": 35,
+      "caption": "Smeargle Color Eagle holo Neo Discovery Pokémon card graded Beckett 8.5, featuring Smeargle with gold and green accents.",
+      "image_url": "https://i.ebayimg.com/images/g/9RIAAeSw0jJqt5Db/s-l1600.webp",
+      "conditions": [
+        "slab",
+        "public_seller_photo"
+      ]
+    },
+    {
+      "id": "label100_406975129126",
+      "company_hint": "beckett",
+      "title": "Pokemon 1999 Charizard 4/102 Holo Rare Base Set Unlimited BGS 8 | eBay",
+      "page_url": "https://www.ebay.com/itm/406975129126",
+      "ref_id": "turn340view1",
+      "link_id": 26,
+      "caption": "Pokemon 1999 Charizard 4/102 Holo Rare Base Set Unlimited BGS 8",
+      "image_url": "https://i.ebayimg.com/images/g/maAAAeSwIKhqIkim/s-l500.jpg",
+      "conditions": [
+        "slab",
+        "public_seller_photo"
+      ]
+    },
+    {
+      "id": "label100_116983141390",
+      "company_hint": "beckett",
+      "title": "1999 POKEMON BASE SET SHADOWLESS #4 CHARIZARD HOLO BGS 8 | eBay",
+      "page_url": "https://www.ebay.com/itm/116983141390",
+      "ref_id": "turn340view2",
+      "link_id": 29,
+      "caption": "1999 Pokémon Base Set Shadowless #4 Charizard holo BGS 8, yellow border, fiery Charizard with green wings.",
+      "image_url": "https://i.ebayimg.com/images/g/P8oAAeSwZnZpCs8-/s-l1600.webp",
+      "conditions": [
+        "slab",
+        "public_seller_photo"
+      ]
+    },
+    {
+      "id": "label100_127844775326",
+      "company_hint": "beckett",
+      "title": "BGS 8.5 BASE UNLIMITED POKEMON HOLO R POLIWRATH 1999 | eBay",
+      "page_url": "https://www.ebay.com/itm/127844775326",
+      "ref_id": "turn341view0",
+      "link_id": 26,
+      "caption": "BGS 8.5 BASE UNLIMITED POKEMON HOLO R POLIWRATH 1999",
+      "image_url": "https://i.ebayimg.com/images/g/yCoAAOSwrHJnljvR/s-l500.png",
+      "conditions": [
+        "slab",
+        "public_seller_photo"
+      ]
+    },
+    {
+      "id": "label100_257418127129",
+      "company_hint": "beckett",
+      "title": "Pokémon - Venusaur (Holo) - Set Base 1999 15/102 - ITA - BECKETT 8.5 NM-MT+ | eBay",
+      "page_url": "https://www.ebay.com/itm/257418127129",
+      "ref_id": "turn341view1",
+      "link_id": 29,
+      "caption": "Picture 1 of 2",
+      "image_url": "https://i.ebayimg.com/images/g/IaoAAeSweLRpvtbZ/s-l1600.webp",
+      "conditions": [
+        "slab",
+        "public_seller_photo"
+      ]
+    },
+    {
+      "id": "label100_177788602827",
+      "company_hint": "beckett",
+      "title": "Pokémon TCG Blaine's Charizard Holo Rare Card Japanese Gym Challenge BECKETT 8.5 | eBay",
+      "page_url": "https://www.ebay.com/itm/177788602827",
+      "ref_id": "turn342view0",
+      "link_id": 26,
+      "caption": "Pokémon TCG Blaine's Charizard Holo Rare Card Japanese Gym Challenge BECKETT 8.5",
+      "image_url": "https://i.ebayimg.com/images/g/194AAeSwWGZpbXM-/s-l500.jpg",
+      "conditions": [
+        "slab",
+        "public_seller_photo"
+      ]
+    },
+    {
+      "id": "label100_306918554279",
+      "company_hint": "beckett",
+      "title": "Poliwrath Holo Rare Base Set Unlimited #13 Beckett 8.5 Pokémon TCG 1999 | eBay",
+      "page_url": "https://www.ebay.com/itm/306918554279",
+      "ref_id": "turn342view1",
+      "link_id": 53,
+      "caption": "Poliwrath holo rare Pokémon TCG 1999 Beckett 8.5, blue/white Poliwrath with whirlpool base in protective case.",
+      "image_url": "https://i.ebayimg.com/images/g/KjIAAeSwn8tp-TUm/s-l1600.webp",
+      "conditions": [
+        "slab",
+        "public_seller_photo"
+      ]
+    },
+    {
+      "id": "label100_389660758403",
+      "company_hint": "beckett",
+      "title": "Pokemon Shadowless Chansey 3/102 BGS Beckett 8.5 Base Set GOOD REGRADE | eBay",
+      "page_url": "https://www.ebay.com/itm/389660758403",
+      "ref_id": "turn342view2",
+      "link_id": 31,
+      "caption": "Picture 1 of 4",
+      "image_url": "https://i.ebayimg.com/images/g/8tAAAOSw149gHL5F/s-l1600.webp",
+      "conditions": [
+        "slab",
+        "public_seller_photo"
+      ]
+    },
+    {
+      "id": "label100_117192519531",
+      "company_hint": "cgc",
+      "title": "Pokemon Porygon-Z GX 317/SM-P Gym Stamped Promo CGC 10 Pristine | eBay",
+      "page_url": "https://www.ebay.com/itm/117192519531",
+      "ref_id": "turn343view0",
+      "link_id": 39,
+      "caption": "CGC 10 Pristine Pokémon Porygon-Z GX 317/SM-P gym stamped promo card with Japanese text, blue Porygon-Z GX 240 HP in case.",
+      "image_url": "https://i.ebayimg.com/images/g/uI0AAeSw~RxqA~Fq/s-l1600.webp",
+      "conditions": [
+        "slab",
+        "public_seller_photo"
+      ]
+    },
+    {
+      "id": "label100_800716677202",
+      "company_hint": "cgc",
+      "title": "CGC 10 PRISTINE Pokémon DODUO 013/032 Classic Venusaur Deck Holo Japanese | eBay",
+      "page_url": "https://www.ebay.com/itm/800716677202",
+      "ref_id": "turn343view2",
+      "link_id": 26,
+      "caption": "CGC 10 PRISTINE Pokémon DODUO 013/032 Classic Venusaur Deck Holo Japanese",
+      "image_url": "https://i.ebayimg.com/images/g/b98AAeSwmdlqtzBx/s-l500.jpg",
+      "conditions": [
+        "slab",
+        "public_seller_photo"
+      ]
+    },
+    {
+      "id": "label100_406861147094",
+      "company_hint": "cgc",
+      "title": "Pokemon 1999 Golduck 35/62 Fossil 1st Edition PRISTINE CGC 10 | eBay",
+      "page_url": "https://www.ebay.com/itm/406861147094",
+      "ref_id": "turn344view0",
+      "link_id": 30,
+      "caption": "Golduck 35/62 Fossil 1st Edition Pokémon card graded CGC 10, featuring blue-gold duck with hyper beam attack.",
+      "image_url": "https://i.ebayimg.com/images/g/KHMAAeSw69Jp4KBp/s-l1600.webp",
+      "conditions": [
+        "slab",
+        "public_seller_photo"
+      ]
+    },
+    {
+      "id": "label100_157534594084",
+      "company_hint": "cgc",
+      "title": "CGC PRISTINE 10 Pikachu CLC 008/034 Pokémon Card - LOW POP - GRADED | eBay",
+      "page_url": "https://www.ebay.com/itm/157534594084",
+      "ref_id": "turn344view1",
+      "link_id": 31,
+      "caption": "CGC PRISTINE 10 Pikachu CLC 008/034 Pokémon card with yellow electric-type Pikachu on purple-rainbow background.",
+      "image_url": "https://i.ebayimg.com/images/g/YwgAAeSwHbhpOIff/s-l1600.webp",
+      "conditions": [
+        "slab",
+        "public_seller_photo"
+      ]
+    },
+    {
+      "id": "label100_326878079751",
+      "company_hint": "cgc",
+      "title": "CGC Pristine 10 Venusaur 1999 Topps Pokémon The First Movie E3 (Pop 1!!) | eBay",
+      "page_url": "https://www.ebay.com/itm/326878079751",
+      "ref_id": "turn344view2",
+      "link_id": 31,
+      "caption": "CGC Pristine 10 1999 Topps Pokémon The First Movie E3 Venusaur card with colorful Venusaur artwork on purple border.",
+      "image_url": "https://i.ebayimg.com/images/g/G1YAAeSwA3JpbBJs/s-l1600.webp",
+      "conditions": [
+        "slab",
+        "public_seller_photo"
+      ]
+    },
+    {
+      "id": "label100_306950037783",
+      "company_hint": "cgc",
+      "title": "2025 POKEMON PIKACHU CGC 10 GEM MINT | eBay",
+      "page_url": "https://www.ebay.com/itm/306950037783",
+      "ref_id": "turn346view0",
+      "link_id": 29,
+      "caption": "2025 Pokémon PIKACHU CGC 10 GEM MINT, yellow Pikachu on wooden bench in forest, 60 HP, unwinds attack text.",
+      "image_url": "https://i.ebayimg.com/images/g/E2oAAeSwZZBqDUnI/s-l1600.webp",
+      "conditions": [
+        "slab",
+        "public_seller_photo"
+      ]
+    },
+    {
+      "id": "label100_286931936416",
+      "company_hint": "cgc",
+      "title": "1999 Pokemon Base Set 1st Edition Porygon Card #39/102 - CGC 7.5 Near Mint + | eBay",
+      "page_url": "https://www.ebay.com/itm/286931936416",
+      "ref_id": "turn346view1",
+      "link_id": 32,
+      "caption": "1999 Pokémon Base Set 1st Ed. Porygon #39/102, CGC 7.5, yellow border, holographic background, 30 HP.",
+      "image_url": "https://i.ebayimg.com/images/g/ZpsAAeSw~INpE58L/s-l1600.webp",
+      "conditions": [
+        "slab",
+        "public_seller_photo"
+      ]
+    },
+    {
+      "id": "label100_227092531615",
+      "company_hint": "cgc",
+      "title": "1999 Pokemon Venusaur Base Set #015/102 Holo CGC 8 | eBay",
+      "page_url": "https://www.ebay.com/itm/227092531615",
+      "ref_id": "turn346view2",
+      "link_id": 27,
+      "caption": "Picture 1 of 1",
+      "image_url": "https://i.ebayimg.com/images/g/EGgAAeSwfk5pH6ZC/s-l1600.webp",
+      "conditions": [
+        "slab",
+        "public_seller_photo"
+      ]
+    },
+    {
+      "id": "label100_227063230477",
+      "company_hint": "psa",
+      "title": "Pokemon Card English \"Eevee\" SVP-EN173 PSA 10 | eBay",
+      "page_url": "https://www.ebay.com/itm/227063230477",
+      "ref_id": "turn347view0",
+      "link_id": 31,
+      "caption": "English Pokemon card SVP-EN173 PSA 10 featuring Eevee artwork with yellow border, boosted evolution text, and attack details.",
+      "image_url": "https://i.ebayimg.com/images/g/PUYAAeSw9QppDZVr/s-l1600.webp",
+      "conditions": [
+        "slab",
+        "public_seller_photo"
+      ]
+    },
+    {
+      "id": "label100_318515600273",
+      "company_hint": "psa",
+      "title": "Pokemon Mewtwo Sm214 PSA 8 | eBay",
+      "page_url": "https://www.ebay.com/itm/318515600273",
+      "ref_id": "turn347view1",
+      "link_id": 29,
+      "caption": "Mewtwo Sm214 Pokémon card PSA 8, purple border, holo background, black Mewtwo with gold accents.",
+      "image_url": "https://i.ebayimg.com/images/g/~pwAAeSw5oRqQS5R/s-l1600.webp",
+      "conditions": [
+        "slab",
+        "public_seller_photo"
+      ]
+    },
+    {
+      "id": "label100_157946793643",
+      "company_hint": "psa",
+      "title": "Pokémon Mewtwo & Mew GX SM191 Promo PSA 8 (new cert) | eBay",
+      "page_url": "https://www.ebay.com/itm/157946793643",
+      "ref_id": "turn347view2",
+      "link_id": 29,
+      "caption": "PSA 8 Mewtwo & Mew GX SM191 promo card in protective case, featuring Mewtwo & Mew GX with rainbow foil and attack text.",
+      "image_url": "https://i.ebayimg.com/images/g/g4IAAeSwPIZqFzM6/s-l1600.webp",
+      "conditions": [
+        "slab",
+        "public_seller_photo"
+      ]
+    },
+    {
+      "id": "label100_257751176286",
+      "company_hint": "psa",
+      "title": "Pokemon TCG 1999 Base Set Mewtwo Holo Rare PSA 8 10/102 Wizards of Coast | eBay",
+      "page_url": "https://www.ebay.com/itm/257751176286",
+      "ref_id": "turn348view0",
+      "link_id": 29,
+      "caption": "Picture 1 of 2",
+      "image_url": "https://i.ebayimg.com/images/g/TqgAAeSw69RqrbJL/s-l1600.webp",
+      "conditions": [
+        "slab",
+        "public_seller_photo"
+      ]
+    },
+    {
+      "id": "label100_168474235776",
+      "company_hint": "psa",
+      "title": "1999 Pokemon Base Set Mewtwo 10/102 Holo Rare PSA 8 NM-MT | eBay",
+      "page_url": "https://www.ebay.com/itm/168474235776",
+      "ref_id": "turn348view1",
+      "link_id": 29,
+      "caption": "1999 Pokémon Base Set Mewtwo 10/102 holo rare PSA 8, Mewtwo with gold foil and attack text on purple border background.",
+      "image_url": "https://i.ebayimg.com/images/g/KUYAAeSw9XlqNY1O/s-l1600.webp",
+      "conditions": [
+        "slab",
+        "public_seller_photo"
+      ]
+    },
+    {
+      "id": "label100_398302596329",
+      "company_hint": "psa",
+      "title": "Pokemon WOTC Black Star Promo Mewtwo 14 PSA 8 | eBay",
+      "page_url": "https://www.ebay.com/itm/398302596329",
+      "ref_id": "turn349view0",
+      "link_id": 29,
+      "caption": "PSA 8 Mewtwo Black Star Promo card, purple border, holo background, 70 HP, attacks: Energy Absorption & Psburn.",
+      "image_url": "https://i.ebayimg.com/images/g/AeAAAeSwSytqhUPm/s-l1600.webp",
+      "conditions": [
+        "slab",
+        "public_seller_photo"
+      ]
+    },
+    {
+      "id": "label100_257730660039",
+      "company_hint": "psa",
+      "title": "1999 Pokemon Base Set Mewtwo Holo 10/102 PSA 8 NM-MT Unlimited Vintage WOTC | eBay",
+      "page_url": "https://www.ebay.com/itm/257730660039",
+      "ref_id": "turn349view1",
+      "link_id": 32,
+      "caption": "Picture 1 of 4",
+      "image_url": "https://i.ebayimg.com/images/g/d90AAeSww05qn35v/s-l1600.webp",
+      "conditions": [
+        "slab",
+        "public_seller_photo"
+      ]
+    },
+    {
+      "id": "label100_287610505898",
+      "company_hint": "psa",
+      "title": "Pokemon Eevee Promo 173/131 Prismatic Evolutions Pokemon Center ETB PSA 10 | eBay",
+      "page_url": "https://www.ebay.com/itm/287610505898",
+      "ref_id": "turn349view2",
+      "link_id": 29,
+      "caption": "Pokemon Eevee Promo 173/131 Prismatic Evolutions card graded ETB PSA 10, featuring Eevee in action with yellow and white Pokémon.",
+      "image_url": "https://i.ebayimg.com/images/g/GaoAAeSwJ-RquADb/s-l1600.webp",
+      "conditions": [
+        "slab",
+        "public_seller_photo"
+      ]
+    },
+    {
+      "id": "label100_358464585522",
+      "company_hint": "psa",
+      "title": "1999 Pokémon Base Set Mewtwo-Rare Holo PSA 8 NM-MT #10 | eBay",
+      "page_url": "https://www.ebay.com/itm/358464585522",
+      "ref_id": "turn350view0",
+      "link_id": 34,
+      "caption": "1999 Pokémon Base Set Mewtwo-Rare holo PSA 8, Mewtwo with gold foil, purple border, in protective case.",
+      "image_url": "https://i.ebayimg.com/images/g/njYAAeSwU21qdoBC/s-l1600.webp",
+      "conditions": [
+        "slab",
+        "public_seller_photo"
+      ]
+    },
+    {
+      "id": "label100_287152680634",
+      "company_hint": "psa",
+      "title": "Pokemon 1999 Mewtwo (Movie Promo) 03/53 Wotc Promo Regular PSA 8 | eBay",
+      "page_url": "https://www.ebay.com/itm/287152680634",
+      "ref_id": "turn350view1",
+      "link_id": 31,
+      "caption": "Wotc Promo 1999 Pokémon Mewtwo card 03/53, PSA 8, white Mewtwo with purple border on dark background.",
+      "image_url": "https://i.ebayimg.com/images/g/BfAAAeSw3oFpl7jL/s-l1600.webp",
+      "conditions": [
+        "slab",
+        "public_seller_photo"
+      ]
+    },
+    {
+      "id": "label100_800266885327",
+      "company_hint": "tag",
+      "title": "TAG 10 2022 Pokemon Umbreon VMAX TG23/TG30 Brilliant Stars TG Alt Art Holo EN | eBay",
+      "page_url": "https://www.ebay.com/itm/800266885327",
+      "ref_id": "turn351view2",
+      "link_id": 29,
+      "caption": "TAG 10 2022 Pokémon Umbreon VMAX TG23/TG30 Brilliant Stars holo card with dark Umbreon artwork in protective case.",
+      "image_url": "https://i.ebayimg.com/images/g/2P4AAeSwst9qQ70m/s-l1600.webp",
+      "conditions": [
+        "slab",
+        "public_seller_photo"
+      ]
+    },
+    {
+      "id": "label100_137154472208",
+      "company_hint": "tag",
+      "title": "Pokemon Charizard Detective Pikachu TAG 9 5/18 | eBay",
+      "page_url": "https://www.ebay.com/itm/137154472208",
+      "ref_id": "turn352view0",
+      "link_id": 29,
+      "caption": "Charizard Detective Pikachu TAG 9 5/18 holo card in protective case, featuring fiery Charizard with 180 HP.",
+      "image_url": "https://i.ebayimg.com/images/g/g-AAAeSwHYFpvt1O/s-l1600.webp",
+      "conditions": [
+        "slab",
+        "public_seller_photo"
+      ]
+    },
+    {
+      "id": "label100_178506051583",
+      "company_hint": "tag",
+      "title": "Mega Gengar 284/217 Tag 10 gem mint SIR | eBay",
+      "page_url": "https://www.ebay.com/itm/178506051583",
+      "ref_id": "turn352view2",
+      "link_id": 33,
+      "caption": "Mega Gengar 284/217 with gold border, rainbow foil, and moves: Shadow Concealment, Void Gaze, Ascended Hero.",
+      "image_url": "https://i.ebayimg.com/images/g/Rz4AAeSwXFhqrHIv/s-l1600.webp",
+      "conditions": [
+        "slab",
+        "public_seller_photo"
+      ]
+    },
+    {
+      "id": "label100_397829935118",
+      "company_hint": "tag",
+      "title": "TAG 10 (985) MEGA GENGAR EX #269/217 POKÉMON ASCENDED HEROES (POP 103, 4TH RANK) | eBay",
+      "page_url": "https://www.ebay.com/itm/397829935118",
+      "ref_id": "turn353view0",
+      "link_id": 26,
+      "caption": "TAG 10 (985) MEGA GENGAR EX #269/217 POKÉMON ASCENDED HEROES (POP 103, 4TH RANK)",
+      "image_url": "https://i.ebayimg.com/images/g/ApwAAeSw16pp2vPF/s-l500.jpg",
+      "conditions": [
+        "slab",
+        "public_seller_photo"
+      ]
+    },
+    {
+      "id": "label100_306485570669",
+      "company_hint": "tag",
+      "title": "STAMPED Umbreon ex 060/131 SV Prismatic Evolutions Double Rare Pokémon TAG 10 | eBay",
+      "page_url": "https://www.ebay.com/itm/306485570669",
+      "ref_id": "turn353view1",
+      "link_id": 37,
+      "caption": "STAMPED Umbreon ex 060/131 SV Prismatic Evolutions Double Rare Pokémon TAG 10 in protective case.",
+      "image_url": "https://i.ebayimg.com/images/g/k4YAAeSwPGBou66~/s-l1600.webp",
+      "conditions": [
+        "slab",
+        "public_seller_photo"
+      ]
+    },
+    {
+      "id": "label100_398150162220",
+      "company_hint": "tag",
+      "title": "Gengar Vmax 271/264 Alternate Art - Secret Rare Pokemon Tag 10 Gem Mint | eBay",
+      "page_url": "https://www.ebay.com/itm/398150162220",
+      "ref_id": "turn353view2",
+      "link_id": 29,
+      "caption": "Gengar Vmax 271/264 Alternate Art Pokémon Tag 10, purple ghost Pokémon with rainbow foil in protective case.",
+      "image_url": "https://i.ebayimg.com/images/g/jKEAAeSwKZRqTRqP/s-l1600.webp",
+      "conditions": [
+        "slab",
+        "public_seller_photo"
+      ]
+    },
+    {
+      "id": "label100_357980484801",
+      "company_hint": "psa",
+      "title": "Blastoise VMAX Pokemon Battle Box Full Art Promo TAG 10 W3537171 PSA #SWSH103 | eBay",
+      "page_url": "https://www.ebay.com/itm/357980484801",
+      "ref_id": "turn354view1",
+      "link_id": 29,
+      "caption": "Blastoise VMAX Pokémon Battle Box Full Art Promo TAG 10 W3537171 PSA, dark armored Blastoise with red accents.",
+      "image_url": "https://i.ebayimg.com/images/g/xN4AAeSwbc5pMN7P/s-l1600.webp",
+      "conditions": [
+        "slab",
+        "public_seller_photo"
+      ]
+    },
+    {
+      "id": "label100_227526033226",
+      "company_hint": "ace",
+      "title": "Graded ACE 9 - Charizard ex - 199/165 - 151 - Pokemon | eBay UK",
+      "page_url": "https://www.ebay.co.uk/itm/227526033226",
+      "ref_id": "turn354view2",
+      "link_id": 24,
+      "caption": "Picture 1 of 1",
+      "image_url": "https://i.ebayimg.com/images/g/PycAAeSw~rVquTBk/s-l1600.webp",
+      "conditions": [
+        "slab",
+        "public_seller_photo"
+      ]
+    },
+    {
+      "id": "label100_377055081311",
+      "company_hint": "beckett",
+      "title": "Pokémon Charizard V SWSH050 Champion's Path Promo BGS 9.5 Gem Mint w/Subgrades | eBay",
+      "page_url": "https://www.ebay.com/itm/377055081311",
+      "ref_id": "turn355view0",
+      "link_id": 34,
+      "caption": "Charizard V SWSH050 Champion’s Path promo card graded Beckett 9.5 Gem Mint, featuring orange dragon with fiery background.",
+      "image_url": "https://i.ebayimg.com/images/g/URIAAeSw7-tpwA5H/s-l1600.webp",
+      "conditions": [
+        "slab",
+        "public_seller_photo"
+      ]
+    },
+    {
+      "id": "label100_267711277755",
+      "company_hint": "beckett",
+      "title": "shibuya pikachu Bgs 9.5 READ Description & CHECK PICTURES | eBay",
+      "page_url": "https://www.ebay.com/itm/267711277755",
+      "ref_id": "turn355view1",
+      "link_id": 34,
+      "caption": "Picture 1 of 7",
+      "image_url": "https://i.ebayimg.com/images/g/K-UAAeSw4Z1qrnVp/s-l1600.webp",
+      "conditions": [
+        "slab",
+        "public_seller_photo"
+      ]
+    },
+    {
+      "id": "label100_226080076515",
+      "company_hint": "beckett",
+      "title": "BGS 9.5 GEM MINT UNLIMITED CHARIZARD 1999 Pokemon Base #4/102 Holo Rare | eBay",
+      "page_url": "https://www.ebay.com/itm/226080076515",
+      "ref_id": "turn356view1",
+      "link_id": 26,
+      "caption": "BGS 9.5 GEM MINT UNLIMITED CHARIZARD 1999 Pokemon Base #4/102 Holo Rare",
+      "image_url": "https://i.ebayimg.com/images/g/sRAAAOSwpjxgHNWl/s-l500.jpg",
+      "conditions": [
+        "slab",
+        "public_seller_photo"
+      ]
+    },
+    {
+      "id": "label100_377108682558",
+      "company_hint": "psa",
+      "title": "1999 Pokémon Game Venusaur Holo #15 PSA 8 NM-MT | eBay",
+      "page_url": "https://www.ebay.com/itm/377108682558",
+      "ref_id": "turn357view0",
+      "link_id": 31,
+      "caption": "1999 Pokémon Game Venusaur Holo #15, PSA 8, blue Venusaur with fiery background, yellow border, holographic sparkles.",
+      "image_url": "https://i.ebayimg.com/images/g/X1gAAeSwkJNp26bF/s-l1600.webp",
+      "conditions": [
+        "slab",
+        "public_seller_photo"
+      ]
+    },
+    {
+      "id": "label100_407143628483",
+      "company_hint": "ace",
+      "title": "Eevee TG11/TG30 Standard Brilliant Stars Pokemon Ace 9 Mint | eBay UK",
+      "page_url": "https://www.ebay.co.uk/itm/407143628483",
+      "ref_id": "turn359view0",
+      "link_id": 29,
+      "caption": "Picture 1 of 5",
+      "image_url": "https://i.ebayimg.com/images/g/vWwAAeSwHxVqt29j/s-l1600.webp",
+      "conditions": [
+        "slab",
+        "public_seller_photo"
+      ]
+    },
+    {
+      "id": "label100_358046580511",
+      "company_hint": "tag",
+      "title": "Pokémon TCG Pikachu Jungle 60/64 1st Edition - Base Set - TAG EX MT Grade 607 | eBay",
+      "page_url": "https://www.ebay.com/itm/358046580511",
+      "ref_id": "turn360view0",
+      "link_id": 29,
+      "caption": "Sparkling Nintendo Jungle Pikachu 60/64 Pokémon card with yellow border, in case, PSA 10 Gem Mint.",
+      "image_url": "https://i.ebayimg.com/images/g/ZA8AAeSwhDJqhL0N/s-l1600.webp",
+      "conditions": [
+        "slab",
+        "public_seller_photo"
+      ]
+    },
+    {
+      "id": "label100_227529618922",
+      "company_hint": "cgc",
+      "title": "Pokemon TCG SM9 Tag Bolt Charizard 013/095 Holo Rare JP CGC Graded 2018 | eBay",
+      "page_url": "https://www.ebay.com/itm/227529618922",
+      "ref_id": "turn360view1",
+      "link_id": 29,
+      "caption": "Charizard 013/095 Japanese holo card with fiery orange background, in protective case, graded CGC Mint 9.",
+      "image_url": "https://i.ebayimg.com/images/g/rhgAAeSwszFqIOQi/s-l1600.webp",
+      "conditions": [
+        "slab",
+        "public_seller_photo"
+      ]
+    },
+    {
+      "id": "label100_205041067257",
+      "company_hint": "cgc",
+      "title": "Pokémon TCG - Celebi - 009/076 S3a Legendary Heartbeat Amazing Rare - CGC 9.5 | eBay",
+      "page_url": "https://www.ebay.com/itm/205041067257",
+      "ref_id": "turn361view0",
+      "link_id": 29,
+      "caption": "2020 Japanese Pokémon SWORD & SHIELD LEGENDARY HEARTBEAT #009 CELEBI PSA 7, green-yellow Pokémon with rainbow foil.",
+      "image_url": "https://i.ebayimg.com/images/g/oScAAeSwgW9qkdPX/s-l1600.webp",
+      "conditions": [
+        "slab",
+        "public_seller_photo"
+      ]
+    },
+    {
+      "id": "label100_358410665533",
+      "company_hint": "ags",
+      "title": "Pokémon Surfing Pikachu V Ultra Rare Holo AGS 10 Celebrations 008/025 | eBay",
+      "page_url": "https://www.ebay.com/itm/358410665533",
+      "ref_id": "turn361view1",
+      "link_id": 28,
+      "caption": "PSA 6 2021 Pokémon TCG Surfing Pikachu V, holo foil, electric-themed, rainbow Pikachu.",
+      "image_url": "https://i.ebayimg.com/images/g/kjoAAeSwHJdqt4Dd/s-l500.webp",
+      "conditions": [
+        "slab",
+        "public_seller_photo"
+      ]
+    },
+    {
+      "id": "label100_314664396719",
+      "company_hint": "ags",
+      "title": "Pokémon TCG Pikachu Jungle 60/64 Regular 1st Edition Common 1995. 9.0 AGS grade. | eBay",
+      "page_url": "https://www.ebay.com/itm/314664396719",
+      "ref_id": "turn362view0",
+      "link_id": 32,
+      "caption": "Pikachu TCG 60/64 Regular 1st Edition card with yellow border, 50 HP, and moves: Spark, Bend, and Retreat.",
+      "image_url": "https://i.ebayimg.com/images/g/qcQAAOSwPkJknIsg/s-l1600.webp",
+      "conditions": [
+        "slab",
+        "public_seller_photo"
+      ]
+    },
+    {
+      "id": "label100_137209581494",
+      "company_hint": "ace",
+      "title": "Pokémon TCG Shining Mew Holo Card Shining Legends Series 40/73 Ace 7 | eBay UK",
+      "page_url": "https://www.ebay.co.uk/itm/137209581494",
+      "ref_id": "turn364view1",
+      "link_id": 26,
+      "caption": "Picture 1 of 2",
+      "image_url": "https://i.ebayimg.com/images/g/aNgAAeSwlOpqsP7G/s-l1600.webp",
+      "conditions": [
+        "slab",
+        "public_seller_photo"
+      ]
+    },
+    {
+      "id": "label100_257694517237",
+      "company_hint": "ace",
+      "title": "Pokémon TCG Umbreon 32/75 Neo Discovery Rare Regular Ace Graded 7 EN 2001 | eBay UK",
+      "page_url": "https://www.ebay.co.uk/itm/257694517237",
+      "ref_id": "turn365view0",
+      "link_id": 27,
+      "caption": "Picture 1 of 3",
+      "image_url": "https://i.ebayimg.com/images/g/pUoAAeSwt3xqiCBT/s-l1600.webp",
+      "conditions": [
+        "slab",
+        "public_seller_photo"
+      ]
+    },
+    {
+      "id": "label100_357846192192",
+      "company_hint": "ace",
+      "title": "1999 Pokemon Snorlax Jungle Non holo rare 27/64 ACE 7 | eBay UK",
+      "page_url": "https://www.ebay.co.uk/itm/357846192192",
+      "ref_id": "turn365view1",
+      "link_id": 24,
+      "caption": "Picture 1 of 1",
+      "image_url": "https://i.ebayimg.com/images/g/cgsAAeSwfsNqsrH~/s-l1600.webp",
+      "conditions": [
+        "slab",
+        "public_seller_photo"
+      ]
+    },
+    {
+      "id": "label100_397833167240",
+      "company_hint": "ags",
+      "title": "Pokémon Mewtwo 150/165 Sv2a 151 Rare Holo Japanese AGS 9.5 TCG | eBay",
+      "page_url": "https://www.ebay.com/itm/397833167240",
+      "ref_id": "turn366view1",
+      "link_id": 29,
+      "caption": "CGC 8.5 Mewtwo 150/165 Sv2a Japanese holo Pokémon card with Mewtwo artwork in purple and orange, in case.",
+      "image_url": "https://i.ebayimg.com/images/g/QZMAAeSwhCFqJbOP/s-l1600.webp",
+      "conditions": [
+        "slab",
+        "public_seller_photo"
+      ]
+    },
+    {
+      "id": "label100_376965637594",
+      "company_hint": "ags",
+      "title": "Pokémon Mewtwo 150/165 151 Legendary Holo Japanese AGS 10 Card | eBay",
+      "page_url": "https://www.ebay.com/itm/376965637594",
+      "ref_id": "turn367view0",
+      "link_id": 29,
+      "caption": "CGC 8.5 Mewtwo 150/165 Sv2a Japanese holo Pokémon card with Mewtwo artwork in purple and orange, in case.",
+      "image_url": "https://i.ebayimg.com/images/g/QZMAAeSwhCFqJbOP/s-l1600.webp",
+      "conditions": [
+        "slab",
+        "public_seller_photo"
+      ]
+    },
+    {
+      "id": "label100_297904518312",
+      "company_hint": "cgc",
+      "title": "CGC 10 Pristine Shiinotic AR – Pokémon Card Japanese Paradise Dragona 066/064 | eBay",
+      "page_url": "https://www.ebay.com/itm/297904518312",
+      "ref_id": "turn369view0",
+      "link_id": 29,
+      "caption": "Shiinotic 066/064 Japanese holo card with rainbow dragon artwork, graded CGC Mint 9.5, in protective case.",
+      "image_url": "https://i.ebayimg.com/images/g/o00AAeSwcBxqpdT2/s-l1600.webp",
+      "conditions": [
+        "slab",
+        "public_seller_photo"
+      ]
+    },
+    {
+      "id": "label100_336154895497",
+      "company_hint": "cgc",
+      "title": "Pokemon 1999 Golbat Fossil Unlimited 34/62 CGC 8 Pokémon TCG | eBay",
+      "page_url": "https://www.ebay.com/itm/336154895497",
+      "ref_id": "turn369view1",
+      "link_id": 29,
+      "caption": "CGC 8 Pokémon TCG 1999 Golbat Fossil Unlimited card with blue border, yellow frame, and foil background.",
+      "image_url": "https://i.ebayimg.com/images/g/I9oAAeSwlmJotNQp/s-l1600.webp",
+      "conditions": [
+        "slab",
+        "public_seller_photo"
+      ]
+    },
+    {
+      "id": "label100_168712241309",
+      "company_hint": "psa",
+      "title": "1999 Pokemon Game Movie #3 Mewtwo Movie Promo PSA 8 | eBay",
+      "page_url": "https://www.ebay.com/itm/168712241309",
+      "ref_id": "turn371view0",
+      "link_id": 29,
+      "caption": "1999 Pokémon Mewtwo Black Star Movie Promo #3 card with holographic background, purple border, and yellow HP 70 banner.",
+      "image_url": "https://i.ebayimg.com/images/g/VFAAAOSwcFhfUukZ/s-l1600.webp",
+      "conditions": [
+        "slab",
+        "public_seller_photo"
+      ]
+    },
+    {
+      "id": "label100_117278078333",
+      "company_hint": "tag",
+      "title": "2026 Pokemon ME Ascended Heroes 269/217 Mega Gengar EX MAR TAG 10 (980) | eBay",
+      "page_url": "https://www.ebay.com/itm/117278078333",
+      "ref_id": "turn371view1",
+      "link_id": 30,
+      "caption": "2026 Pokémon ME Ascended Heroes 269/217 Mega Gengar EX Pokémon card with gold border, shadow background, and visible attack text.",
+      "image_url": "https://i.ebayimg.com/images/g/IX4AAeSw82lqRJZp/s-l1600.webp",
+      "conditions": [
+        "slab",
+        "public_seller_photo"
+      ]
+    },
+    {
+      "id": "label100_287189485687",
+      "company_hint": "tag",
+      "title": "Pokémon Pikachu 173/165 Scarlet & Violet 151 Illustration Rare Holo TAG 8 | eBay",
+      "page_url": "https://www.ebay.com/itm/287189485687",
+      "ref_id": "turn372view0",
+      "link_id": 29,
+      "caption": "Pikachu 173/165 Scarlet & Violet 151 holo Japanese card with Pikachu, trainer, and town scene in protective case.",
+      "image_url": "https://i.ebayimg.com/images/g/sg8AAeSwa5lqvFc2/s-l1600.webp",
+      "conditions": [
+        "slab",
+        "public_seller_photo"
+      ]
+    },
+    {
+      "id": "label100_188231501301",
+      "company_hint": "tag",
+      "title": "TAG 10 Mega Gengar ex SAR 240 m2a Dream Special Art Japanese Pokemon Card | eBay",
+      "page_url": "https://www.ebay.com/itm/188231501301",
+      "ref_id": "turn373view0",
+      "link_id": 32,
+      "caption": "CGC 10 Mega Gengar ex 230/193 Japanese holo Pokémon Void Gengar attack card with bold purple “VOID GENGAR” text.",
+      "image_url": "https://i.ebayimg.com/images/g/irkAAeSw7dlqUwRQ/s-l1600.webp",
+      "conditions": [
+        "slab",
+        "public_seller_photo"
+      ]
+    },
+    {
+      "id": "label100_117170692858",
+      "company_hint": "ags",
+      "title": "Lugia Ex 82/131 Graded 10 AGS Pokemon Card Prismatic Evolutions | eBay",
+      "page_url": "https://www.ebay.com/itm/117170692858",
+      "ref_id": "turn373view1",
+      "link_id": 26,
+      "caption": "Lugia Ex 82/131 Graded 10 AGS Pokemon Card Prismatic Evolutions",
+      "image_url": "https://i.ebayimg.com/images/g/dxMAAeSwuhVp88Al/s-l500.jpg",
+      "conditions": [
+        "slab",
+        "public_seller_photo"
+      ]
+    },
+    {
+      "id": "label100_389945389537",
+      "company_hint": "ags",
+      "title": "Pokémon Lugia ex 097/175 Svm Generations Start Decks Holo Japanese AGS 9.5 2023 | eBay",
+      "page_url": "https://www.ebay.com/itm/389945389537",
+      "ref_id": "turn374view0",
+      "link_id": 27,
+      "caption": "Picture 1 of 1",
+      "image_url": "https://i.ebayimg.com/images/g/AjoAAeSwWi9p78QP/s-l1600.webp",
+      "conditions": [
+        "slab",
+        "public_seller_photo"
+      ]
+    },
+    {
+      "id": "label100_196982574569",
+      "company_hint": "ags",
+      "title": "Pokemon SWSH 2022 Lugia V 138/195 Ultra Rare Silver Tempest Graded AGS 9.5 Mint | eBay",
+      "page_url": "https://www.ebay.com/itm/196982574569",
+      "ref_id": "turn375view1",
+      "link_id": 30,
+      "caption": "Pokemon SWSH 2022 Lugia V 138/195 Ultra Rare Silver Tempest card graded AGS 9.5 Mint, featuring holographic artwork.",
+      "image_url": "https://i.ebayimg.com/images/g/HJAAAOSwvFdnm-zn/s-l1600.webp",
+      "conditions": [
+        "slab",
+        "public_seller_photo"
+      ]
+    },
+    {
+      "id": "label100_358813728677",
+      "company_hint": "ags",
+      "title": "Lugia NO. 249 Holo Rare Neo Genesis Pokemon Japanese AGS 9 | eBay",
+      "page_url": "https://www.ebay.com/itm/358813728677",
+      "ref_id": "turn376view0",
+      "link_id": 29,
+      "caption": "Picture 1 of 2",
+      "image_url": "https://i.ebayimg.com/images/g/vVEAAeSwIoZqXDdg/s-l1600.webp",
+      "conditions": [
+        "slab",
+        "public_seller_photo"
+      ]
+    },
+    {
+      "id": "label100_198146951160",
+      "company_hint": "ags",
+      "title": "Pokemon Trading Card Game Classic Squirtle CLB 001/034 AGS Mint 9 Holo 2023 | eBay",
+      "page_url": "https://www.ebay.com/itm/198146951160",
+      "ref_id": "turn376view1",
+      "link_id": 27,
+      "caption": "Pokemon TCG Classic Squirtle CLB 001/034 AGS Mint 9 holo card with vivid Squirtle artwork on blue border.",
+      "image_url": "https://i.ebayimg.com/images/g/J74AAeSwNoxppIIc/s-l1600.webp",
+      "conditions": [
+        "slab",
+        "public_seller_photo"
+      ]
+    },
+    {
+      "id": "label100_186408486283",
+      "company_hint": "ags",
+      "title": "Pokemon Lugia V #079 Paradigm Trigger Japanese AGS 9.5 Mint+ | eBay",
+      "page_url": "https://www.ebay.com/itm/186408486283",
+      "ref_id": "turn377view1",
+      "link_id": 29,
+      "caption": "Picture 1 of 2",
+      "image_url": "https://i.ebayimg.com/images/g/QBQAAOSwDGlmJrl8/s-l1600.webp",
+      "conditions": [
+        "slab",
+        "public_seller_photo"
+      ]
+    },
+    {
+      "id": "label100_137356410301",
+      "company_hint": "ags",
+      "title": "Lugia V 146/131 Shadow/Blue Sea Secret Rare Holo Chinese AGS 10 | eBay",
+      "page_url": "https://www.ebay.com/itm/137356410301",
+      "ref_id": "turn378view0",
+      "link_id": 26,
+      "caption": "Lugia V 146/131 Shadow/Blue Sea Secret Rare Holo Chinese AGS 10",
+      "image_url": "https://i.ebayimg.com/images/g/BkcAAeSwjcxqGRZf/s-l500.png",
+      "conditions": [
+        "slab",
+        "public_seller_photo"
+      ]
+    },
+    {
+      "id": "label100_407228091588",
+      "company_hint": "tag",
+      "title": "Mewtwo 014/032 Classic Collection TAG 9 Japanese | eBay",
+      "page_url": "https://www.ebay.com/itm/407228091588",
+      "ref_id": "turn378view1",
+      "link_id": 29,
+      "caption": "Mewtwo 014/032 Japanese Classic Collection TAG 9 card with holographic purple and gold Mewtwo on black background.",
+      "image_url": "https://i.ebayimg.com/images/g/hf4AAeSwTctqredQ/s-l1600.webp",
+      "conditions": [
+        "slab",
+        "public_seller_photo"
+      ]
+    },
+    {
+      "id": "label100_137154472166",
+      "company_hint": "tag",
+      "title": "Pokemon Mewtwo GX Shining Legends TAG 9 39/73 | eBay",
+      "page_url": "https://www.ebay.com/itm/137154472166",
+      "ref_id": "turn379view0",
+      "link_id": 29,
+      "caption": "Holographic Mewtwo GX Shining Legends card with purple border, yellow frame, and visible attack text “Mewtwo GX 9/73”.",
+      "image_url": "https://i.ebayimg.com/images/g/T4EAAeSwMoRpvty5/s-l1600.webp",
+      "conditions": [
+        "slab",
+        "public_seller_photo"
+      ]
+    },
+    {
+      "id": "label100_178535097962",
+      "company_hint": "tag",
+      "title": "TAG 9 (First Graded) Mewtwo EX 2026 30th Celeb #157/128 Futuristic Rare | eBay",
+      "page_url": "https://www.ebay.com/itm/178535097962",
+      "ref_id": "turn379view1",
+      "link_id": 29,
+      "caption": "Mewtwo EX 2026 30th Celeb #157/128 Futuristic Rare Pokémon card with holographic rainbow aura in protective case.",
+      "image_url": "https://i.ebayimg.com/images/g/AWEAAeSwGTlqtEXL/s-l1600.webp",
+      "conditions": [
+        "slab",
+        "public_seller_photo"
+      ]
+    },
+    {
+      "id": "label100_298525075110",
+      "company_hint": "ace",
+      "title": "ACE 9 Charizard 006 Promo Mint Japanese Pokemon | eBay UK",
+      "page_url": "https://www.ebay.co.uk/itm/298525075110",
+      "ref_id": "turn381view0",
+      "link_id": 27,
+      "caption": "Picture 1 of 3",
+      "image_url": "https://i.ebayimg.com/images/g/6z4AAeSw9apqYLxj/s-l1600.webp",
+      "conditions": [
+        "slab",
+        "public_seller_photo"
+      ]
+    },
+    {
+      "id": "label100_389076694043",
+      "company_hint": "tag",
+      "title": "TAG 9 MINT JAPANESE POKEMON 2019 MEWTWO & MEW GX 052/173 ALL STARS SM12a | eBay",
+      "page_url": "https://www.ebay.com/itm/389076694043",
+      "ref_id": "turn381view1",
+      "link_id": 30,
+      "caption": "TAG 9 MINT Japanese Pokémon 2019 MEWTWO & MEW GX card 052/173 with holographic artwork, purple border, and visible attack text.",
+      "image_url": "https://i.ebayimg.com/images/g/pIAAAeSwhvdo6NrM/s-l1600.webp",
+      "conditions": [
+        "slab",
+        "public_seller_photo"
+      ]
+    }
+  ]
+}
