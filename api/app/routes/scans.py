@@ -7,6 +7,7 @@ import time
 
 from fastapi import APIRouter, Form, HTTPException, Request, Response, UploadFile
 
+from app.client_diagnostics import phone_diagnostic_lines
 from app.cardmarket import (
     MappingError, normalize_product_url, resolve_variant_choice, url_for_row, variants_for_row,
 )
@@ -28,7 +29,21 @@ from app.session import get_or_create_session, require_scan_owner
 router = APIRouter()
 
 
-@router.post("/scans", response_model=ScanResponse)
+@router.post("/diagnostics", status_code=204)
+async def phone_diagnostics(request: Request, response: Response) -> Response:
+    """Accept a short batch of phone timings. The scan itself never waits on this."""
+    logger = logging.getLogger("scan.diagnostics")
+    try:
+        payload = await request.json()
+        lines = phone_diagnostic_lines(payload)
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+    except Exception as exc:
+        raise HTTPException(status_code=400, detail="diagnostics body must be JSON") from exc
+    get_or_create_session(request, response, request.app.state.dbs, request.app.state.settings)
+    for line in lines:
+        logger.info("%s", line)
+    return Response(status_code=204)
 async def create_scan(
     request: Request,
     response: Response,
