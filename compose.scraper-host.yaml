@@ -1,0 +1,64 @@
+# Standalone Cardmarket scraper host. Each service is one lane: one Chrome, one sticky proxy address.
+# Run with the host's .env: docker compose -f compose.scraper-host.yaml --env-file .env up -d --build
+# Docker-published ports bypass ufw. Bind only to the private address the API host reaches.
+x-scraper-env: &scraper-env
+  SCRAPER_API_KEY: ${SCRAPER_API_KEY:?SCRAPER_API_KEY must match the API service}
+  # false = direct connection. Unset uses the proxy only when PROXY_HOST/USER/PASS are set.
+  PROXY_ENABLED: ${PROXY_ENABLED:-}
+  PROXY_HOST: ${PROXY_HOST:-}
+  PROXY_USER: ${PROXY_USER:-}
+  PROXY_PASS: ${PROXY_PASS:-}
+  PROXY_USER_TEMPLATE: ${PROXY_USER_TEMPLATE:-}
+  PROXY_COUNTRY: ${PROXY_COUNTRY:-}
+  TZ: ${PROXY_TZ:-Europe/Berlin}
+  SCRAPER_ATTEMPT_SECONDS: ${SCRAPER_ATTEMPT_SECONDS:-90}
+  SCRAPER_PAGE_GAP_S: ${SCRAPER_PAGE_GAP_S:-0}
+  SCRAPER_DIRECT_PROBE: ${SCRAPER_DIRECT_PROBE:-false}
+  SCRAPER_NET_LOG: ${SCRAPER_NET_LOG:-true}
+  SCRAPER_BROWSER_LIFETIME_S: ${SCRAPER_BROWSER_LIFETIME_S:-1800}
+
+x-scraper: &scraper
+  build:
+    context: .
+    dockerfile: docker/scraper.Dockerfile
+  image: scanapp-scraper:${SCRAPER_IMAGE_TAG:-local}
+  restart: unless-stopped
+  init: true
+  shm_size: 1gb
+  mem_limit: 1536m
+  # No swap: a swapping Chrome misses every attempt deadline.
+  memswap_limit: 1536m
+  healthcheck:
+    test:
+      [
+        "CMD",
+        "python",
+        "-c",
+        "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/health')",
+      ]
+    interval: 30s
+    timeout: 5s
+    retries: 5
+    start_period: 40s
+  logging:
+    driver: json-file
+    options:
+      max-size: 20m
+      max-file: "5"
+
+services:
+  scraper-a:
+    <<: *scraper
+    environment:
+      <<: *scraper-env
+      SCRAPER_LANE: a
+    ports:
+      - "${SCRAPER_BIND_ADDR:?SCRAPER_BIND_ADDR must be a private address}:${SCRAPER_A_PORT:-8001}:8000"
+
+  scraper-b:
+    <<: *scraper
+    environment:
+      <<: *scraper-env
+      SCRAPER_LANE: b
+    ports:
+      - "${SCRAPER_BIND_ADDR:?SCRAPER_BIND_ADDR must be a private address}:${SCRAPER_B_PORT:-8002}:8000"

@@ -353,6 +353,7 @@ def enqueue_job(
     card_id: str | None = None,
     filters: dict[str, str] | None = None,
     tier: str = "free",
+    priority: int | None = None,
 ) -> str:
     if tier == "free" and not get_settings().cardmarket_helper_enabled:
         raise QueueError("PC price helper is disabled", status_code=503)
@@ -362,10 +363,12 @@ def enqueue_job(
     merged = {**parsed, **(filters or {})}
     encoded = _filters_json(merged)
     identity = product_identity_from_url(key)
+    if priority is None:
+        priority = 0 if tier == "proxy" else 10
     with immediate_transaction(conn):
         existing = conn.execute(
             """
-            SELECT id, tier FROM cardmarket_jobs
+            SELECT id, tier, priority FROM cardmarket_jobs
             WHERE url = ?
               AND COALESCE(filters_json, '{}') = ?
               AND status IN ('pending', 'claimed')
@@ -387,9 +390,15 @@ def enqueue_job(
                         """,
                         (job_id,),
                     )
+                current = int(existing["priority"] if existing["priority"] is not None else 10)
+                chosen = min(current, priority)
                 conn.execute(
-                    "UPDATE cardmarket_jobs SET tier = 'proxy', updated_at = ? WHERE id = ?",
-                    (datetime_now(), job_id),
+                    """
+                    UPDATE cardmarket_jobs
+                    SET tier = 'proxy', priority = ?, deadline_at = ?, updated_at = ?
+                    WHERE id = ?
+                    """,
+                    (chosen, _interactive_deadline(chosen), datetime_now(), job_id),
                 )
         else:
             job_id = str(uuid.uuid4())
@@ -398,13 +407,23 @@ def enqueue_job(
                 """
                 INSERT INTO cardmarket_jobs (
                     id, url, card_id, status, created_at, updated_at, attempts,
-                    filters_json, product_identity, next_attempt_at, tier
-                ) VALUES (?, ?, ?, 'pending', ?, ?, 0, ?, ?, ?, ?)
+                    filters_json, product_identity, next_attempt_at, tier, priority, deadline_at
+                ) VALUES (?, ?, ?, 'pending', ?, ?, 0, ?, ?, ?, ?, ?, ?)
                 """,
-                (job_id, key, card_id or "", now, now, encoded, identity, now, tier),
+                (
+                    job_id, key, card_id or "", now, now, encoded, identity, now, tier,
+                    priority, _interactive_deadline(priority),
+                ),
             )
     _notify_job_url(key, merged)
     return job_id
+
+
+def _interactive_deadline(priority: int) -> str | None:
+    if priority > 0:
+        return None
+    seconds = max(1, int(get_settings().cardmarket_interactive_start_s))
+    return time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime(time.time() + seconds))
 
 
 def _notify_job_url(url: str | None, filters: dict[str, str] | None = None) -> None:
@@ -1208,7 +1227,40 @@ def prices_payload(
         "scraper_ready": scraper_is_ready(conn),
         "webview_enabled": get_settings().cardmarket_webview_enabled,
         "challenge_fallback_minutes": get_settings().cardmarket_challenge_fallback_minutes,
+        **_job_wait(conn, sample),
         **state,
+    }
+
+
+def _job_wait(conn: sqlite3.Connection, sample: str | None) -> dict[str, Any]:
+    if not sample:
+        return {"deadline_at": None, "queue_position": None}
+    row = conn.execute(
+        """
+        SELECT deadline_at, priority, created_at
+        FROM cardmarket_jobs
+        WHERE url = ? AND status IN ('pending', 'claimed')
+          AND COALESCE(tier, 'free') = 'proxy'
+        ORDER BY created_at
+        LIMIT 1
+        """,
+        (sample.split("?", 1)[0],),
+    ).fetchone()
+    if row is None:
+        return {"deadline_at": None, "queue_position": None}
+    ahead = conn.execute(
+        """
+        SELECT COUNT(*) FROM cardmarket_jobs
+        WHERE status = 'pending'
+          AND COALESCE(tier, 'free') = 'proxy'
+          AND COALESCE(priority, 10) = 0
+          AND created_at < ?
+        """,
+        (row["created_at"],),
+    ).fetchone()
+    return {
+        "deadline_at": row["deadline_at"],
+        "queue_position": int(ahead[0] or 0) + 1 if row["deadline_at"] else None,
     }
 
 
@@ -1216,10 +1268,42 @@ def touch_helper(conn: sqlite3.Connection) -> None:
     update_helper_status(conn, "legacy", ready=False, paused=False)
 
 
+def interactive_pending(conn: sqlite3.Connection) -> bool:
+    row = conn.execute(
+        """
+        SELECT 1 FROM cardmarket_jobs
+        WHERE status = 'pending'
+          AND COALESCE(tier, 'free') = 'proxy'
+          AND COALESCE(priority, 10) = 0
+          AND (next_attempt_at IS NULL OR next_attempt_at <= ?)
+        LIMIT 1
+        """,
+        (datetime_now(),),
+    ).fetchone()
+    return row is not None
+
+
+def _expire_interactive_jobs(conn: sqlite3.Connection, now: str) -> None:
+    """An interactive job that was not started in time ends without a paid page."""
+    conn.execute(
+        """
+        UPDATE cardmarket_jobs
+        SET status = 'failed', failure_reason = 'expired', updated_at = ?,
+            claim_expires_at = NULL
+        WHERE status = 'pending'
+          AND COALESCE(priority, 10) = 0
+          AND deadline_at IS NOT NULL
+          AND deadline_at < ?
+        """,
+        (now, now),
+    )
+
+
 def claim_proxy_job(conn: sqlite3.Connection, worker_id: str = PROXY_WORKER_ID) -> dict[str, Any] | None:
     with immediate_transaction(conn):
         now = datetime_now()
         settle_expired_claims(conn, now)
+        _expire_interactive_jobs(conn, now)
         row = conn.execute(
             """
             SELECT rowid AS queue_row, *
@@ -1227,7 +1311,7 @@ def claim_proxy_job(conn: sqlite3.Connection, worker_id: str = PROXY_WORKER_ID) 
             WHERE status = 'pending'
               AND COALESCE(tier, 'free') = 'proxy'
               AND (next_attempt_at IS NULL OR next_attempt_at <= ?)
-            ORDER BY created_at ASC, rowid ASC
+            ORDER BY COALESCE(priority, 10) ASC, created_at ASC, rowid ASC
             LIMIT 1
             """,
             (now,),

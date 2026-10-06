@@ -220,6 +220,8 @@ class PriceResponse(BaseModel):
     unlisted: bool = False
     scraper_ready: bool = False
     challenge_fallback_minutes: int = 10
+    deadline_at: str | None = None
+    queue_position: int | None = None
     queued: int | None = None
     pending: int | None = None
     claimed: int | None = None
@@ -294,6 +296,8 @@ def _price_response(payload: dict[str, Any]) -> PriceResponse:
         ),
         sampled_offer_count=payload.get("sampled_offer_count"),
         freshness=payload.get("freshness"),
+        deadline_at=payload.get("deadline_at"),
+        queue_position=payload.get("queue_position"),
         queued=payload.get("queued"),
         pending=payload.get("pending"),
         claimed=payload.get("claimed"),

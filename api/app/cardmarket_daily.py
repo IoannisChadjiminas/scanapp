@@ -8,18 +8,27 @@ from __future__ import annotations
 import logging
 import time
 import uuid
+from contextvars import ContextVar
 from dataclasses import dataclass
 
 import httpx
 
 from app.cardmarket import sample_key, snapshot_record, write_snapshot
-from app.cardmarket_budget import QueueError, reconcile_attempt, reserve_attempt, scraper_block_reason
+from app.cardmarket_budget import (
+    QueueError,
+    current_pool,
+    reconcile_attempt,
+    reserve_attempt,
+    scraper_block_reason,
+    usage_today,
+)
 from app.cardmarket_queue import header_prices, rows_to_prices
 from app.config import Settings, get_settings
 from app.db import connect
 from app.portfolio_db import portfolio_keys, statement
 
 log = logging.getLogger("cardmarket.daily")
+daily_lane_url: ContextVar[str] = ContextVar("daily_lane_url", default="")
 
 DAILY_PARSER = "daily-offers-v1"
 
@@ -184,8 +193,9 @@ def store_result(conn, url: str, result: dict) -> bool:
 
 
 def scrape_product(settings: Settings, url: str, session_id: str) -> dict:
+    base = daily_lane_url.get() or settings.scraper_url
     response = httpx.post(
-        f"{settings.scraper_url.rstrip('/')}/scrape",
+        f"{base.rstrip('/')}/scrape",
         json={"url": url, "session_id": session_id},
         headers={"Authorization": f"Bearer {settings.scraper_api_key}"},
         timeout=settings.scraper_attempt_seconds + 30,
@@ -226,48 +236,64 @@ def run_pass(
         if reason in {"daily-pages", "daily-mb"}:
             log.info("daily stop reason=%s", reason)
             return "capped"
+        pages, _used = usage_today(conn)
+        if settings.scraper_daily_pages - pages <= settings.interactive_reserve_pages():
+            log.info("daily stop reason=interactive-reserve")
+            return "capped"
         if reason:
             log.info("daily stop reason=%s", reason)
             return "blocked"
+        pool = current_pool()
+        lane = pool.lease("daily", conn, timeout=1) if pool is not None else None
+        if pool is not None and lane is None:
+            sleep(1)
+            continue
+        token = daily_lane_url.set(lane.settings.scraper_url) if lane is not None else None
         try:
-            reservation = reserve_attempt(conn, sample=url, session_id=pace.session_id, ip="daily")
-        except QueueError as exc:
-            log.info("daily stop reason=budget detail=%s", exc.detail)
-            return "capped"
-        started = time.monotonic()
-        resumed = False
-        while True:
             try:
-                result = _load(conn, url, pace, reservation, scrape, started)
-                if str(result.get("outcome") or "") == "challenge_unsolved":
+                reservation = reserve_attempt(conn, sample=url, session_id=pace.session_id, ip="daily")
+            except QueueError as exc:
+                log.info("daily stop reason=budget detail=%s", exc.detail)
+                return "capped"
+            started = time.monotonic()
+            resumed = False
+            while True:
+                try:
+                    result = _load(conn, url, pace, reservation, scrape, started)
+                    if str(result.get("outcome") or "") == "challenge_unsolved":
+                        try:
+                            reservation = reserve_attempt(
+                                conn, sample=url, session_id=pace.session_id, ip="daily"
+                            )
+                        except QueueError:
+                            return "capped"
+                        result = _load(conn, url, pace, reservation, scrape, time.monotonic())
+                    break
+                except DailyRateLimit as exc:
+                    reconcile_attempt(
+                        conn,
+                        reservation,
+                        outcome="rate_limited",
+                        actual_bytes=None,
+                        elapsed_ms=int((time.monotonic() - started) * 1000),
+                    )
+                    pace.note("rate_limited")
+                    sleep(exc.retry_after)
+                    if resumed:
+                        return "blocked"
+                    resumed = True
                     try:
                         reservation = reserve_attempt(
                             conn, sample=url, session_id=pace.session_id, ip="daily"
                         )
                     except QueueError:
                         return "capped"
-                    result = _load(conn, url, pace, reservation, scrape, time.monotonic())
-                break
-            except DailyRateLimit as exc:
-                reconcile_attempt(
-                    conn,
-                    reservation,
-                    outcome="rate_limited",
-                    actual_bytes=None,
-                    elapsed_ms=int((time.monotonic() - started) * 1000),
-                )
-                pace.note("rate_limited")
-                sleep(exc.retry_after)
-                if resumed:
-                    return "blocked"
-                resumed = True
-                try:
-                    reservation = reserve_attempt(
-                        conn, sample=url, session_id=pace.session_id, ip="daily"
-                    )
-                except QueueError:
-                    return "capped"
-                started = time.monotonic()
+                    started = time.monotonic()
+        finally:
+            if token is not None:
+                daily_lane_url.reset(token)
+            if lane is not None and pool is not None:
+                pool.release_lease(lane)
         sleep(extra_sleep(pace.gap, settings.scraper_page_gap_s))
     return "done"
 

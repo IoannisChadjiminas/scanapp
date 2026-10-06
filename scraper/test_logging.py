@@ -17,6 +17,7 @@ URL = "https://www.cardmarket.com/en/Pokemon/Products/Singles/Base-Set/Pikachu"
 
 
 def test_scraper_logs_start_and_failure_without_credentials(monkeypatch, caplog):
+    monkeypatch.setenv("SCRAPER_IN_PROCESS", "1")
     monkeypatch.setattr(service, "API_KEY", "test-secret")
     monkeypatch.setattr(service, "reap_stale_browsers", lambda *args, **kwargs: None)
     monkeypatch.setattr(service, "open_session", lambda sid: SimpleNamespace(

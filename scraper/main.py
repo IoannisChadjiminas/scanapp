@@ -33,6 +33,7 @@ from browser import (  # noqa: E402
     run_attempt,
 )
 from proxy import proxy_direct, proxy_enabled, proxy_exit, proxy_server  # noqa: E402
+from supervisor import LaneBusy, LaneUnavailable, Supervisor  # noqa: E402
 from app.cardmarket_html import parse_cardmarket_html  # noqa: E402
 
 log = logging.getLogger("scraper")
@@ -54,6 +55,7 @@ def _quiet_health_access() -> None:
 
 
 _quiet_health_access()
+_supervisor: Supervisor | None = None
 
 API_KEY = os.environ.get("SCRAPER_API_KEY", "")
 MAX_BROWSERS = max(1, int(os.environ.get("MAX_BROWSERS", "1")))
@@ -65,7 +67,14 @@ DIRECT_PROBE = os.environ.get("SCRAPER_DIRECT_PROBE", "").strip().lower() in {"1
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
+    global _supervisor
     _quiet_health_access()
+    in_process = os.environ.get("SCRAPER_IN_PROCESS", "").strip().lower() in {"1", "true", "yes"}
+    if in_process:
+        _supervisor = None
+    else:
+        _supervisor = Supervisor()
+        _supervisor.start()
     log.info(
         "scraper config api_key_configured=%s proxy_enabled=%s proxy_host_configured=%s "
         "proxy_user_configured=%s proxy_password_configured=%s max_browsers=%s deadline_s=%s "
@@ -74,7 +83,11 @@ async def lifespan(app: FastAPI):
         bool(os.environ.get("PROXY_USER", "").strip()), bool(os.environ.get("PROXY_PASS")),
         MAX_BROWSERS, ATTEMPT_SECONDS, DIRECT_PROBE, NET_LOG, BROWSER_LIFETIME_S, PAGE_GAP_S,
     )
-    yield
+    try:
+        yield
+    finally:
+        if _supervisor is not None:
+            _supervisor.stop()
 
 
 app = FastAPI(title="Cardmarket scraper", docs_url=None, redoc_url=None, lifespan=lifespan)
@@ -105,6 +118,16 @@ def note_page_finished() -> None:
 class ScrapeRequest(BaseModel):
     url: str = Field(min_length=8, max_length=500)
     session_id: str = Field(min_length=1, max_length=80)
+
+
+class WarmRequest(BaseModel):
+    session_id: str = Field(min_length=1, max_length=80)
+
+
+def _unavailable_detail(state: str) -> str:
+    return {"starting": "Starting", "restarting": "Restarting", "cooling": "Rate limited"}.get(
+        state, "Busy"
+    )
 
 
 def _authorized(header: str | None) -> bool:
@@ -195,6 +218,38 @@ def health() -> dict:
     return {"ok": True, "cooldown_until": time.time() + left if left else 0}
 
 
+@app.get("/status")
+def status() -> dict:
+    if _supervisor is None:
+        with _cooldown_lock:
+            left = max(0.0, _cooldown_until - time.time())
+        return {
+            "lane": os.environ.get("SCRAPER_LANE", "a"),
+            "state": "cooling" if left else "idle",
+            "attempt_seconds": ATTEMPT_SECONDS,
+            "cooldown_until": time.time() + left if left else 0,
+        }
+    body = _supervisor.status()
+    with _cooldown_lock:
+        left = max(0.0, _cooldown_until - time.time())
+    if left:
+        body["state"] = "cooling"
+        body["cooldown_until"] = time.time() + left
+    return body
+
+
+@app.post("/warm")
+def warm(payload: WarmRequest, authorization: str | None = Header(default=None)) -> dict:
+    if not _authorized(authorization):
+        raise HTTPException(status_code=401, detail="Unauthorized")
+    if _supervisor is None:
+        return {"ok": True, "skipped": True}
+    try:
+        return _supervisor.warm(payload.session_id)
+    except LaneUnavailable as exc:
+        raise HTTPException(status_code=503, detail=_unavailable_detail(exc.state)) from None
+
+
 @app.post("/scrape")
 def scrape(payload: ScrapeRequest, authorization: str | None = Header(default=None)) -> dict:
     global _cooldown_until
@@ -211,6 +266,8 @@ def scrape(payload: ScrapeRequest, authorization: str | None = Header(default=No
             headers={"Retry-After": str(int(left) + 1)},
         )
     wait_for_page_gap()
+    if _supervisor is not None:
+        return _scrape_supervised(payload)
     if not _slots.acquire(timeout=30):
         raise HTTPException(status_code=503, detail="Busy", headers={"Retry-After": "5"})
     started = time.time()
@@ -266,6 +323,74 @@ def scrape(payload: ScrapeRequest, authorization: str | None = Header(default=No
                 "elapsed_ms": result.get("elapsed_ms"),
                 "session_id": payload.session_id,
                 "reused": result["reused"],
+                "country": os.environ.get("PROXY_COUNTRY", ""),
+                "wait_ms": int((time.time() - started) * 1000),
+            },
+            ensure_ascii=False,
+        )
+    )
+    return result
+
+
+def _scrape_supervised(payload: ScrapeRequest) -> dict:
+    """One attempt in the browser process. A hang comes back as timeout, not a stuck slot."""
+    global _cooldown_until
+    started = time.time()
+    log.info("scrape started session=%s", payload.session_id)
+    proxy = proxy_server(payload.session_id) if proxy_enabled() else None
+    log_proxy_exit(payload.session_id, proxy)
+    log_cardmarket_direct(payload.session_id, proxy, payload.url)
+    assert _supervisor is not None
+    try:
+        result = _supervisor.scrape(payload.url, payload.session_id)
+    except LaneBusy:
+        raise HTTPException(status_code=503, detail="Busy", headers={"Retry-After": "5"}) from None
+    except LaneUnavailable as exc:
+        retry = "5"
+        if exc.state == "cooling":
+            retry = str(int(max(0.0, _supervisor.cooldown_until - time.time())) + 1)
+        raise HTTPException(
+            status_code=503,
+            detail=_unavailable_detail(exc.state),
+            headers={"Retry-After": retry},
+        ) from None
+    finally:
+        note_page_finished()
+    if result.get("outcome") == "error":
+        log.error(
+            "scrape failed session=%s error=%s stage=%s frames=%s elapsed_ms=%s",
+            payload.session_id, result.get("error") or "error", result.get("stage") or "-",
+            result.get("frames") or "-", int((time.time() - started) * 1000),
+        )
+        raise HTTPException(status_code=500, detail="Scrape attempt failed")
+    if result.get("outcome") == "rate_limited":
+        log.info("scrape rate_limited session=%s cooldown_s=%s", payload.session_id, COOLDOWN_SECONDS)
+        _supervisor.note_rate_limit(COOLDOWN_SECONDS)
+        with _cooldown_lock:
+            _cooldown_until = time.time() + COOLDOWN_SECONDS
+        raise HTTPException(
+            status_code=503,
+            detail="Rate limited",
+            headers={"Retry-After": str(int(COOLDOWN_SECONDS))},
+        )
+    summary = result.get("net_summary")
+    log.info(
+        "chrome net session=%s %s",
+        payload.session_id,
+        json.dumps(summary, ensure_ascii=False, sort_keys=True) if summary else "no cardmarket or cloudflare traffic",
+    )
+    result["reused"] = bool(result.get("reused"))
+    log.info(
+        json.dumps(
+            {
+                "url": payload.url,
+                "outcome": result.get("outcome"),
+                "bytes": result.get("bytes"),
+                "elapsed_ms": result.get("elapsed_ms"),
+                "session_id": payload.session_id,
+                "reused": result["reused"],
+                "killed": bool(result.get("killed")),
+                "lane": os.environ.get("SCRAPER_LANE", "a"),
                 "country": os.environ.get("PROXY_COUNTRY", ""),
                 "wait_ms": int((time.time() - started) * 1000),
             },

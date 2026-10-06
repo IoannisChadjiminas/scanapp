@@ -36,7 +36,7 @@ _quiet_health_access()
 from app.admission import ScanLimiter
 from app.cardmarket_events import bind_loop
 from app.cardmarket_daily import run_once, should_schedule
-from app.cardmarket_scraper import ScraperWorker
+from app.cardmarket_scraper import LanePool
 
 log = logging.getLogger("cardmarket.daily")
 
@@ -105,7 +105,7 @@ async def lifespan(app: FastAPI):
     app.state.image_executor = ThreadPoolExecutor(max_workers=2, thread_name_prefix="image")
     app.state.loop = asyncio.get_running_loop()
     bind_loop(app.state.loop)
-    worker = ScraperWorker(settings) if settings.scraper_enabled else None
+    worker = LanePool(settings) if settings.scraper_enabled and settings.lane_urls else None
     if worker is not None:
         worker.start()
     app.state.scraper_worker = worker

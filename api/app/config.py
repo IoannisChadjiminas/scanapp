@@ -72,6 +72,12 @@ class Settings(BaseSettings):
     scraper_attempt_seconds: int = 70
     scraper_page_gap_s: float = 0
     scraper_browser_lifetime_s: float = 1800
+    scraper_urls: str = ""
+    cardmarket_interactive_start_s: int = 30
+    scraper_interactive_reserve_pages: int = 0
+    scraper_breaker_failures: int = 3
+    scraper_breaker_base_s: float = 30
+    scraper_breaker_max_s: float = 300
     daily_prices_enabled: bool = False
     daily_gap_min_s: float = 2
     daily_gap_max_s: float = 60
@@ -124,6 +130,18 @@ class Settings(BaseSettings):
     @property
     def cors_origin_list(self) -> list[str]:
         return [item.strip() for item in self.cors_origins.split(",") if item.strip()]
+
+    @property
+    def lane_urls(self) -> list[str]:
+        raw = [item.strip() for item in self.scraper_urls.split(",") if item.strip()]
+        if raw:
+            return raw
+        return [self.scraper_url] if self.scraper_url else []
+
+    def interactive_reserve_pages(self) -> int:
+        if self.scraper_interactive_reserve_pages > 0:
+            return self.scraper_interactive_reserve_pages
+        return max(1, int(self.scraper_daily_pages * 0.2)) if self.scraper_daily_pages else 0
 
     threshold_min_visual: float = Field(default=0.78)
     threshold_min_visual_ocr: float = Field(default=0.70)
