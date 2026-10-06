@@ -77,6 +77,18 @@ class Settings(BaseSettings):
     daily_session_rotate_before_s: float = 120
     daily_browsers: int = 1
     photo_scrape_active: bool = False
+    config_ttl_s: int = 600
+    scan_price_start_on_provisional: bool = True
+    scan_price_candidate_reads: int = 2
+    scan_price_warm_reader: bool = True
+    scan_price_show_stale: bool = True
+    scan_price_stale_max_days: int = 30
+    # off: never. fallback: the phone asks after its own read fails.
+    # parallel: the server queues a paid read when a confident scan has no fresh price.
+    scan_price_server_read: str = "fallback"
+    scan_price_server_read_statuses: str = "matched"
+    scan_price_server_read_delay_ms: int = 3000
+    scan_price_server_read_daily_pages: int = 0
 
     ranking_version: str = "rank-v15-holder-printing-review"
     # Opt-in only; an invalid explicitly configured bundle fails validation.
@@ -128,6 +140,22 @@ class Settings(BaseSettings):
         if raw:
             return raw
         return [self.scraper_url] if self.scraper_url else []
+
+    def scan_candidate_reads(self) -> int:
+        return max(0, min(int(self.scan_price_candidate_reads), 3))
+
+    def scan_server_read_mode(self) -> str:
+        mode = (self.scan_price_server_read or "").strip().lower()
+        if mode in {"off", "fallback", "parallel"}:
+            return mode
+        return "fallback"
+
+    def scan_server_read_statuses(self) -> set[str]:
+        return {
+            item.strip()
+            for item in self.scan_price_server_read_statuses.split(",")
+            if item.strip()
+        }
 
     def interactive_reserve_pages(self) -> int:
         if self.scraper_interactive_reserve_pages > 0:

@@ -118,6 +118,7 @@ class PlausiblePrinting(BaseModel):
     language: str
     image_url: str
     cardmarket_url: str | None = None
+    cardmarket_prices: list[CardmarketPrice] = Field(default_factory=list)
 
 
 class PrintingReview(BaseModel):

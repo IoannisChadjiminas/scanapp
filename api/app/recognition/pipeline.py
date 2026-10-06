@@ -463,11 +463,11 @@ def _recognize_bytes_once(
     sku_groups = get_groups(catalog) if get_groups else grouped_expansion_skus(catalog)
     for item in combined:
         apply_variants_to_candidate(catalog, item, groups=sku_groups)
-    if combined:
-        live_url = combined[0].get("cardmarket_url")
-        combined[0]["cardmarket_prices"] = (
-            snapshot_prices(catalog, live_url) if live_url else []
-        )
+    for item in combined:
+        live_url = item.get("cardmarket_url")
+        if not live_url:
+            continue
+        item["cardmarket_prices"] = snapshot_prices(catalog, live_url)
     timings["cardmarket_ms"] = (time.perf_counter() - mark) * 1000
     status = decide_status(
         combined,
@@ -590,6 +590,9 @@ def _recognize_bytes_once(
                 "language": str(row.get("language") or ""),
                 "image_url": row.get("image_url") or _card_image_url(row),
                 "cardmarket_url": row.get("cardmarket_url"),
+                "cardmarket_prices": row.get("cardmarket_prices") or snapshot_prices(
+                    catalog, row.get("cardmarket_url")
+                ),
             } for row in printing.members],
             guidance=printing.guidance,
         )

@@ -347,6 +347,10 @@ def settle_expired_claims(conn: sqlite3.Connection, now: str | None = None) -> i
     return int(cursor.rowcount or 0)
 
 
+def _stamp_after(seconds: float) -> str:
+    return time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime(time.time() + max(0, seconds)))
+
+
 def enqueue_job(
     conn: sqlite3.Connection,
     url: str,
@@ -354,6 +358,8 @@ def enqueue_job(
     filters: dict[str, str] | None = None,
     tier: str = "free",
     priority: int | None = None,
+    source: str | None = None,
+    delay_s: float = 0,
 ) -> str:
     if tier == "free" and not get_settings().cardmarket_helper_enabled:
         raise QueueError("PC price helper is disabled", status_code=503)
@@ -403,16 +409,22 @@ def enqueue_job(
         else:
             job_id = str(uuid.uuid4())
             now = datetime_now()
+            ready_at = _stamp_after(delay_s) if delay_s else now
+            deadline = _interactive_deadline(priority)
+            if priority == 0 and delay_s:
+                window = max(1, int(get_settings().cardmarket_interactive_start_s))
+                deadline = _stamp_after(delay_s + window)
             conn.execute(
                 """
                 INSERT INTO cardmarket_jobs (
                     id, url, card_id, status, created_at, updated_at, attempts,
-                    filters_json, product_identity, next_attempt_at, tier, priority, deadline_at
-                ) VALUES (?, ?, ?, 'pending', ?, ?, 0, ?, ?, ?, ?, ?, ?)
+                    filters_json, product_identity, next_attempt_at, tier, priority,
+                    deadline_at, job_source
+                ) VALUES (?, ?, ?, 'pending', ?, ?, 0, ?, ?, ?, ?, ?, ?, ?)
                 """,
                 (
-                    job_id, key, card_id or "", now, now, encoded, identity, now, tier,
-                    priority, _interactive_deadline(priority),
+                    job_id, key, card_id or "", now, now, encoded, identity, ready_at, tier,
+                    priority, deadline, source,
                 ),
             )
     _notify_job_url(key, merged)
@@ -560,8 +572,79 @@ def remember_phone_offers(
         sampled_offer_count=len(prices),
     )
     log.info("price source=webview parser=%s offers=%s url=%s", version, len(prices), key)
+    cancel_pending_scan_reads(conn, url)
     _notify_job_url(url)
     return True
+
+
+def cancel_pending_scan_reads(conn: sqlite3.Connection, url: str) -> int:
+    """Drop a scan-started read that has not opened a browser yet."""
+    key = sample_key(url)
+    product = (key or "").split("?", 1)[0]
+    if not product:
+        return 0
+    with immediate_transaction(conn):
+        cursor = conn.execute(
+            """
+            UPDATE cardmarket_jobs
+            SET status = 'failed', failure_reason = 'phone-first', updated_at = ?
+            WHERE status = 'pending'
+              AND job_source = 'scan-parallel'
+              AND (url = ? OR url = ?)
+            """,
+            (datetime_now(), product, key or product),
+        )
+        count = int(cursor.rowcount or 0)
+    if count:
+        log.info("scan parallel cancelled reason=phone-first count=%s url=%s", count, product)
+    return count
+
+
+def scan_parallel_pages_today(conn: sqlite3.Connection) -> int:
+    day = datetime_now()[:10]
+    row = conn.execute(
+        """
+        SELECT COUNT(*) FROM cardmarket_jobs
+        WHERE job_source = 'scan-parallel'
+          AND status IN ('claimed', 'completed')
+          AND updated_at >= ?
+        """,
+        (f"{day}T00:00:00Z",),
+    ).fetchone()
+    return int(row[0] or 0)
+
+
+def schedule_scan_parallel_read(
+    conn: sqlite3.Connection, *, status: str, url: str | None
+) -> str | None:
+    """Queue one paid read after a confident scan, unless config or budget says no."""
+    settings = get_settings()
+    if settings.scan_server_read_mode() != "parallel":
+        return None
+    if status not in settings.scan_server_read_statuses():
+        return None
+    if not url:
+        return None
+    limit = max(0, int(settings.scan_price_server_read_daily_pages))
+    if limit <= 0 or scan_parallel_pages_today(conn) >= limit:
+        log.info("scan parallel skipped reason=budget url=%s", sample_key(url) or "")
+        return None
+    record = snapshot_record(conn, url)
+    observed = (record or {}).get("observed_at") or (record or {}).get("fetched_at")
+    age = _age_seconds(str(observed or ""))
+    if record and record.get("prices") and age is not None and age <= fresh_seconds():
+        return None
+    delay_s = max(0, int(settings.scan_price_server_read_delay_ms)) / 1000
+    job_id = enqueue_job(
+        conn, url, tier="proxy", priority=0, source="scan-parallel", delay_s=delay_s
+    )
+    log.info(
+        "scan parallel queued job=%s delay_s=%s url=%s",
+        job_id,
+        delay_s,
+        sample_key(url) or "",
+    )
+    return job_id
 
 
 def _stamp_epoch(stamp: str | None) -> int | None:

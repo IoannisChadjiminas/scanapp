@@ -80,6 +80,17 @@ async def create_scan(
         try:
             result = await asyncio.shield(future)
             logger.info("recognition_done trace=%s scan_id=%s status=%s timings_ms=%s", trace, result.id, result.status.value, result.timings_ms.model_dump() if hasattr(result.timings_ms, "model_dump") else result.timings_ms)
+            try:
+                from app.cardmarket_queue import schedule_scan_parallel_read
+
+                top = result.suggestions[0].cardmarket_url if result.suggestions else None
+                schedule_scan_parallel_read(
+                    request.app.state.dbs.catalog,
+                    status=result.status.value,
+                    url=top,
+                )
+            except Exception:
+                logger.exception("scan parallel schedule failed trace=%s", trace)
             return result
         except asyncio.CancelledError:
             try:
