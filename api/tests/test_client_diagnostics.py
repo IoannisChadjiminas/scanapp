@@ -1,6 +1,13 @@
 import logging
 
 from app.client_diagnostics import phone_diagnostic_lines
+from app.routes.scans import router
+
+
+def test_scan_and_diagnostics_routes_are_both_registered():
+    paths = {getattr(route, "path", None) for route in router.routes}
+    assert "/scans" in paths
+    assert "/diagnostics" in paths
 
 
 def test_phone_events_keep_timings_and_drop_private_fields(caplog):

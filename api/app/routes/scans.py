@@ -44,6 +44,9 @@ async def phone_diagnostics(request: Request, response: Response) -> Response:
     for line in lines:
         logger.info("%s", line)
     return Response(status_code=204)
+
+
+@router.post("/scans", response_model=ScanResponse)
 async def create_scan(
     request: Request,
     response: Response,
