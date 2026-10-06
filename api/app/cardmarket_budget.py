@@ -73,12 +73,26 @@ def scraper_online() -> bool:
         return bool(_health["ok"] and time.time() - _health["checked_at"] <= 90)
 
 
+_pool = None
+
+
+def bind_pool(pool) -> None:
+    global _pool
+    _pool = pool
+
+
+def current_pool():
+    return _pool
+
+
 def scraper_block_reason(conn: sqlite3.Connection) -> str | None:
     """Why a paid read cannot start. None means the scraper may take a job."""
+    if _pool is not None:
+        return _pool.block_reason(conn)
     settings = get_settings()
     if not settings.scraper_enabled:
         return "disabled"
-    if not settings.scraper_url:
+    if not settings.lane_urls:
         return "no-url"
     if not settings.scraper_api_key:
         return "no-key"
@@ -135,6 +149,19 @@ def reserve_attempt(
 def cooldown_remaining() -> float:
     with _health_lock:
         return max(0.0, float(_health["cooldown_until"]) - time.time())
+
+
+def release_attempt(conn: sqlite3.Connection, reservation_id: str, reason: str) -> None:
+    """A reply that never reached Cardmarket does not spend a page."""
+    conn.execute(
+        """
+        UPDATE cardmarket_scrapes
+        SET state = 'released', outcome = ?, bytes = 0, elapsed_ms = 0
+        WHERE id = ? AND state = 'reserved'
+        """,
+        (reason[:80], reservation_id),
+    )
+    conn.commit()
 
 
 def reconcile_attempt(

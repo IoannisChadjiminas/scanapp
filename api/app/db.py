@@ -147,6 +147,8 @@ def init_catalog(conn: sqlite3.Connection) -> None:
             "submission_id": "TEXT",
             "observed_at": "TEXT",
             "tier": "TEXT NOT NULL DEFAULT 'free'",
+            "priority": "INTEGER NOT NULL DEFAULT 10",
+            "deadline_at": "TEXT",
         },
     )
     _add_columns(

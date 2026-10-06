@@ -39,7 +39,8 @@ services:
       CARDMARKET_HELPER_ENABLED: ${CARDMARKET_HELPER_ENABLED:-false}
       CARDMARKET_WEBVIEW_ENABLED: ${CARDMARKET_WEBVIEW_ENABLED:-true}
       SCRAPER_ENABLED: ${SCRAPER_ENABLED:-false}
-      SCRAPER_URL: http://scraper:8000
+      SCRAPER_URL: ${SCRAPER_URL:-http://scraper:8000}
+      SCRAPER_URLS: ${SCRAPER_URLS:-}
       SCRAPER_API_KEY: ${SCRAPER_API_KEY:-}
       SCRAPER_SESSION_HOURLY: ${SCRAPER_SESSION_HOURLY:-10}
       SCRAPER_IP_HOURLY: ${SCRAPER_IP_HOURLY:-20}
@@ -94,6 +95,7 @@ services:
     mem_limit: 1536m
     environment:
       SCRAPER_API_KEY: ${SCRAPER_API_KEY:-}
+      SCRAPER_LANE: ${SCRAPER_LANE:-a}
       # false = direct connection. Unset uses the proxy only when PROXY_HOST/USER/PASS are set.
       PROXY_ENABLED: ${PROXY_ENABLED:-}
       PROXY_HOST: ${PROXY_HOST:-}
