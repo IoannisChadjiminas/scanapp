@@ -33,6 +33,7 @@ class CaptureConfig(BaseModel):
     max_edge: int = 2000
     native_codec: bool = False
     live_outline: bool = False
+    auto_capture: bool = False
 
 
 class AppConfigResponse(BaseModel):
@@ -62,6 +63,7 @@ def scan_price_config(settings) -> AppConfigResponse:
             max_edge=max(800, min(int(settings.app_max_edge), 4000)),
             native_codec=bool(settings.app_native_codec),
             live_outline=bool(settings.app_live_outline),
+            auto_capture=bool(settings.app_live_outline and settings.app_auto_capture),
         ),
         scan_prices=ScanPriceConfig(
             start_on_provisional=bool(settings.scan_price_start_on_provisional),

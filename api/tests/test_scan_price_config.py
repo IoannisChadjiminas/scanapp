@@ -99,13 +99,13 @@ def test_config_sends_phone_capture_and_warp_switches():
     body = scan_price_config(Settings(_env_file=None))
     assert body.card_warp is False
     assert body.capture.model_dump() == dict(preset='max', jpeg_quality=95, max_edge=2000, native_codec=False,
-                                                live_outline=False)
+                                                live_outline=False, auto_capture=False)
     body = scan_price_config(Settings(_env_file=None, app_card_warp=True, app_capture_preset='ultraHigh',
                                       app_jpeg_quality=85, app_max_edge=1400, app_native_codec=True,
-                                      app_live_outline=True))
+                                      app_live_outline=True, app_auto_capture=True))
     assert body.card_warp is True
     assert body.capture.model_dump() == dict(preset='ultraHigh', jpeg_quality=85, max_edge=1400, native_codec=True,
-                                                live_outline=True)
+                                                live_outline=True, auto_capture=True)
 
 
 def test_config_never_sends_an_unknown_preset_or_silly_quality():
@@ -116,3 +116,8 @@ def test_config_never_sends_an_unknown_preset_or_silly_quality():
 def test_config_keeps_the_photo_edge_in_a_sensible_range():
     assert scan_price_config(Settings(_env_file=None, app_max_edge=100)).capture.max_edge == 800
     assert scan_price_config(Settings(_env_file=None, app_max_edge=99999)).capture.max_edge == 4000
+
+
+def test_auto_capture_needs_the_live_outline():
+    body = scan_price_config(Settings(_env_file=None, app_auto_capture=True))
+    assert body.capture.auto_capture is False
