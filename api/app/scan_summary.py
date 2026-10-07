@@ -42,6 +42,9 @@ def scan_flags(settings: Any, *, stream: bool = False, skip_detect: bool = False
         flags.append(f'app_capture_{preset}')
     if quality != 95:
         flags.append(f'app_jpeg_{quality}')
+    max_edge = getattr(settings, 'app_max_edge', 2000)
+    if max_edge != 2000:
+        flags.append(f'app_edge_{max_edge}')
     if stream:
         flags.append('req_stream')
     if skip_detect:
