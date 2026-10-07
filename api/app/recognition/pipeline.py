@@ -957,8 +957,10 @@ def recognize_bytes(
         # label text: a slab the client missed must not lose its grade.
         grading = GradingEvidence(is_graded=False, grading_status='ungraded',
                                   warnings=['grading_not_requested'])
-        label_seen = any(h.region in ('holder_name', 'holder_collector')
-                         for ev in (first, selected) for h in ev.ocr.hits)
+        label_seen = (any(h.region in ('holder_name', 'holder_collector')
+                          for ev in (first, selected) for h in ev.ocr.hits)
+                      or any(str((ev.evidence.get('frame_selection') or {}).get('profile', ''))
+                             .startswith('slab_') for ev in (first, selected)))
         if (label_seen and getattr(settings, 'use_grading', True)
                 and getattr(settings, 'use_ocr', True)):
             _, _, label_engine = runtime.require()

@@ -236,3 +236,16 @@ def test_no_label_text_keeps_grading_skipped(monkeypatch):
         grading_requires_client_hint=True), runtime=rt, catalog=None, results=None,
         session_id='test', skip_detect=True, graded=False)
     assert result.grading.warnings == ['grading_not_requested']
+
+
+def test_slab_shaped_frame_selection_also_triggers_the_safety_net(monkeypatch):
+    item, _ = evaluation()
+    item.evidence['frame_selection'] = {'profile': 'slab_interior'}
+    monkeypatch.setattr(pipeline, '_recognize_bytes_once', lambda data, **kwargs: item)
+    labels = []
+    card = SimpleNamespace(read_grading=lambda image: labels.append(image.size) or GradingEvidence(slab_detected=True))
+    rt = SimpleNamespace(ocr=card, require=lambda: (None, None, card))
+    result = pipeline.recognize_bytes(b'test', settings=Settings(_env_file=None,
+        grading_requires_client_hint=True), runtime=rt, catalog=None, results=None,
+        session_id='test', skip_detect=True)
+    assert labels == [(60, 90)] and result.grading.slab_detected
