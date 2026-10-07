@@ -26,12 +26,20 @@ class Settings(BaseSettings):
     parallel_grading: bool = False
     # Return at card completion; unfinished/unidentified grading defaults Raw.
     grading_at_card_deadline: bool = False
+    # Label OCR competes with card OCR for CPU. When on, grade only uploads
+    # whose client sent graded=true. Off, the hint is ignored and logged so a
+    # rollout can compare it with what grading found.
+    grading_requires_client_hint: bool = False
     # Retrieval windows may omit metadata. Try the supplied card-shaped frame
     # for OCR first, without changing the visual/artwork retrieval crop.
     ocr_complete_frame_first: bool = False
     # Keep initial OCR unchanged; omit optional footer retries only for a
     # strongly supported, reviewable identity. Never certify its printing.
     ocr_adaptive_footer: bool = False
+    # Requires ocr_adaptive_footer. Read only the title strip when the visual
+    # leader has exactly one same-art printing and both visual streams agree.
+    # A policy change: replay the frozen panel before enabling it.
+    ocr_title_only_single_printing: bool = False
     # One isolated footer reader overlaps initial title/footer inference.
     # Its auxiliary CPU lane is shared with optional grading, not added to it.
     ocr_parallel_regions: bool = False

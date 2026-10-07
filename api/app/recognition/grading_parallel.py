@@ -79,9 +79,22 @@ class GradingJob:
                 pass
 
 
+def grading_requested(settings, graded: bool | None) -> bool:
+    """Hints only matter once GRADING_REQUIRES_CLIENT_HINT is on.
+
+    Until then every scan is graded as before, so a rollout can compare the
+    client's guess with what grading actually found.
+    """
+    if not getattr(settings, 'grading_requires_client_hint', False):
+        return True
+    return bool(graded)
+
+
 def parallel_grading_scope(recognize):
     @wraps(recognize)
     def scoped(data, *, settings, runtime, **kwargs):
+        if not grading_requested(settings, kwargs.get('graded')):
+            return recognize(data, settings=settings, runtime=runtime, **kwargs)
         reader = getattr(runtime, 'grading_ocr', None)
         executor = getattr(runtime, 'grading_executor', None)
         deadline = getattr(settings, 'grading_at_card_deadline', False)

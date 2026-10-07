@@ -34,10 +34,11 @@ from app.recognition.language import confident_language_texts, expand_language, 
 from app.recognition.ocr import OcrResult, inverted_card_layout
 from app.recognition.ocr_framing import complete_frame_probe_allowed, complete_frame_identity_supported, normalize_complete_frame_footer
 from app.recognition.ocr_cache import RequestOcrCache
-from app.recognition.ocr_budget import footer_retry_required, VERSION as OCR_BUDGET_VERSION
+from app.recognition.ocr_budget import (footer_retry_required, title_only_allowed,
+    title_only_confirmed, VERSION as OCR_BUDGET_VERSION)
 from app.recognition.stamp_printing import stamp_printing_hint
 from app.recognition.grading import VERSION as GRADING_VERSION
-from app.recognition.grading_parallel import GradingJob, parallel_grading_scope
+from app.recognition.grading_parallel import GradingJob, grading_requested, parallel_grading_scope
 from app.recognition.holder_printing import holder_printing_hint
 from app.recognition.orientation import retrieve_oriented
 from app.recognition.printing import PrintingDecision, assess_printings
@@ -194,14 +195,36 @@ def _recognize_bytes_once(
         full_candidates = [dict(card_id=str(snapshot.card_ids[i]), name=rows[str(snapshot.card_ids[i])]['name'],
                                 visual_score=float(score))
             for i, score in zip(indices, scores) if str(snapshot.card_ids[i]) in rows]
+    title_only = False
+    printing_index = getattr(runtime, 'printing_index', None)
+    title_only_enabled = bool(getattr(settings, 'ocr_title_only_single_printing', False))
+    if full_candidates and printing_index is not None and title_only_enabled:
+        # Same-art reprints are the only reason to read the collector number
+        # for identity. A lone, complete printing with strong agreeing visual
+        # evidence reads its title only; any doubt reads the footer as before.
+        lead = dict(rows[full_candidates[0]['card_id']])
+        lead['card_id'] = full_candidates[0]['card_id']
+        lead_family, lead_incomplete = printing_index.family(catalog, lead)
+        title_only = title_only_allowed(full_candidates, artwork_hits, lead_family,
+            family_incomplete=lead_incomplete, image_size=image.size)
+    if title_only_enabled:
+        frame_selection['ocr_title_only'] = 'skipped_footer' if title_only else 'not_eligible'
     ocr = OcrResult(failed=True)
     ocr_passes = []
     ocr_cache_hits = []
     def read_card(frame, scope):
         options = {}
         if adaptive_footer and scope == 'selected' and frame is artwork_image:
+            if title_only:
+                observed = read_card_with(frame, scope, read_footer=False)
+                if title_only_confirmed(observed, full_candidates[0]['name']):
+                    return observed
+                # The title disagrees or is weak: gather complete evidence.
+                frame_selection['ocr_title_only'] = 'footer_fallback'
             options['collector_retry_policy'] = lambda observed: footer_retry_required(
                 observed, full_candidates, artwork_hits, image_size=frame.size)
+        return read_card_with(frame, scope, **options)
+    def read_card_with(frame, scope, **options):
         observed, cached = (_ocr_cache.read(ocr_engine, frame, **options) if _ocr_cache is not None
                             else (ocr_engine.read(frame, **options), False))
         if cached:
@@ -284,6 +307,7 @@ def _recognize_bytes_once(
     timings["ocr_ms"] = (time.perf_counter() - mark) * 1000
     timings['ocr_passes_count'] = float(len(ocr_passes))
     timings['ocr_footer_retry_skipped'] = float(ocr.collector_retry_skipped)
+    timings['ocr_footer_skipped'] = float(ocr.footer_skipped)
     if artwork_index is not None and not retake and image is not artwork_image:
         artwork_hits, artwork_timings = artwork_index.search(
             image, embedder, mode=settings.preprocess_config,
@@ -667,6 +691,8 @@ def _recognize_bytes_once(
         confidence.reasons.append('stamp_display_hint_printing_unconfirmed')
     if ocr.collector_retry_skipped:
         confidence.reasons.append('optional_footer_retry_skipped_printing_unconfirmed')
+    if ocr.footer_skipped:
+        confidence.reasons.append('footer_ocr_skipped_single_printing')
     ocr_payload = {
         "name_text": ocr.name_text,
         "collector_text": ocr.collector_text,
@@ -817,6 +843,7 @@ def recognize_bytes(
     skip_detect: bool = False,
     language: str = "auto",
     store_capture: bool | None = None,
+    graded: bool | None = None,
     _grading_job: GradingJob | None = None,
 ) -> ScanResponse:
     """Evaluate first, then persist exactly one result and optional capture.
@@ -924,7 +951,26 @@ def recognize_bytes(
                else GradingEvidence(warnings=['grading_detection_disabled']))
     grading_ready = bool(_grading_job is not None and _grading_job.future is not None
                          and _grading_job.future.done())
-    if getattr(settings, 'use_grading', True) and getattr(settings, 'use_ocr', True):
+    if not grading_requested(settings, graded):
+        # The client says no slab, or no hint arrived while hints are
+        # required. Skip label OCR unless card OCR itself already read holder
+        # label text: a slab the client missed must not lose its grade.
+        grading = GradingEvidence(is_graded=False, grading_status='ungraded',
+                                  warnings=['grading_not_requested'])
+        label_seen = (any(h.region in ('holder_name', 'holder_collector')
+                          for ev in (first, selected) for h in ev.ocr.hits)
+                      or any(str((ev.evidence.get('frame_selection') or {}).get('profile', ''))
+                             .startswith('slab_') for ev in (first, selected)))
+        if (label_seen and getattr(settings, 'use_grading', True)
+                and getattr(settings, 'use_ocr', True)):
+            _, _, label_engine = runtime.require()
+            if label_engine is not None and hasattr(label_engine, 'read_grading'):
+                try:
+                    grading = label_engine.read_grading(first.input_image)
+                    selected.timings['grading_safety_net'] = 1.
+                except Exception:  # noqa: BLE001 - keep the plain ungraded result
+                    logging.getLogger(__name__).exception('Safety-net grading failed for scan %s', selected.response.id)
+    elif getattr(settings, 'use_grading', True) and getattr(settings, 'use_ocr', True):
         _, _, label_engine = runtime.require()
         if deadline:
             if grading_ready:
@@ -947,6 +993,10 @@ def recognize_bytes(
                 grading = GradingEvidence(warnings=['grading_ocr_failed'])
         else:
             grading = GradingEvidence(warnings=['grading_ocr_unavailable'])
+    logging.getLogger('scan.diagnostics').info(
+        'grading_hint scan_id=%s hint=%s requested=%s company=%s slab=%s',
+        selected.response.id, graded, grading_requested(settings, graded),
+        grading.company, grading.slab_detected)
     selected.response.grading = grading
     selected.evidence['grading'] = grading.model_dump(mode='json')
     selected.evidence['grading_version'] = GRADING_VERSION
