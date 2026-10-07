@@ -15,7 +15,7 @@ from app.schemas import GradingEvidence, ScanStatus
 
 
 @pytest.mark.parametrize('requires,graded,expected', [
-    (False, None, True), (False, True, True), (False, False, False),
+    (False, None, True), (False, True, True), (False, False, True),
     (True, None, False), (True, True, True), (True, False, False)])
 def test_client_hint_decides_grading(requires, graded, expected):
     settings = Settings(_env_file=None, grading_requires_client_hint=requires)
@@ -57,7 +57,7 @@ def scan(monkeypatch, *, graded, requires=False):
     return result, observed, labels, saved
 
 
-@pytest.mark.parametrize('graded,requires', [(False, False), (None, True), (False, True)])
+@pytest.mark.parametrize('graded,requires', [(None, True), (False, True)])
 def test_unrequested_grading_never_starts_label_ocr(monkeypatch, graded, requires):
     result, observed, labels, saved = scan(monkeypatch, graded=graded, requires=requires)
     assert observed['observer'] is None and labels == []
@@ -66,7 +66,7 @@ def test_unrequested_grading_never_starts_label_ocr(monkeypatch, graded, require
     assert saved == [result.grading.model_dump()]
 
 
-@pytest.mark.parametrize('graded,requires', [(None, False), (True, True)])
+@pytest.mark.parametrize('graded,requires', [(None, False), (False, False), (True, True)])
 def test_requested_grading_keeps_the_parallel_label_read(monkeypatch, graded, requires):
     result, observed, labels, _ = scan(monkeypatch, graded=graded, requires=requires)
     assert observed['observer'] is not None and labels == [(60, 90)]
@@ -220,8 +220,9 @@ def test_label_text_seen_by_card_ocr_overrides_a_missing_hint(monkeypatch):
         return GradingEvidence(company='psa', grade=10, is_graded=True, grading_status='graded')
     card = SimpleNamespace(read_grading=grade)
     rt = SimpleNamespace(ocr=card, require=lambda: (None, None, card))
-    result = pipeline.recognize_bytes(b'test', settings=Settings(_env_file=None),
-        runtime=rt, catalog=None, results=None, session_id='test', skip_detect=True, graded=False)
+    result = pipeline.recognize_bytes(b'test', settings=Settings(_env_file=None,
+        grading_requires_client_hint=True), runtime=rt, catalog=None, results=None,
+        session_id='test', skip_detect=True, graded=False)
     assert labels == [(60, 90)] and result.grading.company == 'psa'
     assert result.timings_ms['grading_safety_net'] == 1.
 
@@ -231,6 +232,7 @@ def test_no_label_text_keeps_grading_skipped(monkeypatch):
     monkeypatch.setattr(pipeline, '_recognize_bytes_once', lambda data, **kwargs: item)
     card = SimpleNamespace(read_grading=lambda image: pytest.fail('Must not read the label'))
     rt = SimpleNamespace(ocr=card, require=lambda: (None, None, card))
-    result = pipeline.recognize_bytes(b'test', settings=Settings(_env_file=None),
-        runtime=rt, catalog=None, results=None, session_id='test', skip_detect=True, graded=False)
+    result = pipeline.recognize_bytes(b'test', settings=Settings(_env_file=None,
+        grading_requires_client_hint=True), runtime=rt, catalog=None, results=None,
+        session_id='test', skip_detect=True, graded=False)
     assert result.grading.warnings == ['grading_not_requested']

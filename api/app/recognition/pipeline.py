@@ -991,6 +991,10 @@ def recognize_bytes(
                 grading = GradingEvidence(warnings=['grading_ocr_failed'])
         else:
             grading = GradingEvidence(warnings=['grading_ocr_unavailable'])
+    logging.getLogger('scan.diagnostics').info(
+        'grading_hint scan_id=%s hint=%s requested=%s company=%s slab=%s',
+        selected.response.id, graded, grading_requested(settings, graded),
+        grading.company, grading.slab_detected)
     selected.response.grading = grading
     selected.evidence['grading'] = grading.model_dump(mode='json')
     selected.evidence['grading_version'] = GRADING_VERSION

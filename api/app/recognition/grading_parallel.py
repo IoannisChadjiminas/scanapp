@@ -80,10 +80,14 @@ class GradingJob:
 
 
 def grading_requested(settings, graded: bool | None) -> bool:
-    """A client's explicit "not graded" wins; no hint follows the setting."""
-    if graded is not None:
-        return graded
-    return not getattr(settings, 'grading_requires_client_hint', False)
+    """Hints only matter once GRADING_REQUIRES_CLIENT_HINT is on.
+
+    Until then every scan is graded as before, so a rollout can compare the
+    client's guess with what grading actually found.
+    """
+    if not getattr(settings, 'grading_requires_client_hint', False):
+        return True
+    return bool(graded)
 
 
 def parallel_grading_scope(recognize):

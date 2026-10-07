@@ -27,8 +27,8 @@ class Settings(BaseSettings):
     # Return at card completion; unfinished/unidentified grading defaults Raw.
     grading_at_card_deadline: bool = False
     # Label OCR competes with card OCR for CPU. When on, grade only uploads
-    # whose client says a slab may be present (graded=true). An explicit
-    # graded=false always skips grading, whatever this setting says.
+    # whose client sent graded=true. Off, the hint is ignored and logged so a
+    # rollout can compare it with what grading found.
     grading_requires_client_hint: bool = False
     # Retrieval windows may omit metadata. Try the supplied card-shaped frame
     # for OCR first, without changing the visual/artwork retrieval crop.
