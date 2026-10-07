@@ -97,6 +97,8 @@ class Settings(BaseSettings):
     # Phone photo prep, sent through GET /config. Defaults match the app today.
     app_capture_preset: str = 'max'
     app_jpeg_quality: int = 95
+    # Longest side of the photo the app uploads, in pixels.
+    app_max_edge: int = 2000
     app_native_codec: bool = False
     # Tell the phone to find and flatten the card before upload.
     app_card_warp: bool = False

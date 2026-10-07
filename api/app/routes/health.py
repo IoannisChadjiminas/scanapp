@@ -30,6 +30,7 @@ CAPTURE_PRESETS = ('max', 'ultraHigh', 'veryHigh', 'high')
 class CaptureConfig(BaseModel):
     preset: str = 'max'
     jpeg_quality: int = 95
+    max_edge: int = 2000
     native_codec: bool = False
 
 
@@ -57,6 +58,7 @@ def scan_price_config(settings) -> AppConfigResponse:
         capture=CaptureConfig(
             preset=settings.app_capture_preset if settings.app_capture_preset in CAPTURE_PRESETS else 'max',
             jpeg_quality=max(50, min(int(settings.app_jpeg_quality), 100)),
+            max_edge=max(800, min(int(settings.app_max_edge), 4000)),
             native_codec=bool(settings.app_native_codec),
         ),
         scan_prices=ScanPriceConfig(
