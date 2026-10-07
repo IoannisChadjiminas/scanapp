@@ -42,7 +42,7 @@ from app.recognition.grading_parallel import GradingJob, grading_requested, para
 from app.recognition.holder_printing import holder_printing_hint
 from app.recognition.orientation import retrieve_oriented
 from app.recognition.printing import PrintingDecision, assess_printings
-from app.recognition.rank import artwork_evidence_compatible, decide_status, extract_collector_candidates, fraction_named_printing, rerank
+from app.recognition.rank import artwork_evidence_compatible, decide_status, damaged_footer_named_printing, extract_collector_candidates, fraction_named_printing, rerank
 from app.recognition.rank import name_match
 from app.recognition.runtime import Runtime
 from app.schemas import (
@@ -647,6 +647,9 @@ def _recognize_bytes_once(
         except (OSError, ValueError, KeyError, cv2.error):
             logging.getLogger(__name__).exception('Optional stamp ordering failed')
         named = fraction_named_printing(combined, printing.members, numbers)
+        damaged_order = bool(getattr(settings, 'ocr_damaged_footer_order', False))
+        if not named and damaged_order and not stamp_hint:
+            named = damaged_footer_named_printing(combined, printing.members, ocr.hits)
         if named:
             combined.sort(key=lambda row: row.get('card_id') == named, reverse=True)
             if combined:
@@ -730,7 +733,9 @@ def _recognize_bytes_once(
     versions = runtime.versions()
     versions['presentation'] = 'best-match-v1'
     versions['stamp_ordering'] = 'play-stamp-review-v1'
-    versions['unproven_printing_order'] = 'visual-leader-v1'
+    versions['unproven_printing_order'] = (
+        'visual-leader-v1+damaged-footer' if getattr(settings, 'ocr_damaged_footer_order', False)
+        else 'visual-leader-v1')
     versions['ocr_cache'] = 'request-pixels-v1'
     if adaptive_footer:
         versions['ocr_budget'] = OCR_BUDGET_VERSION

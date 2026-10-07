@@ -271,6 +271,68 @@ def fraction_named_printing(ranked: list[dict[str, Any]], members, hits) -> str 
     return str(matched[0].get('card_id'))
 
 
+# Characters the footer reader confuses with digits when they sit inside a number.
+LOOKALIKE_DIGITS = {'Z': '7', 'O': '0', 'I': '1', 'L': '1', 'S': '5', 'B': '8'}
+_DAMAGED_FRACTION_RE = re.compile(r'^[A-Z]{0,4}([0-9A-Z]{1,5})/([0-9A-Z]{1,5})$')
+
+
+def _damaged_fraction(text: str) -> tuple[str, str] | None:
+    """Digits of a footer fraction that holds look-alike letters, else None.
+
+    A clean read returns None so it stays with the normal matcher.
+    """
+    match = _DAMAGED_FRACTION_RE.fullmatch((text or '').replace(' ', '').upper())
+    if not match:
+        return None
+    parts, damaged = [], False
+    for part in match.groups():
+        digits = ''
+        for position, char in enumerate(part):
+            if char.isdigit():
+                digits += char
+            elif char in LOOKALIKE_DIGITS and position > 0:
+                digits += LOOKALIKE_DIGITS[char]
+                damaged = True
+            else:
+                return None
+        parts.append(digits)
+    return (parts[0], parts[1]) if damaged else None
+
+
+def _fits_damaged_fraction(read: tuple[str, str], identifier: str) -> bool:
+    expected = re.fullmatch(r'[A-Za-z]{0,4}(\d{1,4})(?:[A-Za-z])?(?:/(\d{1,4}))?', identifier.replace(' ', ''))
+    if not expected:
+        return False
+    number, denominator = read
+    width = max(len(number), len(expected.group(1)))
+    if number.zfill(width) != expected.group(1).zfill(width):
+        return False
+    if expected.group(2) is None:
+        return False
+    # The denominator can lose its last digit: "03" against 034.
+    printed, got = expected.group(2), denominator
+    return got.lstrip('0') == printed.lstrip('0') or (len(got) >= 2 and printed.startswith(got))
+
+
+def damaged_footer_named_printing(ranked: list[dict[str, Any]], members, hits) -> str | None:
+    """Show the one printing that fits a footer fraction read with look-alike characters.
+
+    Used only when a printing group is unproven. Zero or several fitting
+    printings leave the order alone; this never confirms a printing.
+    """
+    reads = [read for hit in hits if isinstance(hit, OcrHit) and hit.region == 'collector'
+             and hit.confidence is not None and hit.confidence >= .85
+             and (read := _damaged_fraction(hit.text))]
+    if len(reads) != 1 or not ranked:
+        return None
+    rows = [row for row in (members or ranked) if row.get('card_id')]
+    fitting = [row for row in rows if any(_fits_damaged_fraction(reads[0], number)
+                                          for number in accepted_collector_numbers(row))]
+    if len(fitting) != 1 or fitting[0].get('card_id') == ranked[0].get('card_id'):
+        return None
+    return str(fitting[0].get('card_id'))
+
+
 def accepted_collector_numbers(item: dict[str, Any]) -> list[str]:
     numbers = [str(item.get("collector_number") or "")]
     printed = str(item.get("printed_collector_number") or "")
