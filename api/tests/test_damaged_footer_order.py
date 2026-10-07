@@ -47,3 +47,17 @@ def test_weak_or_non_footer_reads_are_ignored():
 
 def test_one_digit_cannot_match_a_different_number():
     assert damaged_footer_named_printing([GYARADOS[1], GYARADOS[0]], GYARADOS, [footer('00z/034')]) is None
+
+
+def test_card_without_a_printed_total_fits_by_its_padded_number():
+    # As staging returns them: Classic Collection has no printed total on record.
+    members = [row('en:hgss1-4', '4'), row('en:A1-078', '078'), row('en:CLB-007', '007')]
+    assert damaged_footer_named_printing(members, members, [footer('C00z/03')]) == 'en:CLB-007'
+
+
+def test_unpadded_or_single_digit_numbers_without_a_total_do_not_fit():
+    members = [row('en:hgss1-4', '4'), row('en:other-7', '7')]
+    assert damaged_footer_named_printing(members, members, [footer('C00z/03')]) is None
+    assert damaged_footer_named_printing(members, members, [footer('z/03')]) is None
+    twins = [row('en:hgss1-4', '4'), row('a', '007'), row('b', '007')]
+    assert damaged_footer_named_printing(twins, twins, [footer('C00z/03')]) is None
