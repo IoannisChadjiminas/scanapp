@@ -195,9 +195,14 @@ def _recognize_bytes_once(
     if frame_selection.get('profile') == 'as_supplied' or inferred_frame:
         detected = False
     timings.update(orientation_timings)
-    blur = blur_variance(image)
+    blur = blur_variance(image, settings.threshold_blur_edge)
     too_small = min(image.size) < settings.threshold_min_side
     too_blurry = blur < settings.threshold_blur
+    if too_blurry and image is not input_image:
+        # A soft patch of card art or a mis-chosen frame must not condemn a
+        # photo that is sharp as a whole.
+        if blur_variance(input_image, settings.threshold_blur_edge) >= settings.threshold_blur:
+            too_blurry = False
     retake = too_small or too_blurry
     if (_progress_observer is not None and not retake and len(scores)
             and float(scores[0]) >= settings.threshold_min_visual):
