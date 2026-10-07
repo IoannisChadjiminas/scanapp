@@ -132,16 +132,21 @@ def replace_portfolio(conn, session_id: str, products: list[tuple[str, str]]) ->
         (session_id,),
     )
     if kept:
-        conn.executemany(
-            statement(
-                conn,
-                """
-                INSERT INTO portfolio_products (session_id, sample_key, opened_at)
-                VALUES (?, ?, ?)
-                """,
-            ),
-            [(session_id, key, opened) for key, opened in kept],
-        )
+        # psycopg connections have no executemany; both drivers' cursors do.
+        cursor = conn.cursor()
+        try:
+            cursor.executemany(
+                statement(
+                    conn,
+                    """
+                    INSERT INTO portfolio_products (session_id, sample_key, opened_at)
+                    VALUES (?, ?, ?)
+                    """,
+                ),
+                [(session_id, key, opened) for key, opened in kept],
+            )
+        finally:
+            cursor.close()
     conn.commit()
     return len(kept)
 
