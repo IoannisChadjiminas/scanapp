@@ -86,6 +86,9 @@ class Settings(BaseSettings):
     daily_browsers: int = 1
     photo_scrape_active: bool = False
     config_ttl_s: int = 600
+    # Tell the phone (GET /config) to look for a graded slab on each photo and
+    # send graded=true/false. Off until switched on here, no app rebuild.
+    app_slab_detection: bool = False
     scan_price_start_on_provisional: bool = True
     scan_price_candidate_reads: int = 2
     scan_price_warm_reader: bool = True

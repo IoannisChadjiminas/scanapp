@@ -27,6 +27,7 @@ class ScanPriceConfig(BaseModel):
 class AppConfigResponse(BaseModel):
     price_fresh_minutes: int
     config_ttl_s: int
+    slab_detection: bool = False
     scan_prices: ScanPriceConfig
 
 
@@ -40,6 +41,7 @@ def scan_price_config(settings) -> AppConfigResponse:
     return AppConfigResponse(
         price_fresh_minutes=max(1, min(minutes, 24 * 60)),
         config_ttl_s=max(30, min(ttl, 24 * 60 * 60)),
+        slab_detection=bool(settings.app_slab_detection),
         scan_prices=ScanPriceConfig(
             start_on_provisional=bool(settings.scan_price_start_on_provisional),
             candidate_reads=settings.scan_candidate_reads(),
