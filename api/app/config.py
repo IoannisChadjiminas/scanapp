@@ -192,7 +192,10 @@ class Settings(BaseSettings):
     threshold_min_visual: float = Field(default=0.78)
     threshold_min_visual_ocr: float = Field(default=0.70)
     threshold_min_gap: float = Field(default=0.04)
-    threshold_blur: float = Field(default=28.0)
+    threshold_blur: float = Field(default=40.0)
+    # Sharpness is measured on a copy shrunk to this long edge (0 = as supplied) so it
+    # does not depend on how large the phone's upload was; the limit is for that size.
+    threshold_blur_edge: int = Field(default=1000)
     threshold_min_side: int = Field(default=180)
 
 

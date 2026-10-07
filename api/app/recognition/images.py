@@ -81,6 +81,13 @@ def apply_crop(
     return result.crop((left, top, right, bottom))
 
 
-def blur_variance(image: Image.Image) -> float:
+def blur_variance(image: Image.Image, edge: int = 0) -> float:
+    """Laplacian variance; with ``edge`` the long side is first shrunk to it so
+    the score does not depend on how large the phone's upload was."""
     gray = cv2.cvtColor(np.asarray(image), cv2.COLOR_RGB2GRAY)
+    long_side = max(gray.shape[:2])
+    if edge > 0 and long_side > edge:
+        scale = edge / long_side
+        gray = cv2.resize(gray, (max(1, round(gray.shape[1] * scale)), max(1, round(gray.shape[0] * scale))),
+                          interpolation=cv2.INTER_AREA)
     return float(cv2.Laplacian(gray, cv2.CV_64F).var())
