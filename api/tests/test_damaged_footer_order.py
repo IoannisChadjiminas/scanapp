@@ -61,3 +61,9 @@ def test_unpadded_or_single_digit_numbers_without_a_total_do_not_fit():
     assert damaged_footer_named_printing(members, members, [footer('z/03')]) is None
     twins = [row('en:hgss1-4', '4'), row('a', '007'), row('b', '007')]
     assert damaged_footer_named_printing(twins, twins, [footer('C00z/03')]) is None
+
+
+def test_damaged_reads_are_trusted_from_the_server_reliable_level():
+    gyarados = [row('en:hgss1-4', '4'), row('en:CLB-007', '007')]
+    assert damaged_footer_named_printing(gyarados, gyarados, [footer('C00z/03', 0.62)]) == 'en:CLB-007'
+    assert damaged_footer_named_printing(gyarados, gyarados, [footer('C00z/03', 0.54)]) is None
