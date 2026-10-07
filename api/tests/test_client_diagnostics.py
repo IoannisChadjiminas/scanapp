@@ -53,3 +53,17 @@ def test_phone_encode_event_keeps_quality_and_codec():
     lines = phone_diagnostic_lines({"events": [{"event": "encode.done", "scan": "s1", "elapsed_ms": 410,
                                                 "bytes": 812345, "quality": 85, "codec": "native"}]})
     assert lines == ["phone event=encode.done scan=s1 elapsed_ms=410 bytes=812345 quality=85 codec=native"]
+
+
+def test_outline_stats_are_kept():
+    lines = phone_diagnostic_lines({"events": [{
+        "event": "outline.stats", "frames": 42, "found": 30, "fps": 5.3, "detect_ms": 3.4,
+    }]})
+    assert lines == ["phone event=outline.stats frames=42 found=30 fps=5.3 detect_ms=3.4"]
+
+
+def test_outline_numbers_reject_text_and_flags():
+    lines = phone_diagnostic_lines({"events": [{
+        "event": "outline.stats", "fps": "fast", "detect_ms": True, "frames": 1.5,
+    }]})
+    assert lines == ["phone event=outline.stats"]
