@@ -101,7 +101,9 @@ class Settings(BaseSettings):
     app_max_edge: int = 2000
     app_native_codec: bool = False
     # Outline the card live in the camera view (iPhone; others keep the guide).
-    app_live_outline: bool = False
+    app_live_outline: bool = True
+    # Take the photo by itself once the live outline locks on (needs app_live_outline).
+    app_auto_capture: bool = True
     # Tell the phone to find and flatten the card before upload.
     app_card_warp: bool = False
     # Honour skip_detect from the phone. Off: the server still runs its own

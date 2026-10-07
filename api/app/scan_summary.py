@@ -24,6 +24,7 @@ SWITCHES = (
     'app_card_warp',
     'app_native_codec',
     'app_live_outline',
+    'app_auto_capture',
     'trust_client_warp',
 )
 
