@@ -323,7 +323,7 @@ def damaged_footer_named_printing(ranked: list[dict[str, Any]], members, hits) -
     printings leave the order alone; this never confirms a printing.
     """
     reads = [read for hit in hits if isinstance(hit, OcrHit) and hit.region == 'collector'
-             and hit.confidence is not None and hit.confidence >= .85
+             and hit.confidence is not None and hit.confidence >= RELIABLE_COLLECTOR_CONF
              and (read := _damaged_fraction(hit.text))]
     if len(reads) != 1 or not ranked:
         return None
