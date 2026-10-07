@@ -47,3 +47,9 @@ def test_phone_events_reject_a_huge_batch():
         assert "short list" in str(exc)
     else:
         raise AssertionError("expected a short-list rejection")
+
+
+def test_phone_encode_event_keeps_quality_and_codec():
+    lines = phone_diagnostic_lines({"events": [{"event": "encode.done", "scan": "s1", "elapsed_ms": 410,
+                                                "bytes": 812345, "quality": 85, "codec": "native"}]})
+    assert lines == ["phone event=encode.done scan=s1 elapsed_ms=410 bytes=812345 quality=85 codec=native"]
