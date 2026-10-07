@@ -953,9 +953,21 @@ def recognize_bytes(
                          and _grading_job.future.done())
     if not grading_requested(settings, graded):
         # The client says no slab, or no hint arrived while hints are
-        # required. Never spend label OCR; the user can still mark a grade.
+        # required. Skip label OCR unless card OCR itself already read holder
+        # label text: a slab the client missed must not lose its grade.
         grading = GradingEvidence(is_graded=False, grading_status='ungraded',
                                   warnings=['grading_not_requested'])
+        label_seen = any(h.region in ('holder_name', 'holder_collector')
+                         for ev in (first, selected) for h in ev.ocr.hits)
+        if (label_seen and getattr(settings, 'use_grading', True)
+                and getattr(settings, 'use_ocr', True)):
+            _, _, label_engine = runtime.require()
+            if label_engine is not None and hasattr(label_engine, 'read_grading'):
+                try:
+                    grading = label_engine.read_grading(first.input_image)
+                    selected.timings['grading_safety_net'] = 1.
+                except Exception:  # noqa: BLE001 - keep the plain ungraded result
+                    logging.getLogger(__name__).exception('Safety-net grading failed for scan %s', selected.response.id)
     elif getattr(settings, 'use_grading', True) and getattr(settings, 'use_ocr', True):
         _, _, label_engine = runtime.require()
         if deadline:

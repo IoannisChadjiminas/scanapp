@@ -208,3 +208,29 @@ def test_pipeline_reads_the_footer_for_same_art_reprints(tmp_path, monkeypatch):
     response, regions = run_pipeline(tmp_path, monkeypatch, title='Toxel',
         members=[{}, dict(id='reprint', set_id='cel', set_name='Celebrations')])
     assert len(regions) == 2 and response.timings_ms['ocr_footer_skipped'] == 0.
+
+
+def test_label_text_seen_by_card_ocr_overrides_a_missing_hint(monkeypatch):
+    item, saved = evaluation()
+    item.ocr = OcrResult(hits=[OcrHit('PSA 10', .99, 'holder_name')])
+    monkeypatch.setattr(pipeline, '_recognize_bytes_once', lambda data, **kwargs: item)
+    labels = []
+    def grade(image):
+        labels.append(image.size)
+        return GradingEvidence(company='psa', grade=10, is_graded=True, grading_status='graded')
+    card = SimpleNamespace(read_grading=grade)
+    rt = SimpleNamespace(ocr=card, require=lambda: (None, None, card))
+    result = pipeline.recognize_bytes(b'test', settings=Settings(_env_file=None),
+        runtime=rt, catalog=None, results=None, session_id='test', skip_detect=True, graded=False)
+    assert labels == [(60, 90)] and result.grading.company == 'psa'
+    assert result.timings_ms['grading_safety_net'] == 1.
+
+
+def test_no_label_text_keeps_grading_skipped(monkeypatch):
+    item, _ = evaluation()
+    monkeypatch.setattr(pipeline, '_recognize_bytes_once', lambda data, **kwargs: item)
+    card = SimpleNamespace(read_grading=lambda image: pytest.fail('Must not read the label'))
+    rt = SimpleNamespace(ocr=card, require=lambda: (None, None, card))
+    result = pipeline.recognize_bytes(b'test', settings=Settings(_env_file=None),
+        runtime=rt, catalog=None, results=None, session_id='test', skip_detect=True, graded=False)
+    assert result.grading.warnings == ['grading_not_requested']
