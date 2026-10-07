@@ -40,6 +40,9 @@ class Settings(BaseSettings):
     # leader has exactly one same-art printing and both visual streams agree.
     # A policy change: replay the frozen panel before enabling it.
     ocr_title_only_single_printing: bool = False
+    # Order an unproven printing group by a footer fraction read with look-alike
+    # characters ("00z/03" for 007/034). Reorders only; never confirms a printing.
+    ocr_damaged_footer_order: bool = False
     # One isolated footer reader overlaps initial title/footer inference.
     # Its auxiliary CPU lane is shared with optional grading, not added to it.
     ocr_parallel_regions: bool = False

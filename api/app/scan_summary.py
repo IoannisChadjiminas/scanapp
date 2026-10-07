@@ -14,6 +14,7 @@ SWITCHES = (
     'scan_stream_results',
     'grading_requires_client_hint',
     'ocr_title_only_single_printing',
+    'ocr_damaged_footer_order',
     'ocr_complete_frame_first',
     'ocr_adaptive_footer',
     'ocr_parallel_regions',
