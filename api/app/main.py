@@ -120,6 +120,8 @@ async def lifespan(app: FastAPI):
         if worker is not None:
             worker.stop()
         bind_loop(None)
+        from app.recognition.progress import drain_scan_streams
+        await drain_scan_streams()
         app.state.executor.shutdown(wait=False, cancel_futures=True)
         app.state.image_executor.shutdown(wait=False, cancel_futures=True)
         runtime.close()

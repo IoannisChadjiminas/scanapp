@@ -109,6 +109,7 @@ def _recognize_bytes_once(
     store_capture: bool | None = None,
     _frame_override: tuple[str, Any] | None = None,
     _input_observer: Callable | None = None,
+    _progress_observer: Callable | None = None,
     _ocr_cache: RequestOcrCache | None = None,
 ) -> _ScanEvaluation:
     started = time.perf_counter()
@@ -176,6 +177,25 @@ def _recognize_bytes_once(
     too_small = min(image.size) < settings.threshold_min_side
     too_blurry = blur < settings.threshold_blur
     retake = too_small or too_blurry
+    if (_progress_observer is not None and not retake and len(scores)
+            and float(scores[0]) >= settings.threshold_min_visual):
+        # Weak visual neighbours must wait for the OCR-assisted rescue. A
+        # preview is not a way to expose below-threshold guesses as a match.
+        preview_ids = [str(snapshot.card_ids[i]) for i, score in zip(indices, scores)
+                       if float(score) >= settings.threshold_min_visual_ocr][:3]
+        preview_rows = _lookup_cards(catalog, preview_ids)
+        previews = [dict(card_id=cid, name=preview_rows[cid]['name'],
+                         image_url=_card_image_url(preview_rows[cid]))
+                    for cid in preview_ids if cid in preview_rows]
+        if previews:
+            try:
+                _progress_observer(dict(candidates=previews, provisional=True,
+                    printing_confirmed=False, requires_confirmation=True,
+                    elapsed_ms=round((time.perf_counter()-started)*1000, 2)))
+            except Exception as error:
+                # Optional UI progress cannot change recognition or its evidence.
+                logging.getLogger('scan.diagnostics').warning(
+                    'scan_preview_failed error_type=%s', type(error).__name__)
     artwork_hits = []
     artwork_index = getattr(runtime, "artwork_index", None)
     adaptive_footer = bool(getattr(settings, 'ocr_adaptive_footer', False))
@@ -845,6 +865,7 @@ def recognize_bytes(
     store_capture: bool | None = None,
     graded: bool | None = None,
     _grading_job: GradingJob | None = None,
+    _progress_observer: Callable | None = None,
 ) -> ScanResponse:
     """Evaluate first, then persist exactly one result and optional capture.
 
@@ -860,6 +881,8 @@ def recognize_bytes(
                   crop_y=crop_y, crop_w=crop_w, crop_h=crop_h, rotation=rotation,
                   skip_detect=skip_detect, language=language, store_capture=store_capture)
     kwargs['_ocr_cache'] = ocr_cache
+    if _progress_observer is not None:
+        kwargs['_progress_observer'] = _progress_observer
     if _grading_job is not None:
         kwargs['_input_observer'] = _grading_job.start
     first = _recognize_bytes_once(data, **kwargs)

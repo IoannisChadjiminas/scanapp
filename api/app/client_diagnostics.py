@@ -8,8 +8,8 @@ from typing import Any
 
 _TOKEN = re.compile(r"^[A-Za-z0-9._:-]{1,80}$")
 _EVENT = re.compile(r"^[a-zA-Z0-9._-]{1,64}$")
-_INT_KEYS = {"status", "elapsed_ms", "bytes", "queued", "entries"}
-_TEXT_KEYS = {"route", "host", "cf_ray", "server_trace", "language", "server_scan", "error_type", "state", "scan"}
+_INT_KEYS = {"status", "elapsed_ms", "bytes", "queued", "entries", "quality"}
+_TEXT_KEYS = {"route", "host", "cf_ray", "server_trace", "language", "server_scan", "error_type", "state", "scan", "codec"}
 _MAX_EVENTS = 40
 _MAX_TIMINGS = 40
 
@@ -53,6 +53,8 @@ def _event_line(item: Any) -> str | None:
         "cf_ray",
         "server_trace",
         "cancelled",
+        "quality",
+        "codec",
     ):
         value = _scalar(key, item.get(key))
         if value is not None:
