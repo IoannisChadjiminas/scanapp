@@ -17,7 +17,9 @@ from app.recognition.images import ImageError
 from app.recognition.captures import apply_feedback
 from app.recognition.pipeline import recognize_bytes
 from app.recognition.presentation import match_presentation
+from app.recognition.progress import scan_stream
 from app.recognition.upload import read_upload_limited
+from app.scan_summary import scan_flags, scan_outcome_line, scan_summary_line
 from app.schemas import (
     Candidate,
     FeedbackRequest,
@@ -59,7 +61,8 @@ async def create_scan(
     skip_detect: bool = Form(default=False),
     language: str = Form(default="auto"),
     graded: bool | None = Form(default=None),
-) -> ScanResponse:
+    stream_results: bool = Form(default=False),
+) -> ScanResponse | Response:
     settings = request.app.state.settings
     started = time.perf_counter()
     logger = logging.getLogger("scan.diagnostics")
@@ -77,38 +80,63 @@ async def create_scan(
             detail="Recognition is busy. Try again shortly.",
             headers={"Retry-After": "3"},
         )
+    def recognize(observer=None):
+        return recognize_bytes(
+            data,
+            settings=settings,
+            runtime=request.app.state.runtime,
+            catalog=request.app.state.dbs.catalog,
+            results=request.app.state.dbs.results,
+            session_id=session_id,
+            crop_x=crop_x,
+            crop_y=crop_y,
+            crop_w=crop_w,
+            crop_h=crop_h,
+            rotation=rotation,
+            skip_detect=skip_detect,
+            language=language,
+            graded=graded,
+            _progress_observer=observer,
+        )
+
+    streaming = bool(stream_results and settings.scan_stream_results)
+    flags = scan_flags(settings, stream=streaming, skip_detect=skip_detect, graded=graded)
+
+    def log_summary(result: ScanResponse) -> None:
+        logger.info("%s", scan_summary_line(result, settings, trace=trace,
+                                            upload_bytes=len(data), flags=flags))
+
+    def after_stream(result: ScanResponse) -> None:
+        log_summary(result)
+        schedule_parallel_read(result)
+
+    def schedule_parallel_read(result: ScanResponse) -> None:
+        from app.cardmarket_queue import schedule_scan_parallel_read
+
+        top = result.suggestions[0].cardmarket_url if result.suggestions else None
+        schedule_scan_parallel_read(
+            request.app.state.dbs.catalog,
+            status=result.status.value,
+            url=top,
+        )
+
+    if streaming:
+        # The stream owns the admission slot from here and releases it itself.
+        return scan_stream(loop=request.app.state.loop, executor=request.app.state.executor,
+            limiter=limiter, response=response, trace=trace,
+            recognize=recognize, on_final=after_stream)
     try:
         future = request.app.state.loop.run_in_executor(
-            request.app.state.executor,
-            lambda: recognize_bytes(
-                data,
-                settings=settings,
-                runtime=request.app.state.runtime,
-                catalog=request.app.state.dbs.catalog,
-                results=request.app.state.dbs.results,
-                session_id=session_id,
-                crop_x=crop_x,
-                crop_y=crop_y,
-                crop_w=crop_w,
-                crop_h=crop_h,
-                rotation=rotation,
-                skip_detect=skip_detect,
-                language=language,
-                graded=graded,
-            ),
-        )
+            request.app.state.executor, recognize)
         try:
             result = await asyncio.shield(future)
             logger.info("recognition_done trace=%s scan_id=%s status=%s timings_ms=%s", trace, result.id, result.status.value, result.timings_ms.model_dump() if hasattr(result.timings_ms, "model_dump") else result.timings_ms)
             try:
-                from app.cardmarket_queue import schedule_scan_parallel_read
-
-                top = result.suggestions[0].cardmarket_url if result.suggestions else None
-                schedule_scan_parallel_read(
-                    request.app.state.dbs.catalog,
-                    status=result.status.value,
-                    url=top,
-                )
+                log_summary(result)
+            except Exception:
+                logger.exception("scan summary failed trace=%s", trace)
+            try:
+                schedule_parallel_read(result)
             except Exception:
                 logger.exception("scan parallel schedule failed trace=%s", trace)
             return result
@@ -137,7 +165,7 @@ async def scan_feedback(
     dbs = request.app.state.dbs
     session_id = get_or_create_session(request, response, dbs, settings)
     require_scan_owner(dbs, scan_id, session_id)
-    saved_scan = dbs.results.execute("SELECT status, ocr_json, confirmed_card_id FROM scans WHERE id = ?", (scan_id,)).fetchone()
+    saved_scan = dbs.results.execute("SELECT status, ocr_json, confirmed_card_id, combined_ranking_json FROM scans WHERE id = ?", (scan_id,)).fetchone()
     if payload.action == "confirm" and saved_scan["status"] in {"retake", "no_match", "failed"} and payload.card_id != saved_scan["confirmed_card_id"]:
         raise HTTPException(status_code=409, detail="This scan has no verified suggestion. Retake or use manual correction.")
     if payload.action == "confirm" and saved_scan["status"] == "printing_ambiguous":
@@ -205,6 +233,12 @@ async def scan_feedback(
         (confirmed, rejected, chosen_url, scan_id),
     )
     dbs.results.commit()
+    try:
+        logging.getLogger("scan.diagnostics").info("%s", scan_outcome_line(
+            scan_id, action=payload.action.value, chosen=confirmed,
+            status=saved_scan["status"], combined_ranking_json=saved_scan["combined_ranking_json"]))
+    except Exception:  # noqa: BLE001 - logging must never fail feedback
+        pass
     try:
         apply_feedback(
             settings,

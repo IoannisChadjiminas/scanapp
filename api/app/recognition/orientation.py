@@ -30,9 +30,11 @@ def retrieve_oriented(
     relaxed, and OCR runs once, on the selected orientation.
     """
     embed_ms = retrieve_ms = 0.0
+    embeddings_run = 0
 
     def retrieve(frame: Image.Image) -> tuple[np.ndarray, np.ndarray]:
-        nonlocal embed_ms, retrieve_ms
+        nonlocal embed_ms, retrieve_ms, embeddings_run
+        embeddings_run += 1
         started = time.perf_counter()
         query = embedder.embed(frame, mode)
         if query_vectors is not None:
@@ -81,4 +83,5 @@ def retrieve_oriented(
         "retrieve_ms": retrieve_ms,
         "orientation_degrees": float(angle),
         "frame_hypotheses": float(hypotheses),
+        "embeddings": float(embeddings_run),
     }
