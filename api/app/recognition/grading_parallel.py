@@ -79,9 +79,18 @@ class GradingJob:
                 pass
 
 
+def grading_requested(settings, graded: bool | None) -> bool:
+    """A client's explicit "not graded" wins; no hint follows the setting."""
+    if graded is not None:
+        return graded
+    return not getattr(settings, 'grading_requires_client_hint', False)
+
+
 def parallel_grading_scope(recognize):
     @wraps(recognize)
     def scoped(data, *, settings, runtime, **kwargs):
+        if not grading_requested(settings, kwargs.get('graded')):
+            return recognize(data, settings=settings, runtime=runtime, **kwargs)
         reader = getattr(runtime, 'grading_ocr', None)
         executor = getattr(runtime, 'grading_executor', None)
         deadline = getattr(settings, 'grading_at_card_deadline', False)

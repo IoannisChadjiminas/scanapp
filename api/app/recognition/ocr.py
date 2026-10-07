@@ -36,6 +36,8 @@ class OcrResult:
     collector_retry_used: bool = False
     collector_retry_contributed: bool = False
     collector_retry_skipped: bool = False
+    # The caller asked for the title strip only; no footer evidence exists.
+    footer_skipped: bool = False
     passes: list[dict] = field(default_factory=list)
 
 
@@ -690,7 +692,8 @@ class CardOcr:
             regions = ['full'] * len(texts)
         return texts, scores, regions
 
-    def read(self, image: Image.Image, *, collector_retry_policy=None) -> OcrResult:
+    def read(self, image: Image.Image, *, collector_retry_policy=None,
+             read_footer: bool = True) -> OcrResult:
         passes = []
         def run(patch, region, reason):
             started = time.perf_counter()
@@ -713,10 +716,11 @@ class CardOcr:
             gate = getattr(self, 'auxiliary_gate', None)
             if reader is not None and (reader is self or reader.engine is self.engine):
                 raise RuntimeError('Parallel regions require isolated OCR engines')
-            if reader is not None and executor is not None and gate is not None and gate.try_reserve_card():
+            if (read_footer and reader is not None and executor is not None
+                    and gate is not None and gate.try_reserve_card()):
                 footer = _region(ocr_image, .82, 1.).copy()
                 footer_record = {}
-                def read_footer():
+                def read_footer_strip():
                     started = time.perf_counter()
                     try:
                         return reader._run(footer)
@@ -727,7 +731,7 @@ class CardOcr:
                         footer.close()
                         gate.release_card()
                 try:
-                    future = executor.submit(read_footer)
+                    future = executor.submit(read_footer_strip)
                 except Exception:
                     footer.close()
                     gate.release_card()
@@ -745,7 +749,9 @@ class CardOcr:
                 number_lines, number_scores = observed
             else:
                 name_lines, name_scores = run(_region(ocr_image, 0.0, 0.22), 'name', 'initial')
-                number_lines, number_scores = run(_region(ocr_image, 0.82, 1.0), 'collector', 'initial')
+                number_lines, number_scores = (
+                    run(_region(ocr_image, 0.82, 1.0), 'collector', 'initial')
+                    if read_footer else ([], []))
             name_text = pick_confident_name(name_lines,name_scores)
             if name_text is None and any(_is_layout_badge(t) and s is not None and s>=.85
                                         for t,s in zip(name_lines,name_scores)):
@@ -809,6 +815,8 @@ class CardOcr:
                 except Exception:  # noqa: BLE001 - optional optimization fails closed
                     retry_allowed = True
                 collector_retry_skipped = not retry_allowed
+            if not read_footer:
+                retry_allowed = False
             if image.width < 450 and name_text and name_confidence >= .85 and not has_identifier and retry_allowed:
                 collector_retry_used = True
                 bottom = _region(image, .82, 1.)
@@ -906,6 +914,7 @@ class CardOcr:
                 collector_retry_used=collector_retry_used,
                 collector_retry_contributed=collector_retry_contributed,
                 collector_retry_skipped=collector_retry_skipped,
+                footer_skipped=not read_footer,
                 passes=passes,
             )
         except Exception:  # noqa: BLE001 - OCR must never block retrieval

@@ -9,21 +9,26 @@ class RequestOcrCache:
         self.hits = 0
         self.reads = 0
 
-    def read(self, engine, image, *, collector_retry_policy=None):
+    def read(self, engine, image, *, collector_retry_policy=None, read_footer=True):
         # Geometry/rotation and every pixel must agree. Never reuse a title or
         # footer from a different crop, a previous upload, or the grading OCR.
         pixels = (image.mode, image.size, hashlib.sha256(image.tobytes()).digest())
         # A pruned read cannot satisfy a later request for complete evidence.
         # Complete observations can satisfy either policy without rereading.
-        key = (*pixels, 'adaptive' if collector_retry_policy is not None else 'full')
+        key = (*pixels, 'title_only' if not read_footer else
+               'adaptive' if collector_retry_policy is not None else 'full')
         complete_key = (*pixels, 'full')
         if complete_key in self._observations:
             key = complete_key
         if key in self._observations:
             self.hits += 1
             return deepcopy(self._observations[key]), True
-        observed = (engine.read(image, collector_retry_policy=collector_retry_policy)
-                    if collector_retry_policy is not None else engine.read(image))
+        if not read_footer:
+            observed = engine.read(image, read_footer=False)
+        elif collector_retry_policy is not None:
+            observed = engine.read(image, collector_retry_policy=collector_retry_policy)
+        else:
+            observed = engine.read(image)
         self.reads += 1
         # Ranking supplements observations. Neither the saved result nor its
         # mutable lines/hits/passes may contaminate the pristine cache entry.

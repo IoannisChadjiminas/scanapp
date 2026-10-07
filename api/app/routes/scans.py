@@ -58,6 +58,7 @@ async def create_scan(
     rotation: int = Form(default=0),
     skip_detect: bool = Form(default=False),
     language: str = Form(default="auto"),
+    graded: bool | None = Form(default=None),
 ) -> ScanResponse:
     settings = request.app.state.settings
     started = time.perf_counter()
@@ -93,6 +94,7 @@ async def create_scan(
                 rotation=rotation,
                 skip_detect=skip_detect,
                 language=language,
+                graded=graded,
             ),
         )
         try:
