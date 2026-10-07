@@ -100,6 +100,8 @@ class Settings(BaseSettings):
     # Longest side of the photo the app uploads, in pixels.
     app_max_edge: int = 2000
     app_native_codec: bool = False
+    # Outline the card live in the camera view (iPhone; others keep the guide).
+    app_live_outline: bool = False
     # Tell the phone to find and flatten the card before upload.
     app_card_warp: bool = False
     # Honour skip_detect from the phone. Off: the server still runs its own
