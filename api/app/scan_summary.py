@@ -23,6 +23,7 @@ SWITCHES = (
     'app_slab_detection',
     'app_card_warp',
     'app_native_codec',
+    'app_live_outline',
     'trust_client_warp',
 )
 

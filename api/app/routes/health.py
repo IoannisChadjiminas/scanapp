@@ -32,6 +32,7 @@ class CaptureConfig(BaseModel):
     jpeg_quality: int = 95
     max_edge: int = 2000
     native_codec: bool = False
+    live_outline: bool = False
 
 
 class AppConfigResponse(BaseModel):
@@ -60,6 +61,7 @@ def scan_price_config(settings) -> AppConfigResponse:
             jpeg_quality=max(50, min(int(settings.app_jpeg_quality), 100)),
             max_edge=max(800, min(int(settings.app_max_edge), 4000)),
             native_codec=bool(settings.app_native_codec),
+            live_outline=bool(settings.app_live_outline),
         ),
         scan_prices=ScanPriceConfig(
             start_on_provisional=bool(settings.scan_price_start_on_provisional),
