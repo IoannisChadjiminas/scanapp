@@ -127,21 +127,27 @@ def replace_portfolio(conn, session_id: str, products: list[tuple[str, str]]) ->
             continue
         seen.add(key)
         kept.append((key, opened))
-    conn.execute(
-        statement(conn, "DELETE FROM portfolio_products WHERE session_id = ?"),
-        (session_id,),
-    )
-    if kept:
-        conn.executemany(
-            statement(
-                conn,
-                """
-                INSERT INTO portfolio_products (session_id, sample_key, opened_at)
-                VALUES (?, ?, ?)
-                """,
-            ),
-            [(session_id, key, opened) for key, opened in kept],
+    try:
+        conn.execute(
+            statement(conn, "DELETE FROM portfolio_products WHERE session_id = ?"),
+            (session_id,),
         )
+        # A psycopg connection has no executemany, so insert in plain
+        # multi-row statements that every connection type can run.
+        for start in range(0, len(kept), 300):
+            chunk = kept[start:start + 300]
+            conn.execute(
+                statement(
+                    conn,
+                    "INSERT INTO portfolio_products (session_id, sample_key, opened_at) VALUES "
+                    + ", ".join("(?, ?, ?)" for _ in chunk),
+                ),
+                [value for key, opened in chunk for value in (session_id, key, opened)],
+            )
+    except Exception:
+        # Do not leave the shared connection holding a half-done replace.
+        conn.rollback()
+        raise
     conn.commit()
     return len(kept)
 
