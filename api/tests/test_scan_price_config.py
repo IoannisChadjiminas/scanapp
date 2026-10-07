@@ -99,7 +99,7 @@ def test_config_sends_phone_capture_and_warp_switches():
     body = scan_price_config(Settings(_env_file=None))
     assert body.card_warp is False
     assert body.capture.model_dump() == dict(preset='max', jpeg_quality=95, max_edge=2000, native_codec=False,
-                                                live_outline=False, auto_capture=False)
+                                                live_outline=True, auto_capture=True)
     body = scan_price_config(Settings(_env_file=None, app_card_warp=True, app_capture_preset='ultraHigh',
                                       app_jpeg_quality=85, app_max_edge=1400, app_native_codec=True,
                                       app_live_outline=True, app_auto_capture=True))
@@ -119,5 +119,12 @@ def test_config_keeps_the_photo_edge_in_a_sensible_range():
 
 
 def test_auto_capture_needs_the_live_outline():
-    body = scan_price_config(Settings(_env_file=None, app_auto_capture=True))
+    body = scan_price_config(Settings(_env_file=None, app_live_outline=False, app_auto_capture=True))
     assert body.capture.auto_capture is False
+
+
+def test_outline_and_auto_capture_can_be_switched_off():
+    body = scan_price_config(Settings(_env_file=None, app_auto_capture=False))
+    assert (body.capture.live_outline, body.capture.auto_capture) == (True, False)
+    body = scan_price_config(Settings(_env_file=None, app_live_outline=False))
+    assert (body.capture.live_outline, body.capture.auto_capture) == (False, False)
