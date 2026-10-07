@@ -42,7 +42,7 @@ from app.recognition.grading_parallel import GradingJob, grading_requested, para
 from app.recognition.holder_printing import holder_printing_hint
 from app.recognition.orientation import retrieve_oriented
 from app.recognition.printing import PrintingDecision, assess_printings
-from app.recognition.rank import artwork_evidence_compatible, decide_status, extract_collector_candidates, rerank
+from app.recognition.rank import artwork_evidence_compatible, decide_status, extract_collector_candidates, fraction_named_printing, rerank
 from app.recognition.rank import name_match
 from app.recognition.runtime import Runtime
 from app.schemas import (
@@ -61,6 +61,28 @@ def _now() -> str:
 
 def _card_image_url(row: Any) -> str:
     return display_image_url(row) or f"/api/v1/cards/{row['id']}/image"
+
+
+def prefer_unproven_visual_match(ranked: list[dict[str, Any]], members, *, min_gap: float = 0.04) -> None:
+    """Show the closest image when a printing group is still unproven.
+
+    A small visual gap stays with the current display order. A clear gap is
+    the picture itself, so the closest image in the group replaces a
+    combined-score leader that has no collector number and no stamp.
+    """
+    if len(ranked) < 2 or ranked[0].get("visual_score") is None:
+        return
+    member_ids = {row.get("card_id") for row in members}
+    eligible = [row for row in ranked if row.get("card_id") in member_ids
+                and row.get("visual_score") is not None]
+    if len(eligible) < 2:
+        return
+    preferred = max(eligible, key=lambda row: float(row["visual_score"]))
+    if preferred.get("card_id") == ranked[0].get("card_id"):
+        return
+    if float(preferred["visual_score"]) - float(ranked[0]["visual_score"]) < min_gap:
+        return
+    ranked.sort(key=lambda row: row.get("card_id") == preferred.get("card_id"), reverse=True)
 
 
 def _lookup_cards(conn: sqlite3.Connection, card_ids: list[str]) -> dict[str, sqlite3.Row]:
@@ -624,6 +646,19 @@ def _recognize_bytes_once(
                 reference_identity = dict(combined[0])
         except (OSError, ValueError, KeyError, cv2.error):
             logging.getLogger(__name__).exception('Optional stamp ordering failed')
+        named = fraction_named_printing(combined, printing.members, numbers)
+        if named:
+            combined.sort(key=lambda row: row.get('card_id') == named, reverse=True)
+            if combined:
+                reference_identity = dict(combined[0])
+        elif not stamp_hint and not printing.collector_evidence:
+            prefer_unproven_visual_match(combined, printing.members,
+                                          min_gap=settings.threshold_min_gap)
+            if combined:
+                reference_identity = dict(combined[0])
+        shown_printing = combined[0]["card_id"] if combined else None
+        review_members = sorted(
+            printing.members, key=lambda row: row.get("card_id") != shown_printing)
         printing_review = PrintingReview(
             reason=printing.reason, candidate_group_id=printing.candidate_group_id,
             reference_coverage_complete=printing.reference_coverage_complete,
@@ -637,7 +672,7 @@ def _recognize_bytes_once(
                 "cardmarket_prices": row.get("cardmarket_prices") or snapshot_prices(
                     catalog, row.get("cardmarket_url")
                 ),
-            } for row in printing.members],
+            } for row in review_members],
             guidance=printing.guidance,
         )
     elif local_matches and not framing_review_supported and not artwork_evidence_compatible(
@@ -695,6 +730,7 @@ def _recognize_bytes_once(
     versions = runtime.versions()
     versions['presentation'] = 'best-match-v1'
     versions['stamp_ordering'] = 'play-stamp-review-v1'
+    versions['unproven_printing_order'] = 'visual-leader-v1'
     versions['ocr_cache'] = 'request-pixels-v1'
     if adaptive_footer:
         versions['ocr_budget'] = OCR_BUDGET_VERSION
