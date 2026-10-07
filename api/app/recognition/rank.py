@@ -308,7 +308,9 @@ def _fits_damaged_fraction(read: tuple[str, str], identifier: str) -> bool:
     if number.zfill(width) != expected.group(1).zfill(width):
         return False
     if expected.group(2) is None:
-        return False
+        # The catalogue has no printed total for this card. Zero padding is
+        # then the evidence: "007" fits a card numbered 007, not one numbered 7.
+        return len(number) >= 2 and number == expected.group(1)
     # The denominator can lose its last digit: "03" against 034.
     printed, got = expected.group(2), denominator
     return got.lstrip('0') == printed.lstrip('0') or (len(got) >= 2 and printed.startswith(got))
