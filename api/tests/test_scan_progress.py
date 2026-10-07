@@ -134,3 +134,19 @@ def test_stream_switch_on_sends_provisional_then_final(monkeypatch, caplog):
     line = next(r.getMessage() for r in caplog.records if 'scan_stream_done' in r.getMessage())
     assert 'scan_id=final-id' in line and 'provisional_top=initial-card' in line
     assert 'final_ms=' in line and 'provisional_ms=' in line
+
+
+@pytest.mark.parametrize('trust,expected', [(False, False), (True, True)])
+def test_phone_warp_is_trusted_only_when_switched_on(monkeypatch, trust, expected):
+    from app.routes import scans
+    client, executor = stream_app(monkeypatch, enabled=False)
+    seen = {}
+    def recognize_bytes(data, **kwargs):
+        seen['skip_detect'] = kwargs['skip_detect']
+        raise ImageError('plain path')
+    monkeypatch.setattr(scans, 'recognize_bytes', recognize_bytes)
+    client.app.state.settings = client.app.state.settings.model_copy(update=dict(trust_client_warp=trust))
+    with client, executor:
+        client.post('/scans', data={'skip_detect': 'true'},
+                    files={'image': ('card.jpg', b'jpeg', 'image/jpeg')})
+    assert seen['skip_detect'] is expected

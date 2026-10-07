@@ -91,6 +91,15 @@ class Settings(BaseSettings):
     # Tell the phone (GET /config) to look for a graded slab on each photo and
     # send graded=true/false. Off until switched on here, no app rebuild.
     app_slab_detection: bool = False
+    # Phone photo prep, sent through GET /config. Defaults match the app today.
+    app_capture_preset: str = 'max'
+    app_jpeg_quality: int = 95
+    app_native_codec: bool = False
+    # Tell the phone to find and flatten the card before upload.
+    app_card_warp: bool = False
+    # Honour skip_detect from the phone. Off: the server still runs its own
+    # detection on a phone-flattened photo, so both can be compared first.
+    trust_client_warp: bool = False
     scan_price_start_on_provisional: bool = True
     scan_price_candidate_reads: int = 2
     scan_price_warm_reader: bool = True

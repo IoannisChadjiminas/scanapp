@@ -93,7 +93,7 @@ async def create_scan(
             crop_w=crop_w,
             crop_h=crop_h,
             rotation=rotation,
-            skip_detect=skip_detect,
+            skip_detect=skip_detect and not detect_on_server,
             language=language,
             graded=graded,
             _progress_observer=observer,
@@ -101,6 +101,10 @@ async def create_scan(
 
     streaming = bool(stream_results and settings.scan_stream_results)
     flags = scan_flags(settings, stream=streaming, skip_detect=skip_detect, graded=graded)
+    # A phone-flattened photo is only trusted once TRUST_CLIENT_WARP is on.
+    detect_on_server = skip_detect and not settings.trust_client_warp
+    if detect_on_server:
+        flags.append('server_detect_override')
 
     def log_summary(result: ScanResponse) -> None:
         logger.info("%s", scan_summary_line(result, settings, trace=trace,

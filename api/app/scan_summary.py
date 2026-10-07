@@ -20,6 +20,9 @@ SWITCHES = (
     'parallel_grading',
     'grading_at_card_deadline',
     'app_slab_detection',
+    'app_card_warp',
+    'app_native_codec',
+    'trust_client_warp',
 )
 
 STAGES = (
@@ -32,6 +35,12 @@ def scan_flags(settings: Any, *, stream: bool = False, skip_detect: bool = False
                graded: bool | None = None) -> list[str]:
     """Server switches that were on, plus what this request asked for."""
     flags = [name for name in SWITCHES if getattr(settings, name, False) is True]
+    preset = getattr(settings, 'app_capture_preset', 'max')
+    quality = getattr(settings, 'app_jpeg_quality', 95)
+    if preset != 'max':
+        flags.append(f'app_capture_{preset}')
+    if quality != 95:
+        flags.append(f'app_jpeg_{quality}')
     if stream:
         flags.append('req_stream')
     if skip_detect:

@@ -24,10 +24,21 @@ class ScanPriceConfig(BaseModel):
     server_read: ServerReadConfig
 
 
+CAPTURE_PRESETS = ('max', 'ultraHigh', 'veryHigh', 'high')
+
+
+class CaptureConfig(BaseModel):
+    preset: str = 'max'
+    jpeg_quality: int = 95
+    native_codec: bool = False
+
+
 class AppConfigResponse(BaseModel):
     price_fresh_minutes: int
     config_ttl_s: int
     slab_detection: bool = False
+    card_warp: bool = False
+    capture: CaptureConfig = CaptureConfig()
     scan_prices: ScanPriceConfig
 
 
@@ -42,6 +53,12 @@ def scan_price_config(settings) -> AppConfigResponse:
         price_fresh_minutes=max(1, min(minutes, 24 * 60)),
         config_ttl_s=max(30, min(ttl, 24 * 60 * 60)),
         slab_detection=bool(settings.app_slab_detection),
+        card_warp=bool(settings.app_card_warp),
+        capture=CaptureConfig(
+            preset=settings.app_capture_preset if settings.app_capture_preset in CAPTURE_PRESETS else 'max',
+            jpeg_quality=max(50, min(int(settings.app_jpeg_quality), 100)),
+            native_codec=bool(settings.app_native_codec),
+        ),
         scan_prices=ScanPriceConfig(
             start_on_provisional=bool(settings.scan_price_start_on_provisional),
             candidate_reads=settings.scan_candidate_reads(),
