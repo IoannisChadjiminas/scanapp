@@ -150,3 +150,9 @@ def test_phone_warp_is_trusted_only_when_switched_on(monkeypatch, trust, expecte
         client.post('/scans', data={'skip_detect': 'true'},
                     files={'image': ('card.jpg', b'jpeg', 'image/jpeg')})
     assert seen['skip_detect'] is expected
+
+
+def test_streaming_is_on_by_default_and_can_be_switched_off():
+    from app.config import Settings
+    assert Settings(_env_file=None).scan_stream_results is True
+    assert Settings(_env_file=None, scan_stream_results=False).scan_stream_results is False

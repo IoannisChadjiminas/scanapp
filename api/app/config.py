@@ -44,7 +44,7 @@ class Settings(BaseSettings):
     # Its auxiliary CPU lane is shared with optional grading, not added to it.
     ocr_parallel_regions: bool = False
     # Optional NDJSON progress stream; legacy scans remain a single JSON response.
-    scan_stream_results: bool = False
+    scan_stream_results: bool = True
     enable_matched: bool = True
     ort_intra_threads: int = 1
     ort_inter_threads: int = 1
