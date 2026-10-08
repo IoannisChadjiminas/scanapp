@@ -107,6 +107,9 @@ class Settings(BaseSettings):
     # Use the app's own iPhone camera (card found on every frame) instead of the
     # camera plugin. Off until the native camera has been checked on a phone.
     app_native_camera: bool = False
+    # The same for Android's own camera. Separate so Android can be switched on
+    # and off without touching iPhone. Off until checked on an Android phone.
+    app_native_camera_android: bool = False
     # Let a card count anywhere in the camera view, not only inside the middle box.
     app_card_anywhere: bool = True
     # Tell the phone to find and flatten the card before upload.
