@@ -25,6 +25,7 @@ SWITCHES = (
     'app_native_codec',
     'app_live_outline',
     'app_auto_capture',
+    'app_native_camera',
     'trust_client_warp',
 )
 
