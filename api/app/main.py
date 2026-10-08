@@ -46,6 +46,27 @@ def _seconds_until_utc_day() -> float:
     return max(1.0, (int(now) // 86400 + 1) * 86400 - now)
 
 
+async def _price_sources(stop: asyncio.Event) -> None:
+    """Import Cardmarket's price file and TCGdex prices once a day.
+
+    The guide file is written around 02:50 CET, so the pass runs a little after
+    00:00 UTC and again every day. A failed source keeps the older data.
+    """
+    from app.price_sources import refresh_all_on_own_connection
+
+    while not stop.is_set():
+        settings = get_settings()
+        try:
+            await asyncio.to_thread(refresh_all_on_own_connection, settings)
+        except Exception as exc:
+            log.info("price sources pass failed error=%s", type(exc).__name__)
+        try:
+            await asyncio.wait_for(stop.wait(), timeout=_seconds_until_utc_day() + 3 * 3600)
+        except TimeoutError:
+            continue
+        return
+
+
 async def _daily_prices(stop: asyncio.Event) -> None:
     """Refresh holdings, then wait for the next UTC day. A restart continues the remainder."""
     while not stop.is_set():
@@ -111,12 +132,17 @@ async def lifespan(app: FastAPI):
     app.state.scraper_worker = worker
     daily_stop = asyncio.Event()
     daily_task = asyncio.create_task(_daily_prices(daily_stop)) if should_schedule(settings) else None
+    sources_task = None
+    if settings.price_guide_enabled or settings.tcgdex_prices_enabled:
+        sources_task = asyncio.create_task(_price_sources(daily_stop))
     try:
         yield
     finally:
         daily_stop.set()
         if daily_task is not None:
             daily_task.cancel()
+        if sources_task is not None:
+            sources_task.cancel()
         if worker is not None:
             worker.stop()
         bind_loop(None)

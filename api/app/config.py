@@ -64,6 +64,12 @@ class Settings(BaseSettings):
     cardmarket_webview_enabled: bool = True
     cardmarket_challenge_fallback_minutes: int = 10
     cardmarket_price_fresh_minutes: int = 15
+    # A listing sample stays fresh longer for cheap cards. Pairs of
+    # "trend in EUR up to : seconds fresh"; "*" closes the list. A card with no
+    # known trend keeps the plain window above. CARDMARKET_FRESH_BY_VALUE=false
+    # turns this off.
+    cardmarket_fresh_by_value: bool = True
+    cardmarket_fresh_tiers: str = "2:604800,20:86400,100:21600,*:3600"
     scraper_enabled: bool = False
     scraper_url: str = ""
     scraper_api_key: str = ""
@@ -83,6 +89,17 @@ class Settings(BaseSettings):
     scraper_breaker_base_s: float = 30
     scraper_breaker_max_s: float = 300
     daily_prices_enabled: bool = False
+    # Cardmarket's public nightly price file and TCGdex prices. Neither needs
+    # a browser, a proxy or a login.
+    price_guide_enabled: bool = True
+    price_guide_url: str = (
+        "https://downloads.s3.cardmarket.com/productCatalog/priceGuide/price_guide_6.json"
+    )
+    tcgdex_prices_enabled: bool = True
+    tcgdex_base_url: str = "https://api.tcgdex.net/v2"
+    # Cards refreshed per night, and the pause between requests.
+    tcgdex_prices_batch: int = 300
+    tcgdex_prices_gap_s: float = 0.25
     daily_gap_min_s: float = 2
     daily_gap_max_s: float = 60
     daily_gap_step_s: float = 5
@@ -125,6 +142,9 @@ class Settings(BaseSettings):
     scan_price_server_read_statuses: str = "matched"
     scan_price_server_read_delay_ms: int = 3000
     scan_price_server_read_daily_pages: int = 0
+    # No paid read for a card whose Cardmarket trend is below this (EUR). A card
+    # with no known trend is still read. 0 reads every card.
+    scan_price_server_read_min_trend: float = 2.0
 
     ranking_version: str = "rank-v15-holder-printing-review"
     # Opt-in only; an invalid explicitly configured bundle fails validation.

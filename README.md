@@ -69,6 +69,27 @@ Disabling WebViews removes the phone-challenge prerequisite; session validation,
 rate limits, cooldowns, scraper health, and spend caps still apply. Set it back to
 `true` to restore the WebView-first flow.
 
+## Prices that need no browser
+
+Every scan candidate carries the best price already on file, each tagged with
+`source` (`live`, `cardmarket_file`, `tcgdex`, `tcgplayer`), `as_of` and `stale`.
+Order: a listing sample inside the fresh window, then Cardmarket's public nightly
+price file (`PRICE_GUIDE_URL`, imported into `cardmarket_guide`), then TCGdex
+pricing (`tcgdex_prices`, refreshed for cards the file misses, `TCGDEX_PRICES_BATCH`
+per night), then an older listing sample. A pass runs at start-up and shortly after
+00:00 UTC. `PRICE_GUIDE_ENABLED=false` and `TCGDEX_PRICES_ENABLED=false` switch the
+jobs off. A failed download keeps the previous data.
+
+How long a listing sample stays fresh depends on the card's Cardmarket trend
+(`CARDMARKET_FRESH_TIERS`, default `2:604800,20:86400,100:21600,*:3600`: under
+EUR 2 a week, under 20 a day, under 100 six hours, above that an hour). A card
+with no known trend keeps `CARDMARKET_PRICE_FRESH_MINUTES`.
+`CARDMARKET_FRESH_BY_VALUE=false` turns it off. The price endpoint reports the
+window as `fresh_for_s`. A paid read queued from a scan is skipped for a card
+whose trend is under `SCAN_PRICE_SERVER_READ_MIN_TREND` (EUR 2; 0 reads all).
+The phone can log `price.first_shown` (`elapsed_ms`, `price_source`, `stored`,
+`guessed`) through `/diagnostics`.
+
 Regenerate the OpenAPI document with:
 
 ```bash
