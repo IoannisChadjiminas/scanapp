@@ -67,3 +67,12 @@ def test_outline_numbers_reject_text_and_flags():
         "event": "outline.stats", "fps": "fast", "detect_ms": True, "frames": 1.5,
     }]})
     assert lines == ["phone event=outline.stats"]
+
+
+def test_auto_wait_breakdown_is_kept():
+    lines = phone_diagnostic_lines({"events": [{
+        "event": "auto.wait", "wait_ms": 940, "missed_ms": 410, "steady_ms": 250, "focus_ms": 180,
+        "held_ms": 100, "looks": 28, "found": 17,
+    }]})
+    assert lines == ["phone event=auto.wait found=17 wait_ms=940 missed_ms=410 steady_ms=250 "
+                     "focus_ms=180 held_ms=100 looks=28"]
