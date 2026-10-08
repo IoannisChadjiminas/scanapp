@@ -99,13 +99,13 @@ def test_config_sends_phone_capture_and_warp_switches():
     body = scan_price_config(Settings(_env_file=None))
     assert body.card_warp is False
     assert body.capture.model_dump() == dict(preset='max', jpeg_quality=95, max_edge=2000, native_codec=False,
-                                                live_outline=True, auto_capture=True)
+                                                live_outline=True, auto_capture=True, native_camera=False)
     body = scan_price_config(Settings(_env_file=None, app_card_warp=True, app_capture_preset='ultraHigh',
                                       app_jpeg_quality=85, app_max_edge=1400, app_native_codec=True,
-                                      app_live_outline=True, app_auto_capture=True))
+                                      app_live_outline=True, app_auto_capture=True, app_native_camera=True))
     assert body.card_warp is True
     assert body.capture.model_dump() == dict(preset='ultraHigh', jpeg_quality=85, max_edge=1400, native_codec=True,
-                                                live_outline=True, auto_capture=True)
+                                                live_outline=True, auto_capture=True, native_camera=True)
 
 
 def test_config_never_sends_an_unknown_preset_or_silly_quality():

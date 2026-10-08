@@ -104,6 +104,9 @@ class Settings(BaseSettings):
     app_live_outline: bool = True
     # Take the photo by itself once the live outline locks on (needs app_live_outline).
     app_auto_capture: bool = True
+    # Use the app's own iPhone camera (card found on every frame) instead of the
+    # camera plugin. Off until the native camera has been checked on a phone.
+    app_native_camera: bool = False
     # Tell the phone to find and flatten the card before upload.
     app_card_warp: bool = False
     # Honour skip_detect from the phone. Off: the server still runs its own

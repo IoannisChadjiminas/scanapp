@@ -34,6 +34,7 @@ class CaptureConfig(BaseModel):
     native_codec: bool = False
     live_outline: bool = False
     auto_capture: bool = False
+    native_camera: bool = False
 
 
 class AppConfigResponse(BaseModel):
@@ -64,6 +65,7 @@ def scan_price_config(settings) -> AppConfigResponse:
             native_codec=bool(settings.app_native_codec),
             live_outline=bool(settings.app_live_outline),
             auto_capture=bool(settings.app_live_outline and settings.app_auto_capture),
+            native_camera=bool(settings.app_native_camera),
         ),
         scan_prices=ScanPriceConfig(
             start_on_provisional=bool(settings.scan_price_start_on_provisional),
