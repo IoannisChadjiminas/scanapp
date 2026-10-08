@@ -69,6 +69,17 @@ Disabling WebViews removes the phone-challenge prerequisite; session validation,
 rate limits, cooldowns, scraper health, and spend caps still apply. Set it back to
 `true` to restore the WebView-first flow.
 
+## Prices that need no browser
+
+Every scan candidate carries the best price already on file, each tagged with
+`source` (`live`, `cardmarket_file`, `tcgdex`, `tcgplayer`), `as_of` and `stale`.
+Order: a listing sample inside the fresh window, then Cardmarket's public nightly
+price file (`PRICE_GUIDE_URL`, imported into `cardmarket_guide`), then TCGdex
+pricing (`tcgdex_prices`, refreshed for cards the file misses, `TCGDEX_PRICES_BATCH`
+per night), then an older listing sample. A pass runs at start-up and shortly after
+00:00 UTC. `PRICE_GUIDE_ENABLED=false` and `TCGDEX_PRICES_ENABLED=false` switch the
+jobs off. A failed download keeps the previous data.
+
 Regenerate the OpenAPI document with:
 
 ```bash

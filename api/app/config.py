@@ -83,6 +83,17 @@ class Settings(BaseSettings):
     scraper_breaker_base_s: float = 30
     scraper_breaker_max_s: float = 300
     daily_prices_enabled: bool = False
+    # Cardmarket's public nightly price file and TCGdex prices. Neither needs
+    # a browser, a proxy or a login.
+    price_guide_enabled: bool = True
+    price_guide_url: str = (
+        "https://downloads.s3.cardmarket.com/productCatalog/priceGuide/price_guide_6.json"
+    )
+    tcgdex_prices_enabled: bool = True
+    tcgdex_base_url: str = "https://api.tcgdex.net/v2"
+    # Cards refreshed per night, and the pause between requests.
+    tcgdex_prices_batch: int = 300
+    tcgdex_prices_gap_s: float = 0.25
     daily_gap_min_s: float = 2
     daily_gap_max_s: float = 60
     daily_gap_step_s: float = 5

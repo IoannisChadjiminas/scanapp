@@ -218,6 +218,25 @@ def init_catalog(conn: sqlite3.Connection) -> None:
             ON cardmarket_jobs(helper_id, status);
         CREATE INDEX IF NOT EXISTS idx_cardmarket_jobs_retry
             ON cardmarket_jobs(status, next_attempt_at, created_at);
+        CREATE TABLE IF NOT EXISTS cardmarket_guide (
+            id_product INTEGER PRIMARY KEY,
+            avg REAL, low REAL, trend REAL, avg1 REAL, avg7 REAL, avg30 REAL,
+            avg_holo REAL, low_holo REAL, trend_holo REAL,
+            avg1_holo REAL, avg7_holo REAL, avg30_holo REAL,
+            guide_date TEXT NOT NULL
+        );
+        CREATE TABLE IF NOT EXISTS cardmarket_guide_meta (
+            id INTEGER PRIMARY KEY CHECK (id = 1),
+            guide_date TEXT NOT NULL,
+            row_count INTEGER NOT NULL,
+            imported_at TEXT NOT NULL
+        );
+        CREATE TABLE IF NOT EXISTS tcgdex_prices (
+            card_id TEXT PRIMARY KEY,
+            cardmarket_json TEXT,
+            tcgplayer_json TEXT,
+            fetched_at TEXT NOT NULL
+        );
         CREATE TABLE IF NOT EXISTS portfolio_products (
             session_id TEXT NOT NULL,
             sample_key TEXT NOT NULL,

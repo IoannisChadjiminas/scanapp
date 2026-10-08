@@ -18,9 +18,9 @@ from app.cardmarket import (
     apply_variants_to_candidate,
     grouped_expansion_skus,
     listing_choice_message,
-    snapshot_prices,
     url_for_row,
 )
+from app.price_sources import scan_prices
 from app.db import coverage_payload
 from app.recognition.captures import save_scan_capture
 from app.recognition.detect import card_frame_candidates, detect_and_rectify
@@ -535,10 +535,7 @@ def _recognize_bytes_once(
     for item in combined:
         apply_variants_to_candidate(catalog, item, groups=sku_groups)
     for item in combined:
-        live_url = item.get("cardmarket_url")
-        if not live_url:
-            continue
-        item["cardmarket_prices"] = snapshot_prices(catalog, live_url)
+        item["cardmarket_prices"] = scan_prices(catalog, item["card_id"], item.get("cardmarket_url"))
     timings["cardmarket_ms"] = (time.perf_counter() - mark) * 1000
     status = decide_status(
         combined,
@@ -677,8 +674,8 @@ def _recognize_bytes_once(
                 "language": str(row.get("language") or ""),
                 "image_url": row.get("image_url") or _card_image_url(row),
                 "cardmarket_url": row.get("cardmarket_url"),
-                "cardmarket_prices": row.get("cardmarket_prices") or snapshot_prices(
-                    catalog, row.get("cardmarket_url")
+                "cardmarket_prices": row.get("cardmarket_prices") or scan_prices(
+                    catalog, row["card_id"], row.get("cardmarket_url")
                 ),
             } for row in review_members],
             guidance=printing.guidance,

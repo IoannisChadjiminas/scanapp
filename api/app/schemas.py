@@ -26,6 +26,11 @@ class CardmarketPrice(BaseModel):
     label: str
     amount: float
     currency: str = "EUR"
+    # Where the number came from: live (a listing read), cardmarket_file,
+    # tcgdex, or tcgplayer. Older clients ignore these three fields.
+    source: str | None = None
+    as_of: str | None = None
+    stale: bool = False
 
 
 class CardmarketVariant(BaseModel):
