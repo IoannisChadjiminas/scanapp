@@ -1,5 +1,29 @@
 # Staging catalogue source
 
+## Persistent catalogue release selection — 2026-10-08
+
+The staging API reads `PLANETSCALE_SCHEMA` and `PLANETSCALE_IMPORT_ID` from
+`/etc/scanapp-staging/catalogue-release.env`, a required raw Compose environment
+file outside the Git checkout. These keys intentionally have no entries in the
+API's Compose `environment` block: that block would override the release file.
+Dokploy's generated `.env` and saved environment are no longer authoritative for
+these two keys. Keep credentials in the separate existing `planetscale.env` file.
+
+For a validated release, archive the existing release file, image and effective
+Compose configuration, then atomically replace the two-key release file and
+recreate only the API. Verify the expected import, card routes, unchanged visual
+artifacts and rollback before recording publication. Do not change model, camera,
+threshold, grading or scraper settings as part of a catalogue selection update.
+To roll back, atomically restore the archived release file and recreate only the
+API with its retained image. Older rollback procedures that edit only Dokploy's
+`.env` must also restore this release file once this deployment change is active.
+
+A missing release file fails Compose validation. A normal Git redeploy reads the
+same external file, even if its generated `.env` contains stale catalogue keys.
+Future deployments must preserve this file and must not add competing selector
+entries to the Compose `environment` block. The server's backup archives retain
+the pre-migration Compose and environment for an initial migration rollback.
+
 ## STAGING-ACCURACY-007/008 — 2026-10-01
 
 User explicitly approved each change. Accuracy-007 added a card name/language
