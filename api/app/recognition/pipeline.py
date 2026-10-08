@@ -96,6 +96,20 @@ def _lookup_cards(conn: sqlite3.Connection, card_ids: list[str]) -> dict[str, sq
     return {row["id"]: row for row in rows}
 
 
+def _preview_candidates(conn: sqlite3.Connection, card_ids: list[str]) -> list[dict]:
+    """Early guesses for the phone: set, number and a stored price let the tile
+    fill at once. Everything is read from local tables, never from the network."""
+    rows = _lookup_cards(conn, card_ids)
+    return [dict(card_id=cid, name=rows[cid]['name'],
+                 image_url=_card_image_url(rows[cid]),
+                 set_name=rows[cid]['set_name'],
+                 collector_number=rows[cid]['collector_number'],
+                 language=str(rows[cid]['language'] or ''),
+                 cardmarket_url=rows[cid]['cardmarket_url'],
+                 cardmarket_prices=scan_prices(conn, cid, rows[cid]['cardmarket_url']))
+            for cid in card_ids if cid in rows]
+
+
 @dataclass
 class _ScanEvaluation:
     response: ScanResponse
@@ -210,10 +224,7 @@ def _recognize_bytes_once(
         # preview is not a way to expose below-threshold guesses as a match.
         preview_ids = [str(snapshot.card_ids[i]) for i, score in zip(indices, scores)
                        if float(score) >= settings.threshold_min_visual_ocr][:3]
-        preview_rows = _lookup_cards(catalog, preview_ids)
-        previews = [dict(card_id=cid, name=preview_rows[cid]['name'],
-                         image_url=_card_image_url(preview_rows[cid]))
-                    for cid in preview_ids if cid in preview_rows]
+        previews = _preview_candidates(catalog, preview_ids)
         if previews:
             try:
                 _progress_observer(dict(candidates=previews, provisional=True,
