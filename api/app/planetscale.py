@@ -11,6 +11,7 @@ import numpy as np
 
 from app.config import Settings
 from app.recognition.artifacts import ArtifactError, ArtifactSnapshot, sha256_file, validate_embeddings
+from app.visual_aliases import validate_visual_aliases
 
 
 class CatalogueReadOnly(RuntimeError):
@@ -208,6 +209,15 @@ def load_cloud_catalogue(settings: Settings, local: sqlite3.Connection) -> Artif
             present = {row[0] for row in local.execute("SELECT id FROM cloud.cards")}
             if not set(ids) <= present:
                 raise ArtifactError("PlanetScale vectors reference missing cards")
+            contract = metadata.get("visual_image_aliases")
+            if contract is not None:
+                try:
+                    local.visual_image_aliases = validate_visual_aliases(
+                        local, contract, indexed_ids=ids,
+                        image_root=settings.images_dir,
+                    )
+                except ValueError as exc:
+                    raise ArtifactError(str(exc)) from None
             embeddings.flags.writeable = False
             card_ids.flags.writeable = False
             local.commit()

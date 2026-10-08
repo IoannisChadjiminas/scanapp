@@ -232,6 +232,7 @@ class CardSummary(BaseModel):
     rarity: str = ""
     has_image: bool
     image_url: str | None = None
+    image_owner_id: str | None = None
     variants: dict[str, Any] = Field(default_factory=dict)
     cardmarket_url: str | None = None
     cardmarket_variants: list[CardmarketVariant] = Field(default_factory=list)

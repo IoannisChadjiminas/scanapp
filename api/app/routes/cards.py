@@ -11,12 +11,14 @@ from app.card_images import display_image_url
 from app.cardmarket import url_for_row, variants_for_row
 from app.recognition.language import expand_language
 from app.schemas import CardmarketVariant, CardSearchResponse, CardSummary
+from app.visual_aliases import visual_image_owner
 
 router = APIRouter()
 
 
-def _summary(row) -> CardSummary:  # noqa: ANN001
-    image_url = display_image_url(row)
+def _summary(row, catalog=None) -> CardSummary:  # noqa: ANN001
+    image_url = display_image_url(row, catalog)
+    owner = visual_image_owner(row, catalog)
     return CardSummary(
         id=row["id"],
         name=row["name"],
@@ -27,6 +29,7 @@ def _summary(row) -> CardSummary:  # noqa: ANN001
         rarity=str(row["rarity"] or ""),
         has_image=bool(image_url),
         image_url=image_url,
+        image_owner_id=owner["id"] if owner is not row else None,
         variants=json.loads(row["variants_json"] or "{}"),
         cardmarket_url=url_for_row(row),
     )
@@ -112,7 +115,7 @@ def search_cards(
         ).fetchone()
         total = int(total_row["n"] if total_row else 0)
 
-    return CardSearchResponse(items=[_summary(row) for row in rows], total=total)
+    return CardSearchResponse(items=[_summary(row, catalog) for row in rows], total=total)
 
 
 @router.get("/cards/{card_id}", response_model=CardSummary)
@@ -122,7 +125,7 @@ def get_card(card_id: str, request: Request) -> CardSummary:
     ).fetchone()
     if row is None:
         raise HTTPException(status_code=404, detail="Card not found")
-    summary = _summary(row)
+    summary = _summary(row, request.app.state.dbs.catalog)
     summary.cardmarket_variants = [
         CardmarketVariant.model_validate(variant)
         for variant in variants_for_row(request.app.state.dbs.catalog, row)
@@ -133,8 +136,10 @@ def get_card(card_id: str, request: Request) -> CardSummary:
 @router.get("/cards/{card_id}/image")
 def card_image(card_id: str, request: Request) -> FileResponse:
     row = request.app.state.dbs.catalog.execute(
-        "SELECT image_path, has_image FROM cards WHERE id = ?", (card_id,)
+        "SELECT * FROM cards WHERE id = ?", (card_id,)
     ).fetchone()
+    if row is not None:
+        row = visual_image_owner(row, request.app.state.dbs.catalog)
     if row is None or not row["has_image"] or not row["image_path"]:
         raise HTTPException(status_code=404, detail="Card image not found")
     path = Path(row["image_path"])

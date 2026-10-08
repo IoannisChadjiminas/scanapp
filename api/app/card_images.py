@@ -3,6 +3,9 @@ from __future__ import annotations
 import json
 from pathlib import Path
 from typing import Any
+from urllib.parse import quote
+
+from app.visual_aliases import visual_image_owner
 
 
 def tcgdex_display_url(image_base: str | None, quality: str = "high") -> str | None:
@@ -12,7 +15,10 @@ def tcgdex_display_url(image_base: str | None, quality: str = "high") -> str | N
     return f"{base}/{quality}.webp"
 
 
-def display_image_url(row: Any) -> str | None:
+def display_image_url(row: Any, catalog: Any = None) -> str | None:
+    owner = visual_image_owner(row, catalog)
+    if owner is not row:
+        return f"/api/v1/cards/{quote(str(row['id']), safe=':')}/image"
     keys = set(row.keys()) if hasattr(row, "keys") else set()
     remote = str(row["remote_image_url"] or "") if "remote_image_url" in keys else ""
     if remote.startswith("https://"):
