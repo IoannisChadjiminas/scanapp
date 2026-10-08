@@ -253,3 +253,18 @@ def test_first_price_event_passes_the_allow_list():
     }]})
     assert lines == ["phone event=price.first_shown scan=abc123 elapsed_ms=420 "
                      "stored=false guessed=true price_source=cardmarket_file"]
+
+
+def test_preview_candidates_carry_set_number_and_a_stored_price(tmp_path):
+    from app.recognition.pipeline import _preview_candidates
+
+    conn = _catalog(tmp_path)
+    _card(conn, "en:a", product=100, url=URL)
+    import_guide(conn, GUIDE)
+    [preview] = _preview_candidates(conn, ["en:a", "missing"])
+    assert preview["card_id"] == "en:a"
+    assert preview["set_name"] == "Base Set"
+    assert preview["collector_number"] == "58"
+    assert preview["language"] == "en"
+    assert preview["cardmarket_url"] == URL
+    assert {p["source"] for p in preview["cardmarket_prices"]} == {"cardmarket_file"}
