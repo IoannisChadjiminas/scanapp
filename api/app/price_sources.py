@@ -282,27 +282,35 @@ def tcgdex_ids(row: sqlite3.Row) -> tuple[str, str]:
     return language, str(row["provider_id"] or row["id"]).split(":")[-1]
 
 
-def refresh_tcgdex(conn: sqlite3.Connection, settings: Settings, *, sleep=time.sleep) -> int:
+def refresh_tcgdex(
+    conn: sqlite3.Connection,
+    settings: Settings,
+    *,
+    catalog: sqlite3.Connection | None = None,
+    sleep=time.sleep,
+) -> int:
     """Fetch TCGdex pricing for cards the Cardmarket file does not cover.
 
     Cards never fetched go first, then the oldest fetch. The batch size keeps
     the job polite; it works through the catalogue over several nights.
+
+    `catalog` is the connection scans read cards from. With the PlanetScale
+    catalogue the cards live in an in-memory snapshot attached to that one
+    connection, so a separate connection to the file sees only a few old rows.
+    Candidates come from it; results are written on `conn`.
     """
     batch = max(0, int(settings.tcgdex_prices_batch))
     if batch == 0:
         return 0
-    rows = conn.execute(
-        """
-        SELECT c.id, c.provider_id, c.language
-        FROM cards c
-        LEFT JOIN cardmarket_guide g ON g.id_product = c.cardmarket_id
-        LEFT JOIN tcgdex_prices t ON t.card_id = c.id
-        WHERE g.id_product IS NULL AND c.id NOT LIKE 'extra-%'
-        ORDER BY t.fetched_at IS NOT NULL, t.fetched_at
-        LIMIT ?
-        """,
-        (batch,),
+    source = catalog if catalog is not None else conn
+    cards = source.execute(
+        "SELECT id, provider_id, language, cardmarket_id FROM cards WHERE id NOT LIKE 'extra-%'"
     ).fetchall()
+    covered = {row[0] for row in conn.execute("SELECT id_product FROM cardmarket_guide")}
+    fetched = {row[0]: row[1] for row in conn.execute("SELECT card_id, fetched_at FROM tcgdex_prices")}
+    missing = [row for row in cards if row["cardmarket_id"] is None or int(row["cardmarket_id"]) not in covered]
+    missing.sort(key=lambda row: (row["id"] in fetched, fetched.get(row["id"]) or ""))
+    rows = missing[:batch]
     done = 0
     with httpx.Client(timeout=15) as client:
         for row in rows:
@@ -336,7 +344,9 @@ def refresh_tcgdex(conn: sqlite3.Connection, settings: Settings, *, sleep=time.s
     return done
 
 
-def refresh_all(conn: sqlite3.Connection, settings: Settings) -> None:
+def refresh_all(
+    conn: sqlite3.Connection, settings: Settings, *, catalog: sqlite3.Connection | None = None
+) -> None:
     """One nightly pass. A failed source leaves the older data in place."""
     if settings.price_guide_enabled:
         try:
@@ -345,18 +355,19 @@ def refresh_all(conn: sqlite3.Connection, settings: Settings) -> None:
             log.info("price guide failed error=%s", type(exc).__name__)
     if settings.tcgdex_prices_enabled:
         try:
-            refresh_tcgdex(conn, settings)
+            refresh_tcgdex(conn, settings, catalog=catalog)
         except Exception as exc:
             log.info("tcgdex prices failed error=%s", type(exc).__name__)
 
 
-def refresh_all_on_own_connection(settings: Settings) -> None:
+def refresh_all_on_own_connection(settings: Settings, catalog: sqlite3.Connection | None = None) -> None:
     """Run the pass on a connection of its own, so a large import never shares
-    a transaction with the requests that read prices."""
+    a transaction with the requests that read prices. `catalog` is only read,
+    to choose which cards need TCGdex prices."""
     from app.db import connect
 
     conn = connect(settings.catalog_sqlite)
     try:
-        refresh_all(conn, settings)
+        refresh_all(conn, settings, catalog=catalog)
     finally:
         conn.close()
