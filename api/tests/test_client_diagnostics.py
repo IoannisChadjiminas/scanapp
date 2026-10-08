@@ -76,3 +76,18 @@ def test_auto_wait_breakdown_is_kept():
     }]})
     assert lines == ["phone event=auto.wait found=17 wait_ms=940 missed_ms=410 steady_ms=250 "
                      "focus_ms=180 held_ms=100 looks=28"]
+
+
+def test_camera_opened_keeps_the_app_build_only():
+    lines = phone_diagnostic_lines({"events": [
+        {"event": "camera.opened", "build": "1.0.0+51"},
+        {"event": "camera.opened", "build": "1.0 <script>"},
+    ]})
+    assert lines == ["phone event=camera.opened build=1.0.0+51", "phone event=camera.opened"]
+
+
+def test_auto_stuck_keeps_the_slab_holder_flag():
+    lines = phone_diagnostic_lines({"events": [
+        {"event": "auto.stuck", "found": 9, "wait_ms": 3000, "holder": 1, "coasted": 2},
+    ]})
+    assert lines == ["phone event=auto.stuck found=9 wait_ms=3000 holder=1 coasted=2"]
