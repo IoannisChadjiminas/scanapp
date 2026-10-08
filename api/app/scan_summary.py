@@ -26,6 +26,7 @@ SWITCHES = (
     'app_live_outline',
     'app_auto_capture',
     'app_native_camera',
+    'app_native_camera_android',
     'app_card_anywhere',
     'trust_client_warp',
 )
