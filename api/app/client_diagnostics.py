@@ -8,6 +8,7 @@ from typing import Any
 
 _TOKEN = re.compile(r"^[A-Za-z0-9._:-]{1,80}$")
 _EVENT = re.compile(r"^[a-zA-Z0-9._-]{1,64}$")
+_BUILD = re.compile(r"^[0-9A-Za-z.]{1,20}\+[0-9]{1,6}$|^[0-9A-Za-z.]{1,20}$")
 _INT_KEYS = {"status", "elapsed_ms", "bytes", "queued", "entries", "quality", "frames", "found",
              "wait_ms", "missed_ms", "steady_ms", "focus_ms", "held_ms", "looks"}
 _NUMBER_KEYS = {"fps", "detect_ms"}
@@ -67,6 +68,7 @@ def _event_line(item: Any) -> str | None:
         "focus_ms",
         "held_ms",
         "looks",
+        "build",
     ):
         value = _scalar(key, item.get(key))
         if value is not None:
@@ -92,6 +94,8 @@ def _scalar(key: str, value: Any) -> str | None:
         return f"{float(value):g}" if abs(value) <= 1_000_000 else None
     if key in _TEXT_KEYS:
         return _token(value)
+    if key == "build" and isinstance(value, str) and _BUILD.match(value):
+        return value
     if key == "cancelled" and isinstance(value, bool):
         return "true" if value else "false"
     if key == "status" and isinstance(value, str):
