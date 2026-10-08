@@ -11,7 +11,7 @@ services:
       - path: ${PLANETSCALE_ENV_FILE:-/etc/scanapp-staging/planetscale.env}
         required: false
         format: raw
-      # Release selectors live outside the checkout and generated Dokploy .env.
+      # Catalogue selectors and matching artifact paths live outside the checkout.
       # Missing release selection must fail deployment instead of loading an old import.
       - path: /etc/scanapp-staging/catalogue-release.env
         required: true
@@ -20,8 +20,6 @@ services:
       DATA_DIR: /data
       CATALOGUE_BACKEND: ${CATALOGUE_BACKEND:-planetscale}
       PORTFOLIO_DATABASE_URL: ${PORTFOLIO_DATABASE_URL:-}
-      ARTWORK_BUNDLE_DIR: ${ARTWORK_BUNDLE_DIR:-/data/artwork/PS-REFERENCE-027-20261003}
-      REFERENCE_FEATURES_DIR: ${REFERENCE_FEATURES_DIR:-/data/reference-features/20261003-recovery027-amd64}
       TMP_DIR: /tmp/scanapp
       PREPROCESS_CONFIG: ${PREPROCESS_CONFIG:-pad}
       USE_OCR: ${USE_OCR:-true}
