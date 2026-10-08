@@ -92,6 +92,9 @@ def scan_stream(*, loop, executor, recognize, limiter, response, trace, on_final
     async def body():
         # Disconnect cancels only this consumer. The owned worker releases its
         # slot after it stops touching engines/DBs, not when the socket closes.
+        # A first line at once tells the phone the photo arrived, so a dropped
+        # connection before the result can still be recovered by lookup.
+        yield json.dumps(dict(type='accepted', trace=trace)) + '\n'
         while True:
             try:
                 event = await asyncio.wait_for(events.get(), timeout=10)

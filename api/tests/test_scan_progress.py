@@ -34,9 +34,10 @@ def test_one_preview_then_final_and_session_cookie_with_slot_released(repeat):
             stream = scan_stream(loop=asyncio.get_running_loop(), executor=executor,
                 recognize=recognize, limiter=limiter, response=response, trace='test')
             events = [json.loads(chunk) async for chunk in stream.body_iterator]
-        assert [e['type'] for e in events] == ['provisional', 'final']
-        assert events[0]['candidates'][0]['card_id'] == 'initial-card'
-        assert events[1]['result']['best_match']['card_id'] == 'different-final-card'
+        assert [e['type'] for e in events] == ['accepted', 'provisional', 'final']
+        assert events[0] == dict(type='accepted', trace='test')
+        assert events[1]['candidates'][0]['card_id'] == 'initial-card'
+        assert events[2]['result']['best_match']['card_id'] == 'different-final-card'
         assert calls == [1] and not limiter._busy
         assert stream.headers['cache-control'] == 'no-store'
         assert stream.headers['x-accel-buffering'] == 'no'
@@ -56,7 +57,7 @@ def test_error_is_terminal_sanitized_and_releases_slot(error, code):
             stream = scan_stream(loop=asyncio.get_running_loop(), executor=executor,
                 recognize=recognize, limiter=limiter, response=Response(), trace='test')
             events = [json.loads(chunk) async for chunk in stream.body_iterator]
-        assert events == [dict(type='error', code=code)] and not limiter._busy
+        assert events == [dict(type='accepted', trace='test'), dict(type='error', code=code)] and not limiter._busy
     asyncio.run(run())
 
 
@@ -72,6 +73,7 @@ def test_disconnected_consumer_does_not_release_slot_or_rerun_recognition():
             stream = scan_stream(loop=asyncio.get_running_loop(), executor=executor,
                 recognize=recognize, limiter=limiter, response=Response(), trace='test')
             iterator = stream.body_iterator
+            assert json.loads(await anext(iterator))['type'] == 'accepted'
             assert json.loads(await anext(iterator))['type'] == 'provisional'
             await iterator.aclose()
             assert limiter._busy and not await limiter.acquire()
@@ -130,7 +132,7 @@ def test_stream_switch_on_sends_provisional_then_final(monkeypatch, caplog):
                                files={'image': ('card.jpg', b'jpeg', 'image/jpeg')})
     events = [json.loads(line) for line in response.text.splitlines()]
     assert response.headers['content-type'].startswith('application/x-ndjson')
-    assert [e['type'] for e in events] == ['provisional', 'final']
+    assert [e['type'] for e in events] == ['accepted', 'provisional', 'final']
     line = next(r.getMessage() for r in caplog.records if 'scan_stream_done' in r.getMessage())
     assert 'scan_id=final-id' in line and 'provisional_top=initial-card' in line
     assert 'final_ms=' in line and 'provisional_ms=' in line
