@@ -98,3 +98,11 @@ def test_auto_stuck_keeps_the_held_back_and_shape_fields():
         {"event": "auto.stuck", "wait_ms": 3000, "same_ms": 2800, "busy_ms": 0, "jumps": 6, "ratio": 72},
     ]})
     assert lines == ["phone event=auto.stuck wait_ms=3000 same_ms=2800 busy_ms=0 jumps=6 ratio=72"]
+
+
+def test_print_gap_is_kept_on_auto_events():
+    lines = phone_diagnostic_lines({"events": [
+        {"event": "auto.same", "print_gap": 3.4},
+        {"event": "auto.wait", "wait_ms": 900, "print_gap": 12},
+    ]})
+    assert lines == ["phone event=auto.same print_gap=3.4", "phone event=auto.wait wait_ms=900 print_gap=12"]

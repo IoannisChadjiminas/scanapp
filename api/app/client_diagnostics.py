@@ -12,7 +12,7 @@ _BUILD = re.compile(r"^[0-9A-Za-z.]{1,20}\+[0-9]{1,6}$|^[0-9A-Za-z.]{1,20}$")
 _INT_KEYS = {"status", "elapsed_ms", "bytes", "queued", "entries", "quality", "frames", "found",
              "wait_ms", "missed_ms", "steady_ms", "focus_ms", "held_ms", "looks", "holder", "coasted",
              "same_ms", "busy_ms", "jumps", "ratio"}
-_NUMBER_KEYS = {"fps", "detect_ms"}
+_NUMBER_KEYS = {"fps", "detect_ms", "print_gap"}
 _TEXT_KEYS = {"route", "host", "cf_ray", "server_trace", "language", "server_scan", "error_type", "state", "scan", "codec"}
 _MAX_EVENTS = 40
 _MAX_TIMINGS = 40
@@ -75,6 +75,7 @@ def _event_line(item: Any) -> str | None:
         "busy_ms",
         "jumps",
         "ratio",
+        "print_gap",
         "build",
     ):
         value = _scalar(key, item.get(key))
