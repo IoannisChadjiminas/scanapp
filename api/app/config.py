@@ -107,6 +107,8 @@ class Settings(BaseSettings):
     # Use the app's own iPhone camera (card found on every frame) instead of the
     # camera plugin. Off until the native camera has been checked on a phone.
     app_native_camera: bool = False
+    # Let a card count anywhere in the camera view, not only inside the middle box.
+    app_card_anywhere: bool = True
     # Tell the phone to find and flatten the card before upload.
     app_card_warp: bool = False
     # Honour skip_detect from the phone. Off: the server still runs its own

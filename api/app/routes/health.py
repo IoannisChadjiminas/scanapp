@@ -35,6 +35,7 @@ class CaptureConfig(BaseModel):
     live_outline: bool = False
     auto_capture: bool = False
     native_camera: bool = False
+    card_anywhere: bool = True
 
 
 class AppConfigResponse(BaseModel):
@@ -66,6 +67,7 @@ def scan_price_config(settings) -> AppConfigResponse:
             live_outline=bool(settings.app_live_outline),
             auto_capture=bool(settings.app_live_outline and settings.app_auto_capture),
             native_camera=bool(settings.app_native_camera),
+            card_anywhere=bool(settings.app_card_anywhere),
         ),
         scan_prices=ScanPriceConfig(
             start_on_provisional=bool(settings.scan_price_start_on_provisional),
