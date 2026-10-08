@@ -80,6 +80,16 @@ per night), then an older listing sample. A pass runs at start-up and shortly af
 00:00 UTC. `PRICE_GUIDE_ENABLED=false` and `TCGDEX_PRICES_ENABLED=false` switch the
 jobs off. A failed download keeps the previous data.
 
+How long a listing sample stays fresh depends on the card's Cardmarket trend
+(`CARDMARKET_FRESH_TIERS`, default `2:604800,20:86400,100:21600,*:3600`: under
+EUR 2 a week, under 20 a day, under 100 six hours, above that an hour). A card
+with no known trend keeps `CARDMARKET_PRICE_FRESH_MINUTES`.
+`CARDMARKET_FRESH_BY_VALUE=false` turns it off. The price endpoint reports the
+window as `fresh_for_s`. A paid read queued from a scan is skipped for a card
+whose trend is under `SCAN_PRICE_SERVER_READ_MIN_TREND` (EUR 2; 0 reads all).
+The phone can log `price.first_shown` (`elapsed_ms`, `price_source`, `stored`,
+`guessed`) through `/diagnostics`.
+
 Regenerate the OpenAPI document with:
 
 ```bash

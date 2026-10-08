@@ -217,6 +217,8 @@ class PriceResponse(BaseModel):
     observed_at: str | None = None
     sampled_offer_count: int | None = None
     freshness: str | None = None
+    # How long a listing sample for this product counts as fresh, in seconds.
+    fresh_for_s: int | None = None
     unlisted: bool = False
     scraper_ready: bool = False
     challenge_fallback_minutes: int = 10
@@ -296,6 +298,7 @@ def _price_response(payload: dict[str, Any]) -> PriceResponse:
         ),
         sampled_offer_count=payload.get("sampled_offer_count"),
         freshness=payload.get("freshness"),
+        fresh_for_s=payload.get("fresh_for_s"),
         deadline_at=payload.get("deadline_at"),
         queue_position=payload.get("queue_position"),
         queued=payload.get("queued"),

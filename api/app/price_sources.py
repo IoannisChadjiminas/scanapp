@@ -157,17 +157,86 @@ def _json(raw: Any) -> dict[str, Any]:
     return value if isinstance(value, dict) else {}
 
 
+def parse_tiers(text: str) -> list[tuple[float | None, int]]:
+    """"2:604800,20:86400,*:3600" -> [(2.0, 604800), (20.0, 86400), (None, 3600)]."""
+    tiers: list[tuple[float | None, int]] = []
+    for part in (text or "").split(","):
+        limit, _, seconds = part.strip().partition(":")
+        try:
+            window = int(seconds)
+            bound = None if limit.strip() == "*" else float(limit)
+        except ValueError:
+            continue
+        if window > 0:
+            tiers.append((bound, window))
+    tiers.sort(key=lambda tier: float("inf") if tier[0] is None else tier[0])
+    return tiers
+
+
+def tier_window(settings: Settings, trend: float | None) -> int | None:
+    """Seconds a listing sample stays fresh for a card worth `trend` EUR."""
+    if not settings.cardmarket_fresh_by_value or trend is None or trend <= 0:
+        return None
+    for bound, window in parse_tiers(settings.cardmarket_fresh_tiers):
+        if bound is None or trend < bound:
+            return window
+    return None
+
+
+def market_trend(market: dict[str, Any] | None) -> float | None:
+    if not market:
+        return None
+    for key in ("trend", "trend-holo"):
+        value = _number(market.get(key))
+        if value and value > 0:
+            return value
+    return None
+
+
+def trend_for_url(conn: sqlite3.Connection, url: str | None) -> float | None:
+    """The Cardmarket trend of the product behind a listing URL, if on file."""
+    from app.cardmarket import normalize_product_url
+
+    if not url:
+        return None
+    row = conn.execute(
+        "SELECT cardmarket_id FROM cards WHERE cardmarket_url = ? AND cardmarket_id IS NOT NULL LIMIT 1",
+        (normalize_product_url(url) or url,),
+    ).fetchone()
+    return market_trend(guide_market(conn, row["cardmarket_id"])) if row else None
+
+
+def fresh_window(conn: sqlite3.Connection, url: str | None, *, trend: float | None = None) -> int:
+    """How long a listing sample for this product stays fresh, in seconds."""
+    from app.cardmarket_queue import fresh_seconds
+    from app.config import get_settings
+
+    settings = get_settings()
+    if not settings.cardmarket_fresh_by_value:
+        return fresh_seconds()
+    try:
+        value = trend if trend is not None else trend_for_url(conn, url)
+        return tier_window(settings, value) or fresh_seconds()
+    except sqlite3.Error:
+        return fresh_seconds()
+
+
 def best_prices(conn: sqlite3.Connection, card_id: str, url: str | None) -> list[dict[str, Any]]:
     """The prices to show with one card, each tagged with its source."""
-    from app.cardmarket_queue import _age_seconds, fresh_seconds
+    from app.cardmarket_queue import _age_seconds
 
+    card = conn.execute(
+        "SELECT cardmarket_id, variants_json FROM cards WHERE id = ?", (card_id,)
+    ).fetchone()
+    variants = _json(card["variants_json"]) if card else {}
+    market = guide_market(conn, card["cardmarket_id"] if card else None)
     record = snapshot_record(conn, url) if url else None
     live = list((record or {}).get("prices") or [])
     observed = (record or {}).get("observed_at") or (record or {}).get("fetched_at")
     stale_live: list[dict[str, Any]] = []
     if live:
         age = _age_seconds(str(observed or ""))
-        is_fresh = age is None or age <= fresh_seconds()
+        is_fresh = age is None or age <= fresh_window(conn, url, trend=market_trend(market))
         tagged = [
             {**price, "source": "live", "as_of": observed, "stale": not is_fresh} for price in live
         ]
@@ -175,11 +244,6 @@ def best_prices(conn: sqlite3.Connection, card_id: str, url: str | None) -> list
             return tagged
         stale_live = tagged
 
-    card = conn.execute(
-        "SELECT cardmarket_id, variants_json FROM cards WHERE id = ?", (card_id,)
-    ).fetchone()
-    variants = _json(card["variants_json"]) if card else {}
-    market = guide_market(conn, card["cardmarket_id"] if card else None)
     if market:
         prices = prices_from_market(_swap_holo(market) if _holo_first(variants) else market)
         if prices:

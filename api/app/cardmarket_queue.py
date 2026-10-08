@@ -24,6 +24,7 @@ from app.cardmarket import (
     snapshot_record,
     write_snapshot,
 )
+from app.price_sources import fresh_window, trend_for_url
 from app.config import get_settings
 
 log = logging.getLogger("cardmarket.prices")
@@ -561,7 +562,7 @@ def remember_phone_offers(
     existing_prices = list((existing or {}).get("prices") or [])
     observed = (existing or {}).get("observed_at") or (existing or {}).get("fetched_at")
     age = _age_seconds(str(observed or ""))
-    if _same_prices(existing_prices, prices) and age is not None and age <= fresh_seconds():
+    if _same_prices(existing_prices, prices) and age is not None and age <= fresh_window(conn, url):
         return False
     version = parser_version or PHONE_PARSER_VERSION
     write_snapshot(
@@ -629,10 +630,15 @@ def schedule_scan_parallel_read(
     if limit <= 0 or scan_parallel_pages_today(conn) >= limit:
         log.info("scan parallel skipped reason=budget url=%s", sample_key(url) or "")
         return None
+    floor = float(settings.scan_price_server_read_min_trend)
+    trend = trend_for_url(conn, url) if floor > 0 else None
+    if trend is not None and trend < floor:
+        log.info("scan parallel skipped reason=cheap trend=%s url=%s", trend, sample_key(url) or "")
+        return None
     record = snapshot_record(conn, url)
     observed = (record or {}).get("observed_at") or (record or {}).get("fetched_at")
     age = _age_seconds(str(observed or ""))
-    if record and record.get("prices") and age is not None and age <= fresh_seconds():
+    if record and record.get("prices") and age is not None and age <= fresh_window(conn, url, trend=trend):
         return None
     delay_s = max(0, int(settings.scan_price_server_read_delay_ms)) / 1000
     job_id = enqueue_job(
@@ -1278,11 +1284,12 @@ def prices_payload(
     if unlisted or (not prices and (record or {}).get("empty_count")):
         observed = (record or {}).get("empty_observed_at") or observed
     freshness = None
+    window = fresh_window(conn, url)
     if record and (prices or unlisted or record.get("empty")):
         age = _age_seconds(str(observed or ""))
         if age is None:
             freshness = "live"
-        elif age <= fresh_seconds():
+        elif age <= window:
             freshness = "fresh"
         else:
             freshness = "stale"
@@ -1305,6 +1312,7 @@ def prices_payload(
         "observed_at": observed,
         "sampled_offer_count": (record or {}).get("sampled_offer_count"),
         "freshness": freshness,
+        "fresh_for_s": window,
         "unlisted": unlisted,
         "attempted_at": (record or {}).get("empty_observed_at"),
         "scraper_ready": scraper_is_ready(conn),
@@ -1465,4 +1473,4 @@ def sample_is_fresh(conn: sqlite3.Connection, url: str) -> bool:
     if not record or record.get("unlisted") or not record.get("prices"):
         return False
     age = _age_seconds(str(record.get("observed_at") or ""))
-    return age is not None and 0 <= age <= fresh_seconds()
+    return age is not None and 0 <= age <= fresh_window(conn, url)

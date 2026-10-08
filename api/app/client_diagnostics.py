@@ -13,7 +13,7 @@ _INT_KEYS = {"status", "elapsed_ms", "bytes", "queued", "entries", "quality", "f
              "wait_ms", "missed_ms", "steady_ms", "focus_ms", "held_ms", "looks", "holder", "coasted",
              "same_ms", "busy_ms", "jumps", "ratio"}
 _NUMBER_KEYS = {"fps", "detect_ms", "print_gap"}
-_TEXT_KEYS = {"route", "host", "cf_ray", "server_trace", "language", "server_scan", "error_type", "state", "scan", "codec"}
+_TEXT_KEYS = {"route", "host", "cf_ray", "server_trace", "language", "server_scan", "error_type", "state", "scan", "codec", "price_source"}
 _MAX_EVENTS = 40
 _MAX_TIMINGS = 40
 
@@ -57,6 +57,9 @@ def _event_line(item: Any) -> str | None:
         "cf_ray",
         "server_trace",
         "cancelled",
+        "stored",
+        "guessed",
+        "price_source",
         "quality",
         "codec",
         "frames",
@@ -104,7 +107,7 @@ def _scalar(key: str, value: Any) -> str | None:
         return _token(value)
     if key == "build" and isinstance(value, str) and _BUILD.match(value):
         return value
-    if key == "cancelled" and isinstance(value, bool):
+    if key in {"cancelled", "stored", "guessed"} and isinstance(value, bool):
         return "true" if value else "false"
     if key == "status" and isinstance(value, str):
         return _token(value)

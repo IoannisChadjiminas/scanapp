@@ -41,6 +41,7 @@ def init_catalog(conn: sqlite3.Connection) -> None:
         CREATE INDEX IF NOT EXISTS idx_cards_set ON cards(set_id);
         CREATE INDEX IF NOT EXISTS idx_cards_number ON cards(collector_number);
         CREATE INDEX IF NOT EXISTS idx_cards_language ON cards(language);
+        CREATE INDEX IF NOT EXISTS idx_cards_cardmarket_url ON cards(cardmarket_url);
         CREATE VIRTUAL TABLE IF NOT EXISTS cards_fts USING fts5(
             name, set_name, collector_number, id UNINDEXED
         );

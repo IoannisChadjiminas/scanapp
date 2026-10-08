@@ -8,7 +8,7 @@ import pytest
 
 from app import price_sources
 from app.cardmarket import write_snapshot
-from app.config import Settings
+from app.config import Settings, get_settings
 from app.db import connect, init_catalog
 from app.price_sources import best_prices, import_guide, refresh_tcgdex
 
@@ -80,6 +80,7 @@ def test_a_fresh_listing_sample_beats_the_file(tmp_path):
 
 
 def test_an_old_listing_sample_loses_to_the_file(tmp_path, monkeypatch):
+    monkeypatch.setattr(get_settings(), "cardmarket_fresh_by_value", False)
     conn = _catalog(tmp_path)
     _card(conn, "en:a", product=100, url=URL)
     import_guide(conn, GUIDE)
@@ -90,6 +91,7 @@ def test_an_old_listing_sample_loses_to_the_file(tmp_path, monkeypatch):
 
 
 def test_an_old_listing_sample_is_the_last_resort(tmp_path, monkeypatch):
+    monkeypatch.setattr(get_settings(), "cardmarket_fresh_by_value", False)
     conn = _catalog(tmp_path)
     _card(conn, "en:a", product=None, url=URL)
     write_snapshot(conn, URL, [{"label": "From", "amount": 2.0, "currency": "EUR"}])
@@ -159,3 +161,66 @@ def test_tcgdex_refresh_covers_only_cards_the_file_misses(tmp_path, monkeypatch)
     assert refresh_tcgdex(conn, settings, sleep=lambda _s: None) == 1
     assert seen == ["/v2/en/cards/e"]
     assert {p["source"] for p in best_prices(conn, "en:e", None)} == {"tcgdex"}
+
+
+def test_tiers_make_cheap_cards_fresh_for_longer():
+    settings = Settings()
+    assert price_sources.tier_window(settings, 0.5) == 604800
+    assert price_sources.tier_window(settings, 4.2) == 86400
+    assert price_sources.tier_window(settings, 50) == 21600
+    assert price_sources.tier_window(settings, 300) == 3600
+    assert price_sources.tier_window(settings, None) is None
+    assert price_sources.tier_window(Settings(cardmarket_fresh_by_value=False), 0.5) is None
+
+
+def test_bad_tier_text_is_ignored():
+    assert price_sources.parse_tiers("x:1,5:abc,3:60,*:10") == [(3.0, 60), (None, 10)]
+
+
+def test_fresh_window_follows_the_trend_of_the_product(tmp_path):
+    conn = _catalog(tmp_path)
+    _card(conn, "en:a", product=100, url=URL)
+    import_guide(conn, GUIDE)
+    assert price_sources.trend_for_url(conn, URL) == 4.2
+    assert price_sources.fresh_window(conn, URL) == 86400
+    assert price_sources.fresh_window(conn, "https://example.test/none") == Settings().cardmarket_price_fresh_minutes * 60
+
+
+def test_a_day_old_sample_of_a_cheap_card_is_still_live(tmp_path, monkeypatch):
+    conn = _catalog(tmp_path)
+    _card(conn, "en:a", product=100, url=URL)
+    import_guide(conn, GUIDE)
+    write_snapshot(conn, URL, [{"label": "From", "amount": 2.0, "currency": "EUR"}])
+    # Fifteen minutes is the plain window; a 4 EUR card gets a day.
+    monkeypatch.setattr("app.cardmarket_queue.fresh_seconds", lambda: 0)
+    prices = best_prices(conn, "en:a", URL)
+    assert prices[0]["source"] == "live" and not prices[0]["stale"]
+
+
+def test_parallel_read_is_skipped_for_a_cheap_card(tmp_path, monkeypatch):
+    from app.cardmarket_queue import schedule_scan_parallel_read
+
+    settings = get_settings()
+    monkeypatch.setattr(settings, "scan_price_server_read", "parallel")
+    monkeypatch.setattr(settings, "scan_price_server_read_daily_pages", 10)
+    conn = _catalog(tmp_path)
+    _card(conn, "en:a", product=100, url=URL)
+    import_guide(conn, {**GUIDE, "priceGuides": [{"idProduct": 100, "trend": 0.4}]})
+    assert schedule_scan_parallel_read(conn, status="matched", url=URL) is None
+    import_guide(conn, {**GUIDE, "createdAt": "2026-10-09T02:51:56+0200",
+                        "priceGuides": [{"idProduct": 100, "trend": 9.0}]})
+    assert schedule_scan_parallel_read(conn, status="matched", url=URL) is not None
+    monkeypatch.setattr(settings, "scan_price_server_read_min_trend", 0)
+    assert schedule_scan_parallel_read(conn, status="matched", url=URL + "-other") is not None
+
+
+def test_first_price_event_passes_the_allow_list():
+    from app.client_diagnostics import phone_diagnostic_lines
+
+    lines = phone_diagnostic_lines({"events": [{
+        "event": "price.first_shown", "scan": "abc123", "elapsed_ms": 420,
+        "price_source": "cardmarket_file", "stored": False, "guessed": True,
+        "url": "https://secret.example/x", "card_name": "Pikachu",
+    }]})
+    assert lines == ["phone event=price.first_shown scan=abc123 elapsed_ms=420 "
+                     "stored=false guessed=true price_source=cardmarket_file"]
