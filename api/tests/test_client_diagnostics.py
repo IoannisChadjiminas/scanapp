@@ -91,3 +91,10 @@ def test_auto_stuck_keeps_the_slab_holder_flag():
         {"event": "auto.stuck", "found": 9, "wait_ms": 3000, "holder": 1, "coasted": 2},
     ]})
     assert lines == ["phone event=auto.stuck found=9 wait_ms=3000 holder=1 coasted=2"]
+
+
+def test_auto_stuck_keeps_the_held_back_and_shape_fields():
+    lines = phone_diagnostic_lines({"events": [
+        {"event": "auto.stuck", "wait_ms": 3000, "same_ms": 2800, "busy_ms": 0, "jumps": 6, "ratio": 72},
+    ]})
+    assert lines == ["phone event=auto.stuck wait_ms=3000 same_ms=2800 busy_ms=0 jumps=6 ratio=72"]
