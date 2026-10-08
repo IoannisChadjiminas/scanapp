@@ -46,7 +46,7 @@ def _seconds_until_utc_day() -> float:
     return max(1.0, (int(now) // 86400 + 1) * 86400 - now)
 
 
-async def _price_sources(stop: asyncio.Event) -> None:
+async def _price_sources(stop: asyncio.Event, catalog=None) -> None:
     """Import Cardmarket's price file and TCGdex prices once a day.
 
     The guide file is written around 02:50 CET, so the pass runs a little after
@@ -57,7 +57,7 @@ async def _price_sources(stop: asyncio.Event) -> None:
     while not stop.is_set():
         settings = get_settings()
         try:
-            await asyncio.to_thread(refresh_all_on_own_connection, settings)
+            await asyncio.to_thread(refresh_all_on_own_connection, settings, catalog)
         except Exception as exc:
             log.info("price sources pass failed error=%s", type(exc).__name__)
         try:
@@ -134,7 +134,7 @@ async def lifespan(app: FastAPI):
     daily_task = asyncio.create_task(_daily_prices(daily_stop)) if should_schedule(settings) else None
     sources_task = None
     if settings.price_guide_enabled or settings.tcgdex_prices_enabled:
-        sources_task = asyncio.create_task(_price_sources(daily_stop))
+        sources_task = asyncio.create_task(_price_sources(daily_stop, dbs.catalog))
     try:
         yield
     finally:

@@ -163,6 +163,35 @@ def test_tcgdex_refresh_covers_only_cards_the_file_misses(tmp_path, monkeypatch)
     assert {p["source"] for p in best_prices(conn, "en:e", None)} == {"tcgdex"}
 
 
+def test_tcgdex_refresh_reads_cards_from_the_catalogue_connection(tmp_path, monkeypatch):
+    # With the cloud catalogue the cards exist only on the serving connection;
+    # the job's own connection to the file holds the price tables and no cards.
+    own = _catalog(tmp_path)
+    serving = connect(tmp_path / "serving.sqlite")
+    init_catalog(serving)
+    _card(serving, "en:a", product=100)
+    _card(serving, "en:e", product=None)
+    _card(serving, "en:fresh", product=None)
+    import_guide(own, GUIDE)
+    with own:
+        own.execute("INSERT INTO tcgdex_prices (card_id, cardmarket_json, tcgplayer_json, fetched_at)"
+                    " VALUES ('en:fresh', '{}', '{}', '2026-10-07T00:00:00Z')")
+    seen = []
+
+    def handler(request):
+        seen.append(request.url.path)
+        return httpx.Response(200, json={"pricing": {"cardmarket": {"trend": 3.0, "unit": "EUR"}}})
+
+    real = httpx.Client
+    monkeypatch.setattr(price_sources.httpx, "Client",
+                        lambda **kw: real(transport=httpx.MockTransport(handler), **kw))
+    settings = Settings(tcgdex_prices_batch=10, tcgdex_prices_gap_s=0)
+    assert refresh_tcgdex(own, settings, catalog=serving, sleep=lambda _s: None) == 2
+    assert seen == ["/v2/en/cards/e", "/v2/en/cards/fresh"]
+    stored = {r[0] for r in own.execute("SELECT card_id FROM tcgdex_prices")}
+    assert stored == {"en:e", "en:fresh"}
+
+
 def test_tiers_make_cheap_cards_fresh_for_longer():
     settings = Settings()
     assert price_sources.tier_window(settings, 0.5) == 604800
