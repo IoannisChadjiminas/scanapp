@@ -88,6 +88,6 @@ def test_camera_opened_keeps_the_app_build_only():
 
 def test_auto_stuck_keeps_the_slab_holder_flag():
     lines = phone_diagnostic_lines({"events": [
-        {"event": "auto.stuck", "found": 9, "wait_ms": 3000, "holder": 1},
+        {"event": "auto.stuck", "found": 9, "wait_ms": 3000, "holder": 1, "coasted": 2},
     ]})
-    assert lines == ["phone event=auto.stuck found=9 wait_ms=3000 holder=1"]
+    assert lines == ["phone event=auto.stuck found=9 wait_ms=3000 holder=1 coasted=2"]
