@@ -19,7 +19,7 @@ from app.recognition.pipeline import recognize_bytes
 from app.recognition.presentation import match_presentation
 from app.recognition.progress import scan_stream
 from app.recognition.upload import read_upload_limited
-from app.scan_summary import scan_flags, scan_outcome_line, scan_summary_line
+from app.scan_summary import scan_flags, scan_outcome_line, scan_source, scan_summary_line
 from app.schemas import (
     Candidate,
     FeedbackRequest,
@@ -62,6 +62,14 @@ async def create_scan(
     language: str = Form(default="auto"),
     graded: bool | None = Form(default=None),
     stream_results: bool = Form(default=False),
+    # Where the scan came from. All optional; used for logs and comparisons only.
+    platform: str | None = Form(default=None),
+    capture: str | None = Form(default=None),
+    camera: str | None = Form(default=None),
+    app_build: str | None = Form(default=None),
+    locale: str | None = Form(default=None),
+    card_quad: str | None = Form(default=None),
+    quad_source: str | None = Form(default=None),
 ) -> ScanResponse | Response:
     settings = request.app.state.settings
     started = time.perf_counter()
@@ -100,6 +108,8 @@ async def create_scan(
         )
 
     streaming = bool(stream_results and settings.scan_stream_results)
+    source = scan_source(platform=platform, capture=capture, camera=camera, app_build=app_build,
+                         locale=locale, card_quad=card_quad, quad_source=quad_source)
     flags = scan_flags(settings, stream=streaming, skip_detect=skip_detect, graded=graded)
     # A phone-flattened photo is only trusted once TRUST_CLIENT_WARP is on.
     detect_on_server = skip_detect and not settings.trust_client_warp
@@ -108,7 +118,7 @@ async def create_scan(
 
     def log_summary(result: ScanResponse) -> None:
         logger.info("%s", scan_summary_line(result, settings, trace=trace,
-                                            upload_bytes=len(data), flags=flags))
+                                            upload_bytes=len(data), flags=flags, source=source))
 
     def after_stream(result: ScanResponse) -> None:
         log_summary(result)
@@ -244,12 +254,15 @@ async def scan_feedback(
     except Exception:  # noqa: BLE001 - logging must never fail feedback
         pass
     try:
-        apply_feedback(
+        # File writes stay off the event loop; the review index rebuilds later.
+        await asyncio.to_thread(
+            apply_feedback,
             settings,
             scan_id,
             action=payload.action.value,
             confirmed_card_id=confirmed,
             rejected=bool(rejected),
+            rebuild_index=False,
         )
     except Exception:  # noqa: BLE001 - review files must never fail feedback
         pass

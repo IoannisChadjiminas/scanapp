@@ -606,7 +606,7 @@ def _finish_twins(
     return twins
 
 
-def decide_status(
+def decide_status_with_reason(
     suggestions: list[dict[str, Any]],
     *,
     enable_matched: bool,
@@ -614,11 +614,12 @@ def decide_status(
     min_gap: float,
     retake: bool,
     min_visual_ocr: float | None = None,
-) -> str:
+) -> tuple[str, str]:
+    """The status plus a short code saying which branch produced it."""
     if retake:
-        return "retake"
+        return "retake", "retake_input"
     if not suggestions:
-        return "no_match"
+        return "no_match", "no_candidates"
     ocr_floor = min_visual if min_visual_ocr is None else min_visual_ocr
     top = suggestions[0]
     # Unknown translation only downgrades an otherwise eligible match. It
@@ -628,16 +629,16 @@ def decide_status(
     visual_lead = max(compatible or suggestions, key=lambda row: float(row["visual_score"]))
     if (visual_lead.get("collector_conflict") or top.get("collector_conflict")
         or top.get('structured_collector_conflict') or top.get('language_conflict') or top.get('strong_name_conflict')):
-        return "uncertain"
+        return "uncertain", "conflict"
     second = _visual_second(suggestions, top["card_id"])
     gap = float(top["visual_score"]) - second
     visual_ok = float(top["visual_score"]) >= min_visual and (second <= 0.0 or gap >= min_gap)
     if _finish_twins(suggestions, top, min_gap):
-        return "uncertain"
+        return "uncertain", "finish_twins"
     if visual_ok:
         if not enable_matched:
-            return "uncertain"
-        return "matched"
+            return "uncertain", "matched_disabled"
+        return "matched", "visual_ok"
     if float(top["visual_score"]) >= min_visual and top.get("ocr_consistent") is True:
         twins = [
             row
@@ -647,10 +648,10 @@ def decide_status(
         others = [row for row in twins if row["card_id"] != top["card_id"]]
         if others and all(row.get("ocr_consistent") is False for row in others):
             if not enable_matched:
-                return "uncertain"
-            return "matched"
+                return "uncertain", "matched_disabled"
+            return "matched", "ocr_twin_resolved"
         if others:
-            return "uncertain"
+            return "uncertain", "visual_twins"
     if (
         top.get("ocr_consistent") is True
         and visual_lead.get("card_id") == top.get("card_id")
@@ -658,6 +659,10 @@ def decide_status(
         and (second <= 0.0 or gap >= min_gap)
     ):
         if not enable_matched:
-            return "uncertain"
-        return "matched"
-    return "no_match"
+            return "uncertain", "matched_disabled"
+        return "matched", "ocr_floor"
+    return "no_match", "below_visual_floor"
+
+
+def decide_status(*args, **kwargs) -> str:
+    return decide_status_with_reason(*args, **kwargs)[0]

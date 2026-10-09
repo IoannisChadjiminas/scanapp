@@ -158,3 +158,20 @@ def test_streaming_is_on_by_default_and_can_be_switched_off():
     from app.config import Settings
     assert Settings(_env_file=None).scan_stream_results is True
     assert Settings(_env_file=None, scan_stream_results=False).scan_stream_results is False
+
+
+def test_source_fields_reach_the_scan_summary_and_old_phones_still_work(monkeypatch, caplog):
+    client, executor = stream_app(monkeypatch, enabled=True)
+    files = {'image': ('card.jpg', b'jpeg', 'image/jpeg')}
+    with client, executor, caplog.at_level('INFO', logger='scan.diagnostics'):
+        new = client.post('/scans', data={
+            'stream_results': 'true', 'platform': 'ios', 'capture': 'auto', 'camera': 'native',
+            'app_build': '1.0.0+61', 'card_quad': '0.1,0.1,0.9,0.1,0.9,0.9,0.1,0.9',
+            'quad_source': 'rect'}, files=files)
+        old = client.post('/scans', data={'stream_results': 'true'}, files=files)
+    assert new.status_code == old.status_code == 200
+    lines = [r.getMessage() for r in caplog.records if r.getMessage().startswith('scan_summary')]
+    assert len(lines) == 2
+    assert all(p in lines[0].split() for p in
+               ('platform=ios', 'capture=auto', 'camera=native', 'build=1.0.0+61', 'quad=rect', 'quad_valid=true'))
+    assert 'platform=unknown' in lines[1].split() and 'quad=none' in lines[1].split()
