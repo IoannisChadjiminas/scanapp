@@ -24,7 +24,8 @@ from app.price_sources import scan_prices
 from app.set_totals import set_total
 from app.db import coverage_payload
 from app.recognition.captures import save_scan_capture
-from app.recognition.detect import card_frame_candidates, detect_and_rectify
+from app.recognition.detect import (card_frame_candidates, client_quad_rect, detect_and_rectify,
+                                    quads_agree, server_frame_rect, warp_to_rect)
 from app.recognition.frame_fallback import line_frame_candidates, loose_frame_candidates, portrait_window_candidates, slab_interior_candidate
 from app.recognition.images import apply_crop, blur_variance, decode_image
 from app.recognition.embed import top_k
@@ -130,6 +131,26 @@ class _ScanEvaluation:
     shown: list[dict] = field(default_factory=list)
 
 
+def _detect_with_client_quad(image, fractions) -> tuple[Any, bool, str]:
+    """The server's own detection decides; the phone's corners fill in when it finds nothing.
+
+    A disagreement keeps today's behaviour. A phone quad is only used alone when it
+    also passes the detector's card-shape rules, and visual retrieval still compares
+    it against the alternative frames afterwards.
+    """
+    server = server_frame_rect(image)
+    client = client_quad_rect(image, fractions)
+    if client is None:
+        note = 'client_quad_rejected'
+    elif server is None:
+        return warp_to_rect(image, client), True, 'client_quad_only'
+    else:
+        note = 'client_quad_agrees' if quads_agree(server, client) else 'client_quad_disagrees'
+    if server is None:
+        return image, False, note
+    return warp_to_rect(image, server), True, note
+
+
 def _recognize_bytes_once(
     data: bytes,
     *,
@@ -147,6 +168,7 @@ def _recognize_bytes_once(
     language: str = "auto",
     store_capture: bool | None = None,
     locale: str | None = None,
+    card_quad: list[tuple[float, float]] | None = None,
     _frame_override: tuple[str, Any] | None = None,
     _input_observer: Callable | None = None,
     _progress_observer: Callable | None = None,
@@ -166,10 +188,16 @@ def _recognize_bytes_once(
 
     mark = time.perf_counter()
     detected = False
+    quad_notes: list[str] = []
     if _frame_override is not None:
         image = _frame_override[1]
     elif not skip_detect:
-        image, detected = detect_and_rectify(image)
+        if (card_quad and settings.use_client_quad and rotation == 0
+                and all(v is None for v in (crop_x, crop_y, crop_w, crop_h))):
+            image, detected, quad_note = _detect_with_client_quad(image, card_quad)
+            quad_notes.append(quad_note)
+        else:
+            image, detected = detect_and_rectify(image)
     timings["detect_ms"] = (time.perf_counter() - mark) * 1000
 
     # Respect an explicit language while selecting orientation. Automatic
@@ -573,7 +601,7 @@ def _recognize_bytes_once(
         retake=retake,
     )
     # Which rules produced or lowered the status, in order. Logged and stored, never acted on.
-    status_reasons = [f'rank:{decided_by}']
+    status_reasons = [f'rank:{decided_by}', *quad_notes]
     if framing_review_supported and status=='no_match':
         # Independently qualified printed name + explicit collector and the
         # existing OCR-assisted visual floor can support a review result even
@@ -957,6 +985,7 @@ def recognize_bytes(
     language: str = "auto",
     store_capture: bool | None = None,
     locale: str | None = None,
+    card_quad: list[tuple[float, float]] | None = None,
     graded: bool | None = None,
     _grading_job: GradingJob | None = None,
     _progress_observer: Callable | None = None,
@@ -977,6 +1006,8 @@ def recognize_bytes(
     kwargs['_ocr_cache'] = ocr_cache
     if locale:
         kwargs['locale'] = locale
+    if card_quad:
+        kwargs['card_quad'] = card_quad
     if _progress_observer is not None:
         kwargs['_progress_observer'] = _progress_observer
     if _grading_job is not None:

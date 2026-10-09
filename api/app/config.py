@@ -138,6 +138,8 @@ class Settings(BaseSettings):
     # Honour skip_detect from the phone. Off: the server still runs its own
     # detection on a phone-flattened photo, so both can be compared first.
     trust_client_warp: bool = False
+    # The phone's card corners as a first frame hypothesis. The server's own detection still runs and wins on disagreement.
+    use_client_quad: bool = False
     scan_price_start_on_provisional: bool = True
     scan_price_candidate_reads: int = 2
     scan_price_warm_reader: bool = True
