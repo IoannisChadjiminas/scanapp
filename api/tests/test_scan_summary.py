@@ -104,3 +104,60 @@ def test_replay_finds_the_widest_threshold_that_keeps_precision():
     chosen = replay_thresholds.best(rows, .99)
     # .745 adds the correct .75 scan; .70 would also match the wrong and rejected ones.
     assert chosen['min_visual'] == .745 and chosen['coverage'] == .5
+
+
+def test_source_is_normalised_and_unknown_values_never_fail():
+    from app.scan_summary import parse_quad, scan_source, source_parts
+    source = scan_source(platform=' iOS ', capture='auto', camera='native', app_build='1.0.0+61',
+                         locale='en-GB', card_quad='0.1,0.1,0.9,0.1,0.9,0.9,0.1,0.9', quad_source='rect')
+    assert source_parts(source) == ['platform=ios', 'capture=auto', 'camera=native', 'build=1.0.0+61',
+                                    'locale=en_GB', 'quad=rect', 'quad_valid=true']
+    old = scan_source()
+    assert source_parts(old)[:3] == ['platform=unknown', 'capture=unknown', 'camera=unknown']
+    junk = scan_source(platform='symbian', capture='x y', app_build='bad build!', locale='<script>',
+                       card_quad='1,2,3', quad_source='whatever')
+    assert (junk.platform, junk.build, junk.locale, junk.quad, junk.quad_valid) == (
+        'unknown', 'unknown', 'unknown', 'unknown', False)
+    assert parse_quad('0.1,0.1,0.9,0.1,0.9,0.9,0.1,0.9') is not None
+    assert parse_quad('0.1,0.1,0.1,0.9,0.9,0.9,0.9,0.1') is None  # anticlockwise
+    assert parse_quad('0,0,0.01,0,0.01,0.01,0,0.01') is None  # a speck
+    assert parse_quad('nan,0,1,0,1,1,0,1') is None
+    assert parse_quad('0,0,5,0,5,5,0,5') is None
+
+
+def test_summary_line_carries_the_source():
+    from app.scan_summary import scan_source
+    source = scan_source(platform='android', capture='manual', camera='plugin', app_build='1.0.0+61')
+    line = scan_summary_line(response(), Settings(_env_file=None), trace='t', upload_bytes=1,
+                             flags=[], source=source)
+    for part in ('platform=android', 'capture=manual', 'camera=plugin', 'build=1.0.0+61', 'quad=none'):
+        assert part in line.split(), part
+
+
+def test_report_can_group_by_platform_and_capture():
+    settings = Settings(_env_file=None)
+    from app.scan_summary import scan_source
+    logs = []
+    for scan_id, platform, capture in (('a', 'ios', 'auto'), ('b', 'ios', 'auto'), ('c', 'android', 'manual')):
+        source = scan_source(platform=platform, capture=capture)
+        logs.append('INFO scan.diagnostics ' + scan_summary_line(
+            SimpleNamespace(**{**vars(response()), 'id': scan_id}), settings, trace=scan_id,
+            upload_bytes=10, flags=[], source=source))
+    result = scan_report.report(scan_report.parse(logs), ('platform', 'capture'))
+    assert {k: v['scans'] for k, v in result.items()} == {
+        'platform=ios capture=auto': 2, 'platform=android capture=manual': 1}
+    assert '== platform=ios capture=auto  (2 scans)' in scan_report.render(result, ('platform', 'capture'))
+
+
+def test_reasons_are_counted_per_scan_and_group():
+    settings = Settings(_env_file=None)
+    logs = []
+    for scan_id, reasons in (('a', 'rank:visual_ok,inferred_frame'), ('b', 'rank:visual_ok'),
+                             ('c', 'rank:below_visual_floor')):
+        logs.append('INFO scan.diagnostics ' + scan_summary_line(
+            SimpleNamespace(**{**vars(response()), 'id': scan_id}), settings, trace=scan_id,
+            upload_bytes=1, flags=[]))
+        logs.append(f'INFO scan.diagnostics scan_reasons scan_id={scan_id} status=uncertain reasons={reasons}')
+    result = scan_report.report(scan_report.parse(logs))['none']
+    assert result['reasons'] == {'rank:visual_ok': 2, 'inferred_frame': 1, 'rank:below_visual_floor': 1}
+    assert 'reasons  {' in scan_report.render({'none': result})

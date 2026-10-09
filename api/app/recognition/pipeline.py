@@ -43,7 +43,7 @@ from app.recognition.grading_parallel import GradingJob, grading_requested, para
 from app.recognition.holder_printing import holder_printing_hint
 from app.recognition.orientation import retrieve_oriented
 from app.recognition.printing import PrintingDecision, assess_printings
-from app.recognition.rank import artwork_evidence_compatible, decide_status, damaged_footer_named_printing, extract_collector_candidates, fraction_named_printing, rerank
+from app.recognition.rank import artwork_evidence_compatible, decide_status_with_reason, damaged_footer_named_printing, extract_collector_candidates, fraction_named_printing, rerank
 from app.recognition.rank import name_match
 from app.recognition.runtime import Runtime
 from app.schemas import (
@@ -551,7 +551,7 @@ def _recognize_bytes_once(
     for item in combined:
         item["cardmarket_prices"] = scan_prices(catalog, item["card_id"], item.get("cardmarket_url"))
     timings["cardmarket_ms"] = (time.perf_counter() - mark) * 1000
-    status = decide_status(
+    status, decided_by = decide_status_with_reason(
         combined,
         enable_matched=settings.enable_matched,
         min_visual=settings.threshold_min_visual,
@@ -559,57 +559,75 @@ def _recognize_bytes_once(
         min_gap=settings.threshold_min_gap,
         retake=retake,
     )
+    # Which rules produced or lowered the status, in order. Logged and stored, never acted on.
+    status_reasons = [f'rank:{decided_by}']
     if framing_review_supported and status=='no_match':
         # Independently qualified printed name + explicit collector and the
         # existing OCR-assisted visual floor can support a review result even
         # when another visual neighbour prevented automatic acceptance.
         status='uncertain'
+        status_reasons.append('framing_review_rescue')
     if local_matches:
         status = "uncertain"
+        status_reasons.append('local_artwork_used')
     if any(h.region=='holder_name' for h in ocr.hits) and status=='matched':
         status='uncertain'
+        status_reasons.append('holder_name')
     if any(h.region == 'holder_collector' for h in numbers) and status == 'matched':
         status = 'uncertain'
+        status_reasons.append('holder_collector')
     if any(h.region == 'holder_collector' for h in numbers) and not local_matches and not framing_review_supported:
         status = 'retake'
         retake = True
+        status_reasons.append('holder_collector_unverified')
     # Upscaled collector OCR can support a review, never introduce a new
     # automatic claim. It does not add independent pixels or calibrated proof.
     if ocr.collector_retry_contributed and status == 'matched':
         status = 'uncertain'
+        status_reasons.append('footer_retry_contributed')
     if ocr.collector_retry_skipped and status == 'matched':
         status = 'uncertain'
+        status_reasons.append('footer_retry_skipped')
     # A foreground/min-area rectangle is only a retrieval proposal. Even a
     # strong global match on it stays reviewable, never an automatic printing.
     if inferred_frame and status == 'matched':
         status = 'uncertain'
+        status_reasons.append('inferred_frame')
     if combined and combined[0].get('retrieved_via') == ['ocr_metadata'] and status == 'matched':
         status = 'uncertain'
+        status_reasons.append('metadata_only')
     if combined and combined[0].get('retrieved_via') == ['ocr_title']:
         # Name-only fallback must pass geometry, never automatically confirm.
         if combined[0].get('local_artwork_verified'):
             status = 'uncertain'
+            status_reasons.append('title_only_verified')
         else:
             status = 'retake'
             retake = True
+            status_reasons.append('title_only_unverified')
     if combined and 'ocr_geometry' in combined[0].get('retrieved_via',[]):
         # Weak/missing-language OCR proposes pixels only. It must never escape
         # local artwork verification or become an automatic printing claim.
         if combined[0].get('local_artwork_verified'):
             status='uncertain'
+            status_reasons.append('geometry_verified')
         else:
             status='retake'
             retake=True
+            status_reasons.append('geometry_unverified')
     if combined and decision.detected in {'ja','ko','zh','zh-cn','zh-tw'} and combined[0].get('language') not in rank_languages:
         status = 'retake'
         retake = True
         framing_unverified = True
+        status_reasons.append('language_mismatch')
     if framing_unverified:
         if framing_review_supported or likely_identity_supported:
             status = 'uncertain'
+            status_reasons.append('framing_unverified_review')
         else:
             status = "retake"
             retake = True
+            status_reasons.append('framing_unverified')
     mark = time.perf_counter()
     family, incomplete = [], True
     if combined and not retake and (float(combined[0]["visual_score"]) >= settings.threshold_min_visual or local_matches or framing_review_supported or likely_identity_supported):
@@ -640,6 +658,7 @@ def _recognize_bytes_once(
             guidance='Likely card identified. Confirm the exact set, collector number and finish, or retake with the full card visible.')
     if printing.ambiguous:
         status = "printing_ambiguous"
+        status_reasons.append(f'printing:{printing.reason}')
         # Geometry verifies shared artwork, not the winning reprint. Once
         # siblings are explicitly retained as ambiguous, use their existing
         # OCR/global scores for display order rather than keypoint survival.
@@ -702,6 +721,7 @@ def _recognize_bytes_once(
         status = "retake"
         retake = True
         framing_unverified = True
+        status_reasons.append('local_artwork_incompatible')
     timings["printing_review_ms"] = (time.perf_counter() - mark) * 1000
     shown = [] if status in {"no_match", "retake", "failed"} else combined[:1]
     timings["total_ms"] = (time.perf_counter() - started) * 1000
@@ -804,6 +824,7 @@ def _recognize_bytes_once(
         "framing_review_supported": framing_review_supported,
         "likely_identity_supported": likely_identity_supported,
         "frame_selection": frame_selection,
+        "status_reasons": status_reasons,
         "frame_detected": detected,
         "query_size": list(image.size),
     }
@@ -871,6 +892,7 @@ def _recognize_bytes_once(
                     visual=visual,
                     timings=timings,
                     versions=versions,
+                    rebuild_index=False,
                 )
             except Exception:  # noqa: BLE001 - capture files must never fail a scan
                 pass
@@ -1158,5 +1180,12 @@ def recognize_bytes(
         'selected_pass_region_reads': selected.evidence.get('passes', []) if selected is not first else [],
         'policy': 'identical request pixels only; pristine cloned observations, no cross-upload cache',
     }
+    logging.getLogger('scan.diagnostics').info(
+        'scan_reasons scan_id=%s status=%s reasons=%s', selected.response.id,
+        selected.response.status.value, ','.join(selected.evidence.get('status_reasons') or ['none']))
+    saved = time.perf_counter()
     selected.save()
+    # Saving happens after total_ms is read, so it gets its own line.
+    logging.getLogger('scan.diagnostics').info(
+        'scan_saved scan_id=%s save_ms=%.1f', selected.response.id, (time.perf_counter() - saved) * 1000)
     return selected.response

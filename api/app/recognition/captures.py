@@ -2,12 +2,20 @@ from __future__ import annotations
 
 import io
 import json
+import threading
 from pathlib import Path
 from typing import Any
 
 from PIL import Image
 
 REVIEW_MAX_SIDE = 1600
+# The review index (review.jsonl, labels.jsonl, SUMMARY.md, index.json) reads every
+# stored case, so a scan only marks it stale. It is rebuilt in the background at most
+# once per INDEX_REFRESH_DELAY_S, or on demand when the review routes read it.
+INDEX_REFRESH_DELAY_S = 60.0
+_index_lock = threading.Lock()
+_index_dirty: set[Path] = set()
+_index_timers: dict[Path, threading.Timer] = {}
 
 
 def review_dir(settings: Any) -> Path:
@@ -101,6 +109,7 @@ def save_scan_capture(
     visual: list[dict[str, Any]],
     timings: dict[str, Any],
     versions: dict[str, Any],
+    rebuild_index: bool = True,
 ) -> dict[str, Any] | None:
     if not bool(getattr(settings, "store_captures", True)):
         return None
@@ -130,7 +139,7 @@ def save_scan_capture(
     }
     record["review"] = review_flags(record)
     _write_json(case_path(root, scan_id), record)
-    refresh_index(root)
+    _index_changed(root, rebuild_index)
     return record
 
 
@@ -141,6 +150,7 @@ def apply_feedback(
     action: str,
     confirmed_card_id: str | None,
     rejected: bool,
+    rebuild_index: bool = True,
 ) -> dict[str, Any] | None:
     if not bool(getattr(settings, "store_captures", True)):
         return None
@@ -154,7 +164,7 @@ def apply_feedback(
     record["feedback_action"] = action
     record["review"] = review_flags(record)
     _write_json(path, record)
-    refresh_index(root)
+    _index_changed(root, rebuild_index)
     return record
 
 
@@ -322,6 +332,45 @@ def list_records(
             for item in sliced
         ],
     }
+
+
+def _index_changed(root: Path, rebuild_now: bool) -> None:
+    if rebuild_now:
+        refresh_index(root)
+    else:
+        schedule_index_refresh(root)
+
+
+def schedule_index_refresh(root: Path, delay: float | None = None) -> None:
+    """Mark the index stale and rebuild it once, shortly, off the scan path."""
+    wait = INDEX_REFRESH_DELAY_S if delay is None else delay
+    with _index_lock:
+        _index_dirty.add(root)
+        if root in _index_timers:
+            return
+        timer = threading.Timer(wait, _run_scheduled_refresh, args=(root,))
+        timer.daemon = True
+        _index_timers[root] = timer
+        timer.start()
+
+
+def _run_scheduled_refresh(root: Path) -> None:
+    with _index_lock:
+        _index_timers.pop(root, None)
+    try:
+        refresh_index_if_stale(root)
+    except Exception:  # noqa: BLE001 - the index is a convenience, never a scan failure
+        pass
+
+
+def refresh_index_if_stale(root: Path) -> bool:
+    """Rebuild the index now if a scan or feedback changed it since the last rebuild."""
+    with _index_lock:
+        stale = root in _index_dirty
+        _index_dirty.discard(root)
+    if stale:
+        refresh_index(root)
+    return stale
 
 
 def refresh_index(root: Path) -> None:

@@ -121,3 +121,65 @@ def test_store_captures_can_be_disabled(tmp_path: Path) -> None:
         is None
     )
     assert not (tmp_path / "review").exists()
+
+
+def _save(settings, scan_id: str, **extra):
+    image = Image.new("RGB", (32, 48), color=(9, 9, 9))
+    return save_scan_capture(
+        settings=settings, scan_id=scan_id, session_id="s", created_at="2026-10-09T10:00:00Z",
+        status="uncertain", message=None, input_image=image, query_image=image, request={},
+        image_stats={}, ocr={}, predicted=[], visual=[], timings={}, versions={}, **extra)
+
+
+def test_a_scan_does_not_reread_every_stored_case(tmp_path: Path, monkeypatch) -> None:
+    from app.recognition import captures
+    settings = Settings(data_dir=tmp_path, store_captures=True)
+    _save(settings, "old-1")
+    monkeypatch.setattr(captures, "INDEX_REFRESH_DELAY_S", 3600.0)
+    reads = []
+    real = captures.load_cases
+    monkeypatch.setattr(captures, "load_cases", lambda root: reads.append(root) or real(root))
+    record = _save(settings, "new-1", rebuild_index=False)
+    assert record is not None and reads == []
+    assert (tmp_path / "review" / "cases" / "new-1.json").is_file()
+    root = tmp_path / "review"
+    assert "new-1" not in (root / "review.jsonl").read_text()
+    # The review routes rebuild on demand, once.
+    assert captures.refresh_index_if_stale(root) is True
+    assert "new-1" in (root / "review.jsonl").read_text()
+    assert captures.refresh_index_if_stale(root) is False
+    for timer in list(captures._index_timers.values()):
+        timer.cancel()
+    captures._index_timers.clear()
+
+
+def test_scheduled_rebuild_runs_once_for_many_scans(tmp_path: Path, monkeypatch) -> None:
+    import time
+    from app.recognition import captures
+    settings = Settings(data_dir=tmp_path, store_captures=True)
+    builds = []
+    real = captures.refresh_index
+    monkeypatch.setattr(captures, "refresh_index", lambda root: builds.append(root) or real(root))
+    monkeypatch.setattr(captures, "INDEX_REFRESH_DELAY_S", 0.05)
+    for i in range(5):
+        _save(settings, f"burst-{i}", rebuild_index=False)
+    time.sleep(0.4)
+    assert len(builds) == 1
+    assert "burst-4" in (tmp_path / "review" / "review.jsonl").read_text()
+
+
+def test_review_routes_rebuild_a_stale_index(tmp_path: Path) -> None:
+    from fastapi import FastAPI
+    from fastapi.testclient import TestClient
+    from app.routes.review import router
+    from app.recognition import captures
+    settings = Settings(data_dir=tmp_path, store_captures=True, review_token="tok")
+    _save(settings, "late-1", rebuild_index=False)
+    app = FastAPI()
+    app.state.settings = settings
+    app.include_router(router)
+    body = TestClient(app).get("/review/summary", headers={"X-Review-Token": "tok"}).text
+    assert "late-1" in body and "scans: 1" in body
+    for timer in list(captures._index_timers.values()):
+        timer.cancel()
+    captures._index_timers.clear()

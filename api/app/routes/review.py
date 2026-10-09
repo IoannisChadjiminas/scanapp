@@ -12,6 +12,7 @@ from app.recognition.captures import (
     image_file,
     list_records,
     load_cases,
+    refresh_index_if_stale,
     review_dir,
     with_api_image_urls,
 )
@@ -78,6 +79,7 @@ def review_summary(
     x_review_token: str | None = Header(default=None, alias="X-Review-Token"),
 ) -> str:
     require_review_access(request, authorization, x_review_token)
+    refresh_index_if_stale(review_dir(request.app.state.settings))
     path = review_dir(request.app.state.settings) / "SUMMARY.md"
     if path.is_file():
         return path.read_text()
@@ -92,6 +94,7 @@ def review_labels(
     x_review_token: str | None = Header(default=None, alias="X-Review-Token"),
 ) -> str:
     require_review_access(request, authorization, x_review_token)
+    refresh_index_if_stale(review_dir(request.app.state.settings))
     path = review_dir(request.app.state.settings) / "labels.jsonl"
     if not path.is_file():
         return ""

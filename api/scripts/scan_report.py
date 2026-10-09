@@ -7,6 +7,7 @@ and the phone's own stage times joined through the server scan id.
 
     docker logs --since 24h scanapp-api 2>&1 | python scripts/scan_report.py
     python scripts/scan_report.py api.log --json report.json
+    python scripts/scan_report.py api.log --by platform,capture
 """
 from __future__ import annotations
 
@@ -46,6 +47,8 @@ def parse(lines) -> dict[str, dict]:
     for line in lines:
         if (row := _fields(line, 'scan_summary')) and row.get('scan_id'):
             scans[row['scan_id']]['summary'] = row
+        elif (row := _fields(line, 'scan_reasons')) and row.get('scan_id'):
+            scans[row['scan_id']]['reasons'] = row.get('reasons', 'none').split(',')
         elif (row := _fields(line, 'scan_outcome')) and row.get('scan_id'):
             # The last feedback on a scan is what the user settled on.
             scans[row['scan_id']]['outcome'] = row.get('outcome')
@@ -76,10 +79,17 @@ def _spread(values: list[float]) -> dict | None:
     return dict(n=len(values), median=round(statistics.median(values), 1), p90=round(p90, 1))
 
 
-def report(scans: dict[str, dict]) -> dict[str, dict]:
+def _group_key(summary: dict, by: tuple[str, ...]) -> str:
+    if not by:
+        return summary.get('flags', 'none')
+    return ' '.join(f'{field}={summary.get(field, "unknown")}' for field in by)
+
+
+def report(scans: dict[str, dict], by: tuple[str, ...] = ()) -> dict[str, dict]:
+    """Group by `flags` (default), or by summary fields such as platform and capture."""
     groups: dict[str, list[dict]] = defaultdict(list)
     for row in scans.values():
-        groups[row['summary'].get('flags', 'none')].append(row)
+        groups[_group_key(row['summary'], by)].append(row)
     out = {}
     for flags, rows in sorted(groups.items(), key=lambda item: -len(item[1])):
         summaries = [r['summary'] for r in rows]
@@ -94,6 +104,9 @@ def report(scans: dict[str, dict]) -> dict[str, dict]:
             embeddings=_spread([v for s in summaries if (v := _float(s.get('embeddings'))) is not None]),
             upload_bytes=_spread([v for s in summaries if (v := _float(s.get('bytes'))) is not None]),
             status=dict(Counter(s.get('status', 'none') for s in summaries)),
+            # The rules that produced or lowered each status, counted per scan.
+            reasons=dict(Counter(code for r in rows for code in set(r.get('reasons', ()))
+                                 if code != 'none').most_common(12)),
             footer_skipped=sum(s.get('footer_skipped') == 'true' for s in summaries),
             outcomes=dict(outcomes),
             confirmed_rate=round(outcomes['confirmed'] / given, 3) if given else None,
@@ -110,10 +123,10 @@ def report(scans: dict[str, dict]) -> dict[str, dict]:
     return out
 
 
-def render(result: dict[str, dict]) -> str:
+def render(result: dict[str, dict], by: tuple[str, ...] = ()) -> str:
     lines = []
     for flags, row in result.items():
-        lines.append(f'== flags: {flags}  ({row["scans"]} scans)')
+        lines.append(f'== {flags if by else "flags: " + flags}  ({row["scans"]} scans)')
         for stage, spread in row['stages'].items():
             if spread:
                 lines.append(f'   {stage:<20} median {spread["median"]:>8}  p90 {spread["p90"]:>8}  n={spread["n"]}')
@@ -122,6 +135,8 @@ def render(result: dict[str, dict]) -> str:
         if row['upload_bytes']:
             lines.append(f'   upload bytes         median {row["upload_bytes"]["median"]:>8}')
         lines.append(f'   status   {row["status"]}')
+        if row['reasons']:
+            lines.append(f'   reasons  {row["reasons"]}')
         lines.append(f'   feedback {row["outcomes"]}  confirmed {row["confirmed_rate"]}  '
                      f'corrected {row["corrected_rate"]}')
         if row['stream']:
@@ -138,13 +153,16 @@ def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument('logs', nargs='*', type=Path, help='log files; stdin when omitted')
     parser.add_argument('--json', type=Path, help='also write the report as JSON')
+    parser.add_argument('--by', default='', help='group by summary fields instead of flags, '
+                        'for example platform,capture or platform,camera,build')
     args = parser.parse_args()
     if args.logs:
         lines = [line for path in args.logs for line in path.read_text(errors='replace').splitlines()]
     else:
         lines = sys.stdin.read().splitlines()
-    result = report(parse(lines))
-    print(render(result))
+    by = tuple(field.strip() for field in args.by.split(',') if field.strip())
+    result = report(parse(lines), by)
+    print(render(result, by))
     if args.json:
         args.json.write_text(json.dumps(result, indent=2))
 

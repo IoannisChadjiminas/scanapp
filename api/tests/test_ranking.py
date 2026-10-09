@@ -561,3 +561,18 @@ def test_finish_twins_are_uncertain() -> None:
         )
         == "uncertain"
     )
+
+
+def test_decide_status_says_which_branch_decided():
+    from app.recognition.rank import decide_status_with_reason
+    def row(card_id, visual, **extra):
+        return dict(card_id=card_id, visual_score=visual, **extra)
+    kwargs = dict(enable_matched=True, min_visual=.78, min_visual_ocr=.70, min_gap=.04, retake=False)
+    assert decide_status_with_reason([], **kwargs) == ('no_match', 'no_candidates')
+    assert decide_status_with_reason([row('a', .9)], **{**kwargs, 'retake': True}) == ('retake', 'retake_input')
+    assert decide_status_with_reason([row('a', .9), row('b', .6)], **kwargs) == ('matched', 'visual_ok')
+    assert decide_status_with_reason([row('a', .74, ocr_consistent=True), row('b', .5)], **kwargs) == ('matched', 'ocr_floor')
+    assert decide_status_with_reason([row('a', .6), row('b', .5)], **kwargs) == ('no_match', 'below_visual_floor')
+    assert decide_status_with_reason([row('a', .9, collector_conflict=True)], **kwargs) == ('uncertain', 'conflict')
+    assert decide_status_with_reason([row('a', .9), row('b', .6)], **{**kwargs, 'enable_matched': False}) == (
+        'uncertain', 'matched_disabled')

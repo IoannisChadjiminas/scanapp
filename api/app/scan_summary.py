@@ -7,6 +7,8 @@ id, so `scripts/scan_report.py` can join them with the phone's diagnostics.
 from __future__ import annotations
 
 import json
+import re
+from dataclasses import dataclass
 from typing import Any
 
 # Server switches worth comparing. Each one that is on is listed in `flags`.
@@ -35,6 +37,74 @@ STAGES = (
     'decode_ms', 'detect_ms', 'frame_proposal_ms', 'embed_ms', 'retrieve_ms',
     'local_artwork_ms', 'ocr_ms', 'grading_wait_ms', 'printing_review_ms',
 )
+
+
+PLATFORMS = ('ios', 'android')
+CAPTURES = ('auto', 'manual', 'gallery')
+CAMERAS = ('native', 'plugin')
+QUAD_SOURCES = ('rect', 'document')
+_BUILD = re.compile(r'^[0-9A-Za-z.+_-]{1,24}$')
+_LOCALE = re.compile(r'^[A-Za-z]{2,3}([_-][A-Za-z0-9]{2,8})?$')
+
+
+@dataclass(frozen=True)
+class ScanSource:
+    """Where a scan came from. Every field is optional: older app builds send none."""
+    platform: str = 'unknown'
+    capture: str = 'unknown'
+    camera: str = 'unknown'
+    build: str = 'unknown'
+    locale: str = 'unknown'
+    quad: str = 'none'  # none, or the detector that found the corners the phone sent
+    quad_valid: bool = False
+
+
+def _choice(value: str | None, allowed: tuple[str, ...]) -> str:
+    cleaned = (value or '').strip().lower()
+    return cleaned if cleaned in allowed else 'unknown'
+
+
+def parse_quad(raw: str | None) -> list[tuple[float, float]] | None:
+    """Four corners as "x1,y1,x2,y2,x3,y3,x4,y4", fractions of the photo, clockwise from top-left."""
+    try:
+        values = [float(part) for part in (raw or '').split(',')]
+    except ValueError:
+        return None
+    if len(values) != 8 or any(not -0.05 <= v <= 1.05 for v in values):
+        return None
+    points = list(zip(values[0::2], values[1::2]))
+    area = 0.0
+    for (x1, y1), (x2, y2) in zip(points, points[1:] + points[:1]):
+        area += x1 * y2 - x2 * y1
+    # A real card is a clockwise quad (image y points down) covering a visible part of the photo.
+    return points if area / 2 >= 0.02 else None
+
+
+def scan_source(*, platform: str | None = None, capture: str | None = None,
+                camera: str | None = None, app_build: str | None = None,
+                locale: str | None = None, card_quad: str | None = None,
+                quad_source: str | None = None) -> ScanSource:
+    """Normalise what the phone says about itself. Unknown values never fail a scan."""
+    build = (app_build or '').strip()
+    loc = (locale or '').strip()
+    has_quad = bool((card_quad or '').strip())
+    return ScanSource(
+        platform=_choice(platform, PLATFORMS),
+        capture=_choice(capture, CAPTURES),
+        camera=_choice(camera, CAMERAS),
+        build=build if _BUILD.match(build) else 'unknown',
+        locale=loc.replace('-', '_') if _LOCALE.match(loc) else 'unknown',
+        quad=(_choice(quad_source, QUAD_SOURCES) if has_quad else 'none'),
+        quad_valid=parse_quad(card_quad) is not None if has_quad else False,
+    )
+
+
+def source_parts(source: ScanSource | None) -> list[str]:
+    if source is None:
+        return []
+    return [f'platform={source.platform}', f'capture={source.capture}',
+            f'camera={source.camera}', f'build={source.build}', f'locale={source.locale}',
+            f'quad={source.quad}', f'quad_valid={str(source.quad_valid).lower()}']
 
 
 def scan_flags(settings: Any, *, stream: bool = False, skip_detect: bool = False,
@@ -67,7 +137,7 @@ def _number(value: Any) -> str:
 
 
 def scan_summary_line(result: Any, settings: Any, *, trace: str, upload_bytes: int,
-                      flags: list[str]) -> str:
+                      flags: list[str], source: ScanSource | None = None) -> str:
     timings = getattr(result, 'timings_ms', None) or {}
     if hasattr(timings, 'model_dump'):
         timings = timings.model_dump()
@@ -93,6 +163,7 @@ def scan_summary_line(result: Any, settings: Any, *, trace: str, upload_bytes: i
         f'ocr_passes={int(timings.get("ocr_passes_count", 0))}',
         f'footer_skipped={str(bool(timings.get("ocr_footer_skipped"))).lower()}',
         f'bytes={int(upload_bytes)}',
+        *source_parts(source),
         'thresholds={:.2f}/{:.2f}/{:.2f}'.format(
             float(getattr(settings, 'threshold_min_visual', 0)),
             float(getattr(settings, 'threshold_min_visual_ocr', 0)),
