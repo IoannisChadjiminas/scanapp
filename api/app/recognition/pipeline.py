@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import json
 import logging
+import re
 import sqlite3
 import time
 import uuid
@@ -86,6 +87,48 @@ def prefer_unproven_visual_match(ranked: list[dict[str, Any]], members, *, min_g
     if float(preferred["visual_score"]) - float(ranked[0]["visual_score"]) < min_gap:
         return
     ranked.sort(key=lambda row: row.get("card_id") == preferred.get("card_id"), reverse=True)
+
+
+def _printing_order(row: dict[str, Any]) -> tuple:
+    def natural(value: Any) -> tuple:
+        return tuple((0, int(part), '') if part.isdigit() else (1, 0, part)
+                     for part in re.findall(r'\d+|\D+', str(value or '').lower()))
+    card_id = str(row.get('card_id') or '')
+    return (natural(row.get('set_id') or card_id.split(':')[-1].rsplit('-', 1)[0]),
+            natural(row.get('collector_number')), card_id)
+
+
+def settle_unproven_twins(ranked: list[dict[str, Any]], members, *, min_gap: float = 0.04) -> None:
+    """Show the same printing every time when nothing separates the leaders.
+
+    Printings that share artwork score within noise of each other, so which
+    one led changed from photo to photo. Among group members within `min_gap`
+    of the shown card on both the image and the combined score, and with the
+    same OCR verdict, the first by set and collector number is shown. Order
+    only; the printing stays unproven.
+    """
+    if len(ranked) < 2 or ranked[0].get('visual_score') is None:
+        return
+    shown = ranked[0]
+    member_ids = {row.get('card_id') for row in members}
+    if shown.get('card_id') not in member_ids:
+        return
+
+    def near(row: dict[str, Any], key: str) -> bool:
+        return (row.get(key) is not None and shown.get(key) is not None
+                and abs(float(row[key]) - float(shown[key])) < min_gap)
+
+    twins = [row for row in ranked if row.get('card_id') in member_ids
+             and row.get('name') == shown.get('name')
+             and (row.get('language') or '') == (shown.get('language') or '')
+             and near(row, 'visual_score') and near(row, 'combined_score')
+             and all(row.get(flag) == shown.get(flag) for flag in
+                     ('ocr_consistent', 'collector_conflict', 'structured_collector_conflict'))]
+    if len(twins) < 2:
+        return
+    preferred = min(twins, key=_printing_order)
+    if preferred.get('card_id') != shown.get('card_id'):
+        ranked.sort(key=lambda row: row.get('card_id') == preferred.get('card_id'), reverse=True)
 
 
 def _lookup_cards(conn: sqlite3.Connection, card_ids: list[str]) -> dict[str, sqlite3.Row]:
@@ -733,6 +776,8 @@ def _recognize_bytes_once(
         elif not stamp_hint and not printing.collector_evidence:
             prefer_unproven_visual_match(combined, printing.members,
                                           min_gap=settings.threshold_min_gap)
+            settle_unproven_twins(combined, printing.members,
+                                  min_gap=settings.threshold_min_gap)
             if combined:
                 reference_identity = dict(combined[0])
         shown_printing = combined[0]["card_id"] if combined else None
