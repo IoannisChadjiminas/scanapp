@@ -31,7 +31,8 @@ from app.recognition.embed import top_k
 from app.recognition.identity import likely_identity_agrees, structured_identity_agrees
 from app.recognition.confidence import confidence_payload
 from app.recognition.presentation import match_presentation
-from app.recognition.language import confident_language_texts, expand_language, language_label, resolve_search_languages
+from app.recognition.language import (confident_language_texts, expand_language, language_label, locale_languages,
+                                         order_preview_ids, resolve_search_languages)
 from app.recognition.ocr import OcrResult, inverted_card_layout
 from app.recognition.ocr_framing import complete_frame_probe_allowed, complete_frame_identity_supported, normalize_complete_frame_footer
 from app.recognition.ocr_cache import RequestOcrCache
@@ -145,6 +146,7 @@ def _recognize_bytes_once(
     skip_detect: bool = False,
     language: str = "auto",
     store_capture: bool | None = None,
+    locale: str | None = None,
     _frame_override: tuple[str, Any] | None = None,
     _input_observer: Callable | None = None,
     _progress_observer: Callable | None = None,
@@ -224,8 +226,19 @@ def _recognize_bytes_once(
             and float(scores[0]) >= settings.threshold_min_visual):
         # Weak visual neighbours must wait for the OCR-assisted rescue. A
         # preview is not a way to expose below-threshold guesses as a match.
-        preview_ids = [str(snapshot.card_ids[i]) for i, score in zip(indices, scores)
-                       if float(score) >= settings.threshold_min_visual_ocr][:3]
+        shortlist = [(str(snapshot.card_ids[i]), float(score)) for i, score in zip(indices, scores)
+                     if float(score) >= settings.threshold_min_visual_ocr]
+        preview_ids = [cid for cid, _ in shortlist]
+        if settings.preview_language_order and shortlist:
+            # Order only: near-tied printings show the reader's language first.
+            rows = _lookup_cards(catalog, preview_ids)
+            preference = ((tuple(requested.search) if requested.reason == 'user' else ())
+                          + locale_languages(locale) + ('en',))
+            preview_ids = order_preview_ids(
+                preview_ids, [score for _, score in shortlist],
+                {cid: str(row['language'] or '') for cid, row in rows.items()},
+                preference, settings.threshold_min_gap)
+        preview_ids = preview_ids[:3]
         previews = _preview_candidates(catalog, preview_ids)
         if previews:
             try:
@@ -943,6 +956,7 @@ def recognize_bytes(
     skip_detect: bool = False,
     language: str = "auto",
     store_capture: bool | None = None,
+    locale: str | None = None,
     graded: bool | None = None,
     _grading_job: GradingJob | None = None,
     _progress_observer: Callable | None = None,
@@ -961,6 +975,8 @@ def recognize_bytes(
                   crop_y=crop_y, crop_w=crop_w, crop_h=crop_h, rotation=rotation,
                   skip_detect=skip_detect, language=language, store_capture=store_capture)
     kwargs['_ocr_cache'] = ocr_cache
+    if locale:
+        kwargs['locale'] = locale
     if _progress_observer is not None:
         kwargs['_progress_observer'] = _progress_observer
     if _grading_job is not None:

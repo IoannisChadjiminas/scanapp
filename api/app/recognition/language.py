@@ -82,6 +82,41 @@ def expand_language(code: str | None) -> tuple[str, ...]:
     return LANGUAGE_GROUPS.get(normalized, (normalized,))
 
 
+def locale_languages(locale: str | None) -> tuple[str, ...]:
+    """Catalogue language codes for a phone locale such as en_GB, ja_JP or zh_TW."""
+    code = normalize_language_code(locale)
+    if code in {"", "auto", "unknown"}:
+        return ()
+    if code.startswith("zh"):
+        for hint, found in (("hant", "zh-tw"), ("tw", "zh-tw"), ("hk", "zh-tw"), ("mo", "zh-tw"),
+                            ("hans", "zh-cn"), ("cn", "zh-cn"), ("sg", "zh-cn")):
+            if hint in code.split("-")[1:]:
+                return (found,)
+        return ("zh-tw", "zh-cn")
+    return LANGUAGE_GROUPS.get(code.split("-")[0], ())
+
+
+def order_preview_ids(
+    card_ids: list[str],
+    scores: list[float],
+    languages: dict[str, str],
+    preference: tuple[str, ...],
+    min_gap: float,
+) -> list[str]:
+    """Reader's printing first among near-ties; never promotes anything outside the tie.
+
+    `card_ids` and `scores` arrive best first. Only cards within `min_gap` of the
+    leader move, and only relative to each other, so the preview stays a visual
+    shortlist. Order inside a language is the visual order.
+    """
+    if not card_ids or not preference:
+        return list(card_ids)
+    ties = [i for i, score in enumerate(scores) if scores[0] - score <= min_gap]
+    rank = {code: n for n, code in enumerate(preference)}
+    ordered = sorted(ties, key=lambda i: (rank.get(languages.get(card_ids[i], ""), len(rank)), i))
+    return [card_ids[i] for i in ordered] + [cid for i, cid in enumerate(card_ids) if i not in set(ties)]
+
+
 def language_label(code: str | None) -> str:
     if not code or code == "auto":
         return "Auto-detect"
