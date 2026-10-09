@@ -104,6 +104,7 @@ async def create_scan(
             skip_detect=skip_detect and not detect_on_server,
             language=language,
             graded=graded,
+            locale=locale,
             _progress_observer=observer,
         )
 

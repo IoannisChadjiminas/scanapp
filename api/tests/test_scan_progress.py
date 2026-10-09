@@ -175,3 +175,16 @@ def test_source_fields_reach_the_scan_summary_and_old_phones_still_work(monkeypa
     assert all(p in lines[0].split() for p in
                ('platform=ios', 'capture=auto', 'camera=native', 'build=1.0.0+61', 'quad=rect', 'quad_valid=true'))
     assert 'platform=unknown' in lines[1].split() and 'quad=none' in lines[1].split()
+
+
+def test_locale_reaches_recognition(monkeypatch):
+    from app.routes import scans
+    client, executor = stream_app(monkeypatch, enabled=True)
+    seen = []
+    inner = scans.recognize_bytes
+    monkeypatch.setattr(scans, 'recognize_bytes', lambda data, **kw: (seen.append(kw.get('locale')), inner(data, **kw))[1])
+    files = {'image': ('card.jpg', b'jpeg', 'image/jpeg')}
+    with client, executor:
+        client.post('/scans', data={'stream_results': 'true', 'locale': 'ja_JP'}, files=files)
+        client.post('/scans', data={'stream_results': 'true'}, files=files)
+    assert seen == ['ja_JP', None]
