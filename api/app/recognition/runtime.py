@@ -54,7 +54,7 @@ class Runtime:
                 snapshot = cloud_snapshot if cloud_snapshot is not None else load_snapshot(self.settings)
                 embedder = DinoEmbedder(
                     str(self.settings.dinov2_path),
-                    self.settings.ort_intra_threads,
+                    self.settings.dino_intra_threads or self.settings.ort_intra_threads,
                     self.settings.ort_inter_threads,
                 )
                 ocr = None

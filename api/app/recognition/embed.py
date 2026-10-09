@@ -19,7 +19,10 @@ class DinoEmbedder:
             sess_options=options,
             providers=["CPUExecutionProvider"],
         )
-        self.input_name = self.session.get_inputs()[0].name
+        first = self.session.get_inputs()[0]
+        self.input_name = first.name
+        # A fixed batch size of 1 in the exported graph rules out one batched call.
+        self.batchable = not (isinstance(first.shape[0], int) and first.shape[0] == 1)
 
     def embed(self, image: Image.Image, mode: str) -> np.ndarray:
         prepared = prepare_full_card(image, mode)
@@ -30,6 +33,26 @@ class DinoEmbedder:
         if norm == 0:
             return vector
         return vector / norm
+
+
+    def embed_many(self, images: list[Image.Image], mode: str) -> list[np.ndarray]:
+        """One model call for several frames; the same vectors as `embed`, one by one."""
+        if len(images) < 2 or not self.batchable:
+            return [self.embed(image, mode) for image in images]
+        batch = np.concatenate([to_nchw(prepare_full_card(image, mode)) for image in images])
+        try:
+            outputs = np.asarray(self.session.run(None, {self.input_name: batch})[0], dtype=np.float32)
+        except Exception:
+            self.batchable = False
+            return [self.embed(image, mode) for image in images]
+        if outputs.shape[0] != len(images):
+            self.batchable = False
+            return [self.embed(image, mode) for image in images]
+        vectors = []
+        for row in outputs.reshape(len(images), -1):
+            norm = np.linalg.norm(row)
+            vectors.append(row / norm if norm else row)
+        return vectors
 
 
 def top_k(
