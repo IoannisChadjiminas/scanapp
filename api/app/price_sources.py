@@ -347,7 +347,17 @@ def refresh_tcgdex(
 def refresh_all(
     conn: sqlite3.Connection, settings: Settings, *, catalog: sqlite3.Connection | None = None
 ) -> None:
-    """One nightly pass. A failed source leaves the older data in place."""
+    """One nightly pass. A failed source leaves the older data in place.
+
+    The pass also runs once at every server start. The set totals come first:
+    they are one quick request per language, and cards show them at once.
+    """
+    try:
+        from app.set_totals import refresh_set_totals
+
+        refresh_set_totals(conn, settings, catalog=catalog)
+    except Exception as exc:
+        log.info("set totals failed error=%s", type(exc).__name__)
     if settings.price_guide_enabled:
         try:
             refresh_guide(conn, settings)
@@ -358,12 +368,6 @@ def refresh_all(
             refresh_tcgdex(conn, settings, catalog=catalog)
         except Exception as exc:
             log.info("tcgdex prices failed error=%s", type(exc).__name__)
-    try:
-        from app.set_totals import refresh_set_totals
-
-        refresh_set_totals(conn, settings, catalog=catalog)
-    except Exception as exc:
-        log.info("set totals failed error=%s", type(exc).__name__)
 
 
 def refresh_all_on_own_connection(settings: Settings, catalog: sqlite3.Connection | None = None) -> None:
