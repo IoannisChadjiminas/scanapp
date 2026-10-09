@@ -50,7 +50,7 @@ class Settings(BaseSettings):
     scan_stream_results: bool = True
     enable_matched: bool = True
     # Near-tied preview printings show the requested or phone language first. Order only.
-    preview_language_order: bool = False
+    preview_language_order: bool = True
     ort_intra_threads: int = 1
     # The image model runs alone on the critical path to the preview; OCR keeps ort_intra_threads.
     dino_intra_threads: int = 0
