@@ -50,6 +50,7 @@ class Candidate(BaseModel):
     name: str
     set_name: str
     collector_number: str
+    set_total: int | None = None
     image_url: str
     visual_score: float
     combined_score: float
@@ -120,6 +121,7 @@ class PlausiblePrinting(BaseModel):
     name: str
     set_name: str
     collector_number: str
+    set_total: int | None = None
     language: str
     image_url: str
     cardmarket_url: str | None = None
@@ -228,6 +230,7 @@ class CardSummary(BaseModel):
     set_id: str
     set_name: str
     collector_number: str
+    set_total: int | None = None
     language: str
     rarity: str = ""
     has_image: bool

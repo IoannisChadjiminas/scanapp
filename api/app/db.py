@@ -238,6 +238,13 @@ def init_catalog(conn: sqlite3.Connection) -> None:
             tcgplayer_json TEXT,
             fetched_at TEXT NOT NULL
         );
+        CREATE TABLE IF NOT EXISTS set_totals (
+            language TEXT NOT NULL,
+            set_id TEXT NOT NULL,
+            official_total INTEGER NOT NULL,
+            fetched_at TEXT NOT NULL,
+            PRIMARY KEY (language, set_id)
+        );
         CREATE TABLE IF NOT EXISTS portfolio_products (
             session_id TEXT NOT NULL,
             sample_key TEXT NOT NULL,

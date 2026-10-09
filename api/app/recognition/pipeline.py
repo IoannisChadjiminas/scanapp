@@ -21,6 +21,7 @@ from app.cardmarket import (
     url_for_row,
 )
 from app.price_sources import scan_prices
+from app.set_totals import set_total
 from app.db import coverage_payload
 from app.recognition.captures import save_scan_capture
 from app.recognition.detect import card_frame_candidates, detect_and_rectify
@@ -104,6 +105,7 @@ def _preview_candidates(conn: sqlite3.Connection, card_ids: list[str]) -> list[d
                  image_url=_card_image_url(rows[cid]),
                  set_name=rows[cid]['set_name'],
                  collector_number=rows[cid]['collector_number'],
+                 set_total=set_total(conn, rows[cid]['language'], rows[cid]['set_id']),
                  language=str(rows[cid]['language'] or ''),
                  cardmarket_url=rows[cid]['cardmarket_url'],
                  cardmarket_prices=scan_prices(conn, cid, rows[cid]['cardmarket_url']))
@@ -423,6 +425,7 @@ def _recognize_bytes_once(
                 "set_id": row["set_id"],
                 "set_name": row["set_name"],
                 "collector_number": row["collector_number"],
+                "set_total": set_total(catalog, row["language"], row["set_id"]),
                 "printed_collector_number": (
                     str(row["printed_collector_number"] or "")
                     if "printed_collector_number" in row.keys()
@@ -682,6 +685,7 @@ def _recognize_bytes_once(
             plausible_printings=[{
                 "card_id": row["card_id"], "name": row["name"],
                 "set_name": row["set_name"], "collector_number": row["collector_number"],
+                "set_total": row.get("set_total"),
                 "language": str(row.get("language") or ""),
                 "image_url": row.get("image_url") or _card_image_url(row),
                 "cardmarket_url": row.get("cardmarket_url"),
