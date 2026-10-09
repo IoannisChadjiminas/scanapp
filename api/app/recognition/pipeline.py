@@ -36,7 +36,7 @@ from app.recognition.presentation import match_presentation
 from app.recognition.language import (confident_language_texts, expand_language, language_label, locale_languages,
                                          order_preview_ids, resolve_search_languages)
 from app.recognition.ocr import OcrResult, inverted_card_layout
-from app.recognition.ocr_framing import complete_frame_probe_allowed, complete_frame_identity_supported, normalize_complete_frame_footer
+from app.recognition.ocr_framing import complete_frame_probe_allowed, complete_frame_identity_supported, normalize_complete_frame_footer, wide_footer_allowed, wide_footer_fractions
 from app.recognition.ocr_cache import RequestOcrCache
 from app.recognition.ocr_budget import (footer_retry_required, title_only_allowed,
     title_only_confirmed, VERSION as OCR_BUDGET_VERSION)
@@ -443,6 +443,18 @@ def _recognize_bytes_once(
                     extra = [h for h in extract_collector_candidates([], hits=raw_ocr.hits)
                         if h.region == 'collector' and h.confidence is not None and h.confidence >= .85
                         and ('/' in h.text or any(c.isalpha() for c in h.text))]
+                    if not extra and wide_footer_allowed(input_image):
+                        # The card does not fill the upload, so its number is
+                        # above the footer strip that was just read.
+                        try:
+                            extra, wide_pass = wide_footer_fractions(
+                                ocr_engine, input_image, ocr.name_text,
+                                _lookup_cards(catalog, [str(snapshot.card_ids[i]) for i in indices]).values())
+                            if wide_pass:
+                                ocr_passes.append(dict(scope='original', **wide_pass))
+                        except Exception:  # noqa: BLE001 - keep the evidence already read
+                            logging.getLogger(__name__).exception('Optional wide footer read failed')
+                            extra = []
                     if extra:
                         ocr.hits.extend(extra)
                         ocr.lines.extend(h.text for h in extra)

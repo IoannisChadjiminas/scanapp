@@ -1,8 +1,10 @@
 """Keep printed identity outside an artwork-only retrieval window."""
 from dataclasses import replace
 import re
-from app.recognition.ocr import OcrHit, inverted_card_layout
-from app.recognition.rank import extract_collector_candidates, name_match
+import time
+from app.recognition.ocr import OcrHit, _region, inverted_card_layout
+from app.recognition.rank import (accepted_collector_numbers, extract_collector_candidates,
+                                  name_match, number_matches_identifiers)
 
 
 def complete_frame_probe_allowed(image, *, profile, orientation):
@@ -44,3 +46,45 @@ def normalize_complete_frame_footer(ocr):
         else:
             hits.append(hit)
     return replace(ocr,hits=hits), changes
+
+
+WIDE_FOOTER_TOP = .60
+_FRACTION_RE = re.compile(r'\d{1,4}\s*/\s*\d{1,4}')
+
+
+def wide_footer_allowed(image):
+    # A photo wider than a card has room around the card, so the card's
+    # footer sits above the bottom strip the normal read looks at.
+    return image.width / image.height > .74 and min(image.size) >= 450
+
+
+def wide_footer_fractions(engine, image, name_text, candidates):
+    """Collector fractions from the lower part of an upload wider than a card.
+
+    The text is read as printed, never taken from a candidate. A fraction is
+    kept only when it is the printed number of a candidate carrying the title
+    that was read, so a neighbouring card in the photo adds nothing. Returns
+    the hits and the pass record, or no record when the engine cannot read a
+    patch.
+    """
+    run = getattr(engine, '_run', None)
+    if not callable(run) or not name_text:
+        return [], None
+    patch = _region(image, WIDE_FOOTER_TOP, 1.)
+    started = time.perf_counter()
+    try:
+        texts, scores = run(patch)
+    finally:
+        record = dict(region='collector', reason='wide_footer', width=patch.width,
+                      height=patch.height, ms=round((time.perf_counter() - started) * 1000, 2))
+    named = [dict(row) for row in candidates if name_match(name_text, row['name'])]
+    hits = []
+    for text, score in zip(texts, scores):
+        text = (text or '').strip()
+        if score is None or score < .85 or not _FRACTION_RE.fullmatch(text):
+            continue
+        hit = OcrHit(text, float(score), 'collector')
+        if any(number_matches_identifiers([hit], accepted_collector_numbers(row)) is True
+               for row in named) and all(text != kept.text for kept in hits):
+            hits.append(hit)
+    return hits, record
