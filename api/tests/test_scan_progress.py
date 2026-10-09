@@ -188,3 +188,19 @@ def test_locale_reaches_recognition(monkeypatch):
         client.post('/scans', data={'stream_results': 'true', 'locale': 'ja_JP'}, files=files)
         client.post('/scans', data={'stream_results': 'true'}, files=files)
     assert seen == ['ja_JP', None]
+
+
+def test_card_quad_reaches_recognition_parsed_and_bad_values_become_none(monkeypatch):
+    from app.routes import scans
+    client, executor = stream_app(monkeypatch, enabled=True)
+    seen = []
+    inner = scans.recognize_bytes
+    monkeypatch.setattr(scans, 'recognize_bytes', lambda data, **kw: (seen.append(kw.get('card_quad')), inner(data, **kw))[1])
+    files = {'image': ('card.jpg', b'jpeg', 'image/jpeg')}
+    with client, executor:
+        client.post('/scans', data={'stream_results': 'true',
+                                    'card_quad': '0.1,0.1,0.9,0.1,0.9,0.9,0.1,0.9'}, files=files)
+        client.post('/scans', data={'stream_results': 'true', 'card_quad': 'nonsense'}, files=files)
+        client.post('/scans', data={'stream_results': 'true'}, files=files)
+    assert seen[0] == [(0.1, 0.1), (0.9, 0.1), (0.9, 0.9), (0.1, 0.9)]
+    assert seen[1] is None and seen[2] is None

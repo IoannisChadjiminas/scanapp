@@ -19,7 +19,7 @@ from app.recognition.pipeline import recognize_bytes
 from app.recognition.presentation import match_presentation
 from app.recognition.progress import scan_stream
 from app.recognition.upload import read_upload_limited
-from app.scan_summary import scan_flags, scan_outcome_line, scan_source, scan_summary_line
+from app.scan_summary import parse_quad, scan_flags, scan_outcome_line, scan_source, scan_summary_line
 from app.schemas import (
     Candidate,
     FeedbackRequest,
@@ -105,6 +105,7 @@ async def create_scan(
             language=language,
             graded=graded,
             locale=locale,
+            card_quad=parse_quad(card_quad),
             _progress_observer=observer,
         )
 
