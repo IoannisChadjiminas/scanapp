@@ -10,6 +10,7 @@ from fastapi.responses import FileResponse
 from app.card_images import display_image_url
 from app.cardmarket import url_for_row, variants_for_row
 from app.recognition.language import expand_language
+from app.set_totals import set_total
 from app.schemas import CardmarketVariant, CardSearchResponse, CardSummary
 from app.visual_aliases import visual_image_owner
 
@@ -25,6 +26,7 @@ def _summary(row, catalog=None) -> CardSummary:  # noqa: ANN001
         set_id=row["set_id"],
         set_name=row["set_name"],
         collector_number=row["collector_number"],
+        set_total=set_total(catalog, row["language"], row["set_id"]) if catalog is not None else None,
         language=row["language"],
         rarity=str(row["rarity"] or ""),
         has_image=bool(image_url),
