@@ -60,3 +60,21 @@ def test_cjk_and_empty_searches_page_too(tmp_path: Path) -> None:
     cjk = search_cards(request, q="ピカ", language="", limit=5, offset=1)
     assert cjk.items == [] and cjk.total == 1
 
+
+
+def test_results_carry_the_stored_prices_a_scan_shows(tmp_path: Path) -> None:
+    catalog = _catalog(tmp_path)
+    catalog.execute(
+        "INSERT INTO tcgdex_prices (card_id, cardmarket_json, tcgplayer_json, fetched_at)"
+        " VALUES ('base-000', ?, NULL, '2026-10-01T00:00:00Z')",
+        ('{"unit": "EUR", "low": 1.2, "trend": 3.45, "updated": "2026-10-01"}',),
+    )
+    catalog.commit()
+    items = {item.id: item for item in search_cards(_request(catalog), q="pika", language="", limit=20, offset=0).items}
+    priced = items["base-000"].cardmarket_prices
+    assert [(price.label, price.amount, price.source) for price in priced] == [
+        ("From", 1.2, "tcgdex"),
+        ("Trend", 3.45, "tcgdex"),
+    ]
+    # A card nothing is stored for comes back without a price, not with an error.
+    assert items["base-001"].cardmarket_prices == []

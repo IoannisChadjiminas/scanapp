@@ -9,6 +9,7 @@ from fastapi.responses import FileResponse
 
 from app.card_images import display_image_url
 from app.cardmarket import url_for_row, variants_for_row
+from app.price_sources import scan_prices
 from app.recognition.language import expand_language
 from app.set_totals import set_total
 from app.schemas import CardmarketVariant, CardSearchResponse, CardSummary
@@ -31,6 +32,7 @@ _ORDER = (
 def _summary(row, catalog=None) -> CardSummary:  # noqa: ANN001
     image_url = display_image_url(row, catalog)
     owner = visual_image_owner(row, catalog)
+    url = url_for_row(row)
     return CardSummary(
         id=row["id"],
         name=row["name"],
@@ -44,7 +46,8 @@ def _summary(row, catalog=None) -> CardSummary:  # noqa: ANN001
         image_url=image_url,
         image_owner_id=owner["id"] if owner is not row else None,
         variants=json.loads(row["variants_json"] or "{}"),
-        cardmarket_url=url_for_row(row),
+        cardmarket_url=url,
+        cardmarket_prices=scan_prices(catalog, row["id"], url) if catalog is not None else [],
     )
 
 
