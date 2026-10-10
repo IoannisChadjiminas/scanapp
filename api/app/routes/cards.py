@@ -54,7 +54,10 @@ def search_cards(
     q: str = Query(default="", min_length=0, max_length=80),
     language: str = Query(default="", max_length=16),
     limit: int = Query(default=20, ge=1, le=50),
+    offset: int = Query(default=0, ge=0, le=10_000),
 ) -> CardSearchResponse:
+    """One page of matches. Every query has a fixed order, so `offset` pages
+    neither repeat nor skip cards."""
     catalog = request.app.state.dbs.catalog
     query = q.strip()
     langs = expand_language(language) if language and language != "auto" else ()
@@ -75,9 +78,9 @@ def search_cards(
             WHERE (name LIKE ? OR set_name LIKE ? OR collector_number LIKE ?)
             {lang_clause}
             {_ORDER}
-            LIMIT ?
+            LIMIT ? OFFSET ?
             """,
-            (like, like, like, *lang_params, limit),
+            (like, like, like, *lang_params, limit, offset),
         ).fetchall()
         total_row = catalog.execute(
             f"""
@@ -98,9 +101,9 @@ def search_cards(
             WHERE cards_fts MATCH ?
             {lang_clause}
             {_ORDER}
-            LIMIT ?
+            LIMIT ? OFFSET ?
             """,
-            (fts, *lang_params, limit),
+            (fts, *lang_params, limit, offset),
         ).fetchall()
         total_row = catalog.execute(
             f"""
@@ -119,9 +122,9 @@ def search_cards(
             SELECT cards.* FROM cards{_RELEASES}
             WHERE 1=1 {lang_clause}
             {_ORDER}
-            LIMIT ?
+            LIMIT ? OFFSET ?
             """,
-            (*lang_params, limit),
+            (*lang_params, limit, offset),
         ).fetchall()
         total_row = catalog.execute(
             f"SELECT COUNT(*) AS n FROM cards WHERE 1=1 {lang_clause}",

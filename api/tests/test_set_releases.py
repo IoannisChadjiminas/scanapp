@@ -78,11 +78,11 @@ def test_search_lists_the_newest_expansion_first(tmp_path: Path, monkeypatch) ->
         f"en:{set_id}-{number}" for set_id in ("sv03", "swsh9", "base1", "promo") for number in ("2", "10")
     ]
     request = _request(conn)
-    assert [item.id for item in search_cards(request, q="chari", language="", limit=20).items] == expected
-    assert [item.id for item in search_cards(request, q="", language="", limit=20).items] == expected
+    assert [item.id for item in search_cards(request, q="chari", language="", limit=20, offset=0).items] == expected
+    assert [item.id for item in search_cards(request, q="", language="", limit=20, offset=0).items] == expected
 
 
 def test_search_works_before_any_date_is_known(tmp_path: Path) -> None:
     request = _request(_catalog(tmp_path))
-    names = [item.set_name for item in search_cards(request, q="chari", language="", limit=20).items]
+    names = [item.set_name for item in search_cards(request, q="chari", language="", limit=20, offset=0).items]
     assert names[:2] == ["Base", "Base"]
