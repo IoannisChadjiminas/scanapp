@@ -245,6 +245,13 @@ def init_catalog(conn: sqlite3.Connection) -> None:
             fetched_at TEXT NOT NULL,
             PRIMARY KEY (language, set_id)
         );
+        CREATE TABLE IF NOT EXISTS set_releases (
+            language TEXT NOT NULL,
+            set_id TEXT NOT NULL,
+            release_date TEXT,
+            fetched_at TEXT NOT NULL,
+            PRIMARY KEY (language, set_id)
+        );
         CREATE TABLE IF NOT EXISTS portfolio_products (
             session_id TEXT NOT NULL,
             sample_key TEXT NOT NULL,

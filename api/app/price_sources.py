@@ -368,6 +368,12 @@ def refresh_all(
             refresh_tcgdex(conn, settings, catalog=catalog)
         except Exception as exc:
             log.info("tcgdex prices failed error=%s", type(exc).__name__)
+    try:
+        from app.set_totals import refresh_set_releases
+
+        refresh_set_releases(conn, settings, catalog=catalog)
+    except Exception as exc:
+        log.info("set releases failed error=%s", type(exc).__name__)
 
 
 def refresh_all_on_own_connection(settings: Settings, catalog: sqlite3.Connection | None = None) -> None:
