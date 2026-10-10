@@ -2528,6 +2528,10 @@ def write_snapshot(
             submission_id=submission_id,
             existing=existing,
         )
+    if prices:
+        from app.price_history import record_sales
+
+        record_sales(url, prices, own=conn)
     if commit:
         conn.commit()
     return key

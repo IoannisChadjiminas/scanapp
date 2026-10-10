@@ -58,8 +58,11 @@ def parse_guide(payload: Any) -> tuple[str, list[dict[str, Any]]]:
     return date, rows
 
 
-def import_guide(conn: sqlite3.Connection, payload: Any) -> int:
-    """Replace the stored guide with this file. Returns the rows stored."""
+def import_guide(conn: sqlite3.Connection, payload: Any, history: Any = None) -> int:
+    """Replace the stored guide with this file. Returns the rows stored.
+
+    ``history`` is the connection that keeps one row per product per day.
+    A failure there leaves the import done."""
     date, rows = parse_guide(payload)
     previous = conn.execute("SELECT row_count FROM cardmarket_guide_meta WHERE id = 1").fetchone()
     if not rows:
@@ -85,6 +88,28 @@ def import_guide(conn: sqlite3.Connection, payload: Any) -> int:
             "VALUES (1, ?, ?, ?)",
             (date, len(rows), _now()),
         )
+    if history is not None:
+        try:
+            from app.price_history import record_guide
+
+            stored = record_guide(
+                history,
+                date,
+                (
+                    {
+                        "id_product": entry["idProduct"],
+                        **{name.replace("-", "_"): _number(entry.get(name)) for name in GUIDE_COLUMNS},
+                    }
+                    for entry in rows
+                ),
+            )
+            log.info("price history stored rows=%s", stored)
+        except Exception as exc:
+            log.info("price history failed error=%s", type(exc).__name__)
+            try:
+                history.rollback()
+            except Exception:
+                pass
     return len(rows)
 
 
@@ -100,10 +125,10 @@ def guide_market(conn: sqlite3.Connection, product_id: int | None) -> dict[str, 
     return market
 
 
-def refresh_guide(conn: sqlite3.Connection, settings: Settings) -> int:
+def refresh_guide(conn: sqlite3.Connection, settings: Settings, history: Any = None) -> int:
     response = httpx.get(settings.price_guide_url, timeout=60, follow_redirects=True)
     response.raise_for_status()
-    count = import_guide(conn, response.json())
+    count = import_guide(conn, response.json(), history)
     log.info("price guide imported rows=%s", count)
     return count
 
@@ -345,7 +370,11 @@ def refresh_tcgdex(
 
 
 def refresh_all(
-    conn: sqlite3.Connection, settings: Settings, *, catalog: sqlite3.Connection | None = None
+    conn: sqlite3.Connection,
+    settings: Settings,
+    *,
+    catalog: sqlite3.Connection | None = None,
+    history: Any = None,
 ) -> None:
     """One nightly pass. A failed source leaves the older data in place.
 
@@ -360,7 +389,7 @@ def refresh_all(
         log.info("set totals failed error=%s", type(exc).__name__)
     if settings.price_guide_enabled:
         try:
-            refresh_guide(conn, settings)
+            refresh_guide(conn, settings, history)
         except Exception as exc:
             log.info("price guide failed error=%s", type(exc).__name__)
     if settings.tcgdex_prices_enabled:
@@ -383,7 +412,22 @@ def refresh_all_on_own_connection(settings: Settings, catalog: sqlite3.Connectio
     from app.db import connect
 
     conn = connect(settings.catalog_sqlite)
+    history = None
+    owned = False
+    url = settings.portfolio_database_url.get_secret_value().strip()
     try:
-        refresh_all(conn, settings, catalog=catalog)
+        if url:
+            from app.portfolio_db import connect_portfolio
+
+            history = connect_portfolio(url)
+            owned = True
+        else:
+            history = conn
+    except Exception as exc:
+        log.info("price history database unavailable error=%s", type(exc).__name__)
+    try:
+        refresh_all(conn, settings, catalog=catalog, history=history)
     finally:
+        if owned and history is not None:
+            history.close()
         conn.close()

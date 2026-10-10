@@ -120,6 +120,9 @@ async def lifespan(app: FastAPI):
     runtime.bind_card_languages(dbs.catalog)
     app.state.settings = settings
     app.state.dbs = dbs
+    from app import price_history
+
+    price_history.bind(dbs.portfolio)
     app.state.runtime = runtime
     app.state.scan_limiter = ScanLimiter(settings.scan_wait_limit)
     app.state.executor = ThreadPoolExecutor(max_workers=1, thread_name_prefix="scan")
@@ -152,6 +155,7 @@ async def lifespan(app: FastAPI):
         await drain_grading_updates()
         app.state.executor.shutdown(wait=False, cancel_futures=True)
         app.state.image_executor.shutdown(wait=False, cancel_futures=True)
+        price_history.bind(None)
         runtime.close()
         dbs.close()
 
