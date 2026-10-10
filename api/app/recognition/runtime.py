@@ -52,6 +52,8 @@ class Runtime:
             self._sku_groups = None
             try:
                 snapshot = cloud_snapshot if cloud_snapshot is not None else load_snapshot(self.settings)
+                # Reject malformed lineage before making the runtime ready.
+                getattr(snapshot, "retrieval_segments", None)
                 embedder = DinoEmbedder(
                     str(self.settings.dinov2_path),
                     self.settings.dino_intra_threads or self.settings.ort_intra_threads,

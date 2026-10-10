@@ -60,7 +60,24 @@ def top_k(
     query: np.ndarray,
     k: int = 20,
     keep: np.ndarray | None = None,
+    segments: tuple[int, ...] | None = None,
 ) -> tuple[np.ndarray, np.ndarray]:
+    if segments is not None:
+        if not segments or any(type(n) is not int or n <= 0 for n in segments) or sum(segments) != len(embeddings):
+            raise ValueError("Invalid immutable retrieval segments")
+        if keep is not None and keep.shape[0] != len(embeddings):
+            return np.array([], dtype=np.int64), np.array([], dtype=np.float32)
+        indices, values, offset = [], [], 0
+        for count in segments:
+            idx, score = top_k(embeddings[offset:offset + count], query, k,
+                               None if keep is None else keep[offset:offset + count])
+            indices.extend((idx + offset).tolist())
+            values.extend(score.tolist())
+            offset += count
+        # Preserve each immutable parent's tie order. An appended reference
+        # can win on a higher score, but cannot reorder equally scored parents.
+        order = np.argsort(-np.asarray(values, dtype=np.float32), kind="stable")[:k]
+        return np.asarray(indices, dtype=np.int64)[order], np.asarray(values, dtype=np.float32)[order]
     scores = embeddings @ query.astype(np.float32)
     if keep is not None:
         if keep.shape[0] != scores.shape[0] or not np.any(keep):

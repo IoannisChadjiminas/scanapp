@@ -176,3 +176,32 @@ def test_submission_failure_is_optional_and_releases_owned_pixels_and_slot():
         job.result()
     assert slots.acquire(blocking=False)
     slots.release()
+
+
+def test_pending_grade_can_finish_after_card_without_mutating_returned_result(monkeypatch):
+    entered, finish = Event(), Event()
+    item, saved = evaluation()
+    completions = []
+    def grade(image):
+        entered.set()
+        assert finish.wait(2)
+        return GradingEvidence(company='psa', grade=10, certification_number='172943656', grading_status='graded')
+    def card(data, **kwargs):
+        kwargs['_input_observer'](item.input_image)
+        assert entered.wait(2)
+        return item
+    monkeypatch.setattr(pipeline, '_recognize_bytes_once', card)
+    with ThreadPoolExecutor(max_workers=1) as worker:
+        try:
+            result = pipeline.recognize_bytes(b'test', settings=Settings(_env_file=None,
+                grading_at_card_deadline=True), runtime=runtime(grade, worker),
+                catalog=None, results=None, session_id='test', skip_detect=True,
+                _grading_completion=lambda scan_id,job:completions.append((scan_id,job)))
+            assert result.grading.grading_status == 'pending'
+            assert result.grading.is_graded is None and not finish.is_set()
+            assert saved[0]['grading_status'] == 'pending'
+            assert completions[0][0] == 'scan' and completions[0][1].detached
+        finally:
+            finish.set()
+        assert completions[0][1].result().certification_number == '172943656'
+    assert result.grading.grading_status == 'pending'

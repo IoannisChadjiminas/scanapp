@@ -80,7 +80,7 @@ class GradingEvidence(BaseModel):
 
     slab_detected: bool | None = None
     is_graded: bool | None = None
-    grading_status: Literal["unknown", "graded", "authenticated_only", "ungraded"] = "unknown"
+    grading_status: Literal["unknown", "pending", "graded", "authenticated_only", "ungraded"] = "unknown"
     company: Literal["psa", "beckett", "cgc", "tag", "ace", "ags"] | None = None
     company_source: Literal["label_ocr", "label_ocr_fuzzy", "verified_logo", "none"] = "none"
     grade: float | None = Field(default=None, ge=1, le=10)

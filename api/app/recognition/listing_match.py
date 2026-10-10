@@ -21,7 +21,7 @@ def official_visual_hit(
         return None
     snapshot, embedder, _ocr = runtime.require()
     query = embedder.embed(image, settings.preprocess_config)
-    indices, scores = top_k(snapshot.embeddings, query, k=8)
+    indices, scores = top_k(snapshot.embeddings, query, k=8, segments=getattr(snapshot, "retrieval_segments", None))
     if indices.size == 0:
         return None
     card_ids = [str(snapshot.card_ids[index]) for index in indices]

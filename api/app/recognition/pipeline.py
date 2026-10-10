@@ -277,6 +277,7 @@ def _recognize_bytes_once(
         query_vectors=query_vectors,
         alternate_frames=alternatives,
         selection_metadata=frame_selection,
+        retrieval_segments=getattr(snapshot, "retrieval_segments", None),
     )
     if _frame_override is not None:
         frame_selection['profile'] = _frame_override[0]
@@ -405,7 +406,7 @@ def _recognize_bytes_once(
                 image,ocr=upright,corrected
                 snapshot,embedder,_=runtime.require()
                 query_vectors[id(image)]=embedder.embed(image,settings.preprocess_config)
-                indices,scores=top_k(snapshot.embeddings,query_vectors[id(image)],k=20,keep=keep)
+                indices,scores=top_k(snapshot.embeddings,query_vectors[id(image)],k=20,keep=keep,segments=getattr(snapshot, 'retrieval_segments', None))
                 timings['orientation_degrees']=(timings.get('orientation_degrees',0.)+180.)%360.
         # A retrieval window can cut away the footer even when it exists in
         # the uploaded image. Consult the uncropped input once, only for an
@@ -1046,6 +1047,7 @@ def recognize_bytes(
     graded: bool | None = None,
     _grading_job: GradingJob | None = None,
     _progress_observer: Callable | None = None,
+    _grading_completion: Callable | None = None,
 ) -> ScanResponse:
     """Evaluate first, then persist exactly one result and optional capture.
 
@@ -1116,7 +1118,7 @@ def recognize_bytes(
                 if guided_position is not None:
                     score = float(snapshot.embeddings[guided_position] @ vector)
                 else:
-                    _,scores = top_k(snapshot.embeddings,vector,k=1,keep=keep)
+                    _,scores = top_k(snapshot.embeddings,vector,k=1,keep=keep,segments=getattr(snapshot, 'retrieval_segments', None))
                     score = float(scores[0]) if len(scores) else -1.
                 # Proposal selection is not acceptance. The existing OCR-assisted
                 # floor permits a readable number/name to rescue a glare image;
@@ -1187,6 +1189,11 @@ def recognize_bytes(
                         grading = observed
                 except Exception:  # noqa: BLE001 - return Raw for manual confirmation
                     logging.getLogger(__name__).exception('Optional grading failed for scan %s', selected.response.id)
+            elif (_grading_job is not None and _grading_job.future is not None
+                  and _grading_completion is not None):
+                grading = GradingEvidence(grading_status='pending')
+            elif _grading_completion is not None:
+                grading = GradingEvidence(warnings=['grading_worker_busy'])
             elif _grading_job is not None:
                 _grading_job.stop()
         elif (_grading_job is not None and _grading_job.future is not None
@@ -1289,6 +1296,9 @@ def recognize_bytes(
         selected.response.status.value, ','.join(selected.evidence.get('status_reasons') or ['none']))
     saved = time.perf_counter()
     selected.save()
+    if grading.grading_status == 'pending' and _grading_completion is not None:
+        _grading_completion(selected.response.id, _grading_job)
+        _grading_job.detached = True
     # Saving happens after total_ms is read, so it gets its own line.
     logging.getLogger('scan.diagnostics').info(
         'scan_saved scan_id=%s save_ms=%.1f', selected.response.id, (time.perf_counter() - saved) * 1000)

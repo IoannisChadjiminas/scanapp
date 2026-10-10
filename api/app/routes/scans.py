@@ -16,6 +16,7 @@ from app.recognition.artifacts import ArtifactError
 from app.recognition.images import ImageError
 from app.recognition.captures import apply_feedback
 from app.recognition.pipeline import recognize_bytes
+from app.recognition.grading_completion import schedule_grading_completion
 from app.recognition.presentation import match_presentation
 from app.recognition.progress import scan_stream
 from app.recognition.upload import read_upload_limited
@@ -107,6 +108,8 @@ async def create_scan(
             locale=locale,
             card_quad=parse_quad(card_quad),
             _progress_observer=observer,
+            _grading_completion=lambda scan_id, job: schedule_grading_completion(
+                request.app.state.loop, request.app.state.dbs.results, scan_id, job),
         )
 
     streaming = bool(stream_results and settings.scan_stream_results)
@@ -168,6 +171,15 @@ async def create_scan(
         raise HTTPException(status_code=400, detail=str(exc)) from exc
     finally:
         await limiter.release()
+
+
+@router.get("/scans/{scan_id}/grading")
+async def scan_grading(scan_id: str, request: Request, response: Response) -> dict:
+    dbs = request.app.state.dbs
+    session_id = get_or_create_session(request, response, dbs, request.app.state.settings)
+    require_scan_owner(dbs, scan_id, session_id)
+    row = dbs.results.execute("SELECT ocr_json FROM scans WHERE id=?", (scan_id,)).fetchone()
+    return {"scan_id": scan_id, "grading": json.loads(row['ocr_json'] or '{}').get('grading', {})}
 
 
 @router.post("/scans/{scan_id}/feedback", response_model=FeedbackResponse)

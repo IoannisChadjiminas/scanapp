@@ -45,6 +45,17 @@ class ArtifactSnapshot:
     def snapshot_name(self) -> str:
         return self.preprocess_config
 
+    @property
+    def retrieval_segments(self) -> tuple[int, ...] | None:
+        values = self.manifest.get("retrieval_segments")
+        if values is None:
+            return None
+        if (not isinstance(values, list) or not values
+                or any(type(n) is not int or n <= 0 for n in values)
+                or sum(values) != len(self.embeddings)):
+            raise ArtifactError("Invalid immutable retrieval segment lineage")
+        return tuple(values)
+
 
 def validate_embeddings(embeddings: np.ndarray, card_ids: np.ndarray) -> None:
     if embeddings.ndim != 2:

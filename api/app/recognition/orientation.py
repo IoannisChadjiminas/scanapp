@@ -22,6 +22,7 @@ def retrieve_oriented(
     query_vectors: dict[int, np.ndarray] | None = None,
     alternate_frames: list[tuple[str, Image.Image]] | None = None,
     selection_metadata: dict | None = None,
+    retrieval_segments: tuple[int, ...] | None = None,
 ) -> tuple[Image.Image, np.ndarray, np.ndarray, dict[str, float]]:
     """Only replace the supplied orientation with a materially stronger one.
 
@@ -42,7 +43,7 @@ def retrieve_oriented(
             query_vectors[id(frame)] = query
         embed_ms += (time.perf_counter() - started) * 1000
         started = time.perf_counter()
-        indices, scores = top_k(embeddings, query, k=20, keep=keep)
+        indices, scores = top_k(embeddings, query, k=20, keep=keep, segments=retrieval_segments)
         retrieve_ms += (time.perf_counter() - started) * 1000
         return indices, scores
 

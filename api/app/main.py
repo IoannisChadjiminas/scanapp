@@ -148,6 +148,8 @@ async def lifespan(app: FastAPI):
         bind_loop(None)
         from app.recognition.progress import drain_scan_streams
         await drain_scan_streams()
+        from app.recognition.grading_completion import drain_grading_updates
+        await drain_grading_updates()
         app.state.executor.shutdown(wait=False, cancel_futures=True)
         app.state.image_executor.shutdown(wait=False, cancel_futures=True)
         runtime.close()

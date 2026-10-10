@@ -19,6 +19,7 @@ class GradingJob:
         self.stop_event = Event()
         self.started = False
         self.started_at = None
+        self.detached = False
 
     def start(self, image: Image.Image) -> None:
         if self.started:
@@ -113,8 +114,8 @@ def parallel_grading_scope(recognize):
             return recognize(data, settings=settings, runtime=runtime,
                              _grading_job=job, **kwargs)
         finally:
-            if deadline:
+            if deadline and not job.detached:
                 job.stop()
-            else:
+            elif not deadline:
                 job.drain()
     return scoped
