@@ -238,6 +238,9 @@ class CardSummary(BaseModel):
     image_owner_id: str | None = None
     variants: dict[str, Any] = Field(default_factory=dict)
     cardmarket_url: str | None = None
+    # The same stored figures a scan shows at once: a fresh listing read, the
+    # Cardmarket price file, or TCGdex. Never fetched while searching.
+    cardmarket_prices: list[CardmarketPrice] = Field(default_factory=list)
     cardmarket_variants: list[CardmarketVariant] = Field(default_factory=list)
 
 
