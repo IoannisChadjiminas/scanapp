@@ -2,15 +2,19 @@
 
 TCGdex lists every set with its printed total. The nightly pass stores one row
 per set in the local database, so a scan or a search can add the total to a card
-without touching the card catalogue itself.
+without touching the card catalogue itself. It keeps each set's release date
+the same way, so a search can list the newest expansions first.
 """
 
 from __future__ import annotations
 
 import logging
+import re
 import sqlite3
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
+from time import sleep
 from typing import Any
+from urllib.parse import quote
 
 import httpx
 
@@ -80,3 +84,52 @@ def set_total(conn: sqlite3.Connection, language: Any, set_id: Any) -> int | Non
     except sqlite3.Error:
         return None
     return int(row[0]) if row else None
+
+
+_DATE = re.compile(r"\d{4}-\d{2}-\d{2}")
+
+
+def refresh_set_releases(
+    conn: sqlite3.Connection, settings: Settings, *, catalog: sqlite3.Connection | None = None
+) -> int:
+    """Store the release date of every set the catalogue holds, so a search can
+    show the newest expansions first.
+
+    A date never changes, so only sets without one are asked for: the first
+    pass asks once per set, later passes only for new sets. A set TCGdex has no
+    date for is asked again after a week.
+    """
+    source = catalog if catalog is not None else conn
+    known = {
+        (str(row[0]), str(row[1]))
+        for row in conn.execute(
+            "SELECT language, set_id FROM set_releases WHERE release_date IS NOT NULL OR fetched_at > ?",
+            ((datetime.now(timezone.utc) - timedelta(days=7)).strftime("%Y-%m-%dT%H:%M:%SZ"),),
+        )
+    }
+    wanted = sorted(
+        {(str(row[0] or "en").lower(), str(row[1])) for row in source.execute("SELECT DISTINCT language, set_id FROM cards")}
+        - known
+    )
+    stored = 0
+    with httpx.Client(timeout=30) as client:
+        for language, set_id in wanted:
+            try:
+                response = client.get(f"{settings.tcgdex_base_url}/{language}/sets/{quote(set_id, safe='')}")
+                response.raise_for_status()
+                body = response.json()
+            except (httpx.HTTPError, ValueError) as exc:
+                log.info("set release failed language=%s set=%s error=%s", language, set_id, type(exc).__name__)
+                continue
+            value = str(body.get("releaseDate") or "") if isinstance(body, dict) else ""
+            date = value[:10] if _DATE.match(value) else None
+            now = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+            with conn:
+                conn.execute(
+                    "INSERT OR REPLACE INTO set_releases (language, set_id, release_date, fetched_at) VALUES (?, ?, ?, ?)",
+                    (language, set_id, date, now),
+                )
+            stored += date is not None
+            sleep(max(0.0, float(settings.tcgdex_prices_gap_s)))
+    log.info("set releases refreshed sets=%s asked=%s", stored, len(wanted))
+    return stored

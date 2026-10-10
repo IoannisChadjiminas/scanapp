@@ -16,6 +16,17 @@ from app.visual_aliases import visual_image_owner
 
 router = APIRouter()
 
+# Newest expansions first; a set with no known date goes last. Then by set and
+# by the printed number, read as a number, so 2 comes before 10.
+_RELEASES = (
+    " LEFT JOIN set_releases ON set_releases.language = cards.language"
+    " AND set_releases.set_id = cards.set_id"
+)
+_ORDER = (
+    "ORDER BY set_releases.release_date IS NULL, set_releases.release_date DESC,"
+    " cards.set_name, CAST(cards.collector_number AS INTEGER), cards.collector_number, cards.id"
+)
+
 
 def _summary(row, catalog=None) -> CardSummary:  # noqa: ANN001
     image_url = display_image_url(row, catalog)
@@ -60,10 +71,10 @@ def search_cards(
         like = f"%{query}%"
         rows = catalog.execute(
             f"""
-            SELECT * FROM cards
+            SELECT cards.* FROM cards{_RELEASES}
             WHERE (name LIKE ? OR set_name LIKE ? OR collector_number LIKE ?)
             {lang_clause}
-            ORDER BY set_name, collector_number
+            {_ORDER}
             LIMIT ?
             """,
             (like, like, like, *lang_params, limit),
@@ -83,9 +94,10 @@ def search_cards(
             f"""
             SELECT cards.*
             FROM cards_fts
-            JOIN cards ON cards.id = cards_fts.id
+            JOIN cards ON cards.id = cards_fts.id{_RELEASES}
             WHERE cards_fts MATCH ?
             {lang_clause}
+            {_ORDER}
             LIMIT ?
             """,
             (fts, *lang_params, limit),
@@ -104,9 +116,9 @@ def search_cards(
     else:
         rows = catalog.execute(
             f"""
-            SELECT * FROM cards
+            SELECT cards.* FROM cards{_RELEASES}
             WHERE 1=1 {lang_clause}
-            ORDER BY set_name, collector_number
+            {_ORDER}
             LIMIT ?
             """,
             (*lang_params, limit),
