@@ -133,6 +133,15 @@ class Settings(BaseSettings):
     app_native_camera_android: bool = False
     # Let a card count anywhere in the camera view, not only inside the middle box.
     app_card_anywhere: bool = True
+    # Measure each photo on the phone as it is taken, against threshold_blur at
+    # threshold_blur_edge, and take an automatic photo again when it is blurry.
+    app_photo_check: bool = True
+    # Largest share of the card's middle the phone lets be blown out to white
+    # before it takes the photo again (0 = glare is not checked).
+    app_max_glare: float = 0.08
+    # How many times the phone takes an automatic photo again before sending
+    # its best try anyway, for the server to judge.
+    app_auto_retakes: int = 2
     # Tell the phone to find and flatten the card before upload.
     app_card_warp: bool = False
     # Honour skip_detect from the phone. Off: the server still runs its own

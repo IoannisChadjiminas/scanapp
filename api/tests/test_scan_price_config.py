@@ -95,17 +95,22 @@ def test_a_fresh_stored_price_is_not_read_again(tmp_path, monkeypatch):
     assert claim_proxy_job(conn) is not None
 
 
+PHOTO_CHECK = dict(photo_check=True, min_sharpness=40.0, sharpness_edge=1000, max_glare=0.08, auto_retakes=2)
+
+
 def test_config_sends_phone_capture_and_warp_switches():
     body = scan_price_config(Settings(_env_file=None))
     assert body.card_warp is False
     assert body.capture.model_dump() == dict(preset='max', jpeg_quality=95, max_edge=2000, native_codec=False,
-                                                live_outline=True, auto_capture=True, native_camera=False, native_camera_android=False, card_anywhere=True)
+                                                live_outline=True, auto_capture=True, native_camera=False, native_camera_android=False, card_anywhere=True,
+                                                **PHOTO_CHECK)
     body = scan_price_config(Settings(_env_file=None, app_card_warp=True, app_capture_preset='ultraHigh',
                                       app_jpeg_quality=85, app_max_edge=1400, app_native_codec=True,
                                       app_live_outline=True, app_auto_capture=True, app_native_camera=True, native_camera_android=False, card_anywhere=True))
     assert body.card_warp is True
     assert body.capture.model_dump() == dict(preset='ultraHigh', jpeg_quality=85, max_edge=1400, native_codec=True,
-                                                live_outline=True, auto_capture=True, native_camera=True, native_camera_android=False, card_anywhere=True)
+                                                live_outline=True, auto_capture=True, native_camera=True, native_camera_android=False, card_anywhere=True,
+                                                **PHOTO_CHECK)
 
 
 def test_config_never_sends_an_unknown_preset_or_silly_quality():
@@ -142,3 +147,16 @@ def test_android_camera_switch_is_separate_from_the_iphone_one():
     on = scan_price_config(Settings(_env_file=None, app_native_camera_android=True))
     assert on.capture.native_camera is False
     assert on.capture.native_camera_android is True
+
+
+def test_photo_check_uses_the_server_blur_limit_and_can_be_switched_off():
+    body = scan_price_config(Settings(_env_file=None, threshold_blur=55.0, threshold_blur_edge=800,
+                                      app_max_glare=0.2, app_auto_retakes=1))
+    assert (body.capture.min_sharpness, body.capture.sharpness_edge) == (55.0, 800)
+    assert (body.capture.max_glare, body.capture.auto_retakes) == (0.2, 1)
+    assert scan_price_config(Settings(_env_file=None, app_photo_check=False)).capture.photo_check is False
+
+
+def test_photo_check_keeps_its_numbers_in_range():
+    body = scan_price_config(Settings(_env_file=None, threshold_blur_edge=0, app_max_glare=3.0, app_auto_retakes=99))
+    assert (body.capture.sharpness_edge, body.capture.max_glare, body.capture.auto_retakes) == (1000, 1.0, 5)
