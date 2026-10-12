@@ -78,3 +78,29 @@ def test_results_carry_the_stored_prices_a_scan_shows(tmp_path: Path) -> None:
     ]
     # A card nothing is stored for comes back without a price, not with an error.
     assert items["base-001"].cardmarket_prices == []
+
+
+def test_search_leaves_out_tcg_pocket_cards(tmp_path: Path) -> None:
+    conn = _catalog(tmp_path)
+    for card_id, set_id, set_name in (
+        ("en:A2b-010", "A2b", "Shining Revelry"),
+        ("en:P-A-007", "P-A", "Promos-A"),
+        ("en:sv08.5-011", "sv08.5", "Prismatic Evolutions"),
+    ):
+        conn.execute(
+            "INSERT INTO cards (id, provider_id, name, set_id, set_name, collector_number, language) "
+            "VALUES (?, ?, 'Charizard ex', ?, ?, '10', 'en')",
+            (card_id, card_id, set_id, set_name),
+        )
+        conn.execute(
+            "INSERT INTO cards_fts (name, set_name, collector_number, id) VALUES ('Charizard ex', ?, '10', ?)",
+            (set_name, card_id),
+        )
+    conn.commit()
+
+    found = search_cards(_request(conn), q="Charizard", language="", limit=20, offset=0)
+    assert _ids(found) == ["en:sv08.5-011"]
+    assert found.total == 1
+    browse = search_cards(_request(conn), q="", language="en", limit=50, offset=0)
+    assert "en:A2b-010" not in _ids(browse)
+    assert browse.total == 8
