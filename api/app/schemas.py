@@ -224,6 +224,25 @@ class FeedbackResponse(BaseModel):
     confirmed_card_id: str | None = None
 
 
+class CardMarket(BaseModel):
+    source: str = "cardmarket_file"
+    below_average: bool | None = None
+    basis: str
+    currency: str = "EUR"
+    as_of: str | None = None
+    low: float | None = None
+    trend: float | None = None
+    avg1: float | None = None
+    avg7: float | None = None
+    avg30: float | None = None
+    momentum: float | None = None
+    discount: float | None = None
+    under_trend: float | None = None
+    change_7d: float | None = None
+    change_30d: float | None = None
+    sales_days_30: int | None = None
+
+
 class CardSummary(BaseModel):
     id: str
     name: str
@@ -238,6 +257,7 @@ class CardSummary(BaseModel):
     image_owner_id: str | None = None
     variants: dict[str, Any] = Field(default_factory=dict)
     cardmarket_url: str | None = None
+    market: CardMarket | None = None
     # The same stored figures a scan shows at once: a fresh listing read, the
     # Cardmarket price file, or TCGdex. Never fetched while searching.
     cardmarket_prices: list[CardmarketPrice] = Field(default_factory=list)

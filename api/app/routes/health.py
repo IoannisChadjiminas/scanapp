@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from fastapi import APIRouter, Request
 
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 from app.db import coverage_payload
 from app.schemas import HealthResponse
@@ -40,6 +40,8 @@ class CaptureConfig(BaseModel):
 
 
 class AppConfigResponse(BaseModel):
+    search_presets: list[dict] = Field(default_factory=list)
+    search_history: dict[str, bool] = Field(default_factory=dict)
     price_fresh_minutes: int
     config_ttl_s: int
     slab_detection: bool = False
@@ -55,7 +57,10 @@ def scan_price_config(settings) -> AppConfigResponse:
     delay = int(settings.scan_price_server_read_delay_ms)
     days = int(settings.scan_price_stale_max_days)
     pages = int(settings.scan_price_server_read_daily_pages)
+    from app.routes.cards import SEARCH_PRESETS
+
     return AppConfigResponse(
+        search_presets=SEARCH_PRESETS,
         price_fresh_minutes=max(1, min(minutes, 24 * 60)),
         config_ttl_s=max(30, min(ttl, 24 * 60 * 60)),
         slab_detection=bool(settings.app_slab_detection),
@@ -93,7 +98,15 @@ router = APIRouter()
 @router.get("/config", response_model=AppConfigResponse)
 def app_config(request: Request) -> AppConfigResponse:
     """Values the phone applies at startup and again after config_ttl_s."""
-    return scan_price_config(request.app.state.settings)
+    config = scan_price_config(request.app.state.settings)
+    from app.market_stats import capabilities
+    flags = capabilities(request.app.state.dbs.catalog)
+    config.search_history = flags
+    if flags['change_7d']:
+        config.search_presets = [dict(item, params=dict(item['params'], sort='change_7d_asc')) if item['id']=='biggest_drops' else item for item in config.search_presets]
+    if flags['change_30d'] and flags['liquidity_30d']:
+        config.search_presets = [*config.search_presets, {'id':'steady_climbers', 'label':'Steady climbers', 'icon':'trending_up', 'params':{'preset':'steady_climbers','sort':'change_30d'}}]
+    return config
 
 
 @router.get("/health", response_model=HealthResponse)

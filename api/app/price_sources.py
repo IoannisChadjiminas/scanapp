@@ -75,6 +75,7 @@ def import_guide(conn: sqlite3.Connection, payload: Any, history: Any = None) ->
         f"VALUES (?, {', '.join('?' for _ in columns)}, ?)"
     )
     with conn:
+        conn.execute("DELETE FROM card_market_stats")
         conn.executemany(
             sql,
             [
@@ -104,6 +105,9 @@ def import_guide(conn: sqlite3.Connection, payload: Any, history: Any = None) ->
                 ),
             )
             log.info("price history stored rows=%s", stored)
+            from app.market_stats import rebuild
+
+            rebuild(conn, history, date)
         except Exception as exc:
             log.info("price history failed error=%s", type(exc).__name__)
             try:

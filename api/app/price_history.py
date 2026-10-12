@@ -28,6 +28,9 @@ HISTORY_FIELDS = (
 CHUNK = 2000
 
 SCHEMA = (
+    """CREATE TABLE IF NOT EXISTS price_guide_import_days (
+        day TEXT PRIMARY KEY
+    )""",
     """
     CREATE TABLE IF NOT EXISTS price_history_daily (
         id_product INTEGER NOT NULL,
@@ -39,6 +42,7 @@ SCHEMA = (
         PRIMARY KEY (id_product, day)
     )
     """,
+    "CREATE INDEX IF NOT EXISTS price_history_day ON price_history_daily(day, id_product)",
     """
     CREATE TABLE IF NOT EXISTS price_sales_daily (
         product_url TEXT NOT NULL,
@@ -102,13 +106,20 @@ def record_guide(conn, date: str, entries: Iterable[dict[str, Any]]) -> int:
         ).fetchall()
     }
     pending = []
+    seen = set()
     for entry in entries:
+        seen.add(entry["id_product"])
         values = tuple(entry.get(name) for name in HISTORY_FIELDS)
-        if all(value is None for value in values):
+        if all(value is None for value in values) and entry["id_product"] not in latest:
             continue
         if latest.get(entry["id_product"]) == values:
             continue
         pending.append((entry["id_product"], day, *values))
+    # A removed product must not keep contributing fill-forward sales if it
+    # later returns to the guide.
+    pending.extend((product, day, *(None for _ in HISTORY_FIELDS))
+                   for product in latest.keys() - seen
+                   if any(value is not None for value in latest[product]))
     sql = _sql(
         conn,
         f"INSERT INTO price_history_daily (id_product, day, {', '.join(HISTORY_FIELDS)}) "
@@ -119,6 +130,8 @@ def record_guide(conn, date: str, entries: Iterable[dict[str, Any]]) -> int:
     for start in range(0, len(pending), CHUNK):
         conn.executemany(sql, pending[start : start + CHUNK])
         conn.commit()
+    conn.execute(_sql(conn, "INSERT INTO price_guide_import_days(day) VALUES (?) ON CONFLICT (day) DO NOTHING"), (day,))
+    conn.commit()
     return len(pending)
 
 
