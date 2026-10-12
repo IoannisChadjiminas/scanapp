@@ -7,6 +7,7 @@ Prices stay in the local snapshot table.
 from __future__ import annotations
 
 import sqlite3
+import time
 from urllib.parse import urlsplit
 
 _SCHEMA = """
@@ -66,17 +67,41 @@ def statement(conn, sql: str) -> str:
     return sql.replace("?", "%s")
 
 
-def portfolio_keys(conn) -> list[str]:
-    """Distinct product URLs, most recently opened first."""
+def has_synced_at(conn) -> bool:
+    """True once docs/sql/portfolio-synced-at.sql has been applied.
+
+    Until then the night job keeps every holding, as before.
+    """
+    try:
+        conn.execute(statement(conn, "SELECT synced_at FROM portfolio_products LIMIT 0"))
+        return True
+    except Exception:
+        conn.rollback()
+        return False
+
+
+def portfolio_keys(conn, max_age_days: int = 0) -> list[str]:
+    """Distinct product URLs, most recently opened first.
+
+    With [max_age_days], holdings from an install that has not synced in that
+    many days are left out. Needs the synced_at column.
+    """
+    where, params = "", ()
+    if max_age_days > 0 and has_synced_at(conn):
+        cutoff = time.gmtime(time.time() - max_age_days * 86400)
+        where = "WHERE synced_at >= ?"
+        params = (time.strftime("%Y-%m-%dT%H:%M:%SZ", cutoff),)
     rows = conn.execute(
         statement(
             conn,
-            """
+            f"""
             SELECT sample_key, MAX(opened_at) AS opened
             FROM portfolio_products
+            {where}
             GROUP BY sample_key
             ORDER BY opened DESC, sample_key
             """,
-        )
+        ),
+        params,
     ).fetchall()
     return [str(row["sample_key"]) for row in rows]

@@ -124,6 +124,9 @@ class Settings(BaseSettings):
     daily_session_pages: int = 30
     daily_session_rotate_before_s: float = 120
     daily_browsers: int = 1
+    # Holdings of an install that has not synced in this many days are not
+    # read overnight. 0 keeps every holding. Needs the synced_at column.
+    daily_install_max_age_days: int = 30
     photo_scrape_active: bool = False
     config_ttl_s: int = 600
     # Tell the phone (GET /config) to look for a graded slab on each photo and

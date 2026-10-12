@@ -30,7 +30,7 @@ def setup(monkeypatch, cards):
             prices.append({"label": "Trend", "amount": page, "currency": "EUR"})
         return {"observed_at": stamp, "fetched_at": stamp, "prices": prices}
 
-    monkeypatch.setattr(daily, "portfolio_keys", lambda _conn: urls)
+    monkeypatch.setattr(daily, "portfolio_keys", lambda _conn, _age=0: urls)
     monkeypatch.setattr(daily, "snapshot_record", record)
     monkeypatch.setattr(daily, "trend_for_url", lambda _conn, key: by_url[key][1])
     return {name: url for name, url in zip(cards, urls)}
