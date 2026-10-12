@@ -73,6 +73,10 @@ _LOCALIZED_EXPANSION_RE = re.compile(
     r")$",
     re.I,
 )
+# Cardmarket keeps prints sold outside the booster packs in a side expansion
+# such as "Mega-Evolution-Additionals" (codes like xMEG034). They share the
+# set's name and numbers but are different products from the pack print.
+_SIDE_EXPANSION_RE = re.compile(r"-additionals$", re.I)
 _PROMO_SET_EXPANSIONS = {
     "swshp": {"swsh-black-star-promos"},
     "s-p": {"sword-shield-promos"},
@@ -775,6 +779,8 @@ def set_fits_expansion(
         return False
     if _LOCALIZED_EXPANSION_RE.search(exp) and set_slug != exp:
         return False
+    if _SIDE_EXPANSION_RE.search(exp) and set_slug != exp:
+        return False
     if set_slug == exp:
         return True
     allowed = _PROMO_SET_EXPANSIONS.get((set_id or "").lower())
@@ -1390,12 +1396,49 @@ def clear_ambiguous_auto_links(conn: sqlite3.Connection) -> int:
     return cleared
 
 
+def _products_by_number(conn: sqlite3.Connection) -> dict[str, list[str]]:
+    grouped: dict[str, list[str]] = {}
+    for row in conn.execute("SELECT url FROM cardmarket_expansion_products"):
+        url = str(row["url"] or "")
+        coded = singles_code_and_number(url)
+        if coded:
+            grouped.setdefault(coded[1], []).append(url)
+    return grouped
+
+
+def _has_own_set_listing(
+    row: Any, current: str, products_by_number: dict[str, list[str]]
+) -> bool:
+    """True when the card's own expansion lists this name and number."""
+    name = latin_name_slug(str(row["name"] or ""))
+    number = _collector_number_key(str(row["collector_number"] or ""))
+    if not name or number is None:
+        return False
+    for url in products_by_number.get(number, []):
+        if url == current or not name_fits_product_slug(name, product_slug(url)):
+            continue
+        if set_fits_expansion(
+            str(row["set_id"] or ""),
+            str(row["set_name"] or ""),
+            _expansion_from_url(url),
+            strict=True,
+        ):
+            return True
+    return False
+
+
 def clear_mismatched_auto_links(conn: sqlite3.Connection) -> int:
-    """Drop helper-expansion URLs that are a different language set or a wrong name."""
+    """Drop helper-expansion URLs that are a different language set or a wrong name.
+
+    A URL from a related expansion (Pokemon-GO-Enhanced-Expansion-Pack for
+    Pokemon GO) is dropped too when the card's own expansion lists the card.
+    """
     cleared = 0
+    products_by_number = _products_by_number(conn)
     rows = conn.execute(
         """
-        SELECT id, name, set_id, set_name, cardmarket_url, cardmarket_provenance
+        SELECT id, name, set_id, set_name, collector_number, cardmarket_url,
+               cardmarket_provenance
         FROM cards
         WHERE cardmarket_url IS NOT NULL AND TRIM(cardmarket_url) != ''
         """
@@ -1420,7 +1463,14 @@ def clear_mismatched_auto_links(conn: sqlite3.Connection) -> int:
             expansion,
         )
         if name_ok and set_ok:
-            continue
+            own_set = set_fits_expansion(
+                str(row["set_id"] or ""),
+                str(row["set_name"] or ""),
+                expansion,
+                strict=True,
+            )
+            if own_set or not _has_own_set_listing(row, url, products_by_number):
+                continue
         _clear_auto_product_url(conn, str(row["id"]), url)
         cleared += 1
     return cleared
@@ -1615,6 +1665,7 @@ def _unique_card_for_product(
     groups: dict[tuple[str, str, str], list[sqlite3.Row]] | None = None,
     cards_by_number: dict[str, list[sqlite3.Row]] | None = None,
     cards_by_name: dict[str, list[sqlite3.Row]] | None = None,
+    strict: bool = False,
 ) -> sqlite3.Row | None:
     del name_hint
     product = normalize_product_url(url) or url
@@ -1663,6 +1714,7 @@ def _unique_card_for_product(
             str(row["set_id"] or ""),
             str(row["set_name"] or ""),
             expansion_slug,
+            strict=strict,
         ):
             continue
         hits.append(row)
@@ -1979,6 +2031,7 @@ def link_stored_expansion_products(
     unmatched = 0
     skipped_variants = 0
     considered = 0
+    candidates: list[tuple[str, str, tuple[str, str] | None]] = []
     for row in rows:
         url = str(row["url"] or "")
         coded = singles_code_and_number(url)
@@ -1987,51 +2040,56 @@ def link_stored_expansion_products(
         ):
             continue
         considered += 1
-        if considered == 1 or considered % 2000 == 0:
-            print(
-                f"  {considered} considered, linked {linked}, "
-                f"variant-sku skipped {skipped_variants}",
-                flush=True,
-            )
         key = product_sku_key(url)
         if key is not None and len(groups.get(key, [])) >= 2:
             skipped_variants += 1
             unmatched += 1
             continue
-        hit = _unique_card_for_product(
-            conn,
-            url,
-            str(row["name"] or ""),
-            groups=groups,
-            cards_by_number=cards_by_number,
-            cards_by_name=cards_by_name,
-        )
-        if hit is None:
-            unmatched += 1
-            continue
-        card_id = str(hit["id"])
-        map_card_product(
-            conn,
-            data_dir,
-            card_id,
-            url,
-            provenance="helper-expansion",
-            commit=False,
-        )
-        conn.execute(
-            """
-            UPDATE cardmarket_expansion_products
-            SET card_id = ?, matched = 1
-            WHERE url = ?
-            """,
-            (card_id, url),
-        )
-        number = coded[1] if coded else collector_digits(
-            str(hit["collector_number"] or "")
-        )
-        _drop_indexed_card(cards_by_number, card_id, str(number).lstrip("0") or "0")
-        _drop_indexed_name(cards_by_name, card_id, latin_name_slug(str(hit["name"] or "")))
-        linked += 1
+        candidates.append((url, str(row["name"] or ""), coded))
+    # A product in the card's own expansion goes first. Only then may a card
+    # take a listing from a related expansion (EX-Deoxys for Deoxys), so
+    # Base-Set-2 never takes a Base Set card whose own listing is unclaimed.
+    pending = candidates
+    for strict in (True, False):
+        left: list[tuple[str, str, tuple[str, str] | None]] = []
+        for url, name, coded in pending:
+            hit = _unique_card_for_product(
+                conn,
+                url,
+                name,
+                groups=groups,
+                cards_by_number=cards_by_number,
+                cards_by_name=cards_by_name,
+                strict=strict,
+            )
+            if hit is None:
+                left.append((url, name, coded))
+                continue
+            card_id = str(hit["id"])
+            map_card_product(
+                conn,
+                data_dir,
+                card_id,
+                url,
+                provenance="helper-expansion",
+                commit=False,
+            )
+            conn.execute(
+                """
+                UPDATE cardmarket_expansion_products
+                SET card_id = ?, matched = 1
+                WHERE url = ?
+                """,
+                (card_id, url),
+            )
+            number = coded[1] if coded else collector_digits(
+                str(hit["collector_number"] or "")
+            )
+            _drop_indexed_card(cards_by_number, card_id, str(number).lstrip("0") or "0")
+            _drop_indexed_name(cards_by_name, card_id, latin_name_slug(str(hit["name"] or "")))
+            linked += 1
+        pending = left
+    unmatched += len(pending)
     print(
         f"  done considered {considered}, linked {linked}, "
         f"variant-sku skipped {skipped_variants}",
@@ -2307,6 +2365,33 @@ def link_japanese_listing_codes(
     }
 
 
+def prune_cleared_helper_maps(conn: sqlite3.Connection, data_dir: Path) -> int:
+    """Forget stored helper-expansion links the catalogue no longer carries.
+
+    Without this a link dropped as mismatched comes back on the next start,
+    since startup re-applies every stored link.
+    """
+    stored = _read_helper_maps(data_dir)
+    if not stored:
+        return 0
+    kept: dict[str, dict[str, Any]] = {}
+    for card_id, item in stored.items():
+        if str(item.get("provenance") or "") == "helper-expansion":
+            row = conn.execute(
+                "SELECT cardmarket_url FROM cards WHERE id = ?", (card_id,)
+            ).fetchone()
+            url = normalize_product_url(
+                str(item.get("cardmarket_url") or item.get("url") or "")
+            )
+            if row is not None and str(row["cardmarket_url"] or "") != url:
+                continue
+        kept[card_id] = item
+    dropped = len(stored) - len(kept)
+    if dropped:
+        _write_helper_maps(data_dir, kept)
+    return dropped
+
+
 def apply_cardmarket_links(
     conn: sqlite3.Connection,
     data_dir: Path,
@@ -2321,6 +2406,7 @@ def apply_cardmarket_links(
     cleared = clear_ambiguous_auto_links(conn)
     ja_codes = link_japanese_listing_codes(conn, data_dir)
     named = link_named_set_collectors(conn)
+    pruned = prune_cleared_helper_maps(conn, data_dir)
     conn.commit()
     return {
         "dumps": dumps,
@@ -2335,6 +2421,7 @@ def apply_cardmarket_links(
         "ja_collector_replaced": ja_codes["replaced"],
         "named_set_linked": named["linked"],
         "named_set_urls": named["urls_written"],
+        "helper_maps_pruned": pruned,
     }
 
 
