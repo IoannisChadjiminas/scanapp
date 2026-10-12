@@ -2297,3 +2297,140 @@ def test_list_unmatched_products_skips_official_151_abra(tmp_path: Path) -> None
     assert v1 not in urls
     assert v2 not in urls
     assert urls == [movie]
+
+
+SINGLES = "https://www.cardmarket.com/en/Pokemon/Products/Singles/"
+
+
+def test_additionals_expansion_does_not_fit_the_main_set() -> None:
+    from app.cardmarket import set_fits_expansion
+
+    assert set_fits_expansion("me01", "Mega Evolution", "Mega-Evolution")
+    assert not set_fits_expansion(
+        "me01", "Mega Evolution", "Mega-Evolution-Additionals"
+    )
+    assert not set_fits_expansion(
+        "sv08.5", "Prismatic Evolutions", "Prismatic-Evolutions-Additionals"
+    )
+    assert set_fits_expansion("ex16", "Power Keepers", "EX-Power-Keepers")
+
+
+def test_additionals_listing_does_not_take_the_pack_print(tmp_path: Path) -> None:
+    from app.cardmarket import import_expansion_products
+
+    conn = connect(tmp_path / "catalog.sqlite")
+    init_catalog(conn)
+    _insert_card(conn, "en:me01-034", "Kyogre", "Mega Evolution", "034", set_id="me01")
+    conn.commit()
+    side = SINGLES + "Mega-Evolution-Additionals/Kyogre-xMEG034"
+    main = SINGLES + "Mega-Evolution/Kyogre-MEG034"
+    import_expansion_products(
+        conn,
+        tmp_path,
+        page_url=SINGLES + "Mega-Evolution-Additionals",
+        products=[{"url": side, "name": "Kyogre (xMEG 034)"}],
+    )
+    row = conn.execute("SELECT * FROM cards WHERE id = 'en:me01-034'").fetchone()
+    assert url_for_row(row) is None
+    import_expansion_products(
+        conn,
+        tmp_path,
+        page_url=SINGLES + "Mega-Evolution",
+        products=[{"url": main, "name": "Kyogre (MEG 034)"}],
+    )
+    row = conn.execute("SELECT * FROM cards WHERE id = 'en:me01-034'").fetchone()
+    assert url_for_row(row) == main
+
+
+def test_stored_additionals_link_moves_to_the_main_listing(tmp_path: Path) -> None:
+    from app.cardmarket import apply_cardmarket_links
+
+    conn = connect(tmp_path / "catalog.sqlite")
+    init_catalog(conn)
+    side = SINGLES + "Mega-Evolution-Additionals/Kyogre-xMEG034"
+    main = SINGLES + "Mega-Evolution/Kyogre-MEG034"
+    _insert_card(
+        conn,
+        "en:me01-034",
+        "Kyogre",
+        "Mega Evolution",
+        "034",
+        set_id="me01",
+        cardmarket_url=side,
+        provenance="helper-expansion",
+        verified=1,
+    )
+    _insert_product(conn, side, "Kyogre (xMEG 034)", expansion="Mega-Evolution-Additionals")
+    _insert_product(conn, main, "Kyogre (MEG 034)", expansion="Mega-Evolution")
+    conn.execute(
+        "UPDATE cardmarket_expansion_products SET card_id = 'en:me01-034', matched = 1 WHERE url = ?",
+        (side,),
+    )
+    conn.commit()
+    (tmp_path / "cardmarket-maps.json").write_text(
+        json.dumps(
+            {
+                "cards": {
+                    "en:me01-034": {
+                        "card_id": "en:me01-034",
+                        "cardmarket_url": side,
+                        "provenance": "helper-expansion",
+                    }
+                }
+            }
+        )
+    )
+    stats = apply_cardmarket_links(conn, tmp_path)
+    assert stats["mismatched_cleared"] == 1
+    row = conn.execute("SELECT * FROM cards WHERE id = 'en:me01-034'").fetchone()
+    assert url_for_row(row) == main
+    maps = json.loads((tmp_path / "cardmarket-maps.json").read_text())
+    assert maps["cards"]["en:me01-034"]["cardmarket_url"] == main
+    sync_cardmarket_links(tmp_path, conn)
+    row = conn.execute("SELECT * FROM cards WHERE id = 'en:me01-034'").fetchone()
+    assert url_for_row(row) == main
+
+
+def test_related_expansion_link_is_dropped_when_the_own_set_lists_it(
+    tmp_path: Path,
+) -> None:
+    from app.cardmarket import apply_cardmarket_links
+
+    conn = connect(tmp_path / "catalog.sqlite")
+    init_catalog(conn)
+    japanese = SINGLES + "Pokemon-GO-Enhanced-Expansion-Pack/Pikachu-V1-s10b027"
+    english = SINGLES + "Pokemon-GO/Pikachu-PGO027"
+    _insert_card(
+        conn,
+        "en:swsh10.5-027",
+        "Pikachu",
+        "Pokémon GO",
+        "027",
+        set_id="swsh10.5",
+        cardmarket_url=japanese,
+        provenance="helper-expansion",
+        verified=1,
+    )
+    _insert_product(conn, japanese, "Pikachu (s10b 027)", expansion="Pokemon-GO-Enhanced-Expansion-Pack")
+    _insert_product(conn, english, "Pikachu (PGO 027)", expansion="Pokemon-GO")
+    conn.commit()
+    stats = apply_cardmarket_links(conn, tmp_path)
+    assert stats["mismatched_cleared"] == 1
+    row = conn.execute("SELECT * FROM cards WHERE id = 'en:swsh10.5-027'").fetchone()
+    assert url_for_row(row) == english
+
+
+def test_unique_link_tries_the_cards_own_expansion_first(tmp_path: Path) -> None:
+    from app.cardmarket import apply_cardmarket_links
+
+    conn = connect(tmp_path / "catalog.sqlite")
+    init_catalog(conn)
+    _insert_card(conn, "en:swsh10.5-027", "Pikachu", "Pokémon GO", "027", set_id="swsh10.5")
+    japanese = SINGLES + "Pokemon-GO-Enhanced-Expansion-Pack/Pikachu-s10b027"
+    english = SINGLES + "Pokemon-GO/Pikachu-PGO027"
+    _insert_product(conn, japanese, "Pikachu (s10b 027)", expansion="Pokemon-GO-Enhanced-Expansion-Pack")
+    _insert_product(conn, english, "Pikachu (PGO 027)", expansion="Pokemon-GO")
+    conn.commit()
+    apply_cardmarket_links(conn, tmp_path)
+    row = conn.execute("SELECT * FROM cards WHERE id = 'en:swsh10.5-027'").fetchone()
+    assert url_for_row(row) == english

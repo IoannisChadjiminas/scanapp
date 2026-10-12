@@ -235,6 +235,21 @@ def trend_for_url(conn: sqlite3.Connection, url: str | None) -> float | None:
     return market_trend(guide_market(conn, row["cardmarket_id"])) if row else None
 
 
+def guide_trend_for_url(conn: sqlite3.Connection, url: str | None) -> tuple[float | None, str | None]:
+    """The price file's trend and its date for the product behind a listing URL."""
+    from app.cardmarket import normalize_product_url
+
+    if not url:
+        return None, None
+    row = conn.execute(
+        "SELECT cardmarket_id FROM cards WHERE cardmarket_url = ? AND cardmarket_id IS NOT NULL LIMIT 1",
+        (normalize_product_url(url) or url,),
+    ).fetchone()
+    market = guide_market(conn, row["cardmarket_id"]) if row else None
+    trend = market_trend(market)
+    return (trend, str(market.get("updated") or "") or None) if trend else (None, None)
+
+
 def fresh_window(conn: sqlite3.Connection, url: str | None, *, trend: float | None = None) -> int:
     """How long a listing sample for this product stays fresh, in seconds."""
     from app.cardmarket_queue import fresh_seconds

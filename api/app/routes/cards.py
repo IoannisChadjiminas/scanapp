@@ -28,7 +28,12 @@ _RELEASES = (
     " LEFT JOIN set_releases ON set_releases.language = cards.language"
     " AND set_releases.set_id = cards.set_id"
 )
-
+# Pokémon TCG Pocket cards (sets A1, B2a, P-A ...) are digital only. They have
+# no Cardmarket listing and cannot be collected, so search leaves them out.
+_PHYSICAL = (
+    "NOT (cards.language = 'en'"
+    " AND (cards.set_id = 'P-A' OR cards.set_id GLOB '[AB][0-9]*'))"
+)
 
 
 def _summary(row, catalog=None) -> CardSummary:  # noqa: ANN001
@@ -132,6 +137,7 @@ def search_sets(request: Request, language: str = "") -> list[dict]:
     if cached is None or cached[0] != signature:
         rows = catalog.execute(f"""SELECT cards.language, cards.set_id, MAX(cards.set_name) AS set_name,
             set_releases.release_date, COUNT(*) AS cards FROM cards{_RELEASES}
+            WHERE {_PHYSICAL}
             GROUP BY cards.language, cards.set_id
             ORDER BY release_date IS NULL, release_date DESC, set_name, cards.language, cards.set_id""").fetchall()
         cached = (signature, [dict(row) for row in rows])
@@ -179,7 +185,7 @@ def search_cards(
     if released_after and released_before and released_after > released_before:
         raise HTTPException(422, "Invalid release date range")
     catalog = request.app.state.dbs.catalog
-    clauses, params = ["1=1"], []
+    clauses, params = [_PHYSICAL], []
     if ownership not in ('any', 'hide_owned', 'only_owned'):
         raise HTTPException(422, "Unknown ownership filter")
     if ownership != 'any':

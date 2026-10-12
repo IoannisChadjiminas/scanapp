@@ -6,10 +6,13 @@ The job posts to the existing scraper. It does not open a browser itself.
 from __future__ import annotations
 
 import logging
+import random
+import threading
 import time
 import uuid
 from contextvars import ContextVar
 from dataclasses import dataclass
+from datetime import date, datetime, timedelta, timezone
 
 import httpx
 
@@ -25,7 +28,8 @@ from app.cardmarket_budget import (
 from app.cardmarket_queue import header_prices, rows_to_prices
 from app.config import Settings, get_settings
 from app.db import connect
-from app.portfolio_db import portfolio_keys, statement
+from app.price_sources import market_trend, parse_tiers, trend_for_url
+from app.portfolio_db import has_synced_at, portfolio_keys, statement
 
 log = logging.getLogger("cardmarket.daily")
 daily_lane_url: ContextVar[str] = ContextVar("daily_lane_url", default="")
@@ -38,9 +42,36 @@ def should_schedule(settings: Settings) -> bool:
     return bool(settings.daily_prices_enabled and settings.scraper_enabled)
 
 
-def accepted_daily_browsers(requested: int) -> int:
-    """One held Chrome. A higher count is refused until each session has a window."""
-    return 1
+def accepted_daily_browsers(requested: int, lanes: int = 1) -> int:
+    """Held Chromes the night may use. One lane always stays free for people.
+
+    With one scraper lane the night uses it. With more, it may take all but one,
+    each with its own exit IP.
+    """
+    if lanes < 2:
+        return 1
+    return max(1, min(int(requested), lanes - 1))
+
+
+class WorkQueue:
+    """The night's URLs, shared by every worker so no product is read twice."""
+
+    def __init__(self, items: list[str]) -> None:
+        self._items = list(items)
+        self._lock = threading.Lock()
+        self.total = len(self._items)
+
+    def take(self) -> str | None:
+        with self._lock:
+            return self._items.pop(0) if self._items else None
+
+    def put_back(self, item: str) -> None:
+        with self._lock:
+            self._items.insert(0, item)
+
+    def left(self) -> int:
+        with self._lock:
+            return len(self._items)
 
 
 class DailyRateLimit(Exception):
@@ -127,6 +158,8 @@ def replace_portfolio(conn, session_id: str, products: list[tuple[str, str]]) ->
             continue
         seen.add(key)
         kept.append((key, opened))
+    stamped = has_synced_at(conn)
+    synced = time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())
     try:
         conn.execute(
             statement(conn, "DELETE FROM portfolio_products WHERE session_id = ?"),
@@ -136,6 +169,17 @@ def replace_portfolio(conn, session_id: str, products: list[tuple[str, str]]) ->
         # multi-row statements that every connection type can run.
         for start in range(0, len(kept), 300):
             chunk = kept[start:start + 300]
+            if stamped:
+                conn.execute(
+                    statement(
+                        conn,
+                        "INSERT INTO portfolio_products "
+                        "(session_id, sample_key, opened_at, synced_at) VALUES "
+                        + ", ".join("(?, ?, ?, ?)" for _ in chunk),
+                    ),
+                    [value for key, opened in chunk for value in (session_id, key, opened, synced)],
+                )
+                continue
             conn.execute(
                 statement(
                     conn,
@@ -152,19 +196,105 @@ def replace_portfolio(conn, session_id: str, products: list[tuple[str, str]]) ->
     return len(kept)
 
 
-def due_urls(conn, today: str, portfolio=None) -> list[str]:
-    """Distinct holdings, newest open first, skipping a snapshot already written today."""
-    pending: list[str] = []
-    for key in portfolio_keys(portfolio or conn):
+def _read_date(record: dict | None) -> date | None:
+    stamp = str((record or {}).get("observed_at") or "")[:10]
+    try:
+        return date.fromisoformat(stamp) if stamp else None
+    except ValueError:
+        return None
+
+
+def tier_days(settings: Settings, trend: float | None) -> int:
+    """Days between nightly reads for a card worth `trend` EUR. Unknown: every night."""
+    if trend is None or trend <= 0:
+        return 1
+    for bound, days in parse_tiers(settings.daily_tiers):
+        if bound is None or trend < bound:
+            return max(1, days)
+    return 1
+
+
+def _listing_trend(record: dict | None) -> float | None:
+    """The trend Cardmarket's own page showed on the last listing read."""
+    for quote in (record or {}).get("prices") or []:
+        if quote.get("label") == "Trend":
+            amount = quote.get("amount")
+            if isinstance(amount, (int, float)) and amount > 0:
+                return float(amount)
+    return None
+
+
+def trend_moved(file_trend: float | None, read_trend: float | None, pct: float) -> bool:
+    if not file_trend or not read_trend or pct <= 0:
+        return False
+    return abs(file_trend - read_trend) / read_trend * 100 > pct
+
+
+def due_urls(
+    conn,
+    today: str,
+    portfolio=None,
+    settings: Settings | None = None,
+    rng: random.Random | None = None,
+) -> list[str]:
+    """Holdings whose last listing read is older than their value tier.
+
+    Order: cards about to pass the listing age limit, cards whose trend moved,
+    dearer cards, then the rest. Each group is shuffled.
+    """
+    settings = settings or get_settings()
+    rng = rng or random.Random()
+    day = date.fromisoformat(today)
+    max_age = max(1, int(settings.cardmarket_listing_max_age_days))
+    groups: list[list[str]] = [[], [], [], []]
+    for key in portfolio_keys(portfolio or conn, settings.daily_install_max_age_days):
         record = snapshot_record(conn, key)
-        stamps = (
-            str((record or {}).get("observed_at") or ""),
-            str((record or {}).get("fetched_at") or ""),
-        )
-        if any(stamp.startswith(today) for stamp in stamps):
+        if str((record or {}).get("fetched_at") or "").startswith(today):
             continue
-        pending.append(key)
+        read_on = _read_date(record) if (record or {}).get("prices") else None
+        trend = trend_for_url(conn, key)
+        if read_on is None:
+            groups[2 if trend is None or trend >= 2 else 3].append(key)
+            continue
+        age = (day - read_on).days
+        if age <= 0:
+            continue
+        if age >= max_age - 1:
+            groups[0].append(key)
+        elif trend_moved(trend, _listing_trend(record), settings.daily_move_pct):
+            groups[1].append(key)
+        elif age >= tier_days(settings, trend):
+            groups[2 if trend is None or trend >= 20 else 3].append(key)
+    pending: list[str] = []
+    for group in groups:
+        rng.shuffle(group)
+        pending.extend(group)
     return pending
+
+
+def jittered(gap: float, jitter: float, rng: random.Random | None = None) -> float:
+    spread = max(0.0, min(float(jitter), 0.9))
+    return max(0.0, gap * (1 + (rng or random).uniform(-spread, spread)))
+
+
+def seconds_until(deadline: str, now: datetime) -> float:
+    """Seconds from `now` (UTC) to the next HH:MM, or 0 when it is malformed."""
+    try:
+        hour, minute = (int(part) for part in deadline.split(":", 1))
+        target = now.replace(hour=hour, minute=minute, second=0, microsecond=0)
+    except ValueError:
+        return 0.0
+    if target < now:
+        target += timedelta(days=1)
+    return (target - now).total_seconds()
+
+
+def deadline_gap(gap: float, gap_min: float, remaining: int, seconds_left: float, load_s: float) -> float:
+    """Shorten the gap toward its minimum when the rest of the night will not fit."""
+    if remaining <= 0 or seconds_left <= 0:
+        return gap_min
+    fits = seconds_left / remaining - load_s
+    return min(gap, max(gap_min, fits))
 
 
 def _prices(result: dict) -> list[dict]:
@@ -227,15 +357,35 @@ def run_pass(
     today: str,
     portfolio=None,
     now=time.monotonic,
+    clock=None,
+    queue: WorkQueue | None = None,
 ) -> str:
-    """Walk today's remaining holdings. Returns done, capped, paused, or blocked."""
+    """Walk tonight's due holdings. Returns done, capped, paused, or blocked.
+
+    Several workers can share one [queue]; each has its own pace and exit IP.
+    """
     if settings.photo_scrape_active:
         log.info("daily paused reason=photo-scrape")
         return "paused"
-    if accepted_daily_browsers(settings.daily_browsers) != settings.daily_browsers:
-        log.info("daily browsers requested=%s using=1", settings.daily_browsers)
     pace = DailyPace.from_settings(settings, now)
-    for url in due_urls(conn, today, portfolio):
+    if queue is None:
+        queue = WorkQueue(due_urls(conn, today, portfolio, settings))
+        log.info("daily start due=%s", queue.total)
+    clock = clock or (lambda: datetime.now(timezone.utc))
+    began = now()
+    done = 0
+    misses = 0
+    while (url := queue.take()) is not None:
+        if done and done % 50 == 0 and settings.daily_deadline_utc:
+            elapsed = now() - began
+            pace.gap = deadline_gap(
+                pace.gap,
+                pace.gap_min,
+                queue.left() + 1,
+                seconds_until(settings.daily_deadline_utc, clock()),
+                elapsed / done,
+            )
+            log.info("daily pace gap=%.1f left=%s", pace.gap, queue.left() + 1)
         if settings.photo_scrape_active:
             return "paused"
         reason = scraper_block_reason(conn)
@@ -252,8 +402,15 @@ def run_pass(
         pool = current_pool()
         lane = pool.lease("daily", conn, timeout=1) if pool is not None else None
         if pool is not None and lane is None:
+            # Every lane is busy or resting. Keep the product for the next try.
+            queue.put_back(url)
+            misses += 1
+            if misses >= 60:
+                log.info("daily stop reason=no-free-lane")
+                return "blocked"
             sleep(1)
             continue
+        misses = 0
         token = daily_lane_url.set(lane.settings.scraper_url) if lane is not None else None
         try:
             try:
@@ -300,7 +457,9 @@ def run_pass(
                 daily_lane_url.reset(token)
             if lane is not None and pool is not None:
                 pool.release_lease(lane)
-        sleep(extra_sleep(pace.gap, settings.scraper_page_gap_s))
+        done += 1
+        sleep(extra_sleep(jittered(pace.gap, settings.daily_gap_jitter), settings.scraper_page_gap_s))
+    log.info("daily worker done read=%s", done)
     return "done"
 
 
@@ -324,6 +483,13 @@ def _load(conn, url: str, pace: DailyPace, reservation: str, scrape, started: fl
     return result
 
 
+def _combine(statuses: list[str]) -> str:
+    for status in ("capped", "blocked", "paused"):
+        if status in statuses:
+            return status
+    return "done"
+
+
 def run_once(settings: Settings | None = None) -> str:
     settings = settings or get_settings()
     if not should_schedule(settings):
@@ -332,14 +498,41 @@ def run_once(settings: Settings | None = None) -> str:
     portfolio = _portfolio_conn(settings)
     try:
         today = time.strftime("%Y-%m-%d", time.gmtime())
-        return run_pass(
-            conn,
-            settings,
-            scrape=lambda url, session_id: scrape_product(settings, url, session_id),
-            sleep=time.sleep,
-            today=today,
-            portfolio=portfolio,
-        )
+        scrape = lambda url, session_id: scrape_product(settings, url, session_id)  # noqa: E731
+        workers = accepted_daily_browsers(settings.daily_browsers, len(settings.lane_urls))
+        if workers != settings.daily_browsers:
+            log.info("daily browsers requested=%s using=%s", settings.daily_browsers, workers)
+        if workers == 1:
+            return run_pass(
+                conn, settings, scrape=scrape, sleep=time.sleep, today=today, portfolio=portfolio
+            )
+        queue = WorkQueue(due_urls(conn, today, portfolio, settings))
+        log.info("daily start due=%s workers=%s", queue.total, workers)
+        statuses: list[str] = []
+
+        def work() -> None:
+            own = connect(settings.catalog_sqlite)
+            try:
+                statuses.append(
+                    run_pass(
+                        own, settings, scrape=scrape, sleep=time.sleep, today=today, queue=queue
+                    )
+                )
+            except Exception as exc:  # one worker failing must not stop the others
+                log.info("daily worker failed error=%s", type(exc).__name__)
+                statuses.append("blocked")
+            finally:
+                own.close()
+
+        threads = [threading.Thread(target=work, name=f"daily-{n}") for n in range(workers)]
+        for index, thread in enumerate(threads):
+            thread.start()
+            if index + 1 < len(threads):
+                time.sleep(random.uniform(5, 20))  # do not open every window at once
+        for thread in threads:
+            thread.join()
+        log.info("daily done due=%s left=%s", queue.total, queue.left())
+        return _combine(statuses)
     finally:
         if portfolio is not None:
             portfolio.close()

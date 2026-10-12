@@ -28,7 +28,8 @@ from app.cardmarket import (
 from app.cardmarket_events import notify_product, wait_for_product
 from app.cardmarket_daily import replace_portfolio
 from app.cardmarket_html import parse_cardmarket_html
-from app.cardmarket import sample_key
+from app.cardmarket import sample_key, snapshot_record
+from app.price_sources import fresh_window
 from app.cardmarket_budget import (
     begin_phone_scraper_fallback,
     has_recent_challenge,
@@ -48,6 +49,7 @@ from app.cardmarket_queue import (
     complete_job,
     enqueue_job,
     event_should_stop,
+    _age_seconds,
     prices_payload,
     queue_counts,
     remember_phone_offers,
@@ -219,6 +221,9 @@ class PriceResponse(BaseModel):
     freshness: str | None = None
     # How long a listing sample for this product counts as fresh, in seconds.
     fresh_for_s: int | None = None
+    # The price file's Cardmarket trend for this product, for when no listing read counts.
+    guide_trend: float | None = None
+    guide_trend_at: str | None = None
     unlisted: bool = False
     scraper_ready: bool = False
     challenge_fallback_minutes: int = 10
@@ -299,6 +304,8 @@ def _price_response(payload: dict[str, Any]) -> PriceResponse:
         sampled_offer_count=payload.get("sampled_offer_count"),
         freshness=payload.get("freshness"),
         fresh_for_s=payload.get("fresh_for_s"),
+        guide_trend=payload.get("guide_trend"),
+        guide_trend_at=payload.get("guide_trend_at"),
         deadline_at=payload.get("deadline_at"),
         queue_position=payload.get("queue_position"),
         queued=payload.get("queued"),
@@ -697,6 +704,18 @@ def escalate_price(payload: EscalationRequest, request: Request) -> JobResponse:
     if url_on_cooldown(catalog, payload.url):
         log.info("escalate refused reason=cooldown url=%s", sample)
         raise HTTPException(status_code=429, detail="This card was tried recently")
+    # A card's stored read counts for its value tier (cheap cards: six days).
+    record = snapshot_record(catalog, payload.url)
+    observed = (record or {}).get("observed_at") or (record or {}).get("fetched_at")
+    age = _age_seconds(str(observed or ""))
+    if (
+        record
+        and record.get("prices")
+        and age is not None
+        and age <= fresh_window(catalog, payload.url)
+    ):
+        log.info("escalate refused reason=within-tier url=%s", sample)
+        raise HTTPException(status_code=429, detail="A recent read of this card is still current")
     block = scraper_block_reason(catalog)
     if block:
         log.info("escalate refused reason=%s url=%s", block, sample)

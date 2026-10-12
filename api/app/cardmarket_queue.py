@@ -24,7 +24,7 @@ from app.cardmarket import (
     snapshot_record,
     write_snapshot,
 )
-from app.price_sources import fresh_window, trend_for_url
+from app.price_sources import fresh_window, guide_trend_for_url, trend_for_url
 from app.config import get_settings
 
 log = logging.getLogger("cardmarket.prices")
@@ -1294,6 +1294,10 @@ def prices_payload(
         else:
             freshness = "stale"
     parser = (record or {}).get("parser_version")
+    try:
+        guide_trend, guide_trend_at = guide_trend_for_url(conn, url)
+    except sqlite3.Error:
+        guide_trend, guide_trend_at = None, None
     if announce:
         block = scraper_block_reason(conn)
         log.info(
@@ -1313,6 +1317,8 @@ def prices_payload(
         "sampled_offer_count": (record or {}).get("sampled_offer_count"),
         "freshness": freshness,
         "fresh_for_s": window,
+        "guide_trend": guide_trend,
+        "guide_trend_at": guide_trend_at,
         "unlisted": unlisted,
         "attempted_at": (record or {}).get("empty_observed_at"),
         "scraper_ready": scraper_is_ready(conn),

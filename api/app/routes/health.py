@@ -37,12 +37,19 @@ class CaptureConfig(BaseModel):
     native_camera: bool = False
     native_camera_android: bool = False
     card_anywhere: bool = True
+    # The phone's own check of each photo, with the server's blur limit.
+    photo_check: bool = True
+    min_sharpness: float = 40.0
+    sharpness_edge: int = 1000
+    max_glare: float = 0.08
+    auto_retakes: int = 2
 
 
 class AppConfigResponse(BaseModel):
     search_presets: list[dict] = Field(default_factory=list)
     search_history: dict[str, bool] = Field(default_factory=dict)
     price_fresh_minutes: int
+    listing_max_age_s: int = 7 * 86400
     config_ttl_s: int
     slab_detection: bool = False
     card_warp: bool = False
@@ -62,6 +69,7 @@ def scan_price_config(settings) -> AppConfigResponse:
     return AppConfigResponse(
         search_presets=SEARCH_PRESETS,
         price_fresh_minutes=max(1, min(minutes, 24 * 60)),
+        listing_max_age_s=max(1, min(int(settings.cardmarket_listing_max_age_days), 90)) * 86400,
         config_ttl_s=max(30, min(ttl, 24 * 60 * 60)),
         slab_detection=bool(settings.app_slab_detection),
         card_warp=bool(settings.app_card_warp),
@@ -75,6 +83,11 @@ def scan_price_config(settings) -> AppConfigResponse:
             native_camera=bool(settings.app_native_camera),
             native_camera_android=bool(settings.app_native_camera_android),
             card_anywhere=bool(settings.app_card_anywhere),
+            photo_check=bool(settings.app_photo_check),
+            min_sharpness=max(0.0, float(settings.threshold_blur)),
+            sharpness_edge=max(200, min(int(settings.threshold_blur_edge or 1000), 4000)),
+            max_glare=max(0.0, min(float(settings.app_max_glare), 1.0)),
+            auto_retakes=max(0, min(int(settings.app_auto_retakes), 5)),
         ),
         scan_prices=ScanPriceConfig(
             start_on_provisional=bool(settings.scan_price_start_on_provisional),
