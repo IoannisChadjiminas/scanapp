@@ -28,7 +28,8 @@ from app.cardmarket import (
 from app.cardmarket_events import notify_product, wait_for_product
 from app.cardmarket_daily import replace_portfolio
 from app.cardmarket_html import parse_cardmarket_html
-from app.cardmarket import sample_key
+from app.cardmarket import sample_key, snapshot_record
+from app.price_sources import fresh_window
 from app.cardmarket_budget import (
     begin_phone_scraper_fallback,
     has_recent_challenge,
@@ -48,6 +49,7 @@ from app.cardmarket_queue import (
     complete_job,
     enqueue_job,
     event_should_stop,
+    _age_seconds,
     prices_payload,
     queue_counts,
     remember_phone_offers,
@@ -697,6 +699,18 @@ def escalate_price(payload: EscalationRequest, request: Request) -> JobResponse:
     if url_on_cooldown(catalog, payload.url):
         log.info("escalate refused reason=cooldown url=%s", sample)
         raise HTTPException(status_code=429, detail="This card was tried recently")
+    # A card's stored read counts for its value tier (cheap cards: six days).
+    record = snapshot_record(catalog, payload.url)
+    observed = (record or {}).get("observed_at") or (record or {}).get("fetched_at")
+    age = _age_seconds(str(observed or ""))
+    if (
+        record
+        and record.get("prices")
+        and age is not None
+        and age <= fresh_window(catalog, payload.url)
+    ):
+        log.info("escalate refused reason=within-tier url=%s", sample)
+        raise HTTPException(status_code=429, detail="A recent read of this card is still current")
     block = scraper_block_reason(catalog)
     if block:
         log.info("escalate refused reason=%s url=%s", block, sample)

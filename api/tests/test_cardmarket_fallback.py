@@ -304,3 +304,16 @@ def test_budget_reservation_is_atomic(tmp_path, monkeypatch):
         raise AssertionError("budget allowed a second page")
     record_phone_challenge(conn, session_id="s", ip="1.1.1.1", url=ENGLISH)
     get_settings.cache_clear()
+
+
+def test_escalation_is_refused_while_a_stored_read_is_inside_its_tier(direct_scraper):
+    client, catalog, _settings = direct_scraper
+    # No known trend, so the plain fresh window applies: a read from now is current.
+    write_snapshot(catalog, ENGLISH, OFFERS, observed_at=datetime_now())
+    refused = client.post("/api/v1/cardmarket/escalations", json={"url": ENGLISH})
+    assert refused.status_code == 429
+    assert claim_proxy_job(catalog) is None
+    # A read older than the window is read again.
+    write_snapshot(catalog, GERMAN, OFFERS, observed_at=_stamp(-3 * 86400))
+    record_phone_challenge(catalog, session_id="session", ip="testclient", url=GERMAN)
+    assert client.post("/api/v1/cardmarket/escalations", json={"url": GERMAN}).status_code == 200

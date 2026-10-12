@@ -47,6 +47,7 @@ class CaptureConfig(BaseModel):
 
 class AppConfigResponse(BaseModel):
     price_fresh_minutes: int
+    listing_max_age_s: int = 7 * 86400
     config_ttl_s: int
     slab_detection: bool = False
     card_warp: bool = False
@@ -63,6 +64,7 @@ def scan_price_config(settings) -> AppConfigResponse:
     pages = int(settings.scan_price_server_read_daily_pages)
     return AppConfigResponse(
         price_fresh_minutes=max(1, min(minutes, 24 * 60)),
+        listing_max_age_s=max(1, min(int(settings.cardmarket_listing_max_age_days), 90)) * 86400,
         config_ttl_s=max(30, min(ttl, 24 * 60 * 60)),
         slab_detection=bool(settings.app_slab_detection),
         card_warp=bool(settings.app_card_warp),

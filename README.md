@@ -81,12 +81,26 @@ per night), then an older listing sample. A pass runs at start-up and shortly af
 jobs off. A failed download keeps the previous data.
 
 How long a listing sample stays fresh depends on the card's Cardmarket trend
-(`CARDMARKET_FRESH_TIERS`, default `2:604800,20:86400,100:21600,*:3600`: under
-EUR 2 a week, under 20 a day, under 100 six hours, above that an hour). A card
-with no known trend keeps `CARDMARKET_PRICE_FRESH_MINUTES`.
-`CARDMARKET_FRESH_BY_VALUE=false` turns it off. The price endpoint reports the
-window as `fresh_for_s`. A paid read queued from a scan is skipped for a card
-whose trend is under `SCAN_PRICE_SERVER_READ_MIN_TREND` (EUR 2; 0 reads all).
+(`CARDMARKET_FRESH_TIERS`, default `2:518400,20:172800,*:86400`: under EUR 2 six
+days, under 20 two days, above that a day). A card with no known trend keeps
+`CARDMARKET_PRICE_FRESH_MINUTES` (default 360: the card page asks the phone to
+read again after six hours). `CARDMARKET_FRESH_BY_VALUE=false` turns the tiers
+off. The price endpoint reports the window as `fresh_for_s`. A paid read queued
+from a scan follows the same tiers; `SCAN_PRICE_SERVER_READ_MIN_TREND` is a flat
+floor in EUR and is off at 0.
+
+A listing read is a card's value for `CARDMARKET_LISTING_MAX_AGE_DAYS` (default
+7, sent to the app as `listing_max_age_s` in `/config`). After that the app shows
+the price file's trend.
+
+The nightly job reads each held card on its value tier (`DAILY_TIERS`, default
+`2:6,20:2,*:1`: trend under EUR 2 every 6 days, under 20 every 2 days, above
+that or unknown every night). A card whose price file trend moved more than
+`DAILY_MOVE_PCT` (10) from the trend on its last read is read tonight. Order:
+cards about to pass the listing age limit, then moved cards, then dearer cards,
+then the rest, shuffled within each group. Gaps are `DAILY_GAP_MIN_S` (5) to
+`DAILY_GAP_MAX_S` with `DAILY_GAP_JITTER` (30%) of random spread, and shrink
+toward the minimum when the night would not finish by `DAILY_DEADLINE_UTC`.
 The phone can log `price.first_shown` (`elapsed_ms`, `price_source`, `stored`,
 `guessed`) through `/diagnostics`.
 
