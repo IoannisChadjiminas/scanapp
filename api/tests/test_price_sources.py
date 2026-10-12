@@ -274,3 +274,16 @@ def test_preview_candidates_carry_set_number_and_a_stored_price(tmp_path):
     assert preview["language"] == "en"
     assert preview["cardmarket_url"] == URL
     assert {p["source"] for p in preview["cardmarket_prices"]} == {"cardmarket_file"}
+
+
+def test_price_response_carries_the_price_file_trend(tmp_path):
+    from app.cardmarket_queue import prices_payload
+
+    conn = _catalog(tmp_path)
+    _card(conn, "en:a", product=100, url=URL)
+    import_guide(conn, GUIDE)
+    payload = prices_payload(conn, URL)
+    assert payload["guide_trend"] == 4.2
+    assert payload["guide_trend_at"]
+    other = prices_payload(conn, "https://www.cardmarket.com/en/Pokemon/Products/Singles/X/None")
+    assert other["guide_trend"] is None
