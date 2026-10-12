@@ -101,6 +101,12 @@ cards about to pass the listing age limit, then moved cards, then dearer cards,
 then the rest, shuffled within each group. Gaps are `DAILY_GAP_MIN_S` (5) to
 `DAILY_GAP_MAX_S` with `DAILY_GAP_JITTER` (30%) of random spread, and shrink
 toward the minimum when the night would not finish by `DAILY_DEADLINE_UTC`.
+`DAILY_BROWSERS` (1) sets how many held browsers read at once, each on its own
+scraper lane and exit IP; one lane always stays free for people, and the
+workers share one queue so no product is read twice. Holdings of an install
+that has not synced in `DAILY_INSTALL_MAX_AGE_DAYS` (30; 0 keeps all) are
+skipped once `docs/sql/portfolio-synced-at.sql` has been applied to the
+portfolio database; until then every holding is read.
 The phone can log `price.first_shown` (`elapsed_ms`, `price_source`, `stored`,
 `guessed`) through `/diagnostics`.
 
