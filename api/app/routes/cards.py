@@ -23,6 +23,12 @@ _RELEASES = (
     " LEFT JOIN set_releases ON set_releases.language = cards.language"
     " AND set_releases.set_id = cards.set_id"
 )
+# Pokémon TCG Pocket cards (sets A1, B2a, P-A ...) are digital only. They have
+# no Cardmarket listing and cannot be collected, so search leaves them out.
+_PHYSICAL = (
+    " AND NOT (cards.language = 'en'"
+    " AND (cards.set_id = 'P-A' OR cards.set_id GLOB '[AB][0-9]*'))"
+)
 _ORDER = (
     "ORDER BY set_releases.release_date IS NULL, set_releases.release_date DESC,"
     " cards.set_name, CAST(cards.collector_number AS INTEGER), cards.collector_number, cards.id"
@@ -64,11 +70,11 @@ def search_cards(
     catalog = request.app.state.dbs.catalog
     query = q.strip()
     langs = expand_language(language) if language and language != "auto" else ()
-    lang_clause = ""
+    lang_clause = _PHYSICAL
     lang_params: list[str] = []
     if langs:
         placeholders = ",".join("?" for _ in langs)
-        lang_clause = f" AND cards.language IN ({placeholders})"
+        lang_clause += f" AND cards.language IN ({placeholders})"
         lang_params = list(langs)
 
     has_cjk = any(ord(char) > 0x2E80 for char in query)
