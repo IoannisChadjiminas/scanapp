@@ -194,10 +194,10 @@ def test_tcgdex_refresh_reads_cards_from_the_catalogue_connection(tmp_path, monk
 
 def test_tiers_make_cheap_cards_fresh_for_longer():
     settings = Settings()
-    assert price_sources.tier_window(settings, 0.5) == 604800
-    assert price_sources.tier_window(settings, 4.2) == 86400
-    assert price_sources.tier_window(settings, 50) == 21600
-    assert price_sources.tier_window(settings, 300) == 3600
+    assert price_sources.tier_window(settings, 0.5) == 6 * 86400
+    assert price_sources.tier_window(settings, 4.2) == 2 * 86400
+    assert price_sources.tier_window(settings, 50) == 86400
+    assert price_sources.tier_window(settings, 300) == 86400
     assert price_sources.tier_window(settings, None) is None
     assert price_sources.tier_window(Settings(cardmarket_fresh_by_value=False), 0.5) is None
 
@@ -211,7 +211,7 @@ def test_fresh_window_follows_the_trend_of_the_product(tmp_path):
     _card(conn, "en:a", product=100, url=URL)
     import_guide(conn, GUIDE)
     assert price_sources.trend_for_url(conn, URL) == 4.2
-    assert price_sources.fresh_window(conn, URL) == 86400
+    assert price_sources.fresh_window(conn, URL) == 2 * 86400
     assert price_sources.fresh_window(conn, "https://example.test/none") == Settings().cardmarket_price_fresh_minutes * 60
 
 
@@ -226,7 +226,7 @@ def test_a_day_old_sample_of_a_cheap_card_is_still_live(tmp_path, monkeypatch):
     assert prices[0]["source"] == "live" and not prices[0]["stale"]
 
 
-def test_parallel_read_is_skipped_for_a_cheap_card(tmp_path, monkeypatch):
+def test_parallel_read_follows_the_value_tier_not_a_flat_floor(tmp_path, monkeypatch):
     from app.cardmarket_queue import schedule_scan_parallel_read
 
     settings = get_settings()
@@ -235,12 +235,18 @@ def test_parallel_read_is_skipped_for_a_cheap_card(tmp_path, monkeypatch):
     conn = _catalog(tmp_path)
     _card(conn, "en:a", product=100, url=URL)
     import_guide(conn, {**GUIDE, "priceGuides": [{"idProduct": 100, "trend": 0.4}]})
-    assert schedule_scan_parallel_read(conn, status="matched", url=URL) is None
-    import_guide(conn, {**GUIDE, "createdAt": "2026-10-09T02:51:56+0200",
-                        "priceGuides": [{"idProduct": 100, "trend": 9.0}]})
+    # A cheap card with no read yet is read once.
     assert schedule_scan_parallel_read(conn, status="matched", url=URL) is not None
-    monkeypatch.setattr(settings, "scan_price_server_read_min_trend", 0)
-    assert schedule_scan_parallel_read(conn, status="matched", url=URL + "-other") is not None
+    # One read inside its six days is not repeated.
+    write_snapshot(conn, URL, [{"label": "From", "amount": 0.4, "currency": "EUR"}])
+    assert schedule_scan_parallel_read(conn, status="matched", url=URL) is None
+    # The old flat floor still works when someone sets it.
+    monkeypatch.setattr(settings, "scan_price_server_read_min_trend", 2.0)
+    (tmp_path / "b").mkdir()
+    other = _catalog(tmp_path / "b")
+    _card(other, "en:a", product=100, url=URL)
+    import_guide(other, {**GUIDE, "priceGuides": [{"idProduct": 100, "trend": 0.4}]})
+    assert schedule_scan_parallel_read(other, status="matched", url=URL) is None
 
 
 def test_first_price_event_passes_the_allow_list():
@@ -268,3 +274,16 @@ def test_preview_candidates_carry_set_number_and_a_stored_price(tmp_path):
     assert preview["language"] == "en"
     assert preview["cardmarket_url"] == URL
     assert {p["source"] for p in preview["cardmarket_prices"]} == {"cardmarket_file"}
+
+
+def test_price_response_carries_the_price_file_trend(tmp_path):
+    from app.cardmarket_queue import prices_payload
+
+    conn = _catalog(tmp_path)
+    _card(conn, "en:a", product=100, url=URL)
+    import_guide(conn, GUIDE)
+    payload = prices_payload(conn, URL)
+    assert payload["guide_trend"] == 4.2
+    assert payload["guide_trend_at"]
+    other = prices_payload(conn, "https://www.cardmarket.com/en/Pokemon/Products/Singles/X/None")
+    assert other["guide_trend"] is None

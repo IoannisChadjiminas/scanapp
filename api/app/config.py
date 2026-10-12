@@ -67,13 +67,17 @@ class Settings(BaseSettings):
     cardmarket_helper_enabled: bool = False
     cardmarket_webview_enabled: bool = True
     cardmarket_challenge_fallback_minutes: int = 10
-    cardmarket_price_fresh_minutes: int = 15
+    # How long the card page trusts a stored read before the phone reads again.
+    cardmarket_price_fresh_minutes: int = 360
+    # A listing read is the card's value this long. After that the daily price
+    # file's trend is shown instead.
+    cardmarket_listing_max_age_days: int = 7
     # A listing sample stays fresh longer for cheap cards. Pairs of
     # "trend in EUR up to : seconds fresh"; "*" closes the list. A card with no
     # known trend keeps the plain window above. CARDMARKET_FRESH_BY_VALUE=false
     # turns this off.
     cardmarket_fresh_by_value: bool = True
-    cardmarket_fresh_tiers: str = "2:604800,20:86400,100:21600,*:3600"
+    cardmarket_fresh_tiers: str = "2:518400,20:172800,*:86400"
     scraper_enabled: bool = False
     scraper_url: str = ""
     scraper_api_key: str = ""
@@ -104,7 +108,17 @@ class Settings(BaseSettings):
     # Cards refreshed per night, and the pause between requests.
     tcgdex_prices_batch: int = 300
     tcgdex_prices_gap_s: float = 0.25
-    daily_gap_min_s: float = 2
+    daily_gap_min_s: float = 5
+    # Each gap is stretched or shortened by up to this fraction at random.
+    daily_gap_jitter: float = 0.3
+    # Trend up to EUR : days between nightly reads. "*" closes the list. A card
+    # with no known trend is read every night.
+    daily_tiers: str = "2:6,20:2,*:1"
+    # A card is read tonight whatever its tier when the price file's trend has
+    # moved this many percent from the trend on its last listing read.
+    daily_move_pct: float = 10.0
+    # The night's reads should be finished by this UTC time (HH:MM).
+    daily_deadline_utc: str = "08:00"
     daily_gap_max_s: float = 60
     daily_gap_step_s: float = 5
     daily_session_pages: int = 30
@@ -162,7 +176,8 @@ class Settings(BaseSettings):
     scan_price_server_read_daily_pages: int = 0
     # No paid read for a card whose Cardmarket trend is below this (EUR). A card
     # with no known trend is still read. 0 reads every card.
-    scan_price_server_read_min_trend: float = 2.0
+    # 0 = no flat floor: the value tiers in CARDMARKET_FRESH_TIERS decide.
+    scan_price_server_read_min_trend: float = 0.0
 
     ranking_version: str = "rank-v15-holder-printing-review"
     # Opt-in only; an invalid explicitly configured bundle fails validation.
