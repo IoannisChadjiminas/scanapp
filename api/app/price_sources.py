@@ -138,10 +138,15 @@ def refresh_guide(conn: sqlite3.Connection, settings: Settings, history: Any = N
 
 
 def _holo_first(variants: dict[str, Any]) -> bool:
-    """A printing that only exists as a foil or reverse holo."""
+    """A printing that only exists as a reverse holo.
+
+    Cardmarket's -holo columns are reverse holo sales. A holo rare or an ex
+    card is sold as the plain product, so its price is in the plain columns.
+    """
     return (
         not variants.get("normal")
-        and bool(variants.get("holo") or variants.get("reverse"))
+        and not variants.get("holo")
+        and bool(variants.get("reverse"))
     )
 
 
