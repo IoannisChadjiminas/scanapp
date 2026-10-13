@@ -55,11 +55,20 @@ def test_guide_prices_are_tagged_with_source_and_date(tmp_path):
     assert not prices[0]["stale"]
 
 
-def test_foil_only_printing_uses_the_holo_columns(tmp_path):
+def test_reverse_only_printing_uses_the_holo_columns(tmp_path):
     conn = _catalog(tmp_path)
-    _card(conn, "en:b", product=100, variants={"normal": False, "holo": True})
+    _card(conn, "en:b", product=100, variants={"normal": False, "reverse": True})
     import_guide(conn, GUIDE)
     assert _labels(best_prices(conn, "en:b", None))["Trend"] == 12.0
+
+
+def test_holo_rare_uses_the_plain_columns(tmp_path):
+    # Umbreon ex (sv08.5-060) is holo only and has no reverse holo, so the
+    # -holo figures are not its price.
+    conn = _catalog(tmp_path)
+    _card(conn, "en:b", product=100, variants={"normal": False, "holo": True, "reverse": False})
+    import_guide(conn, GUIDE)
+    assert _labels(best_prices(conn, "en:b", None))["Trend"] == 4.2
 
 
 def test_product_with_only_empty_values_has_no_price(tmp_path):

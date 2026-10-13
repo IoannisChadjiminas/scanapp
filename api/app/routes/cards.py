@@ -60,8 +60,10 @@ def _summary(row, catalog=None) -> CardSummary:  # noqa: ANN001
 
 
 # Choose one EUR source for the whole market block, then its normal/holo
-# figures. A TCGplayer USD price can never enter this CTE.
-_HOLO = "(NOT COALESCE(json_extract(cards.variants_json, '$.normal'), 0) AND (COALESCE(json_extract(cards.variants_json, '$.holo'), 0) OR COALESCE(json_extract(cards.variants_json, '$.reverse'), 0)))"
+# figures. A TCGplayer USD price can never enter this CTE. Cardmarket's -holo
+# columns are reverse holo sales, so only a reverse-only printing reads them
+# first; a holo rare or ex card is priced from the plain columns.
+_HOLO = "(NOT COALESCE(json_extract(cards.variants_json, '$.normal'), 0) AND NOT COALESCE(json_extract(cards.variants_json, '$.holo'), 0) AND COALESCE(json_extract(cards.variants_json, '$.reverse'), 0))"
 _GUIDE = "(COALESCE(g.trend>0, 0) OR COALESCE(g.trend_holo>0, 0))"
 _DEX = "CASE WHEN json_valid(t.cardmarket_json) THEN t.cardmarket_json ELSE '{}' END"
 _EUR = f"json_valid(t.cardmarket_json) AND COALESCE(json_extract({_DEX}, '$.unit'), 'EUR')='EUR'"

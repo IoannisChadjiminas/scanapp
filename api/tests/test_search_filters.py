@@ -15,10 +15,10 @@ def catalog(tmp_path):
     today = date.today().isoformat()
     for lang, set_id, name, released in [('en', 'old', 'Old', '2020-01-01'), ('en', 'new', 'New', today), ('ja', 'new', 'Japanese', today)]:
         conn.execute("INSERT INTO set_releases(language, set_id, release_date, fetched_at) VALUES (?, ?, ?, '2026-10-11')", (lang, set_id, released))
-    # holo chosen, normal chosen, normal fallback to holo, missing prices,
+    # reverse holo chosen, normal chosen, normal fallback to holo, missing prices,
     # downward momentum, under-trend listing; equal-price ties are intentional.
     entries = [
-        ('a', 'en', 'old', '{"holo":true}', 1, 10, 1, 12, 10, 20, 16, 24, 19),
+        ('a', 'en', 'old', '{"reverse":true}', 1, 10, 1, 12, 10, 20, 16, 24, 19),
         ('b', 'en', 'new', '{"normal":true,"holo":true}', 2, 10, 5, 12, 9.5, 30, 20, 25, 20),
         ('c', 'ja', 'new', '{"normal":true}', 3, None, None, None, None, 10, 7, 8, 10),
         ('d', 'en', 'old', '{}', None, None, None, None, None, None, None, None, None),
@@ -52,6 +52,15 @@ def test_price_holo_choice_and_missing(catalog):
     assert next(c for c in search(catalog).items if c.id == "d").market is None
 
 
+def test_holo_rare_is_priced_from_the_plain_columns(catalog):
+    # A holo-only card (an ex or holo rare) has no reverse holo; Cardmarket's
+    # -holo figures are reverse holo sales and must not replace its trend.
+    catalog.execute("UPDATE cards SET variants_json='{\"holo\":true,\"normal\":false,\"reverse\":false}' WHERE id='a'")
+    catalog.commit()
+    card = next(c for c in search(catalog).items if c.id == 'a')
+    assert (card.market.basis, card.market.trend, card.market.low) == ('normal', 10, 1)
+
+
 def test_sets_and_language_and_fts(catalog):
     assert ids(search(catalog, sets=['en:new'])) == ['b']
     assert ids(search(catalog, sets=['new'], language='ja')) == ['c']
@@ -80,7 +89,7 @@ def test_additional_filters(catalog):
     assert ids(search(catalog, momentum_min=.1, sold_recently=True, sort='momentum')) == ['a','b']
     assert search(catalog, momentum_max=-.1).total == 2
     assert search(catalog, rarity=['rare'], category='pokemon', finish='normal').total == 3
-    assert ids(search(catalog, finish='reverse')) == ['e']
+    assert ids(search(catalog, finish='reverse')) == ['a', 'e']
     assert ids(search(catalog, released_before=date(2021,1,1), sort='number')) == ['a','d','e']
     assert search(catalog, released_after=date.today()-timedelta(days=90)).total == 2
     assert ids(search(catalog, sort='unknown')) == ids(search(catalog))

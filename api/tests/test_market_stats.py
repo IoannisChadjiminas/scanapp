@@ -21,7 +21,7 @@ def conn(tmp_path):
     conn = connect(tmp_path / 'market.sqlite')
     init_catalog(conn)
     conn.execute("INSERT INTO cards(id,provider_id,name,set_id,set_name,collector_number,language,cardmarket_id,variants_json) VALUES ('a','a','Pikachu','base','Base','1','en',1,'{\"normal\":true}')")
-    conn.execute("INSERT INTO cards(id,provider_id,name,set_id,set_name,collector_number,language,cardmarket_id,variants_json) VALUES ('h','h','Holo','base','Base','2','en',1,'{\"holo\":true}')")
+    conn.execute("INSERT INTO cards(id,provider_id,name,set_id,set_name,collector_number,language,cardmarket_id,variants_json) VALUES ('h','h','Holo','base','Base','2','en',1,'{\"reverse\":true}')")
     conn.commit()
     yield conn
     conn.close()
