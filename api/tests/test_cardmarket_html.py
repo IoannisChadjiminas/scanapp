@@ -90,6 +90,14 @@ def test_challenge_html_is_blocked_without_rows():
     assert parsed["url"] == URL
 
 
+def test_empty_notice_after_long_product_details():
+    details = "<p>" + "Rarity Number Printed in Available items " * 200 + "</p>"
+    html = _page(details + "<p>There are currently no articles.</p>")
+    parsed = parse_cardmarket_html(URL, html)
+    assert parsed["empty"] is True
+    assert parsed["pending"] is False
+
+
 def test_empty_listing_state():
     html = _page('<div class="no-articles">There are currently no articles.</div>')
     parsed = parse_cardmarket_html(URL, html)

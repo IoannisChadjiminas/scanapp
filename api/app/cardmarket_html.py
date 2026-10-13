@@ -535,7 +535,9 @@ def parse_cardmarket_html(url: str, html: str) -> dict:
             "parser": PARSER_VERSION,
         }
     rows = _rows(root)
-    empty = _empty(root, text)
+    # The empty notice sits under the product details, well past the first
+    # 2500 characters the challenge check looks at.
+    empty = _empty(root, root.text())
     return {
         "url": url,
         "blocked": False,
