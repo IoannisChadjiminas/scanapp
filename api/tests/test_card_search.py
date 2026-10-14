@@ -104,3 +104,27 @@ def test_search_leaves_out_tcg_pocket_cards(tmp_path: Path) -> None:
     browse = search_cards(_request(conn), q="", language="en", limit=50, offset=0)
     assert "en:A2b-010" not in _ids(browse)
     assert browse.total == 8
+
+
+def test_printed_number_with_total_finds_the_card(tmp_path: Path) -> None:
+    conn = _catalog(tmp_path)
+    for card_id, set_id, number in [("dark-145", "dark", "145"), ("other-145", "other", "145"), ("new-045", "new", "045")]:
+        conn.execute(
+            "INSERT INTO cards (id, provider_id, name, set_id, set_name, collector_number, language) VALUES (?, ?, 'Charizard', ?, ?, ?, 'en')",
+            (card_id, card_id, set_id, set_id, number),
+        )
+        conn.execute("INSERT INTO cards_fts (name, set_name, collector_number, id) VALUES ('Charizard', ?, ?, ?)", (set_id, number, card_id))
+    conn.execute("INSERT INTO set_totals (language, set_id, official_total, fetched_at) VALUES ('en', 'dark', 189, 'x'), ('en', 'other', 200, 'x')")
+    conn.commit()
+    request = _request(conn)
+
+    def find(q: str) -> list[str]:
+        return _ids(search_cards(request, q=q, language="", limit=20, offset=0))
+
+    assert find("145/189") == ["dark-145"]
+    assert find("Charizard 145 / 189") == ["dark-145"]
+    assert find("Pikachu 145/189") == []
+    assert sorted(find("145")) == ["dark-145", "other-145"]
+    # A set without a stored total still matches on the number; leading zeros are ignored.
+    assert find("45/100") == ["new-045"]
+    assert len(find("pikachu and not")) == 0
