@@ -26,9 +26,10 @@ class Settings(BaseSettings):
     parallel_grading: bool = False
     # Return at card completion; unfinished/unidentified grading defaults Raw.
     grading_at_card_deadline: bool = False
-    # Label OCR competes with card OCR for CPU. When on, grade only uploads
-    # whose client sent graded=true. Off, the hint is ignored and logged so a
-    # rollout can compare it with what grading found.
+    # Label OCR competes with card OCR for CPU. When on, skip uploads whose
+    # client sent graded=false; graded=true or no hint are still graded. Off,
+    # the hint is ignored and logged so a rollout can compare it with what
+    # grading found.
     grading_requires_client_hint: bool = False
     # Retrieval windows may omit metadata. Try the supplied card-shaped frame
     # for OCR first, without changing the visual/artwork retrieval crop.

@@ -1161,9 +1161,9 @@ def recognize_bytes(
     grading_ready = bool(_grading_job is not None and _grading_job.future is not None
                          and _grading_job.future.done())
     if not grading_requested(settings, graded):
-        # The client says no slab, or no hint arrived while hints are
-        # required. Skip label OCR unless card OCR itself already read holder
-        # label text: a slab the client missed must not lose its grade.
+        # The client read the photo and says no slab. Skip label OCR unless
+        # card OCR itself already read holder label text: a slab the client
+        # missed must not lose its grade.
         grading = GradingEvidence(is_graded=False, grading_status='ungraded',
                                   warnings=['grading_not_requested'])
         label_seen = (any(h.region in ('holder_name', 'holder_collector')
