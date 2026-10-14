@@ -84,11 +84,14 @@ def grading_requested(settings, graded: bool | None) -> bool:
     """Hints only matter once GRADING_REQUIRES_CLIENT_HINT is on.
 
     Until then every scan is graded as before, so a rollout can compare the
-    client's guess with what grading actually found.
+    client's guess with what grading actually found. Once on, only a phone
+    that read the photo and saw no slab (graded=false) skips the label read.
+    No hint means nobody looked: the phone's quick check was unsure or timed
+    out, or the upload came from a client without it, so the label is read.
     """
     if not getattr(settings, 'grading_requires_client_hint', False):
         return True
-    return bool(graded)
+    return graded is not False
 
 
 def parallel_grading_scope(recognize):
