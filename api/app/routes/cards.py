@@ -198,13 +198,25 @@ def search_cards(
         clauses.append("cards.id IN (SELECT value FROM json_each(?))")
         params.append(json.dumps(card_ids))
     query = q.strip()
-    tokens = re.findall(r"[A-Za-z0-9/]+", query)
+    # A printed number such as 145/189 is the collector number and the set's
+    # printed total; it is matched on the columns, not through the text index.
+    numbers = re.findall(r"([A-Za-z0-9]+)\s*/\s*([A-Za-z0-9]+)", query)
+    tokens = re.findall(r"[A-Za-z0-9]+", re.sub(r"[A-Za-z0-9]+\s*/\s*[A-Za-z0-9]+", " ", query))
     if any(ord(char) > 0x2E80 for char in query):
         clauses.append("(cards.name LIKE ? OR cards.set_name LIKE ? OR cards.collector_number LIKE ?)")
         params.extend([f"%{query}%"] * 3)
-    elif tokens:
-        clauses.append("cards.id IN (SELECT id FROM cards_fts WHERE cards_fts MATCH ?)")
-        params.append(" ".join(f"{token}*" for token in tokens))
+    else:
+        for number, total in numbers:
+            clauses.append("LOWER(LTRIM(cards.collector_number, '0'))=LOWER(LTRIM(?, '0'))")
+            params.append(number)
+            if total.isdigit():
+                # A set whose total is not stored yet still matches on the number.
+                clauses.append("COALESCE((SELECT official_total FROM set_totals st WHERE st.language=cards.language AND st.set_id=cards.set_id), ?)=?")
+                params.extend([int(total), int(total)])
+        if tokens:
+            # Quoted so a word like "and" or "not" is not read as an operator.
+            clauses.append("cards.id IN (SELECT id FROM cards_fts WHERE cards_fts MATCH ?)")
+            params.append(" ".join(f'"{token}"*' for token in tokens))
     langs = expand_language(language) if language and language != "auto" else ()
     if langs:
         clauses.append(f"cards.language IN ({','.join('?' for _ in langs)})")
