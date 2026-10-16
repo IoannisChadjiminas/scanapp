@@ -87,7 +87,7 @@ PROBE_JS = r"""
   const rows = document.querySelectorAll(".article-row, tr.article");
   if (rows.length) return "offers";
   if (document.querySelector("[data-test-empty-articles], .noArticles, .no-articles")
-      || /there are currently no articles|no articles available/.test(blob)) return "empty";
+      || /there are currently no articles|no articles available|no available offers/.test(blob)) return "empty";
   if (href && !/\/products\/singles\//i.test(href)) return "wrong_product";
   return "pending";
 })()
