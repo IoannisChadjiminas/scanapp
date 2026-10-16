@@ -1,0 +1,11 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "catalogue-review",
+      "runtimeExecutable": "python3",
+      "runtimeArgs": ["-m", "http.server", "8765", "--bind", "127.0.0.1", "--directory", "data/catalogue-completion/20261004-01/batch-preparation-20261014"],
+      "port": 8765
+    }
+  ]
+}
