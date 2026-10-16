@@ -106,9 +106,10 @@ services:
         aliases:
           - scanapp-api
     # Model/OCR buffers exceeded 1.5 GiB and swapped despite free host RAM.
-    # Keep the total RAM + swap allowance at 3 GiB on the existing 4 GiB host.
-    mem_limit: 2048m
-    memswap_limit: 3072m
+    # With ~42k indexed cards, scans peak at ~2.1 GiB; 2 GiB was OOM-killed.
+    # 3 GiB RAM + 1 GiB swap on the existing 4 GiB host.
+    mem_limit: 3072m
+    memswap_limit: 4096m
     healthcheck:
       test:
         [
