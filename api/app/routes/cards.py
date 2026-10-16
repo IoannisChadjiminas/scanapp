@@ -201,19 +201,45 @@ def search_cards(
     # A printed number such as 145/189 is the collector number and the set's
     # printed total; it is matched on the columns, not through the text index.
     numbers = re.findall(r"([A-Za-z0-9]+)\s*/\s*([A-Za-z0-9]+)", query)
-    tokens = re.findall(r"[A-Za-z0-9]+", re.sub(r"[A-Za-z0-9]+\s*/\s*[A-Za-z0-9]+", " ", query))
-    if any(ord(char) > 0x2E80 for char in query):
-        clauses.append("(cards.name LIKE ? OR cards.set_name LIKE ? OR cards.collector_number LIKE ?)")
-        params.extend([f"%{query}%"] * 3)
+    remaining = re.sub(r"[A-Za-z0-9]+\s*/\s*[A-Za-z0-9]+", " ", query)
+    # Set IDs are not in the name index. Resolve complete codes against catalogue
+    # metadata first, preserving language and numeric groups (sv08.5 == SV8.5).
+    def code_key(value: str) -> str:
+        return re.sub(r"\d+", lambda match: str(int(match[0])), value.casefold())
+
+    known_sets: dict[str, list[dict]] = {}
+    for item in search_sets(request):
+        known_sets.setdefault(code_key(item["set_id"]), []).append(item)
+
+    def extract_set(match: re.Match) -> str:
+        value = match[0]
+        lang, code = value.split(":", 1) if ":" in value else (None, value)
+        matches = [item for item in known_sets.get(code_key(code), [])
+                   if lang is None or item["language"].casefold() == lang.casefold()]
+        if not matches:
+            return value
+        options = []
+        for item in matches:
+            options.append("(cards.language=? AND cards.set_id=?)")
+            params.extend([item["language"], item["set_id"]])
+        clauses.append("(" + " OR ".join(options) + ")")
+        return " "
+
+    remaining = re.sub(r"(?<![\w:])(?:[A-Za-z]{2}:)?[A-Za-z][A-Za-z0-9]*(?:[.-][A-Za-z0-9]+)*(?![\w:])", extract_set, remaining)
+    for number, total in numbers:
+        clauses.append("LOWER(LTRIM(cards.collector_number, '0'))=LOWER(LTRIM(?, '0'))")
+        params.append(number)
+        if total.isdigit():
+            # Unknown totals cannot establish an exact printed-number match.
+            clauses.append("(SELECT official_total FROM set_totals st WHERE st.language=cards.language AND st.set_id=cards.set_id)=?")
+            params.append(int(total))
+    remaining = remaining.strip()
+    if remaining and any(ord(char) > 0x2E80 for char in remaining):
+        for word in remaining.split():
+            clauses.append("(cards.name LIKE ? OR cards.set_name LIKE ? OR cards.collector_number LIKE ?)")
+            params.extend([f"%{word}%"] * 3)
     else:
-        for number, total in numbers:
-            clauses.append("LOWER(LTRIM(cards.collector_number, '0'))=LOWER(LTRIM(?, '0'))")
-            params.append(number)
-            if total.isdigit():
-                # A slash query is an exact printed-number search. Unknown totals
-                # cannot establish a match and must not introduce unrelated sets.
-                clauses.append("(SELECT official_total FROM set_totals st WHERE st.language=cards.language AND st.set_id=cards.set_id)=?")
-                params.append(int(total))
+        tokens = re.findall(r"[A-Za-z0-9]+", remaining)
         if tokens:
             # Quoted so a word like "and" or "not" is not read as an operator.
             clauses.append("cards.id IN (SELECT id FROM cards_fts WHERE cards_fts MATCH ?)")

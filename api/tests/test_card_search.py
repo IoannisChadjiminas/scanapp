@@ -154,3 +154,31 @@ def test_user_printed_number_125_094_is_exact_and_pages(tmp_path: Path) -> None:
         assert _ids(first) == ["charizard"]
         assert first.total == second.total == 1
         assert second.items == []
+
+
+def test_japanese_set_codes_and_names_combine_with_printed_numbers(tmp_path: Path) -> None:
+    conn = _catalog(tmp_path)
+    for card_id, lang, set_id, name, number, total in (
+        ('ja:SV2a-025', 'ja', 'SV2a', 'ピカチュウ', '025', 165),
+        ('ja:SV2a-125', 'ja', 'SV2a', 'エレブー', '125', 165),
+        ('en:sv08.5-025', 'en', 'sv08.5', 'Pikachu', '025', 131),
+        ('en:other-SV080', 'en', 'other', 'Pikachu', 'SV080', 100),
+    ):
+        conn.execute("INSERT INTO cards (id, provider_id, name, set_id, set_name, collector_number, language) VALUES (?, ?, ?, ?, 'Expansion', ?, ?)", (card_id, card_id, name, set_id, number, lang))
+        conn.execute("INSERT INTO cards_fts (id, name, set_name, collector_number) VALUES (?, ?, 'Expansion', ?)", (card_id, name, number))
+        conn.execute("INSERT OR IGNORE INTO set_totals (language, set_id, official_total, fetched_at) VALUES (?, ?, ?, 'x')", (lang, set_id, total))
+    conn.commit()
+    request = _request(conn)
+    def find(query: str, language: str = '') -> list[str]:
+        return _ids(search_cards(request, q=query, language=language, limit=20, offset=0))
+    assert set(find('sv2a')) == {'ja:SV2a-025', 'ja:SV2a-125'}
+    assert find('SV2A 025/0165') == ['ja:SV2a-025']
+    assert find('ja:sv2a ピカチュウ 25/165') == ['ja:SV2a-025']
+    assert find('ピカチュウ 025/165') == ['ja:SV2a-025']
+    assert find('sv2a', 'en') == []
+    assert find('en:sv2a') == []
+    assert find('SV8.5 Pikachu 25/131') == ['en:sv08.5-025']
+    assert find('sv08.5') == ['en:sv08.5-025']
+    # An import invalidates the metadata cache rather than requiring a restart.
+    conn.execute("INSERT INTO cards (id, provider_id, name, set_id, set_name, collector_number, language) VALUES ('ja:new-1', 'ja:new-1', 'New', 'XYZ9', 'New', '1', 'ja')")
+    assert find('xyz9') == ['ja:new-1']
