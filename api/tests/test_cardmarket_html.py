@@ -106,6 +106,29 @@ def test_empty_listing_state():
     assert parsed["rows"] == []
 
 
+def test_no_available_offers_keeps_averages():
+    details = (
+        "<dl><dt>Available items</dt><dd>0</dd><dt>From</dt><dd>N/A</dd>"
+        "<dt>30-days average price</dt><dd>2,99 €</dd>"
+        "<dt>7-days average price</dt><dd>2,99 €</dd>"
+        "<dt>1-day average price</dt><dd>5,50 €</dd></dl>"
+    )
+    html = _page(
+        details + "<p>Currently there are no available offers for this article</p>"
+    )
+    parsed = parse_cardmarket_html(URL, html)
+    assert parsed["empty"] is True
+    assert parsed["pending"] is False
+    assert parsed["header"] == {"7-day": 2.99, "30-day": 2.99, "Available": 0}
+
+
+def test_zero_available_items_is_empty_without_notice():
+    html = _page("<dl><dt>Available items</dt><dd>0</dd></dl>")
+    parsed = parse_cardmarket_html(URL, html)
+    assert parsed["empty"] is True
+    assert parsed["pending"] is False
+
+
 def test_unloaded_table_stays_pending():
     parsed = parse_cardmarket_html(URL, _page("<div>Loading</div>"))
     assert parsed["pending"] is True

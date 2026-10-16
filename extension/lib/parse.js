@@ -118,7 +118,8 @@ export function hasEmptyState(root) {
   return (
     text.includes("there are currently no articles") ||
     text.includes("no articles available") ||
-    text.includes("there are no articles")
+    text.includes("there are no articles") ||
+    text.includes("no available offers")
   );
 }
 
