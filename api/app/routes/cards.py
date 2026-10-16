@@ -115,7 +115,7 @@ SEARCH_PRESETS = [
     {"id": "trending_up", "label": "Trending up", "icon": "trending_up", "params": {"preset": "trending_up", "sort": "momentum"}},
     {"id": "below_average", "label": "Below its average", "icon": "trending_down", "params": {"preset": "below_average", "sort": "discount"}},
     {"id": "under_trend", "label": "Listed under trend", "icon": "euro", "params": {"preset": "under_trend", "sort": "under_trend"}},
-    {"id": "new_set", "label": "New set chase cards", "icon": "star", "params": {"preset": "new_set", "sort": "price_desc"}},
+    {"id": "new_set", "label": "Set chase cards", "icon": "star", "params": {"preset": "new_set", "sort": "price_desc"}},
     {"id": "biggest_drops", "label": "Biggest drops", "icon": "trending_down", "params": {"preset": "biggest_drops", "sort": "momentum_asc"}},
 ]
 
@@ -188,6 +188,8 @@ def search_cards(
         raise HTTPException(422, "Invalid release date range")
     catalog = request.app.state.dbs.catalog
     clauses, params = [_PHYSICAL], []
+    chase_scope, chase_params = [_PHYSICAL, "m_trend>0"], []
+    explicit_set = bool(sets)
     if ownership not in ('any', 'hide_owned', 'only_owned'):
         raise HTTPException(422, "Unknown ownership filter")
     if ownership != 'any':
@@ -212,17 +214,23 @@ def search_cards(
         known_sets.setdefault(code_key(item["set_id"]), []).append(item)
 
     def extract_set(match: re.Match) -> str:
+        nonlocal explicit_set
         value = match[0]
         lang, code = value.split(":", 1) if ":" in value else (None, value)
         matches = [item for item in known_sets.get(code_key(code), [])
                    if lang is None or item["language"].casefold() == lang.casefold()]
         if not matches:
             return value
-        options = []
+        options, values = [], []
         for item in matches:
             options.append("(cards.language=? AND cards.set_id=?)")
-            params.extend([item["language"], item["set_id"]])
-        clauses.append("(" + " OR ".join(options) + ")")
+            values.extend([item["language"], item["set_id"]])
+        clause = "(" + " OR ".join(options) + ")"
+        clauses.append(clause)
+        params.extend(values)
+        chase_scope.append(clause)
+        chase_params.extend(values)
+        explicit_set = True
         return " "
 
     remaining = re.sub(r"(?<![\w:])(?:[A-Za-z]{2}:)?[A-Za-z][A-Za-z0-9]*(?:[.-][A-Za-z0-9]+)*(?![\w:])", extract_set, remaining)
@@ -246,9 +254,13 @@ def search_cards(
             params.append(" ".join(f'"{token}"*' for token in tokens))
     langs = expand_language(language) if language and language != "auto" else ()
     if langs:
-        clauses.append(f"cards.language IN ({','.join('?' for _ in langs)})")
+        clause = f"cards.language IN ({','.join('?' for _ in langs)})"
+        clauses.append(clause)
         params.extend(langs)
+        chase_scope.append(clause)
+        chase_params.extend(langs)
     if sets:
+        scope_start = len(params)
         options = []
         for value in sets:
             if ':' in value:
@@ -258,7 +270,10 @@ def search_cards(
             else:
                 options.append("cards.set_id=?")
                 params.append(value)
-        clauses.append('(' + ' OR '.join(options) + ')')
+        clause = '(' + ' OR '.join(options) + ')'
+        clauses.append(clause)
+        chase_scope.append(clause)
+        chase_params.extend(params[scope_start:])
     for value, expression in ((min_price, "m_trend>=?"), (max_price, "m_trend<=?"),
                               (momentum_min, "m_momentum>=?"), (momentum_max, "m_momentum<=?"),
                               (released_after, "release_date>=?"), (released_before, "release_date<=?")):
@@ -282,16 +297,23 @@ def search_cards(
         "trending_up": ("CASE WHEN m_change_30d IS NOT NULL AND m_sales_days_30 IS NOT NULL THEN m_change_7d>0 AND m_change_30d>0 AND m_sales_days_30>=8 ELSE m_avg7>=m_avg30*1.10 AND m_trend>=m_avg30*1.05 END", "momentum"),
         "below_average": (_BELOW_AVERAGE_RULE, "discount"),
         "under_trend": ("m_low<=m_trend*0.80 AND m_trend>=5", "under_trend"),
-        "new_set": ("release_date>=? AND release_date<=?", "price_desc"),
         "biggest_drops": ("CASE WHEN m_change_7d IS NOT NULL THEN m_change_7d<=-0.15 ELSE m_avg7<=m_avg30*0.85 END", "change_7d_asc" if capabilities(catalog)['change_7d'] else "momentum_asc"),
         "steady_climbers": ("m_change_30d>0 AND weekly_min_change>=-0.05 AND m_sales_days_30 IS NOT NULL", "change_30d"),
     }
     if preset in rules:
         rule, sort = rules[preset]
         clauses.extend(["m_trend>=2 AND m_avg7>0 AND m_avg30>0", rule])
-        if preset == "new_set":
+    cte, source, cte_params = _CTE, "signals", []
+    if preset == "new_set":
+        # Rank the set itself before text, price, rarity and ownership filters.
+        # Narrowing a search must not promote its eleventh card into the chase list.
+        if not explicit_set:
             today = date.today()
-            params.extend([(today - timedelta(days=90)).isoformat(), today.isoformat()])
+            chase_scope.append("release_date>=? AND release_date<=?")
+            chase_params.extend([(today - timedelta(days=90)).isoformat(), today.isoformat()])
+        cte += ", chase_ranked AS (SELECT cards.*, ROW_NUMBER() OVER (PARTITION BY cards.language, cards.set_id ORDER BY m_trend DESC, cards.id) AS chase_rank FROM signals cards WHERE " + " AND ".join(chase_scope) + ") "
+        source, cte_params, sort = "chase_ranked", chase_params, "price_desc"
+        clauses.append("chase_rank<=10")
     orders = {
         "newest": "release_date IS NULL, release_date DESC, cards.set_name, CAST(cards.collector_number AS INTEGER), cards.collector_number",
         "price_desc": "m_trend IS NULL, m_trend DESC",
@@ -308,8 +330,8 @@ def search_cards(
     }
     where = ' AND '.join(clauses)
     order = orders.get(sort, orders["newest"])
-    rows = catalog.execute(_CTE + f"SELECT cards.* FROM signals cards WHERE {where} ORDER BY {order}, cards.id LIMIT ? OFFSET ?", (*params, limit, offset)).fetchall()
-    total = catalog.execute(_CTE + f"SELECT COUNT(*) AS n FROM signals cards WHERE {where}", params).fetchone()["n"]
+    rows = catalog.execute(cte + f"SELECT cards.* FROM {source} cards WHERE {where} ORDER BY {order}, cards.id LIMIT ? OFFSET ?", (*cte_params, *params, limit, offset)).fetchall()
+    total = catalog.execute(cte + f"SELECT COUNT(*) AS n FROM {source} cards WHERE {where}", (*cte_params, *params)).fetchone()["n"]
     return CardSearchResponse(items=[_summary(row, catalog) for row in rows], total=total)
 
 

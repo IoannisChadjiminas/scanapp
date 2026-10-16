@@ -135,3 +135,37 @@ def test_presets_require_floor_and_complete_metrics(catalog):
     assert search(catalog, preset='trending_up').total == 0
     catalog.execute("UPDATE cards SET rarity='None' WHERE id='b'")
     assert next(card for card in search(catalog).items if card.id == 'b').rarity == ''
+
+
+def test_chase_top_ten_per_set_before_other_filters_and_paging(catalog):
+    for lang in ('en', 'ja'):
+        for index in range(12):
+            card_id = f'{lang}:chase-{index:02d}'
+            name = 'Outsideonly' if index == 11 else 'Chase card'
+            product = 100 + index + (100 if lang == 'ja' else 0)
+            catalog.execute("INSERT INTO cards (id, provider_id, name, set_id, set_name, collector_number, language, variants_json, cardmarket_id) VALUES (?, ?, ?, 'chase', 'Chase expansion', ?, ?, '{\"normal\":true}', ?)", (card_id, card_id, name, str(index), lang, product))
+            catalog.execute("INSERT INTO cards_fts (id, name, set_name, collector_number) VALUES (?, ?, 'Chase expansion', ?)", (card_id, name, str(index)))
+            # Fresh sets need no seven-/thirty-day history to have chase cards.
+            catalog.execute("INSERT INTO cardmarket_guide (id_product, trend, guide_date) VALUES (?, ?, ?)", (product, 200 - index, date.today().isoformat()))
+    catalog.execute("INSERT INTO set_releases (language, set_id, release_date, fetched_at) VALUES ('en', 'chase', '2020-01-01', 'x')")
+    catalog.commit()
+    expected = [f'en:chase-{i:02d}' for i in range(10)]
+    found = search(catalog, preset='new_set', sets=['en:chase'])
+    assert ids(found) == expected and found.total == 10
+    assert all(card.market.avg7 is None for card in found.items)
+    pages = [search(catalog, preset='new_set', sets=['en:chase'], limit=4, offset=i) for i in (0, 4, 8)]
+    assert [item for page in pages for item in ids(page)] == expected
+    assert {page.total for page in pages} == {10}
+    # Japanese sets without a release date also work when explicitly selected.
+    assert search(catalog, preset='new_set', sets=['chase'], language='ja').total == 10
+    assert search(catalog, preset='new_set', sets=['en:chase', 'ja:chase']).total == 20
+    assert search(catalog, preset='new_set', q='ja:chase').total == 10
+    # Text, price and ownership only narrow the original top ten.
+    assert search(catalog, preset='new_set', sets=['en:chase'], q='outsideonly').total == 0
+    assert search(catalog, preset='new_set', sets=['en:chase'], max_price=189).total == 0
+    assert search(catalog, preset='new_set', sets=['en:chase'], ownership='only_owned', owned_ids=['en:chase-11']).total == 0
+    assert ids(search(catalog, preset='new_set', sets=['en:chase'], ownership='only_owned', owned_ids=['en:chase-02'])) == ['en:chase-02']
+    assert ids(search(catalog, preset='new_set', language='en')) == ['b']
+    # Stable identity breaks equal-price ties, including across page boundaries.
+    catalog.execute('UPDATE cardmarket_guide SET trend=200 WHERE id_product BETWEEN 100 AND 111')
+    assert ids(search(catalog, preset='new_set', sets=['en:chase'])) == expected
