@@ -210,9 +210,10 @@ def search_cards(
             clauses.append("LOWER(LTRIM(cards.collector_number, '0'))=LOWER(LTRIM(?, '0'))")
             params.append(number)
             if total.isdigit():
-                # A set whose total is not stored yet still matches on the number.
-                clauses.append("COALESCE((SELECT official_total FROM set_totals st WHERE st.language=cards.language AND st.set_id=cards.set_id), ?)=?")
-                params.extend([int(total), int(total)])
+                # A slash query is an exact printed-number search. Unknown totals
+                # cannot establish a match and must not introduce unrelated sets.
+                clauses.append("(SELECT official_total FROM set_totals st WHERE st.language=cards.language AND st.set_id=cards.set_id)=?")
+                params.append(int(total))
         if tokens:
             # Quoted so a word like "and" or "not" is not read as an operator.
             clauses.append("cards.id IN (SELECT id FROM cards_fts WHERE cards_fts MATCH ?)")

@@ -125,6 +125,32 @@ def test_printed_number_with_total_finds_the_card(tmp_path: Path) -> None:
     assert find("Charizard 145 / 189") == ["dark-145"]
     assert find("Pikachu 145/189") == []
     assert sorted(find("145")) == ["dark-145", "other-145"]
-    # A set without a stored total still matches on the number; leading zeros are ignored.
-    assert find("45/100") == ["new-045"]
+    # A missing set total cannot establish an exact printed-number match.
+    assert find("45/100") == []
+    conn.execute("INSERT INTO set_totals (language, set_id, official_total, fetched_at) VALUES ('en', 'new', 100, 'x')")
+    assert find("45/0100") == ["new-045"]
     assert len(find("pikachu and not")) == 0
+
+
+def test_user_printed_number_125_094_is_exact_and_pages(tmp_path: Path) -> None:
+    conn = _catalog(tmp_path)
+    for card_id, set_id, number, total in (
+        ("charizard", "me02", "125", 94),
+        ("wrong-total", "wrong", "125", 194),
+        ("unknown", "unknown", "125", None),
+        ("wrong-number", "me02", "01250", 94),
+    ):
+        conn.execute(
+            "INSERT INTO cards (id, provider_id, name, set_id, set_name, collector_number, language) VALUES (?, ?, 'Mega Charizard X ex', ?, ?, ?, 'en')",
+            (card_id, card_id, set_id, set_id, number),
+        )
+        if total is not None:
+            conn.execute("INSERT OR IGNORE INTO set_totals (language, set_id, official_total, fetched_at) VALUES ('en', ?, ?, 'x')", (set_id, total))
+    conn.commit()
+    request = _request(conn)
+    for query in ("125/094", "125/94", "0125 / 0094"):
+        first = search_cards(request, q=query, language="", limit=1, offset=0)
+        second = search_cards(request, q=query, language="", limit=1, offset=1)
+        assert _ids(first) == ["charizard"]
+        assert first.total == second.total == 1
+        assert second.items == []
