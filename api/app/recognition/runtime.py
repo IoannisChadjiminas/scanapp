@@ -72,7 +72,6 @@ class Runtime:
                         intra_threads=self.settings.ort_intra_threads,
                         inter_threads=self.settings.ort_inter_threads,
                     )
-                    ocr.compact_footer_recovery = self.settings.structured_layout_recovery
                     if self.settings.use_grading and (self.settings.parallel_grading
                                                       or self.settings.grading_at_card_deadline):
                         grading_ocr = CardOcr(

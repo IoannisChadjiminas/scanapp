@@ -57,43 +57,33 @@ def test_resistance_reductions_are_not_collector_numbers(text):
 
 
 @pytest.mark.parametrize('extra', [('7/111', .93), ('7/111', .89), ('71111', .99), ('7/111★', .99)])
-def test_compact_footer_is_one_literal_read_and_retains_original_observations(monkeypatch, extra):
+def test_compact_footer_is_one_literal_read(monkeypatch, extra):
     calls=[]
     def read(self, patch):
         calls.append(patch.size)
-        if len(calls)==1:
-            return ['Jumpluff'],[.99]
-        if len(calls)==2:
-            return ['-30','©1995-2000 Nintendo'],[.99,.99]
-        return ([extra[0]],[extra[1]]) if len(calls)==5 else ([],[])
+        return [extra[0], '-30'], [extra[1], .99]
     monkeypatch.setattr(CardOcr,'_run',read)
-    reader=CardOcr.__new__(CardOcr); reader.compact_footer_recovery=True
-    result=reader.read(Image.new('RGB',(1121,1600)))
-    assert not result.failed and len(calls)==5 and calls[-1]==(900,116)
-    assert result.passes[-1]['reason']=='compact_footer'
-    assert [h.text for h in result.hits][:3]==['Jumpluff','-30','©1995-2000 Nintendo']
-    assert result.collector_retry_contributed is (extra==('7/111',.93))
+    reader=CardOcr.__new__(CardOcr)
+    hits,record=reader.read_compact_footer(Image.new('RGB',(1121,1600)))
+    assert calls==[(900,116)] and record['reason']=='compact_footer'
+    assert [(h.text,h.region) for h in hits]==([('7/111','collector')] if extra==('7/111',.93) else [])
 
 
-def test_gameplay_code_in_footer_retry_cannot_suppress_fraction_recovery(monkeypatch):
-    observations=iter([(['Jumpluff'],[.99]),(['-30'],[.99]),
-        (['LV35'],[.99]),([],[]),(['7/111'],[.93])])
+def test_ordinary_read_never_runs_compact_footer(monkeypatch):
+    # The compact strip is recovery-only; ordinary evidence and status rules
+    # (including footer_retry_contributed) must see exactly the prior passes.
+    observations=iter([(['Jumpluff'],[.99]),(['-30'],[.99]),([],[]),([],[])])
     monkeypatch.setattr(CardOcr,'_run',lambda self,patch:next(observations))
-    reader=CardOcr.__new__(CardOcr);reader.compact_footer_recovery=True
+    reader=CardOcr.__new__(CardOcr)
     result=reader.read(Image.new('RGB',(1121,1600)))
-    assert not result.failed and result.collector_text=='7/111'
-    assert result.passes[-1]['reason']=='compact_footer'
+    assert not result.failed and not result.collector_retry_contributed
+    assert [p['reason'] for p in result.passes]==['initial','initial','footer_half','footer_half']
 
 
-def test_weaker_retry_fraction_can_receive_a_literal_stronger_read(monkeypatch):
-    observations=iter([(['Jumpluff'],[.99]),(['-30'],[.99]),
-        (['7/111'],[.87689]),([],[]),(['7/111'],[.92775])])
-    monkeypatch.setattr(CardOcr,'_run',lambda self,patch:next(observations))
-    reader=CardOcr.__new__(CardOcr);reader.compact_footer_recovery=True
-    result=reader.read(Image.new('RGB',(1121,1600)))
-    assert not result.failed and result.passes[-1]['reason']=='compact_footer'
-    assert [h.confidence for h in result.hits if h.text=='7/111']==[.87689,.92775]
-    numbers=extract_collector_candidates([],hits=result.hits)
+def test_weaker_retry_fraction_can_receive_a_literal_stronger_read():
+    hits=[OcrHit('Jumpluff',.99,'name'),OcrHit('-30',.99,'collector'),
+          OcrHit('7/111',.87689,'collector'),OcrHit('7/111',.92775,'collector')]
+    numbers=extract_collector_candidates([],hits=hits)
     assert [(h.text,h.confidence) for h in numbers]==[('7/111',.92775)]
 
 
@@ -140,11 +130,14 @@ def test_layout_reference_must_stay_inside_root_and_match_validated_source(tmp_p
     assert verifier.verify(image,[('card',str(inside))])==[]
 
 
-@pytest.mark.parametrize('enabled,verified,number,ambiguous', [
-    (True,True,'7/111',False),(False,True,'7/111',False),
-    (True,False,'7/111',False),(True,True,'7/112',False),(True,True,'7/111',True)])
+@pytest.mark.parametrize('enabled,verified,number,ambiguous,compact', [
+    (True,True,'7/111',False,None),(False,True,'7/111',False,None),
+    (True,False,'7/111',False,None),(True,True,'7/112',False,None),(True,True,'7/111',True,None),
+    # A weak first-pass fraction needs the abstained-only compact read.
+    (True,True,'7/111@.87689',False,'7/111'),(True,True,'7/111@.87689',False,None),
+    (True,True,'7/111@.87689',False,'7/112')])
 def test_pipeline_layout_recovery_is_review_only_and_preserves_abstention(
-        tmp_path, monkeypatch, enabled, verified, number, ambiguous):
+        tmp_path, monkeypatch, enabled, verified, number, ambiguous, compact):
     import app.recognition.pipeline as pipeline
     catalog=connect(tmp_path/'catalog.sqlite');results=connect(tmp_path/'results.sqlite')
     init_catalog(catalog);init_results(results)
@@ -159,14 +152,19 @@ def test_pipeline_layout_recovery_is_review_only_and_preserves_abstention(
     ids=[r[0] for r in rows]
     snapshot=SimpleNamespace(card_ids=np.array(ids),embeddings=np.array(
         [[.65,np.sqrt(1-.65**2)]]+[[.55,np.sqrt(1-.55**2)]]*(len(ids)-1),dtype=np.float32))
+    number,_,first_confidence=number.partition('@')
     ocr=OcrResult(name_text='Jumpluff',collector_text=number,
-        hits=[OcrHit('Jumpluff',.99,'name'),OcrHit(number,.99,'collector')])
-    calls=[]
+        hits=[OcrHit('Jumpluff',.99,'name'),OcrHit(number,float(first_confidence or .99),'collector')])
+    calls=[];compact_calls=[]
+    def read_compact_footer(image):
+        compact_calls.append(image.size)
+        return ([OcrHit(compact,.92775,'collector')] if compact else []),dict(
+            region='collector',reason='compact_footer',width=900,height=116,ms=1.)
     def verify(image,refs):
         calls.append(refs)
         return [LayoutMatch('correct',100,20,20,.6)] if verified else []
     runtime=SimpleNamespace(require=lambda:(snapshot,SimpleNamespace(embed=lambda *a:np.array([1,0],dtype=np.float32)),
-        SimpleNamespace(read=lambda image:ocr)),card_languages=np.array(['en']*len(ids)),
+        SimpleNamespace(read=lambda image:ocr,read_compact_footer=read_compact_footer)),card_languages=np.array(['en']*len(ids)),
         artwork_verifier=SimpleNamespace(verify=lambda *a:[]),printing_index=None,layout_verifier=SimpleNamespace(verify=verify),
         metadata_index=MetadataCandidateIndex(catalog.execute('SELECT * FROM cards'),indexed_ids=set(ids)),
         versions=lambda:dict(model_revision='test',catalogue='test',ocr='test',ranking='test'),threshold_config=lambda:{})
@@ -183,7 +181,9 @@ def test_pipeline_layout_recovery_is_review_only_and_preserves_abstention(
         response=recognize_bytes(payload.getvalue(),settings=Settings(_env_file=None,data_dir=tmp_path,
             store_captures=False,use_grading=False,structured_layout_recovery=enabled),
             runtime=runtime,catalog=catalog,results=results,session_id='test')
-        recovered=enabled and verified and number=='7/111' and not ambiguous
+        weak=bool(first_confidence)
+        recovered=(enabled and verified and number=='7/111' and not ambiguous
+                   and (not weak or compact=='7/111'))
         assert response.status.value==('uncertain' if recovered else 'retake')
         if recovered:
             assert response.best_match.card_id=='correct'
@@ -191,10 +191,14 @@ def test_pipeline_layout_recovery_is_review_only_and_preserves_abstention(
             assert response.confidence.visual_similarity==pytest.approx(.55)
         else:
             assert response.best_match is None
-        if not enabled or number!='7/111' or ambiguous:
+        if not enabled or number!='7/111' or ambiguous or (weak and compact!='7/111'):
             assert calls==[]
+        # The compact read runs only for a weak/missing fraction in recovery.
+        assert compact_calls==([(600,825)] if enabled and weak else [])
         saved=json.loads(results.execute('SELECT ocr_json FROM scans WHERE id=?',(response.id,)).fetchone()[0])
         assert saved['layout_review_supported'] is recovered
         assert saved['local_artwork_matches']==[]
+        assert [h['text'] for h in saved['layout_footer_hits']]==([compact] if weak and compact else [])
+        assert 'footer_retry_contributed' not in response.confidence.reasons
     finally:
         catalog.close();results.close()

@@ -7,10 +7,15 @@ similarity was approximately 0.55; regenerating the reference vector agreed
 with the stored vector, so this was not a stale-vector mismatch.
 
 `STRUCTURED_LAYOUT_RECOVERY=true` enables an optional recovery path. It is
-**off by default**, including in `compose.dokploy.yaml`. The flag also enables
-one compact footer OCR pass when the usual footer retries find no fraction
-at confidence 0.90 or above on an upright card-shaped image. The pass retains only literal fractions at
-OCR confidence 0.90 or above. No digits or expected titles are substituted.
+**off by default**, including in `compose.dokploy.yaml`. After ordinary
+recognition abstains (`retake` or `no_match`), the recovery may run one compact
+footer OCR pass when no collector fraction at confidence 0.90 or above exists
+on an upright card-shaped image with a title read at 0.95 or above. The pass
+retains only literal fractions at OCR confidence 0.90 or above. These hits
+gate layout review only: they never re-enter ordinary ranking, status or
+`footer_retry_contributed`, so a result that did not abstain cannot change.
+They are recorded separately as `layout_footer_hits`. No digits or expected
+titles are substituted.
 Signed resistance values such as `-30` are excluded from collector parsing.
 When identical footer tokens repeat, collector parsing retains the strongest
 actual OCR observation, without combining confidences. Raw observations and
@@ -149,3 +154,13 @@ report were saved in PokeSingle's
 `output/scan-investigation-2026-10-17/regression-242/`. The next implementation
 step is to confine extra footer recovery to abstained recognition, then replay
 the changed cases and the regression before enabling it.
+
+### Compact footer confined to abstained recognition
+
+The compact footer read was moved out of `CardOcr.read` into
+`CardOcr.read_compact_footer`, which the pipeline calls only inside the
+layout recovery block. Parasect and Raikou V were `matched` before
+recovery and are no longer eligible for the read, so their
+`footer_retry_contributed` downgrades cannot recur. The API suite passes
+(674 tests). The real-model replay of Jumpluff, Parasect, Raikou V and the
+242-photo regression must be repeated before enabling the flag.

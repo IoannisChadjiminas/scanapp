@@ -50,7 +50,6 @@ def main():
         for path in args.image:
             comparisons={}
             for enabled in (False,True):
-                runtime.ocr.compact_footer_recovery=enabled
                 config=settings.model_copy(update={'structured_layout_recovery':enabled})
                 response=recognize_bytes(path.read_bytes(),settings=config,runtime=runtime,
                     catalog=catalog,results=results,session_id='layout-replay',store_capture=False,

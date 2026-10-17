@@ -692,6 +692,28 @@ class CardOcr:
             regions = ['full'] * len(texts)
         return texts, scores, regions
 
+    def read_compact_footer(self, image: Image.Image) -> tuple[list[OcrHit], dict]:
+        """One shorter, complete footer strip for structured layout recovery.
+
+        A wide footer strip can downsample the tiny collector line out of the
+        detector. This strip preserves both footer corners and avoids the
+        enlargement used by the ordinary retries. It is called only after
+        recognition abstains, so it never adds evidence to an ordinary result.
+        Retain only literal, confident fractions; no digit repairs.
+        """
+        compact = _region(image, .91, 1.)
+        compact.thumbnail((900, 900), Image.Resampling.BICUBIC)
+        started = time.perf_counter()
+        try:
+            lines, scores = self._run(compact)
+        finally:
+            record = dict(region='collector', reason='compact_footer', width=compact.width,
+                height=compact.height, ms=round((time.perf_counter()-started)*1000, 2))
+        hits = [OcrHit(text, score, 'collector') for text, score in zip(lines, scores)
+            if score is not None and score >= .90
+            and re.fullmatch(r'(?:TG|GG)?\d{1,4}\s*/\s*(?:TG|GG)?\d{1,4}', text.strip(), re.I)]
+        return hits, record
+
     def read(self, image: Image.Image, *, collector_retry_policy=None,
              read_footer: bool = True) -> OcrResult:
         passes = []
@@ -860,26 +882,6 @@ class CardOcr:
                         number_lines.extend(text for text, _ in identifiers)
                         number_scores.extend(score for _, score in identifiers)
                     except Exception:  # noqa: BLE001 - optional retry cannot erase first read
-                        pass
-                # A wide footer strip can downsample the tiny collector line
-                # out of the detector. One shorter, complete strip preserves
-                # both footer corners and avoids the enlargement used above.
-                # Retain only literal, confident fractions; no digit repairs.
-                if (getattr(self, 'compact_footer_recovery', False)
-                        and not any(COLLECTOR_FRACTION_RE.search(text) and score is not None and score >= .90
-                                    for text, score in zip(number_lines, number_scores))
-                        and .62 <= image.width / image.height <= .80):
-                    compact = _region(image, .91, 1.)
-                    compact.thumbnail((900, 900), Image.Resampling.BICUBIC)
-                    try:
-                        retry_lines, retry_scores = run(compact, 'collector', 'compact_footer')
-                        identifiers = [(text, score) for text, score in zip(retry_lines, retry_scores)
-                            if score is not None and score >= .90
-                            and re.fullmatch(r'(?:TG|GG)?\d{1,4}\s*/\s*(?:TG|GG)?\d{1,4}', text.strip(), re.I)]
-                        collector_retry_contributed |= bool(identifiers)
-                        number_lines.extend(text for text, _ in identifiers)
-                        number_scores.extend(score for _, score in identifiers)
-                    except Exception:  # noqa: BLE001 - keep every prior observation
                         pass
             extra_lines: list[str] = []
             extra_scores: list[float | None] = []

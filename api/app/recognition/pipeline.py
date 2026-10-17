@@ -828,14 +828,34 @@ def _recognize_bytes_once(
     # layout landmarks as artwork evidence or an automatic printing match.
     layout_matches = []
     layout_review_supported = False
+    layout_footer_hits = []
     layout_verifier = getattr(runtime, 'layout_verifier', None)
     if (getattr(settings, 'structured_layout_recovery', False)
             and layout_verifier is not None and not (too_small or too_blurry)
             and status in {'retake', 'no_match'}):
         mark = time.perf_counter()
+        # The compact footer read is confined to this abstained path. Its
+        # literal fractions gate layout review only; they never re-enter
+        # ordinary ranking or status, so existing results cannot change.
+        recovery_numbers = numbers
+        if (settings.use_ocr and hasattr(ocr_engine, 'read_compact_footer')
+                and name_confidence >= .95 and image.width >= 450
+                and .62 <= image.width / image.height <= .80
+                and not any(h.region == 'collector' and h.confidence is not None
+                            and h.confidence >= .90 and '/' in h.text for h in numbers)):
+            try:
+                compact_hits, compact_pass = ocr_engine.read_compact_footer(image)
+                ocr_passes.append(dict(scope='layout_recovery', **compact_pass))
+                layout_footer_hits = compact_hits
+                if compact_hits:
+                    recovery_numbers = extract_collector_candidates(
+                        [line for line in [ocr.collector_text, *ocr.lines] if line],
+                        hits=[*ocr.hits, *compact_hits])
+            except Exception:  # noqa: BLE001 - optional recovery keeps the abstention
+                logging.getLogger(__name__).exception('Optional compact footer read failed')
         eligible = [row for row in combined if layout_identity_agrees(row,
             ocr_name=ocr.name_text, name_confidence=name_confidence,
-            numbers=numbers, languages=rank_languages)]
+            numbers=recovery_numbers, languages=rank_languages)]
         identities = {(r['set_id'], r['collector_number'], r['language']) for r in eligible}
         if len(identities) == 1 and 0 < len(eligible) <= 4:
             references = [(row['card_id'], str(cards[row['card_id']]['image_path'] or ''))
@@ -950,6 +970,7 @@ def _recognize_bytes_once(
         "local_artwork_matches": [vars(m) for m in local_matches],
         "layout_matches": [vars(m) for m in layout_matches],
         "layout_review_supported": layout_review_supported,
+        "layout_footer_hits": [vars(h) for h in layout_footer_hits],
         "artwork_retrieval": [vars(h) for h in artwork_hits],
         "metadata_candidate_ids": metadata_ids,
         "geometry_candidate_ids": geometry_ids,

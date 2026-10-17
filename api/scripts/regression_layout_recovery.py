@@ -201,7 +201,6 @@ def evaluate_pair(case, root, settings, runtime, catalog, baseline_extractor, ca
     pair={}
     for enabled in (False,True):
         config=settings.model_copy(update={'structured_layout_recovery':enabled})
-        runtime.ocr.compact_footer_recovery=enabled
         results=sqlite3.connect(':memory:');results.row_factory=sqlite3.Row
         init_results(results)
         results.execute("INSERT INTO sessions VALUES('photo-regression','test','test')")
