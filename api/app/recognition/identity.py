@@ -3,7 +3,32 @@ from __future__ import annotations
 import re
 
 from app.recognition.ocr import OcrHit
-from app.recognition.rank import accepted_collector_numbers, artwork_evidence_compatible, name_match, normalize_text, number_matches_identifiers
+from app.recognition.rank import accepted_collector_numbers, artwork_evidence_compatible, name_match, normalize_text, number_matches_identifiers, parse_collector
+
+
+def layout_identity_agrees(item: dict, *, ocr_name: str | None,
+                          name_confidence: float, numbers: list[OcrHit],
+                          languages: tuple[str, ...]) -> bool:
+    """Exact printed identity gates layout verification, never artwork proof.
+
+    Unlike ordinary retrieval, this requires a known matching denominator,
+    exact normalized title and known language. Missing metadata abstains.
+    """
+    if (name_confidence < .95 or not languages or item.get('collector_conflict')
+            or normalize_text(ocr_name) != normalize_text(item['name'])
+            or not structured_identity_agrees(item, ocr_name=ocr_name,
+                name_confidence=name_confidence, numbers=numbers, languages=languages)):
+        return False
+    printed = str(item.get('printed_collector_number') or '')
+    if not printed and item.get('set_total'):
+        printed = f"{item['collector_number']}/{item['set_total']}"
+    expected = parse_collector(printed)
+    if expected is None or expected.denominator is None:
+        return False
+    fractions = [h for h in numbers if h.region == 'collector'
+        and h.confidence is not None and h.confidence >= .90 and '/' in h.text]
+    return bool(fractions) and all(number_matches_identifiers([h], [printed]) is True
+                                   for h in fractions)
 
 
 def review_title_agrees(ocr_name: str | None, card_name: str) -> bool:

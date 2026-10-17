@@ -18,6 +18,7 @@ from app.recognition.local_match import FULL_ART_BOX, FULL_ART_RARITIES, LocalAr
 from app.recognition.artwork import ArtworkIndex
 from app.recognition.metadata import MetadataCandidateIndex
 from app.recognition.reference_features import ReferenceFeatureStore, SCHEMA_VERSION as FEATURES_VERSION
+from app.recognition.layout_match import CardLayoutVerifier
 
 
 @dataclass
@@ -34,6 +35,7 @@ class Runtime:
     error: str | None = None
     printing_index: ReferencePrintingIndex | None = None
     artwork_verifier: LocalArtworkVerifier | None = None
+    layout_verifier: CardLayoutVerifier | None = None
     artwork_index: ArtworkIndex | None = None
     metadata_index: MetadataCandidateIndex | None = None
     card_positions: dict[str, int] | None = None
@@ -70,6 +72,7 @@ class Runtime:
                         intra_threads=self.settings.ort_intra_threads,
                         inter_threads=self.settings.ort_inter_threads,
                     )
+                    ocr.compact_footer_recovery = self.settings.structured_layout_recovery
                     if self.settings.use_grading and (self.settings.parallel_grading
                                                       or self.settings.grading_at_card_deadline):
                         grading_ocr = CardOcr(
@@ -105,6 +108,8 @@ class Runtime:
                 self.card_languages = None
                 self.printing_index = ReferencePrintingIndex(self.settings.data_dir)
                 self.artwork_verifier = LocalArtworkVerifier(self.settings.data_dir)
+                self.layout_verifier = (CardLayoutVerifier(self.settings.data_dir)
+                    if self.settings.structured_layout_recovery else None)
                 self.artwork_index = None
                 self.metadata_index = None
                 self.card_positions = None
@@ -117,6 +122,7 @@ class Runtime:
                 self.card_languages = None
                 self.printing_index = None
                 self.artwork_verifier = None
+                self.layout_verifier = None
                 self.artwork_index = None
                 self.metadata_index = None
                 self.card_positions = None
@@ -156,6 +162,8 @@ class Runtime:
                     [dict(row) for row in catalog.execute('SELECT id, image_path, rarity FROM cards')])
                 self.artwork_verifier.feature_store = store
                 self.printing_index.feature_store = store
+                if self.layout_verifier is not None:
+                    self.layout_verifier.feature_store = store
             except ArtifactError as exc:
                 self.snapshot = None
                 self.embedder = None
@@ -216,6 +224,8 @@ class Runtime:
             versions['ocr'] += '+supported-identity-footer-v1'
         if self.settings.use_ocr and self.settings.ocr_parallel_regions:
             versions['ocr'] += '+bounded-regions-v1'
+        if self.settings.structured_layout_recovery:
+            versions['layout_recovery'] = 'exact-identity-full-layout-review-v1'
         if self.artwork_index is not None:
             versions["artwork"] = (self.artwork_index.manifest["schema_version"] + ":" +
                                     self.artwork_index.manifest["records_sha256"][:12])

@@ -30,7 +30,7 @@ from app.recognition.detect import (card_frame_candidates, client_quad_rect, det
 from app.recognition.frame_fallback import line_frame_candidates, loose_frame_candidates, portrait_window_candidates, slab_interior_candidate
 from app.recognition.images import apply_crop, blur_variance, decode_image
 from app.recognition.embed import top_k
-from app.recognition.identity import likely_identity_agrees, structured_identity_agrees
+from app.recognition.identity import layout_identity_agrees, likely_identity_agrees, structured_identity_agrees
 from app.recognition.confidence import confidence_payload
 from app.recognition.presentation import match_presentation
 from app.recognition.language import (confident_language_texts, expand_language, language_label, locale_languages,
@@ -822,6 +822,34 @@ def _recognize_bytes_once(
         framing_unverified = True
         status_reasons.append('local_artwork_incompatible')
     timings["printing_review_ms"] = (time.perf_counter() - mark) * 1000
+    # Holo glare can defeat artwork descriptors while the printed title,
+    # fraction and distributed card layout remain readable. Corroborate those
+    # independently, only after normal recognition abstains. Never reinterpret
+    # layout landmarks as artwork evidence or an automatic printing match.
+    layout_matches = []
+    layout_review_supported = False
+    layout_verifier = getattr(runtime, 'layout_verifier', None)
+    if (getattr(settings, 'structured_layout_recovery', False)
+            and layout_verifier is not None and not (too_small or too_blurry)
+            and status in {'retake', 'no_match'}):
+        mark = time.perf_counter()
+        eligible = [row for row in combined if layout_identity_agrees(row,
+            ocr_name=ocr.name_text, name_confidence=name_confidence,
+            numbers=numbers, languages=rank_languages)]
+        identities = {(r['set_id'], r['collector_number'], r['language']) for r in eligible}
+        if len(identities) == 1 and 0 < len(eligible) <= 4:
+            references = [(row['card_id'], str(cards[row['card_id']]['image_path'] or ''))
+                          for row in eligible]
+            layout_matches = layout_verifier.verify(image, references)
+            supported_ids = {m.card_id for m in layout_matches}
+            if supported_ids:
+                combined.sort(key=lambda row: row['card_id'] in supported_ids, reverse=True)
+                reference_identity = dict(combined[0])
+                layout_review_supported = True
+                retake = False
+                status = 'uncertain'
+                status_reasons.append('printed_identity_layout_review')
+        timings['layout_verify_ms'] = (time.perf_counter() - mark)*1000
     shown = [] if status in {"no_match", "retake", "failed"} else combined[:1]
     timings["total_ms"] = (time.perf_counter() - started) * 1000
 
@@ -836,6 +864,8 @@ def _recognize_bytes_once(
         message = "The photograph is too blurry for useful recognition. Try again."
     elif retake and too_small:
         message = "Move closer so the card fills more of the frame."
+    elif layout_review_supported:
+        message = 'The printed name, collector number and card layout agree. Artwork similarity is weak; check the card, exact printing and finish before confirming.'
     elif framing_unverified and framing_review_supported:
         message = 'The visible name and collector number agree. Photo framing was not verified; check the exact printing and finish before confirming.'
     elif likely_identity_supported and not retake:
@@ -890,6 +920,8 @@ def _recognize_bytes_once(
         confidence.reasons.append('optional_footer_retry_skipped_printing_unconfirmed')
     if ocr.footer_skipped:
         confidence.reasons.append('footer_ocr_skipped_single_printing')
+    if layout_review_supported:
+        confidence.reasons.append('printed_identity_and_layout_agree_review_only')
     ocr_payload = {
         "name_text": ocr.name_text,
         "collector_text": ocr.collector_text,
@@ -916,6 +948,8 @@ def _recognize_bytes_once(
         "search_languages": list(decision.search),
         "printing_review": printing_review.model_dump(mode="json") if printing_review else None,
         "local_artwork_matches": [vars(m) for m in local_matches],
+        "layout_matches": [vars(m) for m in layout_matches],
+        "layout_review_supported": layout_review_supported,
         "artwork_retrieval": [vars(h) for h in artwork_hits],
         "metadata_candidate_ids": metadata_ids,
         "geometry_candidate_ids": geometry_ids,

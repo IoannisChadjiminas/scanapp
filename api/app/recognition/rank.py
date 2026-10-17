@@ -18,7 +18,7 @@ COLLECTOR_PARTS_RE = re.compile(
 )
 RELIABLE_COLLECTOR_CONF = 0.55
 NON_COLLECTOR_NUMBER_RE = re.compile(
-    r"(?:[×x]\s*\d+|#\s*\d+|\b(?:HP|LV\.?|IV|STAGE)\s*\d+|\d+\s*HP\b)",
+    r"(?:[×x]\s*\d+|(?<!\w)[−–-]\s*\d+\b|#\s*\d+|\b(?:HP|LV\.?|IV|STAGE)\s*\d+|\d+\s*HP\b)",
     re.IGNORECASE,
 )
 # These are set abbreviations, not the distinct TG/GG/SM/SWSH collector
@@ -94,6 +94,14 @@ def extract_collector_candidates(
             # when a holder label happened to propose the same bare number.
             previous=next(h for h in found if h.text == token)
             if previous.region == 'holder_collector' and item.region == 'collector':
+                found.remove(previous)
+                found.append(OcrHit(token,item.confidence,item.region))
+            elif (previous.region == item.region == 'collector'
+                    and item.confidence is not None
+                    and (previous.confidence is None or item.confidence > previous.confidence)):
+                # Keep the strongest literal observation of this identical
+                # footer token. Do not pool confidence across retries or
+                # discard any different (possibly conflicting) token.
                 found.remove(previous)
                 found.append(OcrHit(token,item.confidence,item.region))
             return

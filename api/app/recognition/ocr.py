@@ -861,6 +861,26 @@ class CardOcr:
                         number_scores.extend(score for _, score in identifiers)
                     except Exception:  # noqa: BLE001 - optional retry cannot erase first read
                         pass
+                # A wide footer strip can downsample the tiny collector line
+                # out of the detector. One shorter, complete strip preserves
+                # both footer corners and avoids the enlargement used above.
+                # Retain only literal, confident fractions; no digit repairs.
+                if (getattr(self, 'compact_footer_recovery', False)
+                        and not any(COLLECTOR_FRACTION_RE.search(text) and score is not None and score >= .90
+                                    for text, score in zip(number_lines, number_scores))
+                        and .62 <= image.width / image.height <= .80):
+                    compact = _region(image, .91, 1.)
+                    compact.thumbnail((900, 900), Image.Resampling.BICUBIC)
+                    try:
+                        retry_lines, retry_scores = run(compact, 'collector', 'compact_footer')
+                        identifiers = [(text, score) for text, score in zip(retry_lines, retry_scores)
+                            if score is not None and score >= .90
+                            and re.fullmatch(r'(?:TG|GG)?\d{1,4}\s*/\s*(?:TG|GG)?\d{1,4}', text.strip(), re.I)]
+                        collector_retry_contributed |= bool(identifiers)
+                        number_lines.extend(text for text, _ in identifiers)
+                        number_scores.extend(score for _, score in identifiers)
+                    except Exception:  # noqa: BLE001 - keep every prior observation
+                        pass
             extra_lines: list[str] = []
             extra_scores: list[float | None] = []
             extra_regions: list[str] = []
