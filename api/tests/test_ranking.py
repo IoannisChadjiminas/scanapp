@@ -576,3 +576,21 @@ def test_decide_status_says_which_branch_decided():
     assert decide_status_with_reason([row('a', .9, collector_conflict=True)], **kwargs) == ('uncertain', 'conflict')
     assert decide_status_with_reason([row('a', .9), row('b', .6)], **{**kwargs, 'enable_matched': False}) == (
         'uncertain', 'matched_disabled')
+
+
+def test_japanese_visual_leader_keeps_its_print_without_english_words() -> None:
+    from app.recognition.language import ranking_languages, resolve_search_languages
+    texts = ["Illus. PLANETA Mochizuki", "sv2a", "SR"]
+    visual = [
+        _card("ja:SV2a-185", "リザードンex", "185", 0.86, "ja"),
+        _card("en:sv03.5-183", "Charizard ex", "183", 0.84, "en"),
+    ]
+    decision = resolve_search_languages("auto", texts)
+    # The old ranking language, a Latin-count "en", put the English twin first.
+    flipped = rerank(visual, None, [], ocr_failed=False, detected_languages=("en",),
+                     name_confidence=0., require_confident_ocr=True)
+    assert flipped[0]["card_id"] == "en:sv03.5-183"
+    ranked = rerank(visual, None, [], ocr_failed=False,
+                    detected_languages=ranking_languages(decision, texts, "ja"),
+                    name_confidence=0., require_confident_ocr=True)
+    assert ranked[0]["card_id"] == "ja:SV2a-185"
