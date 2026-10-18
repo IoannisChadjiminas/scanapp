@@ -296,3 +296,48 @@ def test_price_response_carries_the_price_file_trend(tmp_path):
     assert payload["guide_trend_at"]
     other = prices_payload(conn, "https://www.cardmarket.com/en/Pokemon/Products/Singles/X/None")
     assert other["guide_trend"] is None
+
+
+def test_reverse_holo_choice_reads_only_the_holo_columns(tmp_path):
+    conn = _catalog(tmp_path)
+    _card(conn, "en:r", product=100, variants={"normal": True, "reverse": True})
+    import_guide(conn, GUIDE)
+    picked = price_sources.scan_finishes(conn, "en:r")
+    assert picked["finishes"] == ["normal", "reverse"]
+    assert _labels(picked["reverse_holo_prices"]) == {"From": 9.0, "Trend": 12.0, "7-day": 11.0}
+    # The plain price is still the normal print.
+    assert _labels(best_prices(conn, "en:r", None))["Trend"] == 4.2
+
+
+def test_holo_rare_offers_holo_and_reverse(tmp_path):
+    conn = _catalog(tmp_path)
+    _card(conn, "en:h", product=100, variants={"normal": False, "holo": True, "reverse": True})
+    import_guide(conn, GUIDE)
+    assert price_sources.scan_finishes(conn, "en:h")["finishes"] == ["holo", "reverse"]
+
+
+def test_one_finish_offers_no_choice(tmp_path):
+    conn = _catalog(tmp_path)
+    _card(conn, "en:n", product=100, variants={"normal": True, "reverse": False})
+    _card(conn, "en:o", product=100, variants={"normal": False, "reverse": True})
+    import_guide(conn, GUIDE)
+    for card in ("en:n", "en:o"):
+        assert price_sources.scan_finishes(conn, card) == {"finishes": [], "reverse_holo_prices": []}
+
+
+def test_reverse_prices_never_fall_back_to_normal_sales(tmp_path):
+    conn = _catalog(tmp_path)
+    _card(conn, "en:p", product=100, variants={"normal": True, "reverse": True})
+    import_guide(conn, {**GUIDE, "priceGuides": [
+        {"idProduct": 100, "low": 3.5, "trend": 4.2, "avg7": 4.0},
+    ]})
+    assert price_sources.reverse_holo_prices(conn, "en:p") == []
+
+
+def test_reverse_holo_listing_url_reads_the_reverse_trend(tmp_path):
+    conn = _catalog(tmp_path)
+    _card(conn, "en:r", product=100, variants={"normal": True, "reverse": True}, url=URL)
+    import_guide(conn, GUIDE)
+    assert price_sources.guide_trend_for_url(conn, URL)[0] == 4.2
+    assert price_sources.guide_trend_for_url(conn, URL + "?isReverseHolo=Y")[0] == 12.0
+    assert price_sources.trend_for_url(conn, URL + "?isReverseHolo=Y&language=1") == 12.0

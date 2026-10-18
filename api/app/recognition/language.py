@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import re
 from dataclasses import dataclass
 from app.recognition.ocr import OcrHit
 
@@ -56,6 +57,14 @@ EN_PHRASES = (
     "weakness",
     "resistance",
 )
+# Japanese, Korean and Chinese cards also print Latin text: the illustrator,
+# set code, rarity, "HP", "ex" and the Pokémon/Nintendo copyright. Only
+# English sentence words count as evidence that a card is the English print.
+EN_RULE_WORDS = frozenset((
+    "your", "opponent", "opponent's", "during", "turn", "prize", "knocked",
+    "attach", "attached", "discard", "damage", "supporter", "stadium",
+    "when", "may", "only", "play", "cards", "basic", "stage", "evolves", "retreat",
+))
 ZH_CN_PHRASES = ("宝可梦", "这个")
 ZH_TW_PHRASES = ("寶可夢", "這個")
 KO_PHRASES = ("포켓몬",)
@@ -178,6 +187,15 @@ def detect_card_language(texts: list[str]) -> str | None:
     return None
 
 
+def english_print_evidence(texts: list[str]) -> bool:
+    """Printed English words, not merely Latin letters."""
+    lowered = "\n".join(item for item in texts if item).casefold()
+    if any(phrase in lowered for phrase in EN_PHRASES):
+        return True
+    words = set(re.findall(r"[a-z']+", lowered))
+    return len(words & EN_RULE_WORDS) >= 2
+
+
 def detect_script_language(texts: list[str]) -> str | None:
     return detect_card_language(texts)
 
@@ -201,3 +219,24 @@ def resolve_search_languages(
         return LanguageDecision(req, detected, expand_language(req), "user")
     # Auto searches every indexed print. Detected language only ranks English vs Japanese vs Chinese.
     return LanguageDecision("auto", detected, (), "ocr" if detected else "unknown")
+
+
+def ranking_languages(
+    decision: LanguageDecision,
+    texts: list[str],
+    visual_leader_language: str | None = None,
+) -> tuple[str, ...]:
+    """Languages the reranker may favour over the visual order.
+
+    A Japanese card whose kana is read below the confidence floor still has a
+    confident illustrator, set code and copyright line, so a Latin letter
+    count alone guesses "en" and would swap the Japanese print for its
+    English twin. That guess may only agree with the picture's own leader;
+    printed English words still rank as before.
+    """
+    if decision.reason == "user":
+        return decision.search
+    if (decision.detected == "en" and visual_leader_language not in {None, "", "en"}
+            and not english_print_evidence(texts)):
+        return ()
+    return expand_language(decision.detected)

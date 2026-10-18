@@ -1,6 +1,7 @@
 from __future__ import annotations
 
-from app.recognition.language import detect_script_language, resolve_search_languages
+from app.recognition.language import (detect_script_language, english_print_evidence, ranking_languages,
+                                     resolve_search_languages)
 from app.recognition.rank import name_match, normalize_text
 
 
@@ -44,3 +45,39 @@ def test_normalize_keeps_japanese_letters() -> None:
 def test_japanese_name_matches_catalogue_name() -> None:
     assert name_match("ゲンガー&ミミッキュGX", "ゲンガー&ミミッキュGX") is True
     assert name_match("ゲンガー", "ゲンガー&ミミッキュGX") is True
+
+
+def _auto(texts: list[str]):
+    return resolve_search_languages("auto", texts)
+
+
+# Confident Latin text on a Japanese print whose kana OCR fell below the floor.
+JA_FOOTER_LATIN = ["Illus. PLANETA Mochizuki", "sv2a 185/165 SR",
+                   "©2023 Pokémon/Nintendo/Creatures/GAME FREAK"]
+
+
+def test_latin_letters_alone_do_not_rank_a_japanese_leader_as_english() -> None:
+    decision = _auto(JA_FOOTER_LATIN)
+    assert decision.detected == "en"
+    assert ranking_languages(decision, JA_FOOTER_LATIN, "ja") == ()
+
+
+def test_latin_guess_still_ranks_when_the_picture_leads_with_english() -> None:
+    decision = _auto(JA_FOOTER_LATIN)
+    assert ranking_languages(decision, JA_FOOTER_LATIN, "en") == ("en",)
+    assert ranking_languages(decision, JA_FOOTER_LATIN, None) == ("en",)
+
+
+def test_printed_english_words_rank_over_a_japanese_leader() -> None:
+    texts = ["Illus. PLANETA Mochizuki", "Pokémon ex rule: When your Pokémon ex is Knocked Out,",
+             "your opponent takes 2 Prize cards."]
+    assert english_print_evidence(texts)
+    assert ranking_languages(_auto(texts), texts, "ja") == ("en",)
+    assert english_print_evidence(["weakness", "resistance"])
+    assert not english_print_evidence(JA_FOOTER_LATIN)
+
+
+def test_detected_japanese_and_user_language_rank_unchanged() -> None:
+    texts = ["2進化", "リザードンex"]
+    assert ranking_languages(_auto(texts), texts, "en") == ("ja",)
+    assert ranking_languages(resolve_search_languages("en", texts), texts, "ja") == ("en",)

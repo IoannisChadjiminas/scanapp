@@ -29,6 +29,8 @@ GUIDE_COLUMNS = (
 # A file that shrinks by more than this against the last import is treated as
 # damaged and kept out.
 MIN_KEEP_RATIO = 0.5
+# Cardmarket's listing filter for reverse holo copies of a product.
+REVERSE_HOLO_FILTER = "isReverseHolo"
 
 
 def _now() -> str:
@@ -160,6 +162,29 @@ def _swap_holo(market: dict[str, Any]) -> dict[str, Any]:
     return swapped
 
 
+def _reverse_only(market: dict[str, Any]) -> dict[str, Any]:
+    """The -holo figures as the plain ones, with no fallback to normal sales."""
+    reverse = {key: value for key, value in market.items() if not key.endswith("-holo")}
+    for name in ("low", "trend", "avg7"):
+        reverse[name] = market.get(f"{name}-holo")
+    return reverse
+
+
+def finishes(variants: dict[str, Any]) -> list[str]:
+    """The finishes a collector picks between, the plain one first.
+
+    Empty when the card comes in one finish only. A reverse-only printing is
+    already priced from the reverse holo columns, so it offers no choice.
+    """
+    if not variants.get("reverse"):
+        return []
+    if variants.get("normal"):
+        return ["normal", "reverse"]
+    if variants.get("holo"):
+        return ["holo", "reverse"]
+    return []
+
+
 def _tag(prices: list[dict[str, Any]], source: str, as_of: str | None) -> list[dict[str, Any]]:
     return [{**price, "source": source, "as_of": as_of, "stale": False} for price in prices]
 
@@ -217,10 +242,18 @@ def tier_window(settings: Settings, trend: float | None) -> int | None:
     return None
 
 
-def market_trend(market: dict[str, Any] | None) -> float | None:
+def is_reverse_holo_url(url: str | None) -> bool:
+    """A listing URL filtered to reverse holo copies (Cardmarket's isReverseHolo=Y)."""
+    from urllib.parse import parse_qs, urlparse
+
+    values = parse_qs(urlparse(url or "").query).get(REVERSE_HOLO_FILTER) or []
+    return any(value.upper() == "Y" for value in values)
+
+
+def market_trend(market: dict[str, Any] | None, *, reverse: bool = False) -> float | None:
     if not market:
         return None
-    for key in ("trend", "trend-holo"):
+    for key in ("trend-holo",) if reverse else ("trend", "trend-holo"):
         value = _number(market.get(key))
         if value and value > 0:
             return value
@@ -237,7 +270,8 @@ def trend_for_url(conn: sqlite3.Connection, url: str | None) -> float | None:
         "SELECT cardmarket_id FROM cards WHERE cardmarket_url = ? AND cardmarket_id IS NOT NULL LIMIT 1",
         (normalize_product_url(url) or url,),
     ).fetchone()
-    return market_trend(guide_market(conn, row["cardmarket_id"])) if row else None
+    market = guide_market(conn, row["cardmarket_id"]) if row else None
+    return market_trend(market, reverse=is_reverse_holo_url(url))
 
 
 def guide_trend_for_url(conn: sqlite3.Connection, url: str | None) -> tuple[float | None, str | None]:
@@ -251,7 +285,7 @@ def guide_trend_for_url(conn: sqlite3.Connection, url: str | None) -> tuple[floa
         (normalize_product_url(url) or url,),
     ).fetchone()
     market = guide_market(conn, row["cardmarket_id"]) if row else None
-    trend = market_trend(market)
+    trend = market_trend(market, reverse=is_reverse_holo_url(url))
     return (trend, str(market.get("updated") or "") or None) if trend else (None, None)
 
 
@@ -314,6 +348,43 @@ def best_prices(conn: sqlite3.Connection, card_id: str, url: str | None) -> list
             if prices:
                 return _tag(prices, "tcgplayer", block.get("updated") or stored["fetched_at"])
     return stale_live
+
+
+def reverse_holo_prices(conn: sqlite3.Connection, card_id: str) -> list[dict[str, Any]]:
+    """Cardmarket's reverse holo figures for a card that also has another finish."""
+    card = conn.execute(
+        "SELECT cardmarket_id, variants_json FROM cards WHERE id = ?", (card_id,)
+    ).fetchone()
+    if card is None or not finishes(_json(card["variants_json"])):
+        return []
+    market = guide_market(conn, card["cardmarket_id"])
+    if market:
+        prices = prices_from_market(_reverse_only(market))
+        if prices:
+            return _tag(prices, "cardmarket_file", market["updated"])
+    stored = conn.execute(
+        "SELECT cardmarket_json, fetched_at FROM tcgdex_prices WHERE card_id = ?", (card_id,)
+    ).fetchone()
+    market = _json(stored["cardmarket_json"]) if stored else {}
+    if market:
+        prices = prices_from_market(_reverse_only(market))
+        if prices:
+            return _tag(prices, "tcgdex", market.get("updated") or stored["fetched_at"])
+    return []
+
+
+def scan_finishes(conn: sqlite3.Connection, card_id: str) -> dict[str, Any]:
+    """The finish choice for one card, which must never fail a scan."""
+    try:
+        card = conn.execute("SELECT variants_json FROM cards WHERE id = ?", (card_id,)).fetchone()
+        offered = finishes(_json(card["variants_json"])) if card else []
+        return {
+            "finishes": offered,
+            "reverse_holo_prices": reverse_holo_prices(conn, card_id) if offered else [],
+        }
+    except Exception:
+        log.exception("scan finishes failed card=%s", card_id)
+        return {"finishes": [], "reverse_holo_prices": []}
 
 
 def scan_prices(conn: sqlite3.Connection, card_id: str, url: str | None) -> list[dict[str, Any]]:
