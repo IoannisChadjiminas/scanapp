@@ -87,6 +87,52 @@ def test_missing_catalogue_identifier_is_unknown_not_a_contradiction():
     assert number_matches_identifiers([], ['199/165']) is None
 
 
+def test_charmander_dropped_footer_digits_do_not_promote_torchic():
+    # Saved scan e20b9f0e: 023/185 was read literally as 3/185.
+    charmander = {**_card('en:swsh4-23', 'Charmander', '23', .818983793258667),
+                  'set_total': 185}
+    torchic = {**_card('en:2015xy-3', 'Torchic', '3', .7995504140853882),
+               'set_total': 12}
+    ranked = rerank([charmander, torchic], 'Charmander',
+                    [OcrHit('3/185', .99962, 'collector')], False,
+                    detected_languages=('en',), name_confidence=.99995,
+                    require_confident_ocr=True)
+    assert ranked[0]['card_id'] == 'en:swsh4-23'
+    assert all(row['structured_collector_conflict'] for row in ranked)
+    assert ranked[1]['strong_name_conflict']
+    # Preserve the contradictory OCR; do not silently repair 3 into 023.
+    assert decide_status(ranked, enable_matched=True, min_visual=.78,
+                         min_gap=.04, retake=False) == 'uncertain'
+
+
+def test_known_set_total_distinguishes_same_number_printings():
+    from app.recognition.rank import accepted_collector_numbers, number_matches_identifiers
+    card = {**_card('torchic', 'Torchic', '3', .8), 'set_total': 12}
+    assert number_matches_identifiers(['3/185'], accepted_collector_numbers(card)) is False
+    assert number_matches_identifiers(['003/012'], accepted_collector_numbers(card)) is True
+    assert number_matches_identifiers(['3'], accepted_collector_numbers(card)) is True
+    for unknown in (None, 0, -1, 'unknown'):
+        card['set_total'] = unknown
+        assert accepted_collector_numbers(card) == ['3']
+
+
+def test_reprint_printed_alias_is_not_given_the_reprint_set_total():
+    from app.recognition.rank import accepted_collector_numbers, number_matches_identifiers
+    card = {**_card('reprint', 'Mew VMAX', '026', .99),
+            'set_total': 70, 'printed_collector_number': '114'}
+    assert accepted_collector_numbers(card) == ['026', '114']
+    assert number_matches_identifiers(['114/264'], accepted_collector_numbers(card)) is True
+    card['printed_collector_number'] = '114/264'
+    assert accepted_collector_numbers(card) == ['026', '114/264']
+    assert number_matches_identifiers(['114/70'], accepted_collector_numbers(card)) is False
+
+
+def test_bare_prefixed_identifiers_do_not_invent_printed_fractions():
+    from app.recognition.rank import accepted_collector_numbers
+    card = {**_card('promo', 'Charmander', 'SWSH232', .8), 'set_total': 307}
+    assert accepted_collector_numbers(card) == ['SWSH232']
+
+
 def test_conflicting_ocr_language_cannot_automatically_accept_only_foreign_candidate():
     ranked = rerank([_card('english','Pikachu','173',.99,'en')], 'ピカチュウ', [], False,
                     detected_languages=('ja',), name_confidence=.99, require_confident_ocr=True)

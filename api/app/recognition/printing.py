@@ -15,6 +15,7 @@ from typing import Any
 import numpy as np
 from PIL import Image, ImageOps
 
+from app.physical_cards import is_tcg_pocket_card
 from app.recognition.ocr import OcrHit
 from app.recognition.rank import accepted_collector_numbers, number_matches_identifiers, normalize_text
 
@@ -82,6 +83,8 @@ class ReferencePrintingIndex:
                 cached = []
                 for row in rows[:512]:
                     card = dict(row)
+                    if is_tcg_pocket_card(card.get("language"), card.get("set_id")):
+                        continue
                     probe = None
                     raw_path = str(card.get("image_path") or "")
                     path = Path(raw_path).resolve()

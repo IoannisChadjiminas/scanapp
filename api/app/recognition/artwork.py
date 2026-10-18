@@ -14,6 +14,7 @@ from typing import Any
 import numpy as np
 from PIL import Image
 
+from app.physical_cards import is_tcg_pocket_card_id
 from app.recognition.artifacts import ArtifactError, sha256_file
 from app.recognition.printing import ART_BOX
 
@@ -111,8 +112,10 @@ class ArtworkIndex:
         """
         if k < 1:
             return [], {"artwork_embed_ms": 0., "artwork_retrieve_ms": 0.}
-        keep = np.array([not languages or r["language"] in languages
-                         for r in self.records], dtype=bool)
+        keep = np.array([
+            (not languages or r["language"] in languages) and not is_tcg_pocket_card_id(r["card_id"])
+            for r in self.records
+        ], dtype=bool)
         if not np.any(keep):
             return [], {"artwork_embed_ms": 0., "artwork_retrieve_ms": 0.}
         hypotheses = [("as_supplied", image)]

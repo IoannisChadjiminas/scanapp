@@ -23,6 +23,7 @@ from app.cardmarket import (
 )
 from app.price_sources import scan_prices
 from app.catalogue_titles import stored_view_title
+from app.physical_cards import is_tcg_pocket_card
 from app.set_totals import set_total
 from app.db import coverage_payload
 from app.recognition.captures import save_scan_capture
@@ -34,8 +35,9 @@ from app.recognition.embed import top_k
 from app.recognition.identity import layout_identity_agrees, likely_identity_agrees, structured_identity_agrees
 from app.recognition.confidence import confidence_payload
 from app.recognition.presentation import match_presentation
-from app.recognition.language import (confident_language_texts, expand_language, language_label, locale_languages,
-                                         order_preview_ids, resolve_search_languages)
+from app.recognition.language import (confident_language_texts, language_label, locale_languages,
+                                         order_preview_ids, ranking_languages,
+                                         resolve_search_languages)
 from app.recognition.ocr import OcrResult, inverted_card_layout
 from app.recognition.ocr_framing import complete_frame_probe_allowed, complete_frame_identity_supported, normalize_complete_frame_footer, wide_footer_allowed, wide_footer_fractions
 from app.recognition.ocr_cache import RequestOcrCache
@@ -58,6 +60,17 @@ from app.schemas import (
     ScanResponse,
     ScanStatus,
 )
+
+
+def _scan_keep(runtime, requested) -> np.ndarray | None:
+    """Language choice plus the physical-card mask. Pocket rows never match."""
+    keep = None
+    if requested.reason == "user" and requested.search and runtime.card_languages is not None:
+        keep = np.isin(runtime.card_languages, list(requested.search))
+    physical = getattr(runtime, "physical_cards", None)
+    if physical is None:
+        return keep
+    return physical if keep is None else keep & physical
 
 
 def _now() -> str:
@@ -248,9 +261,7 @@ def _recognize_bytes_once(
     # Respect an explicit language while selecting orientation. Automatic
     # language detection follows OCR on the selected frame.
     requested = resolve_search_languages(language, [])
-    keep = None
-    if requested.reason == "user" and requested.search and runtime.card_languages is not None:
-        keep = np.isin(runtime.card_languages, list(requested.search))
+    keep = _scan_keep(runtime, requested)
     query_vectors = {}
     frame_selection = {}
     alternatives = []
@@ -476,13 +487,14 @@ def _recognize_bytes_once(
         timings.update(artwork_timings)
     query_image = image
 
-    decision = resolve_search_languages(
-        language,
-        confident_language_texts(ocr.hits),
-    )
+    language_texts = confident_language_texts(ocr.hits)
+    decision = resolve_search_languages(language, language_texts)
     numbers = extract_collector_candidates(
         [line for line in [ocr.collector_text, *ocr.lines] if line], hits=ocr.hits)
-    rank_languages = decision.search if decision.reason == 'user' else expand_language(decision.detected)
+    leader_id = str(snapshot.card_ids[indices[0]]) if len(indices) else None
+    leader = _lookup_cards(catalog, [leader_id]).get(leader_id) if leader_id else None
+    rank_languages = ranking_languages(decision, language_texts,
+                                       str(leader['language'] or '') if leader is not None else None)
     name_confidence = max((h.confidence or 0.0 for h in ocr.hits
                           if h.text == ocr.name_text and h.region == 'name'), default=0.0)
     mark = time.perf_counter()
@@ -516,6 +528,8 @@ def _recognize_bytes_once(
             score = float(snapshot.embeddings[position] @ query_vectors[id(image)]) if position is not None else 0.
         row = cards.get(card_id)
         if row is None:
+            continue
+        if "set_id" in row.keys() and is_tcg_pocket_card(row["language"], row["set_id"]):
             continue
         visual.append(
             {
@@ -1158,9 +1172,7 @@ def recognize_bytes(
         if frames:
             snapshot, embedder, _ = runtime.require()
             requested = resolve_search_languages(language,[])
-            keep = None
-            if requested.reason == 'user' and requested.search and runtime.card_languages is not None:
-                keep = np.isin(runtime.card_languages,list(requested.search))
+            keep = _scan_keep(runtime, requested)
             best = None
             guided_position = None
             if (first.lead and first.name_confidence >= .85

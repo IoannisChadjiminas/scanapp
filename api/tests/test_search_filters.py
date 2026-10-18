@@ -114,6 +114,16 @@ def test_http_params_and_validation(catalog):
         assert client.get('/cards?min_price=-1').status_code == 422
         assert client.get('/cards?min_price=nan').status_code == 422
         assert client.get('/cards?released_after=2026-02-30').status_code == 422
+        # Full-catalogue browsing must be able to continue beyond 10,000 cards.
+        for response in (
+            client.get('/cards?limit=10&offset=10010'),
+            client.post('/cards/search', json={'limit': 10, 'offset': 10010}),
+        ):
+            assert response.status_code == 200
+            assert response.json()['items'] == []
+            assert response.json()['total'] == 5
+        assert client.get('/cards?offset=-1').status_code == 422
+        assert client.post('/cards/search', json={'offset': -1}).status_code == 422
         assert client.get('/search-options').json()['rarities'] == [{'value': 'rare', 'label': 'Rare'}]
 
 

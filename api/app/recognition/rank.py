@@ -348,6 +348,15 @@ def accepted_collector_numbers(item: dict[str, Any]) -> list[str]:
     printed = str(item.get("printed_collector_number") or "")
     if printed and printed not in numbers:
         numbers.append(printed)
+    # A known printed set total qualifies a bare numeric catalogue number.
+    # Otherwise 3/185 falsely agrees with Torchic #3 from a 12-card set.
+    # Explicit printed aliases take precedence: a reprint may retain its
+    # original number/denominator rather than the reprint set's total.
+    number = parse_collector(numbers[0])
+    total = item.get("set_total")
+    if (not printed and number and not number.prefix and not number.denominator
+            and type(total) is int and total > 0):
+        numbers.append(f"{numbers[0]}/{total}")
     if str(item.get('set_id') or '').lower()=='svp' and re.fullmatch(r'\d{1,3}',numbers[0]):
         numbers.append('SVP'+numbers[0].zfill(3))
     return [number for number in numbers if number]

@@ -17,6 +17,7 @@ from app.recognition.printing import ReferencePrintingIndex
 from app.recognition.local_match import FULL_ART_BOX, FULL_ART_RARITIES, LocalArtworkVerifier
 from app.recognition.artwork import ArtworkIndex
 from app.recognition.metadata import MetadataCandidateIndex
+from app.physical_cards import is_tcg_pocket_card
 from app.recognition.reference_features import ReferenceFeatureStore, SCHEMA_VERSION as FEATURES_VERSION
 from app.recognition.layout_match import CardLayoutVerifier
 
@@ -32,6 +33,7 @@ class Runtime:
     region_executor: ThreadPoolExecutor | None = field(default=None, repr=False)
     grading_slots: Any = field(default_factory=lambda: BoundedSemaphore(1), repr=False)
     card_languages: np.ndarray | None = None
+    physical_cards: np.ndarray | None = None
     error: str | None = None
     printing_index: ReferencePrintingIndex | None = None
     artwork_verifier: LocalArtworkVerifier | None = None
@@ -105,6 +107,7 @@ class Runtime:
                 if grading_ocr is not None:
                     self.grading_executor = ThreadPoolExecutor(max_workers=1, thread_name_prefix='grading')
                 self.card_languages = None
+                self.physical_cards = None
                 self.printing_index = ReferencePrintingIndex(self.settings.data_dir)
                 self.artwork_verifier = LocalArtworkVerifier(self.settings.data_dir)
                 self.layout_verifier = (CardLayoutVerifier(self.settings.data_dir)
@@ -119,6 +122,7 @@ class Runtime:
                 self.ocr = None
                 self.close()
                 self.card_languages = None
+                self.physical_cards = None
                 self.printing_index = None
                 self.artwork_verifier = None
                 self.layout_verifier = None
@@ -132,18 +136,31 @@ class Runtime:
         self._sku_groups = None
         if self.snapshot is None:
             self.card_languages = None
+            self.physical_cards = None
             return
-        lookup = {
-            str(row["id"]): str(row["language"] or "en")
-            for row in catalog.execute("SELECT id, language FROM cards")
-        }
+        columns = {row[1] for row in catalog.execute("PRAGMA table_info(cards)")}
+        set_column = "set_id" if "set_id" in columns else "''"
+        lookup = {}
+        pocket = {}
+        for row in catalog.execute(f"SELECT id, language, {set_column} AS set_id FROM cards"):
+            card_id = str(row["id"])
+            language = str(row["language"] or "en")
+            lookup[card_id] = language
+            pocket[card_id] = is_tcg_pocket_card(language, row["set_id"])
         self.card_languages = np.array(
             [lookup.get(str(card_id), "en") for card_id in self.snapshot.card_ids],
             dtype=object,
         )
+        self.physical_cards = np.array(
+            [not pocket.get(str(card_id), False) for card_id in self.snapshot.card_ids],
+            dtype=bool,
+        )
         self.card_positions = {str(cid): i for i, cid in enumerate(self.snapshot.card_ids)}
         self.metadata_index = MetadataCandidateIndex(
-            catalog.execute('SELECT id,name,collector_number,printed_collector_number,language FROM cards'),
+            (row for row in catalog.execute(
+                'SELECT id,name,collector_number,printed_collector_number,language,'
+                f'{set_column} AS set_id FROM cards')
+             if not is_tcg_pocket_card(row['language'], row['set_id'])),
             indexed_ids=set(self.card_positions))
         # The validated cloud snapshot protects expansion products from writes.
         # Build its presentation groups once, rather than parsing every listing
@@ -167,6 +184,7 @@ class Runtime:
                 self.snapshot = None
                 self.embedder = None
                 self.card_languages = None
+                self.physical_cards = None
                 self.error = str(exc)
                 return
         if self.settings.artwork_bundle_dir is not None:
@@ -182,6 +200,7 @@ class Runtime:
                 self.snapshot = None
                 self.embedder = None
                 self.card_languages = None
+                self.physical_cards = None
                 self.artwork_index = None
                 self.error = str(exc)
 

@@ -165,7 +165,7 @@ def search_cards(
     q: Annotated[str, Query(max_length=80)] = "",
     language: Annotated[str, Query(max_length=16)] = "",
     limit: Annotated[int, Query(ge=1, le=50)] = 20,
-    offset: Annotated[int, Query(ge=0, le=10_000)] = 0,
+    offset: Annotated[int, Query(ge=0)] = 0,
     sets: Annotated[list[str] | None, Query(alias="set")] = None,
     min_price: Annotated[float | None, Query(ge=0, allow_inf_nan=False)] = None,
     max_price: Annotated[float | None, Query(ge=0, allow_inf_nan=False)] = None,
@@ -344,7 +344,7 @@ class CardSearchBody(BaseModel):
     q: str = Field(default='', max_length=80)
     language: str = Field(default='', max_length=16)
     limit: int = Field(default=20, ge=1, le=50)
-    offset: int = Field(default=0, ge=0, le=10000)
+    offset: int = Field(default=0, ge=0)
     sets: list[str] | None = Field(default=None, alias='set', max_length=1000)
     min_price: float | None = Field(default=None, ge=0, allow_inf_nan=False)
     max_price: float | None = Field(default=None, ge=0, allow_inf_nan=False)
