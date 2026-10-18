@@ -169,3 +169,32 @@ def test_chase_top_ten_per_set_before_other_filters_and_paging(catalog):
     # Stable identity breaks equal-price ties, including across page boundaries.
     catalog.execute('UPDATE cardmarket_guide SET trend=200 WHERE id_product BETWEEN 100 AND 111')
     assert ids(search(catalog, preset='new_set', sets=['en:chase'])) == expected
+
+
+def test_chase_name_search_covers_all_sets_before_filtering_and_paging(catalog):
+    for set_id, released in [('vintage', '2020-01-01'), ('undated', None), ('recent', date.today().isoformat())]:
+        if released:
+            catalog.execute("INSERT INTO set_releases VALUES ('en', ?, ?, 'x')", (set_id, released))
+        for index in range(12):
+            card_id = f'en:{set_id}-{index:02d}'
+            # The eleventh-ranked card matches too, but must not be promoted.
+            name = 'Charizard' if index in (0, 10) else 'Pikachu'
+            product = 1000 + index + 100 * ['vintage', 'undated', 'recent'].index(set_id)
+            catalog.execute("INSERT INTO cards (id, provider_id, name, set_id, set_name, collector_number, language, variants_json, cardmarket_id) VALUES (?, ?, ?, ?, ?, ?, 'en', '{\"normal\":true}', ?)", (card_id, card_id, name, set_id, set_id, str(index), product))
+            catalog.execute("INSERT INTO cards_fts (id, name, set_name, collector_number) VALUES (?, ?, ?, ?)", (card_id, name, set_id, str(index)))
+            catalog.execute("INSERT INTO cardmarket_guide (id_product, trend, guide_date) VALUES (?, ?, ?)", (product, 200 - index, date.today().isoformat()))
+    catalog.commit()
+
+    expected = ['en:recent-00', 'en:undated-00', 'en:vintage-00']
+    found = search(catalog, preset='new_set', q='chari', language='en')
+    assert ids(found) == expected and found.total == 3
+    pages = [search(catalog, preset='new_set', q='chari', limit=2, offset=offset) for offset in (0, 2)]
+    assert [card.id for page in pages for card in page.items] == expected
+    assert {page.total for page in pages} == {3}
+    assert search(catalog, preset='new_set', q='chari', language='ja').total == 0
+    assert ids(search(catalog, preset='new_set', q='chari', sets=['en:vintage'])) == ['en:vintage-00']
+    assert ids(search(catalog, preset='new_set', q='chari', released_before=date(2021, 1, 1))) == ['en:vintage-00']
+    assert search(catalog, preset='new_set', q='chari', max_price=199).total == 0
+    assert search(catalog, preset='new_set', q='chari', ownership='only_owned', owned_ids=['en:vintage-10']).total == 0
+    # Browsing without a name still defaults to recent releases.
+    assert {card.set_id for card in search(catalog, preset='new_set', q='   ').items} == {'new', 'recent'}

@@ -1,5 +1,13 @@
 # Staging catalogue source
 
+## Charizard ex SVP 196 route correction — 2026-10-17
+
+The user reported that `Charizard-ex-V1-SVP196` returns Cardmarket's **Invalid product** page and supplied the working `Charizard-ex-V3-SVP196` URL. Corrected `en:svp-196` in the active `pokesingle_completion_20261016_jalinks14` snapshot: primary card URL, matching product row and cloud helper metadata. A guarded atomic transaction preserved counts and recalculated the cards digest (`395a51ddc6f07d6922f6e0d6bef978b3`) and products digest (`1fb63607f8b5a76bda45c67da7806380`). Import ID stays `PS-CATALOGUE-EN-JA-LINKS14-20261016`.
+
+The persistent `/data/cardmarket-maps.json` helper also contains V3. Operational SQLite has no base card/product rows for this cloud-only card. Product ID 821616 and the V2 sibling remain; no finish equivalence was inferred. Cardmarket's current product catalogue still lists 821616 as Charizard ex with Infernal Reign / Burning Darkness. The agent's direct V3 browser check encountered Cloudflare, so live route validity is recorded as user verified.
+
+Restarted only the staging API to reload its validated snapshot. Public health is ready; `/api/v1/cards/en%3Asvp-196` returns V3 and no V1 variant. Card counts, coverage and recognition artifacts are unchanged. SQL, prior rows/manifest and public readback are archived in `data/cardmarket-url-corrections/20261017-svp196/`; the remote prior helper entry is under `/data/cardmarket-url-corrections/20261017-svp196/`. Future candidates must inherit this correction. Already saved client card snapshots may still contain the old URL until refreshed from the catalogue.
+
 ## Persistent catalogue release selection — 2026-10-08
 
 The staging API reads `PLANETSCALE_SCHEMA` and `PLANETSCALE_IMPORT_ID` from

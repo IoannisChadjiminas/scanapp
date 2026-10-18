@@ -309,7 +309,9 @@ def search_cards(
     if preset == "new_set":
         # Rank the set itself before text, price, rarity and ownership filters.
         # Narrowing a search must not promote its eleventh card into the chase list.
-        if not explicit_set:
+        # Only unsearched browsing defaults to recent releases. A name/number
+        # search should find chase cards from sets of any age (or unknown date).
+        if not explicit_set and not query:
             today = date.today()
             chase_scope.append("release_date>=? AND release_date<=?")
             chase_params.extend([(today - timedelta(days=90)).isoformat(), today.isoformat()])

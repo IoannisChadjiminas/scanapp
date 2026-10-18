@@ -11,10 +11,10 @@ This replaces the 2026-10-15 handoff (no longer in the repo root; its plan and t
 
 **Start here:**
 
-1. Confirm what staging serves: `curl -s https://scan.pokesingle.com/api/v1/health` should show `PS-CATALOGUE-EN-JA-LINKS14-20261016` and `ready: true`. If it shows something else, read the end of `events.jsonl` first.
+1. Confirm what staging serves: `curl -s https://scan.pokesingle.com/api/v1/health` should show `PS-CATALOGUE-EN-JA-ID-20261018` and `ready: true`. If it shows something else, read the end of `events.jsonl` first.
 2. Read sections 3 (rules), 4.8 (gates) and 4.9 (variants).
 3. Create a 3-hour read/write PlanetScale role (section 8) and run the "Useful queries" gap count to confirm the numbers in section 2.
-4. Pick the next item from section 5 (1 Japanese row still without a Cardmarket link) and follow section 4 step by step, logging as you go.
+4. Pick the next item from section 5. The 16 sets are on staging, and 1,586 of those cards now have a Cardmarket link. English view titles are on the same catalogue. `ja:S5R-006`, `ja:S3a-030` and `ja:CP6-011` have images and features and no scan vectors. Investigate those three later.
 
 ## 1. Goal
 
@@ -30,16 +30,16 @@ Each change ships as a new inactive PlanetScale candidate schema. It is checked,
 
 | | Value |
 |---|---|
-| Staging serves | `PS-CATALOGUE-EN-JA-LINKS14-20261016` (schema `pokesingle_completion_20261016_jalinks14`) |
-| Feature dir / artwork dir | `reference-features/20261016-ja-mp` / `artwork/PS-CATALOGUE-EN-JA-MP-20261016` |
-| Cards | 48,657 in total, of which 14,706 are Japanese |
-| Vectors | 42,364 per mode (pad and square), plus 18,890 artwork regions. The two extra rows are no longer scan targets. Health still reports 42,408 indexed, of which 14,705 are Japanese, because that count is cards with an image |
-| Japanese with an image | 14,705 of 14,706 (**1 left**, `ja:neo2-057`) |
-| Japanese with a Cardmarket link | 14,705 of 14,706 (**1 left**: the Gengar extra row) |
+| Staging serves | `PS-CATALOGUE-EN-JA-ID-20261018` (schema `pokesingle_completion_20261018_jaid`) |
+| Feature dir / artwork dir | `reference-features/20261017-ja-sets` / `artwork/PS-CATALOGUE-EN-JA-SETH3-20261017` |
+| Cards | 50,270 in total, of which 16,319 are Japanese |
+| Vectors | 43,695 per mode (pad and square), plus 21,552 artwork regions. Health reports 44,021 indexed, of which 16,318 are Japanese, because that count is cards with an image |
+| Japanese with an image | 16,318 of 16,319 (**1 left**, `ja:neo2-057`) |
+| Japanese with a Cardmarket link | 16,291 of 16,319. 1,586 of the new cards are linked. 27 new cards and the Gengar extra are still without a page |
 | Japanese with a Cardmarket product ID (price) | 12,266 (**2,440 left**) |
 | English | All 109 gaps closed (see the 2026-10-15 sections of `PROCESS-AND-PENDING.md`) |
 | Staging API memory | 3 GiB RAM + 1 GiB swap (PR IoannisChadjiminas/scanapp#47, merged 2026-10-16 06:08Z) |
-| PlanetScale storage | 71 `pokesingle*` schemas, about 22 GB in total. Each new candidate is a full copy and adds about 0.35–0.45 GB. Old schemas are kept on purpose (delete nothing); ask the owner before any clean-up |
+| PlanetScale storage | 72 `pokesingle*` schemas, about 22 GB in total, including the inactive JASETS schema that was not kept. Each new candidate is a full copy and adds about 0.35–0.45 GB. Old schemas are kept on purpose (delete nothing); ask the owner before any clean-up |
 | Staging disk | 75 GB disk, 34 GB free; the data volume is 13 GB. Each image wave adds 0.1–0.25 GB |
 | Local disk (owner's Mac) | Run folder 149 GB; 251 GiB free |
 | Production | Untouched |
@@ -74,6 +74,12 @@ Each candidate is a full copy of its parent plus one change.
 | PS-CATALOGUE-EN-JA-LINKS12-20261016 | pokesingle_completion_20261016_jalinks12 | Six live-page links: Hiroshima's Pikachu, Fukuoka's Pikachu, Riolu, Mega Zeraora ex, Boss's Orders - Ghetsis, and the Japanese Gyarados Star moved off `en:ex13-8`. Price ids unchanged. Features unchanged |
 | PS-CATALOGUE-EN-JA-LINKS13-20261016 | pokesingle_completion_20261016_jalinks13 | Blaziken extra shares the `ja:S8b-217` page. Gengar extra loses price id 558478. Both extras leave the scan index. Artwork bundle unchanged |
 | PS-CATALOGUE-EN-JA-LINKS14-20261016 | pokesingle_completion_20261016_jalinks14 | `ja:SV-P-272` linked to Energy Search (272). The page picture is エネルギー転送 272/SV-P. Price id 838366 stays. Features unchanged |
+| PS-CATALOGUE-EN-JA-SETS-20261017 | pokesingle_completion_20261017_jasets | 1,613 cards from the 16 absent sets (1,334 with vectors, 279 printing alternatives). Not kept: two Charizard panel photos changed best match. Schema and files stay. Do not re-apply its seed SQL |
+| PS-CATALOGUE-EN-JA-SETH-20261017 | pokesingle_completion_20261017_jaseth | Same cards, with `ja:S5R-006` and `ja:S3a-030` removed from the scan index. Not kept: `ebay-ja_PMCG1-021-1` moved to `ja:CP6-011`. Schema and files stay |
+| PS-CATALOGUE-EN-JA-SETH3-20261017 | pokesingle_completion_20261017_jaseth3 | Same cards, with `ja:CP6-011` also removed from the scan index. Kept. Best card and status match JALINKS14 |
+| PS-CATALOGUE-EN-JA-CM-20261017 | pokesingle_completion_20261017_jacm | 1,586 Cardmarket links for the 16 sets, where the set code, number and name agree. 25 title mismatches and 2 already-used urls stay unlinked. No product ids. Features and vectors unchanged |
+| PS-CATALOGUE-EN-JA-VIEW-20261018 | pokesingle_completion_20261018_jaview | JACM plus English `view_title`. Matching `name` is unchanged. 16,313 of 16,319 Japanese cards have a view title. Six stored pages belong to a different card and were not copied |
+| PS-CATALOGUE-EN-JA-ID-20261018 | pokesingle_completion_20261018_jaid | JAVIEW plus 4,016 product ids on cards that already had that page URL. Names, view titles, images and vectors are unchanged. This is what staging serves |
 
 ### Rollback
 
@@ -105,6 +111,12 @@ Every switch archived the previous release file under `/etc/scanapp-staging/cata
 | `ja-links12-20261017` | JALINKS11 |
 | `ja-links13-20261017` | JALINKS12 |
 | `ja-links14-20261017` | JALINKS13 |
+| `ja-sets-20261017` | JALINKS14 (the release restored after JASETS was switched and rolled back) |
+| `ja-seth-20261017` | JALINKS14 (the release restored after JASETH was switched and rolled back) |
+| `ja-seth3-20261017` | JALINKS14 (the release to restore if this JASETH3 switch is rolled back) |
+| `ja-cm-20261017` | JASETH3 (the release to restore if this link switch is rolled back) |
+| `ja-view-20261018` | JACM (the release to restore if this view-title switch is rolled back) |
+| `ja-id-20261018` | JAVIEW (the release to restore if this product-id switch is rolled back) |
 
 The compose file before the memory change is in `api-mem-3g-20261016/`. Older archives for the English work (for example `en-mfbv-20261015`) are in the same folder.
 
@@ -328,23 +340,24 @@ A card can get one of four treatments. Choose per card and record the reason in 
 
 Base-set Charizard (`ja:PMCG1-021`) photos select the 25th/30th reprints; image fixes tested and ruled out.
 
-Both photos stay in `vintage/panel-vintage-18.json` (`ebay-ja_PMCG1-021-1`, `ebay-ja_PMCG1-021-2`), so a future fix shows up as an improvement. On the neo2 candidate the first photo is `printing_ambiguous` on `ja:M6a-137` (alternative `ja:S8a-P-001`); the second stays `uncertain` on `ja:S10P-030`. A cleaner TCG Collector scan is already the reference. An approved eBay photo of the same card was measured locally and did not make `ja:PMCG1-021` the selected card, and the official site does not publish the 1996 Expansion Pack scan. `ja:neo2-057` still has no image.
+Both photos stay in `vintage/panel-vintage-18.json` (`ebay-ja_PMCG1-021-1`, `ebay-ja_PMCG1-021-2`), so a future fix shows up as an improvement. On the catalogue staging serves, the first photo is `printing_ambiguous` on `ja:M6a-137` and the second is `uncertain` on `ja:S10P-030`. The JASETS switch moved them to `ja:S5R-006` and `ja:S3a-030` and was rolled back. Those two cards were then left out of the scan index on JASETH. The second photo returned to `ja:S10P-030`. The first moved to `ja:CP6-011`, so JASETH was rolled back. `ja:CP6-011` was then left out of the scan index on JASETH3. The Cardmarket link candidate kept those best cards and statuses. The view-title candidate kept them again. Staging now serves the view-title candidate. Both photos are back to the previous best card and status. Investigate `ja:S5R-006`, `ja:S3a-030` and `ja:CP6-011` later. A cleaner TCG Collector scan is already the reference. An approved eBay photo of the same card was measured locally and did not make `ja:PMCG1-021` the selected card, and the official site does not publish the 1996 Expansion Pack scan. `ja:neo2-057` still has no image.
 
 Telling a base-set card from a reprint of the same art is a scanner change. It was not done. It needs its own approval and a full panel run.
 
 ## 5. What is left (in priority order)
 
-1. **Cardmarket links (1 Japanese row still without one).** JALINKS14 linked `ja:SV-P-272`. `ja:neo2-057` still has no image. What remains:
+1. **16 absent sets are on staging** as `PS-CATALOGUE-EN-JA-VIEW-20261018` (JACM plus English view titles). All 1,613 have images and features. 1,331 have scan vectors. `ja:S5R-006`, `ja:S3a-030` and `ja:CP6-011` have no scan vectors; investigate them later. 1,586 have a Cardmarket page. 27 do not: 25 title mismatches in `cardmarket/links-held.json`, plus `ja:S2-022` and `ja:S3-025`, whose pages are already on `ja:SV-P-222` and `ja:SV4a-325`. Do not re-apply `data/catalogue-gaps/tcgdex-empty-sets-20261017/prepared-jasets-v1/02-seed-and-apply.sql`.
+2. **Cardmarket links (1 Japanese row still without one).** JALINKS14 linked `ja:SV-P-272`. `ja:neo2-057` still has no image. What remains:
    - `extra-gengar-mimikyu-gx-103-095` still has no page. Its stored picture is the 102 card, and both the 102 and 103 pages already sit on `ja:SM9-102` and `ja:SM9-103`. The picture stays, because the feature store is bound to that file and the 103 scan already belongs to `ja:SM9-103`. `ja:SV-P-272` (エネルギー転送) now has the Energy Search (272) page. The picture is 272/SV-P, between Victini 271 and Potion 273, so price id 838366 stays. `ja:neo2-057` still has no image. `ja:M-P-155` has the V2 page only; a second Riolu product in the file was not on the page and was not linked.
    - **632 (MC 477, SV4a 45, SM6 110):** product lists were read in the owner's browser. 629 unique links are on JACRRAWL. The three held URL collisions (`ja:MC-067`, `ja:MC-100`, `ja:MC-124`) were moved onto those cards on JALINKS6.
    - **The other 192** were rematched on 2026-10-16 and held: 157 name-only collisions, 15 numbers with no product, 13 sets with no mapped expansion, 6 products that matched two cards, and `ja:web1-002` (Nidoran) whose only product is Nidoran [M].
-2. **Product IDs (2,440 without one):** most have no link (item 1). 169 are versioned products (V1/V2) that need a page check (`japanese-wave1-20261015/cardmarket-product-file/id-held.json`). V numbering does not always follow product-ID order.
-3. **Names.**
+3. **Product IDs (4,053 without one):** the previous 2,440, plus the 1,613 new cards, which have no product id. Most of the older ones have no link (item 2). 169 are versioned products (V1/V2) that need a page check (`japanese-wave1-20261015/cardmarket-product-file/id-held.json`). V numbering does not always follow product-ID order.
+4. **Names.**
    - 10 trainer names are left unchanged because there is no confident official form (listed in JAFIX `ja_fixes.names_left_unchanged`).
    - The neo3 and neo4 Unown cards still have single-letter names (e.g. "k"). Rename them as アンノーン plus the letter (e.g. アンノーンK) after confirming the convention.
    - Other vintage sets not covered by this wave may still have machine-translated names. Search `cards.name` for Latin letters or obvious translations.
-4. **Wave 3 leftovers:** the 5 non-English Ancient Mew versions (Cardmarket V1–V5).
-5. **Production:** decide when and how to promote. The production API needs the same 3 GiB memory limit first, because scans peak at about 2.1 GiB with the current catalogue. Before production, confirm the app presents `printing_ambiguous` as a choice for the user, not a confirmed match.
+5. **Wave 3 leftovers:** the 5 non-English Ancient Mew versions (Cardmarket V1–V5).
+6. **Production:** decide when and how to promote. The production API needs the same 3 GiB memory limit first, because scans peak at about 2.1 GiB with the current catalogue. Before production, confirm the app presents `printing_ambiguous` as a choice for the user, not a confirmed match.
 
 ## 6. Pitfalls learned (save time)
 
@@ -362,6 +375,8 @@ Telling a base-set card from a reprint of the same art is a scanner change. It w
 - **TCG Collector numbers:** unnumbered vintage sets show "No. 001", which is TCG Collector's own order. It matched the catalogue order for every set except neo2 (Unown), but always verify by name.
 - **Cleared links:** the 10 cleared Cardmarket links now show no price on purpose; the old prices belonged to unrelated products.
 - **Python on the Mac:** the system python3 has no `yaml` or `numpy`. Run such checks inside the API image.
+- **Percent signs in SQL:** `cursor.execute(sql)` with no parameters stores `%%` as two percent signs. The JASETS seed file doubled them, and `en:exu-%3F` became `en:exu-%%3F`. The import manifest was repaired in the schema. Do not run that file again, and do not run the `%%` replace a second time.
+- **Transactions:** a statement before `with conn.transaction()` opens an outer transaction, and the block becomes a savepoint. Closing the connection then rolls the schema back even though the script printed success. Put `SET` inside the block, and read the new schema back on a second connection before trusting the commit.
 
 ## 7. Where this can run
 
