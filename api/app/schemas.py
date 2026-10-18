@@ -64,6 +64,10 @@ class Candidate(BaseModel):
     retrieved_via: list[str] = Field(default_factory=list)
     artwork_score: float | None = None
     artwork_profile: str | None = None
+    # The finishes to pick between ("normal" or "holo", then "reverse"), empty
+    # when there is one. Reverse holo prices are Cardmarket's -holo figures.
+    finishes: list[str] = Field(default_factory=list)
+    reverse_holo_prices: list[CardmarketPrice] = Field(default_factory=list)
 
 
 class OcrEvidence(BaseModel):
@@ -128,6 +132,8 @@ class PlausiblePrinting(BaseModel):
     image_url: str
     cardmarket_url: str | None = None
     cardmarket_prices: list[CardmarketPrice] = Field(default_factory=list)
+    finishes: list[str] = Field(default_factory=list)
+    reverse_holo_prices: list[CardmarketPrice] = Field(default_factory=list)
 
 
 class PrintingReview(BaseModel):
@@ -265,6 +271,8 @@ class CardSummary(BaseModel):
     # Cardmarket price file, or TCGdex. Never fetched while searching.
     cardmarket_prices: list[CardmarketPrice] = Field(default_factory=list)
     cardmarket_variants: list[CardmarketVariant] = Field(default_factory=list)
+    finishes: list[str] = Field(default_factory=list)
+    reverse_holo_prices: list[CardmarketPrice] = Field(default_factory=list)
 
 
 class CardSearchResponse(BaseModel):
