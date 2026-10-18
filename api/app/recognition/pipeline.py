@@ -34,8 +34,9 @@ from app.recognition.embed import top_k
 from app.recognition.identity import layout_identity_agrees, likely_identity_agrees, structured_identity_agrees
 from app.recognition.confidence import confidence_payload
 from app.recognition.presentation import match_presentation
-from app.recognition.language import (confident_language_texts, expand_language, language_label, locale_languages,
-                                         order_preview_ids, resolve_search_languages)
+from app.recognition.language import (confident_language_texts, language_label, locale_languages,
+                                         order_preview_ids, ranking_languages,
+                                         resolve_search_languages)
 from app.recognition.ocr import OcrResult, inverted_card_layout
 from app.recognition.ocr_framing import complete_frame_probe_allowed, complete_frame_identity_supported, normalize_complete_frame_footer, wide_footer_allowed, wide_footer_fractions
 from app.recognition.ocr_cache import RequestOcrCache
@@ -476,13 +477,14 @@ def _recognize_bytes_once(
         timings.update(artwork_timings)
     query_image = image
 
-    decision = resolve_search_languages(
-        language,
-        confident_language_texts(ocr.hits),
-    )
+    language_texts = confident_language_texts(ocr.hits)
+    decision = resolve_search_languages(language, language_texts)
     numbers = extract_collector_candidates(
         [line for line in [ocr.collector_text, *ocr.lines] if line], hits=ocr.hits)
-    rank_languages = decision.search if decision.reason == 'user' else expand_language(decision.detected)
+    leader_id = str(snapshot.card_ids[indices[0]]) if len(indices) else None
+    leader = _lookup_cards(catalog, [leader_id]).get(leader_id) if leader_id else None
+    rank_languages = ranking_languages(decision, language_texts,
+                                       str(leader['language'] or '') if leader is not None else None)
     name_confidence = max((h.confidence or 0.0 for h in ocr.hits
                           if h.text == ocr.name_text and h.region == 'name'), default=0.0)
     mark = time.perf_counter()
