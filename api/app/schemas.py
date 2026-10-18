@@ -48,6 +48,7 @@ class CardmarketVariant(BaseModel):
 class Candidate(BaseModel):
     card_id: str
     name: str
+    view_title: str | None = None
     set_name: str
     collector_number: str
     set_total: int | None = None
@@ -119,6 +120,7 @@ class RecognitionConfidence(BaseModel):
 class PlausiblePrinting(BaseModel):
     card_id: str
     name: str
+    view_title: str | None = None
     set_name: str
     collector_number: str
     set_total: int | None = None
@@ -246,6 +248,7 @@ class CardMarket(BaseModel):
 class CardSummary(BaseModel):
     id: str
     name: str
+    view_title: str | None = None
     set_id: str
     set_name: str
     collector_number: str

@@ -61,6 +61,7 @@ def init_catalog(conn: sqlite3.Connection) -> None:
             "cardmarket_verified_at": "TEXT",
             "remote_image_url": "TEXT",
             "printed_collector_number": "TEXT",
+            "view_title": "TEXT",
         },
     )
     conn.execute(

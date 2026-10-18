@@ -22,6 +22,7 @@ from app.cardmarket import (
     url_for_row,
 )
 from app.price_sources import scan_prices
+from app.catalogue_titles import stored_view_title
 from app.set_totals import set_total
 from app.db import coverage_payload
 from app.recognition.captures import save_scan_capture
@@ -147,6 +148,7 @@ def _preview_candidates(conn: sqlite3.Connection, card_ids: list[str]) -> list[d
     fill at once. Everything is read from local tables, never from the network."""
     rows = _lookup_cards(conn, card_ids)
     return [dict(card_id=cid, name=rows[cid]['name'],
+                 view_title=stored_view_title(rows[cid]),
                  image_url=_card_image_url(rows[cid]),
                  set_name=rows[cid]['set_name'],
                  collector_number=rows[cid]['collector_number'],
@@ -519,6 +521,7 @@ def _recognize_bytes_once(
             {
                 "card_id": card_id,
                 "name": row["name"],
+                "view_title": stored_view_title(row),
                 "set_id": row["set_id"],
                 "set_name": row["set_name"],
                 "collector_number": row["collector_number"],
@@ -802,6 +805,7 @@ def _recognize_bytes_once(
             collector_evidence=list(printing.collector_evidence),
             plausible_printings=[{
                 "card_id": row["card_id"], "name": row["name"],
+                "view_title": row.get("view_title"),
                 "set_name": row["set_name"], "collector_number": row["collector_number"],
                 "set_total": row.get("set_total"),
                 "language": str(row.get("language") or ""),

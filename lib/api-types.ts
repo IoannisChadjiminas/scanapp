@@ -3,6 +3,7 @@ export type ScanStatus = "matched" | "no_match" | "uncertain" | "printing_ambigu
 export type PlausiblePrinting = {
   card_id: string;
   name: string;
+  view_title?: string | null;
   set_name: string;
   collector_number: string;
   language: string;
@@ -52,6 +53,7 @@ export type CardmarketVariant = {
 export type Candidate = {
   card_id: string;
   name: string;
+  view_title?: string | null;
   set_name: string;
   collector_number: string;
   image_url: string;
@@ -113,6 +115,7 @@ export type ScanResponse = {
 export type CardSummary = {
   id: string;
   name: string;
+  view_title?: string | null;
   set_id: string;
   set_name: string;
   collector_number: string;

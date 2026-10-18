@@ -182,8 +182,13 @@ def load_cloud_catalogue(settings: Settings, local: sqlite3.Connection) -> Artif
             local.execute("CREATE INDEX cloud.products_url ON cardmarket_expansion_products(url)")
             local.execute("CREATE TEMP VIEW cards AS SELECT * FROM cloud.cards")
             local.execute("CREATE TEMP VIEW cardmarket_expansion_products AS SELECT * FROM cloud.cardmarket_expansion_products")
-            local.execute("CREATE VIRTUAL TABLE temp.cards_fts USING fts5(name,set_name,collector_number,id UNINDEXED)")
-            local.execute("INSERT INTO temp.cards_fts SELECT name,set_name,collector_number,id FROM cloud.cards")
+            card_columns = {row[1] for row in local.execute("PRAGMA table_info(cloud.cards)")}
+            if "view_title" in card_columns:
+                local.execute("CREATE VIRTUAL TABLE temp.cards_fts USING fts5(name,view_title,set_name,collector_number,id UNINDEXED)")
+                local.execute("INSERT INTO temp.cards_fts SELECT name,coalesce(view_title,''),set_name,collector_number,id FROM cloud.cards")
+            else:
+                local.execute("CREATE VIRTUAL TABLE temp.cards_fts USING fts5(name,set_name,collector_number,id UNINDEXED)")
+                local.execute("INSERT INTO temp.cards_fts SELECT name,set_name,collector_number,id FROM cloud.cards")
             ids = [str(cid) for cid in manifest["indexed_ids"]]
             stats = metadata["vectors"][settings.preprocess_config]
             if len(ids) != len(set(ids)) or len(ids) != stats["count"]:
