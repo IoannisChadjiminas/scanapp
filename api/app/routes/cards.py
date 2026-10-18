@@ -12,6 +12,7 @@ from fastapi import APIRouter, HTTPException, Query, Request
 from fastapi.responses import FileResponse
 
 from app.card_images import display_image_url
+from app.catalogue_titles import stored_view_title
 from app.cardmarket import url_for_row, variants_for_row
 from app.price_sources import scan_prices
 from app.market_stats import capabilities
@@ -43,6 +44,7 @@ def _summary(row, catalog=None) -> CardSummary:  # noqa: ANN001
     return CardSummary(
         id=row["id"],
         name=row["name"],
+        view_title=stored_view_title(row),
         set_id=row["set_id"],
         set_name=row["set_name"],
         collector_number=row["collector_number"],

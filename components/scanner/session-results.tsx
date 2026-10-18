@@ -17,6 +17,7 @@ import {
 } from "@/components/ui/table";
 import { CardmarketOpen } from "@/components/scanner/cardmarket-open";
 import type { SessionResult } from "@/lib/api-types";
+import { viewTitle } from "@/lib/view-title";
 
 type SessionResultsProps = {
   results: SessionResult[];
@@ -73,7 +74,7 @@ export function SessionResults({ results, onExport }: SessionResultsProps) {
         {results.map((row) => (
           <div key={row.scan_id} className="rounded-xl border p-3 text-sm">
             <p className="font-medium">
-              {row.suggestions[0]?.name ?? "No suggestion"}
+              {row.suggestions[0] ? viewTitle(row.suggestions[0]) : "No suggestion"}
             </p>
             <p className="text-muted-foreground">
               {new Date(row.created_at).toLocaleString()} · {outcome(row)}
@@ -111,7 +112,7 @@ export function SessionResults({ results, onExport }: SessionResultsProps) {
                 <TableCell>{new Date(row.created_at).toLocaleString()}</TableCell>
                 <TableCell>{row.status}</TableCell>
                 <TableCell>
-                  {row.suggestions[0]?.name ?? "—"}
+                  {row.suggestions[0] ? viewTitle(row.suggestions[0]) : "—"}
                   {listingUrl(row) ? (
                     <>
                       {" "}

@@ -23,6 +23,7 @@ import {
 import { api, assetUrl } from "@/lib/api";
 import type { Candidate, CardSummary, CardmarketVariant, PrintingReview, ScanStatus } from "@/lib/api-types";
 import { languageLabel } from "@/lib/languages";
+import { viewTitle } from "@/lib/view-title";
 import { CardmarketOpen } from "@/components/scanner/cardmarket-open";
 import {
   CardmarketPrices,
@@ -179,7 +180,7 @@ export function Suggestions({
       {showCard && displayed ? (
         <Card>
           <CardHeader>
-            <CardTitle>{displayed.name}</CardTitle>
+            <CardTitle>{viewTitle(displayed)}</CardTitle>
             <CardDescription>
               {printingReady ? <>{displayed.language ? `${languageLabel(displayed.language)} · ` : ""}
                 {displayed.set_name} · #{displayed.collector_number}</> : "The photograph does not prove a specific printing."}
@@ -190,7 +191,7 @@ export function Suggestions({
               // eslint-disable-next-line @next/next/no-img-element
               <img
               src={assetUrl(displayed.image_url)}
-              alt={printingReady ? `${displayed.name} from ${displayed.set_name}` : `${displayed.name} reference — printing unconfirmed`}
+              alt={printingReady ? `${viewTitle(displayed)} from ${displayed.set_name}` : `${viewTitle(displayed)} reference — printing unconfirmed`}
               className="mx-auto max-h-72 w-auto rounded-md"
               />
             ) : null}
@@ -281,7 +282,7 @@ export function Suggestions({
                 className="mx-auto max-h-40 w-auto rounded-md opacity-70"
               />
               <p className="text-sm">
-                {top.name} · {top.set_name} #{top.collector_number}
+                {viewTitle(top)} · {top.set_name} #{top.collector_number}
                 {top.language ? ` · ${languageLabel(top.language)}` : ""}
               </p>
               <OfferBlock url={top.cardmarket_url} prices={top.cardmarket_prices} />

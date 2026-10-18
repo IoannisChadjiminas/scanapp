@@ -15,6 +15,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { api, queueCardmarketLookup } from "@/lib/api";
 import type { CardSummary, HealthResponse, ScanResponse, SessionResult } from "@/lib/api-types";
+import { viewTitle } from "@/lib/view-title";
 import { LANGUAGE_CHOICES, languageLabel } from "@/lib/languages";
 
 type Stage = "idle" | "camera" | "crop" | "processing" | "result";
@@ -216,7 +217,7 @@ export function ScannerApp() {
         row.scan_id,
         row.created_at,
         row.status,
-        row.suggestions[0]?.name ?? "",
+        row.suggestions[0] ? viewTitle(row.suggestions[0]) : "",
         row.confirmed_card_id ?? "",
         String(row.rejected),
         row.timings_ms.total_ms ?? "",
