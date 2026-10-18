@@ -14,7 +14,7 @@ from fastapi.responses import FileResponse
 from app.card_images import display_image_url
 from app.catalogue_titles import stored_view_title
 from app.cardmarket import url_for_row, variants_for_row
-from app.price_sources import scan_prices
+from app.price_sources import scan_finishes, scan_prices
 from app.market_stats import capabilities
 from app.recognition.language import expand_language
 from app.set_totals import set_total
@@ -58,6 +58,7 @@ def _summary(row, catalog=None) -> CardSummary:  # noqa: ANN001
         variants=json.loads(row["variants_json"] or "{}"),
         cardmarket_url=url,
         cardmarket_prices=scan_prices(catalog, row["id"], url) if catalog is not None else [],
+        **(scan_finishes(catalog, row["id"]) if catalog is not None else {}),
     )
 
 

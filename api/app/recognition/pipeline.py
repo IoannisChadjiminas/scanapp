@@ -21,7 +21,7 @@ from app.cardmarket import (
     listing_choice_message,
     url_for_row,
 )
-from app.price_sources import scan_prices
+from app.price_sources import scan_finishes, scan_prices
 from app.catalogue_titles import stored_view_title
 from app.set_totals import set_total
 from app.db import coverage_payload
@@ -156,7 +156,8 @@ def _preview_candidates(conn: sqlite3.Connection, card_ids: list[str]) -> list[d
                  set_total=set_total(conn, rows[cid]['language'], rows[cid]['set_id']),
                  language=str(rows[cid]['language'] or ''),
                  cardmarket_url=rows[cid]['cardmarket_url'],
-                 cardmarket_prices=scan_prices(conn, cid, rows[cid]['cardmarket_url']))
+                 cardmarket_prices=scan_prices(conn, cid, rows[cid]['cardmarket_url']),
+                 **scan_finishes(conn, cid))
             for cid in card_ids if cid in rows]
 
 
@@ -652,6 +653,7 @@ def _recognize_bytes_once(
         apply_variants_to_candidate(catalog, item, groups=sku_groups)
     for item in combined:
         item["cardmarket_prices"] = scan_prices(catalog, item["card_id"], item.get("cardmarket_url"))
+        item.update(scan_finishes(catalog, item["card_id"]))
     timings["cardmarket_ms"] = (time.perf_counter() - mark) * 1000
     status, decided_by = decide_status_with_reason(
         combined,
@@ -816,6 +818,8 @@ def _recognize_bytes_once(
                 "cardmarket_prices": row.get("cardmarket_prices") or scan_prices(
                     catalog, row["card_id"], row.get("cardmarket_url")
                 ),
+                **({key: row[key] for key in ("finishes", "reverse_holo_prices")}
+                   if "finishes" in row else scan_finishes(catalog, row["card_id"])),
             } for row in review_members],
             guidance=printing.guidance,
         )
