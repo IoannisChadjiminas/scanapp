@@ -61,7 +61,8 @@ _OFFER_CLASSES = frozenset(
 _PRICE_CLASSES = frozenset({"price-container", "listing-price"})
 _COUNT_CLASS_RE = re.compile(r"comment|quantity|item-count|available", re.IGNORECASE)
 _EMPTY_RE = re.compile(
-    r"there are currently no articles|no articles available|there are no articles",
+    r"there are currently no articles|no articles available|there are no articles"
+    r"|no available offers",
     re.IGNORECASE,
 )
 _CHALLENGE_RE = re.compile(
@@ -535,16 +536,18 @@ def parse_cardmarket_html(url: str, html: str) -> dict:
             "parser": PARSER_VERSION,
         }
     rows = _rows(root)
+    header = _header(root.text())
     # The empty notice sits under the product details, well past the first
-    # 2500 characters the challenge check looks at.
-    empty = _empty(root, root.text())
+    # 2500 characters the challenge check looks at. "Available items 0" in the
+    # product details says the same when the notice's wording changes.
+    empty = _empty(root, root.text()) or (not rows and header.get("Available") == 0)
     return {
         "url": url,
         "blocked": False,
         "empty": empty,
         "pending": not rows and not empty,
         "rows": rows,
-        "header": _header(root.text()),
+        "header": header,
         "chart": _chart(root),
         "image": _product_image(root),
         "parser": PARSER_VERSION,
