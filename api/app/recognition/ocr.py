@@ -224,6 +224,7 @@ class CardOcr:
         cls_path: str,
         intra_threads: int,
         inter_threads: int,
+        det_limit_side_len: int = 0,
     ) -> None:
         from rapidocr import EngineType, RapidOCR
 
@@ -241,6 +242,8 @@ class CardOcr:
                 "EngineConfig.onnxruntime.inter_op_num_threads": inter_threads,
             }
         )
+        if det_limit_side_len > 0:
+            self.engine.text_det.limit_side_len = det_limit_side_len
 
     def share_inference_sessions_from(self, other: CardOcr) -> None:
         """Share read-only CPU model sessions, never mutable RapidOCR state.
@@ -718,6 +721,8 @@ class CardOcr:
              read_footer: bool = True) -> OcrResult:
         passes = []
         def run(patch, region, reason):
+            if reason != 'initial' and getattr(self, 'skip_retry_passes', False):
+                return [], []
             started = time.perf_counter()
             try:
                 return self._run(patch)

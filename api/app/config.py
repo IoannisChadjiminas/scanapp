@@ -16,6 +16,8 @@ class Settings(BaseSettings):
     # Writable portfolio store: PlanetScale database pokesingle-product.
     # Empty keeps holdings in the local catalogue file for tests.
     portfolio_database_url: SecretStr = SecretStr("")
+    # Server-to-server portfolio registration; never supplied to mobile clients.
+    scanapp_service_token: SecretStr = SecretStr("")
     planetscale_schema: str = "pokesingle_import_20261001"
     planetscale_import_id: str = "PS-IMPORT-001-20261001"
     tmp_dir: Path = Path("/tmp/scanapp")
@@ -54,6 +56,14 @@ class Settings(BaseSettings):
     # One focused title read for unresolved, unrelated candidate lists.
     # A changed result requires independent local artwork verification.
     ocr_conflict_title_retry: bool = False
+    # Text-detector short-side target in pixels (RapidOCR Det.limit_side_len, limit_type min).
+    # 0 keeps the library default (736). Smaller is cheaper but can change OCR text; a policy
+    # change: replay the frozen panel before enabling it.
+    ocr_det_limit_side_len: int = 0
+    # Skip every optional OCR retry pass (weak header, small footer, footer halves); only the
+    # title and footer reads run. Cheaper, but a retry can recover a number the first read missed.
+    # A policy change: replay the frozen panel on the full catalogue before enabling it.
+    ocr_skip_retry_passes: bool = False
     # Optional NDJSON progress stream; legacy scans remain a single JSON response.
     scan_stream_results: bool = True
     enable_matched: bool = True

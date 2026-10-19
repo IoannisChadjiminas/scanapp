@@ -22,6 +22,26 @@ CREATE INDEX IF NOT EXISTS portfolio_products_opened_idx
 """
 
 
+def schema_objects_exist(conn, names: tuple[str, ...]) -> bool:
+    """Avoid startup DDL for a pre-provisioned restricted PostgreSQL role."""
+    if isinstance(conn, sqlite3.Connection):
+        return False
+    row = conn.execute(
+        "SELECT bool_and(to_regclass(name) IS NOT NULL) AS ready "
+        "FROM unnest(%s::text[]) AS objects(name)",
+        (list(names),),
+    ).fetchone()
+    return bool(row and row["ready"])
+
+
+def ensure_portfolio_schema(conn) -> None:
+    if schema_objects_exist(conn, ("portfolio_products", "portfolio_products_opened_idx")):
+        return
+    for ddl in _SCHEMA.split(";"):
+        if ddl.strip():
+            conn.execute(ddl)
+
+
 def connect_portfolio(url: str):
     """Open the portfolio database. The URL is never logged."""
     parts = urlsplit(url.strip())
@@ -46,9 +66,7 @@ def connect_portfolio(url: str):
     try:
         if not conn.pgconn.ssl_in_use:
             raise ValueError("Portfolio database TLS is required")
-        for ddl in _SCHEMA.split(";"):
-            if ddl.strip():
-                conn.execute(ddl)
+        ensure_portfolio_schema(conn)
         writable = conn.execute(
             "SELECT has_table_privilege(current_user, 'portfolio_products', 'INSERT') AS ok"
         ).fetchone()

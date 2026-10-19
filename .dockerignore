@@ -4,6 +4,7 @@ out
 node_modules
 data
 datasets
+exports
 coverage
 playwright-report
 test-results
@@ -12,7 +13,11 @@ __pycache__
 .pytest_cache
 .venv
 venv
-.env
+.env*
+**/.env*
+.secrets
+**/.secrets
+**/*.p8
 *.pem
 .DS_Store
 plan.md

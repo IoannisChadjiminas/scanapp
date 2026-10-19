@@ -118,7 +118,11 @@ PYTHONPATH=api python -c "from app.main import app; import json; print(json.dump
 
 ## Dokploy public URL
 
-Use `compose.dokploy.yaml` only. Do not deploy `compose.override.yaml` or `compose.prod.yaml`. Attach the domain to service `web`, port `80`. Fill the catalogue volume from a local builder run (`./scripts/offload-local.sh`); see `catalogue/README.md`.
+For the shared production PokeSingle host, use the dedicated configuration and
+move procedure in [docs/production-single-server.md](docs/production-single-server.md).
+The existing staging procedure below continues to use `compose.dokploy.yaml`.
+
+For staging, use `compose.dokploy.yaml` only. Do not deploy `compose.override.yaml` or `compose.prod.yaml` through Dokploy. Attach the domain to service `web`, port `80`. Fill the catalogue volume from a local builder run (`./scripts/offload-local.sh`); see `catalogue/README.md`.
 
 `npm run dev` only serves the UI on [http://localhost:3000](http://localhost:3000). It does not start FastAPI. Without the API you will see **Recognition API is not running**.
 

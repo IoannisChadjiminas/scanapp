@@ -91,6 +91,7 @@ from app.routes.cardmarket import router as cardmarket_router
 from app.routes.cards import router as cards_router
 from app.routes.health import router as health_router
 from app.routes.images import router as images_router
+from app.routes.internal import router as internal_router
 from app.routes.review import router as review_router
 from app.routes.scans import router as scans_router
 
@@ -212,3 +213,4 @@ app.include_router(review_router, prefix="/api/v1", tags=["review"])
 app.include_router(scans_router, prefix="/api/v1", tags=["scans"])
 app.include_router(cards_router, prefix="/api/v1", tags=["cards"])
 app.include_router(cardmarket_router, prefix="/api/v1", tags=["cardmarket"])
+app.include_router(internal_router, prefix="/api/v1", tags=["internal"])
