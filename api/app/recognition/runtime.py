@@ -83,6 +83,7 @@ class Runtime:
                             cls_path=str(models / "ch_ppocr_mobile_v2.0_cls_mobile.onnx"),
                             intra_threads=self.settings.ort_intra_threads,
                             inter_threads=self.settings.ort_inter_threads,
+                            det_limit_side_len=self.settings.ocr_det_limit_side_len,
                         )
                         grading_ocr.share_inference_sessions_from(ocr)
                 if ocr is not None:
