@@ -1,0 +1,203 @@
+# Production on the shared PokeSingle host. Select this file only in Dokploy.
+# Set HTTPS/DNS for service web, port 80, using Dokploy Domains.
+# Host catalogue credentials/artifacts must be provisioned before deployment.
+# Traefik terminates HTTPS. Caddy in `web` listens on :80 and proxies /api/v1 → api:8000.
+services:
+  api:
+    build:
+      context: .
+      dockerfile: docker/api.Dockerfile
+    restart: unless-stopped
+    # Kept outside Dokploy's Git checkout so redeploys never overwrite the secret.
+    env_file:
+      - path: ${PLANETSCALE_ENV_FILE:-/etc/scanapp-production/planetscale.env}
+        required: true
+        format: raw
+      # Catalogue selectors and matching artifact paths live outside the checkout.
+      # Missing release selection must fail deployment instead of loading an old import.
+      - path: ${CATALOGUE_RELEASE_ENV_FILE:-/etc/scanapp-production/catalogue-release.env}
+        required: true
+        format: raw
+    environment:
+      DATA_DIR: /data
+      CATALOGUE_BACKEND: ${CATALOGUE_BACKEND:-planetscale}
+      PORTFOLIO_DATABASE_URL: ${PORTFOLIO_DATABASE_URL:?Set the production ScanApp portfolio database URL}
+      SCANAPP_SERVICE_TOKEN: ${SCANAPP_SERVICE_TOKEN:?Set the shared production service token}
+      PRICE_GUIDE_ENABLED: ${PRICE_GUIDE_ENABLED:-false}
+      TCGDEX_PRICES_ENABLED: ${TCGDEX_PRICES_ENABLED:-false}
+      TMP_DIR: /tmp/scanapp
+      PREPROCESS_CONFIG: ${PREPROCESS_CONFIG:-pad}
+      USE_OCR: ${USE_OCR:-true}
+      PARALLEL_GRADING: ${PARALLEL_GRADING:-true}
+      GRADING_AT_CARD_DEADLINE: ${GRADING_AT_CARD_DEADLINE:-true}
+      # Phone sends graded=true/false; false skips grading (-24.5% CPU, 0 answer
+      # changes on staging: docs/experiments/ocr-grading-cpu-20261019.md).
+      GRADING_REQUIRES_CLIENT_HINT: ${GRADING_REQUIRES_CLIENT_HINT:-true}
+      APP_SLAB_DETECTION: ${APP_SLAB_DETECTION:-true}
+      APP_CARD_WARP: ${APP_CARD_WARP:-false}
+      APP_CAPTURE_PRESET: ${APP_CAPTURE_PRESET:-max}
+      APP_JPEG_QUALITY: ${APP_JPEG_QUALITY:-95}
+      APP_MAX_EDGE: ${APP_MAX_EDGE:-2000}
+      APP_NATIVE_CODEC: ${APP_NATIVE_CODEC:-false}
+      APP_LIVE_OUTLINE: ${APP_LIVE_OUTLINE:-true}
+      APP_AUTO_CAPTURE: ${APP_AUTO_CAPTURE:-true}
+      APP_NATIVE_CAMERA: ${APP_NATIVE_CAMERA:-false}
+      APP_NATIVE_CAMERA_ANDROID: ${APP_NATIVE_CAMERA_ANDROID:-false}
+      APP_CARD_ANYWHERE: ${APP_CARD_ANYWHERE:-true}
+      TRUST_CLIENT_WARP: ${TRUST_CLIENT_WARP:-false}
+      OCR_COMPLETE_FRAME_FIRST: ${OCR_COMPLETE_FRAME_FIRST:-true}
+      OCR_ADAPTIVE_FOOTER: ${OCR_ADAPTIVE_FOOTER:-true}
+      OCR_TITLE_ONLY_SINGLE_PRINTING: ${OCR_TITLE_ONLY_SINGLE_PRINTING:-false}
+      OCR_DAMAGED_FOOTER_ORDER: ${OCR_DAMAGED_FOOTER_ORDER:-false}
+      OCR_PARALLEL_REGIONS: ${OCR_PARALLEL_REGIONS:-true}
+      STRUCTURED_LAYOUT_RECOVERY: ${STRUCTURED_LAYOUT_RECOVERY:-false}
+      OCR_CONFLICT_TITLE_RETRY: ${OCR_CONFLICT_TITLE_RETRY:-true}
+      SCAN_STREAM_RESULTS: ${SCAN_STREAM_RESULTS:-true}
+      PREVIEW_LANGUAGE_ORDER: ${PREVIEW_LANGUAGE_ORDER:-true}
+      USE_CLIENT_QUAD: ${USE_CLIENT_QUAD:-false}
+      ENABLE_MATCHED: ${ENABLE_MATCHED:-true}
+      ORT_INTRA_THREADS: ${ORT_INTRA_THREADS:-1}
+      ORT_INTER_THREADS: ${ORT_INTER_THREADS:-1}
+      # Image model only; OCR keeps ORT_INTRA_THREADS. 0 = same as ORT_INTRA_THREADS.
+      DINO_INTRA_THREADS: ${DINO_INTRA_THREADS:-2}
+      OMP_NUM_THREADS: ${OMP_NUM_THREADS:-1}
+      MAX_IMAGE_PIXELS: ${MAX_IMAGE_PIXELS:-12000000}
+      MAX_UPLOAD_BYTES: ${MAX_UPLOAD_BYTES:-12582912}
+      SCAN_WAIT_LIMIT: ${SCAN_WAIT_LIMIT:-2}
+      STORE_CAPTURES: ${STORE_CAPTURES:-false}
+      REVIEW_TOKEN: ${REVIEW_TOKEN:-}
+      CARDMARKET_HELPER_ENABLED: ${CARDMARKET_HELPER_ENABLED:-false}
+      CARDMARKET_WEBVIEW_ENABLED: ${CARDMARKET_WEBVIEW_ENABLED:-true}
+      SCRAPER_ENABLED: ${SCRAPER_ENABLED:-false}
+      SCRAPER_URL: ${SCRAPER_URL:-http://scraper:8000}
+      SCRAPER_URLS: ${SCRAPER_URLS:-}
+      SCRAPER_API_KEY: ${SCRAPER_API_KEY:-}
+      SCRAPER_SESSION_HOURLY: ${SCRAPER_SESSION_HOURLY:-10}
+      SCRAPER_IP_HOURLY: ${SCRAPER_IP_HOURLY:-20}
+      SCRAPER_DAILY_PAGES: ${SCRAPER_DAILY_PAGES:-50}
+      SCRAPER_DAILY_MB: ${SCRAPER_DAILY_MB:-50}
+      SCRAPER_RESERVE_KB: ${SCRAPER_RESERVE_KB:-500}
+      SCRAPER_URL_COOLDOWN_S: ${SCRAPER_URL_COOLDOWN_S:-1800}
+      SCRAPER_ATTEMPT_SECONDS: ${SCRAPER_ATTEMPT_SECONDS:-90}
+      SCRAPER_PAGE_GAP_S: ${SCRAPER_PAGE_GAP_S:-0}
+      SCRAPER_BROWSER_LIFETIME_S: ${SCRAPER_BROWSER_LIFETIME_S:-1800}
+      DAILY_PRICES_ENABLED: ${DAILY_PRICES_ENABLED:-false}
+      DAILY_GAP_MIN_S: ${DAILY_GAP_MIN_S:-5}
+      DAILY_GAP_JITTER: ${DAILY_GAP_JITTER:-0.3}
+      DAILY_TIERS: ${DAILY_TIERS:-2:6,20:2,*:1}
+      DAILY_MOVE_PCT: ${DAILY_MOVE_PCT:-10}
+      DAILY_DEADLINE_UTC: ${DAILY_DEADLINE_UTC:-08:00}
+      CARDMARKET_LISTING_MAX_AGE_DAYS: ${CARDMARKET_LISTING_MAX_AGE_DAYS:-7}
+      DAILY_GAP_MAX_S: ${DAILY_GAP_MAX_S:-60}
+      DAILY_GAP_STEP_S: ${DAILY_GAP_STEP_S:-5}
+      DAILY_SESSION_PAGES: ${DAILY_SESSION_PAGES:-30}
+      DAILY_SESSION_ROTATE_BEFORE_S: ${DAILY_SESSION_ROTATE_BEFORE_S:-120}
+      DAILY_BROWSERS: ${DAILY_BROWSERS:-1}
+      DAILY_INSTALL_MAX_AGE_DAYS: ${DAILY_INSTALL_MAX_AGE_DAYS:-30}
+      PHOTO_SCRAPE_ACTIVE: ${PHOTO_SCRAPE_ACTIVE:-false}
+      CONFIG_TTL_S: ${CONFIG_TTL_S:-600}
+      SCAN_PRICE_START_ON_PROVISIONAL: ${SCAN_PRICE_START_ON_PROVISIONAL:-true}
+      SCAN_PRICE_CANDIDATE_READS: ${SCAN_PRICE_CANDIDATE_READS:-2}
+      SCAN_PRICE_WARM_READER: ${SCAN_PRICE_WARM_READER:-true}
+      SCAN_PRICE_SHOW_STALE: ${SCAN_PRICE_SHOW_STALE:-true}
+      SCAN_PRICE_STALE_MAX_DAYS: ${SCAN_PRICE_STALE_MAX_DAYS:-30}
+      SCAN_PRICE_SERVER_READ: ${SCAN_PRICE_SERVER_READ:-fallback}
+      SCAN_PRICE_SERVER_READ_STATUSES: ${SCAN_PRICE_SERVER_READ_STATUSES:-matched}
+      SCAN_PRICE_SERVER_READ_DELAY_MS: ${SCAN_PRICE_SERVER_READ_DELAY_MS:-3000}
+      SCAN_PRICE_SERVER_READ_DAILY_PAGES: ${SCAN_PRICE_SERVER_READ_DAILY_PAGES:-0}
+    volumes:
+      - scanapp-data:/data
+      - scanapp-tmp:/tmp/scanapp
+    expose:
+      - "8000"
+    networks:
+      default:
+        aliases:
+          - scanapp-production-api
+    # Model/OCR buffers exceeded 1.5 GiB and swapped despite free host RAM.
+    # With ~42k indexed cards, scans peak at ~2.1 GiB; 2 GiB was OOM-killed.
+    # Provision host RAM for this service, the product API, Dokploy and the OS.
+    # This permits up to 1 GiB swap only when swap is configured on the host.
+    mem_limit: 3072m
+    memswap_limit: 4096m
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "python",
+          "-c",
+          "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/api/v1/health')",
+        ]
+      interval: 15s
+      timeout: 5s
+      retries: 10
+      start_period: 40s
+
+  scraper:
+    # Optional paid/browser price scraping; no scraper process in the default rollout.
+    profiles: [scraping]
+    build:
+      context: .
+      dockerfile: docker/scraper.Dockerfile
+    restart: unless-stopped
+    init: true
+    shm_size: 1gb
+    mem_limit: 1536m
+    # Keeps the headless browser from taking the cores the scan worker needs.
+    cpus: ${SCRAPER_CPUS:-0.5}
+    environment:
+      SCRAPER_API_KEY: ${SCRAPER_API_KEY:-}
+      SCRAPER_LANE: ${SCRAPER_LANE:-a}
+      # false = direct connection. Unset uses the proxy only when PROXY_HOST/USER/PASS are set.
+      PROXY_ENABLED: ${PROXY_ENABLED:-}
+      PROXY_HOST: ${PROXY_HOST:-}
+      PROXY_USER: ${PROXY_USER:-}
+      PROXY_PASS: ${PROXY_PASS:-}
+      PROXY_USER_TEMPLATE: ${PROXY_USER_TEMPLATE:-}
+      PROXY_COUNTRY: ${PROXY_COUNTRY:-}
+      TZ: ${PROXY_TZ:-Europe/Berlin}
+      SCRAPER_ATTEMPT_SECONDS: ${SCRAPER_ATTEMPT_SECONDS:-90}
+      SCRAPER_PAGE_GAP_S: ${SCRAPER_PAGE_GAP_S:-0}
+      SCRAPER_DIRECT_PROBE: ${SCRAPER_DIRECT_PROBE:-false}
+      SCRAPER_NET_LOG: ${SCRAPER_NET_LOG:-true}
+      SCRAPER_BROWSER_LIFETIME_S: ${SCRAPER_BROWSER_LIFETIME_S:-1800}
+    expose:
+      - "8000"
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "python",
+          "-c",
+          "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/health')",
+        ]
+      interval: 30s
+      timeout: 5s
+      retries: 5
+      start_period: 40s
+
+  web:
+    build:
+      context: .
+      dockerfile: docker/web.Dockerfile
+    restart: unless-stopped
+    depends_on:
+      api:
+        condition: service_started
+    environment:
+      SITE_ADDRESS: ":80"
+      # The short name "api" also exists on dokploy-network for another app.
+      API_UPSTREAM: scanapp-production-api
+    expose:
+      - "80"
+    networks:
+      - default
+      - dokploy-network
+
+volumes:
+  scanapp-data:
+  scanapp-tmp:
+
+networks:
+  dokploy-network:
+    external: true

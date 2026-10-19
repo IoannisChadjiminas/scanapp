@@ -59,6 +59,12 @@ _sink: Any = None
 
 
 def ensure_schema(conn) -> None:
+    from app.portfolio_db import schema_objects_exist
+
+    if schema_objects_exist(conn, ("price_guide_import_days", "price_history_daily",
+                                   "price_history_day", "price_sales_daily")):
+        conn.commit()
+        return
     for ddl in SCHEMA:
         conn.execute(ddl)
     conn.commit()

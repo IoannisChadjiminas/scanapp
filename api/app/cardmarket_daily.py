@@ -148,7 +148,7 @@ def extra_sleep(gap: float, page_gap: float) -> float:
     return max(0.0, gap - page_gap)
 
 
-def replace_portfolio(conn, session_id: str, products: list[tuple[str, str]]) -> int:
+def replace_portfolio(conn, session_id: str, products: list[tuple[str, str]], *, lock_owner: bool = False) -> int:
     """Replace one session's holdings. Each item is a sample key and when it was opened."""
     kept: list[tuple[str, str]] = []
     seen: set[str] = set()
@@ -161,6 +161,18 @@ def replace_portfolio(conn, session_id: str, products: list[tuple[str, str]]) ->
     stamped = has_synced_at(conn)
     synced = time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())
     try:
+        if lock_owner:
+            # Service requests use independent connections. Lock even an empty
+            # owner so two first-time replacements cannot merge their snapshots.
+            import sqlite3
+
+            if isinstance(conn, sqlite3.Connection):
+                conn.execute("BEGIN IMMEDIATE")
+            else:
+                conn.execute(
+                    "SELECT pg_advisory_xact_lock(hashtextextended(%s, 0))",
+                    (session_id,),
+                )
         conn.execute(
             statement(conn, "DELETE FROM portfolio_products WHERE session_id = ?"),
             (session_id,),

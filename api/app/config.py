@@ -16,6 +16,8 @@ class Settings(BaseSettings):
     # Writable portfolio store: PlanetScale database pokesingle-product.
     # Empty keeps holdings in the local catalogue file for tests.
     portfolio_database_url: SecretStr = SecretStr("")
+    # Server-to-server portfolio registration; never supplied to mobile clients.
+    scanapp_service_token: SecretStr = SecretStr("")
     planetscale_schema: str = "pokesingle_import_20261001"
     planetscale_import_id: str = "PS-IMPORT-001-20261001"
     tmp_dir: Path = Path("/tmp/scanapp")
