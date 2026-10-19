@@ -73,6 +73,7 @@ class Runtime:
                         cls_path=str(models / "ch_ppocr_mobile_v2.0_cls_mobile.onnx"),
                         intra_threads=self.settings.ort_intra_threads,
                         inter_threads=self.settings.ort_inter_threads,
+                        det_limit_side_len=self.settings.ocr_det_limit_side_len,
                     )
                     if self.settings.use_grading and (self.settings.parallel_grading
                                                       or self.settings.grading_at_card_deadline):
@@ -84,6 +85,8 @@ class Runtime:
                             inter_threads=self.settings.ort_inter_threads,
                         )
                         grading_ocr.share_inference_sessions_from(ocr)
+                if ocr is not None:
+                    ocr.skip_retry_passes = self.settings.ocr_skip_retry_passes
                 self.snapshot = snapshot
                 self.embedder = embedder
                 self.ocr = ocr
@@ -96,6 +99,7 @@ class Runtime:
                         cls_path=str(self.settings.models_dir / "ch_ppocr_mobile_v2.0_cls_mobile.onnx"),
                         intra_threads=self.settings.ort_intra_threads,
                         inter_threads=self.settings.ort_inter_threads,
+                        det_limit_side_len=self.settings.ocr_det_limit_side_len,
                     )
                     region_ocr.share_inference_sessions_from(ocr)
                     self.region_executor = ThreadPoolExecutor(max_workers=1, thread_name_prefix='card-region')

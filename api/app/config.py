@@ -54,6 +54,14 @@ class Settings(BaseSettings):
     # One focused title read for unresolved, unrelated candidate lists.
     # A changed result requires independent local artwork verification.
     ocr_conflict_title_retry: bool = False
+    # Text-detector short-side target in pixels (RapidOCR Det.limit_side_len, limit_type min).
+    # 0 keeps the library default (736). Smaller is cheaper but can change OCR text; a policy
+    # change: replay the frozen panel before enabling it.
+    ocr_det_limit_side_len: int = 0
+    # Skip every optional OCR retry pass (weak header, small footer, footer halves); only the
+    # title and footer reads run. Cheaper, but a retry can recover a number the first read missed.
+    # A policy change: replay the frozen panel on the full catalogue before enabling it.
+    ocr_skip_retry_passes: bool = False
     # Optional NDJSON progress stream; legacy scans remain a single JSON response.
     scan_stream_results: bool = True
     enable_matched: bool = True
