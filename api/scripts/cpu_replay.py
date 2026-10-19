@@ -2,7 +2,9 @@
 
 Runs inside the API container (needs app.recognition.detect and cgroup v2). CPU is the
 container cgroup's usage delta, measured until the server has been idle for a moment,
-so background grading and OCR work after the response is counted.
+so background grading and OCR work after the response is counted. Memory per scan is
+the server process's resident set (VmRSS) and its high-water mark (VmHWM, peak RSS since
+start) from /proc, plus the container cgroup's memory.peak where the kernel provides it.
 
 Modes (phone behaviour is simulated from the photo, nothing else is sent):
   --hint   send graded=true for slab photos and graded=false for all others
@@ -23,6 +25,7 @@ sys.path.insert(0, '/app')
 from app.recognition.detect import server_frame_rect, warp_to_rect  # noqa: E402
 
 CPU_STAT = Path('/sys/fs/cgroup/cpu.stat')
+MEMORY_PEAK = Path('/sys/fs/cgroup/memory.peak')
 
 
 SERVER_PID = None
@@ -44,6 +47,29 @@ def cpu_usec():
     for line in CPU_STAT.read_text().splitlines():
         if line.startswith('usage_usec'):
             return int(line.split()[1])
+
+
+def memory_mb():
+    """Server RSS now and its peak (MiB): --server-pid's tree, else PID 1 (the API in its container)."""
+    pid = SERVER_PID or 1
+    if SERVER_PID is not None:
+        import psutil
+        root = psutil.Process(pid)
+        pids = [root.pid, *(child.pid for child in root.children(recursive=True))]
+    else:
+        pids = [pid]
+    rss = hwm = 0
+    for each in pids:
+        try:
+            fields = dict(line.split(':', 1) for line in Path(f'/proc/{each}/status').read_text().splitlines())
+        except OSError:
+            continue
+        rss += int(fields.get('VmRSS', '0 kB').split()[0])
+        hwm += int(fields.get('VmHWM', '0 kB').split()[0])
+    out = dict(rss_mb=round(rss / 1024, 1), peak_rss_mb=round(hwm / 1024, 1))
+    if SERVER_PID is None and MEMORY_PEAK.exists():
+        out['cgroup_peak_mb'] = round(int(MEMORY_PEAK.read_text()) / (1 << 20), 1)
+    return out
 
 
 def settle(idle=1.2, limit=20):
@@ -105,7 +131,7 @@ def main():
                 alternatives=[s.get('card_id') for s in body.get('suggestions', [])][:5],
                 ocr=(body.get('ocr') or {}), grading=body.get('grading'),
                 timings=body.get('timings_ms'), printing=(body.get('confidence') or {}).get('printing'),
-                quad_sent='card_quad' in form, warped='skip_detect' in form)
+                quad_sent='card_quad' in form, warped='skip_detect' in form, **memory_mb())
             handle.write(json.dumps(row) + '\n')
             handle.flush()
             print(case['id'], reply.status_code, round(row['cpu_ms']), round(http_ms), row['status'], flush=True)
