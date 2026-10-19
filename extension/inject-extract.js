@@ -136,7 +136,8 @@ function scanappCollectCardmarket() {
     root.querySelector("[data-test-empty-articles], .noArticles, .no-articles") ||
     text.toLowerCase().includes("there are currently no articles") ||
     text.toLowerCase().includes("no articles available") ||
-    text.toLowerCase().includes("there are no articles")
+    text.toLowerCase().includes("there are no articles") ||
+    text.toLowerCase().includes("no available offers")
   ) {
     outcome = "empty";
   }

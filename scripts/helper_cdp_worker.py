@@ -129,7 +129,7 @@ COLLECT_JS = (
     }
   }
   const emptyNode = Boolean(document.querySelector("[data-test-empty-articles], .noArticles, .no-articles"));
-  const emptyText = /there are currently no articles|no articles available|there are no articles/.test(bodyText.toLowerCase());
+  const emptyText = /there are currently no articles|no articles available|there are no articles|no available offers/.test(bodyText.toLowerCase());
   const empty = emptyNode || emptyText;
   let outcome = "unrecognized";
   if (prices.length) outcome = "offers";
