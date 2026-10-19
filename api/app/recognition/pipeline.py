@@ -6,6 +6,7 @@ import re
 import sqlite3
 import time
 import uuid
+from copy import deepcopy
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from typing import Any, Callable
@@ -52,6 +53,7 @@ from app.recognition.printing import PrintingDecision, assess_printings
 from app.recognition.rank import artwork_evidence_compatible, decide_status_with_reason, damaged_footer_named_printing, extract_collector_candidates, fraction_named_printing, rerank
 from app.recognition.rank import name_match
 from app.recognition.runtime import Runtime
+from app.recognition.title_retry import read_conflicting_title, title_retry_allowed
 from app.schemas import (
     Candidate,
     GradingEvidence,
@@ -188,6 +190,7 @@ class _ScanEvaluation:
     evidence: dict
     ranked: list[dict] = field(default_factory=list)
     shown: list[dict] = field(default_factory=list)
+    query_image: Any = None
 
 
 def _detect_with_client_quad(image, fractions) -> tuple[Any, bool, str]:
@@ -229,9 +232,11 @@ def _recognize_bytes_once(
     locale: str | None = None,
     card_quad: list[tuple[float, float]] | None = None,
     _frame_override: tuple[str, Any] | None = None,
+    _frame_detected_override: bool = False,
     _input_observer: Callable | None = None,
     _progress_observer: Callable | None = None,
     _ocr_cache: RequestOcrCache | None = None,
+    _title_retry_ocr: OcrResult | None = None,
 ) -> _ScanEvaluation:
     started = time.perf_counter()
     timings: dict[str, float] = {}
@@ -250,6 +255,7 @@ def _recognize_bytes_once(
     quad_notes: list[str] = []
     if _frame_override is not None:
         image = _frame_override[1]
+        detected = _frame_detected_override
     elif not skip_detect:
         if (card_quad and settings.use_client_quad and rotation == 0
                 and all(v is None for v in (crop_x, crop_y, crop_w, crop_h))):
@@ -371,7 +377,12 @@ def _recognize_bytes_once(
     ocr = OcrResult(failed=True)
     ocr_passes = []
     ocr_cache_hits = []
+    title_retry_used = []
     def read_card(frame, scope):
+        if (_title_retry_ocr is not None and _frame_override is not None
+                and frame is _frame_override[1]):
+            title_retry_used.append(scope)
+            return deepcopy(_title_retry_ocr)
         options = {}
         if adaptive_footer and scope == 'selected' and frame is artwork_image:
             if title_only:
@@ -974,6 +985,8 @@ def _recognize_bytes_once(
         "collector_retry_skipped": ocr.collector_retry_skipped,
         "passes": ocr_passes,
         "ocr_cache_hits": ocr_cache_hits,
+        **({"title_retry_observations_used": bool(title_retry_used)}
+           if _title_retry_ocr is not None else {}),
         "stamp_printing_hint": stamp_hint,
         "confidence": confidence.model_dump(mode='json'),
         "match_presentation": presentation.model_dump(mode='json'),
@@ -1099,7 +1112,7 @@ def _recognize_bytes_once(
     return _ScanEvaluation(response, timings, input_image, save,
                            reference_identity, ocr, numbers,
                            tuple(rank_languages), name_confidence, too_small or too_blurry, ocr_payload,
-                           combined, shown)
+                           combined, shown, query_image)
 
 
 @parallel_grading_scope
@@ -1150,6 +1163,45 @@ def recognize_bytes(
         kwargs['_input_observer'] = _grading_job.start
     first = _recognize_bytes_once(data, **kwargs)
     selected = first
+    title_recovery = None
+    if (getattr(settings, 'ocr_conflict_title_retry', False) and settings.use_ocr and not skip_detect
+            and all(v is None for v in (crop_x, crop_y, crop_w, crop_h))
+            and title_retry_allowed(first)):
+        _, _, title_engine = runtime.require()
+        if callable(getattr(title_engine, '_run', None)) and getattr(runtime, 'artwork_verifier', None) is not None:
+            mark = time.perf_counter()
+            title_recovery = dict(attempted=True, selected=False, original_name=first.ocr.name_text,
+                                  first_top_id=first.lead['card_id'])
+            try:
+                observed, record = read_conflicting_title(title_engine, first.query_image, first.ocr)
+                title_recovery['read'] = record
+                if observed is not None:
+                    retry_kwargs = {k: v for k, v in kwargs.items()
+                                    if k not in {'_progress_observer', '_input_observer'}}
+                    retry = _recognize_bytes_once(data, **retry_kwargs,
+                        _frame_override=('conflicting_title', first.query_image),
+                        _frame_detected_override=bool(first.evidence.get('frame_detected')),
+                        _title_retry_ocr=observed)
+                    verified = {m['card_id'] for m in retry.evidence.get('local_artwork_matches', [])}
+                    eligible = bool(retry.lead and retry.lead['card_id'] in verified
+                        and retry.response.status in {ScanStatus.uncertain, ScanStatus.printing_ambiguous}
+                        and name_match(observed.name_text, retry.lead['name'])
+                        and artwork_evidence_compatible(retry.lead, ocr_name=observed.name_text,
+                            name_confidence=retry.name_confidence, numbers=first.numbers,
+                            languages=first.languages)
+                        and not any(retry.lead.get(k) for k in
+                            ('strong_name_conflict', 'structured_collector_conflict', 'language_conflict')))
+                    # A re-oriented frame falls back to a fresh read; record it.
+                    title_recovery.update(retry_top_id=retry.lead['card_id'] if retry.lead else None,
+                        observations_used=bool(retry.evidence.get('title_retry_observations_used')),
+                        selected=eligible)
+                    if eligible:
+                        selected = retry
+                        selected.timings['first_pass_ms'] = first.timings['total_ms']
+            except Exception as error:  # noqa: BLE001 - optional recovery preserves first result
+                title_recovery['error_type'] = type(error).__name__
+                logging.getLogger(__name__).exception('Optional title recovery failed')
+            selected.timings['title_retry_ms'] = (time.perf_counter() - mark) * 1000
     attempted = False
     proposal_ms = embed_ms = 0.
     recovery = {'hypotheses':0,'proposal_profile':None,'proposal_score':None,
@@ -1348,18 +1400,20 @@ def recognize_bytes(
     selected.timings.update(boundary_proposal_ms=proposal_ms,
                             boundary_selection_ms=embed_ms,
                             boundary_retry_attempted=float(attempted),
-                            boundary_retry_selected=float(selected is not first),
+                            boundary_retry_selected=float(attempted and selected is not first),
                             total_ms=(time.perf_counter()-started)*1000)
     selected.timings['ocr_cache_hits'] = float(ocr_cache.hits)
     selected.timings['ocr_unique_reads'] = float(ocr_cache.reads)
     selected.response.timings_ms = {key:round(value,2) for key,value in selected.timings.items()}
     selected.evidence['boundary_recovery'] = {
         **recovery,
-        'attempted': attempted, 'selected': selected is not first,
+        'attempted': attempted, 'selected': attempted and selected is not first,
         'first_status': first.response.status.value,
         'first_top_id': first.lead.get('card_id') if first.lead else None,
         'policy': 'one review-only retry; preserve first-pass identity contradictions',
     }
+    if title_recovery is not None:
+        selected.evidence['title_recovery'] = title_recovery
     selected.evidence['ocr_request_summary'] = {
         'unique_reads': ocr_cache.reads, 'cache_hits': ocr_cache.hits,
         'first_pass_region_reads': first.evidence.get('passes', []),
