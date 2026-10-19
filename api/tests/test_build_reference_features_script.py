@@ -105,3 +105,29 @@ def test_smoke_subset_compares_against_full_bundle(data_dir, monkeypatch, capsys
     summary = json.loads(capsys.readouterr().out.strip().splitlines()[-1])
     assert summary['subset'] and summary['cards'] == 2
     assert summary['compared']['compared_cards'] == 2 and summary['compared']['problems'] == []
+
+
+def test_mirrored_curation_decision_matches_other_bundle(data_dir, monkeypatch, capsys):
+    run(monkeypatch, '--data-dir', data_dir, '--output', data_dir / 'full')
+    other = other_architecture(json.loads((data_dir / 'full' / 'manifest.json').read_text()))
+    other['records']['b'] = dict(image_path=other['records']['b']['image_path'], art_box=other['records']['b']['art_box'],
+                                 available=False, unavailable_reason='display_only_no_vectors')
+    other['available'] = 1
+    (data_dir / 'other.json').write_text(json.dumps(other))
+    with pytest.raises(SystemExit, match='beyond the architecture fields'):
+        run(monkeypatch, '--data-dir', data_dir, '--output', data_dir / 'plain', '--compare-manifest', data_dir / 'other.json')
+    capsys.readouterr()
+    run(monkeypatch, '--data-dir', data_dir, '--output', data_dir / 'mirrored', '--compare-manifest', data_dir / 'other.json',
+        '--mirror-unavailable', 'display_only_no_vectors', '--native-check', 5)
+    summary = json.loads(capsys.readouterr().out.strip().splitlines()[-1])
+    assert summary['mirrored_unavailable']['cards'] == ['b'] and summary['available'] == 1
+    assert summary['compared']['problems'] == [] and summary['native_check']['deltas'] == []
+    assert len(list((data_dir / 'mirrored').glob('*.npz'))) == 1
+
+
+def test_existing_rejected_bundle_can_be_rechecked(data_dir, monkeypatch, capsys):
+    run(monkeypatch, '--data-dir', data_dir, '--output', data_dir / 'full')
+    capsys.readouterr()
+    run(monkeypatch, '--data-dir', data_dir, '--output', data_dir / 'full', '--existing', '--native-check', 5)
+    summary = json.loads(capsys.readouterr().out.strip().splitlines()[-1])
+    assert summary['existing'] and summary['validated'] and summary['native_check']['deltas'] == []

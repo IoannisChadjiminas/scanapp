@@ -81,6 +81,8 @@ behaves exactly as before.
 | `--expect-cards 50270` | Refuses unless the catalogue has exactly that many cards |
 | `--compare-manifest x86/manifest.json` | After building, compares with staging's x86 manifest. Only `architecture` and `opencv_build_sha256` may differ. Library versions, extraction settings, catalogue signature, card coverage, image mapping, art boxes, availability and source-image checksums must all match. |
 | `--native-check 200` | Re-extracts 200 evenly spaced cards live and requires bitwise-equal features |
+| `--mirror-unavailable display_only_no_vectors` | With `--compare-manifest`: marks unavailable exactly the cards the x86 manifest marks unavailable for that reason. That reason is a release curation step outside the builder (staging's `20261017-ja-sets` lists 10 such cards: `en:mfb-*` and `en:svp-500`). Without the flag, the comparison rightly refuses the bundle. |
+| `--existing` | Re-checks an already built bundle in `--output` (restore `manifest.rejected.json` to `manifest.json` first) instead of rebuilding |
 | `--limit N` | Smoke test only. Builds N evenly spaced cards. The bundle is bound to that subset, and the API rejects it for the full catalogue. |
 
 If a comparison or native check fails, the script renames `manifest.json` to
@@ -288,7 +290,7 @@ Then the full build. The estimate is about 30-60 minutes, scaled from the Mac su
 not measured on Ampere. Run it inside `tmux` or with `nohup`:
 
 ```bash
-docker run --rm --network none -v /srv/scanapp-arm/data:/data -v /srv/scanapp-arm:/kit:ro "$IMG" python /kit/scripts/build_reference_features.py --data-dir /data --output /data/reference-features/PS-CATALOGUE-EN-JA-ENID2-20261019-aarch64 --workers 4 --expect-architecture aarch64 --expect-import-id PS-CATALOGUE-EN-JA-ENID2-20261019 --expect-cards 50270 --compare-manifest /kit/x86-features-manifest.json --native-check 200 | tee /srv/scanapp-arm/results/features-build.log
+docker run --rm --network none -v /srv/scanapp-arm/data:/data -v /srv/scanapp-arm:/kit:ro "$IMG" python /kit/scripts/build_reference_features.py --data-dir /data --output /data/reference-features/PS-CATALOGUE-EN-JA-ENID2-20261019-aarch64 --workers 4 --expect-architecture aarch64 --expect-import-id PS-CATALOGUE-EN-JA-ENID2-20261019 --expect-cards 50270 --compare-manifest /kit/x86-features-manifest.json --mirror-unavailable display_only_no_vectors --native-check 200 | tee /srv/scanapp-arm/results/features-build.log
 ```
 
 The last line is a JSON summary. Check it for `"validated": true`,
@@ -324,7 +326,9 @@ EOF
 
 ### 7. Start the API and check it
 
-`--cpus 2` matches the staging baseline (2 vCPU, `--cpus 2`). The memory limit matches
+`--cpus 2` matches the staging baseline (2 vCPU, `--cpus 2`). On a box with more cores
+than the target, `--cpuset-cpus 0-1` (or `0-3` for a CAX21) is closer to a real small
+host; on 2026-10-19 both gave the same CPU per scan. The memory limit matches
 the staging compose file.
 
 ```bash
@@ -411,6 +415,10 @@ The decision rests on **card_id and status changes**, not CPU.
   same card and status, do not count as answer changes.
 - **Without the x86 control,** a difference against the staging baseline is an upper
   bound on the Arm effect, not a measurement of it.
+
+One known setup effect inflates CPU on the box: in local mode every scan rebuilds the
+Cardmarket listing groups (`cardmarket_ms` of about 3 s, against 5 ms with the cloud
+catalogue; see `Runtime.listing_groups`). Subtract it before comparing CPU.
 
 Then compare cost. Use CPU-seconds per scan (the mean and the p90) to see how many
 scans per hour the 4 vCPU box sustains. Use p50/p90 latency at `--cpus 2` against the

@@ -108,6 +108,26 @@ def compare_manifests(new, other, partial):
     return dict(summary, problems=problems)
 
 
+def mirror_unavailable(output, manifest, other, reason):
+    """Copy one explicit release decision from the other bundle: cards it marks unavailable
+    with `reason` (e.g. display_only_no_vectors) become unavailable here, with that reason.
+
+    This mirrors a curation step, not numerics; every other comparison stays strict.
+    Rewrites manifest.json; the loader validates the result afterwards.
+    """
+    ids = sorted(cid for cid, r in other['records'].items()
+                 if not r['available'] and r.get('unavailable_reason') == reason and cid in manifest['records'])
+    for card_id in ids:
+        record = manifest['records'][card_id]
+        if record['available']:
+            (output / record['filename']).unlink()
+        manifest['records'][card_id] = dict(image_path=record['image_path'], art_box=record['art_box'],
+                                            available=False, unavailable_reason=reason)
+    manifest['available'] = sum(r['available'] for r in manifest['records'].values())
+    (output / 'manifest.json').write_text(json.dumps(manifest, sort_keys=True, indent=2))
+    return ids
+
+
 def reject(output, summary, message):
     """Unpublish a finished bundle: without manifest.json no loader can activate it."""
     (output / 'manifest.json').rename(output / 'manifest.rejected.json')
@@ -148,6 +168,11 @@ def main():
     parser.add_argument('--expect-cards', type=int, help='refuse unless the catalogue has exactly this many cards')
     parser.add_argument('--compare-manifest', type=Path,
                         help="another architecture's manifest.json for the same release")
+    parser.add_argument('--mirror-unavailable', metavar='REASON',
+                        help='with --compare-manifest: mark the cards the other bundle lists as unavailable '
+                             'for this reason (a release curation decision) unavailable here too')
+    parser.add_argument('--existing', action='store_true',
+                        help='check an already built bundle in --output instead of building one')
     parser.add_argument('--native-check', type=int, default=0,
                         help='after the build, re-extract this many cards live and require bitwise equality')
     parser.add_argument('--limit', type=int,
@@ -159,15 +184,21 @@ def main():
     if args.limit:
         rows = subset(rows, args.limit)
     other = json.loads(args.compare_manifest.read_text()) if args.compare_manifest else None
+    if args.mirror_unavailable and other is None:
+        raise SystemExit('--mirror-unavailable needs --compare-manifest')
 
     def progress(number, count):
         if number % 250 == 0:
             print(json.dumps({'processed': number, 'total': count}), flush=True)
     cv2.setNumThreads(1)
     started = time.perf_counter()
-    manifest = build_reference_bundle(rows, args.data_dir, args.output, progress, workers=args.workers)
+    if args.existing:
+        manifest = json.loads((args.output / 'manifest.json').read_text())
+    else:
+        manifest = build_reference_bundle(rows, args.data_dir, args.output, progress, workers=args.workers)
     elapsed = time.perf_counter() - started
     usage = resource.getrusage(resource.RUSAGE_SELF)
+    mirrored = mirror_unavailable(args.output, manifest, other, args.mirror_unavailable) if args.mirror_unavailable else None
     # The same strict loader the API runs: contract, catalogue signature, coverage, checksums.
     # It already refuses a manifest whose architecture or OpenCV build is not this host's.
     store = ReferenceFeatureStore.load(args.output, rows)
@@ -182,6 +213,10 @@ def main():
                    cpu_seconds=round(usage.ru_utime + usage.ru_stime, 1),
                    # ru_maxrss is KiB on Linux, bytes on macOS.
                    peak_rss_mb=round(usage.ru_maxrss / (1 << 20 if sys.platform == 'darwin' else 1 << 10), 1))
+    if args.existing:
+        summary.update(existing=True, build_seconds=None, cpu_seconds=None, peak_rss_mb=None)
+    if mirrored is not None:
+        summary['mirrored_unavailable'] = dict(reason=args.mirror_unavailable, cards=mirrored)
     if other is not None:
         summary['compared'] = compare_manifests(manifest, other, partial=bool(args.limit))
         if summary['compared']['problems']:
