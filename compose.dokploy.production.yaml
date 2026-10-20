@@ -64,6 +64,9 @@ services:
       MAX_IMAGE_PIXELS: ${MAX_IMAGE_PIXELS:-12000000}
       MAX_UPLOAD_BYTES: ${MAX_UPLOAD_BYTES:-12582912}
       SCAN_WAIT_LIMIT: ${SCAN_WAIT_LIMIT:-2}
+      # Scans recognized at once in this one process (1-8). Each extra lane shares the loaded
+      # models and adds only its own OCR readers and workers. 1 = one scan at a time, as before.
+      SCAN_LANES: ${SCAN_LANES:-1}
       STORE_CAPTURES: ${STORE_CAPTURES:-false}
       REVIEW_TOKEN: ${REVIEW_TOKEN:-}
       CARDMARKET_HELPER_ENABLED: ${CARDMARKET_HELPER_ENABLED:-false}
