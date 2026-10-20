@@ -20,6 +20,7 @@ from app.recognition.pipeline import recognize_bytes
 from app.recognition.grading_completion import schedule_grading_completion
 from app.recognition.presentation import match_presentation
 from app.recognition.progress import scan_stream
+from app.recognition.runtime import scan_lane
 from app.recognition.upload import read_upload_limited
 from app.scan_summary import parse_quad, scan_flags, scan_outcome_line, scan_source, scan_summary_line
 from app.schemas import (
@@ -98,29 +99,31 @@ async def create_scan(
             headers={"Retry-After": "3"},
         )
     def recognize(observer=None):
-        return recognize_bytes(
-            data,
-            settings=settings,
-            runtime=request.app.state.runtime,
-            catalog=request.app.state.dbs.catalog,
-            results=request.app.state.dbs.results,
-            session_id=session_id,
-            crop_x=crop_x,
-            crop_y=crop_y,
-            crop_w=crop_w,
-            crop_h=crop_h,
-            rotation=rotation,
-            skip_detect=skip_detect and not detect_on_server,
-            language=language,
-            graded=graded,
-            client_text=hint,
-            client_text_reason=hint_reason,
-            locale=locale,
-            card_quad=parse_quad(card_quad),
-            _progress_observer=observer,
-            _grading_completion=lambda scan_id, job: schedule_grading_completion(
-                request.app.state.loop, request.app.state.dbs.results, scan_id, job),
-        )
+        # One free lane per admitted scan: its own OCR readers, the shared models.
+        with scan_lane(request.app.state.runtime) as runtime:
+            return recognize_bytes(
+                data,
+                settings=settings,
+                runtime=runtime,
+                catalog=request.app.state.dbs.catalog,
+                results=request.app.state.dbs.results,
+                session_id=session_id,
+                crop_x=crop_x,
+                crop_y=crop_y,
+                crop_w=crop_w,
+                crop_h=crop_h,
+                rotation=rotation,
+                skip_detect=skip_detect and not detect_on_server,
+                language=language,
+                graded=graded,
+                client_text=hint,
+                client_text_reason=hint_reason,
+                locale=locale,
+                card_quad=parse_quad(card_quad),
+                _progress_observer=observer,
+                _grading_completion=lambda scan_id, job: schedule_grading_completion(
+                    request.app.state.loop, request.app.state.dbs.results, scan_id, job),
+            )
 
     streaming = bool(stream_results and settings.scan_stream_results)
     source = scan_source(platform=platform, capture=capture, camera=camera, app_build=app_build,

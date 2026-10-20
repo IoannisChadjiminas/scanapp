@@ -4,6 +4,7 @@ import json
 import logging
 import re
 import sqlite3
+import threading
 import time
 import uuid
 from copy import deepcopy
@@ -65,6 +66,9 @@ from app.schemas import (
     ScanResponse,
     ScanStatus,
 )
+
+# Scan lanes share one results connection; keep each scan's insert and commit together.
+_results_write = threading.Lock()
 
 
 def _scan_keep(runtime, requested) -> np.ndarray | None:
@@ -1089,35 +1093,36 @@ def _recognize_bytes_once(
         "query_size": list(image.size),
     }
     def save() -> None:
-        results.execute(
-            """
-        INSERT INTO scans (
-            id, session_id, created_at, status, preprocessing, model_revision,
-            catalogue_version, ocr_version, ranking_version, threshold_config_json,
-            ocr_json, visual_ranking_json, combined_ranking_json, timings_json,
-            confirmed_card_id, rejected, error
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NULL, 0, NULL)
-            """,
-            (
-                scan_id,
-                session_id,
-                created_at,
-                status,
-                settings.preprocess_config,
-                versions["model_revision"],
-                versions["catalogue"],
-                versions["ocr"],
-                versions["ranking"],
-                json.dumps(runtime.threshold_config()),
-                json.dumps(ocr_payload),
-                # Persist the bounded union for verification-miss audits;
-                # this never expands the public suggestions.
-                json.dumps(visual),
-                json.dumps(combined),
-                json.dumps(timings),
-            ),
-        )
-        results.commit()
+        with _results_write:
+            results.execute(
+                """
+            INSERT INTO scans (
+                id, session_id, created_at, status, preprocessing, model_revision,
+                catalogue_version, ocr_version, ranking_version, threshold_config_json,
+                ocr_json, visual_ranking_json, combined_ranking_json, timings_json,
+                confirmed_card_id, rejected, error
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NULL, 0, NULL)
+                """,
+                (
+                    scan_id,
+                    session_id,
+                    created_at,
+                    status,
+                    settings.preprocess_config,
+                    versions["model_revision"],
+                    versions["catalogue"],
+                    versions["ocr"],
+                    versions["ranking"],
+                    json.dumps(runtime.threshold_config()),
+                    json.dumps(ocr_payload),
+                    # Persist the bounded union for verification-miss audits;
+                    # this never expands the public suggestions.
+                    json.dumps(visual),
+                    json.dumps(combined),
+                    json.dumps(timings),
+                ),
+            )
+            results.commit()
         persist = settings.store_captures if store_capture is None else store_capture
         if persist:
             try:

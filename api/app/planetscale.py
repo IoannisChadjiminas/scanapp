@@ -4,12 +4,12 @@ from __future__ import annotations
 import hashlib
 import re
 import sqlite3
-import threading
 from urllib.parse import urlsplit
 
 import numpy as np
 
 from app.config import Settings
+from app.db import SerializedConnection, SerializedCursor
 from app.recognition.artifacts import ArtifactError, ArtifactSnapshot, sha256_file, validate_embeddings
 from app.visual_aliases import validate_visual_aliases
 
@@ -18,16 +18,7 @@ class CatalogueReadOnly(RuntimeError):
     pass
 
 
-class CloudCatalogCursor(sqlite3.Cursor):
-    def __del__(self):
-        # sqlite3 finalizes a cursor's last prepared statement during GC.
-        # Close under the same lock before its C destructor runs; otherwise
-        # even an apparently harmless temporary SELECT cursor can invert locks.
-        try:
-            self.close()
-        except (sqlite3.Error, AttributeError):
-            pass
-
+class CloudCatalogCursor(SerializedCursor):
     def _run(self, method, *args, **kwargs):
         # SQLite invokes the Python authorizer while holding its mutex. All
         # entry points must acquire this Python lock first, avoiding a GIL /
@@ -40,65 +31,10 @@ class CloudCatalogCursor(sqlite3.Cursor):
                     raise CatalogueReadOnly("Catalogue is read-only; publish reviewed mapping changes separately.") from None
                 raise
 
-    def execute(self, *args, **kwargs):
-        return self._run(super().execute, *args, **kwargs)
 
-    def executemany(self, *args, **kwargs):
-        return self._run(super().executemany, *args, **kwargs)
-
-    def executescript(self, *args, **kwargs):
-        return self._run(super().executescript, *args, **kwargs)
-
-    def fetchone(self):
-        return self._run(super().fetchone)
-
-    def fetchall(self):
-        return self._run(super().fetchall)
-
-    def fetchmany(self, *args, **kwargs):
-        return self._run(super().fetchmany, *args, **kwargs)
-
-    def __next__(self):
-        return self._run(super().__next__)
-
-    def close(self):
-        return self._run(super().close)
-
-
-class CloudCatalogConnection(sqlite3.Connection):
+class CloudCatalogConnection(SerializedConnection):
     catalogue_readonly = True
-
-    def __init__(self, *args, **kwargs):
-        self._cache_lock = threading.RLock()
-        super().__init__(*args, **kwargs)
-
-    def cursor(self, factory=CloudCatalogCursor):
-        # Custom factories could silently bypass serialization.
-        if not issubclass(factory, CloudCatalogCursor):
-            raise TypeError("Cloud catalogue cursors must be serialized")
-        with self._cache_lock:
-            return super().cursor(factory)
-
-    def execute(self, *args, **kwargs):
-        return self.cursor().execute(*args, **kwargs)
-
-    def executemany(self, *args, **kwargs):
-        return self.cursor().executemany(*args, **kwargs)
-
-    def executescript(self, *args, **kwargs):
-        return self.cursor().executescript(*args, **kwargs)
-
-    def commit(self):
-        with self._cache_lock:
-            return super().commit()
-
-    def rollback(self):
-        with self._cache_lock:
-            return super().rollback()
-
-    def close(self):
-        with self._cache_lock:
-            return super().close()
+    cursor_class = CloudCatalogCursor
 
 
 def protect_catalogue(conn: sqlite3.Connection) -> None:

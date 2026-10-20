@@ -4,17 +4,18 @@ import asyncio
 
 
 class ScanLimiter:
-    def __init__(self, wait_limit: int) -> None:
+    def __init__(self, wait_limit: int, slots: int = 1) -> None:
         self._lock = asyncio.Lock()
-        self._busy = False
+        self._active = 0
         self._waiters: list[asyncio.Event] = []
         self.wait_limit = wait_limit
+        self.slots = max(1, slots)
 
     async def acquire(self) -> bool:
         while True:
             async with self._lock:
-                if not self._busy:
-                    self._busy = True
+                if self._active < self.slots:
+                    self._active += 1
                     return True
                 if len(self._waiters) >= self.wait_limit:
                     return False
@@ -30,6 +31,6 @@ class ScanLimiter:
 
     async def release(self) -> None:
         async with self._lock:
-            self._busy = False
+            self._active = max(0, self._active - 1)
             if self._waiters:
                 self._waiters.pop(0).set()

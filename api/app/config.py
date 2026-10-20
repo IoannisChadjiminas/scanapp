@@ -91,6 +91,9 @@ class Settings(BaseSettings):
     max_image_pixels: int = 12_000_000
     max_upload_bytes: int = 12_582_912
     scan_wait_limit: int = 2
+    # Scans recognized at once in this process. Each lane adds its own OCR readers and
+    # label/region workers but shares the loaded models and indexes; 1 keeps one scan at a time.
+    scan_lanes: int = Field(default=1, ge=1, le=8)
     cors_origins: str = "http://localhost:3000,http://127.0.0.1:3000"
     session_cookie: str = "scanapp_session"
     session_ttl_days: int = 30
