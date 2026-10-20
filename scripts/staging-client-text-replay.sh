@@ -45,11 +45,11 @@ git diff --quiet HEAD -- api/app api/scripts || { echo "commit api/ changes firs
 echo "== copy code $COMMIT, panel and hints to $HOST:$BENCH"
 ssh -o BatchMode=yes "$HOST" "test ! -e '$BENCH' || { echo '$BENCH already exists' >&2; exit 1; }; mkdir -p '$BENCH/kit' '$BENCH/out' && chmod 700 '$BENCH'"
 git archive --format=tar HEAD api/app api/scripts | ssh -o BatchMode=yes "$HOST" "tar -x -C '$BENCH'"
-tar -C "$PANEL" -cf - cases.json photos | ssh -o BatchMode=yes "$HOST" "tar -x -C '$BENCH/kit'"
+COPYFILE_DISABLE=1 tar --no-xattrs -C "$PANEL" -cf - cases.json photos | ssh -o BatchMode=yes "$HOST" "tar -x -C '$BENCH/kit'"
 scp -q -o BatchMode=yes "$HINTS" "$HOST:$BENCH/kit/hints.jsonl"
 
-ssh -o BatchMode=yes "$HOST" \
-  BENCH="$BENCH" LIVE="$LIVE" VOLUME="$VOLUME" DOCKER="$DOCKER" RUNS="$RUNS" bash -s <<'EOF'
+ssh -o BatchMode=yes "$HOST" "$(printf 'BENCH=%q LIVE=%q VOLUME=%q DOCKER=%q RUNS=%q bash -s' \
+  "$BENCH" "$LIVE" "$VOLUME" "$DOCKER" "$RUNS")" <<'EOF'
 set -euo pipefail
 D="$DOCKER"
 state=$($D inspect "$LIVE" --format '{{.State.Status}}')
