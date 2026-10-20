@@ -55,6 +55,12 @@ services:
       SCAN_STREAM_RESULTS: ${SCAN_STREAM_RESULTS:-true}
       PREVIEW_LANGUAGE_ORDER: ${PREVIEW_LANGUAGE_ORDER:-true}
       USE_CLIENT_QUAD: ${USE_CLIENT_QUAD:-false}
+      # Phone's own read of the card name and number (client_text): logged, and with
+      # CLIENT_TEXT_OCR=footer it stands in for the server's footer read when it confirms
+      # the visual answer. Staging replay 2026-10-20: -7.2% CPU, no wrong answers.
+      APP_CLIENT_TEXT: ${APP_CLIENT_TEXT:-true}
+      CLIENT_TEXT_HINTS: ${CLIENT_TEXT_HINTS:-true}
+      CLIENT_TEXT_OCR: ${CLIENT_TEXT_OCR:-footer}
       ENABLE_MATCHED: ${ENABLE_MATCHED:-true}
       ORT_INTRA_THREADS: ${ORT_INTRA_THREADS:-1}
       ORT_INTER_THREADS: ${ORT_INTER_THREADS:-1}
