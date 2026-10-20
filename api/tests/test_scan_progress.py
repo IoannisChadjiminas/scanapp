@@ -204,3 +204,29 @@ def test_card_quad_reaches_recognition_parsed_and_bad_values_become_none(monkeyp
         client.post('/scans', data={'stream_results': 'true'}, files=files)
     assert seen[0] == [(0.1, 0.1), (0.9, 0.1), (0.9, 0.9), (0.1, 0.9)]
     assert seen[1] is None and seen[2] is None
+
+
+@pytest.mark.parametrize('switches,expected', [
+    (dict(), (None, 'absent')),
+    (dict(client_text_hints=True), ('Toxel', 'ok')),
+    (dict(client_text_fast_path=True), ('Toxel', 'ok')),
+])
+def test_client_text_reaches_recognition_only_when_switched_on(monkeypatch, switches, expected):
+    from app.routes import scans
+    client, executor = stream_app(monkeypatch, enabled=False)
+    seen = []
+    def recognize_bytes(data, **kwargs):
+        hint = kwargs['client_text']
+        seen.append((hint.name if hint else None, kwargs['client_text_reason']))
+        raise ImageError('plain path')
+    monkeypatch.setattr(scans, 'recognize_bytes', recognize_bytes)
+    client.app.state.settings = client.app.state.settings.model_copy(update=switches)
+    body = json.dumps(dict(v=1, engine='mlkit', name='Toxel', name_conf=.99, number='078/185',
+                           number_conf=.99))
+    with client, executor:
+        client.post('/scans', data={'client_text': body},
+                    files={'image': ('card.jpg', b'jpeg', 'image/jpeg')})
+        client.post('/scans', data={'client_text': '{"v":1'},
+                    files={'image': ('card.jpg', b'jpeg', 'image/jpeg')})
+    assert seen[0] == expected
+    assert seen[1] == ((None, 'absent') if not switches else (None, 'not_json'))

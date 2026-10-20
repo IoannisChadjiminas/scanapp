@@ -13,6 +13,7 @@ from app.cardmarket import (
 )
 from app.db import coverage_payload
 from app.recognition.artifacts import ArtifactError
+from app.recognition.client_text import parse_client_text
 from app.recognition.images import ImageError
 from app.recognition.captures import apply_feedback
 from app.recognition.pipeline import recognize_bytes
@@ -71,6 +72,9 @@ async def create_scan(
     locale: str | None = Form(default=None),
     card_quad: str | None = Form(default=None),
     quad_source: str | None = Form(default=None),
+    # The phone's own read of the name and collector number (JSON). Read only
+    # with CLIENT_TEXT_HINTS or CLIENT_TEXT_FAST_PATH; it never picks a card.
+    client_text: str | None = Form(default=None),
 ) -> ScanResponse | Response:
     settings = request.app.state.settings
     started = time.perf_counter()
@@ -81,6 +85,9 @@ async def create_scan(
         request, response, request.app.state.dbs, settings
     )
     data = await read_upload_limited(image, settings.max_upload_bytes)
+    hint, hint_reason = None, 'absent'
+    if getattr(settings, 'client_text_hints', False) or getattr(settings, 'client_text_fast_path', False):
+        hint, hint_reason = parse_client_text(client_text)
     logger.info("upload_read trace=%s bytes=%s elapsed_ms=%.1f", trace, len(data), (time.perf_counter()-started)*1000)
     acquired = await limiter.acquire()
     if not acquired:
@@ -105,6 +112,8 @@ async def create_scan(
             skip_detect=skip_detect and not detect_on_server,
             language=language,
             graded=graded,
+            client_text=hint,
+            client_text_reason=hint_reason,
             locale=locale,
             card_quad=parse_quad(card_quad),
             _progress_observer=observer,
@@ -120,6 +129,8 @@ async def create_scan(
     detect_on_server = skip_detect and not settings.trust_client_warp
     if detect_on_server:
         flags.append('server_detect_override')
+    if hint is not None:
+        flags.append('req_client_text')
 
     def log_summary(result: ScanResponse) -> None:
         logger.info("%s", scan_summary_line(result, settings, trace=trace,

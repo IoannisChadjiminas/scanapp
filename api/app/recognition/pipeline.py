@@ -28,6 +28,8 @@ from app.physical_cards import is_tcg_pocket_card
 from app.set_totals import set_total
 from app.db import coverage_payload
 from app.recognition.captures import save_scan_capture
+from app.recognition.client_text import (VERSION as CLIENT_TEXT_VERSION, ClientText, client_text_line,
+                                         fast_path_decision, server_read_agrees)
 from app.recognition.detect import (card_frame_candidates, client_quad_rect, detect_and_rectify,
                                     quads_agree, server_frame_rect, warp_to_rect)
 from app.recognition.frame_fallback import line_frame_candidates, loose_frame_candidates, portrait_window_candidates, slab_interior_candidate
@@ -237,6 +239,7 @@ def _recognize_bytes_once(
     _progress_observer: Callable | None = None,
     _ocr_cache: RequestOcrCache | None = None,
     _title_retry_ocr: OcrResult | None = None,
+    client_text: ClientText | None = None,
 ) -> _ScanEvaluation:
     started = time.perf_counter()
     timings: dict[str, float] = {}
@@ -346,7 +349,9 @@ def _recognize_bytes_once(
     adaptive_footer = bool(getattr(settings, 'ocr_adaptive_footer', False))
     artwork_image = None
     full_candidates = []
-    if adaptive_footer and artwork_index is not None and not retake:
+    fast_path_wanted = bool(client_text is not None and getattr(settings, 'client_text_fast_path', False)
+                            and _frame_override is None)
+    if (adaptive_footer or fast_path_wanted) and artwork_index is not None and not retake:
         # Retrieve independent illustration evidence before deciding whether
         # optional collector retries are useful. Initial OCR stays untouched.
         artwork_hits, artwork_timings = artwork_index.search(
@@ -358,12 +363,13 @@ def _recognize_bytes_once(
         artwork_image = image
         rows = _lookup_cards(catalog, [str(snapshot.card_ids[i]) for i in indices])
         full_candidates = [dict(card_id=str(snapshot.card_ids[i]), name=rows[str(snapshot.card_ids[i])]['name'],
-                                visual_score=float(score))
+                                visual_score=float(score),
+                                language=str(rows[str(snapshot.card_ids[i])]['language'] or ''))
             for i, score in zip(indices, scores) if str(snapshot.card_ids[i]) in rows]
     title_only = False
     printing_index = getattr(runtime, 'printing_index', None)
     title_only_enabled = bool(getattr(settings, 'ocr_title_only_single_printing', False))
-    if full_candidates and printing_index is not None and title_only_enabled:
+    if adaptive_footer and full_candidates and printing_index is not None and title_only_enabled:
         # Same-art reprints are the only reason to read the collector number
         # for identity. A lone, complete printing with strong agreeing visual
         # evidence reads its title only; any doubt reads the footer as before.
@@ -374,6 +380,24 @@ def _recognize_bytes_once(
             family_incomplete=lead_incomplete, image_size=image.size)
     if title_only_enabled:
         frame_selection['ocr_title_only'] = 'skipped_footer' if title_only else 'not_eligible'
+    fast_path = False
+    client_text_skipped = []
+    if fast_path_wanted:
+        # The phone's text may only confirm the server's own pixel answer; then
+        # the optional OCR re-reads are left out. It never ranks or selects.
+        lead = None
+        if full_candidates:
+            lead = dict(rows[full_candidates[0]['card_id']])
+            lead['card_id'] = full_candidates[0]['card_id']
+            lead['set_total'] = set_total(catalog, lead['language'], lead['set_id'])
+        try:
+            fast_path, fast_reason = fast_path_decision(client_text, full_candidates, lead, artwork_hits,
+                catalog, image_size=image.size,
+                min_confidence=float(getattr(settings, 'client_text_min_confidence', .9)))
+        except Exception:  # noqa: BLE001 - an optional hint keeps the full path
+            logging.getLogger(__name__).exception('Client text decision failed')
+            fast_path, fast_reason = False, 'error'
+        frame_selection['client_text_fast_path'] = fast_reason
     ocr = OcrResult(failed=True)
     ocr_passes = []
     ocr_cache_hits = []
@@ -393,6 +417,9 @@ def _recognize_bytes_once(
                 frame_selection['ocr_title_only'] = 'footer_fallback'
             options['collector_retry_policy'] = lambda observed: footer_retry_required(
                 observed, full_candidates, artwork_hits, image_size=frame.size)
+        if fast_path and scope == 'selected' and frame is artwork_image:
+            options['optional_retry_gate'] = lambda observed: server_read_agrees(
+                client_text, observed, require_title=fast_reason == 'eligible_title_required')
         return read_card_with(frame, scope, **options)
     def read_card_with(frame, scope, **options):
         observed, cached = (_ocr_cache.read(ocr_engine, frame, **options) if _ocr_cache is not None
@@ -438,7 +465,11 @@ def _recognize_bytes_once(
         # agreeing title plus explicit, confidence-qualified identifiers.
         # Supplement, never replace, first-pass evidence; later contradictions
         # remain visible to the normal ranking/printing safety rules.
-        if inferred_frame and not ocr.failed and not original_identity_used:
+        if (fast_path and inferred_frame and not ocr.failed and not original_identity_used
+                and ocr.client_text_gate and server_read_agrees(
+                    client_text, ocr, require_title=fast_reason == 'eligible_title_required')):
+            client_text_skipped.append('original')
+        elif inferred_frame and not ocr.failed and not original_identity_used:
             first_numbers = extract_collector_candidates([], hits=ocr.hits)
             has_explicit = any(h.confidence is not None and h.confidence >= .85
                 and ('/' in h.text or any(c.isalpha() for c in h.text)) for h in first_numbers)
@@ -490,6 +521,10 @@ def _recognize_bytes_once(
     timings['ocr_passes_count'] = float(len(ocr_passes))
     timings['ocr_footer_retry_skipped'] = float(ocr.collector_retry_skipped)
     timings['ocr_footer_skipped'] = float(ocr.footer_skipped)
+    if fast_path_wanted:
+        frame_selection['client_text_gate'] = ocr.client_text_gate
+        frame_selection['client_text_skipped_reads'] = client_text_skipped
+        timings['client_text_fast_path'] = float(bool(ocr.client_text_gate or client_text_skipped))
     if artwork_index is not None and not retake and image is not artwork_image:
         artwork_hits, artwork_timings = artwork_index.search(
             image, embedder, mode=settings.preprocess_config,
@@ -958,6 +993,8 @@ def _recognize_bytes_once(
     versions['ocr_cache'] = 'request-pixels-v1'
     if adaptive_footer:
         versions['ocr_budget'] = OCR_BUDGET_VERSION
+    if fast_path_wanted:
+        versions['client_text'] = CLIENT_TEXT_VERSION
     presentation = match_presentation(combined, status=status, printing_review=printing_review,
                                       min_visual=settings.threshold_min_visual_ocr)
     confidence = confidence_payload(combined, status=status,
@@ -1135,6 +1172,8 @@ def recognize_bytes(
     locale: str | None = None,
     card_quad: list[tuple[float, float]] | None = None,
     graded: bool | None = None,
+    client_text: ClientText | None = None,
+    client_text_reason: str = 'absent',
     _grading_job: GradingJob | None = None,
     _progress_observer: Callable | None = None,
     _grading_completion: Callable | None = None,
@@ -1161,7 +1200,8 @@ def recognize_bytes(
         kwargs['_progress_observer'] = _progress_observer
     if _grading_job is not None:
         kwargs['_input_observer'] = _grading_job.start
-    first = _recognize_bytes_once(data, **kwargs)
+    # Only the first evaluation may use the phone's text; recoveries read in full.
+    first = _recognize_bytes_once(data, **kwargs, client_text=client_text)
     selected = first
     title_recovery = None
     if (getattr(settings, 'ocr_conflict_title_retry', False) and settings.use_ocr and not skip_detect
@@ -1420,6 +1460,28 @@ def recognize_bytes(
         'selected_pass_region_reads': selected.evidence.get('passes', []) if selected is not first else [],
         'policy': 'identical request pixels only; pristine cloned observations, no cross-upload cache',
     }
+    if client_text is not None or client_text_reason != 'absent':
+        frame = first.evidence.get('frame_selection') or {}
+        fast = ('used' if first.timings.get('client_text_fast_path')
+                else frame.get('client_text_fast_path', 'off'))
+        if fast.startswith('eligible'):
+            fast = 'server_disagrees'
+        selected.evidence['client_text'] = {
+            'version': CLIENT_TEXT_VERSION, 'parse': client_text_reason, 'fast_path': fast,
+            'engine': client_text.engine if client_text else None,
+            'name': client_text.name if client_text else None,
+            'name_conf': client_text.name_conf if client_text else None,
+            'number': client_text.number if client_text else None,
+            'number_conf': client_text.number_conf if client_text else None,
+            'policy': 'skips optional re-reads only; never ranks, selects or confirms',
+        }
+        try:
+            logging.getLogger('scan.diagnostics').info('%s', client_text_line(
+                selected.response.id, client_text, client_text_reason,
+                status=selected.response.status.value, top=selected.lead,
+                ocr_name=selected.ocr.name_text, ocr_numbers=selected.numbers, fast_path=fast))
+        except Exception:  # noqa: BLE001 - a log line must not fail the scan
+            logging.getLogger(__name__).exception('Client text log failed')
     logging.getLogger('scan.diagnostics').info(
         'scan_reasons scan_id=%s status=%s reasons=%s', selected.response.id,
         selected.response.status.value, ','.join(selected.evidence.get('status_reasons') or ['none']))

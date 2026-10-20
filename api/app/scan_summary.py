@@ -31,6 +31,8 @@ SWITCHES = (
     'app_native_camera_android',
     'app_card_anywhere',
     'trust_client_warp',
+    'client_text_hints',
+    'client_text_fast_path',
 )
 
 STAGES = (
