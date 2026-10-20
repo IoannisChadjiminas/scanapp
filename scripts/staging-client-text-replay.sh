@@ -32,7 +32,7 @@ RUNS="${RUNS:-base footer base2 footer2}"
 COMMIT="$(git rev-parse --short HEAD)"
 
 if [[ "${1:-}" != "--run" ]]; then
-  sed -n '2,20p' "$0" | sed 's/^# \{0,1\}//'
+  sed -n '2,/^set /p' "$0" | grep '^#' | sed 's/^# \{0,1\}//'
   echo
   echo "host=$HOST live_api=$LIVE volume=$VOLUME bench=$BENCH code=$COMMIT runs='$RUNS'"
   echo "panel=$PANEL hints=$HINTS -> results in $LOCAL_OUT"
