@@ -13,7 +13,7 @@ single printing for that collector number. Anything else runs the full path.
 """
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 import json
 import math
 import re
@@ -21,12 +21,14 @@ import unicodedata
 from typing import Any
 
 from app.physical_cards import is_tcg_pocket_card
+from app.recognition.ocr import OcrHit, OcrResult
 from app.recognition.printing import printing_key
 from app.recognition.rank import (RELIABLE_COLLECTOR_CONF, accepted_collector_numbers,
                                   extract_collector_candidates, name_match,
                                   number_matches_identifiers, parse_collector)
 
 VERSION = 'client-text-v1'
+OCR_MODES = ('off', 'footer', 'all')
 MAX_BYTES = 512
 _KEYS = {'v', 'engine', 'name', 'name_conf', 'number', 'number_conf', 'ms'}
 _ENGINE = re.compile(r'^[a-z0-9][a-z0-9._-]{0,31}$')
@@ -186,6 +188,70 @@ def fast_path_decision(hint: ClientText | None, candidates: list[dict], lead: di
     return True, 'eligible'
 
 
+def ocr_skip_decision(hint: ClientText | None, candidates: list[dict], lead_for, catalog, *,
+                      mode: str, image_size, min_confidence: float, min_visual: float,
+                      min_gap: float) -> tuple[bool, str | None, str]:
+    """May the phone's read stand in for server OCR on this frame? Decided before OCR.
+
+    The phone must confirm the visual leader by name and number, and the catalogue must
+    have one printing of that name with that number. The phone never settles a near tie:
+    with 'footer' the server still reads the title, which separates different names and
+    scripts, so only a same-name reprint within `min_gap` stops it; with 'all' any other
+    card within `min_gap` does.
+
+    The leader is the visual first, even when the same artwork in another language ranks
+    above the phone's card (マリル above Marill): the footer read is what lets the ranker
+    rule that print out, so standing in there turned matched scans uncertain on the
+    replay. Returns whether the phone may stand in, the card it confirmed, and the reason.
+    """
+    if hint is None:
+        return False, None, 'no_hint'
+    if not hint.name or not hint.number:
+        return False, None, 'incomplete'
+    if (hint.name_conf or 0.) < min_confidence or (hint.number_conf or 0.) < min_confidence:
+        return False, None, 'low_confidence'
+    width, height = image_size
+    if not .62 <= width / height <= .80:
+        return False, None, 'frame_shape'
+    if not candidates:
+        return False, None, 'no_candidates'
+    first = candidates[0]
+    lead = lead_for(first['card_id'])
+    if lead is None:
+        return False, None, 'no_candidates'
+    if first['visual_score'] < min_visual:
+        return False, None, 'visual_floor'
+    if not name_match(hint.name, first['name']):
+        return False, None, 'name_disagrees'
+    if number_matches_identifiers([hint.number], accepted_collector_numbers(lead)) is not True:
+        return False, None, 'number_disagrees'
+    if printings_with_number(catalog, lead, hint.number) != {printing_key(lead)}:
+        return False, None, 'printings'
+    ties = [c for c in candidates[1:] if not _alias(c['card_id'], first['card_id'])
+            and first['visual_score'] - c['visual_score'] < min_gap]
+    if mode == 'footer':
+        if any(name_match(hint.name, c['name']) for c in ties):
+            return False, None, 'reprint_tie'
+    elif ties:
+        return False, None, 'visual_tie'
+    return True, first['card_id'], 'eligible'
+
+
+def phone_read(hint: ClientText) -> OcrResult:
+    """The phone's text as the card read, for CLIENT_TEXT_OCR=all."""
+    return OcrResult(name_text=hint.name, collector_text=hint.number, lines=[hint.name, hint.number],
+                     hits=[OcrHit(hint.name, hint.name_conf, 'name'),
+                           OcrHit(hint.number, hint.number_conf, 'collector')],
+                     failed=False, client_text_used='all')
+
+
+def with_phone_number(observed: OcrResult, hint: ClientText) -> OcrResult:
+    """A server title-only read completed with the phone's collector number."""
+    return replace(observed, collector_text=hint.number, lines=[*observed.lines, hint.number],
+                   hits=[*observed.hits, OcrHit(hint.number, hint.number_conf, 'collector')],
+                   footer_skipped=False, client_text_used='number')
+
+
 def _alias(a: str, b: str) -> bool:
     """One catalogue card listed with and without its language prefix (sv01-210, en:sv01-210)."""
     return a.split(':', 1)[-1] == b.split(':', 1)[-1]
@@ -239,7 +305,7 @@ def _flag(value: bool | None) -> str:
 
 def client_text_line(scan_id: str, hint: ClientText | None, reason: str, *, status: str,
                      top: dict | None, ocr_name: str | None, ocr_numbers: list,
-                     fast_path: str) -> str:
+                     fast_path: str, ocr_skip: str = 'off') -> str:
     """One greppable line per hinted scan. The phone's title text itself is not logged."""
     parts = ['client_text', f'scan_id={scan_id}', f'parse={reason}']
     if hint is not None:
@@ -251,5 +317,5 @@ def client_text_line(scan_id: str, hint: ClientText | None, reason: str, *, stat
                   f'number_conf={"none" if hint.number_conf is None else f"{hint.number_conf:.2f}"}',
                   f'phone_ms={"none" if hint.ms is None else hint.ms}',
                   *(f'{key}_agrees={_flag(value)}' for key, value in agrees.items())]
-    parts += [f'fast_path={fast_path}', f'status={status}', f'top={(top or {}).get("card_id") or "none"}']
+    parts += [f'fast_path={fast_path}', f'ocr_skip={ocr_skip}', f'status={status}', f'top={(top or {}).get("card_id") or "none"}']
     return ' '.join(parts)

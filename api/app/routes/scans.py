@@ -86,7 +86,8 @@ async def create_scan(
     )
     data = await read_upload_limited(image, settings.max_upload_bytes)
     hint, hint_reason = None, 'absent'
-    if getattr(settings, 'client_text_hints', False) or getattr(settings, 'client_text_fast_path', False):
+    if (getattr(settings, 'client_text_hints', False) or getattr(settings, 'client_text_fast_path', False)
+            or getattr(settings, 'client_text_ocr', 'off') != 'off'):
         hint, hint_reason = parse_client_text(client_text)
     logger.info("upload_read trace=%s bytes=%s elapsed_ms=%.1f", trace, len(data), (time.perf_counter()-started)*1000)
     acquired = await limiter.acquire()

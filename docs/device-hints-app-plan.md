@@ -2,7 +2,7 @@
 
 **For:** the Flutter app (`PokeSingle`, separate repository)
 **Server side:** this repository, `client_text` on `POST /api/v1/scans`, flags `CLIENT_TEXT_HINTS`,
-`CLIENT_TEXT_FAST_PATH`, `APP_CLIENT_TEXT` (all off by default)
+`CLIENT_TEXT_FAST_PATH`, `CLIENT_TEXT_OCR`, `APP_CLIENT_TEXT` (all off by default)
 **Measured basis:** [experiments/device-text-hints-20261020.md](./experiments/device-text-hints-20261020.md)
 
 The phone reads the card's printed name and collector number on the device, for free, and
@@ -14,10 +14,12 @@ answer. A wrong, late or missing hint costs nothing but the saving.
 panel (the photos where the server re-reads are the ones the phone cannot read either). The
 phone change that is worth most today is making the existing slab check answer more often
 (section 6, "Do it once"), because every scan without `graded` pays for a full label read. The
-card-text hint is worth shipping alongside it, in the same text pass, for two reasons: the
-server's `client_text` log lines measure the phone's accuracy on real captures, and it is the
-input to the next server experiment (skipping the server's own initial footer read when the phone
-confirms a lone printing; see the report).
+card-text hint is worth shipping alongside it, in the same text pass: with
+`CLIENT_TEXT_OCR=footer` the server skips its own footer read when the phone's name and number
+confirm the visual answer, which saved 4.4% of server CPU on the replay with no wrong answer, and
+the `client_text` log lines measure the phone's accuracy on real captures first. Every hint that
+is missing a field (55 of 155 panel photos) is a scan where that saving cannot happen, so the
+number read in section 4 is the part worth tuning.
 
 ## 1. What the app does today (PokeSingle at `20f5bc2`)
 

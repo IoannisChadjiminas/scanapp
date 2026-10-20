@@ -39,6 +39,8 @@ class OcrResult:
     # The phone's text confirmed the visual leader and this read did not
     # contradict it, so the optional re-reads were left out (None: not asked).
     client_text_gate: bool | None = None
+    # 'number' or 'all' when the phone's read stands in for this server read.
+    client_text_used: str | None = None
     # The caller asked for the title strip only; no footer evidence exists.
     footer_skipped: bool = False
     passes: list[dict] = field(default_factory=list)

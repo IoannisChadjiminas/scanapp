@@ -74,6 +74,11 @@ class Settings(BaseSettings):
     client_text_fast_path: bool = False
     # Both phone fields must be at least this confident for the fast path.
     client_text_min_confidence: float = 0.9
+    # Let the phone's read stand in for server OCR when it confirms the visual leader with
+    # one printing for that number. 'footer': the server reads only the title and takes the
+    # number from the phone; 'all': the server reads no card text. 'off' (default): never.
+    # The phone's text then becomes evidence: replay the frozen panel before enabling it.
+    client_text_ocr: str = 'off'
     # Optional NDJSON progress stream; legacy scans remain a single JSON response.
     scan_stream_results: bool = True
     enable_matched: bool = True

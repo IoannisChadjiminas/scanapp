@@ -113,6 +113,8 @@ def scan_flags(settings: Any, *, stream: bool = False, skip_detect: bool = False
                graded: bool | None = None) -> list[str]:
     """Server switches that were on, plus what this request asked for."""
     flags = [name for name in SWITCHES if getattr(settings, name, False) is True]
+    if getattr(settings, 'client_text_ocr', 'off') not in ('off', None):
+        flags.append(f'client_text_ocr_{settings.client_text_ocr}')
     preset = getattr(settings, 'app_capture_preset', 'max')
     quality = getattr(settings, 'app_jpeg_quality', 95)
     if preset != 'max':

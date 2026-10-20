@@ -10,8 +10,8 @@ from PIL import Image
 
 from app.config import Settings
 from app.recognition import pipeline
-from app.recognition.client_text import (ClientText, fast_path_decision, parse_client_text,
-                                         server_read_agrees)
+from app.recognition.client_text import (ClientText, fast_path_decision, ocr_skip_decision,
+                                         parse_client_text, server_read_agrees)
 from app.recognition.ocr import CardOcr, OcrHit, OcrResult
 from app.recognition.ocr_cache import RequestOcrCache
 from app.routes.health import scan_price_config
@@ -184,7 +184,8 @@ def test_cache_never_serves_a_fast_path_read_as_complete_evidence():
     assert cached and not again.collector_retry_skipped and len(reads) == 2
 
 
-def run_pipeline(tmp_path, monkeypatch, *, hint, fast_path=True, rows=(('first', 'Toxel', '078/185'),)):
+def run_pipeline(tmp_path, monkeypatch, *, hint, fast_path=True, rows=(('first', 'Toxel', '078/185'),),
+                 ocr='off', title='Toxel'):
     from app.db import connect, init_catalog, init_results
     catalog = connect(tmp_path/'catalog.sqlite'); results = connect(tmp_path/'results.sqlite')
     init_catalog(catalog); init_results(results)
@@ -197,7 +198,7 @@ def run_pipeline(tmp_path, monkeypatch, *, hint, fast_path=True, rows=(('first',
     def read(image):
         regions.append(image.size)
         # The footer strip holds no readable number, so the footer retries are due.
-        return (['Toxel'], [.99]) if len(regions) == 1 else (['weakness'], [.99])
+        return ([title], [.99]) if len(regions) == 1 else (['weakness'], [.99])
     reader._run = read
     def oriented(image, *args, **kwargs):
         kwargs['query_vectors'][id(image)] = np.array([1., 0.], dtype=np.float32)
@@ -218,7 +219,7 @@ def run_pipeline(tmp_path, monkeypatch, *, hint, fast_path=True, rows=(('first',
     try:
         response = pipeline.recognize_bytes(buffer.getvalue(), settings=Settings(_env_file=None,
             data_dir=tmp_path, store_captures=False, use_grading=False, enable_matched=True,
-            client_text_hints=True, client_text_fast_path=fast_path), runtime=runtime,
+            client_text_hints=True, client_text_fast_path=fast_path, client_text_ocr=ocr), runtime=runtime,
             catalog=catalog, results=results, session_id='test', skip_detect=True,
             client_text=parsed, client_text_reason=reason)
         saved = json.loads(results.execute('SELECT ocr_json FROM scans').fetchone()[0])
@@ -261,3 +262,76 @@ def test_with_the_fast_path_off_the_hint_is_only_logged(tmp_path, monkeypatch):
 def test_config_tells_the_phone_whether_to_send_client_text():
     assert scan_price_config(Settings(_env_file=None)).client_text is False
     assert scan_price_config(Settings(_env_file=None, app_client_text=True)).client_text is True
+
+
+def skip(hint=None, *, mode='footer', visual=.90, rivals=(), above=(), rows=None, size=(600, 840)):
+    hint = hint or parse_client_text(payload())[0]
+    lead = card('first', '78')
+    allowed, card_id, reason = ocr_skip_decision(hint, [*above,
+        dict(card_id='first', name='Toxel', visual_score=visual, language='en'), *rivals],
+        lambda cid: lead if cid == 'first' else card(cid, '99', name='other'),
+        Catalog(rows or [lead]), mode=mode, image_size=size, min_confidence=.9, min_visual=.78,
+        min_gap=.04)
+    assert card_id == ('first' if allowed else None)
+    return allowed, reason
+
+
+def rival(name, score=.88, card_id='other', language='en'):
+    return dict(card_id=card_id, name=name, visual_score=score, language=language)
+
+
+def test_the_phone_may_stand_in_only_for_a_confirmed_lone_printing():
+    assert skip() == (True, 'eligible')
+    assert skip(mode='all') == (True, 'eligible')
+    assert skip(visual=.77) == (False, 'visual_floor')
+    assert skip(rows=[card('first', '78'), card('reprint', '78', set_id='cel')]) == (False, 'printings')
+    assert skip(ClientText('x', 'Toxel', .99, '079/185', .99)) == (False, 'number_disagrees')
+    assert skip(ClientText('x', 'Toxel', .5, '078/185', .99)) == (False, 'low_confidence')
+    assert skip(ClientText('x', None, None, '078/185', .99)) == (False, 'incomplete')
+
+
+def test_the_phone_never_settles_a_near_tie():
+    other_name, reprint = [rival('Pikachu')], [rival('Toxel', card_id='reprint')]
+    # The server's own title read still separates different names in footer mode.
+    assert skip(rivals=other_name) == (True, 'eligible')
+    assert skip(rivals=other_name, mode='all') == (False, 'visual_tie')
+    # Only the number would separate a same-name reprint: never on the phone's word.
+    assert skip(rivals=reprint) == (False, 'reprint_tie')
+    assert skip(rivals=[rival('Toxel', .80, 'reprint')]) == (True, 'eligible')
+    assert skip(rivals=[rival('Toxel', card_id='en:first')], mode='all') == (True, 'eligible')
+
+
+def test_footer_mode_reads_only_the_title_and_takes_the_number_from_the_phone(tmp_path, monkeypatch):
+    response, regions, saved = run_pipeline(tmp_path, monkeypatch, hint=payload(), fast_path=False,
+                                            ocr='footer')
+    assert len(regions) == 1 and response.best_match.card_id == 'first'
+    assert response.ocr.collector_text == '078/185' and response.timings_ms['client_text_ocr'] == 1.
+    assert 'phone_text_used_number' in response.confidence.reasons
+    assert saved['client_text']['ocr_skip'] == 'used_number'
+
+
+def test_footer_mode_reads_the_footer_when_the_server_title_disagrees(tmp_path, monkeypatch):
+    response, regions, saved = run_pipeline(tmp_path, monkeypatch, hint=payload(), fast_path=False,
+                                            ocr='footer', title='Pikachu')
+    assert len(regions) > 1 and response.timings_ms['client_text_ocr'] == 0.
+    assert saved['client_text']['ocr_skip'] == 'title_disagrees'
+
+
+def test_all_mode_reads_no_card_text_on_the_server(tmp_path, monkeypatch):
+    response, regions, saved = run_pipeline(tmp_path, monkeypatch, hint=payload(), fast_path=False, ocr='all')
+    assert regions == [] and response.best_match.card_id == 'first'
+    assert response.ocr.name_text == 'Toxel' and response.ocr.collector_text == '078/185'
+    assert saved['client_text']['ocr_skip'] == 'used_all'
+
+
+def test_a_disagreeing_phone_keeps_the_full_server_read(tmp_path, monkeypatch):
+    response, regions, saved = run_pipeline(tmp_path, monkeypatch, hint=payload(number='079/185'),
+                                            fast_path=False, ocr='all')
+    assert len(regions) >= 2 and saved['client_text']['ocr_skip'] == 'number_disagrees'
+    assert response.ocr.collector_text != '078/185'
+
+
+def test_the_same_art_in_another_language_ranked_first_keeps_the_server_read():
+    japanese = [rival('エレズン', .91, 'ja:S1-001', 'ja')]
+    assert skip(above=japanese) == (False, 'name_disagrees')
+    assert skip(above=japanese, mode='all') == (False, 'name_disagrees')

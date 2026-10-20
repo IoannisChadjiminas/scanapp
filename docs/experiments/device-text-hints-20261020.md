@@ -9,7 +9,8 @@ and production were not touched. Every new switch is off by default.
 |---|---|---|---|---|---|
 | `CLIENT_TEXT_FAST_PATH=true`: skip the optional OCR re-reads when the phone's name and number confirm a clear visual leader with one printing | **0 of 437** | 0.2% (6,584 to 6,574 ms mean locally; the noise floor is also 0.2%) | 2,555 / 5,199 to 2,533 / 5,148 ms (noise) | **0 of 155** (also 0 exact-field changes) | Safe, but saves nothing on this panel. Keep off. |
 | `CLIENT_TEXT_HINTS=true`: read and log the hint only | 0 | 0 by construction | n/a | 0 | Switch on with the app change, to measure the phone's accuracy on real scans. |
-| Not built: skip the server's *initial* footer read when the phone confirms a lone printing | up to ~1 of the 2 initial reads on about half the scans | upper bound roughly 5 to 10% locally | n/a | not measured; changes the evidence model | Worth a separate, designed experiment (see "Where the phone could still help"). |
+| **`CLIENT_TEXT_OCR=footer`**: the server reads only the title and takes the collector number from the phone, when the phone confirms the visual leader and its lone printing for that number | **37 of 437** (used on 37 of 155 scans) | **4.4%** (6,093 to 5,827 ms; 1.15 s saved on each scan where it was used) | 2,306 / 4,605 to 2,229 / 4,670 ms | **1 of 155**, a status upgrade on the right card (uncertain to matched); 0 wrong; 143/154 correct both | Best result here. The phone's number becomes evidence: confirm on staging (x86) before enabling. |
+| `CLIENT_TEXT_OCR=all`: the server reads no card text and uses the phone's name and number | 24 of 437 (used on 12) | 1.8% (to 5,982 ms; 1.68 s saved per use) | 2,294 / 4,707 ms | 0 of 155 | Safe, but the stricter tie rule leaves few scans. Not worth it over `footer`. |
 
 The fast path never fired on a scan that had anything to skip. It fired on 19 of 155 photos, and
 all 19 had only the two initial reads (title and footer) in the baseline. The 43 photos where the
@@ -18,8 +19,10 @@ not found, or the visual answer is not clear. That is structural, not a tuning p
 re-reads exactly when its own first read missed the collector number, read a weak title, or used
 an inferred frame, and the same small, blurred, clipped or slabbed footer defeats the phone too.
 
-The grading hint (`graded=false` skips label OCR, 24.5% less CPU, already the production default)
-remains the only phone-side change with a large measured saving. Part A below shows the app sends
+The phone's read does pay off when it replaces the server's *initial* footer read
+(`CLIENT_TEXT_OCR=footer`, section "Option 1"): 4.4% less CPU locally with no wrong answer. The
+grading hint (`graded=false` skips label OCR, 24.5% less CPU, already the production default)
+is still the largest phone-side saving. Part A below shows the app sends
 it, but only when its 300 ms ML Kit check answers in time.
 
 ## Part A: what the app already sends (PokeSingle at `20f5bc2`, read only)
@@ -145,6 +148,58 @@ Per-scan CPU differences between the fast-path pair are noise (p10 -147 ms, p50 
 p90 +157 ms). An earlier fast-path run that was not paired showed 3.9% less CPU; that was the
 machine getting quieter during its last 36 photos, not the fast path (the same 437 passes).
 
+## Option 1: the phone's read in place of server OCR (`CLIENT_TEXT_OCR`)
+
+`CLIENT_TEXT_OCR=off|footer|all` (default `off`; read only when set, like the hints). Decided before
+OCR on the first evaluation only (`ocr_skip_decision` in `client_text.py`). The phone may stand in
+only when it confirms what the pixels already say:
+
+- both phone fields present and at least 0.9 confident; card-shaped frame;
+- the full-card visual leader scores at least `THRESHOLD_MIN_VISUAL` (0.78), its name matches the
+  phone's name and its printed number the phone's number;
+- the catalogue has exactly one printing of that name and language with that number;
+- no near tie the phone would settle: within `THRESHOLD_MIN_GAP` (0.04) of the leader, `footer`
+  allows no other card with the phone's name (a reprint that only the number separates), `all`
+  allows no other card at all (alias ids of the leader excepted).
+
+`footer` then reads the title strip only. The phone's number is added as the collector read only
+if the server's own title read names the phone's card at 0.85 or more; otherwise the server reads
+the footer as usual. `all` reads no card text and uses both phone fields. Every use adds the
+confidence reason `phone_text_used_number` or `phone_text_used_all` and is logged
+(`ocr_skip=used_number` on the `client_text` line). The phone's text is evidence in these scans,
+but it can only agree with the visual leader; anything else runs the server's full read.
+
+Replay (three servers at the same time, as above):
+
+| Run | Phone used | OCR passes | CPU mean / p50 / p90 (ms) | HTTP p50 / p90 (ms) | Correct | Answer changes |
+|---|---|---|---|---|---|---|
+| baseline5 | - | 437 | 6,093 / 3,887 / 11,840 | 2,306 / 4,605 | 143/154 | - |
+| footer | 37 | 400 | 5,827 / 3,845 / 11,768 | 2,229 / 4,670 | 143/154 | 1 |
+| all | 12 | 413 | 5,982 / 3,931 / 11,955 | 2,294 / 4,707 | 143/154 | 0 |
+
+- `footer`, on the 37 scans where it was used: status unchanged on 36 (21 matched, 15 uncertain);
+  one slab (`fresh100_326160477186`, Abra 063/165) went from uncertain to matched because the
+  server's footer read had not proven the printing and the phone's number did. Printing went
+  from unconfirmed to supported on 4. No card changed, nothing got worse.
+- Why only 37: the phone sent no hint (18) or an incomplete one (37) on 55 photos; its name did
+  not match the visual leader on 32 (mostly the same artwork in Japanese ranked a hair above the
+  English card, see next point); its number did not on 10; low confidence 9; below the visual
+  floor 5; near-tied reprints 3; more than one printing 1; the server's title disagreed 1; frame
+  not card-shaped 1; eligible but the complete-frame probe read the card instead 1.
+- Tried and dropped: letting `footer` step over a higher-ranked Japanese print of the same art
+  (マリル 0.896 above Marill 0.895) when the server's own title read confirms the English card.
+  It raised use to 46 scans and the saving to 5.6% (paired run `baseline6` / `ocrfooter2`), but 3
+  matched scans became uncertain: the footer text the server no longer read is what lets the
+  ranker rule the Japanese print out by language, and without it the phone's number conflicts
+  with that print. The rule now keeps the visual first as the leader.
+- `all` uses the phone on few scans because any other card within 0.04 stops it, and same-art
+  prints in the other language are often that close.
+
+On x86 the saving should be larger in absolute terms, since OCR is a bigger share of staging's
+scan time (3.0 s of 4.5 s wall with the grading hint, against about 1.1 s of 3 s here), but the
+share of scans where the phone stands in is a property of the photos and the phone. Both need the
+staging replay below and, for real phone captures, the `client_text` log lines.
+
 ## Where the phone could still help
 
 1. **Get the grading hint on more scans.** Every `null` `graded` costs a full label read (a third
@@ -152,16 +207,10 @@ machine getting quieter during its last 36 photos, not the fast path (the same 4
    diagnostics first. Then make the check faster: one recognizer kept alive, no temporary file,
    and one text pass shared with the card-text read (`docs/device-hints-app-plan.md`, section 6).
    This is likely the largest phone-side CPU lever left, and it needs no server change.
-2. **Skip the server's initial footer read when the phone confirms a lone printing** (not built).
-   The initial footer read is 752 ms of OCR pass time per scan here, against 522 ms for the title.
-   About half the hinted scans (78 of 141 hint log lines) had a phone name and number that both
-   matched the server's final answer. Dropping the footer read on those would be an upper bound
-   of roughly 5 to 10% of local CPU, before the visual-margin and lone-printing conditions shrink
-   it. But it changes what the server knows: the collector number would come only from the phone,
-   so the existing rule that missing text never certifies a printing (as with
-   `OCR_TITLE_ONLY_SINGLE_PRINTING`, off in production) must decide the status, and a frozen-panel
-   replay on x86 must show no lost answers before anyone relies on it. This is the experiment to
-   run next if more CPU is needed, and it keeps the rule that the hint never picks a card.
+2. **More scans where the phone can stand in for the footer read** (`CLIENT_TEXT_OCR=footer`,
+   built, 4.4% here on 37 of 155 scans). Most misses are on the phone side: no or incomplete hint
+   on 55 photos. Real app captures are framed and sharper than eBay listings, so the `client_text`
+   log lines will show the real coverage; a better phone crop and number rule raise it directly.
 3. Keep `CLIENT_TEXT_FAST_PATH` off. It is safe on this panel (0 answer changes) but saved no work.
    It may matter for a different traffic mix (real phone photos are cleaner than eBay listings),
    which the `client_text` log lines will show before anyone switches it on.
@@ -176,11 +225,15 @@ fresh results database, scrapers and price jobs off, restart staging unchanged a
    `CLIENT_TEXT_HINTS=true`. Copy the panel and
    `device-text-hints-apple-vision-20261020.jsonl` into the container.
 2. `python scripts/cpu_replay.py --panel cases.json --root panel --hint --client-text hints.jsonl --out base.jsonl`
-3. Restart `bench-api` with `CLIENT_TEXT_FAST_PATH=true` added; same command to `fast.jsonl`.
-4. Repeat 2 and 3 once (noise floor), then `python scripts/compare_replay.py base.jsonl fast.jsonl base2.jsonl`.
-5. Pass: 0 card or status changes, and the `client_text` log lines' `fast_path=used` scans' OCR pass
-   counts lower than the baseline's. On this evidence the expected result is no saving, so this
-   replay is only worth running together with the experiment in item 2 above.
+3. Restart `bench-api` with `CLIENT_TEXT_OCR=footer` added; same command to `footer.jsonl`.
+4. Repeat 2 and 3 once (noise floor), then
+   `python scripts/compare_replay.py base.jsonl footer.jsonl base2.jsonl footer2.jsonl`.
+5. Pass: no card change, no matched scan turned uncertain and no wrong card turned matched, and
+   fewer OCR passes than the baseline. Status upgrades on the expected card (as on the Abra slab
+   here) are listed and reviewed by hand. Measure CPU per scan from the cgroup as on 2026-10-19.
+6. If it passes, enable in production in this order: `APP_CLIENT_TEXT=true` and
+   `CLIENT_TEXT_HINTS=true` with the app release; watch a week of `client_text` lines (agreement
+   with the answer, share of `ocr_skip=used_number`); then `CLIENT_TEXT_OCR=footer`.
 
 ## Limits
 
@@ -189,6 +242,8 @@ fresh results database, scrapers and price jobs off, restart staging unchanged a
   outcome table.
 - Apple Vision on a Mac is a proxy for iOS; ML Kit on Android was not simulated.
 - The phone's crop is simulated with the server's detector.
+- The local runs used staging's recognition flags (including `OCR_TITLE_ONLY_SINGLE_PRINTING=true`
+  and `USE_CLIENT_QUAD=true`); the production compose defaults some of these differently.
 - Local ARM run without reference features; answers differ from staging on some photos (see the
   2026-10-19 report), but both sides of each comparison used the same setup.
 
