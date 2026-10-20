@@ -64,6 +64,21 @@ class Settings(BaseSettings):
     # title and footer reads run. Cheaper, but a retry can recover a number the first read missed.
     # A policy change: replay the frozen panel on the full catalogue before enabling it.
     ocr_skip_retry_passes: bool = False
+    # Read the phone's own OCR of the card (client_text on POST /scans) and log how it
+    # agrees with the server. Off: the field is ignored. It never chooses a card.
+    client_text_hints: bool = False
+    # When the phone's name and collector number confirm a clear visual/artwork leader
+    # with a single printing for that number, skip the optional OCR re-reads (weak
+    # header, footer halves, original-upload re-read). Any disagreement keeps the full
+    # path. A policy change: replay the frozen panel before enabling it.
+    client_text_fast_path: bool = False
+    # Both phone fields must be at least this confident for the fast path.
+    client_text_min_confidence: float = 0.9
+    # Let the phone's read stand in for server OCR when it confirms the visual leader with
+    # one printing for that number. 'footer': the server reads only the title and takes the
+    # number from the phone; 'all': the server reads no card text. 'off' (default): never.
+    # The phone's text then becomes evidence: replay the frozen panel before enabling it.
+    client_text_ocr: str = 'off'
     # Optional NDJSON progress stream; legacy scans remain a single JSON response.
     scan_stream_results: bool = True
     enable_matched: bool = True
@@ -153,6 +168,9 @@ class Settings(BaseSettings):
     # Tell the phone (GET /config) to look for a graded slab on each photo and
     # send graded=true/false. Off until switched on here, no app rebuild.
     app_slab_detection: bool = False
+    # Tell the phone (GET /config) to read the card's name and collector number on
+    # the device and send them as client_text. Off until switched on here.
+    app_client_text: bool = False
     # Phone photo prep, sent through GET /config. Defaults match the app today.
     app_capture_preset: str = 'max'
     app_jpeg_quality: int = 95

@@ -9,13 +9,15 @@ class RequestOcrCache:
         self.hits = 0
         self.reads = 0
 
-    def read(self, engine, image, *, collector_retry_policy=None, read_footer=True):
+    def read(self, engine, image, *, collector_retry_policy=None, read_footer=True,
+             optional_retry_gate=None):
         # Geometry/rotation and every pixel must agree. Never reuse a title or
         # footer from a different crop, a previous upload, or the grading OCR.
         pixels = (image.mode, image.size, hashlib.sha256(image.tobytes()).digest())
         # A pruned read cannot satisfy a later request for complete evidence.
         # Complete observations can satisfy either policy without rereading.
         key = (*pixels, 'title_only' if not read_footer else
+               'client_text' if optional_retry_gate is not None else
                'adaptive' if collector_retry_policy is not None else 'full')
         complete_key = (*pixels, 'full')
         if complete_key in self._observations:
@@ -25,6 +27,9 @@ class RequestOcrCache:
             return deepcopy(self._observations[key]), True
         if not read_footer:
             observed = engine.read(image, read_footer=False)
+        elif optional_retry_gate is not None:
+            observed = engine.read(image, collector_retry_policy=collector_retry_policy,
+                                   optional_retry_gate=optional_retry_gate)
         elif collector_retry_policy is not None:
             observed = engine.read(image, collector_retry_policy=collector_retry_policy)
         else:

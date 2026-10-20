@@ -8,6 +8,7 @@ Modes (phone behaviour is simulated from the photo, nothing else is sent):
   --hint   send graded=true for slab photos and graded=false for all others
   --quad   send the server detector's own card corners as card_quad
   --warp   upload the server-warped card with skip_detect=true
+  --client-text HINTS  send each case's client_text from simulate_client_text.py output
 """
 import argparse
 import json
@@ -70,14 +71,19 @@ def main():
     p.add_argument('--warp', action='store_true')
     p.add_argument('--limit', type=int, default=10**9)
     p.add_argument('--server-pid', type=int)
+    p.add_argument('--client-text', type=Path)
     a = p.parse_args()
     global SERVER_PID
     SERVER_PID = a.server_pid
     cases = json.loads(a.panel.read_text())[:a.limit]
+    hints = ({r['id']: r['client_text'] for r in map(json.loads, a.client_text.read_text().splitlines())}
+             if a.client_text else {})
     with httpx.Client(timeout=120) as client, a.out.open('w') as handle:
         for case in cases:
             path = a.root / case['photo_file']
             data, form = path.read_bytes(), {'language': 'auto'}
+            if hints.get(case['id']):
+                form['client_text'] = hints[case['id']]
             if a.hint:
                 form['graded'] = 'true' if case['kind'] == 'slab' else 'false'
             if a.quad or a.warp:
@@ -101,11 +107,12 @@ def main():
             best = body.get('best_match') or {}
             row = dict(id=case['id'], kind=case['kind'], expected=case.get('expected_card_ids', []),
                 http=reply.status_code, http_ms=http_ms, cpu_ms=(after - before) / 1000,
-                status=body.get('status'), card_id=best.get('card_id'),
+                scan_id=body.get('id'), status=body.get('status'), card_id=best.get('card_id'),
                 alternatives=[s.get('card_id') for s in body.get('suggestions', [])][:5],
                 ocr=(body.get('ocr') or {}), grading=body.get('grading'),
                 timings=body.get('timings_ms'), printing=(body.get('confidence') or {}).get('printing'),
-                quad_sent='card_quad' in form, warped='skip_detect' in form)
+                quad_sent='card_quad' in form, warped='skip_detect' in form,
+                client_text_sent='client_text' in form)
             handle.write(json.dumps(row) + '\n')
             handle.flush()
             print(case['id'], reply.status_code, round(row['cpu_ms']), round(http_ms), row['status'], flush=True)

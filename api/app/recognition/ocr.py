@@ -36,6 +36,11 @@ class OcrResult:
     collector_retry_used: bool = False
     collector_retry_contributed: bool = False
     collector_retry_skipped: bool = False
+    # The phone's text confirmed the visual leader and this read did not
+    # contradict it, so the optional re-reads were left out (None: not asked).
+    client_text_gate: bool | None = None
+    # 'number' or 'all' when the phone's read stands in for this server read.
+    client_text_used: str | None = None
     # The caller asked for the title strip only; no footer evidence exists.
     footer_skipped: bool = False
     passes: list[dict] = field(default_factory=list)
@@ -718,7 +723,7 @@ class CardOcr:
         return hits, record
 
     def read(self, image: Image.Image, *, collector_retry_policy=None,
-             read_footer: bool = True) -> OcrResult:
+             read_footer: bool = True, optional_retry_gate=None) -> OcrResult:
         passes = []
         def run(patch, region, reason):
             if reason != 'initial' and getattr(self, 'skip_retry_passes', False):
@@ -780,7 +785,19 @@ class CardOcr:
                     run(_region(ocr_image, 0.82, 1.0), 'collector', 'initial')
                     if read_footer else ([], []))
             name_text = pick_confident_name(name_lines,name_scores)
-            if name_text is None and any(_is_layout_badge(t) and s is not None and s>=.85
+            # Asked once, on the untouched first reads. A failing gate keeps
+            # every established retry; it never adds or edits observations.
+            client_text_gate = None
+            if optional_retry_gate is not None:
+                try:
+                    client_text_gate = bool(optional_retry_gate(OcrResult(
+                        name_text=name_text, lines=[*name_lines, *number_lines], hits=[
+                            *(OcrHit(t, s, 'name') for t, s in zip(name_lines, name_scores)),
+                            *(OcrHit(t, s, 'collector') for t, s in zip(number_lines, number_scores))])))
+                except Exception:  # noqa: BLE001 - optional optimization fails closed
+                    client_text_gate = False
+            skip_optional = bool(client_text_gate)
+            if not skip_optional and name_text is None and any(_is_layout_badge(t) and s is not None and s>=.85
                                         for t,s in zip(name_lines,name_scores)):
                 # A holder/window can put the stage badge at the very bottom
                 # of the title strip and clip its following name. One wider
@@ -806,7 +823,7 @@ class CardOcr:
             # One higher-resolution title pass for weak reads. Require a
             # materially more confident, text-compatible reading; do not swap
             # an unrelated high-confidence title into the identity evidence.
-            if name_text and .50 <= name_confidence < .90:
+            if not skip_optional and name_text and .50 <= name_confidence < .90:
                 header = _region(image, 0., .22)
                 scale = min(3., 1200 / header.width)
                 if scale > 1.:
@@ -842,6 +859,12 @@ class CardOcr:
                 except Exception:  # noqa: BLE001 - optional optimization fails closed
                     retry_allowed = True
                 collector_retry_skipped = not retry_allowed
+            if (skip_optional and retry_allowed and read_footer and name_text
+                    and name_confidence >= .85 and not has_identifier):
+                # Like the adaptive footer: a skipped number read leaves the
+                # printing unconfirmed, never certified by the phone's text.
+                retry_allowed = False
+                collector_retry_skipped = True
             if not read_footer:
                 retry_allowed = False
             if image.width < 450 and name_text and name_confidence >= .85 and not has_identifier and retry_allowed:
@@ -941,6 +964,7 @@ class CardOcr:
                 collector_retry_used=collector_retry_used,
                 collector_retry_contributed=collector_retry_contributed,
                 collector_retry_skipped=collector_retry_skipped,
+                client_text_gate=client_text_gate,
                 footer_skipped=not read_footer,
                 passes=passes,
             )

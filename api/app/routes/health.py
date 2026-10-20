@@ -52,6 +52,8 @@ class AppConfigResponse(BaseModel):
     listing_max_age_s: int = 7 * 86400
     config_ttl_s: int
     slab_detection: bool = False
+    # Send the phone's own read of the card's name and number as client_text.
+    client_text: bool = False
     card_warp: bool = False
     capture: CaptureConfig = CaptureConfig()
     scan_prices: ScanPriceConfig
@@ -72,6 +74,7 @@ def scan_price_config(settings) -> AppConfigResponse:
         listing_max_age_s=max(1, min(int(settings.cardmarket_listing_max_age_days), 90)) * 86400,
         config_ttl_s=max(30, min(ttl, 24 * 60 * 60)),
         slab_detection=bool(settings.app_slab_detection),
+        client_text=bool(getattr(settings, 'app_client_text', False)),
         card_warp=bool(settings.app_card_warp),
         capture=CaptureConfig(
             preset=settings.app_capture_preset if settings.app_capture_preset in CAPTURE_PRESETS else 'max',
