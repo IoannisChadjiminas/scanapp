@@ -38,7 +38,7 @@ def test_one_preview_then_final_and_session_cookie_with_slot_released(repeat):
         assert events[0] == dict(type='accepted', trace='test')
         assert events[1]['candidates'][0]['card_id'] == 'initial-card'
         assert events[2]['result']['best_match']['card_id'] == 'different-final-card'
-        assert calls == [1] and not limiter._busy
+        assert calls == [1] and not limiter._active
         assert stream.headers['cache-control'] == 'no-store'
         assert stream.headers['x-accel-buffering'] == 'no'
         assert 'content-length' not in stream.headers
@@ -57,7 +57,7 @@ def test_error_is_terminal_sanitized_and_releases_slot(error, code):
             stream = scan_stream(loop=asyncio.get_running_loop(), executor=executor,
                 recognize=recognize, limiter=limiter, response=Response(), trace='test')
             events = [json.loads(chunk) async for chunk in stream.body_iterator]
-        assert events == [dict(type='accepted', trace='test'), dict(type='error', code=code)] and not limiter._busy
+        assert events == [dict(type='accepted', trace='test'), dict(type='error', code=code)] and not limiter._active
     asyncio.run(run())
 
 
@@ -76,13 +76,13 @@ def test_disconnected_consumer_does_not_release_slot_or_rerun_recognition():
             assert json.loads(await anext(iterator))['type'] == 'accepted'
             assert json.loads(await anext(iterator))['type'] == 'provisional'
             await iterator.aclose()
-            assert limiter._busy and not await limiter.acquire()
+            assert limiter._active and not await limiter.acquire()
             finish.set()
             for _ in range(100):
-                if not limiter._busy:
+                if not limiter._active:
                     break
                 await asyncio.sleep(.01)
-        assert calls == [1] and not limiter._busy
+        assert calls == [1] and not limiter._active
     asyncio.run(run())
 
 

@@ -125,8 +125,9 @@ async def lifespan(app: FastAPI):
 
     price_history.bind(dbs.portfolio)
     app.state.runtime = runtime
-    app.state.scan_limiter = ScanLimiter(settings.scan_wait_limit)
-    app.state.executor = ThreadPoolExecutor(max_workers=1, thread_name_prefix="scan")
+    lanes = max(1, settings.scan_lanes)
+    app.state.scan_limiter = ScanLimiter(settings.scan_wait_limit, slots=lanes)
+    app.state.executor = ThreadPoolExecutor(max_workers=lanes, thread_name_prefix="scan")
     app.state.image_executor = ThreadPoolExecutor(max_workers=2, thread_name_prefix="image")
     app.state.loop = asyncio.get_running_loop()
     bind_loop(app.state.loop)

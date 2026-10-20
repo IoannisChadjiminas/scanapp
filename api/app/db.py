@@ -1,10 +1,94 @@
 from __future__ import annotations
 
 import sqlite3
+import threading
 from pathlib import Path
 
 from app.config import Settings
 from app.schemas import Coverage, LanguageCoverage
+
+
+class SerializedCursor(sqlite3.Cursor):
+    """Every call holds its connection's lock: threads may share one connection."""
+
+    def __del__(self):
+        # sqlite3 finalizes a cursor's last prepared statement during GC.
+        # Close under the same lock before its C destructor runs.
+        try:
+            self.close()
+        except (sqlite3.Error, AttributeError):
+            pass
+
+    def _run(self, method, *args, **kwargs):
+        with self.connection._cache_lock:
+            return method(*args, **kwargs)
+
+    def execute(self, *args, **kwargs):
+        return self._run(super().execute, *args, **kwargs)
+
+    def executemany(self, *args, **kwargs):
+        return self._run(super().executemany, *args, **kwargs)
+
+    def executescript(self, *args, **kwargs):
+        return self._run(super().executescript, *args, **kwargs)
+
+    def fetchone(self):
+        return self._run(super().fetchone)
+
+    def fetchall(self):
+        return self._run(super().fetchall)
+
+    def fetchmany(self, *args, **kwargs):
+        return self._run(super().fetchmany, *args, **kwargs)
+
+    def __next__(self):
+        return self._run(super().__next__)
+
+    def close(self):
+        return self._run(super().close)
+
+
+class SerializedConnection(sqlite3.Connection):
+    """One connection shared by API and scan-lane threads, one call at a time.
+
+    Python's sqlite3 objects are not safe for simultaneous use from several
+    threads ("bad parameter or other API misuse"), even with
+    check_same_thread=False.
+    """
+    cursor_class = SerializedCursor
+
+    def __init__(self, *args, **kwargs):
+        self._cache_lock = threading.RLock()
+        super().__init__(*args, **kwargs)
+
+    def cursor(self, factory=None):
+        factory = factory or self.cursor_class
+        # Custom factories could silently bypass serialization.
+        if not issubclass(factory, self.cursor_class):
+            raise TypeError("Shared connection cursors must be serialized")
+        with self._cache_lock:
+            return super().cursor(factory)
+
+    def execute(self, *args, **kwargs):
+        return self.cursor().execute(*args, **kwargs)
+
+    def executemany(self, *args, **kwargs):
+        return self.cursor().executemany(*args, **kwargs)
+
+    def executescript(self, *args, **kwargs):
+        return self.cursor().executescript(*args, **kwargs)
+
+    def commit(self):
+        with self._cache_lock:
+            return super().commit()
+
+    def rollback(self):
+        with self._cache_lock:
+            return super().rollback()
+
+    def close(self):
+        with self._cache_lock:
+            return super().close()
 
 
 def connect(path: Path, *, factory=sqlite3.Connection) -> sqlite3.Connection:
@@ -434,12 +518,14 @@ class Databases:
         self.cloud_snapshot = None
         if settings.catalogue_backend not in {"sqlite", "planetscale"}:
             raise ValueError("Unsupported catalogue backend")
+        # Several scan lanes use these connections at once; one lane keeps plain ones.
+        shared = SerializedConnection if settings.scan_lanes > 1 else sqlite3.Connection
         if settings.catalogue_backend == "planetscale":
             from app.planetscale import CloudCatalogConnection
             self.catalog = connect(settings.catalog_sqlite, factory=CloudCatalogConnection)
         else:
-            self.catalog = connect(settings.catalog_sqlite)
-        self.results = connect(settings.results_sqlite)
+            self.catalog = connect(settings.catalog_sqlite, factory=shared)
+        self.results = connect(settings.results_sqlite, factory=shared)
         init_catalog(self.catalog)
         init_results(self.results)
         self._portfolio_owned = False
