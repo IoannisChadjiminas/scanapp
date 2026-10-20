@@ -9,7 +9,7 @@ and production were not touched. Every new switch is off by default.
 |---|---|---|---|---|---|
 | `CLIENT_TEXT_FAST_PATH=true`: skip the optional OCR re-reads when the phone's name and number confirm a clear visual leader with one printing | **0 of 437** | 0.2% (6,584 to 6,574 ms mean locally; the noise floor is also 0.2%) | 2,555 / 5,199 to 2,533 / 5,148 ms (noise) | **0 of 155** (also 0 exact-field changes) | Safe, but saves nothing on this panel. Keep off. |
 | `CLIENT_TEXT_HINTS=true`: read and log the hint only | 0 | 0 by construction | n/a | 0 | Switch on with the app change, to measure the phone's accuracy on real scans. |
-| **`CLIENT_TEXT_OCR=footer`**: the server reads only the title and takes the collector number from the phone, when the phone confirms the visual leader and its lone printing for that number | **37 of 437** (used on 37 of 155 scans) | **4.4%** (6,093 to 5,827 ms; 1.15 s saved on each scan where it was used) | 2,306 / 4,605 to 2,229 / 4,670 ms | **1 of 155**, a status upgrade on the right card (uncertain to matched); 0 wrong; 143/154 correct both | Best result here. The phone's number becomes evidence: confirm on staging (x86) before enabling. |
+| **`CLIENT_TEXT_OCR=footer`**: the server reads only the title and takes the collector number from the phone, when the phone confirms the visual leader and its lone printing for that number | 36 of 438 on staging (used on 36 of 155 scans) | **7.2% and 7.1% on staging** (9,170 to 8,510 ms and 9,086 to 8,444 ms; 2.4 s saved per use). Locally 4.4%. | staging p50 3,407 to 3,077 ms; p90 unchanged (7,506 / 7,599) | **2 of 155 on staging, both status upgrades on the right card** (two slabs, uncertain to matched); 0 wrong; 150/154 correct in every run | **Verified on staging.** The phone's number becomes evidence; enable after the app ships `client_text` and the log lines confirm real-capture accuracy. |
 | `CLIENT_TEXT_OCR=all`: the server reads no card text and uses the phone's name and number | 24 of 437 (used on 12) | 1.8% (to 5,982 ms; 1.68 s saved per use) | 2,294 / 4,707 ms | 0 of 155 | Safe, but the stricter tie rule leaves few scans. Not worth it over `footer`. |
 
 The fast path never fired on a scan that had anything to skip. It fired on 19 of 155 photos, and
@@ -215,11 +215,30 @@ staging replay below and, for real phone captures, the `client_text` log lines.
    It may matter for a different traffic mix (real phone photos are cleaner than eBay listings),
    which the `client_text` log lines will show before anyone switches it on.
 
-## Staging replay (proposed, not run)
+## Staging replay (run 2026-10-20)
 
-For final confirmation on x86 with reference features and the cloud catalogue, using the same
-throwaway-container method as 2026-10-19 (stop the live staging API during the runs, `--cpus 2`,
-fresh results database, scrapers and price jobs off, restart staging unchanged afterwards):
+`scripts/staging-client-text-replay.sh --run` on `auctaro-staging` (x86, 2 vCPU, 3.8 GB): the live
+ScanApp API container was stopped for the duration (about an hour; web, scraper and the other
+services kept running) and restarted unchanged afterwards (health ok, ready, import
+`PS-CATALOGUE-EN-JA-ENID2-20261019`). A throwaway `bench-api` ran the live API's own image and
+environment with this branch's code mounted read-only, the live data volume read-only, its own
+results database and catalogue-cache copy, 2 CPUs, captures, scrapers and price jobs off. Four
+alternating runs over the whole panel with the oracle `graded` hint and the simulated phone text;
+CPU from the container cgroup. The copied panel photos and environment file were deleted.
+
+| Run | CPU mean / p50 / p90 (ms) | HTTP p50 / p90 (ms) | OCR passes | Phone used | Correct | Answer changes vs base |
+|---|---|---|---|---|---|---|
+| base | 9,170 / 6,216 / 16,249 | 3,407 / 7,506 | 438 | - | 150/154 | - |
+| footer | 8,510 / 5,881 / 16,623 | 3,077 / 7,599 | 402 | 36 | 150/154 | 2 (upgrades) |
+| base2 | 9,086 / 6,275 / 16,350 | 3,393 / 7,668 | 438 | - | 150/154 | 0 (noise floor 0.9%) |
+| footer2 | 8,444 / 5,960 / 15,930 | 3,262 / 7,348 | 402 | 36 | 150/154 | 2 (the same two) |
+
+The two changes, identical in both footer runs: `fresh100_326160477186` (Abra 063/165 slab) and
+`fresh100_196431506881` (Pikachu slab, en:pop9-15), both uncertain to matched with the printing
+newly supported. On the second the server had misread 15/179 and the phone read 15/17. Rows and
+log lines: `data/latency/device-text-hints-20261020/staging/`.
+
+The original plan for this replay, kept for repeat runs (the script does all of it):
 
 1. Build an image from this branch and start `bench-api` with staging's environment plus
    `CLIENT_TEXT_HINTS=true`. Copy the panel and
@@ -249,6 +268,7 @@ fresh results database, scrapers and price jobs off, restart staging unchanged a
 
 ## Files
 
+- Staging runbook: `scripts/staging-client-text-replay.sh` (plan only unless `--run`).
 - Server: `api/app/recognition/client_text.py` (new), `api/app/recognition/pipeline.py`,
   `api/app/recognition/ocr.py`, `api/app/recognition/ocr_cache.py`, `api/app/routes/scans.py`,
   `api/app/routes/health.py`, `api/app/config.py`, `api/app/scan_summary.py`.
