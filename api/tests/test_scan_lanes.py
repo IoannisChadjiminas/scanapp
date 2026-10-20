@@ -185,7 +185,8 @@ def test_lanes_share_serialized_sqlite_connections(tmp_path):
     one = Databases(Settings(_env_file=None, data_dir=tmp_path / 'one', scan_lanes=1))
     two = Databases(Settings(_env_file=None, data_dir=tmp_path / 'two', scan_lanes=2))
     try:
-        assert not isinstance(one.catalog, SerializedConnection)
+        # One lane still shares them with the event loop, so they are serialized too.
+        assert isinstance(one.catalog, SerializedConnection) and isinstance(one.results, SerializedConnection)
         assert isinstance(two.catalog, SerializedConnection) and isinstance(two.results, SerializedConnection)
         two.catalog.executemany('INSERT INTO cards (id, provider_id, name, set_id, set_name, collector_number) '
                                 'VALUES (?, ?, ?, ?, ?, ?)',
@@ -205,3 +206,27 @@ def test_lanes_share_serialized_sqlite_connections(tmp_path):
     finally:
         one.close()
         two.close()
+
+
+def test_one_lane_results_connection_survives_event_loop_writes(tmp_path):
+    # With one lane, a scan thread inserts results while the event loop records
+    # feedback or grading completion on the same connection.
+    from app.db import Databases
+
+    dbs = Databases(Settings(_env_file=None, data_dir=tmp_path, scan_lanes=1))
+    try:
+        dbs.results.execute('CREATE TABLE race (worker INTEGER, n INTEGER)')
+        dbs.results.commit()
+
+        def write(worker):
+            for n in range(300):
+                dbs.results.execute('INSERT INTO race VALUES (?, ?)', (worker, n))
+                dbs.results.commit()
+                dbs.results.execute('SELECT count(*) FROM race WHERE worker = ?', (worker,)).fetchone()
+
+        with ThreadPoolExecutor(2) as pool:
+            for future in [pool.submit(write, worker) for worker in range(2)]:
+                future.result()
+        assert dbs.results.execute('SELECT count(*) FROM race').fetchone()[0] == 600
+    finally:
+        dbs.close()

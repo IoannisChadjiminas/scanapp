@@ -518,8 +518,9 @@ class Databases:
         self.cloud_snapshot = None
         if settings.catalogue_backend not in {"sqlite", "planetscale"}:
             raise ValueError("Unsupported catalogue backend")
-        # Several scan lanes use these connections at once; one lane keeps plain ones.
-        shared = SerializedConnection if settings.scan_lanes > 1 else sqlite3.Connection
+        # Scan lanes and the event loop (feedback, session results, grading
+        # completion) share these connections, even with one lane.
+        shared = SerializedConnection
         if settings.catalogue_backend == "planetscale":
             from app.planetscale import CloudCatalogConnection
             self.catalog = connect(settings.catalog_sqlite, factory=CloudCatalogConnection)
