@@ -44,6 +44,14 @@ git diff --quiet HEAD -- api/app api/scripts || { echo "commit api/ changes firs
 
 echo "== copy code $COMMIT, panel and hints to $HOST:$BENCH"
 ssh -o BatchMode=yes "$HOST" "test ! -e '$BENCH' || { echo '$BENCH already exists' >&2; exit 1; }; mkdir -p '$BENCH/kit' '$BENCH/out' && chmod 700 '$BENCH'"
+cleanup() {
+  status=$?
+  mkdir -p "$LOCAL_OUT"
+  scp -q -o BatchMode=yes "$HOST:$BENCH/out/*" "$LOCAL_OUT/" 2>/dev/null || true
+  ssh -o BatchMode=yes "$HOST" "rm -rf '$BENCH'" || true
+  exit $status
+}
+trap cleanup EXIT
 git archive --format=tar HEAD api/app api/scripts | ssh -o BatchMode=yes "$HOST" "tar -x -C '$BENCH'"
 COPYFILE_DISABLE=1 tar --no-xattrs -C "$PANEL" -cf - cases.json photos | ssh -o BatchMode=yes "$HOST" "tar -x -C '$BENCH/kit'"
 scp -q -o BatchMode=yes "$HINTS" "$HOST:$BENCH/kit/hints.jsonl"
@@ -63,7 +71,10 @@ $D inspect "$LIVE" --format '{{range .Config.Env}}{{println .}}{{end}}' > "$BENC
 vol=$($D volume inspect "$VOLUME" --format '{{.Mountpoint}}')
 mkdir -p "$BENCH/data"
 for entry in $(ls -A "$vol"); do
-  case "$entry" in results.sqlite*|review|captures|tmp) ;; *) ln -s "/data/$entry" "$BENCH/data/$entry" ;; esac
+  # The bench owns its results, and its own copy of the local catalogue cache (copied below,
+  # once the live API has stopped writing it); everything else is the live data, read-only.
+  case "$entry" in results.sqlite*|catalog.sqlite*|cache|review|captures|tmp) ;;
+    *) ln -s "/data/$entry" "$BENCH/data/$entry" ;; esac
 done
 
 restore() {
@@ -83,6 +94,8 @@ trap restore EXIT
 
 echo "== stop live API (web, scraper and other services keep running)"
 $D stop "$LIVE" >/dev/null
+cp -p "$vol"/catalog.sqlite* "$BENCH/data/"
+[ -d "$vol/cache" ] && cp -a "$vol/cache" "$BENCH/data/cache"
 
 for run in $RUNS; do
   extra=""
@@ -90,6 +103,8 @@ for run in $RUNS; do
   echo "== $run: start bench-api"
   $D rm -f bench-api >/dev/null 2>&1 || true
   rm -f "$BENCH/data/results.sqlite"*
+  # Every run starts from the same catalogue cache.
+  cp -p "$vol"/catalog.sqlite* "$BENCH/data/" 2>/dev/null || true
   $D run -d --name bench-api --cpus 2 --memory 4g --env-file "$BENCH/live.env" \
     -e DATA_DIR=/bench -e TMP_DIR=/tmp/bench -e STORE_CAPTURES=false -e SCRAPER_ENABLED=false \
     -e DAILY_PRICES_ENABLED=false -e PRICE_GUIDE_ENABLED=false -e TCGDEX_PRICES_ENABLED=false \
@@ -116,7 +131,6 @@ EOF
 echo "== copy results to $LOCAL_OUT"
 mkdir -p "$LOCAL_OUT"
 scp -q -o BatchMode=yes "$HOST:$BENCH/out/*" "$LOCAL_OUT/"
-ssh -o BatchMode=yes "$HOST" "rm -rf '$BENCH'"
 python3 api/scripts/compare_replay.py "$LOCAL_OUT/base.jsonl" "$LOCAL_OUT/footer.jsonl" \
   "$LOCAL_OUT/base2.jsonl" "$LOCAL_OUT/footer2.jsonl" > "$LOCAL_OUT/compare.json"
 echo "Done: $LOCAL_OUT/compare.json"
