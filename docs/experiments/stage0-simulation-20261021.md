@@ -15,7 +15,7 @@ Stage 1 answers when the phone vector's top card and the catalogue card for the 
 | Same card, margin > 0 | 17 | 17 | **0** | 10.8% |
 | **Proposed gate: same card, margin ≥ 0.02** | **13** | **13** | **0** | **8.3%** |
 
-Round 2, below, keeps that same margin and raises the gate to **36 of 157 (22.9%)**, still with 0 wrong.
+Round 2, below, keeps that same margin and raises the gate to **36 of 157 (22.9%)**, still with 0 wrong. Round 3, the footer read, raises it again to **40 of 157 (25.5%)**.
 
 No confidence cut and no quality cut. Vision's confidence is often 1.0 on a wrong read, so it does not separate the panel. The correct answers include a soft crop (sharpness 463) and a little glare (0.066). A sharpness floor or a glare cap would only drop correct answers.
 
@@ -318,6 +318,121 @@ The 23 misreads are 19 slabs, 3 raw photos and the Lugia screenshot. The three r
 
 The 9 `vector_wrong` rows are the ones the twin cut leaves out: the same-language reprints (Sandshrew twice, Electabuzz), Scizor `en:sv10-188` against `en:sv03-205`, Armarouge's vector `en:me02-095`, Blastoise ex at cosine 0.752, Pikachu ex against メガカイリューex at 0.774, Comfey, and Charmander. The 7 catalogue misses are a number with a name that matches nothing (`DOBOAD`, `FEEID`, and similar). The 3 number misreads are slabs whose digits are wrong (`21/99` for `71/99`, `SWSH267` for `SWSH261`, `06/108` for `106/108`). Twelve photos still have no rectangle.
 
+## Round 3
+
+Same catalogue, same gate (margin ≥ 0.02), same Fix A and Fix B. The only change is the simulated phone's collector-number read. The full-card Vision pass stays. After it, the phone reads the bottom 14% of the straightened card at 2×, then the bottom-left and bottom-right corners (35% × 15%) if that strip has no catalogue number, then the strip once more with a contrast boost. `minimumTextHeight` on those crops is 0.015, and language correction stays off. Digit swaps (`O→0`, `I→1`, `S→5`, `B→8`, `Z→2`) apply only inside a number. A number is kept when the catalogue has that printed number, or that collector number in a set of the same total. `017/012` fails that check. On a slab, label words are dropped from the card name, and the label number is used when the footer has nothing.
+
+2× is the scale that stays inside the time budget. On this Mac the extra reads add a median **52 ms** and a p90 of **138 ms** (mean 74 ms, 145 photos that have a crop).
+
+### Number-read rate
+
+Photos whose `client_text` has a collector number.
+
+| Kind | Photos | Round 2 | Round 3 |
+|---|---:|---:|---:|
+| Raw | 100 | 70 | 74 |
+| Slab | 50 | 22 | 33 |
+| Phone | 5 | 4 | 4 |
+| Screenshot | 2 | 1 | 2 |
+| **All** | **157** | **97 (61.8%)** | **113 (72.0%)** |
+
+Lugia's contrast retry now reads `017/032`, and the name is the label's `LUGIA EX`. Charmander keeps the label number `18a/147`. Neither becomes a stage 1 answer: Lugia's vector is still `ja:CP3-018`, and Charmander's vector is still below the twin cut.
+
+### Stage 1
+
+| | Margin > 0 | Wrong | Margin ≥ 0.02 | Wrong | Share |
+|---|---:|---:|---:|---:|---:|
+| Round 2 | 50 | 0 | 36 | 0 | 22.9% |
+| **Round 3** | **57** | **0** | **40** | **0** | **25.5%** |
+
+By kind at the gate: raw 33 of 100, slab 7 of 50, phone 0 of 5, screenshot 0 of 2. At any positive margin: raw 48, slab 9, phone 0, screenshot 0.
+
+Each row adds one change on top of the row above. Stage 1 is the margin ≥ 0.02 gate.
+
+| After this change | Photos with a number | Stage 1 | Wrong |
+|---|---:|---:|---:|
+| Round 2 | 97 | 36 | 0 |
+| Footer strip at 2× | 103 | 39 | 0 |
+| Bottom corners, when the strip misses | 105 | 40 | 0 |
+| Number cleanup and the extra formats | 107 | 41 | 0 |
+| Catalogue check | 102 | 40 | 0 |
+| Contrast retry | 103 | 40 | 0 |
+| Slab label filter and label number | 113 | 40 | 0 |
+
+The catalogue check is the step that drops a number. It removed `TG01/80` on `fresh100_387647223051` (Parasect, the real total is 30). That read had been a correct stage 1 answer, and it is not one after the check. The gate stays at 0 wrong. The contrast retry recovered Lugia's `017/032` and one other number, and neither is a new stage 1 answer. The slab rules add nine numbers, mostly the label number, and those photos still do not agree with the vector.
+
+### New answers at the gate
+
+| Photo | Card | Margin |
+|---|---|---:|
+| `holdout3_008` | `en:swsh12.5gg-GG05` Lapras | 0.100 |
+| `fresh100_336576388984` | `en:swshp-SWSH261` Charizard VMAX | 0.037 |
+| `fresh100_146314372000` | `en:xy12-106` Dragonite | 0.025 |
+| `holdout3_012` | `en:swsh12.5gg-GG46` Deoxys | 0.022 |
+
+Three more agree and are correct, with margins just under 0.02, so the gate leaves them: `holdout4_017` (`en:swsh12.5gg-GG47`, 0.020), `freshraw_0_1807925107` (`en:sv02-204`, 0.011), `fresh100_145701209354` (`en:swsh7-29`, 0.006).
+
+### Still no number
+
+44 photos. Twelve have no rectangle. Four crops are tiny, three are cut off, five footers came back empty. Sixteen have footer text and no number pattern: the line is copyright, a weakness line, or a gallery number whose slash was lost (`GG41GG70`). Four were read and rejected: `TG01/80`, `210/109`, `RC29/32`, `GG46/20`. The one phone photo still missing a number is Toxel (`reported:5f743be8-…`): the footer sentence contains `078` and no fraction.
+
+| Photo | Kind | Why |
+|---|---|---|
+| `fresh100_135663917530` | raw | no rectangle |
+| `fresh100_396269138140` | raw | tiny crop |
+| `fresh100_387647223051` | raw | read `TG01/80`, rejected |
+| `fresh100_336501773626` | raw | footer text, no number |
+| `fresh100_125514764134` | raw | footer text, no number |
+| `fresh100_205836607918` | raw | no rectangle |
+| `fresh100_267406776028` | raw | read `210/109`, rejected |
+| `freshimg_0_1212241946` | slab | tiny crop |
+| `freshimg_0_967558432` | slab | read `RC29/32`, rejected |
+| `freshimg_1_113190404` | slab | no rectangle |
+| `fresh100_157312218315` | slab | tiny crop |
+| `fresh100_206285662050` | slab | footer empty |
+| `fresh100_126873299285` | slab | footer text, no number |
+| `fresh100_135116047131` | slab | no rectangle |
+| `fresh100_326075712447` | slab | tiny crop |
+| `fresh100_287247791643` | slab | footer text, no number |
+| `fresh100_177390016065` | slab | no rectangle |
+| `fresh100_407246892266` | slab | footer empty |
+| `fresh100_197768683572` | slab | footer text, no number |
+| `fresh100_407246154199` | slab | footer text, no number |
+| `fresh100_287264323565` | slab | footer text, no number |
+| `freshextra_1_1957211138` | slab | footer empty |
+| `fresh100_146365926690` | slab | no rectangle |
+| `fresh100_205148259527` | slab | footer text, no number |
+| `holdout4_004` | raw | footer text, no number |
+| `holdout4_006` | raw | no rectangle |
+| `holdout4_009` | raw | footer text, no number |
+| `holdout4_011` | raw | footer empty |
+| `holdout4_013` | raw | no rectangle |
+| `holdout4_016` | raw | footer text, no number |
+| `holdout4_027` | raw | footer text, no number |
+| `holdout4_046` | raw | no rectangle |
+| `holdout4_047` | raw | card cut off |
+| `holdout4_050` | raw | footer empty |
+| `holdout4_058` | raw | no rectangle |
+| `holdout4_070` | raw | card cut off |
+| `holdout4_078` | raw | card cut off |
+| `holdout4_105` | raw | no rectangle |
+| `holdout3_009` | raw | no rectangle |
+| `holdout3_014` | raw | read `GG46/20`, rejected |
+| `holdout3_016` | raw | footer text, no number |
+| `holdout3_017` | raw | footer text, no number |
+| `holdout3_018` | raw | footer text, no number |
+| `reported:5f743be8-6e58-4a77-9263-6a5fae525291` | phone | footer text, no number |
+
+### Port to the app
+
+The Mac run is the specification. Nothing in PokeSingle was changed.
+
+- `ios/Runner/CardWarp.swift` `recognizeText`: add a second request for a crop. Bottom 14% of the straightened card, upscaled 2×, and the two bottom corners at 35% × 15%. Set `minimumTextHeight` to 0.015 and leave `usesLanguageCorrection` false. One contrast-boosted retry of the strip when the first reads have no catalogue number.
+- `lib/data/text_pass.dart`: run that request after the full-card pass, corners only if the strip missed, and stop once a number is in hand. The extra work on this Mac was 52 ms median, 138 ms p90.
+- `lib/data/card_text.dart` `pickCardNumber`: clean digits only inside a number, accept `18a/147`, `TG01/TG30`, `GG38/GG70`, `SWSH020`, `SVP 053` and `001/S-P`, and reject a line that sits above the bottom 10% of the card. A fused `GG41GG70`, with the slash missing, is the pattern that still fails here.
+- The catalogue check needs set totals. The API already stores them in `set_totals`. Bundle that table, or let stage 1 reject a number whose denominator matches no set total, before the phone treats it as read.
+- `lib/data/label_text.dart`: do not use a label word as the card name (the server's `grading_label_line` and `slab_label_field`: PRISTINE, GEM MINT, a dated Pokémon header, `#17HOLO`). When the footer has no valid number, send the label number and the label's language.
+
 ## How to run it again
 
 The catalogue export and the reference images are gitignored, under `data/latency/stage0-simulation-20261021/kit/`:
@@ -338,9 +453,15 @@ Then:
 api/scripts/stage0_simulation.sh
 ```
 
-That compiles `vision_text`, simulates corners, text, slab labels, quality and the embedding, converts the palettized model if it is missing, replays the panel against a local API with the production flags, and writes `data/latency/stage0-simulation-20261021/stage1.json` plus `docs/experiments/stage0-duplicate-pairs-20261021.csv`. Round 2 is the estimate step. With the phone fields and the replay already on disk, rerun just that step:
+That compiles `vision_text`, simulates corners, text, the footer and corner number read, slab labels, quality and the embedding, converts the palettized model if it is missing, replays the panel against a local API with the production flags, and writes `data/latency/stage0-simulation-20261021/stage1.json` plus `docs/experiments/stage0-duplicate-pairs-20261021.csv`. Round 3's number read is `api/scripts/footer_numbers.py`, and it uses set totals from `data/catalogue-completion/staging-data-local-20261014/catalog.sqlite`. With the phone fields and the replay already on disk, rerun the number read and then the estimate:
 
 ```
+.venv/bin/python api/scripts/footer_numbers.py \
+  --stage0 data/latency/stage0-simulation-20261021/stage0.jsonl \
+  --catalog data/latency/stage0-simulation-20261021/kit/catalog.sqlite \
+  --totals data/catalogue-completion/staging-data-local-20261014/catalog.sqlite \
+  --vision /tmp/vision_text \
+  --ablation data/latency/stage0-simulation-20261021/footer-ablation.json
 .venv/bin/python api/scripts/estimate_stage1.py \
   --panel data/latency/stage0-simulation-20261021/stage0.jsonl \
   --index data/latency/stage0-simulation-20261021/kit/vectors/pad \

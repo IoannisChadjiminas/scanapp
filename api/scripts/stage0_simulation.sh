@@ -15,10 +15,14 @@ MODELS="${MODELS:-$ROOT/data/catalogue-completion/staging-data-local-20261014/mo
 MODEL="$OUT/coreml_pal8.mlpackage"
 
 mkdir -p "$OUT" "$RUNTIME"
-if [[ ! -x /tmp/vision_text ]]; then
+if [[ ! -x /tmp/vision_text || "$ROOT/api/scripts/vision_text.swift" -nt /tmp/vision_text ]]; then
   swiftc -O "$ROOT/api/scripts/vision_text.swift" -o /tmp/vision_text
 fi
 "$PY" "$ROOT/api/scripts/simulate_stage0.py" fields --out "$OUT" --vision /tmp/vision_text
+"$PY" "$ROOT/api/scripts/footer_numbers.py" \
+  --stage0 "$OUT/stage0.jsonl" --catalog "$KIT/catalog.sqlite" \
+  --totals "$ROOT/data/catalogue-completion/staging-data-local-20261014/catalog.sqlite" \
+  --vision /tmp/vision_text --ablation "$OUT/footer-ablation.json"
 
 if [[ ! -d "$MODEL" ]]; then
   "$COREML_PY" "$ROOT/api/scripts/simulate_stage0.py" convert --onnx "$ONNX" --model "$MODEL"
