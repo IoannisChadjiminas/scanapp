@@ -53,12 +53,14 @@ def number_key(value: str | None) -> str | None:
     return f'{match[1]}{int(match[2])}{match[3]}'
 
 
-def label_lines(hits: list[OcrHit]) -> list[str]:
+def label_lines(hits: list[OcrHit], recovery: bool = False) -> list[str]:
     """Confident title-strip lines, only when a grading label is visibly among them."""
+    from app.recognition.ocr import slab_label_field
     lines = [h.text for h in hits if h.region in ('name', 'holder_name')
              and h.confidence is not None and h.confidence >= MIN_CONFIDENCE]
     holder = any(h.region == 'holder_name' for h in hits)
-    return lines if holder or any(grading_label_line(line) for line in lines) else []
+    marked = any(grading_label_line(line) or (recovery and slab_label_field(line)) for line in lines)
+    return lines if holder or marked else []
 
 
 def parse_label(lines: list[str], recovery: bool = False) -> tuple[list[str], str | None]:
@@ -134,7 +136,7 @@ def set_score(label_set: str, set_name: str, set_id: str = '') -> float:
 def label_identity_candidates(index, catalog: sqlite3.Connection, *, hits: list[OcrHit],
                               languages: tuple[str, ...], recovery: bool = False) -> tuple[list[str], str]:
     """`recovery` (SLAB_TEXT_RECOVERY): fused PSA numbers, PSA language codes and set aliases."""
-    lines = label_lines(hits)
+    lines = label_lines(hits, recovery)
     if not lines:
         return [], 'no_label'
     sets, number = parse_label(lines, recovery)
@@ -199,16 +201,3 @@ def read_label_half(engine, image: Image.Image) -> tuple[list[OcrHit], dict]:
         patch.close()
     return [OcrHit(t, s, 'holder_name') for t, s in zip(lines, scores)], record
 
-
-def read_label_strip(engine, label: Image.Image) -> tuple[list[OcrHit], dict]:
-    """One OCR read of a holder's label strip, upscaled so small label text is legible."""
-    scale = min(3., 1200 / max(label.width, 1))
-    patch = label.resize((round(label.width * scale), round(label.height * scale)),
-                         Image.Resampling.LANCZOS) if scale > 1. else label
-    started = time.perf_counter()
-    try:
-        lines, scores = engine._run(patch)
-    finally:
-        record = dict(region='label', reason='holder_label', width=patch.width, height=patch.height,
-                      ms=round((time.perf_counter() - started) * 1000, 2))
-    return [OcrHit(t, s, 'holder_name') for t, s in zip(lines, scores)], record

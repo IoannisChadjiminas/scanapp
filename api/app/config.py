@@ -82,9 +82,6 @@ class Settings(BaseSettings):
     # strips read no printed number (a screenshot's status and browser bars), read the whole
     # upload once (~1,400 px) and feed its lines to the number+name and label paths.
     full_image_text_fallback: bool = False
-    # A client quad around a slab holder (portrait 0.52-0.68): embed, match artwork and read
-    # the title/footer on the card region inside it; read the label strip separately.
-    holder_card_region: bool = False
     # Slab text repairs: PSA labels whose set name is not the catalogue's (label name +
     # number + language, "#17HOLO", "JP", set aliases), the set line under a dated label
     # header is never the name, a footer fraction with an unknown denominator (017/012)

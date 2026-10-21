@@ -34,8 +34,7 @@ from app.recognition.client_text import (OCR_MODES as CLIENT_TEXT_OCR_MODES, VER
                                          phone_read, server_read_agrees, with_phone_number)
 from app.recognition.detect import (card_frame_candidates, client_quad_rect, detect_and_rectify,
                                     quads_agree, server_frame_rect, warp_to_rect)
-from app.recognition.frame_fallback import (holder_card_region, holder_shaped, line_frame_candidates,
-                                            loose_frame_candidates, portrait_window_candidates, slab_interior_candidate)
+from app.recognition.frame_fallback import line_frame_candidates, loose_frame_candidates, portrait_window_candidates, slab_interior_candidate
 from app.recognition.images import apply_crop, blur_variance, decode_image
 from app.recognition.embed import top_k
 from app.recognition.identity import layout_identity_agrees, likely_identity_agrees, structured_identity_agrees
@@ -62,7 +61,7 @@ from app.recognition.title_retry import read_conflicting_title, title_retry_allo
 from app.recognition.text_identity import (VERSION as TEXT_IDENTITY_VERSION, confident_fractions, name_agrees,
                                            name_tokens, read_whole_image, text_identity_candidates)
 from app.recognition.label_identity import (VERSION as LABEL_IDENTITY_VERSION, label_identity_candidates,
-                                            read_label_half, read_label_strip)
+                                            read_label_half)
 from app.schemas import (
     Candidate,
     GradingEvidence,
@@ -272,7 +271,6 @@ def _recognize_bytes_once(
     mark = time.perf_counter()
     detected = False
     quad_notes: list[str] = []
-    holder_label = None
     if _frame_override is not None:
         image = _frame_override[1]
         detected = _frame_detected_override
@@ -281,12 +279,6 @@ def _recognize_bytes_once(
                 and all(v is None for v in (crop_x, crop_y, crop_w, crop_h))):
             image, detected, quad_note = _detect_with_client_quad(image, card_quad)
             quad_notes.append(quad_note)
-            if (getattr(settings, 'holder_card_region', False) and detected
-                    and quad_note == 'client_quad_only' and holder_shaped(image)):
-                # The phone outlined the slab, not the card: embed, match and read the
-                # card inside it, and keep the label strip for the label paths.
-                image, holder_label, holder_profile = holder_card_region(image)
-                quad_notes.append(f'holder_card_region:{holder_profile}')
         else:
             image, detected = detect_and_rectify(image)
     timings["detect_ms"] = (time.perf_counter() - mark) * 1000
@@ -299,7 +291,7 @@ def _recognize_bytes_once(
     frame_selection = {}
     alternatives = []
     mark = time.perf_counter()
-    if not skip_detect and _frame_override is None and holder_label is None:
+    if not skip_detect and _frame_override is None:
         if detected:
             alternatives.append(('as_supplied', input_image))
             slab = slab_interior_candidate(image)
@@ -629,22 +621,14 @@ def _recognize_bytes_once(
             if slab_label:
                 label_ids, label_reason = label_identity_candidates(metadata_index, catalog,
                     hits=ocr.hits, languages=rank_languages, recovery=recovery)
-                if holder_label is not None and not text_ids and not label_ids:
-                    # The card region holds no label: read the holder's own label strip.
-                    holder_hits, holder_pass = read_label_strip(ocr_engine, holder_label)
-                    ocr_passes.append(dict(scope='holder_label', **holder_pass))
-                    label_ids, label_reason = label_identity_candidates(metadata_index, catalog,
-                        hits=[*ocr.hits, *holder_hits], languages=rank_languages, recovery=recovery)
-                    ocr.hits.extend(holder_hits)
-                    ocr.lines.extend(h.text for h in holder_hits)
-                if (label_reason == 'no_label_number' and not text_ids and holder_label is None
+                if (label_reason == 'no_label_number' and not text_ids
                         and callable(getattr(ocr_engine, '_run', None))):
                     # The title strip caught only the label's header. One read of the
                     # upload's upper half for the label's set line and number.
                     label_hits, label_pass = read_label_half(ocr_engine, input_image)
                     ocr_passes.append(dict(scope='slab_label', **label_pass))
                     label_ids, label_reason = label_identity_candidates(metadata_index, catalog,
-                        hits=[*ocr.hits, *label_hits], languages=rank_languages)
+                        hits=[*ocr.hits, *label_hits], languages=rank_languages, recovery=recovery)
                 text_ids = sorted({*text_ids, *label_ids})
                 if len(text_ids) > 3:
                     text_ids, text_reason = [], 'too_many_candidates'
@@ -915,9 +899,6 @@ def _recognize_bytes_once(
         status_reasons.append('footer_retry_skipped')
     # A foreground/min-area rectangle is only a retrieval proposal. Even a
     # strong global match on it stays reviewable, never an automatic printing.
-    if holder_label is not None and status == 'matched':
-        status = 'uncertain'
-        status_reasons.append('holder_card_region')
     if inferred_frame and status == 'matched':
         status = 'uncertain'
         status_reasons.append('inferred_frame')
@@ -1549,9 +1530,7 @@ def recognize_bytes(
                                   warnings=['grading_not_requested'])
         label_seen = (any(h.region in ('holder_name', 'holder_collector')
                           for ev in (first, selected) for h in ev.ocr.hits)
-                      # A phone quad around a holder is a slab too, label read or not.
-                      or any(str(reason).startswith('holder_card_region')
-                             for ev in (first, selected) for reason in ev.evidence.get('status_reasons', []))
+
                       or any(str((ev.evidence.get('frame_selection') or {}).get('profile', ''))
                              .startswith('slab_') for ev in (first, selected)))
         if (label_seen and getattr(settings, 'use_grading', True)

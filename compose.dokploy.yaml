@@ -56,10 +56,9 @@ services:
       # No card frame and no printed number in the strips (a screenshot's status/browser
       # bars): one whole-image read feeds the same text paths. docs/experiments/full-image-text-fallback-20261021.md
       FULL_IMAGE_TEXT_FALLBACK: ${FULL_IMAGE_TEXT_FALLBACK:-true}
-      # A phone quad around a slab holder: embed/read the card inside it, read the label
-      # strip separately; PSA label name+number+language, numerator+name for misread
-      # denominators. docs/experiments/holder-quad-card-region-20261021.md
-      HOLDER_CARD_REGION: ${HOLDER_CARD_REGION:-true}
+      # Slab label text repairs: PSA label name+number+language, label lines never the
+      # name, attack damage never the number, numerator+name for misread denominators.
+      # docs/experiments/slab-text-recovery-20261021.md
       SLAB_TEXT_RECOVERY: ${SLAB_TEXT_RECOVERY:-true}
       SCAN_STREAM_RESULTS: ${SCAN_STREAM_RESULTS:-true}
       PREVIEW_LANGUAGE_ORDER: ${PREVIEW_LANGUAGE_ORDER:-true}
