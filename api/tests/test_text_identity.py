@@ -119,7 +119,7 @@ def test_more_than_three_named_cards_is_too_broad(tmp_path):
 
 def scan(tmp_path, monkeypatch, *, enabled, verify_aligned=True, lead_score=.73, name='PRISTINE',
          slab_label=False, lead_name='オーロンゲ', screenshot=False, full_image=False, detected=False,
-         holder=False, holder_region=False, recovery=False):
+         holder=False, holder_region=False, recovery=False, recorded=None):
     """One slab-screenshot scan through the real pipeline with a faked OCR and verifier."""
     monkeypatch.setattr('app.recognition.pipeline.detect_and_rectify', lambda im: (im, detected))
     for name_ in ('card_frame_candidates', 'loose_frame_candidates', 'portrait_window_candidates'):
@@ -155,6 +155,8 @@ def scan(tmp_path, monkeypatch, *, enabled, verify_aligned=True, lead_score=.73,
                  + [OcrHit('017/012', .93, 'collector')])
         card = OcrResult(name_text='ルギア', collector_text=None, lines=['ルギア', '230'],
             hits=[OcrHit('ルギア', .998, 'name'), OcrHit('230*', .98, 'name'), OcrHit('×2', .8, 'collector')])
+    if recorded is not None:
+        observed = recorded
     if screenshot:
         # The app failure: the strips hold only the phone's status and browser bars.
         observed = OcrResult(name_text=None, collector_text='36', lines=['11:38', '1/5', '③ auctaro.com', '36'],
@@ -463,3 +465,33 @@ def test_slab_label_lines_and_attack_damage_are_never_name_or_number():
     assert pick_collector_text(['Flame Tail', '20', '×2', 'retreat'], template_filter='set_lines') is None
     assert pick_collector_text(['053'], template_filter='set_lines') == '053'
     assert pick_collector_text(['SWSH050'], template_filter='set_lines') == 'SWSH050'
+
+
+STAGING_SLAB_OUTLINE = next(c for c in CASES if c['id'] == 'staging_862c09b5')
+
+
+@pytest.mark.parametrize('recovery', [False, True])
+def test_slab_outline_scan_862c09b5_ends_on_lugia_never_the_visual_guess(tmp_path, monkeypatch, recovery):
+    """The app's exact scan, replayed through the pipeline with its own recorded OCR.
+
+    The quad is the slab outline (784x1238 frame, client_quad_only), the title strip holds
+    the PSA-style label and the footer reads 017/012. Today the visual guess (standing in
+    for Inteleon) wins; with SLAB_TEXT_RECOVERY the label's LUGIA EX + #17 + JP gives
+    ja:CLF-017, verified by projecting its artwork onto the upload.
+    """
+    monkeypatch.setattr('app.recognition.pipeline.client_quad_rect',
+                        lambda image, fractions: np.float32([[12, 338], [796, 338], [796, 1575], [12, 1575]]))
+    monkeypatch.setattr('app.recognition.pipeline.server_frame_rect', lambda image: None)
+    recorded = [OcrHit(h['text'], h['confidence'], h['region']) for h in STAGING_SLAB_OUTLINE['hits']]
+    observed = OcrResult(name_text='CLASSIC COLLECTION', collector_text='017/012',
+                         lines=[h.text for h in recorded], hits=recorded)
+    response, evidence, boundary = scan(tmp_path, monkeypatch, enabled=True, slab_label=True, holder=True,
+                                        recovery=recovery, recorded=observed)
+    assert 'client_quad_only' in evidence['status_reasons']
+    shown = [s.card_id for s in response.suggestions]
+    if recovery:
+        assert shown == ['ja:CLF-017'] and response.confidence.requires_confirmation
+        assert evidence['text_identity']['label_ids'] == ['ja:CLF-017']
+        assert evidence['text_identity']['outcome'] == 'verified' and not boundary
+    else:
+        assert 'ja:CLF-017' not in shown and evidence['text_identity']['label_ids'] == []

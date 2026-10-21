@@ -27,7 +27,7 @@ All are slab screenshots from the iOS gallery with `quad=rect`. The quads are no
 
 | Scan | Frame | Was | Cause | With `SLAB_TEXT_RECOVERY` (recorded OCR, fixture) |
 |---|---|---|---|---|
-| ad1b8f19, 072818fe | 784×1238 slab | ja:S8b-038 Inteleon | name "CLASSIC COLLECTION"; `#17HOLO` not parsed; PSA set name not in catalogue; footer 017/012 | label: #17 + JP + LUGIA EX → ja:CLF-017 |
+| ad1b8f19, 072818fe, 862c09b5 | 784×1238 slab | ja:S8b-038 Inteleon | name "CLASSIC COLLECTION"; `#17HOLO` not parsed; PSA set name not in catalogue; footer 017/012 | label: #17 + JP + LUGIA EX → ja:CLF-017 |
 | b73e0359 | 906×1236 | ja:CLF-017 verified | (footer 017/032 read) | unchanged; name now LUGIA EX, not CLASSIC COLLECTION |
 | b6b5a00b | 694×917 card window | ja:SM10b-065 | name "CLASSIC COLLECTION", no number | name ルギア; label #17 + CLASSIC COLLECTION alias → CLF-017 |
 | 14f53a69 | 662×817 | retake | name "#17HOLO", collector "200" | name ルギア, collector none; label #17 + ルギア → CLF-017 |
@@ -72,13 +72,17 @@ All are slab screenshots from the iOS gallery with `quad=rect`. The quads are no
 
 ## Regression fixtures
 
-- **`api/tests/fixtures/text_identity_cases.jsonl`** gains the recorded OCR of all eight staging scans above (`staging_<id>`), each with its true catalogue neighbourhood. For `e61fc463` it also holds the upper-half label read, recorded on the Charmander screenshot at 923×2000. The test asserts, per scan:
+- **`api/tests/fixtures/text_identity_cases.jsonl`** gains the recorded OCR of all nine staging scans above (`staging_<id>`), each with its true catalogue neighbourhood. For `e61fc463` it also holds the upper-half label read, recorded on the Charmander screenshot at 923×2000. The test asserts, per scan:
   - the old name and collector picks are reproduced;
   - with recovery, no label line becomes the name and no damage or template word becomes the number;
   - label recovery (or numerator + name) gives exactly the expected card;
   - `cab13528`, which was answered by its picture, is not disturbed.
 - **Unit tests** cover the new label fields, damage, the CJK-title preference and the guards.
-- **Full API suite:** 870 passed, 4 skipped.
+- **Top acceptance case, `862c09b5`** (app build 1.0.0+147, the app's exact 421,985-byte upload, slab-outline quad; its OCR is identical to ad1b8f19 and 072818fe). A pipeline test replays its recorded OCR through `recognize_bytes` with a slab-outline quad (`client_quad_only`, 784×1238 frame):
+  - without the flag, the visual guess wins, as on staging;
+  - with `SLAB_TEXT_RECOVERY`, the label (LUGIA EX + #17 + JP) gives ja:CLF-017. It is verified by artwork projection, shown for confirmation, and the boundary retry is skipped.
+  - Re-encodes of that screenshot already pass on staging. Only the app's exact bytes fail, and those were not stored, so recorded OCR is the strongest reproduction available.
+- **Full API suite:** 873 passed, 4 skipped. The replay ran on this recognition code; later commits only added tests and fixtures.
 
 ## Caveats
 
