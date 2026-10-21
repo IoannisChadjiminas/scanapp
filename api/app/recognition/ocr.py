@@ -177,7 +177,35 @@ def _pick_name_line(lines: list[str]) -> str | None:
     return None
 
 
-def pick_name_line(lines: list[str]) -> str | None:
+# Grader logos and label words the brand patterns in grading.py leave out.
+LABEL_WORDS = re.compile(r"^(?:PI|PI GRADING|PCA|SGC|CCC|BLACK LABEL|GOLD LABEL|CERT(?:IFICATION)?(?: ?(?:NO|#))?"
+                         r"|GRADE|GRADED|SUBGRADES?|HOLO|REVERSE HOLO|1ST EDITION)$")
+
+
+def grading_label_line(text: str) -> bool:
+    """A grading-label field, never a card title: issuer, grade word, cert or dated header.
+
+    Whole-line matches only, so TAG TEAM, ACE SPEC or a name containing a digit stay titles.
+    """
+    from app.recognition.grading import CONDITION, NUMBER, brand_company, _label_identity, _text
+    value = _text(text)
+    if not value:
+        return False
+    # "10 PRISTINE", "GEM MT 10", "MINT 9": a condition word with an optional grade either side.
+    bare = re.sub(rf"^{NUMBER}\s+|\s+{NUMBER}$", "", value)
+    return bool(brand_company(value) or LABEL_WORDS.fullmatch(value) or _label_identity(value)
+                or (CONDITION.fullmatch(bare) and not _has_cjk(value) and bare not in {'EX', 'GX'})
+                or re.fullmatch(r"(?:NO\.?\s*|#\s*)?[A-Z]{0,2}\d{6,14}", value.replace(' ', ''))
+                # A label's set line carries the collector number: "HIDDEN FATES - SV59/SV94".
+                or bool(re.search(r"[A-Z]{3,}", value) and re.search(r"\b[A-Z]{0,4}\d{1,4}\s*/\s*[A-Z]{0,4}\d{1,4}\b", value)))
+
+
+def pick_name_line(lines: list[str], label_filter: bool = False) -> str | None:
+    if label_filter:
+        # A slab label's fields are never the card's title. Its field order varies by
+        # grader (PSA prints the grade word mid-label), so position after the label is
+        # not used; a stage badge below still marks the card's own title.
+        lines = [line for line in lines if not grading_label_line(line)]
     # Prefer a title after the card's stage/trainer badge, rather than a
     # background sign above it. This is reading-order layout evidence, not a
     # catalogue-specific name whitelist. Evolution instructions aren't badges.
@@ -187,6 +215,10 @@ def pick_name_line(lines: list[str]) -> str | None:
             if title:
                 return title
     return _pick_name_line(lines)
+
+
+def label_filter_of(engine) -> bool:
+    return bool(getattr(engine, 'label_name_filter', False))
 
 
 def inverted_card_layout(result: OcrResult) -> bool:
@@ -199,15 +231,16 @@ def inverted_card_layout(result: OcrResult) -> bool:
     return top_fraction and bottom_stage
 
 
-def pick_confident_name(lines: list[str], scores: list[float | None]) -> str | None:
-    first = pick_name_line(lines)
+def pick_confident_name(lines: list[str], scores: list[float | None],
+                        label_filter: bool = False) -> str | None:
+    first = pick_name_line(lines, label_filter)
     if first is None:
         return None
     first_score = next((score or 0. for text,score in zip(lines,scores) if text == first),0.)
     if first_score >= .85:
         return first
     confident = [text for text,score in zip(lines,scores) if score is not None and score >= .85]
-    return pick_name_line(confident) or first
+    return pick_name_line(confident, label_filter) or first
 
 
 COLLECTOR_FRACTION_RE = re.compile(r"\d{1,4}\s*/\s*\d{1,4}")
@@ -784,7 +817,7 @@ class CardOcr:
                 number_lines, number_scores = (
                     run(_region(ocr_image, 0.82, 1.0), 'collector', 'initial')
                     if read_footer else ([], []))
-            name_text = pick_confident_name(name_lines,name_scores)
+            name_text = pick_confident_name(name_lines,name_scores,label_filter_of(self))
             # Asked once, on the untouched first reads. A failing gate keeps
             # every established retry; it never adds or edits observations.
             client_text_gate = None
@@ -808,7 +841,7 @@ class CardOcr:
                     retry_lines,retry_scores=run(wider.resize(
                         (round(wider.width*scale),round(wider.height*scale)),Image.Resampling.LANCZOS),
                         'name', 'wider_header')
-                    retry_name=pick_confident_name(retry_lines,retry_scores)
+                    retry_name=pick_confident_name(retry_lines,retry_scores,label_filter_of(self))
                     score=max((s or 0. for t,s in zip(retry_lines,retry_scores) if t==retry_name),default=0.)
                     if retry_name and score>=.85:
                         name_text=retry_name
@@ -831,7 +864,7 @@ class CardOcr:
                         retry_lines, retry_scores = run(header.resize(
                             (round(header.width * scale), round(header.height * scale)),
                             Image.Resampling.LANCZOS), 'name', 'weak_header')
-                        retry_name = pick_confident_name(retry_lines, retry_scores)
+                        retry_name = pick_confident_name(retry_lines, retry_scores, label_filter_of(self))
                         retry_confidence = max((s or 0. for t,s in zip(retry_lines,retry_scores)
                                                 if t == retry_name), default=0.)
                         if (retry_name and retry_confidence >= .90 and
@@ -922,7 +955,8 @@ class CardOcr:
                     passes.append(dict(region='full', reason='empty_regions', width=image.width,
                         height=image.height, ms=round((time.perf_counter()-started)*1000, 2)))
                 title_pairs = [(t,s) for t,s,r in zip(extra_lines,extra_scores,extra_regions) if r == 'name']
-                name_text = pick_confident_name([t for t,_ in title_pairs],[s for _,s in title_pairs])
+                name_text = pick_confident_name([t for t,_ in title_pairs],[s for _,s in title_pairs],
+                                                label_filter_of(self))
                 number_lines = [t for t,r in zip(extra_lines,extra_regions) if r == 'collector']
             lines = [*name_lines, *number_lines, *extra_lines]
             hits = [

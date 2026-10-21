@@ -138,6 +138,7 @@ class Runtime:
             grading_ocr = reader()
             grading_ocr.share_inference_sessions_from(owner)
         ocr.skip_retry_passes = self.settings.ocr_skip_retry_passes
+        ocr.label_name_filter = self.settings.ocr_label_name_filter
         if self.settings.ocr_parallel_regions:
             gate = AuxiliaryWorkGate()
             region_ocr = reader()

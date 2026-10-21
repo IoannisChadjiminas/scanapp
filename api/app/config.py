@@ -64,6 +64,16 @@ class Settings(BaseSettings):
     # title and footer reads run. Cheaper, but a retry can recover a number the first read missed.
     # A policy change: replay the frozen panel on the full catalogue before enabling it.
     ocr_skip_retry_passes: bool = False
+    # Never take a grading-label word (PRISTINE, GEM MINT, PSA, a cert number...) as the card
+    # name; with a label in the title strip, prefer a title read after it. A policy change:
+    # replay the frozen panel before enabling it.
+    ocr_label_name_filter: bool = False
+    # When an abstaining scan has a confident printed fraction plus a name read anywhere in
+    # its OCR lines that together narrow the catalogue to 1-3 cards, add those cards as
+    # candidates for local artwork verification and, if unverified, return them as
+    # suggestions needing confirmation instead of an empty retake. A verified single
+    # candidate also skips the boundary retry. Never overrides a confident visual answer.
+    text_identity_candidates: bool = False
     # Read the phone's own OCR of the card (client_text on POST /scans) and log how it
     # agrees with the server. Off: the field is ignored. It never chooses a card.
     client_text_hints: bool = False

@@ -5,7 +5,7 @@ import time
 
 from PIL import Image
 
-from app.recognition.ocr import OcrHit, pick_confident_name
+from app.recognition.ocr import OcrHit, label_filter_of, pick_confident_name
 from app.recognition.rank import name_match, normalize_text
 
 
@@ -47,7 +47,7 @@ def read_conflicting_title(engine, image, original):
     record = dict(region='name', reason='conflicting_title', width=patch.width, height=patch.height)
     try:
         lines, scores = engine._run(patch)
-        title = pick_confident_name(lines, scores)
+        title = pick_confident_name(lines, scores, label_filter_of(engine))
         confidence = max((s or 0. for t, s in zip(lines, scores) if t == title), default=0.)
         record.update(lines=[dict(text=t, confidence=s) for t, s in zip(lines, scores)],
                       title=title, confidence=confidence)

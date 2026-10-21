@@ -58,6 +58,7 @@ from app.recognition.rank import artwork_evidence_compatible, decide_status_with
 from app.recognition.rank import name_match
 from app.recognition.runtime import Runtime
 from app.recognition.title_retry import read_conflicting_title, title_retry_allowed
+from app.recognition.text_identity import VERSION as TEXT_IDENTITY_VERSION, text_identity_candidates
 from app.schemas import (
     Candidate,
     GradingEvidence,
@@ -198,6 +199,8 @@ class _ScanEvaluation:
     ranked: list[dict] = field(default_factory=list)
     shown: list[dict] = field(default_factory=list)
     query_image: Any = None
+    # 'verified' (one locally verified number+name candidate), 'unverified', or None.
+    text_identity: str | None = None
 
 
 def _detect_with_client_quad(image, fractions) -> tuple[Any, bool, str]:
@@ -591,6 +594,20 @@ def _recognize_bytes_once(
         name_confidence=name_confidence,numbers=numbers,languages=rank_languages
     ) if metadata_index and not metadata_ids and not title_ids and hasattr(metadata_index,'geometry_candidates') else []
     timings['metadata_retrieve_ms'] = (time.perf_counter() - mark) * 1000
+    text_ids: list[str] = []
+    text_reason = None
+    if (getattr(settings, 'text_identity_candidates', False) and metadata_index is not None
+            and not retake and not ocr.failed
+            and (not len(scores) or float(scores[0]) < settings.threshold_min_visual)):
+        # Only below the automatic visual floor: text never overrides a strong picture.
+        mark = time.perf_counter()
+        try:
+            text_ids, text_reason = text_identity_candidates(metadata_index, catalog,
+                hits=ocr.hits, numbers=numbers, languages=rank_languages)
+        except Exception:  # noqa: BLE001 - optional candidates keep the established path
+            logging.getLogger(__name__).exception('Text identity candidates failed')
+            text_ids, text_reason = [], 'error'
+        timings['text_identity_ms'] = (time.perf_counter() - mark) * 1000
     visual: list[dict[str, Any]] = []
     selected_ids = [str(snapshot.card_ids[i]) for i in indices]
     full_ids = set(selected_ids)
@@ -599,11 +616,12 @@ def _recognize_bytes_once(
     selected_ids.extend(cid for cid in metadata_ids if cid not in selected_ids)
     selected_ids.extend(cid for cid in title_ids if cid not in selected_ids)
     selected_ids.extend(cid for cid in geometry_ids if cid not in selected_ids)
+    selected_ids.extend(cid for cid in text_ids if cid not in selected_ids)
     cards = _lookup_cards(catalog, selected_ids)
     full_scores = {str(snapshot.card_ids[i]): float(score)
                    for i, score in zip(indices, scores, strict=True)}
     positions = getattr(runtime, 'card_positions', None) or (
-        {str(cid): i for i, cid in enumerate(snapshot.card_ids)} if artwork_hits or metadata_ids or title_ids or geometry_ids else {})
+        {str(cid): i for i, cid in enumerate(snapshot.card_ids)} if artwork_hits or metadata_ids or title_ids or geometry_ids or text_ids else {})
     for card_id in selected_ids:
         score = full_scores.get(card_id)
         if score is None:
@@ -639,7 +657,8 @@ def _recognize_bytes_once(
                                  (["artwork"] if card_id in artwork_by_id else []) +
                                  (["ocr_metadata"] if card_id in metadata_ids else []) +
                                  (["ocr_title"] if card_id in title_ids else []) +
-                                 (["ocr_geometry"] if card_id in geometry_ids else []),
+                                 (["ocr_geometry"] if card_id in geometry_ids else []) +
+                                 (["ocr_text_identity"] if card_id in text_ids else []),
                 "artwork_score": artwork_by_id[card_id].score if card_id in artwork_by_id else None,
                 "artwork_profile": artwork_by_id[card_id].reference_profile if card_id in artwork_by_id else None,
             }
@@ -659,12 +678,14 @@ def _recognize_bytes_once(
     # candidate is never automatically accepted as a single printing.
     mark = time.perf_counter()
     local_matches = []
+    text_aligned: list[str] = []
     framing_unverified = False
     verifier = getattr(runtime, "artwork_verifier", None)
     ratio = image.width / image.height
     if combined and not retake and verifier is not None and (
         float(combined[0]["visual_score"]) < settings.threshold_min_visual
         or bool(geometry_ids)
+        or bool(text_ids)
         or any(h.region == 'holder_collector' for h in numbers)
         or combined[0].get('retrieved_via') == ['ocr_title']
         or not .62 <= ratio <= .80
@@ -687,6 +708,10 @@ def _recognize_bytes_once(
         if geometry_ids:
             geometry_only=[r for r in combined if r['card_id'] in geometry_ids]
             local_order=[*geometry_only[:4],*local_order]
+        if text_ids:
+            # Number+name candidates are checked first; the cap of eight still applies.
+            text_only = [r for r in combined if r['card_id'] in text_ids]
+            local_order = [*text_only, *(r for r in local_order if r['card_id'] not in text_ids)]
         # Geometry can verify art on a sibling with a different collector
         # number; otherwise an older reprint occupying top-K would block the
         # whole family. Name/language constrain identity verification, while
@@ -701,6 +726,19 @@ def _recognize_bytes_once(
                 seen_printings.add(key)
                 references.append((item["card_id"], str(row["image_path"] or "")))
         local_matches = verifier.verify(image, references) if references else []
+        if text_ids and hasattr(verifier, 'propose_frame') and not any(
+                m.card_id in text_ids for m in local_matches):
+            # The selected frame may be a whole screenshot or slab. Project each
+            # number+name candidate's artwork onto the upload and verify it there.
+            for card_id in text_ids:
+                row = cards.get(card_id)
+                if row is None or not row['image_path']:
+                    continue
+                reference = (card_id, str(row['image_path']))
+                aligned = verifier.propose_frame(input_image, reference)
+                found = verifier.verify(aligned, [reference]) if aligned is not None else []
+                local_matches.extend(found)
+                text_aligned.extend(m.card_id for m in found)
         framing_unverified = not local_matches and (
             not .62 <= ratio <= .80 or
             (not skip_detect and not detected and
@@ -826,6 +864,25 @@ def _recognize_bytes_once(
             status = "retake"
             retake = True
             status_reasons.append('framing_unverified')
+    text_identity = None
+    if text_ids and status in {'retake', 'no_match'} and not (too_small or too_blurry):
+        # The scan would abstain, yet a confident printed number and a name read in
+        # the photo leave at most three cards. Verified artwork makes it a review
+        # result; without it the cards are suggestions that need confirmation.
+        verified = [r for r in combined if r['card_id'] in text_ids and r.get('local_artwork_verified')]
+        chosen = verified or sorted((r for r in combined if r['card_id'] in text_ids),
+                                    key=lambda r: float(r['visual_score']), reverse=True)
+        if chosen:
+            chosen_ids = [r['card_id'] for r in chosen]
+            combined.sort(key=lambda r: (r['card_id'] in chosen_ids,
+                                         -chosen_ids.index(r['card_id']) if r['card_id'] in chosen_ids else 0),
+                          reverse=True)
+            reference_identity = dict(combined[0])
+            text_identity = 'verified' if len(verified) == 1 else 'unverified'
+            status, retake, framing_unverified = 'uncertain', False, False
+            status_reasons.append(f'text_identity_{text_identity}')
+    elif text_ids and combined and combined[0]['card_id'] in text_ids and combined[0].get('local_artwork_verified'):
+        text_identity = 'verified'
     mark = time.perf_counter()
     family, incomplete = [], True
     if combined and not retake and (float(combined[0]["visual_score"]) >= settings.threshold_min_visual or local_matches or framing_review_supported or likely_identity_supported):
@@ -975,6 +1032,8 @@ def _recognize_bytes_once(
                 status_reasons.append('printed_identity_layout_review')
         timings['layout_verify_ms'] = (time.perf_counter() - mark)*1000
     shown = [] if status in {"no_match", "retake", "failed"} else combined[:1]
+    if text_identity == 'unverified' and status == 'uncertain':
+        shown = [r for r in combined if r['card_id'] in text_ids][:3]
     timings["total_ms"] = (time.perf_counter() - started) * 1000
 
     message = None
@@ -988,6 +1047,10 @@ def _recognize_bytes_once(
         message = "The photograph is too blurry for useful recognition. Try again."
     elif retake and too_small:
         message = "Move closer so the card fills more of the frame."
+    elif text_identity == 'unverified' and status == 'uncertain':
+        message = 'The printed collector number and a name in the photo point to these cards. The artwork was not verified; pick the right one or retake with the whole card visible.'
+    elif text_identity == 'verified' and status == 'uncertain':
+        message = 'The printed collector number, a name in the photo and the artwork agree. Check the exact printing and finish before confirming.'
     elif layout_review_supported:
         message = 'The printed name, collector number and card layout agree. Artwork similarity is weak; check the card, exact printing and finish before confirming.'
     elif framing_unverified and framing_review_supported:
@@ -1031,6 +1094,8 @@ def _recognize_bytes_once(
         versions['ocr_budget'] = OCR_BUDGET_VERSION
     if fast_path_wanted:
         versions['client_text'] = CLIENT_TEXT_VERSION
+    if getattr(settings, 'text_identity_candidates', False):
+        versions['text_identity'] = TEXT_IDENTITY_VERSION
     presentation = match_presentation(combined, status=status, printing_review=printing_review,
                                       min_visual=settings.threshold_min_visual_ocr)
     confidence = confidence_payload(combined, status=status,
@@ -1084,6 +1149,9 @@ def _recognize_bytes_once(
         "artwork_retrieval": [vars(h) for h in artwork_hits],
         "metadata_candidate_ids": metadata_ids,
         "geometry_candidate_ids": geometry_ids,
+        **({"text_identity": dict(candidate_ids=text_ids, reason=text_reason, outcome=text_identity,
+                                  aligned_verified=text_aligned)}
+           if getattr(settings, 'text_identity_candidates', False) else {}),
         "framing_unverified": framing_unverified,
         "framing_review_supported": framing_review_supported,
         "likely_identity_supported": likely_identity_supported,
@@ -1188,7 +1256,7 @@ def _recognize_bytes_once(
     return _ScanEvaluation(response, timings, input_image, save,
                            reference_identity, ocr, numbers,
                            tuple(rank_languages), name_confidence, too_small or too_blurry, ocr_payload,
-                           combined, shown, query_image)
+                           combined, shown, query_image, text_identity)
 
 
 @parallel_grading_scope
@@ -1286,8 +1354,11 @@ def recognize_bytes(
     recovery = {'hypotheses':0,'proposal_profile':None,'proposal_score':None,
                 'retry_status':None,'retry_top_id':None,'identity_compatible':None,
                 'selection_identity':None}
+    # A verified number+name candidate already answered: the boundary retry is skipped
+    # (its status is no longer retake). Unverified suggestions still try a better frame.
     if (not skip_detect and all(v is None for v in (crop_x,crop_y,crop_w,crop_h))
-            and first.response.status == ScanStatus.retake and not first.quality_retake):
+            and (first.response.status == ScanStatus.retake or first.text_identity == 'unverified')
+            and not first.quality_retake):
         mark = time.perf_counter()
         # Slab edges can outrank the inner card geometrically. Eight line
         # probes plus one artwork-aligned proposal still lead to at most ONE
