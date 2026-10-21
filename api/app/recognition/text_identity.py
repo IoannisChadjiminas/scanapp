@@ -75,7 +75,7 @@ def confident_fractions(numbers: list[OcrHit]) -> list[OcrHit]:
 
 def text_identity_candidates(index, catalog: sqlite3.Connection, *, hits: list[OcrHit],
                              numbers: list[OcrHit], languages: tuple[str, ...],
-                             any_fraction: bool = False) -> tuple[list[str], str]:
+                             any_fraction: bool = False, numerator_fallback: bool = False) -> tuple[list[str], str]:
     """Card ids (at most three) agreeing with the one confident fraction and a read name.
 
     Returns ([], reason) when the evidence is missing, contradictory or too broad. With
@@ -90,7 +90,7 @@ def text_identity_candidates(index, catalog: sqlite3.Connection, *, hits: list[O
         found = []
         for key in sorted(keys):
             ids, reason = text_identity_candidates(index, catalog, hits=hits, languages=languages,
-                numbers=[h for h in fractions if (p := parse_collector(h.text))
+                numerator_fallback=numerator_fallback, numbers=[h for h in fractions if (p := parse_collector(h.text))
                          and (p.prefix, p.number, p.denominator) == key])
             if ids:
                 found.append(ids)
@@ -109,6 +109,7 @@ def text_identity_candidates(index, catalog: sqlite3.Connection, *, hits: list[O
     rows = {r['id']: dict(r) for r in catalog.execute(
         f'SELECT * FROM cards WHERE id IN ({placeholders})', ids)}
     numbered = []
+    known_totals = set()
     for card_id in ids:
         row = rows.get(card_id)
         if row is None:
@@ -119,8 +120,16 @@ def text_identity_candidates(index, catalog: sqlite3.Connection, *, hits: list[O
         # number accepts any denominator, which is not a printed-number agreement.
         expected = [n for n in accepted_collector_numbers(row)
                     if (p := parse_collector(n)) is not None and p.denominator]
+        known_totals.update(p.denominator for n in expected if (p := parse_collector(n)))
         if expected and all(number_matches_identifiers([h], expected) is True for h in fractions):
             numbered.append(row)
+    numerator_only = False
+    if not numbered and numerator_fallback and not ({p.denominator for h in fractions
+                                                     if (p := parse_collector(h.text))} & known_totals):
+        # The read denominator is no set's printed total (017/012 for 017/032): a misread.
+        # The numerator stands, and the name must then narrow the cards on its own.
+        numbered = [rows[c] for c in ids if c in rows]
+        numerator_only = True
     if not numbered:
         return [], 'number_not_in_catalogue'
     tokens = name_tokens(hits)
@@ -133,7 +142,7 @@ def text_identity_candidates(index, catalog: sqlite3.Connection, *, hits: list[O
     if len(named) > MAX_CANDIDATES:
         # The catalogue has no HP column to break the tie; too broad to propose.
         return [], 'too_many_candidates'
-    return sorted(row['card_id'] for row in named), 'candidates'
+    return sorted(row['card_id'] for row in named), 'numerator_candidates' if numerator_only else 'candidates'
 
 
 def read_whole_image(engine, image: Image.Image, long_edge: int = 1400) -> tuple[list[OcrHit], dict]:

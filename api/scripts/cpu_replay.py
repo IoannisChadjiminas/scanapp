@@ -110,6 +110,9 @@ def main():
             data, form = path.read_bytes(), {'language': 'auto'}
             if hints.get(case['id']):
                 form['client_text'] = hints[case['id']]
+            if case.get('card_quad'):
+                # A recorded phone quad (fractions, clockwise from top-left), e.g. a holder outline.
+                form['card_quad'], form['quad_source'] = case['card_quad'], 'rect'
             if a.hint:
                 form['graded'] = 'true' if case['kind'] == 'slab' else 'false'
             if a.quad or a.warp:

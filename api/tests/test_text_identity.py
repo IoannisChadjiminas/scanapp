@@ -11,7 +11,8 @@ from app.config import Settings
 from app.db import connect, init_catalog, init_results
 from app.recognition.local_match import LocalArtworkMatch
 from app.recognition.metadata import MetadataCandidateIndex
-from app.recognition.ocr import OcrHit, OcrResult, grading_label_line, pick_collector_text, pick_confident_name
+from app.recognition.ocr import (OcrHit, OcrResult, grading_label_line, pick_collector_text, pick_confident_name,
+                                 slab_label_field)
 from app.recognition.label_identity import label_identity_candidates, number_key, parse_label
 from app.recognition.pipeline import recognize_bytes
 from app.recognition.rank import extract_collector_candidates
@@ -117,7 +118,8 @@ def test_more_than_three_named_cards_is_too_broad(tmp_path):
 
 
 def scan(tmp_path, monkeypatch, *, enabled, verify_aligned=True, lead_score=.73, name='PRISTINE',
-         slab_label=False, lead_name='オーロンゲ', screenshot=False, full_image=False, detected=False):
+         slab_label=False, lead_name='オーロンゲ', screenshot=False, full_image=False, detected=False,
+         holder=False, holder_region=False, recovery=False, recorded=None):
     """One slab-screenshot scan through the real pipeline with a faked OCR and verifier."""
     monkeypatch.setattr('app.recognition.pipeline.detect_and_rectify', lambda im: (im, detected))
     for name_ in ('card_frame_candidates', 'loose_frame_candidates', 'portrait_window_candidates'):
@@ -144,6 +146,17 @@ def scan(tmp_path, monkeypatch, *, enabled, verify_aligned=True, lead_score=.73,
         hits=[OcrHit('10', .9999, 'name'), OcrHit('Pi', .69, 'name'), OcrHit('PRISTINE', .9999, 'name'),
               OcrHit('017/032', .99997, 'collector'), OcrHit('ギラティナ', .90, 'collector'),
               OcrHit('ルギア', .85, 'collector'), OcrHit('230', .9999, 'collector')])
+    reads = []
+    if holder:
+        # The holder-quad Lugia: the strips read the label and a misread footer.
+        observed = OcrResult(name_text='CLASSIC COLLECTION', collector_text='017/012', lines=[],
+            hits=[OcrHit(t, .99, 'holder_name') for t in
+                  ('10', 'PRISTINE', '2023 POKÉMON JP', 'CLASSIC COLLECTION', 'LUGIA EX', '#17HOLO')]
+                 + [OcrHit('017/012', .93, 'collector')])
+        card = OcrResult(name_text='ルギア', collector_text=None, lines=['ルギア', '230'],
+            hits=[OcrHit('ルギア', .998, 'name'), OcrHit('230*', .98, 'name'), OcrHit('×2', .8, 'collector')])
+    if recorded is not None:
+        observed = recorded
     if screenshot:
         # The app failure: the strips hold only the phone's status and browser bars.
         observed = OcrResult(name_text=None, collector_text='36', lines=['11:38', '1/5', '③ auctaro.com', '36'],
@@ -151,6 +164,9 @@ def scan(tmp_path, monkeypatch, *, enabled, verify_aligned=True, lead_score=.73,
                   OcrHit('③ auctaro.com', .97, 'collector'), OcrHit('36', .9999, 'collector')])
     whole_reads = []
     def whole(patch):
+        if holder:
+            return (['10', 'PRISTINE', '2023 POKÉMON JP', 'CLASSIC COLLECTION', 'LUGIA EX', '#17HOLO', '00044829'],
+                    [.99] * 7)
         whole_reads.append(patch.size)
         return (['11:38', '1/5', '10', 'PRISTINE', 'ルギア', '230*', '017/032', '③ auctaro.com'],
                 [.99, .998, .9999, .9999, .998, .978, .995, .97])
@@ -160,7 +176,8 @@ def scan(tmp_path, monkeypatch, *, enabled, verify_aligned=True, lead_score=.73,
                 if verify_aligned and image is aligned and any(c == 'ja:CLF-017' for c, _ in references) else [])
     runtime = SimpleNamespace(require=lambda: (snapshot,
         SimpleNamespace(embed=lambda *args: np.array([1, 0], dtype=np.float32)),
-        SimpleNamespace(read=lambda image: observed, _run=whole)),
+        SimpleNamespace(read=lambda image: reads.append(image.size) or (card if holder and image.width < 700 else observed),
+                        _run=whole)),
         card_languages=np.array([i.split(':')[0] for i in ids]), printing_index=None,
         artwork_verifier=SimpleNamespace(verify=verify, propose_frame=lambda image, reference: aligned),
         metadata_index=MetadataCandidateIndex(catalog.execute('SELECT * FROM cards'), indexed_ids=set(ids)),
@@ -171,10 +188,13 @@ def scan(tmp_path, monkeypatch, *, enabled, verify_aligned=True, lead_score=.73,
     try:
         response = recognize_bytes(payload.getvalue(), settings=Settings(_env_file=None, data_dir=tmp_path,
             store_captures=False, text_identity_candidates=enabled, ocr_label_name_filter=enabled,
-            slab_label_identity=slab_label, full_image_text_fallback=full_image),
-            runtime=runtime, catalog=catalog, results=results, session_id='test', graded=False)
+            slab_label_identity=slab_label, full_image_text_fallback=full_image,
+            slab_text_recovery=recovery, use_client_quad=holder),
+            runtime=runtime, catalog=catalog, results=results, session_id='test', graded=False,
+            **({'card_quad': [(.01, .17), (.86, .17), (.86, .79), (.01, .79)]} if holder else {}))
         evidence = json.loads(results.execute('SELECT ocr_json FROM scans').fetchone()[0])
         scan.whole_reads = whole_reads
+        scan.reads = reads
         return response, evidence, bool(boundary)
     finally:
         catalog.close()
@@ -234,15 +254,40 @@ def test_recorded_failures_name_and_narrow_to_the_right_card(tmp_path, case):
     first = [h for h in names if h.region == 'name'] or names
     name = pick_confident_name([h.text for h in first], [h.confidence for h in first], label_filter=True)
     assert name is None or not grading_label_line(name)
-    assert pick_confident_name([h.text for h in first], [h.confidence for h in first]) == case['before']['name_text']
+    before_filter = True if case.get('path') == 'slab_recovery' else False
+    assert pick_confident_name([h.text for h in first], [h.confidence for h in first],
+                               label_filter=before_filter) == case['before']['name_text']
     footer = [h.text for h in hits if h.region == 'collector']
     if footer:
-        assert pick_collector_text(footer) == case['before'].get('collector_text', pick_collector_text(footer))
+        assert pick_collector_text(footer, template_filter=before_filter) == case['before'].get(
+            'collector_text', pick_collector_text(footer))
         assert pick_collector_text(footer, template_filter=True) not in {'retreat', 'resistance', 'weakness'}
     numbers = extract_collector_candidates([h.text for h in hits], hits=hits)
     index = MetadataCandidateIndex(catalog.execute('SELECT * FROM cards'),
                                    indexed_ids={r['id'] for r in case['catalogue_rows']})
-    if case.get('path') == 'full_image':
+    if case.get('path') == 'slab_recovery':
+        # Slab-outline app scans on staging: the recovery rules pick no label line as the
+        # name, no attack damage as the number, and reach exactly the right card.
+        texts = [h.text for h in first]
+        name = pick_confident_name(texts, [h.confidence for h in first], label_filter='set_lines')
+        assert name is None or not (grading_label_line(name) or slab_label_field(name))
+        if footer:
+            assert pick_collector_text(footer, template_filter='set_lines') not in {'20', '200', '21', 'retreat'}
+        languages = tuple(case['languages'])
+        label_hits = [*hits, *(OcrHit(h['text'], h['confidence'], h['region'])
+                               for h in case.get('label_half_hits', []))]
+        found, reason = label_identity_candidates(index, catalog, hits=label_hits, languages=languages,
+                                                  recovery=True)
+        if not found:
+            found, reason = text_identity_candidates(index, catalog, hits=hits, numbers=numbers,
+                                                     languages=languages, numerator_fallback=True)
+        if case.get('answered_by_picture'):
+            # No label text was read; the picture alone answered, and text must not interfere.
+            catalog.close()
+            return
+        assert found == case['expected_card_ids']
+        reason = 'candidates'
+    elif case.get('path') == 'full_image':
         # The first pass alone reaches nothing on either path.
         assert text_identity_candidates(index, catalog, hits=hits, numbers=numbers,
                                         languages=())[0] == []
@@ -354,3 +399,99 @@ def test_whole_image_fallback_never_runs_on_a_found_frame_or_a_read_number(tmp_p
     options.update(change)
     scan(tmp_path, monkeypatch, **options)
     assert scan.whole_reads == []
+
+
+def test_psa_japanese_label_recovers_by_name_number_and_language(tmp_path):
+    # Holder-quad Lugia scan ad1b8f19: the label's set name is not the catalogue's.
+    lines = ['10', 'PRISTINE', '2023 POKÉMON JP', 'CLASSIC COLLECTION', 'LUGIA EX', '#17HOLO', '00044829']
+    assert parse_label(lines)[1] is None
+    assert parse_label(lines, recovery=True)[1] == '17'
+    catalog = catalogue(tmp_path)
+    ids = {r[0] for r in catalog.execute('SELECT id FROM cards')}
+    index = MetadataCandidateIndex(catalog.execute('SELECT * FROM cards'), indexed_ids=ids)
+    hits = [OcrHit(t, .99, 'holder_name') for t in lines]
+    assert label_identity_candidates(index, catalog, hits=hits, languages=())[0] == []
+    # "JP" decides the language even when the scan's own read was English.
+    assert label_identity_candidates(index, catalog, hits=hits, languages=('en',),
+                                     recovery=True)[0] == ['ja:CLF-017']
+
+
+def test_unknown_denominator_falls_back_to_numerator_and_name(tmp_path):
+    catalog = catalogue(tmp_path)
+    ids = {r[0] for r in catalog.execute('SELECT id FROM cards')}
+    index = MetadataCandidateIndex(catalog.execute('SELECT * FROM cards'), indexed_ids=ids)
+    misread = [OcrHit('017/012', .95, 'collector')]
+    hits = [*misread, OcrHit('ルギア', .99, 'name')]
+    assert text_identity_candidates(index, catalog, hits=hits, numbers=misread,
+                                    languages=('ja',))[1] == 'number_not_in_catalogue'
+    assert text_identity_candidates(index, catalog, hits=hits, numbers=misread, languages=('ja',),
+                                    numerator_fallback=True) == (['ja:CLF-017'], 'numerator_candidates')
+    # A known total that simply has no such card is not a misread.
+    other = [OcrHit('017/147', .95, 'collector')]
+    catalog.execute("INSERT INTO cards (id,provider_id,name,set_id,set_name,collector_number,language,"
+                    "printed_collector_number) VALUES ('ja:X-1','ja:X-1','x','X','X','001','ja','001/147')")
+    catalog.commit()
+    index = MetadataCandidateIndex(catalog.execute('SELECT * FROM cards'), indexed_ids=ids | {'ja:X-1'})
+    assert text_identity_candidates(index, catalog, hits=[*other, OcrHit('ルギア', .99, 'name')], numbers=other,
+                                    languages=('ja',), numerator_fallback=True)[0] == ['ja:CLF-017']
+
+
+def test_set_line_under_a_dated_label_header_is_never_the_name():
+    lines = ['10', 'PRISTINE', '2023 POKÉMON JP', 'CLASSIC COLLECTION', 'LUGIA EX', '#17HOLO', '00044829']
+    assert pick_confident_name(lines, [.99]*7, label_filter=True) == 'CLASSIC COLLECTION'
+    assert pick_confident_name(lines, [.99]*7, label_filter='set_lines') == 'LUGIA EX'
+    mew = ['2023 POKEMON SVP EN', '#053', 'MEW ex', 'NM-MT', '151 ULTRA-PREMIUM COLL', '8', 'FSA']
+    assert pick_confident_name(mew, [.99]*7, label_filter='set_lines') == 'MEW ex'
+    cgc = ['CGC UNIVERSAL GRADE', 'NM/Mint+', 'Charmander', '8.5', 'Pokémon (2017)', 'Burning Shadows- 18a/147']
+    assert pick_confident_name(cgc, [.99]*6, label_filter='set_lines') == 'Charmander'
+    # Panel slab fresh100_307061782471: this header already holds its set; the next line is the card.
+    gyarados = ['2016 BREAKPOINT', 'MGYARADOSEX', 'FULLART', 'NM-MT', '#115', '792958']
+    assert pick_confident_name(gyarados, [.99]*6, label_filter='set_lines') == 'MGYARADOSEX'
+
+
+
+def test_slab_label_lines_and_attack_damage_are_never_name_or_number():
+    for line in ('#17HOLO', 'Burning Shadows- 18a/147', 'Cos. Holo - Charmander Sidekick Coll.'):
+        assert slab_label_field(line)
+    for title in ('Charmander', 'Porygon2', 'LUGIA EX', 'Mr. Mime', 'Ho-Oh ex', 'Pikachu-GX'):
+        assert not slab_label_field(title)
+    assert pick_confident_name(['#17HOLO', '00044829', '龙办', 'ルギア', '230*'], [.99, 1, .52, 1, .99],
+                               label_filter='set_lines') == 'ルギア'
+    assert pick_confident_name(['CLASSIC COLLECTION', 'LUGIA EX', '#17HOLO', '00044829', 'ルギア', '230*'],
+                               [.99] * 6, label_filter='set_lines') == 'ルギア'
+    assert pick_confident_name(['Pokemon (2017)', 'Burning Shadows- 18a/147', 'Cos. Holo - Charmander Sidekick Coll.'],
+                               [.94, .97, .99], label_filter='set_lines') is None
+    assert pick_collector_text(['****エアロブレイク', '200', '-30', '×21'], template_filter='set_lines') is None
+    assert pick_collector_text(['Flame Tail', '20', '×2', 'retreat'], template_filter='set_lines') is None
+    assert pick_collector_text(['053'], template_filter='set_lines') == '053'
+    assert pick_collector_text(['SWSH050'], template_filter='set_lines') == 'SWSH050'
+
+
+STAGING_SLAB_OUTLINE = next(c for c in CASES if c['id'] == 'staging_862c09b5')
+
+
+@pytest.mark.parametrize('recovery', [False, True])
+def test_slab_outline_scan_862c09b5_ends_on_lugia_never_the_visual_guess(tmp_path, monkeypatch, recovery):
+    """The app's exact scan, replayed through the pipeline with its own recorded OCR.
+
+    The quad is the slab outline (784x1238 frame, client_quad_only), the title strip holds
+    the PSA-style label and the footer reads 017/012. Today the visual guess (standing in
+    for Inteleon) wins; with SLAB_TEXT_RECOVERY the label's LUGIA EX + #17 + JP gives
+    ja:CLF-017, verified by projecting its artwork onto the upload.
+    """
+    monkeypatch.setattr('app.recognition.pipeline.client_quad_rect',
+                        lambda image, fractions: np.float32([[12, 338], [796, 338], [796, 1575], [12, 1575]]))
+    monkeypatch.setattr('app.recognition.pipeline.server_frame_rect', lambda image: None)
+    recorded = [OcrHit(h['text'], h['confidence'], h['region']) for h in STAGING_SLAB_OUTLINE['hits']]
+    observed = OcrResult(name_text='CLASSIC COLLECTION', collector_text='017/012',
+                         lines=[h.text for h in recorded], hits=recorded)
+    response, evidence, boundary = scan(tmp_path, monkeypatch, enabled=True, slab_label=True, holder=True,
+                                        recovery=recovery, recorded=observed)
+    assert 'client_quad_only' in evidence['status_reasons']
+    shown = [s.card_id for s in response.suggestions]
+    if recovery:
+        assert shown == ['ja:CLF-017'] and response.confidence.requires_confirmation
+        assert evidence['text_identity']['label_ids'] == ['ja:CLF-017']
+        assert evidence['text_identity']['outcome'] == 'verified' and not boundary
+    else:
+        assert 'ja:CLF-017' not in shown and evidence['text_identity']['label_ids'] == []

@@ -200,11 +200,42 @@ def grading_label_line(text: str) -> bool:
                 or bool(re.search(r"[A-Z]{3,}", value) and re.search(r"\b[A-Z]{0,4}\d{1,4}\s*/\s*[A-Z]{0,4}\d{1,4}\b", value)))
 
 
+def slab_label_field(text: str) -> bool:
+    """Label lines the whole-line grading fields miss: a number fused with its variant
+    ("#17HOLO"), a set line whose number has a letter suffix ("Burning Shadows- 18a/147"),
+    and CGC's variant line ("Cos. Holo - Charmander Sidekick Coll.")."""
+    from app.recognition.grading import _text
+    value = _text(text)
+    return bool(re.fullmatch(r'#\s*[A-Z]{0,5}\d{1,4}[A-Z]{0,8}', value.replace(' ', ''))
+                or (re.search(r'[A-Z]{3,}', value)
+                    and re.search(r'\b[A-Z]{0,5}\d{1,4}[A-Z]?\s*/\s*[A-Z]{0,4}\d{1,4}\b', value))
+                or re.match(r'^(?:[A-Z.]+\s+)*(?:HOLO|REVERSE HOLO|REV\.? HOLO|FOIL|NON-HOLO|PROMO|1ST EDITION)\s*[-–]\s+\S',
+                            value))
+
+
 def pick_name_line(lines: list[str], label_filter: bool = False) -> str | None:
     if label_filter:
         # A slab label's fields are never the card's title. Its field order varies by
         # grader (PSA prints the grade word mid-label), so position after the label is
         # not used; a stage badge below still marks the card's own title.
+        original = list(lines)
+        if label_filter == 'set_lines':
+            # PSA continues the set name under its dated header ("2023 POKÉMON JP" /
+            # "CLASSIC COLLECTION"); a digit-free line right after it is that set line.
+            from app.recognition.grading import _label_identity, _text
+            # Only a header without a set of its own ("2023 POKÉMON JP", not "2016 BREAKPOINT").
+            dated = {i + 1 for i, line in enumerate(lines) if re.fullmatch(
+                r'(?:19|20)\d{2}\s+POK[EÉ]MON(?:\s+(?:JP|JPN|EN|ENG|KR|CHN?|JAPANESE|ENGLISH|KOREAN|CHINESE))?',
+                _text(line))}
+            lines = [line for i, line in enumerate(lines)
+                     if not (i in dated and not re.search(r'\d', line) and not _is_layout_badge(line))
+                     and not slab_label_field(line)]
+            if any(grading_label_line(line) or slab_label_field(line) for line in original):
+                # Labels are printed in Latin; with a label in the strip, a CJK title is
+                # the card's own ("ルギア" below "CLASSIC COLLECTION / LUGIA EX").
+                own = _pick_name_line([line for line in lines if _has_cjk(line)])
+                if own:
+                    return own
         lines = [line for line in lines if not grading_label_line(line)]
     # Prefer a title after the card's stage/trainer badge, rather than a
     # background sign above it. This is reading-order layout evidence, not a
@@ -217,8 +248,10 @@ def pick_name_line(lines: list[str], label_filter: bool = False) -> str | None:
     return _pick_name_line(lines)
 
 
-def label_filter_of(engine) -> bool:
-    return bool(getattr(engine, 'label_name_filter', False))
+def label_filter_of(engine) -> bool | str:
+    if not getattr(engine, 'label_name_filter', False):
+        return False
+    return 'set_lines' if getattr(engine, 'label_set_lines', False) else True
 
 
 def inverted_card_layout(result: OcrResult) -> bool:
@@ -246,7 +279,7 @@ def pick_confident_name(lines: list[str], scores: list[float | None],
 COLLECTOR_FRACTION_RE = re.compile(r"\d{1,4}\s*/\s*\d{1,4}")
 
 
-def pick_collector_text(number_lines: list[str], template_filter: bool = False) -> str | None:
+def pick_collector_text(number_lines: list[str], template_filter: bool | str = False) -> str | None:
     for line in number_lines:
         match = COLLECTOR_FRACTION_RE.search(line)
         if match:
@@ -262,6 +295,11 @@ def pick_collector_text(number_lines: list[str], template_filter: bool = False) 
             return bool(len(words) <= 2 and '©' not in line and any(
                 re.fullmatch(r"(?i)[A-Z]{0,5}\d{1,4}[A-Z]?(?:/[A-Z]{0,4}\d{1,4})?", w) for w in words))
         number_lines = [line for line in number_lines if collector_like(line)]
+        if template_filter == 'set_lines':
+            # Attack damage (20, 200) is a bare multiple of ten; printed promo and set
+            # numbers without a total carry leading zeros (053) or a prefix (SWSH050).
+            number_lines = [line for line in number_lines
+                            if not re.fullmatch(r'\s*[1-9]\d{0,2}0\s*[+×x]?\s*', line)]
     return number_lines[-1] if number_lines else None
 
 

@@ -53,19 +53,26 @@ def number_key(value: str | None) -> str | None:
     return f'{match[1]}{int(match[2])}{match[3]}'
 
 
-def label_lines(hits: list[OcrHit]) -> list[str]:
+def label_lines(hits: list[OcrHit], recovery: bool = False) -> list[str]:
     """Confident title-strip lines, only when a grading label is visibly among them."""
+    from app.recognition.ocr import slab_label_field
     lines = [h.text for h in hits if h.region in ('name', 'holder_name')
              and h.confidence is not None and h.confidence >= MIN_CONFIDENCE]
     holder = any(h.region == 'holder_name' for h in hits)
-    return lines if holder or any(grading_label_line(line) for line in lines) else []
+    marked = any(grading_label_line(line) or (recovery and slab_label_field(line)) for line in lines)
+    return lines if holder or marked else []
 
 
-def parse_label(lines: list[str]) -> tuple[list[str], str | None]:
-    """Set-name texts and the label's collector number (None when absent or contradictory)."""
+def parse_label(lines: list[str], recovery: bool = False) -> tuple[list[str], str | None]:
+    """Set-name texts and the label's collector number (None when absent or contradictory).
+
+    `recovery` also reads a number fused with its variant word ("#17HOLO").
+    """
     sets, numbers = [], set()
     for raw in lines:
         line = _text(raw)
+        if recovery:
+            line = re.sub(r'(#\s*[A-Z]{0,5}\d{1,4}[A-Z]?)(HOLO|REV|FOIL|1ST|PROMO)\b', r'\1 \2', line)
         cgc = CGC_SET_LINE.fullmatch(line)
         if cgc and not DATED.match(line):
             sets.append(cgc['set'])
@@ -91,10 +98,19 @@ LANGUAGE_WORDS = {'JAPANESE': 'ja', 'JPN': 'ja', 'KOREAN': 'ko', 'CHINESE': 'zh-
                   'SIMPLIFIED CHINESE': 'zh-cn', 'ENGLISH': 'en'}
 
 
-def label_language(lines: list[str]) -> str | None:
+# PSA abbreviates the language on its dated header: "2023 POKÉMON JP".
+HEADER_LANGUAGE = re.compile(r'^(?:19|20)\d{2}\s+POK[EÉ]MON\s+(JP|JPN|KR|CHN?)\b')
+HEADER_CODES = {'JP': 'ja', 'JPN': 'ja', 'KR': 'ko', 'CH': 'zh-tw', 'CHN': 'zh-tw'}
+# PSA set names that share no words with the catalogue's: label phrase -> catalogue set ids.
+SET_ALIASES = {('ja', 'CLASSIC COLLECTION'): ('CLF', 'CLL', 'CLK')}
+
+
+def label_language(lines: list[str], recovery: bool = False) -> str | None:
     """A label that names the card's language ("Pokémon (2023) Japanese") decides it."""
     found = {code for raw in lines for word, code in LANGUAGE_WORDS.items()
              if re.search(rf'\b{word}\b', _text(raw))}
+    if recovery:
+        found |= {HEADER_CODES[m[1]] for raw in lines if (m := HEADER_LANGUAGE.match(_text(raw)))}
     if 'zh-cn' in found:
         found.discard('zh-tw')
     return next(iter(found)) if len(found) == 1 else None
@@ -118,17 +134,18 @@ def set_score(label_set: str, set_name: str, set_id: str = '') -> float:
 
 
 def label_identity_candidates(index, catalog: sqlite3.Connection, *, hits: list[OcrHit],
-                              languages: tuple[str, ...]) -> tuple[list[str], str]:
-    lines = label_lines(hits)
+                              languages: tuple[str, ...], recovery: bool = False) -> tuple[list[str], str]:
+    """`recovery` (SLAB_TEXT_RECOVERY): fused PSA numbers, PSA language codes and set aliases."""
+    lines = label_lines(hits, recovery)
     if not lines:
         return [], 'no_label'
-    sets, number = parse_label(lines)
+    sets, number = parse_label(lines, recovery)
     if number is None:
         return [], 'no_label_number'
     parts = parse_collector(number)
     if parts is None:
         return [], 'no_label_number'
-    printed = label_language(lines)
+    printed = label_language(lines, recovery)
     languages = (printed,) if printed else languages
     pool = [row for row in index.by_number.get((parts.prefix, parts.number), ())
             if not languages or row.get('language') in languages]
@@ -144,7 +161,14 @@ def label_identity_candidates(index, catalog: sqlite3.Connection, *, hits: list[
                                           number_key(r['printed_collector_number'])}]
     if not rows:
         return [], 'number_not_in_catalogue'
-    scored = [(max((set_score(s, str(r['set_name'] or ''), str(r['set_id'] or '')) for s in sets), default=0.), r) for r in rows]
+    aliased = set()
+    if recovery:
+        text = ' '.join(_text(line) for line in lines)
+        aliased = {set_id for (language, phrase), ids in SET_ALIASES.items()
+                   if phrase in text and (not languages or language in languages) for set_id in ids}
+    scored = [(1. if r['set_id'] in aliased else
+               max((set_score(s, str(r['set_name'] or ''), str(r['set_id'] or '')) for s in sets), default=0.), r)
+              for r in rows]
     in_set = [r for score, r in scored if score >= .6]
     tokens = name_tokens([OcrHit(line, 1., 'name') for line in lines])
     named = [r for r in (in_set or rows) if name_agrees(tokens, r['name'], str(r.get('view_title') or ''))]
@@ -176,3 +200,4 @@ def read_label_half(engine, image: Image.Image) -> tuple[list[OcrHit], dict]:
                       ms=round((time.perf_counter() - started) * 1000, 2))
         patch.close()
     return [OcrHit(t, s, 'holder_name') for t, s in zip(lines, scores)], record
+

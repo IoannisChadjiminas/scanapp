@@ -82,6 +82,12 @@ class Settings(BaseSettings):
     # strips read no printed number (a screenshot's status and browser bars), read the whole
     # upload once (~1,400 px) and feed its lines to the number+name and label paths.
     full_image_text_fallback: bool = False
+    # Slab text repairs: PSA labels whose set name is not the catalogue's (label name +
+    # number + language, "#17HOLO", "JP", set aliases), the set line under a dated label
+    # header is never the name, a footer fraction with an unknown denominator (017/012)
+    # falls back to its numerator + name, and an artwork-verified label card is not vetoed
+    # by a footer number that contradicts the label.
+    slab_text_recovery: bool = False
     # Read the phone's own OCR of the card (client_text on POST /scans) and log how it
     # agrees with the server. Off: the field is ignored. It never chooses a card.
     client_text_hints: bool = False

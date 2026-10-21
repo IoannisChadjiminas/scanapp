@@ -607,6 +607,7 @@ def _recognize_bytes_once(
     label_reason = None
     text_conflict = False
     full_fallback = None
+    recovery = bool(getattr(settings, 'slab_text_recovery', False))
     slab_label = bool(getattr(settings, 'slab_label_identity', False))
     top_visual = float(scores[0]) if len(scores) else 0.
     if (getattr(settings, 'text_identity_candidates', False) and metadata_index is not None
@@ -616,10 +617,10 @@ def _recognize_bytes_once(
         mark = time.perf_counter()
         try:
             text_ids, text_reason = text_identity_candidates(metadata_index, catalog,
-                hits=ocr.hits, numbers=numbers, languages=rank_languages)
+                hits=ocr.hits, numbers=numbers, languages=rank_languages, numerator_fallback=recovery)
             if slab_label:
                 label_ids, label_reason = label_identity_candidates(metadata_index, catalog,
-                    hits=ocr.hits, languages=rank_languages)
+                    hits=ocr.hits, languages=rank_languages, recovery=recovery)
                 if (label_reason == 'no_label_number' and not text_ids
                         and callable(getattr(ocr_engine, '_run', None))):
                     # The title strip caught only the label's header. One read of the
@@ -627,7 +628,7 @@ def _recognize_bytes_once(
                     label_hits, label_pass = read_label_half(ocr_engine, input_image)
                     ocr_passes.append(dict(scope='slab_label', **label_pass))
                     label_ids, label_reason = label_identity_candidates(metadata_index, catalog,
-                        hits=[*ocr.hits, *label_hits], languages=rank_languages)
+                        hits=[*ocr.hits, *label_hits], languages=rank_languages, recovery=recovery)
                 text_ids = sorted({*text_ids, *label_ids})
                 if len(text_ids) > 3:
                     text_ids, text_reason = [], 'too_many_candidates'
@@ -646,11 +647,12 @@ def _recognize_bytes_once(
                 full_languages = ranking_languages(resolve_search_languages(language, full_texts),
                                                    full_texts, None)
                 found, found_reason = text_identity_candidates(metadata_index, catalog,
-                    hits=full_hits, numbers=full_numbers, languages=full_languages, any_fraction=True)
+                    hits=full_hits, numbers=full_numbers, languages=full_languages, any_fraction=True,
+                    numerator_fallback=recovery)
                 if slab_label and not found:
                     label_hits = [OcrHit(h.text, h.confidence, 'name') for h in full_hits]
                     found, found_reason = label_identity_candidates(metadata_index, catalog,
-                        hits=label_hits, languages=full_languages)
+                        hits=label_hits, languages=full_languages, recovery=recovery)
                 full_fallback.update(candidate_ids=found, reason=found_reason)
                 if found:
                     # The whole-image read becomes evidence for this scan: its language
@@ -1048,7 +1050,10 @@ def _recognize_bytes_once(
             } for row in review_members],
             guidance=printing.guidance,
         )
-    elif local_matches and not framing_review_supported and not artwork_evidence_compatible(
+    elif local_matches and not framing_review_supported and not (
+        # A slab label's own number, with verified artwork, outranks a footer misread.
+        recovery and combined[0]['card_id'] in label_ids and combined[0].get('local_artwork_verified')
+    ) and not artwork_evidence_compatible(
         combined[0], ocr_name=ocr.name_text, name_confidence=name_confidence,
         numbers=numbers, languages=rank_languages
     ):
@@ -1525,6 +1530,7 @@ def recognize_bytes(
                                   warnings=['grading_not_requested'])
         label_seen = (any(h.region in ('holder_name', 'holder_collector')
                           for ev in (first, selected) for h in ev.ocr.hits)
+
                       or any(str((ev.evidence.get('frame_selection') or {}).get('profile', ''))
                              .startswith('slab_') for ev in (first, selected)))
         if (label_seen and getattr(settings, 'use_grading', True)
