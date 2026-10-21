@@ -119,7 +119,7 @@ def test_more_than_three_named_cards_is_too_broad(tmp_path):
 
 def scan(tmp_path, monkeypatch, *, enabled, verify_aligned=True, lead_score=.73, name='PRISTINE',
          slab_label=False, lead_name='オーロンゲ', screenshot=False, full_image=False, detected=False,
-         holder=False, holder_region=False, recovery=False, recorded=None):
+         holder=False, holder_region=False, recovery=False, recorded=None, extra_rows=(), verifies=None):
     """One slab-screenshot scan through the real pipeline with a faked OCR and verifier."""
     monkeypatch.setattr('app.recognition.pipeline.detect_and_rectify', lambda im: (im, detected))
     for name_ in ('card_frame_candidates', 'loose_frame_candidates', 'portrait_window_candidates'):
@@ -128,7 +128,7 @@ def scan(tmp_path, monkeypatch, *, enabled, verify_aligned=True, lead_score=.73,
     boundary = []
     monkeypatch.setattr('app.recognition.pipeline.line_frame_candidates',
                         lambda *a, **k: boundary.append(1) or [])
-    catalog, results = catalogue(tmp_path), connect(tmp_path/'results.sqlite')
+    catalog, results = catalogue(tmp_path, extra_rows), connect(tmp_path/'results.sqlite')
     init_results(results)
     results.execute("INSERT INTO sessions VALUES ('test','test','test')")
     wrong = [f'ja:W{i}-054' for i in range(20)]
@@ -137,8 +137,8 @@ def scan(tmp_path, monkeypatch, *, enabled, verify_aligned=True, lead_score=.73,
                         'printed_collector_number,image_path) VALUES (?,?,?,?,?,?,?,?,?)',
                         (cid, cid, lead_name, cid, cid, '054', 'ja', '054/070', f'/refs/{cid}.jpg'))
     catalog.commit()
-    ids = [*wrong, 'ja:CLF-017', 'ja:CP3-017', 'ja:SM7b-017', 'en:sv1-17']
-    scores = [lead_score - .001*i for i in range(20)] + [.60, .55, .69, .5]
+    ids = [*wrong, 'ja:CLF-017', 'ja:CP3-017', 'ja:SM7b-017', 'en:sv1-17', *(r[0] for r in extra_rows)]
+    scores = [lead_score - .001*i for i in range(20)] + [.60, .55, .69, .5] + [.61] * len(extra_rows)
     snapshot = SimpleNamespace(card_ids=np.array(ids), embeddings=np.array(
         [[s, np.sqrt(1-s*s)] for s in scores], dtype=np.float32))
     observed = OcrResult(name_text=name if not enabled else None, collector_text='017/032',
@@ -172,6 +172,8 @@ def scan(tmp_path, monkeypatch, *, enabled, verify_aligned=True, lead_score=.73,
                 [.99, .998, .9999, .9999, .998, .978, .995, .97])
     aligned = Image.new('RGB', (600, 825))
     def verify(image, references):
+        if verifies is not None:
+            return [LocalArtworkMatch(c, 50, 50, .15) for c, _ in references if verifies(c, image is aligned)]
         return ([LocalArtworkMatch('ja:CLF-017', 28, 28, .33)]
                 if verify_aligned and image is aligned and any(c == 'ja:CLF-017' for c, _ in references) else [])
     runtime = SimpleNamespace(require=lambda: (snapshot,
@@ -254,7 +256,7 @@ def test_recorded_failures_name_and_narrow_to_the_right_card(tmp_path, case):
     first = [h for h in names if h.region == 'name'] or names
     name = pick_confident_name([h.text for h in first], [h.confidence for h in first], label_filter=True)
     assert name is None or not grading_label_line(name)
-    before_filter = True if case.get('path') == 'slab_recovery' else False
+    before_filter = case.get('before_filter', True if case.get('path') == 'slab_recovery' else False)
     assert pick_confident_name([h.text for h in first], [h.confidence for h in first],
                                label_filter=before_filter) == case['before']['name_text']
     footer = [h.text for h in hits if h.region == 'collector']
@@ -495,3 +497,49 @@ def test_slab_outline_scan_862c09b5_ends_on_lugia_never_the_visual_guess(tmp_pat
         assert evidence['text_identity']['outcome'] == 'verified' and not boundary
     else:
         assert 'ja:CLF-017' not in shown and evidence['text_identity']['label_ids'] == []
+
+
+CLV = ('en:CLV-017', 'Lugia ex', 'CLV', '017', 'en', '017/034', 'Lugia ex')
+
+
+def recorded_lugia(drop=()):
+    hits = [OcrHit(h['text'], h['confidence'], h['region']) for h in STAGING_SLAB_OUTLINE['hits']
+            if h['text'] not in drop]
+    return OcrResult(name_text='LUGIA EX', collector_text='017/012', lines=[h.text for h in hits], hits=hits)
+
+
+def lugia_scan(tmp_path, monkeypatch, verifies, drop=()):
+    """Scans df0e5562/41abdcce: slab outline, label read, footer 017/012, and the real
+    verifier's behaviour: the English Classic deck Lugia (same artwork) verifies."""
+    monkeypatch.setattr('app.recognition.pipeline.client_quad_rect',
+                        lambda image, fractions: np.float32([[12, 338], [796, 338], [796, 1575], [12, 1575]]))
+    monkeypatch.setattr('app.recognition.pipeline.server_frame_rect', lambda image: None)
+    return scan(tmp_path, monkeypatch, enabled=True, slab_label=True, holder=True, recovery=True,
+                recorded=recorded_lugia(drop), extra_rows=(CLV,), verifies=verifies)
+
+
+def test_label_language_picks_the_japanese_printing_over_the_english_twin(tmp_path, monkeypatch):
+    # Real-world behaviour on the app's upload: CLV-017 verifies on the slab frame, CLF-017
+    # only once its artwork is projected onto the upload.
+    response, evidence, boundary = lugia_scan(tmp_path, monkeypatch,
+        lambda card, aligned: card == 'en:CLV-017' or (card == 'ja:CLF-017' and aligned))
+    assert response.status != 'retake'
+    assert [s.card_id for s in response.suggestions][0] == 'ja:CLF-017'
+    assert evidence['frame_selection']['label_language'] == 'ja'
+    assert evidence['text_identity']['candidate_ids'] == ['ja:CLF-017'] and not boundary
+
+
+def test_unverified_japanese_printing_is_still_shown_never_a_retake(tmp_path, monkeypatch):
+    response, evidence, _ = lugia_scan(tmp_path, monkeypatch, lambda card, aligned: card == 'en:CLV-017')
+    assert response.status == 'uncertain' and response.confidence.requires_confirmation
+    assert [s.card_id for s in response.suggestions][0] == 'ja:CLF-017'
+
+
+def test_without_a_language_on_the_label_the_closer_total_leads_its_verified_twin(tmp_path, monkeypatch):
+    # No "2023 POKÉMON JP": 017/012 is closer to CLF's /032 than CLV's /034, so the Japanese
+    # printing leads and the verified English twin follows; both need confirmation.
+    response, evidence, boundary = lugia_scan(tmp_path, monkeypatch, lambda card, aligned: card == 'en:CLV-017',
+                                              drop=('2023 POKÉMON JP',))
+    assert response.status == 'uncertain' and response.confidence.requires_confirmation
+    assert [s.card_id for s in response.suggestions][:2] == ['ja:CLF-017', 'en:CLV-017']
+    assert 'text_identity_language_sibling' in evidence['status_reasons'] and not boundary

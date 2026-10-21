@@ -55,13 +55,13 @@ from app.recognition.holder_printing import holder_printing_hint
 from app.recognition.orientation import retrieve_oriented
 from app.recognition.printing import PrintingDecision, assess_printings
 from app.recognition.rank import artwork_evidence_compatible, decide_status_with_reason, damaged_footer_named_printing, extract_collector_candidates, fraction_named_printing, rerank
-from app.recognition.rank import name_match
+from app.recognition.rank import name_match, normalize_text
 from app.recognition.runtime import Runtime
 from app.recognition.title_retry import read_conflicting_title, title_retry_allowed
 from app.recognition.text_identity import (VERSION as TEXT_IDENTITY_VERSION, confident_fractions, name_agrees,
                                            name_tokens, read_whole_image, text_identity_candidates)
 from app.recognition.label_identity import (VERSION as LABEL_IDENTITY_VERSION, label_identity_candidates,
-                                            read_label_half)
+                                            label_language, label_lines, read_label_half)
 from app.schemas import (
     Candidate,
     GradingEvidence,
@@ -629,7 +629,20 @@ def _recognize_bytes_once(
                     ocr_passes.append(dict(scope='slab_label', **label_pass))
                     label_ids, label_reason = label_identity_candidates(metadata_index, catalog,
                         hits=[*ocr.hits, *label_hits], languages=rank_languages, recovery=recovery)
-                text_ids = sorted({*text_ids, *label_ids})
+                text_ids = (list(dict.fromkeys([*label_ids, *text_ids])) if recovery
+                            else sorted({*text_ids, *label_ids}))
+                if recovery:
+                    # A label that names the card's language ("2023 POKÉMON JP") decides it,
+                    # even when the label's card name is Latin ("LUGIA EX").
+                    label_language_code = label_language(label_lines(ocr.hits, recovery), recovery)
+                    if label_language_code:
+                        rows = _lookup_cards(catalog, text_ids)
+                        in_language = [c for c in text_ids if c in rows
+                                       and str(rows[c]['language'] or '') == label_language_code]
+                        if in_language:
+                            text_ids = in_language
+                        rank_languages = (label_language_code,)
+                        frame_selection['label_language'] = label_language_code
                 if len(text_ids) > 3:
                     text_ids, text_reason = [], 'too_many_candidates'
             whole_frame = image.width * image.height >= .85 * input_image.width * input_image.height
@@ -680,6 +693,14 @@ def _recognize_bytes_once(
                 and not name_agrees(tokens, leader['name'], str(leader['view_title'] or '')))
             if not text_conflict:
                 text_ids, text_reason = [], 'visual_leader_supported'
+        elif text_ids and recovery and len(indices):
+            # Below the floor too: a visual guess that no read name supports must not
+            # outrank the label's own card when neither verifies.
+            leader = _lookup_cards(catalog, [str(snapshot.card_ids[indices[0]])]).get(
+                str(snapshot.card_ids[indices[0]]))
+            tokens = name_tokens(ocr.hits)
+            text_conflict = bool(leader is not None and leader['id'] not in text_ids and tokens
+                and not name_agrees(tokens, leader['name'], str(leader['view_title'] or '')))
         timings['text_identity_ms'] = (time.perf_counter() - mark) * 1000
     visual: list[dict[str, Any]] = []
     selected_ids = [str(snapshot.card_ids[i]) for i in indices]
@@ -1110,8 +1131,41 @@ def _recognize_bytes_once(
                 status = 'uncertain'
                 status_reasons.append('printed_identity_layout_review')
         timings['layout_verify_ms'] = (time.perf_counter() - mark)*1000
+    if (recovery and text_ids and not (too_small or too_blurry)
+            and any(r['card_id'] in text_ids and r.get('local_artwork_verified') for r in combined)):
+        # A number/label candidate whose artwork verified is never dropped for an empty
+        # retake, and a same-name candidate in the label's language leads the one that
+        # happened to verify (CLV-017 English, CLF-017 Japanese share the artwork).
+        verified = [r for r in combined if r['card_id'] in text_ids and r.get('local_artwork_verified')]
+        lead = verified[0]
+        def same_name(r):
+            return (r['card_id'] != lead['card_id'] and normalize_text(r.get('view_title') or r['name'])
+                    == normalize_text(lead.get('view_title') or lead['name']))
+        siblings = sorted((r for r in combined if r['card_id'] in text_ids and same_name(r)),
+                          key=lambda r: text_ids.index(r['card_id']))
+        # The language evidence decides first; otherwise the text order does (label
+        # candidates, then the printed total closest to the read one).
+        sibling = (next((r for r in siblings if r.get('language') in rank_languages), None)
+                   if rank_languages and lead.get('language') not in rank_languages else
+                   next((r for r in siblings if text_ids.index(r['card_id']) < text_ids.index(lead['card_id'])
+                         and (not rank_languages or r.get('language') in rank_languages)), None))
+        order = [*([sibling] if sibling else []), lead,
+                 *(r for r in combined if r['card_id'] in text_ids and r not in (sibling, lead))]
+        if sibling or status in {'retake', 'no_match'}:
+            ids = [r['card_id'] for r in order]
+            combined.sort(key=lambda r: ids.index(r['card_id']) if r['card_id'] in ids else len(ids))
+            reference_identity = dict(combined[0])
+            if status in {'retake', 'no_match'}:
+                status, retake, framing_unverified = 'uncertain', False, False
+                status_reasons.append('text_identity_verified_review')
+            if sibling:
+                status = 'uncertain'
+                status_reasons.append('text_identity_language_sibling')
+            # 'sibling': the shared artwork verified on another printing; show both, sibling
+            # first. Verified pixels exist, so the boundary retry is not needed.
+            text_identity = 'sibling' if sibling and not sibling.get('local_artwork_verified') else 'verified'
     shown = [] if status in {"no_match", "retake", "failed"} else combined[:1]
-    if text_identity == 'unverified' and status == 'uncertain':
+    if text_identity in {'unverified', 'sibling'} and status == 'uncertain':
         shown = [r for r in combined if r['card_id'] in text_ids][:3]
     timings["total_ms"] = (time.perf_counter() - started) * 1000
 
@@ -1126,6 +1180,8 @@ def _recognize_bytes_once(
         message = "The photograph is too blurry for useful recognition. Try again."
     elif retake and too_small:
         message = "Move closer so the card fills more of the frame."
+    elif text_identity == 'sibling' and status == 'uncertain':
+        message = 'The label names this card and its language; the same artwork verified on another printing. Pick the right printing before confirming.'
     elif text_identity == 'unverified' and status == 'uncertain':
         message = 'The printed collector number and a name in the photo point to these cards. The artwork was not verified; pick the right one or retake with the whole card visible.'
     elif text_identity == 'verified' and status == 'uncertain':
