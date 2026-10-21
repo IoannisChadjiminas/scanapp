@@ -142,7 +142,19 @@ def text_identity_candidates(index, catalog: sqlite3.Connection, *, hits: list[O
     if len(named) > MAX_CANDIDATES:
         # The catalogue has no HP column to break the tie; too broad to propose.
         return [], 'too_many_candidates'
-    return sorted(row['card_id'] for row in named), 'numerator_candidates' if numerator_only else 'candidates'
+    if numerator_only:
+        # Order a misread number's cards by how close their printed total is to the read
+        # one (017/012: /032 before /034), digit by digit.
+        read = next((p.denominator for h in fractions if (p := parse_collector(h.text))), '') or ''
+        def closeness(row):
+            totals = [p.denominator for n in accepted_collector_numbers(row)
+                      if (p := parse_collector(n)) is not None and p.denominator]
+            def distance(total):
+                a, b = read.zfill(3), total.zfill(3)
+                return sum(x != y for x, y in zip(a, b)) + abs(len(a) - len(b))
+            return (min((distance(t) for t in totals), default=99), row['card_id'])
+        return [row['card_id'] for row in sorted(named, key=closeness)], 'numerator_candidates'
+    return sorted(row['card_id'] for row in named), 'candidates'
 
 
 def read_whole_image(engine, image: Image.Image, long_edge: int = 1400) -> tuple[list[OcrHit], dict]:
