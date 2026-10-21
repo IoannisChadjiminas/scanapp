@@ -11,6 +11,8 @@ Modes (phone behaviour is simulated from the photo, nothing else is sent):
   --quad   send the server detector's own card corners as card_quad
   --warp   upload the server-warped card with skip_detect=true
   --client-text HINTS  send each case's client_text from simulate_client_text.py output
+  --stage0 FIELDS      send card_quad, client_text, client_quality and client_embedding
+                       from simulate_stage0.py (a simulated phone)
 """
 import argparse
 import json
@@ -98,19 +100,29 @@ def main():
     p.add_argument('--limit', type=int, default=10**9)
     p.add_argument('--server-pid', type=int)
     p.add_argument('--client-text', type=Path)
+    p.add_argument('--stage0', type=Path, help='simulate_stage0.py jsonl: quad, text, quality, embedding')
     a = p.parse_args()
     global SERVER_PID
     SERVER_PID = a.server_pid
     cases = json.loads(a.panel.read_text())[:a.limit]
     hints = ({r['id']: r['client_text'] for r in map(json.loads, a.client_text.read_text().splitlines())}
              if a.client_text else {})
+    phone = {}
+    if a.stage0:
+        phone = {r['id']: r for r in map(json.loads, a.stage0.read_text().splitlines()) if r.get('id')}
     with httpx.Client(timeout=120) as client, a.out.open('w') as handle:
         for case in cases:
             path = a.root / case['photo_file']
             data, form = path.read_bytes(), {'language': 'auto'}
             if hints.get(case['id']):
                 form['client_text'] = hints[case['id']]
-            if case.get('card_quad'):
+            simulated = phone.get(case['id']) or {}
+            for key in ('client_text', 'client_quality', 'client_embedding'):
+                if simulated.get(key):
+                    form[key] = simulated[key]
+            if simulated.get('card_quad'):
+                form['card_quad'], form['quad_source'] = simulated['card_quad'], 'rect'
+            elif case.get('card_quad'):
                 # A recorded phone quad (fractions, clockwise from top-left), e.g. a holder outline.
                 form['card_quad'], form['quad_source'] = case['card_quad'], 'rect'
             if a.hint:
@@ -118,7 +130,7 @@ def main():
             if a.quad or a.warp:
                 image = ImageOps.exif_transpose(Image.open(path)).convert('RGB')
                 rect = server_frame_rect(image)
-                if rect is not None and a.quad:
+                if rect is not None and a.quad and 'card_quad' not in form:
                     w, h = image.size
                     form['card_quad'] = ','.join(f'{x / (w - 1):.4f},{y / (h - 1):.4f}' for x, y in rect)
                     form['quad_source'] = 'replay'
@@ -141,7 +153,9 @@ def main():
                 ocr=(body.get('ocr') or {}), grading=body.get('grading'),
                 timings=body.get('timings_ms'), printing=(body.get('confidence') or {}).get('printing'),
                 quad_sent='card_quad' in form, warped='skip_detect' in form,
-                client_text_sent='client_text' in form, **memory_mb())
+                client_text_sent='client_text' in form,
+                client_quality_sent='client_quality' in form,
+                client_embedding_sent='client_embedding' in form, **memory_mb())
             handle.write(json.dumps(row) + '\n')
             handle.flush()
             print(case['id'], reply.status_code, round(row['cpu_ms']), round(http_ms), row['status'], flush=True)
