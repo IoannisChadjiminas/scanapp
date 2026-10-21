@@ -117,9 +117,9 @@ def test_more_than_three_named_cards_is_too_broad(tmp_path):
 
 
 def scan(tmp_path, monkeypatch, *, enabled, verify_aligned=True, lead_score=.73, name='PRISTINE',
-         slab_label=False, lead_name='オーロンゲ'):
+         slab_label=False, lead_name='オーロンゲ', screenshot=False, full_image=False, detected=False):
     """One slab-screenshot scan through the real pipeline with a faked OCR and verifier."""
-    monkeypatch.setattr('app.recognition.pipeline.detect_and_rectify', lambda im: (im, False))
+    monkeypatch.setattr('app.recognition.pipeline.detect_and_rectify', lambda im: (im, detected))
     for name_ in ('card_frame_candidates', 'loose_frame_candidates', 'portrait_window_candidates'):
         monkeypatch.setattr(f'app.recognition.pipeline.{name_}', lambda *a, **k: [])
     monkeypatch.setattr('app.recognition.pipeline.slab_interior_candidate', lambda *a, **k: None)
@@ -144,12 +144,23 @@ def scan(tmp_path, monkeypatch, *, enabled, verify_aligned=True, lead_score=.73,
         hits=[OcrHit('10', .9999, 'name'), OcrHit('Pi', .69, 'name'), OcrHit('PRISTINE', .9999, 'name'),
               OcrHit('017/032', .99997, 'collector'), OcrHit('ギラティナ', .90, 'collector'),
               OcrHit('ルギア', .85, 'collector'), OcrHit('230', .9999, 'collector')])
+    if screenshot:
+        # The app failure: the strips hold only the phone's status and browser bars.
+        observed = OcrResult(name_text=None, collector_text='36', lines=['11:38', '1/5', '③ auctaro.com', '36'],
+            hits=[OcrHit('11:38', .99, 'name'), OcrHit('1/5', .998, 'name'),
+                  OcrHit('③ auctaro.com', .97, 'collector'), OcrHit('36', .9999, 'collector')])
+    whole_reads = []
+    def whole(patch):
+        whole_reads.append(patch.size)
+        return (['11:38', '1/5', '10', 'PRISTINE', 'ルギア', '230*', '017/032', '③ auctaro.com'],
+                [.99, .998, .9999, .9999, .998, .978, .995, .97])
     aligned = Image.new('RGB', (600, 825))
     def verify(image, references):
         return ([LocalArtworkMatch('ja:CLF-017', 28, 28, .33)]
                 if verify_aligned and image is aligned and any(c == 'ja:CLF-017' for c, _ in references) else [])
     runtime = SimpleNamespace(require=lambda: (snapshot,
-        SimpleNamespace(embed=lambda *args: np.array([1, 0], dtype=np.float32)), SimpleNamespace(read=lambda image: observed)),
+        SimpleNamespace(embed=lambda *args: np.array([1, 0], dtype=np.float32)),
+        SimpleNamespace(read=lambda image: observed, _run=whole)),
         card_languages=np.array([i.split(':')[0] for i in ids]), printing_index=None,
         artwork_verifier=SimpleNamespace(verify=verify, propose_frame=lambda image, reference: aligned),
         metadata_index=MetadataCandidateIndex(catalog.execute('SELECT * FROM cards'), indexed_ids=set(ids)),
@@ -160,9 +171,10 @@ def scan(tmp_path, monkeypatch, *, enabled, verify_aligned=True, lead_score=.73,
     try:
         response = recognize_bytes(payload.getvalue(), settings=Settings(_env_file=None, data_dir=tmp_path,
             store_captures=False, text_identity_candidates=enabled, ocr_label_name_filter=enabled,
-            slab_label_identity=slab_label),
+            slab_label_identity=slab_label, full_image_text_fallback=full_image),
             runtime=runtime, catalog=catalog, results=results, session_id='test', graded=False)
         evidence = json.loads(results.execute('SELECT ocr_json FROM scans').fetchone()[0])
+        scan.whole_reads = whole_reads
         return response, evidence, bool(boundary)
     finally:
         catalog.close()
@@ -230,7 +242,21 @@ def test_recorded_failures_name_and_narrow_to_the_right_card(tmp_path, case):
     numbers = extract_collector_candidates([h.text for h in hits], hits=hits)
     index = MetadataCandidateIndex(catalog.execute('SELECT * FROM cards'),
                                    indexed_ids={r['id'] for r in case['catalogue_rows']})
-    if case.get('path') == 'label':
+    if case.get('path') == 'full_image':
+        # The first pass alone reaches nothing on either path.
+        assert text_identity_candidates(index, catalog, hits=hits, numbers=numbers,
+                                        languages=())[0] == []
+        assert label_identity_candidates(index, catalog, hits=hits, languages=())[0] == []
+        full = [OcrHit(h['text'], h['confidence'], h['region']) for h in case['full_image_hits']]
+        full_numbers = extract_collector_candidates([], hits=full)
+        # The page counter "1/5" is a second confident fraction; only "any fraction" mode
+        # lets the card's own 017/032 stand.
+        assert text_identity_candidates(index, catalog, hits=full, numbers=full_numbers,
+                                        languages=('ja',))[1] == 'conflicting_fractions'
+        found, reason = text_identity_candidates(index, catalog, hits=full, numbers=full_numbers,
+                                                 languages=('ja',), any_fraction=True)
+        assert found == case['expected_card_ids']
+    elif case.get('path') == 'label':
         found, reason = label_identity_candidates(index, catalog, hits=hits, languages=tuple(case['languages']))
         # The number+name path alone cannot reach these cards.
         assert set(case['expected_card_ids']).isdisjoint(text_identity_candidates(
@@ -302,3 +328,29 @@ def test_slab_label_flag_leaves_a_leader_the_text_supports(tmp_path, monkeypatch
     assert evidence['text_identity']['candidate_ids'] == []
     assert evidence['text_identity']['reason'] == 'visual_leader_supported'
     assert all(s.card_id != 'ja:CLF-017' for s in response.suggestions)
+
+
+def test_whole_image_fallback_reads_a_screenshot_once_and_verifies(tmp_path, monkeypatch):
+    response, evidence, boundary = scan(tmp_path, monkeypatch, enabled=True, slab_label=True,
+                                        screenshot=True, full_image=True)
+    assert len(scan.whole_reads) == 1 and max(scan.whole_reads[0]) <= 1400
+    assert [s.card_id for s in response.suggestions] == ['ja:CLF-017']
+    assert response.status == 'uncertain' and response.confidence.requires_confirmation
+    full = evidence['text_identity']['full_image']
+    assert full['candidate_ids'] == ['ja:CLF-017'] and evidence['text_identity']['outcome'] == 'verified'
+    assert any(p['scope'] == 'full_image_text' for p in evidence['passes'])
+    assert {'text': '017/032', 'confidence': .995, 'region': 'full_image'} in evidence['hits']
+    assert not boundary
+
+
+def test_whole_image_fallback_is_off_by_default_and_the_screenshot_stays_a_retake(tmp_path, monkeypatch):
+    response, evidence, boundary = scan(tmp_path, monkeypatch, enabled=True, slab_label=True, screenshot=True)
+    assert scan.whole_reads == [] and response.status == 'retake' and boundary
+
+
+@pytest.mark.parametrize('change', [dict(detected=True), dict(screenshot=False)])
+def test_whole_image_fallback_never_runs_on_a_found_frame_or_a_read_number(tmp_path, monkeypatch, change):
+    options = dict(enabled=True, slab_label=True, screenshot=True, full_image=True)
+    options.update(change)
+    scan(tmp_path, monkeypatch, **options)
+    assert scan.whole_reads == []
