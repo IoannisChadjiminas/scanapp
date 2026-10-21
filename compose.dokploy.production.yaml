@@ -57,6 +57,9 @@ services:
       # docs/experiments/slab-text-identity-20261021.md
       OCR_LABEL_NAME_FILTER: ${OCR_LABEL_NAME_FILTER:-true}
       TEXT_IDENTITY_CANDIDATES: ${TEXT_IDENTITY_CANDIDATES:-true}
+      # Slab labels: set + number from CGC/PSA/BGS labels (18a, SV59, TG01) become verified
+      # candidates. docs/experiments/slab-label-identity-20261021.md
+      SLAB_LABEL_IDENTITY: ${SLAB_LABEL_IDENTITY:-true}
       SCAN_STREAM_RESULTS: ${SCAN_STREAM_RESULTS:-true}
       PREVIEW_LANGUAGE_ORDER: ${PREVIEW_LANGUAGE_ORDER:-true}
       USE_CLIENT_QUAD: ${USE_CLIENT_QUAD:-false}
