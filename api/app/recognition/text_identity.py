@@ -10,7 +10,10 @@ from __future__ import annotations
 
 import re
 import sqlite3
+import time
 import unicodedata
+
+from PIL import Image
 
 from app.recognition.ocr import OcrHit, grading_label_line
 from app.recognition.rank import (accepted_collector_numbers, name_match, normalize_text,
@@ -71,15 +74,29 @@ def confident_fractions(numbers: list[OcrHit]) -> list[OcrHit]:
 
 
 def text_identity_candidates(index, catalog: sqlite3.Connection, *, hits: list[OcrHit],
-                             numbers: list[OcrHit], languages: tuple[str, ...]) -> tuple[list[str], str]:
+                             numbers: list[OcrHit], languages: tuple[str, ...],
+                             any_fraction: bool = False) -> tuple[list[str], str]:
     """Card ids (at most three) agreeing with the one confident fraction and a read name.
 
-    Returns ([], reason) when the evidence is missing, contradictory or too broad.
+    Returns ([], reason) when the evidence is missing, contradictory or too broad. With
+    `any_fraction` (a whole-image read also holds page counters such as "1/5"), each
+    fraction is tried on its own and exactly one may lead to candidates.
     """
     fractions = confident_fractions(numbers)
     if not fractions:
         return [], 'no_confident_fraction'
     keys = {(p.prefix, p.number, p.denominator) for h in fractions if (p := parse_collector(h.text))}
+    if len(keys) != 1 and any_fraction:
+        found = []
+        for key in sorted(keys):
+            ids, reason = text_identity_candidates(index, catalog, hits=hits, languages=languages,
+                numbers=[h for h in fractions if (p := parse_collector(h.text))
+                         and (p.prefix, p.number, p.denominator) == key])
+            if ids:
+                found.append(ids)
+        if len(found) == 1:
+            return found[0], 'candidates'
+        return [], 'conflicting_fractions' if found else 'no_name_agreement'
     if len(keys) != 1:
         return [], 'conflicting_fractions'
     prefix, number, _ = next(iter(keys))
@@ -117,3 +134,21 @@ def text_identity_candidates(index, catalog: sqlite3.Connection, *, hits: list[O
         # The catalogue has no HP column to break the tie; too broad to propose.
         return [], 'too_many_candidates'
     return sorted(row['card_id'] for row in named), 'candidates'
+
+
+def read_whole_image(engine, image: Image.Image, long_edge: int = 1400) -> tuple[list[OcrHit], dict]:
+    """One OCR read of the whole upload, downscaled to about `long_edge` pixels.
+
+    Hits carry region 'collector' so a printed fraction anywhere counts as one; the
+    caller keeps them out of title and footer evidence.
+    """
+    scale = min(1., long_edge / max(image.size))
+    patch = image if scale >= 1. else image.resize(
+        (round(image.width * scale), round(image.height * scale)), Image.Resampling.LANCZOS)
+    started = time.perf_counter()
+    try:
+        lines, scores = engine._run(patch)
+    finally:
+        record = dict(region='full', reason='full_image_text', width=patch.width, height=patch.height,
+                      ms=round((time.perf_counter() - started) * 1000, 2))
+    return [OcrHit(t, s, 'collector') for t, s in zip(lines, scores)], record

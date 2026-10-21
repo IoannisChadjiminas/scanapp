@@ -43,7 +43,7 @@ from app.recognition.presentation import match_presentation
 from app.recognition.language import (confident_language_texts, language_label, locale_languages,
                                          order_preview_ids, ranking_languages,
                                          resolve_search_languages)
-from app.recognition.ocr import OcrResult, inverted_card_layout
+from app.recognition.ocr import OcrHit, OcrResult, inverted_card_layout
 from app.recognition.ocr_framing import complete_frame_probe_allowed, complete_frame_identity_supported, normalize_complete_frame_footer, wide_footer_allowed, wide_footer_fractions
 from app.recognition.ocr_cache import RequestOcrCache
 from app.recognition.ocr_budget import (footer_retry_required, title_only_allowed,
@@ -58,8 +58,8 @@ from app.recognition.rank import artwork_evidence_compatible, decide_status_with
 from app.recognition.rank import name_match
 from app.recognition.runtime import Runtime
 from app.recognition.title_retry import read_conflicting_title, title_retry_allowed
-from app.recognition.text_identity import (VERSION as TEXT_IDENTITY_VERSION, name_agrees, name_tokens,
-                                           text_identity_candidates)
+from app.recognition.text_identity import (VERSION as TEXT_IDENTITY_VERSION, confident_fractions, name_agrees,
+                                           name_tokens, read_whole_image, text_identity_candidates)
 from app.recognition.label_identity import (VERSION as LABEL_IDENTITY_VERSION, label_identity_candidates,
                                             read_label_half)
 from app.schemas import (
@@ -606,6 +606,7 @@ def _recognize_bytes_once(
     label_ids: list[str] = []
     label_reason = None
     text_conflict = False
+    full_fallback = None
     slab_label = bool(getattr(settings, 'slab_label_identity', False))
     top_visual = float(scores[0]) if len(scores) else 0.
     if (getattr(settings, 'text_identity_candidates', False) and metadata_index is not None
@@ -630,6 +631,39 @@ def _recognize_bytes_once(
                 text_ids = sorted({*text_ids, *label_ids})
                 if len(text_ids) > 3:
                     text_ids, text_reason = [], 'too_many_candidates'
+            whole_frame = image.width * image.height >= .85 * input_image.width * input_image.height
+            if (getattr(settings, 'full_image_text_fallback', False) and not text_ids
+                    and not detected and whole_frame
+                    and not confident_fractions(numbers) and callable(getattr(ocr_engine, '_run', None))):
+                # No card frame was found and the strips read no printed number: on a
+                # screenshot they hold the phone's status and browser bars. One read of
+                # the whole upload feeds the same number+name and label paths.
+                full_hits, full_pass = read_whole_image(ocr_engine, input_image)
+                ocr_passes.append(dict(scope='full_image_text', **full_pass))
+                full_fallback = dict(lines=len(full_hits), ms=full_pass['ms'])
+                full_numbers = extract_collector_candidates([], hits=full_hits)
+                full_texts = confident_language_texts([*ocr.hits, *full_hits])
+                full_languages = ranking_languages(resolve_search_languages(language, full_texts),
+                                                   full_texts, None)
+                found, found_reason = text_identity_candidates(metadata_index, catalog,
+                    hits=full_hits, numbers=full_numbers, languages=full_languages, any_fraction=True)
+                if slab_label and not found:
+                    label_hits = [OcrHit(h.text, h.confidence, 'name') for h in full_hits]
+                    found, found_reason = label_identity_candidates(metadata_index, catalog,
+                        hits=label_hits, languages=full_languages)
+                full_fallback.update(candidate_ids=found, reason=found_reason)
+                if found:
+                    # The whole-image read becomes evidence for this scan: its language
+                    # decides ranking, its lines join the OCR record (region 'full_image',
+                    # never a footer collector or a title).
+                    text_ids, text_reason = found, f'full_image:{found_reason}'
+                    ocr.hits.extend(OcrHit(h.text, h.confidence, 'full_image') for h in full_hits)
+                    ocr.lines.extend(h.text for h in full_hits)
+                    language_texts = full_texts
+                    decision = resolve_search_languages(language, language_texts)
+                    rank_languages = full_languages
+                    numbers = extract_collector_candidates(
+                        [line for line in [ocr.collector_text, *ocr.lines] if line], hits=ocr.hits)
         except Exception:  # noqa: BLE001 - optional candidates keep the established path
             logging.getLogger(__name__).exception('Text identity candidates failed')
             text_ids, text_reason = [], 'error'
@@ -1194,7 +1228,9 @@ def _recognize_bytes_once(
         **({"text_identity": dict(candidate_ids=text_ids, reason=text_reason, outcome=text_identity,
                                   aligned_verified=text_aligned,
                                   **(dict(label_ids=label_ids, label_reason=label_reason,
-                                          leader_conflict=text_conflict) if slab_label else {}))}
+                                          leader_conflict=text_conflict) if slab_label else {}),
+                                  **(dict(full_image=full_fallback)
+                                     if getattr(settings, 'full_image_text_fallback', False) else {}))}
            if getattr(settings, 'text_identity_candidates', False) else {}),
         "framing_unverified": framing_unverified,
         "framing_review_supported": framing_review_supported,

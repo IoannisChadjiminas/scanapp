@@ -78,6 +78,10 @@ class Settings(BaseSettings):
     # Shadows - 18a/147", PSA "#18A") into catalogue candidates, and also try them when a
     # near-threshold visual leader agrees with neither the label nor the card's printed name.
     slab_label_identity: bool = False
+    # Requires text_identity_candidates. When no card frame was found and the title/footer
+    # strips read no printed number (a screenshot's status and browser bars), read the whole
+    # upload once (~1,400 px) and feed its lines to the number+name and label paths.
+    full_image_text_fallback: bool = False
     # Read the phone's own OCR of the card (client_text on POST /scans) and log how it
     # agrees with the server. Off: the field is ignored. It never chooses a card.
     client_text_hints: bool = False
