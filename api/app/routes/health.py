@@ -54,6 +54,10 @@ class AppConfigResponse(BaseModel):
     slab_detection: bool = False
     # Send the phone's own read of the card's name and number as client_text.
     client_text: bool = False
+    # Slab label fields, a phone embedding, and photo quality. Logged only.
+    client_label: bool = False
+    client_embedding: bool = False
+    client_quality: bool = False
     card_warp: bool = False
     capture: CaptureConfig = CaptureConfig()
     scan_prices: ScanPriceConfig
@@ -75,6 +79,9 @@ def scan_price_config(settings) -> AppConfigResponse:
         config_ttl_s=max(30, min(ttl, 24 * 60 * 60)),
         slab_detection=bool(settings.app_slab_detection),
         client_text=bool(getattr(settings, 'app_client_text', False)),
+        client_label=bool(getattr(settings, 'app_client_label', False)),
+        client_embedding=bool(getattr(settings, 'app_client_embedding', False)),
+        client_quality=bool(getattr(settings, 'app_client_quality', False)),
         card_warp=bool(settings.app_card_warp),
         capture=CaptureConfig(
             preset=settings.app_capture_preset if settings.app_capture_preset in CAPTURE_PRESETS else 'max',

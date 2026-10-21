@@ -23,6 +23,7 @@ from app.recognition.progress import scan_stream
 from app.recognition.runtime import scan_lane
 from app.recognition.upload import read_upload_limited
 from app.scan_summary import parse_quad, scan_flags, scan_outcome_line, scan_source, scan_summary_line
+from app.stage0 import PhoneEvidence, phone_evidence, stage0_line
 from app.schemas import (
     Candidate,
     FeedbackRequest,
@@ -76,6 +77,9 @@ async def create_scan(
     # The phone's own read of the name and collector number (JSON). Read only
     # with CLIENT_TEXT_HINTS or CLIENT_TEXT_FAST_PATH; it never picks a card.
     client_text: str | None = Form(default=None),
+    # Logged only. Invalid values are left out, and neither is passed into recognition.
+    client_quality: str | None = Form(default=None),
+    client_embedding: str | None = Form(default=None),
 ) -> ScanResponse | Response:
     settings = request.app.state.settings
     started = time.perf_counter()
@@ -136,9 +140,19 @@ async def create_scan(
     if hint is not None:
         flags.append('req_client_text')
 
+    try:
+        evidence = phone_evidence(client_text, client_quality, client_embedding)
+    except Exception:
+        logger.exception("stage0 parse failed trace=%s", trace)
+        evidence = PhoneEvidence()
+
     def log_summary(result: ScanResponse) -> None:
         logger.info("%s", scan_summary_line(result, settings, trace=trace,
                                             upload_bytes=len(data), flags=flags, source=source))
+        try:
+            logger.info("%s", stage0_line(result, trace=trace, source=source, evidence=evidence))
+        except Exception:
+            logger.exception("stage0 log failed trace=%s", trace)
 
     def after_stream(result: ScanResponse) -> None:
         log_summary(result)

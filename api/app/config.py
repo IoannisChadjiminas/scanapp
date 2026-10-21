@@ -195,6 +195,11 @@ class Settings(BaseSettings):
     # Tell the phone (GET /config) to read the card's name and collector number on
     # the device and send them as client_text. Off until switched on here.
     app_client_text: bool = False
+    # Slab label fields, a phone embedding, and photo quality. The phone sends
+    # them only when asked. Logged only; none of them changes a scan's answer.
+    app_client_label: bool = False
+    app_client_embedding: bool = False
+    app_client_quality: bool = False
     # Phone photo prep, sent through GET /config. Defaults match the app today.
     app_capture_preset: str = 'max'
     app_jpeg_quality: int = 95

@@ -30,6 +30,9 @@ def test_a_complete_hint_is_read_and_normalised():
     assert parse_client_text(payload(number='SVP 045'))[0].number == 'SVP045'
     assert parse_client_text(payload(name=None, name_conf=None))[0].name is None
     assert parse_client_text(payload(name='ピカチュウ'))[0].name == 'ピカチュウ'
+    labelled = parse_client_text(payload(v=2, label_name='LUGIA EX', label_grader='PSA'))
+    assert labelled[1] == 'ok' and labelled[0] == ClientText(
+        'apple-vision', 'Toxel', .98, '078/185', .97, 120)
 
 
 @pytest.mark.parametrize('raw,reason', [
@@ -43,7 +46,7 @@ def test_a_complete_hint_is_read_and_normalised():
     (payload(number_conf=True), 'bad_confidence'), (payload(name_conf='high'), 'bad_confidence'),
     ('{"v":1,"engine":"x","name_conf":NaN,"name":"Toxel"}', 'bad_confidence'),
     (payload(ms=-1), 'bad_ms'), (payload(name=None, number=None), 'empty'),
-    (payload(name='Toxel' + ' ' * 600), 'too_long'),
+    (payload(name='Toxel' + ' ' * 900), 'too_long'),
 ])
 def test_malformed_hints_are_dropped_with_a_reason(raw, reason):
     assert parse_client_text(raw) == (None, reason)

@@ -29,8 +29,12 @@ from app.recognition.rank import (RELIABLE_COLLECTOR_CONF, accepted_collector_nu
 
 VERSION = 'client-text-v1'
 OCR_MODES = ('off', 'footer', 'all')
-MAX_BYTES = 512
-_KEYS = {'v', 'engine', 'name', 'name_conf', 'number', 'number_conf', 'ms'}
+MAX_BYTES = 768
+_LABEL_KEYS = {
+    'label_name', 'label_name_conf', 'label_number', 'label_number_conf',
+    'label_set', 'label_language', 'label_grader', 'label_grade',
+}
+_KEYS = {'v', 'engine', 'name', 'name_conf', 'number', 'number_conf', 'ms', *_LABEL_KEYS}
 _ENGINE = re.compile(r'^[a-z0-9][a-z0-9._-]{0,31}$')
 # 14/100, 045/198, TG12/TG30, GG01/GG70, SWSH050, SVP 045, SM35, 25a.
 _NUMBER = re.compile(r'^(?:[A-Z]{1,5}[- ]?)?\d{1,4}[A-Z]?(?:\s*/\s*(?:[A-Z]{1,4})?\d{1,4})?$',
@@ -100,7 +104,11 @@ def parse_client_text(raw: str | None) -> tuple[ClientText | None, str]:
         return None, 'not_object'
     if set(body) - _KEYS:
         return None, 'unknown_keys'
-    if body.get('v') != 1 or isinstance(body.get('v'), bool):
+    version = body.get('v')
+    # Version 2 adds slab label fields. They are logged elsewhere and are not
+    # part of this hint, so a version 2 body with no label field is still refused.
+    if version not in (1, 2) or isinstance(version, bool) or (
+            version == 2 and not (_LABEL_KEYS & set(body))):
         return None, 'bad_version'
     engine = body.get('engine')
     if not isinstance(engine, str) or not _ENGINE.fullmatch(engine):
