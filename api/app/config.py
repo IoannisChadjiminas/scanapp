@@ -74,6 +74,10 @@ class Settings(BaseSettings):
     # suggestions needing confirmation instead of an empty retake. A verified single
     # candidate also skips the boundary retry. Never overrides a confident visual answer.
     text_identity_candidates: bool = False
+    # Requires text_identity_candidates. Parse a slab label's set line and number ("Burning
+    # Shadows - 18a/147", PSA "#18A") into catalogue candidates, and also try them when a
+    # near-threshold visual leader agrees with neither the label nor the card's printed name.
+    slab_label_identity: bool = False
     # Read the phone's own OCR of the card (client_text on POST /scans) and log how it
     # agrees with the server. Off: the field is ignored. It never chooses a card.
     client_text_hints: bool = False

@@ -11,7 +11,8 @@ from app.config import Settings
 from app.db import connect, init_catalog, init_results
 from app.recognition.local_match import LocalArtworkMatch
 from app.recognition.metadata import MetadataCandidateIndex
-from app.recognition.ocr import OcrHit, OcrResult, grading_label_line, pick_confident_name
+from app.recognition.ocr import OcrHit, OcrResult, grading_label_line, pick_collector_text, pick_confident_name
+from app.recognition.label_identity import label_identity_candidates, number_key, parse_label
 from app.recognition.pipeline import recognize_bytes
 from app.recognition.rank import extract_collector_candidates
 from app.recognition.text_identity import name_agrees, name_tokens, text_identity_candidates
@@ -115,7 +116,8 @@ def test_more_than_three_named_cards_is_too_broad(tmp_path):
                                     languages=('ja',)) == ([], 'too_many_candidates')
 
 
-def scan(tmp_path, monkeypatch, *, enabled, verify_aligned=True, lead_score=.73, name='PRISTINE'):
+def scan(tmp_path, monkeypatch, *, enabled, verify_aligned=True, lead_score=.73, name='PRISTINE',
+         slab_label=False, lead_name='オーロンゲ'):
     """One slab-screenshot scan through the real pipeline with a faked OCR and verifier."""
     monkeypatch.setattr('app.recognition.pipeline.detect_and_rectify', lambda im: (im, False))
     for name_ in ('card_frame_candidates', 'loose_frame_candidates', 'portrait_window_candidates'):
@@ -131,7 +133,7 @@ def scan(tmp_path, monkeypatch, *, enabled, verify_aligned=True, lead_score=.73,
     for cid in wrong:
         catalog.execute('INSERT INTO cards (id,provider_id,name,set_id,set_name,collector_number,language,'
                         'printed_collector_number,image_path) VALUES (?,?,?,?,?,?,?,?,?)',
-                        (cid, cid, 'オーロンゲ', cid, cid, '054', 'ja', '054/070', f'/refs/{cid}.jpg'))
+                        (cid, cid, lead_name, cid, cid, '054', 'ja', '054/070', f'/refs/{cid}.jpg'))
     catalog.commit()
     ids = [*wrong, 'ja:CLF-017', 'ja:CP3-017', 'ja:SM7b-017', 'en:sv1-17']
     scores = [lead_score - .001*i for i in range(20)] + [.60, .55, .69, .5]
@@ -157,7 +159,8 @@ def scan(tmp_path, monkeypatch, *, enabled, verify_aligned=True, lead_score=.73,
     Image.fromarray(np.random.default_rng(7).integers(0, 255, (1990, 1180, 3), dtype=np.uint8)).save(payload, 'JPEG')
     try:
         response = recognize_bytes(payload.getvalue(), settings=Settings(_env_file=None, data_dir=tmp_path,
-            store_captures=False, text_identity_candidates=enabled, ocr_label_name_filter=enabled),
+            store_captures=False, text_identity_candidates=enabled, ocr_label_name_filter=enabled,
+            slab_label_identity=slab_label),
             runtime=runtime, catalog=catalog, results=results, session_id='test', graded=False)
         evidence = json.loads(results.execute('SELECT ocr_json FROM scans').fetchone()[0])
         return response, evidence, bool(boundary)
@@ -215,15 +218,87 @@ def test_recorded_failures_name_and_narrow_to_the_right_card(tmp_path, case):
         catalog.execute('INSERT INTO set_totals VALUES (?,?,?,?)', (language, set_id, total, 'fixture'))
     catalog.commit()
     hits = [OcrHit(h['text'], h['confidence'], h['region']) for h in case['hits']]
-    names = [h for h in hits if h.region == 'name']
-    name = pick_confident_name([h.text for h in names], [h.confidence for h in names], label_filter=True)
+    names = [h for h in hits if h.region in ('name', 'holder_name')][:len(case['hits'])]
+    first = [h for h in names if h.region == 'name'] or names
+    name = pick_confident_name([h.text for h in first], [h.confidence for h in first], label_filter=True)
     assert name is None or not grading_label_line(name)
-    assert pick_confident_name([h.text for h in names], [h.confidence for h in names]) == case['before']['name_text']
+    assert pick_confident_name([h.text for h in first], [h.confidence for h in first]) == case['before']['name_text']
+    footer = [h.text for h in hits if h.region == 'collector']
+    if footer:
+        assert pick_collector_text(footer) == case['before'].get('collector_text', pick_collector_text(footer))
+        assert pick_collector_text(footer, template_filter=True) not in {'retreat', 'resistance', 'weakness'}
     numbers = extract_collector_candidates([h.text for h in hits], hits=hits)
     index = MetadataCandidateIndex(catalog.execute('SELECT * FROM cards'),
                                    indexed_ids={r['id'] for r in case['catalogue_rows']})
-    found, reason = text_identity_candidates(index, catalog, hits=hits, numbers=numbers,
-                                             languages=tuple(case['languages']))
+    if case.get('path') == 'label':
+        found, reason = label_identity_candidates(index, catalog, hits=hits, languages=tuple(case['languages']))
+        # The number+name path alone cannot reach these cards.
+        assert set(case['expected_card_ids']).isdisjoint(text_identity_candidates(
+            index, catalog, hits=hits, numbers=numbers, languages=tuple(case['languages']))[0])
+    else:
+        found, reason = text_identity_candidates(index, catalog, hits=hits, numbers=numbers,
+                                                 languages=tuple(case['languages']))
     assert reason == 'candidates' and 1 <= len(found) <= 3
     assert set(case['expected_card_ids']) & set(found)
+    if case.get('path') == 'label':
+        assert found == case['expected_card_ids']
     catalog.close()
+
+
+@pytest.mark.parametrize('lines,sets,number', [
+    (['CGC UNIVERSAL GRADE', 'Charmander', 'Pokémon (2017)', 'Burning Shadows- 18a/147'], 'BURNING SHADOWS', '18A'),
+    (['2017 POKEMON SM BURNING SHADOWS', '#18A', 'CHARMANDER', 'NM-MT'], 'POKEMON SM BURNING SHADOWS', '18A'),
+    (['2017 Pokemon Sun & Moon Burning Shadows #18a', 'Charmander'], 'POKEMON SUN & MOON BURNING SHADOWS', '18A'),
+    (['2019 POKEMON SM HIDDEN FATES', '#SV59', 'MEWTWO GX'], 'POKEMON SM HIDDEN FATES', 'SV59'),
+    (['2021 POKEMON SWSH PROMO', '#SWSH050', 'PIKACHU'], 'POKEMON SWSH PROMO', 'SWSH50'),
+    (['2022 POKEMON LOST ORIGIN', '#TG01', 'BRAIXEN'], 'POKEMON LOST ORIGIN', 'TG1'),
+    (['Trading Card Game Classic - 026/032', 'Holo - Blastoise & Suicune ex Deck'], 'TRADING CARD GAME CLASSIC', '26'),
+])
+def test_label_set_lines_of_each_grader(lines, sets, number):
+    found, parsed = parse_label(lines)
+    assert found[0].strip() == sets and parsed == number
+
+
+def test_number_keys_keep_prefix_and_suffix():
+    assert [number_key(v) for v in ('018a', '18', 'SV059', 'TG01', 'GG70', 'SWSH050', '026/032')] == [
+        '18A', '18', 'SV59', 'TG1', 'GG70', 'SWSH50', '26']
+    # Two different numbers on one label abstain.
+    assert parse_label(['#18A', 'Burning Shadows - 19/147'])[1] is None
+
+
+def test_template_words_never_become_the_collector_text():
+    footer = ['Flame Tail', '20', '×2', 'resistance', 'retreat']
+    assert pick_collector_text(footer) == 'retreat'
+    assert pick_collector_text(footer, template_filter=True) == '20'
+    assert pick_collector_text(['×2', '-30', 'retreat'], template_filter=True) is None
+    assert pick_collector_text(['weakness', 'resistance'], template_filter=True) is None
+    assert pick_collector_text(['retreat', '18a/147'], template_filter=True) == '18a/147'
+    for junk in ('damage and Electabuzz does 10 damage', '©2023 PokemoeN', 'es 2 Priz', '09470703AK', '30KC'):
+        assert pick_collector_text([junk], template_filter=True) is None
+    assert pick_collector_text(['your turn.', 'MFGG66/GG70'], template_filter=True) == 'MFGG66/GG70'
+    assert pick_collector_text(['energy', '085'], template_filter=True) == '085'
+    assert pick_collector_text(['SV59'], template_filter=True) == 'SV59'
+
+
+def test_near_threshold_leader_that_contradicts_the_text_gets_candidates(tmp_path, monkeypatch):
+    # Without the label flag a 0.80 leader keeps text out entirely.
+    response, evidence, _ = scan(tmp_path, monkeypatch, enabled=True, lead_score=.80)
+    assert evidence['text_identity']['candidate_ids'] == []
+    assert all(s.card_id != 'ja:CLF-017' for s in response.suggestions)
+
+
+def test_slab_label_flag_tries_text_against_a_contradicted_near_threshold_leader(tmp_path, monkeypatch):
+    response, evidence, boundary = scan(tmp_path, monkeypatch, enabled=True, lead_score=.80, slab_label=True)
+    assert evidence['text_identity']['leader_conflict'] is True
+    assert [s.card_id for s in response.suggestions] == ['ja:CLF-017']
+    assert response.status == 'uncertain' and response.confidence.requires_confirmation
+    assert evidence['text_identity']['outcome'] == 'verified' and not boundary
+
+
+def test_slab_label_flag_leaves_a_leader_the_text_supports(tmp_path, monkeypatch):
+    # The leader is named like the read (ルギア), so text has no say at 0.80.
+    response, evidence, _ = scan(tmp_path, monkeypatch, enabled=True, lead_score=.80, slab_label=True,
+                                 lead_name='ルギアV')
+    assert evidence['text_identity']['candidate_ids'] == []
+    assert evidence['text_identity']['reason'] == 'visual_leader_supported'
+    assert all(s.card_id != 'ja:CLF-017' for s in response.suggestions)
