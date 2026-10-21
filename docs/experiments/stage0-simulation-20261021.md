@@ -15,6 +15,8 @@ Stage 1 answers when the phone vector's top card and the catalogue card for the 
 | Same card, margin > 0 | 17 | 17 | **0** | 10.8% |
 | **Proposed gate: same card, margin ≥ 0.02** | **13** | **13** | **0** | **8.3%** |
 
+Round 2, below, keeps that same margin and raises the gate to **36 of 157 (22.9%)**, still with 0 wrong.
+
 No confidence cut and no quality cut. Vision's confidence is often 1.0 on a wrong read, so it does not separate the panel. The correct answers include a soft crop (sharpness 463) and a little glare (0.066). A sharpness floor or a glare cap would only drop correct answers.
 
 The four answers the 0.02 gate leaves for the full pipeline are near ties, all correct on this panel:
@@ -207,6 +209,115 @@ There is no wrong stage 1 answer to list. Every photo that did not agree is belo
 | `lugia-screenshot` | screenshot | text_misread | ja:CP3-018 | - | ja:CLF-017 |
 | `charmander-screenshot` | screenshot | vector_wrong | ja:S12-070 | en:sm3-18a | en:sm3-18a |
 
+## Round 2
+
+Same phone fields, same replay. Two changes in the stage 1 estimate only. The catalogue file is unchanged.
+
+### Fix A: one card for a duplicated id
+
+561 English cards are stored twice, as `sv01-210` and `en:sv01-210`, with the same name, set, number and language. Both ids are in the embedding index, and both have a Cardmarket id. The stage 1 lookup now keeps the `en:` id when a candidate list contains both. That list is `docs/experiments/stage0-duplicate-pairs-20261021.csv`, for a later catalogue cleanup. Two pairs have different Cardmarket product ids (`sv01-015` Meowscarada 702311 and 800836, `sv01-023` Arboliva 702319 and 749045). The price tables in this export are empty, so this run cannot say which id a price is attached to.
+
+`ambiguous_text` fell from 42 photos to 18. The 18 that remain:
+
+- **5 are the same artwork in both languages, with the same printed number.** Nidoking `174` and Tangela `178` each match `en:sv03.5-…` and `ja:SV2a-…`. The Japanese row's English title is "Nidoking" or "Tangela", so the English read hits both rows. The text is not one card, so the twin rule does not fire.
+- **3 are the same name and number in different sets.** Vulpix `68/102` (`en:base1-68` and `en:hgss2-68`), Charmeleon `24/102` (`en:base1-24` and `en:swsh4-24`), Ancient Booster Energy Capsule `159` (`en:PPS5-PAR-159` and `en:sv04-159`).
+- **10 match several printings**, or a loose name. The phone Pikachu `35/108` is in this group, and so is a Gyarados read that also hits Ariados.
+
+### Fix B: same-artwork language twins
+
+The vector's card and the text's card agree when their reference vectors have cosine at least **0.84**, they are different languages, and the twin does not repeat the text's number with a different set total. The text's card is the answer, and the margin is the gap from that pair to the next other card.
+
+0.98, the first guess, accepts nothing on this panel. Duplicate ids are cosine 1.0. Same-artwork language pairs sit lower, from 0.848 (Roxanne) to 0.951 (Marill). The plan's Dragonair pair, `en:sv03.5-181` and `ja:SV2a-182`, is 0.870. The next different-language pair that is not the same artwork is 0.774 (`en:sv08-247` Pikachu ex against `ja:M2a-246` メガカイリューex). Charmander's vector, `ja:S12-070` ミニリュウ, is 0.772 against `en:sm3-18a`. One real pair, Blastoise ex `en:sv03.5-200` and `ja:SV2a-202`, is 0.752 and sits on that same side of the gap, so the cut leaves it out. Same-language reprints stay out too: Sandshrew `en:base4-91` against `en:base1-62` is 0.941, and Electabuzz `en:base4-24` against `en:base1-20` is 0.907. No photo on the panel was a language twin with a conflicting set total.
+
+| Reference cosine | Margin > 0, correct / wrong | Margin ≥ 0.02, correct / wrong |
+|---|---:|---:|
+| 0.75 | 53 / 0 | 37 / 0 |
+| 0.80 and 0.84 | 50 / 0 | 36 / 0 |
+| 0.90 | 45 / 0 | 31 / 0 |
+| 0.95 | 34 / 0 | 21 / 0 |
+| 0.98 | 31 / 0 | 18 / 0 |
+
+0.75 is still 0 wrong on this panel because the text happened to be the right card. It would also treat Charmander and the Pikachu ex / メガカイリューex pair as twins. The gate uses 0.84.
+
+### Round 1 against round 2
+
+The margin gate is unchanged: same card, margin ≥ 0.02. Every column is correct / wrong.
+
+| Run | Margin > 0 | Margin ≥ 0.02 | Share at the gate |
+|---|---:|---:|---:|
+| Round 1 | 17 / 0 | 13 / 0 | 8.3% |
+| A only, duplicate ids collapsed | 31 / 0 | 18 / 0 | 11.5% |
+| B only, language twins | 30 / 0 | 26 / 0 | 16.6% |
+| **A and B** | **50 / 0** | **36 / 0** | **22.9%** |
+
+A on its own adds 5 answers at the gate. B on its own adds 13. Together they add 23: the 5 from A, the 13 from B, and 5 that need both. Those last five were ambiguous until the duplicate id was collapsed, and the vector is the Japanese twin (Armarouge `en:sv01-203` on four photos, Kirlia `en:sv01-212` on `fresh100_365490414711`).
+
+By kind, A and B together:
+
+| Kind | Photos | Margin > 0 | Margin ≥ 0.02 | Wrong |
+|---|---:|---:|---:|---:|
+| Raw | 100 | 44 | 31 | 0 |
+| Slab | 50 | 6 | 5 | 0 |
+| Phone | 5 | 0 | 0 | 0 |
+| Screenshot | 2 | 0 | 0 | 0 |
+
+There is no wrong stage 1 answer at either margin. Fourteen further photos agree and are correct, with margins from 0.0006 to 0.017, and the 0.02 gate leaves them for the full pipeline. Ten of those fourteen are new in round 2. Four were already the round 1 near ties.
+
+### New answers at the gate
+
+Five from collapsing the duplicate id. The vector and the text were already the same card.
+
+| Photo | Card | Margin |
+|---|---|---:|
+| `freshraw_4_343408992` | `en:sv01-210` Drowzee | 0.072 |
+| `fresh100_235971735451` | `en:sv01-210` Drowzee | 0.030 |
+| `freshraw_3_1376470916` | `en:sv01-212` Kirlia | 0.024 |
+| `fresh100_226992725275` | `en:sv01-210` Drowzee | 0.024 |
+| `freshraw_4_1318482242` | `en:sv01-210` Drowzee | 0.020 |
+
+Eighteen from a language twin. The card named here is the text's card.
+
+| Photo | Card | Vector | Cosine | Margin |
+|---|---|---|---:|---:|
+| `freshraw_0_1861309623` | `en:sv02-204` Marill | `ja:SV2P-073` | 0.951 | 0.168 |
+| `freshraw_0_299404800` | `en:sv02-204` Marill | `ja:SV2P-073` | 0.951 | 0.136 |
+| `fresh100_316758938735` | `en:sv02-204` Marill | `ja:SV2P-073` | 0.951 | 0.022 |
+| `holdout4_024` | `en:swsh12.5gg-GG64` Melony | `ja:S12a-244` | 0.895 | 0.163 |
+| `fresh100_116219612870` | `en:sv03.5-181` Dragonair | `ja:SV2a-182` | 0.870 | 0.140 |
+| `fresh100_167884982800` | `en:sv03-209` Lechonk | `ja:SV3-120` | 0.938 | 0.137 |
+| `fresh100_365490414711` | `en:sv01-212` Kirlia | `ja:SV1S-084` | 0.945 | 0.093 |
+| `holdout4_029` | `en:swsh12.5gg-GG66` Roxanne | `ja:S12a-242` | 0.848 | 0.081 |
+| `fresh100_286467766284` | `en:sv01-203` Armarouge | `ja:SV1S-080` | 0.911 | 0.080 |
+| `fresh100_235982624286` | `en:sv01-203` Armarouge | `ja:SV1S-080` | 0.911 | 0.078 |
+| `freshraw_2_1235899331` | `en:sv03-205` Scizor | `ja:SV3-116` | 0.894 | 0.076 |
+| `holdout4_028` | `en:swsh12.5gg-GG66` Roxanne | `ja:S12a-242` | 0.848 | 0.058 |
+| `holdout4_005` | `en:swsh12.5gg-GG38` Suicune V | `ja:S12a-215` | 0.937 | 0.056 |
+| `freshraw_1_2051404991` | `en:sv01-203` Armarouge | `ja:SV1S-080` | 0.911 | 0.049 |
+| `fresh100_227232802112` | `en:sv01-203` Armarouge | `ja:SV1S-080` | 0.911 | 0.045 |
+| `fresh100_205408031074` | `en:sv06-188` Eevee | `ja:SV5a-078` | 0.930 | 0.040 |
+| `fresh100_376009575543` | `en:sv06-188` Eevee | `ja:SV5a-078` | 0.930 | 0.032 |
+| `fresh100_168302185613` | `ja:SM12a-041` ピカチュウ&ゼクロムGX | `en:sm9-33` | 0.925 | 0.022 |
+
+### What still does not agree
+
+107 photos still do not agree. Counts:
+
+| Reason | Photos |
+|---|---:|
+| `no_text` | 35 |
+| `text_misread` | 23 |
+| `ambiguous_text` | 18 |
+| `no_embedding` | 12 |
+| `vector_wrong` | 9 |
+| `no_catalogue_hit` | 7 |
+| `number_misread` | 3 |
+
+**Phone reading.** Of the 35 with no text, 30 have no number and 11 have no name. The number is the gap: without it the lookup does not start. One of the five phone photos is here, Toxel, with the name read and the number missing. The other four phone photos are not a missed word. Three match more than one printing (Charmeleon `24/102`, Pikachu `35/108`, Ancient Booster Energy Capsule `159`). Comfey matched `en:30th-077` and the vector picked a different Comfey, `en:A3-080`.
+
+The 23 misreads are 19 slabs, 3 raw photos and the Lugia screenshot. The three raw photos have the right number and a name that is not a name (`HP7OC` and `HZO` for Marill, `ТИР 100 C` for Dragonair). On those three the vector is already the Japanese twin, so a real name would be a stage 1 answer under the twin rule. The slab misses are the label or the holder being read as the card: `CENTERING`, `EDGES`, `1999 POKEMON GAME`, a grader line, or a number with the wrong total. Lugia is that last case. The card window read `#17 HOLO` and `017/012`, and the printed number is `017/032`. The label had the name and no number, so the lookup used the card window.
+
+The 9 `vector_wrong` rows are the ones the twin cut leaves out: the same-language reprints (Sandshrew twice, Electabuzz), Scizor `en:sv10-188` against `en:sv03-205`, Armarouge's vector `en:me02-095`, Blastoise ex at cosine 0.752, Pikachu ex against メガカイリューex at 0.774, Comfey, and Charmander. The 7 catalogue misses are a number with a name that matches nothing (`DOBOAD`, `FEEID`, and similar). The 3 number misreads are slabs whose digits are wrong (`21/99` for `71/99`, `SWSH267` for `SWSH261`, `06/108` for `106/108`). Twelve photos still have no rectangle.
+
 ## How to run it again
 
 The catalogue export and the reference images are gitignored, under `data/latency/stage0-simulation-20261021/kit/`:
@@ -227,7 +338,20 @@ Then:
 api/scripts/stage0_simulation.sh
 ```
 
-That compiles `vision_text`, simulates corners, text, slab labels, quality and the embedding, converts the palettized model if it is missing, replays the panel against a local API with the production flags, and writes `data/latency/stage0-simulation-20261021/stage1.json`. The API virtualenv needs `uvicorn`, `psutil` and `rapidocr`, which are in `api/requirements.txt`.
+That compiles `vision_text`, simulates corners, text, slab labels, quality and the embedding, converts the palettized model if it is missing, replays the panel against a local API with the production flags, and writes `data/latency/stage0-simulation-20261021/stage1.json` plus `docs/experiments/stage0-duplicate-pairs-20261021.csv`. Round 2 is the estimate step. With the phone fields and the replay already on disk, rerun just that step:
+
+```
+.venv/bin/python api/scripts/estimate_stage1.py \
+  --panel data/latency/stage0-simulation-20261021/stage0.jsonl \
+  --index data/latency/stage0-simulation-20261021/kit/vectors/pad \
+  --catalog data/latency/stage0-simulation-20261021/kit/catalog.sqlite \
+  --replay data/latency/stage0-simulation-20261021/replay.jsonl \
+  --log data/latency/stage0-simulation-20261021/server.log \
+  --out data/latency/stage0-simulation-20261021/stage1.json \
+  --duplicates-out docs/experiments/stage0-duplicate-pairs-20261021.csv
+```
+
+The API virtualenv needs `uvicorn`, `psutil` and `rapidocr`, which are in `api/requirements.txt`.
 
 Full API suite on this branch: 883 passed, 4 skipped.
 

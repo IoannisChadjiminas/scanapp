@@ -122,4 +122,5 @@ fi
 
 "$PY" "$ROOT/api/scripts/estimate_stage1.py" \
   --panel "$OUT/stage0.jsonl" --index "$KIT/vectors/pad" --catalog "$KIT/catalog.sqlite" \
-  --replay "$OUT/replay.jsonl" --log "$OUT/server.log" --out "$OUT/stage1.json"
+  --replay "$OUT/replay.jsonl" --log "$OUT/server.log" --out "$OUT/stage1.json" \
+  --duplicates-out "$ROOT/docs/experiments/stage0-duplicate-pairs-20261021.csv"
