@@ -246,11 +246,22 @@ def pick_confident_name(lines: list[str], scores: list[float | None],
 COLLECTOR_FRACTION_RE = re.compile(r"\d{1,4}\s*/\s*\d{1,4}")
 
 
-def pick_collector_text(number_lines: list[str]) -> str | None:
+def pick_collector_text(number_lines: list[str], template_filter: bool = False) -> str | None:
     for line in number_lines:
         match = COLLECTOR_FRACTION_RE.search(line)
         if match:
             return re.sub(r"\s+", "", match.group(0))
+    if template_filter:
+        # Weakness/resistance/retreat and other template words carry no digit; a
+        # collector number always does.
+        # Weakness ×2, resistance -30, HP, rules text and copyright lines are not numbers
+        # either: keep short lines holding a collector-shaped token (18a, SV59, TG01).
+        def collector_like(line: str) -> bool:
+            cleaned = re.sub(r"(?i)[×x]\s*\d+|[-−–+]\s*\d+|\bHP\s*\d+|\d+\s*HP\b", " ", line)
+            words = cleaned.split()
+            return bool(len(words) <= 2 and '©' not in line and any(
+                re.fullmatch(r"(?i)[A-Z]{0,5}\d{1,4}[A-Z]?(?:/[A-Z]{0,4}\d{1,4})?", w) for w in words))
+        number_lines = [line for line in number_lines if collector_like(line)]
     return number_lines[-1] if number_lines else None
 
 
@@ -991,7 +1002,7 @@ class CardOcr:
                 # Footer observations must not become title evidence when a
                 # slab/proposal misses the actual name region.
                 name_text=name_text,
-                collector_text=pick_collector_text(number_lines),
+                collector_text=pick_collector_text(number_lines, label_filter_of(self)),
                 lines=lines,
                 hits=hits,
                 failed=False,

@@ -58,7 +58,10 @@ from app.recognition.rank import artwork_evidence_compatible, decide_status_with
 from app.recognition.rank import name_match
 from app.recognition.runtime import Runtime
 from app.recognition.title_retry import read_conflicting_title, title_retry_allowed
-from app.recognition.text_identity import VERSION as TEXT_IDENTITY_VERSION, text_identity_candidates
+from app.recognition.text_identity import (VERSION as TEXT_IDENTITY_VERSION, name_agrees, name_tokens,
+                                           text_identity_candidates)
+from app.recognition.label_identity import (VERSION as LABEL_IDENTITY_VERSION, label_identity_candidates,
+                                            read_label_half)
 from app.schemas import (
     Candidate,
     GradingEvidence,
@@ -67,6 +70,10 @@ from app.schemas import (
     ScanResponse,
     ScanStatus,
 )
+
+# With SLAB_LABEL_IDENTITY, text candidates are also tried up to this far above the automatic
+# visual floor when the visual leader agrees with no name read on the card or its label.
+LEADER_CONFLICT_MARGIN = .07
 
 # Scan lanes share one results connection; keep each scan's insert and commit together.
 _results_write = threading.Lock()
@@ -596,17 +603,47 @@ def _recognize_bytes_once(
     timings['metadata_retrieve_ms'] = (time.perf_counter() - mark) * 1000
     text_ids: list[str] = []
     text_reason = None
+    label_ids: list[str] = []
+    label_reason = None
+    text_conflict = False
+    slab_label = bool(getattr(settings, 'slab_label_identity', False))
+    top_visual = float(scores[0]) if len(scores) else 0.
     if (getattr(settings, 'text_identity_candidates', False) and metadata_index is not None
             and not retake and not ocr.failed
-            and (not len(scores) or float(scores[0]) < settings.threshold_min_visual)):
-        # Only below the automatic visual floor: text never overrides a strong picture.
+            and (top_visual < settings.threshold_min_visual
+                 or (slab_label and top_visual < settings.threshold_min_visual + LEADER_CONFLICT_MARGIN))):
         mark = time.perf_counter()
         try:
             text_ids, text_reason = text_identity_candidates(metadata_index, catalog,
                 hits=ocr.hits, numbers=numbers, languages=rank_languages)
+            if slab_label:
+                label_ids, label_reason = label_identity_candidates(metadata_index, catalog,
+                    hits=ocr.hits, languages=rank_languages)
+                if (label_reason == 'no_label_number' and not text_ids
+                        and callable(getattr(ocr_engine, '_run', None))):
+                    # The title strip caught only the label's header. One read of the
+                    # upload's upper half for the label's set line and number.
+                    label_hits, label_pass = read_label_half(ocr_engine, input_image)
+                    ocr_passes.append(dict(scope='slab_label', **label_pass))
+                    label_ids, label_reason = label_identity_candidates(metadata_index, catalog,
+                        hits=[*ocr.hits, *label_hits], languages=rank_languages)
+                text_ids = sorted({*text_ids, *label_ids})
+                if len(text_ids) > 3:
+                    text_ids, text_reason = [], 'too_many_candidates'
         except Exception:  # noqa: BLE001 - optional candidates keep the established path
             logging.getLogger(__name__).exception('Text identity candidates failed')
             text_ids, text_reason = [], 'error'
+        if text_ids and top_visual >= settings.threshold_min_visual:
+            # Only below the automatic visual floor, unless the visual leader agrees with
+            # neither the card's printed name nor the label: text never overrides a
+            # picture that the card's own text supports.
+            leader = _lookup_cards(catalog, [str(snapshot.card_ids[indices[0]])]).get(
+                str(snapshot.card_ids[indices[0]]))
+            tokens = name_tokens(ocr.hits)
+            text_conflict = bool(leader is not None and leader['id'] not in text_ids and tokens
+                and not name_agrees(tokens, leader['name'], str(leader['view_title'] or '')))
+            if not text_conflict:
+                text_ids, text_reason = [], 'visual_leader_supported'
         timings['text_identity_ms'] = (time.perf_counter() - mark) * 1000
     visual: list[dict[str, Any]] = []
     selected_ids = [str(snapshot.card_ids[i]) for i in indices]
@@ -865,7 +902,10 @@ def _recognize_bytes_once(
             retake = True
             status_reasons.append('framing_unverified')
     text_identity = None
-    if text_ids and status in {'retake', 'no_match'} and not (too_small or too_blurry):
+    # A near-threshold leader that contradicts the card's text is no better than an abstention.
+    conflicting_leader = bool(text_conflict and combined and combined[0]['card_id'] not in text_ids
+        and not combined[0].get('local_artwork_verified') and status in {'uncertain', 'printing_ambiguous'})
+    if text_ids and (status in {'retake', 'no_match'} or conflicting_leader) and not (too_small or too_blurry):
         # The scan would abstain, yet a confident printed number and a name read in
         # the photo leave at most three cards. Verified artwork makes it a review
         # result; without it the cards are suggestions that need confirmation.
@@ -1096,6 +1136,8 @@ def _recognize_bytes_once(
         versions['client_text'] = CLIENT_TEXT_VERSION
     if getattr(settings, 'text_identity_candidates', False):
         versions['text_identity'] = TEXT_IDENTITY_VERSION
+        if slab_label:
+            versions['label_identity'] = LABEL_IDENTITY_VERSION
     presentation = match_presentation(combined, status=status, printing_review=printing_review,
                                       min_visual=settings.threshold_min_visual_ocr)
     confidence = confidence_payload(combined, status=status,
@@ -1150,7 +1192,9 @@ def _recognize_bytes_once(
         "metadata_candidate_ids": metadata_ids,
         "geometry_candidate_ids": geometry_ids,
         **({"text_identity": dict(candidate_ids=text_ids, reason=text_reason, outcome=text_identity,
-                                  aligned_verified=text_aligned)}
+                                  aligned_verified=text_aligned,
+                                  **(dict(label_ids=label_ids, label_reason=label_reason,
+                                          leader_conflict=text_conflict) if slab_label else {}))}
            if getattr(settings, 'text_identity_candidates', False) else {}),
         "framing_unverified": framing_unverified,
         "framing_review_supported": framing_review_supported,
