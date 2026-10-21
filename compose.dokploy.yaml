@@ -67,6 +67,10 @@ services:
       # CLIENT_TEXT_OCR=footer it stands in for the server's footer read when it confirms
       # the visual answer. Staging replay 2026-10-20: -7.2% CPU, no wrong answers.
       APP_CLIENT_TEXT: ${APP_CLIENT_TEXT:-true}
+      # Stage 0 (docs/stage0-on-device-plan.md): the phone sends slab label fields and photo
+      # quality; the server only logs them (stage0 line), answers are unchanged.
+      APP_CLIENT_LABEL: ${APP_CLIENT_LABEL:-true}
+      APP_CLIENT_QUALITY: ${APP_CLIENT_QUALITY:-true}
       CLIENT_TEXT_HINTS: ${CLIENT_TEXT_HINTS:-true}
       CLIENT_TEXT_OCR: ${CLIENT_TEXT_OCR:-footer}
       ENABLE_MATCHED: ${ENABLE_MATCHED:-true}
