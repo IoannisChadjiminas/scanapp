@@ -15,7 +15,7 @@ Stage 1 answers when the phone vector's top card and the catalogue card for the 
 | Same card, margin > 0 | 17 | 17 | **0** | 10.8% |
 | **Proposed gate: same card, margin ≥ 0.02** | **13** | **13** | **0** | **8.3%** |
 
-Round 2, below, keeps that same margin and raises the gate to **36 of 157 (22.9%)**, still with 0 wrong. Round 3, the footer read, raises it again to **40 of 157 (25.5%)**.
+Round 2, below, keeps that same margin and raises the gate to **36 of 157 (22.9%)**, still with 0 wrong. Round 3, the footer read, raises it again to **40 of 157 (25.5%)**. Round 4 adds a text-first artwork check and reaches **53 of 157 (33.8%)**, still with 0 wrong.
 
 No confidence cut and no quality cut. Vision's confidence is often 1.0 on a wrong read, so it does not separate the panel. The correct answers include a soft crop (sharpness 463) and a little glare (0.066). A sharpness floor or a glare cap would only drop correct answers.
 
@@ -433,6 +433,86 @@ The Mac run is the specification. Nothing in PokeSingle was changed.
 - The catalogue check needs set totals. The API already stores them in `set_totals`. Bundle that table, or let stage 1 reject a number whose denominator matches no set total, before the phone treats it as read.
 - `lib/data/label_text.dart`: do not use a label word as the card name (the server's `grading_label_line` and `slab_label_field`: PRISTINE, GEM MINT, a dated Pokémon header, `#17HOLO`). When the footer has no valid number, send the label number and the label's language.
 
+## Round 4
+
+Stage 1 is unchanged: 40 of 157, margin ≥ 0.02, 0 wrong. Stage 1b runs only where that gate abstains. The phone's number and name must name exactly one card (duplicate ids collapsed; an English/Japanese twin pair is kept in the text's language). Then the existing artwork verifier checks that one reference against the photo, using the phone's corners. If that warp does not verify, one `propose_frame` projection is tried. A different, non-twin card that leads the text card by ≥ 0.05 is never answered.
+
+### Stage 1 and stage 1b
+
+| | Answered | Correct | Wrong |
+|---|---:|---:|---:|
+| Stage 1 | 40 | 40 | 0 |
+| Stage 1b | 13 | 13 | 0 |
+| **Together** | **53 (33.8%)** | **53** | **0** |
+
+| Kind | Photos | Stage 1 | Stage 1b | Together | Wrong |
+|---|---:|---:|---:|---:|---:|
+| Raw | 100 | 33 | 13 | 46 | 0 |
+| Slab | 50 | 7 | 0 | 7 | 0 |
+| Phone | 5 | 0 | 0 | 0 | 0 |
+| Screenshot | 2 | 0 | 0 | 0 | 0 |
+
+All 13 used the phone quad. None needed `propose_frame`.
+
+### Stage 1b answers
+
+| Photo | Card | Artwork inliers | Vector top | Its margin | Gap over the text card |
+|---|---|---:|---|---:|---:|
+| `fresh100_167458253135` | `en:sv01-210` | 167 | `sv01-210` | 0.005 | 0 |
+| `freshraw_4_123815526` | `en:sv01-210` | 80 | `sv01-210` | 0.002 | 0 |
+| `fresh100_127125641244` | `en:sv01-212` | 65 | `sv01-212` | 0.001 | 0 |
+| `fresh100_135586143350` | `en:sv01-212` | 62 | `en:sv01-212` | 0.006 | 0 |
+| `fresh100_356618307865` | `en:sv01-212` | 60 | `ja:SV1S-084` | 0.012 | 0.025 |
+| `fresh100_396170517118` | `en:sv01-212` | 56 | `sv01-212` | 0.003 | 0 |
+| `fresh100_185962385461` | `en:sv01-203` | 54 | `en:me02-095` | 0.001 | 0.050 |
+| `holdout4_049` | `en:base1-20` | 51 | `en:base4-24` | 0.005 | 0.005 |
+| `freshraw_1_925085473` | `en:sv01-203` | 50 | `sv01-203` | 0.015 | 0 |
+| `holdout4_085` | `en:base1-62` | 50 | `en:base4-91` | 0.020 | 0.026 |
+| `holdout4_051` | `en:base1-20` | 43 | `base1-20` | 0.004 | 0 |
+| `holdout4_060` | `en:base1-65` | 35 | `en:base1-65` | 0.013 | 0 |
+| `fresh100_236504673185` | `en:sv01-203` | 33 | `sv01-203` | 0.017 | 0 |
+
+`fresh100_356618307865` is a language twin: the vector's top is the Japanese card, the text's card is the English one, and the artwork check agrees with the text. `fresh100_185962385461` is the closest call rule 4 allows. `en:me02-095` leads `en:sv01-203` by 0.050, just under 0.05, and the artwork check is correct.
+
+### Near-miss
+
+One photo verified and was rejected by rule 4. `holdout4_084` matched `en:base1-62` with 56 artwork inliers, and that is the right card, but `en:base4-91` leads it by 0.056. It goes to the full pipeline. No photo verified with a thin inlier count. The weakest accepted check had 33 artwork inliers.
+
+### Inlier threshold
+
+The verifier's own floor is 10 artwork inliers, plus its geometry checks (spread, coverage, a real homography). On this panel every check that passed had at least 33, and none were wrong.
+
+| Artwork inliers at least | Answers | Wrong |
+|---:|---:|---:|
+| 10 | 13 | 0 |
+| 15 | 13 | 0 |
+| 20 | 13 | 0 |
+| 25 | 13 | 0 |
+| 30 | 13 | 0 |
+| 40 | 11 | 0 |
+| 60 | 5 | 0 |
+
+Keep the verifier's floor of 10. A cutoff of 30 would still keep these 13. A cutoff of 40 drops two correct answers (`33` and `35` inliers).
+
+### Server time
+
+On the 13 answers, measured on this Mac: the vector search is 0.03 ms per photo, the catalogue lookup is about 0.6 ms, and the artwork check is a median **53 ms** (mean 61, max 110). The full pipeline on the same photos was a median **1.7 s** total and **3.0 s** of CPU. Stage 1b is one reference, not the pipeline's shortlist.
+
+### Slabs
+
+Stage 1b answered no slab. Of the 43 slabs stage 1 left, 31 had no single catalogue card for the text, 7 matched more than one card, and 5 had no reference image. None reached the artwork check, so the slab-outline quad was not asked to confirm a card. It also did not confirm a wrong one.
+
+### What still goes to the full pipeline
+
+104 photos.
+
+| Reason | Photos |
+|---|---:|
+| Text does not name one card | 71 |
+| Text matches more than one card | 19 |
+| That card has no reference image | 13 |
+| Artwork verified, but another card leads by ≥ 0.05 | 1 |
+
 ## How to run it again
 
 The catalogue export and the reference images are gitignored, under `data/latency/stage0-simulation-20261021/kit/`:
@@ -470,6 +550,15 @@ That compiles `vision_text`, simulates corners, text, the footer and corner numb
   --log data/latency/stage0-simulation-20261021/server.log \
   --out data/latency/stage0-simulation-20261021/stage1.json \
   --duplicates-out docs/experiments/stage0-duplicate-pairs-20261021.csv
+.venv/bin/python api/scripts/estimate_stage1b.py \
+  --panel data/latency/stage0-simulation-20261021/stage0.jsonl \
+  --photos data/latency/stage0-simulation-20261021/panel \
+  --cases data/latency/stage0-simulation-20261021/cases.json \
+  --index data/latency/stage0-simulation-20261021/kit/vectors/pad \
+  --catalog data/latency/stage0-simulation-20261021/kit/catalog.sqlite \
+  --references data/latency/stage0-simulation-20261021/kit \
+  --replay data/latency/stage0-simulation-20261021/replay.jsonl \
+  --out data/latency/stage0-simulation-20261021/stage1b.json
 ```
 
 The API virtualenv needs `uvicorn`, `psutil` and `rapidocr`, which are in `api/requirements.txt`.
