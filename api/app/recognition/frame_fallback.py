@@ -189,4 +189,3 @@ def loose_frame_candidates(image: Image.Image, limit: int = 2) -> list[Image.Ima
         if len(frames)>=limit:
             break
     return frames
-
