@@ -205,6 +205,16 @@ def pick_name_line(lines: list[str], label_filter: bool = False) -> str | None:
         # A slab label's fields are never the card's title. Its field order varies by
         # grader (PSA prints the grade word mid-label), so position after the label is
         # not used; a stage badge below still marks the card's own title.
+        if label_filter == 'set_lines':
+            # PSA continues the set name under its dated header ("2023 POKÉMON JP" /
+            # "CLASSIC COLLECTION"); a digit-free line right after it is that set line.
+            from app.recognition.grading import _label_identity, _text
+            # Only a header without a set of its own ("2023 POKÉMON JP", not "2016 BREAKPOINT").
+            dated = {i + 1 for i, line in enumerate(lines) if re.fullmatch(
+                r'(?:19|20)\d{2}\s+POK[EÉ]MON(?:\s+(?:JP|JPN|EN|ENG|KR|CHN?|JAPANESE|ENGLISH|KOREAN|CHINESE))?',
+                _text(line))}
+            lines = [line for i, line in enumerate(lines)
+                     if not (i in dated and not re.search(r'\d', line) and not _is_layout_badge(line))]
         lines = [line for line in lines if not grading_label_line(line)]
     # Prefer a title after the card's stage/trainer badge, rather than a
     # background sign above it. This is reading-order layout evidence, not a
@@ -217,8 +227,10 @@ def pick_name_line(lines: list[str], label_filter: bool = False) -> str | None:
     return _pick_name_line(lines)
 
 
-def label_filter_of(engine) -> bool:
-    return bool(getattr(engine, 'label_name_filter', False))
+def label_filter_of(engine) -> bool | str:
+    if not getattr(engine, 'label_name_filter', False):
+        return False
+    return 'set_lines' if getattr(engine, 'label_set_lines', False) else True
 
 
 def inverted_card_layout(result: OcrResult) -> bool:

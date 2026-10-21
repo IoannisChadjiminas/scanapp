@@ -189,3 +189,31 @@ def loose_frame_candidates(image: Image.Image, limit: int = 2) -> list[Image.Ima
         if len(frames)>=limit:
             break
     return frames
+
+
+def holder_shaped(image: Image.Image) -> bool:
+    """A slab holder: taller than a card (0.716) because of its label."""
+    return .52 <= image.width / image.height <= .67 and min(image.size) >= 200
+
+
+def holder_card_region(holder: Image.Image) -> tuple[Image.Image, Image.Image, str]:
+    """The card inside a slab holder, and the holder's label strip above it.
+
+    The card's own outline is used when the detector finds a card-shaped, large rectangle
+    below the label; otherwise a fixed card-aspect window below the label (24-96%).
+    """
+    from app.recognition.detect import server_frame_rect, warp_to_rect
+    w, h = holder.size
+    label = holder.crop((0, 0, w, round(.27 * h)))
+    top = round(.15 * h)
+    lower = holder.crop((0, top, w, h))
+    rect = server_frame_rect(lower)
+    if rect is not None:
+        width = float(np.linalg.norm(rect[1] - rect[0]) + np.linalg.norm(rect[2] - rect[3])) / 2
+        height = float(np.linalg.norm(rect[3] - rect[0]) + np.linalg.norm(rect[2] - rect[1])) / 2
+        if height > 0 and .64 <= width / height <= .80 and width * height >= .35 * w * h:
+            return warp_to_rect(lower, rect), label, 'outline'
+    height = round(.72 * h)
+    width = min(w, round(height * 63 / 88))
+    left, top = (w - width) // 2, round(.24 * h)
+    return holder.crop((left, top, left + width, top + height)), label, 'window'
