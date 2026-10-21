@@ -152,4 +152,7 @@ def health(request: Request) -> HealthResponse:
         detail=runtime.error,
         catalogue_backend=settings.catalogue_backend,
         catalogue_import_id=settings.planetscale_import_id if settings.catalogue_backend == "planetscale" else None,
+        stage1_answers=getattr(getattr(request.app.state, 'stage1_checker', None), 'answers', 0),
+        stage1_checks=getattr(getattr(request.app.state, 'stage1_checker', None), 'checks', 0),
+        stage1_disagreements=getattr(getattr(request.app.state, 'stage1_checker', None), 'disagreements', 0),
     )

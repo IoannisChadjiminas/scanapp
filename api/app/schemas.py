@@ -193,6 +193,9 @@ class HealthResponse(BaseModel):
     detail: str | None = None
     catalogue_backend: str = "sqlite"
     catalogue_import_id: str | None = None
+    stage1_answers: int = 0
+    stage1_checks: int = 0
+    stage1_disagreements: int = 0
 
 
 class PrepareResponse(BaseModel):

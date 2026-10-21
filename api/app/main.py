@@ -127,6 +127,9 @@ async def lifespan(app: FastAPI):
     app.state.runtime = runtime
     lanes = max(1, settings.scan_lanes)
     app.state.scan_limiter = ScanLimiter(settings.scan_wait_limit, slots=lanes)
+    from app.recognition.stage1_check import Stage1Checker
+    app.state.stage1_checker = Stage1Checker()
+    app.state.stage1_checker.start()
     app.state.executor = ThreadPoolExecutor(max_workers=lanes, thread_name_prefix="scan")
     app.state.image_executor = ThreadPoolExecutor(max_workers=2, thread_name_prefix="image")
     app.state.loop = asyncio.get_running_loop()
@@ -150,6 +153,9 @@ async def lifespan(app: FastAPI):
             sources_task.cancel()
         if worker is not None:
             worker.stop()
+        checker = getattr(app.state, 'stage1_checker', None)
+        if checker is not None:
+            checker.stop()
         bind_loop(None)
         from app.recognition.progress import drain_scan_streams
         await drain_scan_streams()
