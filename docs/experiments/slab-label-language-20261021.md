@@ -62,7 +62,7 @@ Recognition alone (total minus grading) goes from about 4.5 s to about 1.8 s. Th
   - with the label's `JP`: ja:CLF-017, no boundary retry, never a retake;
   - CLF never verifies: ja:CLF-017 still shown first, needing confirmation, never a retake;
   - no language on the label: the closer printed total leads, so ja:CLF-017 comes first and the verified en:CLV-017 second; both need confirmation.
-- Full API suite: 878 passed, 4 skipped.
+- Full API suite: 878 passed, 4 skipped. Raw replay outputs stay in the local replay kit (not in git).
 
 ## Replay
 
