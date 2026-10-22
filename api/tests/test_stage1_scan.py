@@ -106,6 +106,18 @@ def test_an_answer_skips_the_pipeline_and_queues_the_background_check(monkeypatc
     assert job.card_id == 'en:base1-25' and job.scan_id == 'stage1-id'
 
 
+def test_answer_counter_includes_scans_without_background_checks(monkeypatch):
+    decision = Decision(True, '1b', 'en:base1-25', 0.04, 33, 'artwork', 55.0)
+    client, executor, calls = _client(monkeypatch, early=True, background=False, decision=decision)
+    with client, executor:
+        response = client.post('/scans', files={'image': ('card.jpg', b'jpeg', 'image/jpeg')})
+    assert response.status_code == 200
+    assert calls == {'pipeline': 0, 'gate': 1}
+    checker = client.app.state.stage1_checker
+    assert checker.answers == 1
+    assert checker._queue.qsize() == 0
+
+
 def test_streaming_keeps_the_full_pipeline(monkeypatch):
     decision = Decision(True, '1', 'en:base1-25', 0.04, None, 'same', 2.0)
     client, executor, calls = _client(monkeypatch, early=True, decision=decision, stream=True)

@@ -215,9 +215,10 @@ async def create_scan(
                 logger.exception("scan parallel schedule failed trace=%s", trace)
             decision = gate_note.get('decision')
             checker = getattr(request.app.state, 'stage1_checker', None)
+            if decision is not None and decision.answered and checker is not None:
+                checker.note_answer()
             if (decision is not None and decision.answered and checker is not None
                     and getattr(settings, 'stage1_background_check', False)):
-                checker.note_answer()
                 from app.recognition.captures import review_dir
                 store = review_dir(settings) / 'images' if getattr(settings, 'store_captures', False) else None
 
