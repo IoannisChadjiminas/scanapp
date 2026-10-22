@@ -207,6 +207,12 @@ class Settings(BaseSettings):
     stage1_sample_rate: float = 1.0
     stage1_require_confirmation: bool = True
     stage1b_text_verify: bool = False
+    # Real-scan fixes: independently opt in on staging, never by code default.
+    stage1_set_totals: bool = False
+    stage1_normalize_duplicates: bool = False
+    stage1_printing_groups: bool = False
+    stage1_promo_numbers: bool = False
+    stage1_diagnostics: bool = False
     # Phone photo prep, sent through GET /config. Defaults match the app today.
     app_capture_preset: str = 'max'
     app_jpeg_quality: int = 95

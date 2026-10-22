@@ -10,6 +10,7 @@ import logging
 import sqlite3
 import time
 import uuid
+from dataclasses import replace
 from io import BytesIO
 from pathlib import Path
 
@@ -21,21 +22,23 @@ from app.recognition.detect import warp_to_rect
 from app.recognition.pipeline import _preview_candidates, _results_write
 from app.recognition.presentation import match_presentation
 from app.recognition.stage1_gate import (
-    MIN_INLIERS, Decision, decide, load_catalogue, text_fields,
+    MIN_INLIERS, Decision, GateOptions, decide, load_catalogue, text_fields,
 )
 from app.recognition.client_embedding import parse_client_embedding
 from app.schemas import (
-    GradingEvidence, OcrEvidence, RecognitionConfidence, ScanResponse, ScanStatus,
+    GradingEvidence, OcrEvidence, RecognitionConfidence, ScanResponse, ScanStatus, PrintingReview,
 )
 
 log = logging.getLogger('scan.diagnostics')
 
 
-def _catalogue(runtime, catalog: sqlite3.Connection):
+def _catalogue(runtime, catalog: sqlite3.Connection, options: GateOptions):
     cached = getattr(runtime, 'stage1_catalogue', None)
-    if cached is None:
-        cached = load_catalogue(catalog)
+    key = (options.set_totals, options.normalize_duplicates, options.promo_numbers)
+    if cached is None or getattr(runtime, 'stage1_catalogue_options', None) != key:
+        cached = load_catalogue(catalog, options)
         runtime.stage1_catalogue = cached
+        runtime.stage1_catalogue_options = key
     return cached
 
 
@@ -105,14 +108,15 @@ def evaluate_stage1(*, settings, runtime, catalog, client_text: str | None,
         return Decision(False, None, None, None, None, vector_reason if client_embedding else 'no_embedding', 0)
     if embeddings is None or not card_ids or embeddings.shape[0] != len(card_ids):
         return Decision(False, None, None, None, None, 'no_index', 0)
-    by_key, by_id, bare_ids = _catalogue(runtime, catalog)
+    options = GateOptions.from_settings(settings)
+    by_key, by_id, bare_ids = _catalogue(runtime, catalog, options)
     name, number, language, label = text_fields(client_text)
     stage1b = bool(getattr(settings, 'stage1b_text_verify', False))
     decision = decide(
         vector, np.asarray(embeddings, dtype=np.float32), card_ids,
         by_key=by_key, by_id=by_id, bare_ids=bare_ids,
         name=name, number=number, language=language, quad_ok=bool(card_quad),
-        stage1b=stage1b, label=label)
+        stage1b=stage1b, label=label, options=options)
     if decision.stage != '1b_pending':
         return decision
     card = by_id.get(decision.card_id or '')
@@ -120,8 +124,8 @@ def evaluate_stage1(*, settings, runtime, catalog, client_text: str | None,
     inliers = _artwork(runtime, image_bytes, card_quad, decision.card_id or '', None if card is None else card.get('image_path'))
     elapsed = decision.ms + (time.perf_counter() - started) * 1000
     if inliers is None:
-        return Decision(False, None, None, decision.margin, None, 'artwork_miss', elapsed)
-    return Decision(True, '1b', decision.card_id, decision.margin, inliers, 'artwork', elapsed)
+        return replace(decision, answered=False, stage=None, card_id=None, inliers=None, reason='artwork_miss', ms=elapsed)
+    return replace(decision, answered=True, stage='1b', inliers=inliers, reason='artwork', ms=elapsed)
 
 
 def answer_stage1(*, decision: Decision, settings, runtime, catalog, results, session_id: str,
@@ -133,6 +137,20 @@ def answer_stage1(*, decision: Decision, settings, runtime, catalog, results, se
     item = {**shown[0], 'visual_score': 0.0, 'combined_score': 0.0, 'ocr_consistent': True,
             'retrieved_via': [f'stage{decision.stage}']}
     status = ScanStatus.uncertain if getattr(settings, 'stage1_require_confirmation', True) else ScanStatus.matched
+    printing_review = None
+    if decision.printing_ids:
+        # Same artwork identifies the card, never its stamp/edition. Reuse the
+        # existing explicit printing-selection and feedback contract.
+        members = _preview_candidates(catalog, list(decision.printing_ids))
+        if len(members) != len(decision.printing_ids) or members[0]['card_id'] != decision.card_id:
+            raise LookupError('incomplete stage1 printing group')
+        status = ScanStatus.printing_ambiguous
+        printing_review = PrintingReview(
+            reason='stage1_same_artwork_reprint', candidate_group_id='stage1:' + (decision.card_id or ''),
+            grouping_basis='reference_vector_similarity_or_catalogue_reprint',
+            reference_coverage_complete=False, collector_evidence=[number] if number else [],
+            plausible_printings=members,
+            guidance='Choose the exact printing, including any Prize Pack stamp, before confirming.')
     grading = GradingEvidence(is_graded=False, grading_status='ungraded', warnings=['grading_not_requested'])
     if graded is True:
         _snapshot, _embedder, engine = runtime.require()
@@ -153,8 +171,9 @@ def answer_stage1(*, decision: Decision, settings, runtime, catalog, results, se
     confidence = RecognitionConfidence(
         candidate_card_id=decision.card_id, visual_margin=decision.margin,
         identity='stage1', requires_confirmation=status != ScanStatus.matched,
-        reasons=[f'stage_{decision.stage}'])
-    presentation = match_presentation([item], status=status.value, printing_review=None)
+        printing='ambiguous' if printing_review else 'unconfirmed',
+        reasons=[f'stage_{decision.stage}', *(['choose_printing'] if printing_review else [])])
+    presentation = match_presentation([item], status=status.value, printing_review=printing_review)
     scan_id = str(uuid.uuid4())
     response = ScanResponse(
         id=scan_id, status=status, suggestions=[],
@@ -162,6 +181,7 @@ def answer_stage1(*, decision: Decision, settings, runtime, catalog, results, se
         coverage=coverage_payload(catalog), timings_ms=timings, versions=versions,
         message='Check this card before confirming.' if status == ScanStatus.uncertain else None,
         confidence=confidence, grading=grading,
+        printing_review=printing_review,
         **presentation.model_dump(mode='json'))
     # Candidate list stays the one card. Presentation may repeat it as the best match.
     from app.schemas import Candidate
@@ -180,7 +200,8 @@ def answer_stage1(*, decision: Decision, settings, runtime, catalog, results, se
                 (scan_id, session_id, status.value, settings.preprocess_config,
                  versions.get('model_revision', ''), versions.get('catalogue', ''),
                  versions.get('ocr', ''), versions.get('ranking', ''),
-                 json.dumps({}), json.dumps({'stage': decision.stage, 'card_id': decision.card_id}),
+                 json.dumps({}), json.dumps({'stage': decision.stage, 'card_id': decision.card_id,
+                     **({'printing_review': printing_review.model_dump(mode='json')} if printing_review else {})}),
                  json.dumps([item]), json.dumps([item]), json.dumps(timings)))
             results.commit()
     return response

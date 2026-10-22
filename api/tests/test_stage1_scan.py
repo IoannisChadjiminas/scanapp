@@ -22,7 +22,7 @@ def _lane(runtime):
     yield runtime
 
 
-def _client(monkeypatch, *, early=False, background=False, decision=None, stream=False):
+def _client(monkeypatch, *, early=False, background=False, decision=None, stream=False, diagnostics=False):
     from concurrent.futures import ThreadPoolExecutor
 
     from fastapi import FastAPI
@@ -63,6 +63,7 @@ def _client(monkeypatch, *, early=False, background=False, decision=None, stream
     app.state.settings = Settings(
         _env_file=None, scan_stream_results=stream, stage1_early_exit=early,
         stage1_background_check=background, stage1_sample_rate=1.0, store_captures=False)
+    app.state.settings.stage1_diagnostics = diagnostics
     app.state.executor = executor
     app.state.scan_limiter = ScanLimiter(0)
     app.state.runtime = SimpleNamespace()
@@ -170,3 +171,20 @@ def test_background_check_skips_when_a_scan_is_busy(caplog):
         checker.submit(job, sample_rate=1.0, busy=True)
     assert checker._queue.qsize() == 0
     assert 'skipped busy=true' in caplog.records[-1].getMessage()
+
+
+def test_route_logs_gate_metadata_only_when_the_diagnostics_flag_is_on(monkeypatch, caplog):
+    for enabled in (False, True):
+        caplog.clear()
+        decision = Decision(True, '1', 'en:base1-24', .04, None, 'same', 1.,
+                            vector_top='en:base1-24', vector_top_score=.95,
+                            text_candidates=('en:base1-24',), text_candidate_count=1)
+        client, executor, _calls = _client(monkeypatch, early=True, decision=decision, diagnostics=enabled)
+        with caplog.at_level(logging.INFO, logger='scan.diagnostics'), client, executor:
+            assert client.post('/scans', files={'image': ('card.jpg', b'jpeg', 'image/jpeg')}).status_code == 200
+        line = next(r.getMessage() for r in caplog.records if r.getMessage().startswith('stage0 '))
+        if enabled:
+            assert 'vector_top=en:base1-24' in line and 'vector_top_score=0.9500' in line
+            assert 'text_candidates=en:base1-24 text_candidate_count=1' in line
+        else:
+            assert 'vector_top=off' in line and 'text_candidates=' not in line
