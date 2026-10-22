@@ -236,7 +236,7 @@ def _recognize_bytes_once(
     settings: Settings,
     runtime: Runtime,
     catalog: sqlite3.Connection,
-    results: sqlite3.Connection,
+    results: sqlite3.Connection | None,
     session_id: str,
     crop_x: float | None = None,
     crop_y: float | None = None,
@@ -1407,8 +1407,9 @@ def recognize_bytes(
     settings: Settings,
     runtime: Runtime,
     catalog: sqlite3.Connection,
-    results: sqlite3.Connection,
+    results: sqlite3.Connection | None,
     session_id: str,
+    persist: bool = True,
     crop_x: float | None = None,
     crop_y: float | None = None,
     crop_w: float | None = None,
@@ -1426,7 +1427,10 @@ def recognize_bytes(
     _progress_observer: Callable | None = None,
     _grading_completion: Callable | None = None,
 ) -> ScanResponse:
-    """Evaluate first, then persist exactly one result and optional capture.
+    """Evaluate first, then optionally persist one result and its capture.
+
+    ``persist=False`` evaluates without saving scan/session results or scheduling
+    grading updates. It also suppresses captures, even when STORE_CAPTURES is on.
 
     A failed framing decision may try ONE line-supported frame. Existing useful
     results are never replaced. Recovery uses the same identity/quality guards,
@@ -1434,6 +1438,8 @@ def recognize_bytes(
     Explicit crops and quality retakes do not trigger this extra OCR pass.
     """
     started = time.perf_counter()
+    if not persist:
+        _grading_completion = None
     ocr_cache = RequestOcrCache()
     kwargs = dict(settings=settings, runtime=runtime, catalog=catalog,
                   results=results, session_id=session_id, crop_x=crop_x,
@@ -1742,12 +1748,13 @@ def recognize_bytes(
     logging.getLogger('scan.diagnostics').info(
         'scan_reasons scan_id=%s status=%s reasons=%s', selected.response.id,
         selected.response.status.value, ','.join(selected.evidence.get('status_reasons') or ['none']))
-    saved = time.perf_counter()
-    selected.save()
-    if grading.grading_status == 'pending' and _grading_completion is not None:
-        _grading_completion(selected.response.id, _grading_job)
-        _grading_job.detached = True
-    # Saving happens after total_ms is read, so it gets its own line.
-    logging.getLogger('scan.diagnostics').info(
-        'scan_saved scan_id=%s save_ms=%.1f', selected.response.id, (time.perf_counter() - saved) * 1000)
+    if persist:
+        saved = time.perf_counter()
+        selected.save()
+        if grading.grading_status == 'pending' and _grading_completion is not None:
+            _grading_completion(selected.response.id, _grading_job)
+            _grading_job.detached = True
+        # Saving happens after total_ms is read, so it gets its own line.
+        logging.getLogger('scan.diagnostics').info(
+            'scan_saved scan_id=%s save_ms=%.1f', selected.response.id, (time.perf_counter() - saved) * 1000)
     return selected.response

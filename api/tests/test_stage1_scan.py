@@ -110,6 +110,7 @@ def test_an_answer_skips_the_pipeline_and_queues_the_background_check(monkeypatc
     assert job.card_id == 'en:base1-25' and job.scan_id == 'stage1-id'
     job.recognize(b'photo-bytes')
     assert calls['pipeline_kwargs'][-1]['results'] is None
+    assert calls['pipeline_kwargs'][-1]['persist'] is False
 
 
 def test_answer_counter_includes_scans_without_background_checks(monkeypatch):
@@ -145,6 +146,7 @@ def test_streamed_stage1_answer_is_the_final_result(monkeypatch):
     assert job.card_id == 'en:base1-25'
     job.recognize(b'photo-bytes')
     assert calls['pipeline_kwargs'][-1]['results'] is None
+    assert calls['pipeline_kwargs'][-1]['persist'] is False
 
 
 def test_background_check_logs_a_disagreement_and_keeps_the_photo(tmp_path, caplog):

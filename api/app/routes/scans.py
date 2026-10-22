@@ -198,7 +198,7 @@ async def create_scan(
             with scan_lane(request.app.state.runtime) as runtime:
                 return recognize_bytes(
                     payload, settings=settings, runtime=runtime,
-                    catalog=request.app.state.dbs.catalog, results=None,
+                    catalog=request.app.state.dbs.catalog, results=None, persist=False,
                     session_id=session_id, language=language, graded=graded, store_capture=False)
 
         job = CheckJob(result.id, decision.card_id or '', data, rerun, store_dir=store)
