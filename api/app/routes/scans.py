@@ -109,7 +109,7 @@ async def create_scan(
         # One free lane per admitted scan: its own OCR readers, the shared models.
         with scan_lane(request.app.state.runtime) as runtime:
             decision = None
-            if getattr(settings, 'stage1_early_exit', False) and observer is None:
+            if getattr(settings, 'stage1_early_exit', False):
                 try:
                     decision = evaluate_stage1(
                         settings=settings, runtime=runtime, catalog=request.app.state.dbs.catalog,
@@ -183,6 +183,30 @@ async def create_scan(
         log_summary(result)
         schedule_parallel_read(result)
 
+    def stage1_followup(result: ScanResponse | None, *, busy: bool) -> None:
+        decision = gate_note.get('decision')
+        checker = getattr(request.app.state, 'stage1_checker', None)
+        if result is None or decision is None or not decision.answered or checker is None:
+            return
+        checker.note_answer()
+        if not getattr(settings, 'stage1_background_check', False):
+            return
+        from app.recognition.captures import review_dir
+        store = review_dir(settings) / 'images' if getattr(settings, 'store_captures', False) else None
+
+        def rerun(payload: bytes):
+            with scan_lane(request.app.state.runtime) as runtime:
+                return recognize_bytes(
+                    payload, settings=settings, runtime=runtime,
+                    catalog=request.app.state.dbs.catalog, results=None,
+                    session_id=session_id, language=language, graded=graded, store_capture=False)
+
+        job = CheckJob(result.id, decision.card_id or '', data, rerun, store_dir=store)
+        checker.submit(job, sample_rate=float(getattr(settings, 'stage1_sample_rate', 1.0)), busy=busy)
+
+    async def after_stream_release(result: ScanResponse | None) -> None:
+        stage1_followup(result, busy=await limiter.busy())
+
     def schedule_parallel_read(result: ScanResponse) -> None:
         from app.cardmarket_queue import schedule_scan_parallel_read
 
@@ -197,8 +221,9 @@ async def create_scan(
         # The stream owns the admission slot from here and releases it itself.
         return scan_stream(loop=request.app.state.loop, executor=request.app.state.executor,
             limiter=limiter, response=response, trace=trace,
-            recognize=recognize, on_final=after_stream)
-    stage1_job = None
+            recognize=recognize, on_final=after_stream,
+            on_released=after_stream_release)
+    result = None
     try:
         future = request.app.state.loop.run_in_executor(
             request.app.state.executor, recognize)
@@ -213,23 +238,6 @@ async def create_scan(
                 schedule_parallel_read(result)
             except Exception:
                 logger.exception("scan parallel schedule failed trace=%s", trace)
-            decision = gate_note.get('decision')
-            checker = getattr(request.app.state, 'stage1_checker', None)
-            if decision is not None and decision.answered and checker is not None:
-                checker.note_answer()
-            if (decision is not None and decision.answered and checker is not None
-                    and getattr(settings, 'stage1_background_check', False)):
-                from app.recognition.captures import review_dir
-                store = review_dir(settings) / 'images' if getattr(settings, 'store_captures', False) else None
-
-                def rerun(payload: bytes):
-                    with scan_lane(request.app.state.runtime) as runtime:
-                        return recognize_bytes(
-                            payload, settings=settings, runtime=runtime,
-                            catalog=request.app.state.dbs.catalog, results=request.app.state.dbs.results,
-                            session_id=session_id, language=language, graded=graded, store_capture=False)
-
-                stage1_job = CheckJob(result.id, decision.card_id or '', data, rerun, store_dir=store)
             return result
         except asyncio.CancelledError:
             try:
@@ -243,10 +251,7 @@ async def create_scan(
         raise HTTPException(status_code=400, detail=str(exc)) from exc
     finally:
         await limiter.release()
-        if stage1_job is not None:
-            busy = limiter._active > 0 or bool(limiter._waiters)
-            request.app.state.stage1_checker.submit(
-                stage1_job, sample_rate=float(getattr(settings, 'stage1_sample_rate', 1.0)), busy=busy)
+        stage1_followup(result, busy=await limiter.busy())
 
 
 @router.get("/scans/{scan_id}/grading")

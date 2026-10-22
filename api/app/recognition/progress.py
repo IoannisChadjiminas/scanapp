@@ -29,7 +29,7 @@ def _tops(preview_payload, result):
     return provisional or 'none', final or 'none', agrees
 
 
-def scan_stream(*, loop, executor, recognize, limiter, response, trace, on_final=None):
+def scan_stream(*, loop, executor, recognize, limiter, response, trace, on_final=None, on_released=None):
     """Own the worker and admission slot even if the streaming client leaves.
 
     One upload, one recognition, one persisted final result. No rerun on a
@@ -59,6 +59,7 @@ def scan_stream(*, loop, executor, recognize, limiter, response, trace, on_final
         loop.call_soon_threadsafe(deliver_preview)
 
     async def work():
+        result = None
         try:
             result = await loop.run_in_executor(executor, lambda: recognize(preview))
             # Very fast workers may finish before the queued loop callback is
@@ -84,6 +85,11 @@ def scan_stream(*, loop, executor, recognize, limiter, response, trace, on_final
             events.put_nowait(dict(type='error', code='failed'))
         finally:
             await limiter.release()
+            if on_released is not None:
+                try:
+                    await on_released(result)
+                except Exception:
+                    logger.exception('scan stream release follow-up failed trace=%s', trace)
 
     task = loop.create_task(work())
     _running.add(task)

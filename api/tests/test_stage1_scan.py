@@ -10,10 +10,11 @@ from app.schemas import Coverage, OcrEvidence, ScanResponse, ScanStatus
 
 
 def _answer(**_kwargs):
+    stage = _kwargs.get('decision').stage if _kwargs.get('decision') is not None else '1'
     return ScanResponse(
         id='stage1-id', status=ScanStatus.uncertain, suggestions=[],
         ocr=OcrEvidence(), coverage=Coverage(cards=0, indexed=0, missing_images=0),
-        timings_ms={'total_ms': 1.0}, versions={'stage': '1'})
+        timings_ms={'total_ms': 1.0}, versions={'stage': stage})
 
 
 @contextmanager
@@ -32,10 +33,13 @@ def _client(monkeypatch, *, early=False, background=False, decision=None, stream
     from app.recognition.images import ImageError
     from app.routes import scans
 
-    calls = {'pipeline': 0, 'gate': 0}
+    calls = {'pipeline': 0, 'gate': 0, 'pipeline_kwargs': []}
 
     def recognize_bytes(data, **kwargs):
         calls['pipeline'] += 1
+        calls['pipeline_kwargs'].append(kwargs)
+        if kwargs.get('results', object()) is None and kwargs.get('store_capture') is False:
+            return SimpleNamespace(suggestions=[])
         if kwargs.get('_progress_observer') is not None:
             return SimpleNamespace(
                 id='full-id', status=SimpleNamespace(value='uncertain'), suggestions=[],
@@ -78,7 +82,7 @@ def test_flag_off_does_not_consult_the_gate(monkeypatch):
     with client, executor:
         response = client.post('/scans', files={'image': ('card.jpg', b'jpeg', 'image/jpeg')})
     assert response.status_code == 400
-    assert calls == {'pipeline': 1, 'gate': 0}
+    assert calls['pipeline'] == 1 and calls['gate'] == 0
 
 
 def test_abstain_runs_the_full_pipeline(monkeypatch):
@@ -87,7 +91,7 @@ def test_abstain_runs_the_full_pipeline(monkeypatch):
     with client, executor:
         response = client.post('/scans', files={'image': ('card.jpg', b'jpeg', 'image/jpeg')})
     assert response.status_code == 400
-    assert calls == {'pipeline': 1, 'gate': 1}
+    assert calls['pipeline'] == 1 and calls['gate'] == 1
     assert client.app.state.stage1_checker.answers == 0
 
 
@@ -99,11 +103,13 @@ def test_an_answer_skips_the_pipeline_and_queues_the_background_check(monkeypatc
     assert response.status_code == 200
     assert response.json()['id'] == 'stage1-id'
     assert response.json()['status'] == 'uncertain'
-    assert calls == {'pipeline': 0, 'gate': 1}
+    assert calls['pipeline'] == 0 and calls['gate'] == 1
     checker = client.app.state.stage1_checker
     assert checker.answers == 1
     job = checker._queue.get_nowait()
     assert job.card_id == 'en:base1-25' and job.scan_id == 'stage1-id'
+    job.recognize(b'photo-bytes')
+    assert calls['pipeline_kwargs'][-1]['results'] is None
 
 
 def test_answer_counter_includes_scans_without_background_checks(monkeypatch):
@@ -112,20 +118,33 @@ def test_answer_counter_includes_scans_without_background_checks(monkeypatch):
     with client, executor:
         response = client.post('/scans', files={'image': ('card.jpg', b'jpeg', 'image/jpeg')})
     assert response.status_code == 200
-    assert calls == {'pipeline': 0, 'gate': 1}
+    assert calls['pipeline'] == 0 and calls['gate'] == 1
     checker = client.app.state.stage1_checker
     assert checker.answers == 1
     assert checker._queue.qsize() == 0
 
 
-def test_streaming_keeps_the_full_pipeline(monkeypatch):
-    decision = Decision(True, '1', 'en:base1-25', 0.04, None, 'same', 2.0)
-    client, executor, calls = _client(monkeypatch, early=True, decision=decision, stream=True)
+def test_streamed_stage1_answer_is_the_final_result(monkeypatch):
+    import json
+
+    decision = Decision(True, '1b', 'en:base1-25', 0.04, 33, 'artwork', 55.0)
+    client, executor, calls = _client(
+        monkeypatch, early=True, background=True, decision=decision, stream=True)
     with client, executor:
         response = client.post('/scans', data={'stream_results': 'true'},
                                files={'image': ('card.jpg', b'jpeg', 'image/jpeg')})
     assert response.status_code == 200
-    assert calls['pipeline'] == 1 and calls['gate'] == 0
+    events = [json.loads(line) for line in response.text.splitlines()]
+    assert events[-1]['type'] == 'final'
+    assert events[-1]['result']['id'] == 'stage1-id'
+    assert events[-1]['result']['versions']['stage'] == '1b'
+    assert calls == {'pipeline': 0, 'gate': 1, 'pipeline_kwargs': []}
+    checker = client.app.state.stage1_checker
+    assert checker.answers == 1
+    job = checker._queue.get_nowait()
+    assert job.card_id == 'en:base1-25'
+    job.recognize(b'photo-bytes')
+    assert calls['pipeline_kwargs'][-1]['results'] is None
 
 
 def test_background_check_logs_a_disagreement_and_keeps_the_photo(tmp_path, caplog):
