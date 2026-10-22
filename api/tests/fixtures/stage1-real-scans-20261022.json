@@ -1,0 +1,410 @@
+{
+  "provenance": "Read-only staging queries on 2026-10-22. No request vectors/corners survived; user confirmed no saved payloads. Never substitute server OCR or reference vectors for phone evidence.",
+  "cards": [
+    {
+      "id": "en:xy12-35",
+      "name": "Pikachu",
+      "view_title": null,
+      "collector_number": "35",
+      "printed_collector_number": null,
+      "language": "en",
+      "set_id": "xy12",
+      "set_name": "Evolutions",
+      "image_path": "/data/reference-images/en/xy12-35.webp"
+    },
+    {
+      "id": "en:mep-078",
+      "name": "Toxel",
+      "view_title": null,
+      "collector_number": "078",
+      "printed_collector_number": null,
+      "language": "en",
+      "set_id": "mep",
+      "set_name": "MEP Black Star Promos",
+      "image_path": "/data/reference-images/recovered/en_mep-078.jpg"
+    },
+    {
+      "id": "base1-24",
+      "name": "Charmeleon",
+      "view_title": null,
+      "collector_number": "24",
+      "printed_collector_number": null,
+      "language": "en",
+      "set_id": "base1",
+      "set_name": "Base Set",
+      "image_path": "/data/reference-images/base1-24.webp"
+    },
+    {
+      "id": "en:base1-24",
+      "name": "Charmeleon",
+      "view_title": null,
+      "collector_number": "24",
+      "printed_collector_number": null,
+      "language": "en",
+      "set_id": "base1",
+      "set_name": "Base Set",
+      "image_path": "/data/reference-images/en/base1-24.webp"
+    },
+    {
+      "id": "en:sv04-159",
+      "name": "Ancient Booster Energy Capsule",
+      "view_title": null,
+      "collector_number": "159",
+      "printed_collector_number": null,
+      "language": "en",
+      "set_id": "sv04",
+      "set_name": "Paradox Rift",
+      "image_path": "/data/reference-images/en/sv04-159.webp"
+    },
+    {
+      "id": "en:svp-053",
+      "name": "Mew ex",
+      "view_title": null,
+      "collector_number": "053",
+      "printed_collector_number": null,
+      "language": "en",
+      "set_id": "svp",
+      "set_name": "SVP Black Star Promos",
+      "image_path": "/data/reference-images/en/svp-053.webp"
+    },
+    {
+      "id": "en:swsh4-24",
+      "name": "Charmeleon",
+      "view_title": null,
+      "collector_number": "24",
+      "printed_collector_number": null,
+      "language": "en",
+      "set_id": "swsh4",
+      "set_name": "Vivid Voltage",
+      "image_path": "/data/reference-images/en/swsh4-24.webp"
+    },
+    {
+      "id": "en:30th-035",
+      "name": "Pikachu",
+      "view_title": null,
+      "collector_number": "035",
+      "printed_collector_number": null,
+      "language": "en",
+      "set_id": "30th",
+      "set_name": "30th Celebration",
+      "image_path": "/data/reference-images/en/30th-035.webp"
+    },
+    {
+      "id": "en:30th-077",
+      "name": "Comfey",
+      "view_title": null,
+      "collector_number": "077",
+      "printed_collector_number": null,
+      "language": "en",
+      "set_id": "30th",
+      "set_name": "30th Celebration",
+      "image_path": "/data/reference-images/en/30th-077.webp"
+    },
+    {
+      "id": "en:PPS5-PAR-159",
+      "name": "Ancient Booster Energy Capsule",
+      "view_title": null,
+      "collector_number": "159",
+      "printed_collector_number": "159/182",
+      "language": "en",
+      "set_id": "PPS5",
+      "set_name": "Play! Pokémon Prize Pack Series Five",
+      "image_path": "/data/reference-images/en/PPS5-PAR-159.webp"
+    },
+    {
+      "id": "en:np-35",
+      "name": "Pikachu δ",
+      "view_title": null,
+      "collector_number": "35",
+      "printed_collector_number": null,
+      "language": "en",
+      "set_id": "np",
+      "set_name": "Nintendo Black Star Promos",
+      "image_path": "/data/reference-images/en/np-35.webp"
+    },
+    {
+      "id": "en:30th-024",
+      "name": "Pikachu",
+      "view_title": null,
+      "collector_number": "024",
+      "printed_collector_number": null,
+      "language": "en",
+      "set_id": "30th",
+      "set_name": "30th Celebration",
+      "image_path": "/data/reference-images/en/30th-024.webp"
+    },
+    {
+      "id": "en:base4-35",
+      "name": "Charmeleon",
+      "view_title": null,
+      "collector_number": "35",
+      "printed_collector_number": null,
+      "language": "en",
+      "set_id": "base4",
+      "set_name": "Base Set 2",
+      "image_path": "/data/reference-images/en/base4-35.webp"
+    },
+    {
+      "id": "en:basep-24",
+      "name": "___________'s Pikachu",
+      "view_title": null,
+      "collector_number": "24",
+      "printed_collector_number": null,
+      "language": "en",
+      "set_id": "basep",
+      "set_name": "Wizards Black Star Promos",
+      "image_path": "/data/reference-images/en/basep-24.webp"
+    },
+    {
+      "id": "en:basep-35",
+      "name": "Pichu",
+      "view_title": null,
+      "collector_number": "35",
+      "printed_collector_number": null,
+      "language": "en",
+      "set_id": "basep",
+      "set_name": "Wizards Black Star Promos",
+      "image_path": "/data/reference-images/en/basep-35.webp"
+    },
+    {
+      "id": "en:cel25cc-CC008",
+      "name": "_____'s Pikachu",
+      "view_title": null,
+      "collector_number": "CC008",
+      "printed_collector_number": "24",
+      "language": "en",
+      "set_id": "cel25cc",
+      "set_name": "Celebrations Classic Collection",
+      "image_path": "/data/reference-images/en/cel25cc-CC008.jpg"
+    },
+    {
+      "id": "en:ex13-78",
+      "name": "Pikachu",
+      "view_title": null,
+      "collector_number": "78",
+      "printed_collector_number": null,
+      "language": "en",
+      "set_id": "ex13",
+      "set_name": "Holon Phantoms",
+      "image_path": "/data/reference-images/en/ex13-78.webp"
+    },
+    {
+      "id": "en:hgss1-78",
+      "name": "Pikachu",
+      "view_title": null,
+      "collector_number": "78",
+      "printed_collector_number": null,
+      "language": "en",
+      "set_id": "hgss1",
+      "set_name": "HeartGold SoulSilver",
+      "image_path": "/data/reference-images/en/hgss1-78.webp"
+    },
+    {
+      "id": "en:pl4-35",
+      "name": "Charmeleon",
+      "view_title": null,
+      "collector_number": "35",
+      "printed_collector_number": null,
+      "language": "en",
+      "set_id": "pl4",
+      "set_name": "Arceus",
+      "image_path": "/data/reference-images/en/pl4-35.webp"
+    },
+    {
+      "id": "ja:M6a-035",
+      "name": "ピカチュウ",
+      "view_title": "Pikachu",
+      "collector_number": "035",
+      "printed_collector_number": null,
+      "language": "ja",
+      "set_id": "M6a",
+      "set_name": "30th CELEBRATION",
+      "image_path": "/data/reference-images/ja/M6a-35.webp"
+    },
+    {
+      "id": "ja:PMCG1-035",
+      "name": "ピカチュウ",
+      "view_title": "Pikachu",
+      "collector_number": "035",
+      "printed_collector_number": null,
+      "language": "ja",
+      "set_id": "PMCG1",
+      "set_name": "拡張パック",
+      "image_path": "/data/reference-images/ja-20261015-vintage/ja_PMCG1-035.jpg"
+    },
+    {
+      "id": "ja:PMCG2-024",
+      "name": "ピカチュウ",
+      "view_title": "Pikachu",
+      "collector_number": "024",
+      "printed_collector_number": null,
+      "language": "ja",
+      "set_id": "PMCG2",
+      "set_name": "ポケモンジャングル",
+      "image_path": "/data/reference-images/ja-20261015-vintage/ja_PMCG2-024.jpg"
+    },
+    {
+      "id": "ja:S12-024",
+      "name": "ピカチュウ",
+      "view_title": "Pikachu",
+      "collector_number": "024",
+      "printed_collector_number": null,
+      "language": "ja",
+      "set_id": "S12",
+      "set_name": "パラダイムトリガー",
+      "image_path": "/data/reference-images/ja/S12-024.webp"
+    },
+    {
+      "id": "ja:S8a-024",
+      "name": "Flying Pikachu VMAX",
+      "view_title": "Flying Pikachu VMAX",
+      "collector_number": "024",
+      "printed_collector_number": null,
+      "language": "ja",
+      "set_id": "S8a",
+      "set_name": "25th アニバーサリーコレクション",
+      "image_path": "/data/reference-images/ja/S8a-024.webp"
+    }
+  ],
+  "set_totals": {
+    "en:base1": 102,
+    "en:30th": 128,
+    "en:np": 40,
+    "en:sv04": 182,
+    "en:swsh4": 185,
+    "en:xy12": 108,
+    "en:mep": 112
+  },
+  "scans": [
+    {
+      "id": "b3ac26f2",
+      "full_pipeline_card": "en:mep-078",
+      "client_text": null,
+      "text_source": "no phone text recorded",
+      "card_quad": null,
+      "quad_observed": "rect",
+      "client_embedding": null,
+      "embedding_observed": true,
+      "before_reason": "no_unique_text",
+      "before_margin": 0.1329,
+      "replay_skip": "numeric corners and phone vector were not retained"
+    },
+    {
+      "id": "c5687ed0",
+      "full_pipeline_card": "en:sv04-159",
+      "client_text": {
+        "v": 1,
+        "engine": "apple-vision",
+        "name": "Ancient Booster Energy Capsule",
+        "name_conf": 1.0,
+        "number": "159/182",
+        "number_conf": 1.0
+      },
+      "text_source": "saved parsed phone evidence",
+      "card_quad": null,
+      "quad_observed": "rect",
+      "client_embedding": null,
+      "embedding_observed": true,
+      "before_reason": "ambiguous_text",
+      "before_margin": 0.0022,
+      "replay_skip": "numeric corners and phone vector were not retained"
+    },
+    {
+      "id": "70585dbe",
+      "full_pipeline_card": "en:xy12-35",
+      "client_text": {
+        "v": 1,
+        "engine": "apple-vision",
+        "name": "Pikachu",
+        "name_conf": 1.0,
+        "number": "35/108",
+        "number_conf": 1.0
+      },
+      "text_source": "saved parsed phone evidence",
+      "card_quad": null,
+      "quad_observed": "rect",
+      "client_embedding": null,
+      "embedding_observed": true,
+      "before_reason": "ambiguous_text",
+      "before_margin": 0.0024,
+      "replay_skip": "numeric corners and phone vector were not retained"
+    },
+    {
+      "id": "982a6a0d",
+      "full_pipeline_card": "en:30th-077",
+      "client_text": {
+        "v": 1,
+        "engine": "apple-vision",
+        "name": "Comfey",
+        "name_conf": 1.0,
+        "number": "077/128",
+        "number_conf": 1.0
+      },
+      "text_source": "saved parsed phone evidence",
+      "card_quad": null,
+      "quad_observed": "rect",
+      "client_embedding": null,
+      "embedding_observed": true,
+      "before_reason": "visual_contradiction",
+      "before_margin": 0.0641,
+      "replay_skip": "numeric corners and phone vector were not retained"
+    },
+    {
+      "id": "b438c6f1",
+      "full_pipeline_card": "en:base1-24",
+      "client_text": {
+        "v": 1,
+        "engine": "apple-vision",
+        "name": "Charmeleon",
+        "name_conf": 1.0,
+        "number": "24/102",
+        "number_conf": 1.0
+      },
+      "text_source": "saved parsed phone evidence",
+      "card_quad": null,
+      "quad_observed": "rect",
+      "client_embedding": null,
+      "embedding_observed": true,
+      "before_reason": "ambiguous_text",
+      "before_margin": 0.0225,
+      "replay_skip": "numeric corners and phone vector were not retained"
+    },
+    {
+      "id": "a19b066e",
+      "full_pipeline_card": "en:sv04-123",
+      "client_text": {
+        "v": 1,
+        "engine": "apple-vision",
+        "name": "Brute Bonnet",
+        "name_conf": 1.0
+      },
+      "text_source": "saved parsed phone evidence",
+      "card_quad": null,
+      "quad_observed": "none",
+      "client_embedding": null,
+      "embedding_observed": false,
+      "before_reason": "no_embedding",
+      "before_margin": null,
+      "replay_skip": null
+    },
+    {
+      "id": "df96aa6a",
+      "full_pipeline_card": "zh-tw:SV8a-099",
+      "client_text": {
+        "v": 1,
+        "engine": "apple-vision",
+        "name": "Brute Bonnet",
+        "name_conf": 1.0
+      },
+      "text_source": "saved parsed phone evidence",
+      "card_quad": null,
+      "quad_observed": "rect",
+      "client_embedding": null,
+      "embedding_observed": true,
+      "before_reason": "no_unique_text",
+      "before_margin": 0.0011,
+      "replay_skip": "numeric corners and phone vector were not retained"
+    }
+  ],
+  "catalogue_scope": "All active catalogue name matches among collector/printed numerators 24,35,77,78,159; includes every numeric text candidate for the recorded names."
+}

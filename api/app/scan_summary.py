@@ -40,6 +40,11 @@ SWITCHES = (
     'stage1_early_exit',
     'stage1_background_check',
     'stage1b_text_verify',
+    'stage1_set_totals',
+    'stage1_normalize_duplicates',
+    'stage1_printing_groups',
+    'stage1_promo_numbers',
+    'stage1_diagnostics',
 )
 
 STAGES = (

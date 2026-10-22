@@ -1,7 +1,7 @@
 """Accept and log the phone's stage-0 evidence.
 
-Nothing here changes a scan's answer. A phone embedding is checked and then
-left unused: there is no vector search, so the log says ``vector_top=off``.
+Nothing here changes a scan's answer. Optional gate diagnostics describe the
+search already performed by stage 1; logging never runs a second search.
 """
 from __future__ import annotations
 
@@ -74,11 +74,13 @@ def phone_evidence(
 
 def stage0_line(result: Any, *, trace: str, source: Any, evidence: PhoneEvidence,
                 stage1: str | None = None, stage1_reason: str | None = None,
-                stage1_margin: float | None = None, stage1_ms: float | None = None) -> str:
+                stage1_margin: float | None = None, stage1_ms: float | None = None,
+                gate: Any = None) -> str:
     """One line per scan: what arrived, and whether it agrees with the answer.
 
     ``would=text`` is only a planning mark for stage 1: the phone's name and
-    number both match the top suggestion. The phone's vector is not searched.
+    number both match the top suggestion. Only catalogue IDs and scores from
+    an existing gate decision are added, never vectors or raw OCR text.
     """
     suggestions = list(getattr(result, 'suggestions', None) or [])
     top = suggestions[0] if suggestions else None
@@ -106,15 +108,30 @@ def stage0_line(result: Any, *, trace: str, source: Any, evidence: PhoneEvidence
         f'name_agree={name_agree}',
         f'number_agree={number_agree}',
         f'label_name_agree={label_agree}',
-        'vector_top=off',
+        'vector_top=' + (_card_id(getattr(gate, 'vector_top', None)) if gate is not None else 'off'),
         f'would={would}',
     ]
+    if gate is not None:
+        parts.extend([
+            'vector_top_score=' + _metric(getattr(gate, 'vector_top_score', None), 4),
+            'text_candidates=' + (','.join(_card_id(cid) for cid in gate.text_candidates[:5]) or 'none'),
+            f'text_candidate_count={gate.text_candidate_count}',
+        ])
+        if gate.reason == 'visual_contradiction':
+            parts.extend([
+                'contradicting_card=' + _card_id(gate.contradicting_card),
+                'contradiction_gap=' + _metric(gate.contradiction_gap, 4),
+            ])
     if stage1:
         parts.append(f'stage1={stage1}')
         parts.append(f'stage1_reason={stage1_reason or "none"}')
         parts.append('stage1_margin=' + ('none' if stage1_margin is None else f'{stage1_margin:.4f}'))
         parts.append('stage1_ms=' + ('none' if stage1_ms is None else f'{stage1_ms:.1f}'))
     return ' '.join(parts)
+
+
+def _card_id(value: str | None) -> str:
+    return value if isinstance(value, str) and re.fullmatch(r'[A-Za-z0-9:._-]{1,128}', value) else 'none'
 
 
 def _text(raw: str | None) -> dict[str, Any]:
@@ -182,8 +199,8 @@ def _quality(raw: str | None) -> tuple[float | None, float | None, float | None]
 def _embedding(raw: str | None) -> bool:
     """True when the vector is 384 float16 values for a known model.
 
-    The vector is not returned and not searched. ``CLIENT_EMBEDDING`` stays off
-    for answers.
+    This reporting helper does not return or search the vector. The optional
+    stage 1 gate validates and searches its own parsed copy separately.
     """
     if not raw or len(raw.encode('utf-8', errors='replace')) > EMBEDDING_MAX_BYTES:
         return False
