@@ -71,6 +71,14 @@ services:
       # quality; the server only logs them (stage0 line), answers are unchanged.
       APP_CLIENT_LABEL: ${APP_CLIENT_LABEL:-true}
       APP_CLIENT_QUALITY: ${APP_CLIENT_QUALITY:-true}
+      APP_CLIENT_EMBEDDING: ${APP_CLIENT_EMBEDDING:-true}
+      # Stage 1 (docs/stage1-build-plan.md). Off in code. Staging turns it on.
+      # Confirmation stays required. The background check runs on every stage 1 answer.
+      STAGE1_EARLY_EXIT: ${STAGE1_EARLY_EXIT:-true}
+      STAGE1_BACKGROUND_CHECK: ${STAGE1_BACKGROUND_CHECK:-true}
+      STAGE1_SAMPLE_RATE: ${STAGE1_SAMPLE_RATE:-1.0}
+      STAGE1_REQUIRE_CONFIRMATION: ${STAGE1_REQUIRE_CONFIRMATION:-true}
+      STAGE1B_TEXT_VERIFY: ${STAGE1B_TEXT_VERIFY:-true}
       CLIENT_TEXT_HINTS: ${CLIENT_TEXT_HINTS:-true}
       CLIENT_TEXT_OCR: ${CLIENT_TEXT_OCR:-footer}
       ENABLE_MATCHED: ${ENABLE_MATCHED:-true}

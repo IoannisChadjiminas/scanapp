@@ -37,6 +37,9 @@ SWITCHES = (
     'trust_client_warp',
     'client_text_hints',
     'client_text_fast_path',
+    'stage1_early_exit',
+    'stage1_background_check',
+    'stage1b_text_verify',
 )
 
 STAGES = (

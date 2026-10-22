@@ -83,6 +83,34 @@ def test_finished_grade_is_used_only_when_company_identified(monkeypatch, eviden
     assert result.timings_ms['grading_ready_at_card_deadline'] == 1
 
 
+def test_nonpersistent_recognition_never_schedules_late_grading(monkeypatch):
+    entered, finish = Event(), Event()
+    item, saved = evaluation()
+
+    def grade(image):
+        entered.set()
+        assert finish.wait(2)
+        return GradingEvidence(company='psa', grade=9, grading_status='graded')
+
+    def card(data, **kwargs):
+        kwargs['_input_observer'](item.input_image)
+        assert entered.wait(2)
+        return item
+
+    monkeypatch.setattr(pipeline, '_recognize_bytes_once', card)
+    with ThreadPoolExecutor(max_workers=1) as worker:
+        try:
+            result = pipeline.recognize_bytes(
+                b'test', settings=Settings(_env_file=None, grading_at_card_deadline=True),
+                runtime=runtime(grade, worker), catalog=None, results=None,
+                session_id='test', skip_detect=True, persist=False,
+                _grading_completion=lambda *args: pytest.fail('Must not schedule a result write'))
+            assert result.grading.grading_status != 'pending'
+            assert saved == []
+        finally:
+            finish.set()
+
+
 def test_failed_optional_grade_returns_plain_ungraded(monkeypatch):
     item, saved = evaluation()
     def fail(image):

@@ -34,3 +34,8 @@ class ScanLimiter:
             self._active = max(0, self._active - 1)
             if self._waiters:
                 self._waiters.pop(0).set()
+
+    async def busy(self) -> bool:
+        """Whether a live scan is running or waiting for an admission slot."""
+        async with self._lock:
+            return self._active > 0 or bool(self._waiters)

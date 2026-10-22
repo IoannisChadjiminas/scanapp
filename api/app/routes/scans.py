@@ -24,6 +24,8 @@ from app.recognition.runtime import scan_lane
 from app.recognition.upload import read_upload_limited
 from app.scan_summary import parse_quad, scan_flags, scan_outcome_line, scan_source, scan_summary_line
 from app.stage0 import PhoneEvidence, phone_evidence, stage0_line
+from app.recognition.stage1_answer import answer_stage1, evaluate_stage1
+from app.recognition.stage1_check import CheckJob
 from app.schemas import (
     Candidate,
     FeedbackRequest,
@@ -102,9 +104,26 @@ async def create_scan(
             detail="Recognition is busy. Try again shortly.",
             headers={"Retry-After": "3"},
         )
+    gate_note: dict = {}
     def recognize(observer=None):
         # One free lane per admitted scan: its own OCR readers, the shared models.
         with scan_lane(request.app.state.runtime) as runtime:
+            decision = None
+            if getattr(settings, 'stage1_early_exit', False):
+                try:
+                    decision = evaluate_stage1(
+                        settings=settings, runtime=runtime, catalog=request.app.state.dbs.catalog,
+                        client_text=client_text, client_embedding=client_embedding,
+                        card_quad=parse_quad(card_quad), image_bytes=data)
+                except Exception:
+                    logger.exception("stage1 gate failed trace=%s", trace)
+                    decision = None
+                gate_note['decision'] = decision
+                if decision is not None and decision.answered:
+                    return answer_stage1(
+                        decision=decision, settings=settings, runtime=runtime,
+                        catalog=request.app.state.dbs.catalog, results=request.app.state.dbs.results,
+                        session_id=session_id, client_text=client_text, graded=graded, image_bytes=data)
             return recognize_bytes(
                 data,
                 settings=settings,
@@ -150,13 +169,43 @@ async def create_scan(
         logger.info("%s", scan_summary_line(result, settings, trace=trace,
                                             upload_bytes=len(data), flags=flags, source=source))
         try:
-            logger.info("%s", stage0_line(result, trace=trace, source=source, evidence=evidence))
+            decision = gate_note.get('decision')
+            logger.info("%s", stage0_line(
+                result, trace=trace, source=source, evidence=evidence,
+                stage1=('answered' if decision is not None and decision.answered else 'abstained') if decision is not None else None,
+                stage1_reason=None if decision is None else decision.reason,
+                stage1_margin=None if decision is None else decision.margin,
+                stage1_ms=None if decision is None else decision.ms))
         except Exception:
             logger.exception("stage0 log failed trace=%s", trace)
 
     def after_stream(result: ScanResponse) -> None:
         log_summary(result)
         schedule_parallel_read(result)
+
+    def stage1_followup(result: ScanResponse | None, *, busy: bool) -> None:
+        decision = gate_note.get('decision')
+        checker = getattr(request.app.state, 'stage1_checker', None)
+        if result is None or decision is None or not decision.answered or checker is None:
+            return
+        checker.note_answer()
+        if not getattr(settings, 'stage1_background_check', False):
+            return
+        from app.recognition.captures import review_dir
+        store = review_dir(settings) / 'images' if getattr(settings, 'store_captures', False) else None
+
+        def rerun(payload: bytes):
+            with scan_lane(request.app.state.runtime) as runtime:
+                return recognize_bytes(
+                    payload, settings=settings, runtime=runtime,
+                    catalog=request.app.state.dbs.catalog, results=None, persist=False,
+                    session_id=session_id, language=language, graded=graded, store_capture=False)
+
+        job = CheckJob(result.id, decision.card_id or '', data, rerun, store_dir=store)
+        checker.submit(job, sample_rate=float(getattr(settings, 'stage1_sample_rate', 1.0)), busy=busy)
+
+    async def after_stream_release(result: ScanResponse | None) -> None:
+        stage1_followup(result, busy=await limiter.busy())
 
     def schedule_parallel_read(result: ScanResponse) -> None:
         from app.cardmarket_queue import schedule_scan_parallel_read
@@ -172,7 +221,9 @@ async def create_scan(
         # The stream owns the admission slot from here and releases it itself.
         return scan_stream(loop=request.app.state.loop, executor=request.app.state.executor,
             limiter=limiter, response=response, trace=trace,
-            recognize=recognize, on_final=after_stream)
+            recognize=recognize, on_final=after_stream,
+            on_released=after_stream_release)
+    result = None
     try:
         future = request.app.state.loop.run_in_executor(
             request.app.state.executor, recognize)
@@ -200,6 +251,7 @@ async def create_scan(
         raise HTTPException(status_code=400, detail=str(exc)) from exc
     finally:
         await limiter.release()
+        stage1_followup(result, busy=await limiter.busy())
 
 
 @router.get("/scans/{scan_id}/grading")

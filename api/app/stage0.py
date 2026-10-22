@@ -72,7 +72,9 @@ def phone_evidence(
     )
 
 
-def stage0_line(result: Any, *, trace: str, source: Any, evidence: PhoneEvidence) -> str:
+def stage0_line(result: Any, *, trace: str, source: Any, evidence: PhoneEvidence,
+                stage1: str | None = None, stage1_reason: str | None = None,
+                stage1_margin: float | None = None, stage1_ms: float | None = None) -> str:
     """One line per scan: what arrived, and whether it agrees with the answer.
 
     ``would=text`` is only a planning mark for stage 1: the phone's name and
@@ -107,6 +109,11 @@ def stage0_line(result: Any, *, trace: str, source: Any, evidence: PhoneEvidence
         'vector_top=off',
         f'would={would}',
     ]
+    if stage1:
+        parts.append(f'stage1={stage1}')
+        parts.append(f'stage1_reason={stage1_reason or "none"}')
+        parts.append('stage1_margin=' + ('none' if stage1_margin is None else f'{stage1_margin:.4f}'))
+        parts.append('stage1_ms=' + ('none' if stage1_ms is None else f'{stage1_ms:.1f}'))
     return ' '.join(parts)
 
 

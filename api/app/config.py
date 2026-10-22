@@ -200,6 +200,13 @@ class Settings(BaseSettings):
     app_client_label: bool = False
     app_client_embedding: bool = False
     app_client_quality: bool = False
+    # Stage 1 answers from the phone's vector and text. Off until staging turns it on.
+    # Production stays off until the background check has stayed clean.
+    stage1_early_exit: bool = False
+    stage1_background_check: bool = False
+    stage1_sample_rate: float = 1.0
+    stage1_require_confirmation: bool = True
+    stage1b_text_verify: bool = False
     # Phone photo prep, sent through GET /config. Defaults match the app today.
     app_capture_preset: str = 'max'
     app_jpeg_quality: int = 95
