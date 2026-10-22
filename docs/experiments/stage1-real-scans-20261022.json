@@ -1,0 +1,145 @@
+{
+  "summary": {
+    "photos": 157,
+    "before_answers": 53,
+    "after_answers": 58,
+    "after_stages": {
+      "1": 43,
+      "1b": 15
+    },
+    "wrong": 0,
+    "added": [
+      "fresh100_196431506881",
+      "fresh100_227337115305",
+      "fresh100_196323744191",
+      "holdout4_080",
+      "phone_5085926a-1afb-4505-88a9-c2f23fae34ba"
+    ],
+    "lost": [],
+    "printing_choice_photos": [],
+    "unchanged_fallback_answers": 99,
+    "unaffected_answer_changes": [],
+    "energy_reference_cosine": 0.9763335585594177
+  },
+  "real_scans": [
+    {
+      "id": "b3ac26f2",
+      "before_reason": "no_unique_text",
+      "text_candidates_after": [],
+      "text_identity_after": null,
+      "printing_choices": [],
+      "gate_replay": "skipped_missing_phone_vector_and_corners",
+      "actual_phone_text_present": false
+    },
+    {
+      "id": "c5687ed0",
+      "before_reason": "ambiguous_text",
+      "text_candidates_after": [
+        "en:sv04-159",
+        "en:PPS5-PAR-159"
+      ],
+      "text_identity_after": "en:sv04-159",
+      "printing_choices": [
+        "en:sv04-159",
+        "en:PPS5-PAR-159"
+      ],
+      "gate_replay": "skipped_missing_phone_vector_and_corners",
+      "actual_phone_text_present": true
+    },
+    {
+      "id": "70585dbe",
+      "before_reason": "ambiguous_text",
+      "text_candidates_after": [
+        "en:xy12-35"
+      ],
+      "text_identity_after": "en:xy12-35",
+      "printing_choices": [],
+      "gate_replay": "skipped_missing_phone_vector_and_corners",
+      "actual_phone_text_present": true
+    },
+    {
+      "id": "982a6a0d",
+      "before_reason": "visual_contradiction",
+      "text_candidates_after": [
+        "en:30th-077"
+      ],
+      "text_identity_after": "en:30th-077",
+      "printing_choices": [],
+      "gate_replay": "skipped_missing_phone_vector_and_corners",
+      "actual_phone_text_present": true
+    },
+    {
+      "id": "b438c6f1",
+      "before_reason": "ambiguous_text",
+      "text_candidates_after": [
+        "en:base1-24"
+      ],
+      "text_identity_after": "en:base1-24",
+      "printing_choices": [],
+      "gate_replay": "skipped_missing_phone_vector_and_corners",
+      "actual_phone_text_present": true
+    },
+    {
+      "id": "a19b066e",
+      "before_reason": "no_embedding",
+      "text_candidates_after": [],
+      "text_identity_after": null,
+      "printing_choices": [],
+      "gate_replay": "no_embedding",
+      "actual_phone_text_present": true
+    },
+    {
+      "id": "df96aa6a",
+      "before_reason": "no_unique_text",
+      "text_candidates_after": [],
+      "text_identity_after": null,
+      "printing_choices": [],
+      "gate_replay": "skipped_missing_phone_vector_and_corners",
+      "actual_phone_text_present": true
+    }
+  ],
+  "real_scan_limit": "Six observed vectors and all numeric quads were not retained. User confirmed no saved requests. No real-vector success claim.",
+  "duplicate_audit": {
+    "pairs_in_pr65_csv": 561,
+    "present_pairs": 561,
+    "old_rule_missed": 0,
+    "new_rule_missed": 0,
+    "old_misses": [],
+    "charmeleon_fields_differing": [],
+    "charmeleon_rows": {
+      "base1-24": {
+        "name": "Charmeleon",
+        "set_id": "base1",
+        "collector_number": "24",
+        "printed_collector_number": null,
+        "language": "en"
+      },
+      "en:base1-24": {
+        "name": "Charmeleon",
+        "set_id": "base1",
+        "collector_number": "24",
+        "printed_collector_number": null,
+        "language": "en"
+      }
+    },
+    "csv_sha256": "c9c8334299f7925bd023701757f9758cdb19fe4ada5fa8ba2ae0235ef4a1ddf2"
+  },
+  "set_total_snapshot_rows": 560,
+  "comfey": {
+    "recorded_phone_margin": 0.0641,
+    "phone_vector_leader": null,
+    "reason": "The phone vector and its leader ID were not retained. Margin is top versus runner-up, not necessarily the gap to Comfey.",
+    "server_visual_leader": "ja:S10a-014",
+    "server_visual_leader_name": "Pikachu",
+    "server_visual_leader_score": 0.728402853012085,
+    "server_comfey_score": 0.6582393646240234,
+    "leader_reference_cosine_to_comfey": 0.6856759786605835,
+    "interpretation": "The separate server visual search also favored a wrong card. It is not proof of the phone leader."
+  },
+  "input_sha256": {
+    "api/tests/fixtures/stage1-real-scans-20261022.json": "4a0a1fa93e7142e8902345771e8287cb9486c2b7ef891ca7d67c6b8ef91c1338",
+    "api/tests/fixtures/stage1-set-totals-20261022.json": "5c2e51c88d377129abef2de697a187ec3c278ec3882141ff2c7b6f887ce23e44",
+    "data/latency/stage0-simulation-20261021/stage0.jsonl": "0dcc851995aff244c63731875ac204fb8af54d34b88d76ff9a84be7e3bb08a15",
+    "data/latency/stage0-simulation-20261021/kit/catalog.sqlite": "ed1504421cd346ecaca312b9606b2864276804519f8632c71533b833d4f6f61d"
+  }
+}
