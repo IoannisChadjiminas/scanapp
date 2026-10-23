@@ -67,6 +67,7 @@ class Candidate(BaseModel):
     # The finishes to pick between ("normal" or "holo", then "reverse"), empty
     # when there is one. Reverse holo prices are Cardmarket's -holo figures.
     finishes: list[str] = Field(default_factory=list)
+    supports_first_edition: bool = False
     reverse_holo_prices: list[CardmarketPrice] = Field(default_factory=list)
 
 
@@ -133,6 +134,7 @@ class PlausiblePrinting(BaseModel):
     cardmarket_url: str | None = None
     cardmarket_prices: list[CardmarketPrice] = Field(default_factory=list)
     finishes: list[str] = Field(default_factory=list)
+    supports_first_edition: bool = False
     reverse_holo_prices: list[CardmarketPrice] = Field(default_factory=list)
 
 
