@@ -173,6 +173,16 @@ def _lookup_cards(conn: sqlite3.Connection, card_ids: list[str]) -> dict[str, sq
     return {row["id"]: row for row in rows}
 
 
+def _supports_first_edition(row: sqlite3.Row | dict) -> bool:
+    """Read TCGdex's firstEdition capability flag from the stored variants."""
+    raw = row.get("variants_json") if isinstance(row, dict) else row["variants_json"]
+    try:
+        variants = json.loads(raw or "{}") if isinstance(raw, str) else raw
+    except (TypeError, ValueError):
+        return False
+    return isinstance(variants, dict) and variants.get("firstEdition") is True
+
+
 def _preview_candidates(conn: sqlite3.Connection, card_ids: list[str]) -> list[dict]:
     """Early guesses for the phone: set, number and a stored price let the tile
     fill at once. Everything is read from local tables, never from the network."""
@@ -185,6 +195,7 @@ def _preview_candidates(conn: sqlite3.Connection, card_ids: list[str]) -> list[d
                  set_total=set_total(conn, rows[cid]['language'], rows[cid]['set_id']),
                  language=str(rows[cid]['language'] or ''),
                  cardmarket_url=rows[cid]['cardmarket_url'],
+                 supports_first_edition=_supports_first_edition(rows[cid]),
                  cardmarket_prices=scan_prices(conn, cid, rows[cid]['cardmarket_url']),
                  **scan_finishes(conn, cid))
             for cid in card_ids if cid in rows]
@@ -747,6 +758,7 @@ def _recognize_bytes_once(
                 "language": str(row["language"] or ""),
                 "rarity": str(row["rarity"] or ""),
                 "cardmarket_url": url_for_row(row),
+                "supports_first_edition": _supports_first_edition(row),
                 "retrieved_via": (["full_card"] if card_id in full_ids else []) +
                                  (["artwork"] if card_id in artwork_by_id else []) +
                                  (["ocr_metadata"] if card_id in metadata_ids else []) +
@@ -1063,6 +1075,7 @@ def _recognize_bytes_once(
                 "language": str(row.get("language") or ""),
                 "image_url": row.get("image_url") or _card_image_url(row),
                 "cardmarket_url": row.get("cardmarket_url"),
+                "supports_first_edition": _supports_first_edition(row),
                 "cardmarket_prices": row.get("cardmarket_prices") or scan_prices(
                     catalog, row["card_id"], row.get("cardmarket_url")
                 ),
