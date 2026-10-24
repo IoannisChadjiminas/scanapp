@@ -213,6 +213,10 @@ class Settings(BaseSettings):
     stage1_printing_groups: bool = False
     stage1_promo_numbers: bool = False
     stage1_diagnostics: bool = False
+    # Android fast-path fixes: each opts in on staging only, never by code default.
+    stage1_number_repair: bool = False
+    stage1_fuzzy_name: bool = False
+    stage1b_server_frame: bool = False
     # Phone photo prep, sent through GET /config. Defaults match the app today.
     app_capture_preset: str = 'max'
     app_jpeg_quality: int = 95

@@ -17,7 +17,7 @@ pytestmark = pytest.mark.skipif(
 def test_panel_matches_the_measured_stage1_and_stage1b_answers(real_fixes):
     from app.recognition.local_match import FULL_ART_BOX, FULL_ART_RARITIES, LocalArtworkVerifier
     from app.recognition.stage1_answer import evaluate_stage1
-    from app.recognition.stage1_gate import GateOptions, same_card
+    from app.recognition.stage1_gate import same_card
     from app.scan_summary import parse_quad
     import sqlite3
 
@@ -56,7 +56,8 @@ def test_panel_matches_the_measured_stage1_and_stage1b_answers(real_fixes):
         snapshot=SimpleNamespace(embeddings=index, card_ids=ids.tolist()),
         artwork_verifier=verifier)
     settings = SimpleNamespace(stage1b_text_verify=True,
-        **{'stage1_' + name: real_fixes for name in GateOptions.__dataclass_fields__})
+        **{'stage1_' + name: real_fixes for name in ('set_totals', 'normalize_duplicates', 'printing_groups',
+                                                     'promo_numbers', 'diagnostics')})
 
     got_stage1 = {}
     got_stage1b = {}

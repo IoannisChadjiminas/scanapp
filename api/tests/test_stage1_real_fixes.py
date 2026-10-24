@@ -52,7 +52,8 @@ def test_all_new_flags_default_off_and_are_staging_only():
     assert GateOptions.from_settings(off) == GateOptions()
     repo = Path(__file__).resolve().parents[2]
     staging = (repo / 'compose.dokploy.yaml').read_text()
-    for name in GateOptions.__dataclass_fields__:
+    # number_repair and fuzzy_name belong to the Android fast-path fixes and have their own flag test.
+    for name in set(GateOptions.__dataclass_fields__) - {'number_repair', 'fuzzy_name'}:
         key = 'STAGE1_' + name.upper()
         assert f'{key}: ${{{key}:-true}}' in staging
         for production in repo.glob('compose*prod*.yaml'):
