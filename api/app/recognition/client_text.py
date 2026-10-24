@@ -29,12 +29,17 @@ from app.recognition.rank import (RELIABLE_COLLECTOR_CONF, accepted_collector_nu
 
 VERSION = 'client-text-v1'
 OCR_MODES = ('off', 'footer', 'all')
-MAX_BYTES = 768
+# The phone may add up to five raw number reads (see `number_candidates`); with a long
+# name and a slab label they need room beyond the 768 bytes of the first version.
+MAX_BYTES = 1280
+CANDIDATE_REGIONS = ('footer', 'corner_left', 'corner_right', 'label')
+MAX_CANDIDATES = 5
 _LABEL_KEYS = {
     'label_name', 'label_name_conf', 'label_number', 'label_number_conf',
     'label_set', 'label_language', 'label_grader', 'label_grade',
 }
-_KEYS = {'v', 'engine', 'name', 'name_conf', 'number', 'number_conf', 'ms', *_LABEL_KEYS}
+_KEYS = {'v', 'engine', 'name', 'name_conf', 'number', 'number_conf', 'ms', 'number_candidates',
+         *_LABEL_KEYS}
 _ENGINE = re.compile(r'^[a-z0-9][a-z0-9._-]{0,31}$')
 # 14/100, 045/198, TG12/TG30, GG01/GG70, SWSH050, SVP 045, SM35, 25a.
 _NUMBER = re.compile(r'^(?:[A-Z]{1,5}[- ]?)?\d{1,4}[A-Z]?(?:\s*/\s*(?:[A-Z]{1,4})?\d{1,4})?$',
@@ -49,6 +54,7 @@ class ClientText:
     number: str | None = None
     number_conf: float | None = None
     ms: int | None = None
+    number_candidates: tuple[str, ...] = ()
 
 
 def _confidence(value: Any) -> float | None:
@@ -90,6 +96,34 @@ def _number(value: Any) -> str | None:
     return compact
 
 
+def number_candidates(value: Any) -> tuple[str, ...]:
+    """Raw number-like reads from the phone, sanitized. Bad entries are dropped, never the hint.
+
+    Each entry is ``{"text": <=16 chars, "conf": 0..1 or null, "region": one of CANDIDATE_REGIONS}``,
+    at most five, in the order the phone sent them (best first). The text is kept as read: the
+    catalogue, not the format, decides whether a repaired number is real.
+    """
+    if not isinstance(value, list):
+        return ()
+    found: list[str] = []
+    for item in value[:MAX_CANDIDATES]:
+        if not isinstance(item, dict) or set(item) != {'text', 'conf', 'region'}:
+            continue
+        text, region = item['text'], item['region']
+        if not isinstance(text, str) or region not in CANDIDATE_REGIONS:
+            continue
+        try:
+            _confidence(item['conf'])
+        except ValueError:
+            continue
+        text = unicodedata.normalize('NFC', text).strip()
+        if (not 1 <= len(text) <= 16 or any(unicodedata.category(c).startswith('C') for c in text)
+                or text in found):
+            continue
+        found.append(text)
+    return tuple(found)
+
+
 def parse_client_text(raw: str | None) -> tuple[ClientText | None, str]:
     """Strictly validated hint and why it was taken or dropped. Never raises."""
     if raw is None or not raw.strip():
@@ -120,10 +154,11 @@ def parse_client_text(raw: str | None) -> tuple[ClientText | None, str]:
         hint = ClientText(engine=engine, name=_name(body.get('name')),
                           name_conf=_confidence(body.get('name_conf')),
                           number=_number(body.get('number')),
-                          number_conf=_confidence(body.get('number_conf')), ms=ms)
+                          number_conf=_confidence(body.get('number_conf')), ms=ms,
+                          number_candidates=number_candidates(body.get('number_candidates')))
     except ValueError as error:
         return None, str(error)
-    if hint.name is None and hint.number is None:
+    if hint.name is None and hint.number is None and not hint.number_candidates:
         return None, 'empty'
     return hint, 'ok'
 

@@ -23,7 +23,7 @@ from app.recognition.pipeline import _preview_candidates, _results_write
 from app.recognition.presentation import match_presentation
 from app.recognition.stage1_gate import (
     MIN_INLIERS, Decision, GateOptions, collapse_hits, decide, load_catalogue, lookup, one_card,
-    printing_group, text_fields,
+    printing_group, resolve_number, text_fields, text_number_candidates,
 )
 from app.recognition.client_embedding import parse_client_embedding
 from app.schemas import (
@@ -137,6 +137,7 @@ def _evaluate_server_frame(*, settings, runtime, catalog, client_text, card_quad
         return Decision(False, None, None, None, None, 'no_index', 0)
     by_key, by_id, bare_ids = _catalogue(runtime, catalog, options)
     name, number, language, label = text_fields(client_text)
+    number, used_candidate = resolve_number(name, number, text_number_candidates(client_text), language, by_key, options)
     hits = collapse_hits(lookup(by_key, name, number, language, options), bare_ids)
     if not hits:
         return Decision(False, None, None, None, None, 'no_unique_text', (time.perf_counter() - started) * 1000)
@@ -156,6 +157,7 @@ def _evaluate_server_frame(*, settings, runtime, catalog, client_text, card_quad
     if decision.answered:
         # A stage 1 answer here would rest on the server's own frame alone. Verify the artwork too.
         decision = replace(decision, answered=False, stage='1b_pending', reason='needs_artwork')
+    decision = replace(decision, number_candidate=used_candidate)
     if decision.stage != '1b_pending':
         return replace(decision, ms=(time.perf_counter() - started) * 1000)
     card = by_id.get(decision.card_id or '')
@@ -186,12 +188,14 @@ def evaluate_stage1(*, settings, runtime, catalog, client_text: str | None,
     options = GateOptions.from_settings(settings)
     by_key, by_id, bare_ids = _catalogue(runtime, catalog, options)
     name, number, language, label = text_fields(client_text)
+    number, used_candidate = resolve_number(name, number, text_number_candidates(client_text), language, by_key, options)
     stage1b = bool(getattr(settings, 'stage1b_text_verify', False))
     decision = decide(
         vector, np.asarray(embeddings, dtype=np.float32), card_ids,
         by_key=by_key, by_id=by_id, bare_ids=bare_ids,
         name=name, number=number, language=language, quad_ok=bool(card_quad),
         stage1b=stage1b, label=label, options=options)
+    decision = replace(decision, number_candidate=used_candidate)
     if decision.stage != '1b_pending':
         return decision
     card = by_id.get(decision.card_id or '')

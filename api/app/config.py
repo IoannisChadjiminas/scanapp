@@ -200,6 +200,10 @@ class Settings(BaseSettings):
     app_client_label: bool = False
     app_client_embedding: bool = False
     app_client_quality: bool = False
+    # Raw collector-number reads the phone could not validate (PokeSingle #161). The server
+    # repairs them against the catalogue (stage1_number_repair). On by default (owner's call);
+    # it only matters where stage 1 itself is on.
+    app_client_number_candidates: bool = True
     # Stage 1 answers from the phone's vector and text. Off until staging turns it on.
     # Production stays off until the background check has stayed clean.
     stage1_early_exit: bool = False
@@ -214,7 +218,7 @@ class Settings(BaseSettings):
     stage1_promo_numbers: bool = False
     stage1_diagnostics: bool = False
     # Android fast-path fixes: each opts in on staging only, never by code default.
-    stage1_number_repair: bool = False
+    stage1_number_repair: bool = True
     stage1_fuzzy_name: bool = False
     stage1b_server_frame: bool = False
     # Phone photo prep, sent through GET /config. Defaults match the app today.

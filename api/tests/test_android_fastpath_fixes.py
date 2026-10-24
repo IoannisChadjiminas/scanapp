@@ -52,13 +52,17 @@ def ids(catalogue, name, number, options=ON):
     return sorted(card['id'] for card in collapse_hits(lookup(by_key, name, number, None, options), bare))
 
 
-def test_every_fix_defaults_off_and_only_staging_compose_may_turn_it_on():
+def test_fuzzy_name_and_server_frame_default_off_and_only_staging_compose_may_turn_them_on():
     fields = Settings.model_fields
-    assert not any(fields[key].default for key in ('stage1_number_repair', 'stage1_fuzzy_name', 'stage1b_server_frame'))
-    assert GateOptions.from_settings(Settings(_env_file=None)) == GateOptions()
+    assert not any(fields[key].default for key in ('stage1_fuzzy_name', 'stage1b_server_frame'))
+    # Number repair is on by default (the owner's call, with the phone's raw number candidates):
+    # it only offers the ordinary lookup more spellings, and stage 1 itself stays off in production.
+    assert fields['stage1_number_repair'].default is True
+    assert GateOptions.from_settings(Settings(_env_file=None)) == GateOptions(number_repair=True)
     staging = (REPO / 'compose.dokploy.yaml').read_text()
     for key in ('STAGE1_NUMBER_REPAIR', 'STAGE1_FUZZY_NAME', 'STAGE1B_SERVER_FRAME'):
         assert f'{key}: ${{{key}:-' in staging
+    for key in ('STAGE1_FUZZY_NAME', 'STAGE1B_SERVER_FRAME'):
         for production in REPO.glob('compose*prod*.yaml'):
             assert key not in production.read_text()
 
@@ -133,7 +137,7 @@ def test_fuzzy_name_distances():
 def _settings(**extra):
     return SimpleNamespace(stage1b_text_verify=True, stage1b_server_frame=True, stage1_set_totals=False,
                            stage1_normalize_duplicates=False, stage1_printing_groups=False, stage1_promo_numbers=False,
-                           stage1_diagnostics=False, stage1_number_repair=False, stage1_fuzzy_name=False, **extra)
+                           stage1_diagnostics=False, stage1_number_repair=True, stage1_fuzzy_name=False, **extra)
 
 
 def _runtime(card_ids, vectors):

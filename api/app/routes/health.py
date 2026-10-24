@@ -58,6 +58,7 @@ class AppConfigResponse(BaseModel):
     client_label: bool = False
     client_embedding: bool = False
     client_quality: bool = False
+    client_number_candidates: bool = False
     card_warp: bool = False
     capture: CaptureConfig = CaptureConfig()
     scan_prices: ScanPriceConfig
@@ -82,6 +83,7 @@ def scan_price_config(settings) -> AppConfigResponse:
         client_label=bool(getattr(settings, 'app_client_label', False)),
         client_embedding=bool(getattr(settings, 'app_client_embedding', False)),
         client_quality=bool(getattr(settings, 'app_client_quality', False)),
+        client_number_candidates=bool(getattr(settings, 'app_client_number_candidates', False)),
         card_warp=bool(settings.app_card_warp),
         capture=CaptureConfig(
             preset=settings.app_capture_preset if settings.app_capture_preset in CAPTURE_PRESETS else 'max',
