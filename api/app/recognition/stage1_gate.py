@@ -19,8 +19,9 @@ import time
 import numpy as np
 
 from app.recognition.client_embedding import parse_client_embedding
+from app.recognition.client_text import number_candidates
 from app.recognition.label_identity import number_key
-from app.recognition.stage1_text_repair import fuzzy_name_ok, number_variants
+from app.recognition.stage1_text_repair import card_totals, fuzzy_name_ok, number_variants
 from app.recognition.rank import name_match, number_match, number_matches_identifiers, parse_collector, normalize_text
 
 TWIN_COSINE = 0.84
@@ -62,6 +63,8 @@ class Decision:
     text_candidate_count: int = 0
     contradicting_card: str | None = None
     contradiction_gap: float | None = None
+    # The raw phone read that was repaired into the number the gate used (logged, never trusted).
+    number_candidate: str | None = None
 
 
 def _empty(reason: str, started: float, *, margin: float | None = None) -> Decision:
@@ -94,6 +97,61 @@ def text_fields(raw: str | None) -> tuple[str | None, str | None, str | None, bo
     name = body.get('name') if isinstance(body.get('name'), str) else None
     number = body.get('number') if isinstance(body.get('number'), str) else None
     return name, number, None, False
+
+
+_CLEAN_NUMBER = re.compile(r'^[A-Z]{0,5}\d{1,4}[A-Z]?(?:/[A-Z]{0,4}\d{1,4})?$')
+_USABLE_NUMBER = re.compile(r'^(?:[A-Z0-9]{0,5}\d{1,4}[A-Z]?/[A-Z]{0,4}\d{1,4}|[A-Z]{2,5}\d{1,4})$')
+
+
+def text_number_candidates(raw: str | None) -> tuple[str, ...]:
+    """The phone's raw number reads, only when it sent no valid number of its own."""
+    if not raw:
+        return ()
+    try:
+        body = json.loads(raw)
+    except (json.JSONDecodeError, UnicodeError):
+        return ()
+    if not isinstance(body, dict) or body.get('number'):
+        return ()
+    return number_candidates(body.get('number_candidates'))
+
+
+def _total_agrees(spelling: str, card: dict) -> bool:
+    """A repaired number with a set total must match a total the catalogue holds for that card.
+
+    The ordinary lookup lets a bare catalogue number fit any denominator, which is fine for the
+    phone's own validated number but too loose for a repaired guess: 205/777 must not pass.
+    A prefixed code with no total (TG05, SWSH020) has nothing to compare.
+    """
+    parts = parse_collector(spelling)
+    if parts is None or not parts.denominator:
+        return True
+    totals = {total.lstrip('0') or '0' for total in card_totals(card)}
+    return (parts.denominator.lstrip('0') or '0') in totals
+
+
+def resolve_number(name: str | None, number: str | None, candidates: tuple[str, ...],
+                   language: str | None, by_key: dict[str, list[dict]],
+                   options: 'GateOptions') -> tuple[str | None, str | None]:
+    """(number, candidate used). A valid ``number`` always wins and is never replaced.
+
+    A raw candidate is used only when, after the catalogue-constrained repair, it is a
+    number the catalogue holds (with its set total, or a prefixed promo/gallery code) for
+    a card whose name also agrees with the phone's name. It cannot pick a card by itself:
+    the gate still needs the vector, or stage 1b the artwork, to agree afterwards.
+    """
+    if number or not name or not candidates or not options.number_repair:
+        return number, None
+    for candidate in candidates:
+        compact = re.sub(r'\s+', '', candidate.upper())
+        spellings = ([compact] if _CLEAN_NUMBER.fullmatch(compact) else []) + number_variants(candidate, by_key)
+        for spelling in spellings:
+            if not _USABLE_NUMBER.fullmatch(spelling):
+                continue
+            hits = _strict_lookup(by_key, name, spelling, language, options)
+            if any(_total_agrees(spelling, card) for card in hits):
+                return spelling, candidate
+    return number, None
 
 
 def number_ok(phone: str | None, card: dict, options: GateOptions = GateOptions()) -> bool:

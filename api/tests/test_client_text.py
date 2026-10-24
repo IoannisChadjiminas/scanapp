@@ -46,7 +46,7 @@ def test_a_complete_hint_is_read_and_normalised():
     (payload(number_conf=True), 'bad_confidence'), (payload(name_conf='high'), 'bad_confidence'),
     ('{"v":1,"engine":"x","name_conf":NaN,"name":"Toxel"}', 'bad_confidence'),
     (payload(ms=-1), 'bad_ms'), (payload(name=None, number=None), 'empty'),
-    (payload(name='Toxel' + ' ' * 900), 'too_long'),
+    (payload(name='Toxel' + ' ' * 1400), 'too_long'),
 ])
 def test_malformed_hints_are_dropped_with_a_reason(raw, reason):
     assert parse_client_text(raw) == (None, reason)

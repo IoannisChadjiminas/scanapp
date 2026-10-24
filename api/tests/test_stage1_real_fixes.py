@@ -49,7 +49,8 @@ def gate(catalog, ids, vectors, query, *, name='Ancient Booster Energy Capsule',
 
 def test_all_new_flags_default_off_and_are_staging_only():
     off = Settings(_env_file=None)
-    assert GateOptions.from_settings(off) == GateOptions()
+    # number_repair is on by default (phone number candidates); the rest stay off.
+    assert GateOptions.from_settings(off) == GateOptions(number_repair=True)
     repo = Path(__file__).resolve().parents[2]
     staging = (repo / 'compose.dokploy.yaml').read_text()
     # number_repair and fuzzy_name belong to the Android fast-path fixes and have their own flag test.

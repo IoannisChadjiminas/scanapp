@@ -12,7 +12,7 @@ import re
 from dataclasses import dataclass
 from typing import Any
 
-TEXT_MAX_BYTES = 768
+TEXT_MAX_BYTES = 1280
 QUALITY_MAX_BYTES = 256
 EMBEDDING_MAX_BYTES = 2048
 EMBEDDING_DIM = 384
@@ -75,7 +75,7 @@ def phone_evidence(
 def stage0_line(result: Any, *, trace: str, source: Any, evidence: PhoneEvidence,
                 stage1: str | None = None, stage1_reason: str | None = None,
                 stage1_margin: float | None = None, stage1_ms: float | None = None,
-                gate: Any = None) -> str:
+                gate: Any = None, number_candidate: str | None = None) -> str:
     """One line per scan: what arrived, and whether it agrees with the answer.
 
     ``would=text`` is only a planning mark for stage 1: the phone's name and
@@ -127,6 +127,9 @@ def stage0_line(result: Any, *, trace: str, source: Any, evidence: PhoneEvidence
         parts.append(f'stage1_reason={stage1_reason or "none"}')
         parts.append('stage1_margin=' + ('none' if stage1_margin is None else f'{stage1_margin:.4f}'))
         parts.append('stage1_ms=' + ('none' if stage1_ms is None else f'{stage1_ms:.1f}'))
+    if isinstance(number_candidate, str) and re.fullmatch(r'[A-Za-z0-9/#|().-]{1,16}', number_candidate):
+        # The raw phone read that number repair turned into the number the gate used.
+        parts.append(f'number_candidate={number_candidate}')
     return ' '.join(parts)
 
 

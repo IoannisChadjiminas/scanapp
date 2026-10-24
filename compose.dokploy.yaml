@@ -71,6 +71,8 @@ services:
       # quality; the server only logs them (stage0 line), answers are unchanged.
       APP_CLIENT_LABEL: ${APP_CLIENT_LABEL:-true}
       APP_CLIENT_QUALITY: ${APP_CLIENT_QUALITY:-true}
+      # Raw number reads the phone couldn't validate (PokeSingle #161), repaired against the catalogue.
+      APP_CLIENT_NUMBER_CANDIDATES: ${APP_CLIENT_NUMBER_CANDIDATES:-true}
       APP_CLIENT_EMBEDDING: ${APP_CLIENT_EMBEDDING:-true}
       # Stage 1 (docs/stage1-build-plan.md). Off in code. Staging turns it on.
       # Confirmation stays required. The background check runs on every stage 1 answer.
@@ -89,7 +91,7 @@ services:
       # The server frame fix is the one with a measured gain; the other two found nothing on the
       # A55 panel because the app drops numbers the catalogue cannot hold, so they stay off here.
       STAGE1B_SERVER_FRAME: ${STAGE1B_SERVER_FRAME:-true}
-      STAGE1_NUMBER_REPAIR: ${STAGE1_NUMBER_REPAIR:-false}
+      STAGE1_NUMBER_REPAIR: ${STAGE1_NUMBER_REPAIR:-true}
       STAGE1_FUZZY_NAME: ${STAGE1_FUZZY_NAME:-false}
       CLIENT_TEXT_HINTS: ${CLIENT_TEXT_HINTS:-true}
       CLIENT_TEXT_OCR: ${CLIENT_TEXT_OCR:-footer}

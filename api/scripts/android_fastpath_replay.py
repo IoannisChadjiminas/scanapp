@@ -66,6 +66,30 @@ def raw_footer_number(on_card: list[Line]) -> str | None:
     return best[1] if best else None
 
 
+def app_number_candidates(on_card: list[Line]) -> list[dict]:
+    """What the app sends in `number_candidates` (PokeSingle #161), rebuilt from the captured lines.
+
+    Footer-band lines only (centre y >= .80): number-like tokens of 3-16 characters that carry a
+    slash or `#`, or at least four digit-like characters. Lone 1-3 digit values (attack damage),
+    years and any line with HP are dropped. Deduplicated, best confidence first, at most five.
+    """
+    found: dict[str, float | None] = {}
+    for line in on_card:
+        if line.centre_y < .80 or re.search(r'\bHP\b', line.text, re.I):
+            continue
+        for match in RAW_NUMBER.finditer(line.text):
+            token = match.group(0).strip()
+            digits = sum(c.isdigit() or c in 'OoIl|' for c in token)
+            if not 3 <= len(token) <= 16 or YEAR.match(token):
+                continue
+            if not (('/' in token or '#' in token) or digits >= 4):
+                continue
+            if token not in found or (line.conf or 0) > (found[token] or 0):
+                found[token] = line.conf
+    ordered = sorted(found.items(), key=lambda item: -(item[1] if item[1] is not None else -1))
+    return [{'text': text, 'conf': conf, 'region': 'footer'} for text, conf in ordered[:5]]
+
+
 def load_panel(data_root: Path, ocr_path: Path, set_totals_dart: Path, raw_number: bool = False):
     parity = data_root / PARITY
     per_photo = {row['id']: row for row in json.loads((parity / 'a55-fresh157-per-photo.json').read_text())['panel']}
@@ -89,9 +113,11 @@ def load_panel(data_root: Path, ocr_path: Path, set_totals_dart: Path, raw_numbe
         client_text = card_text.client_text(on_card) if on_card is not None else None
         if raw_number and on_card is not None:
             body = json.loads(client_text) if client_text else None
-            if body and body.get('name') and not body.get('number'):
-                body['number'] = raw_footer_number(on_card)
-                client_text = json.dumps(body)
+            if body and not body.get('number'):
+                candidates = app_number_candidates(on_card)
+                if candidates:
+                    body['number_candidates'] = candidates
+                    client_text = json.dumps(body)
         # One live photo sent a quad that was never stored; without it neither quad nor vector can be replayed.
         vector = vectors.get(pid, {}).get('android_vector') if live['client_embedding_sent'] and quad else None
         rows.append({
@@ -235,7 +261,7 @@ def main():
     parser.add_argument('--number-repair', action='store_true')
     parser.add_argument('--fuzzy-name', action='store_true')
     parser.add_argument('--server-frame', action='store_true')
-    parser.add_argument('--whatif-raw-number', action='store_true', help='send the raw footer token when the app sent no number (needs an app change)')
+    parser.add_argument('--whatif-raw-number', action='store_true', help='send the app\'s number_candidates when it sent no number (PokeSingle #161)')
     args = parser.parse_args()
     data = args.data_root
     panel = data / 'data/latency/stage0-simulation-20261021'

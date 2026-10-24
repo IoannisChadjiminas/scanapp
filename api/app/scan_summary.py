@@ -28,6 +28,7 @@ SWITCHES = (
     'app_client_label',
     'app_client_embedding',
     'app_client_quality',
+    'app_client_number_candidates',
     'app_native_codec',
     'app_live_outline',
     'app_auto_capture',

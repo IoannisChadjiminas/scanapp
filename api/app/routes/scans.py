@@ -176,7 +176,8 @@ async def create_scan(
                 stage1_reason=None if decision is None else decision.reason,
                 stage1_margin=None if decision is None else decision.margin,
                 stage1_ms=None if decision is None else decision.ms,
-                gate=decision if getattr(settings, 'stage1_diagnostics', False) else None))
+                gate=decision if getattr(settings, 'stage1_diagnostics', False) else None,
+                number_candidate=None if decision is None else getattr(decision, 'number_candidate', None)))
         except Exception:
             logger.exception("stage0 log failed trace=%s", trace)
 
