@@ -1,0 +1,120 @@
+{
+ "run": "android_fastpath_replay_20261024",
+ "panel": 157,
+ "ocr_capture_sha256": "b5197b3c6c976977e1ea48aa01bc9add22494b136c9e0810ed41ba4cea471fd7",
+ "live_a55": {
+  "early": 21,
+  "ids": [
+   "fresh100_116219612870",
+   "fresh100_145701209354",
+   "fresh100_177223455994",
+   "fresh100_185962385461",
+   "fresh100_186821197401",
+   "fresh100_205408031074",
+   "fresh100_205836607918",
+   "fresh100_227337115305",
+   "fresh100_235982624286",
+   "fresh100_287264323565",
+   "fresh100_396170517118",
+   "freshextra_6_1736995038",
+   "freshimg_0_1142638013",
+   "freshraw_0_1861309623",
+   "freshraw_0_299404800",
+   "freshraw_1_2051404991",
+   "freshraw_1_925085473",
+   "freshraw_4_123815526",
+   "holdout4_039",
+   "holdout4_070",
+   "reported:ea69f453-102f-48d9-84fb-d7d5b4a34f90"
+  ]
+ },
+ "modes": {
+  "baseline": {
+   "early": 25,
+   "stage1": 15,
+   "stage1b": 10,
+   "wrong": [],
+   "added_vs_baseline": [],
+   "lost_vs_baseline": []
+  },
+  "number_repair": {
+   "early": 25,
+   "stage1": 15,
+   "stage1b": 10,
+   "wrong": [],
+   "added_vs_baseline": [],
+   "lost_vs_baseline": []
+  },
+  "fuzzy_name": {
+   "early": 25,
+   "stage1": 15,
+   "stage1b": 10,
+   "wrong": [],
+   "added_vs_baseline": [],
+   "lost_vs_baseline": []
+  },
+  "server_frame": {
+   "early": 27,
+   "stage1": 15,
+   "stage1b": 12,
+   "wrong": [],
+   "added_vs_baseline": [
+    "fresh100_236504673185",
+    "fresh100_135586143350"
+   ],
+   "lost_vs_baseline": []
+  },
+  "all_three": {
+   "early": 27,
+   "stage1": 15,
+   "stage1b": 12,
+   "wrong": [],
+   "added_vs_baseline": [
+    "fresh100_236504673185",
+    "fresh100_135586143350"
+   ],
+   "lost_vs_baseline": []
+  },
+  "whatif_raw_number": {
+   "early": 25,
+   "stage1": 15,
+   "stage1b": 10,
+   "wrong": [],
+   "added_vs_baseline": [],
+   "lost_vs_baseline": []
+  },
+  "whatif_raw_number_plus_repair": {
+   "early": 26,
+   "stage1": 16,
+   "stage1b": 10,
+   "wrong": [],
+   "added_vs_baseline": [
+    "fresh100_316758938735"
+   ],
+   "lost_vs_baseline": []
+  }
+ },
+ "baseline_vs_live": {
+  "both": 15,
+  "live_only": [
+   "fresh100_116219612870",
+   "fresh100_145701209354",
+   "fresh100_227337115305",
+   "freshextra_6_1736995038",
+   "freshraw_4_123815526",
+   "reported:ea69f453-102f-48d9-84fb-d7d5b4a34f90"
+  ],
+  "replay_only": [
+   "fresh100_226992725275",
+   "fresh100_235971735451",
+   "fresh100_327234085023",
+   "freshraw_3_1376470916",
+   "holdout4_049",
+   "holdout4_051",
+   "holdout4_060",
+   "holdout4_078",
+   "holdout4_080",
+   "holdout4_085"
+  ]
+ }
+}

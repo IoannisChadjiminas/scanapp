@@ -45,6 +45,9 @@ SWITCHES = (
     'stage1_printing_groups',
     'stage1_promo_numbers',
     'stage1_diagnostics',
+    'stage1_number_repair',
+    'stage1_fuzzy_name',
+    'stage1b_server_frame',
 )
 
 STAGES = (

@@ -20,6 +20,7 @@ import numpy as np
 
 from app.recognition.client_embedding import parse_client_embedding
 from app.recognition.label_identity import number_key
+from app.recognition.stage1_text_repair import fuzzy_name_ok, number_variants
 from app.recognition.rank import name_match, number_match, number_matches_identifiers, parse_collector, normalize_text
 
 TWIN_COSINE = 0.84
@@ -36,6 +37,8 @@ class GateOptions:
     printing_groups: bool = False
     promo_numbers: bool = False
     diagnostics: bool = False
+    number_repair: bool = False
+    fuzzy_name: bool = False
 
     @classmethod
     def from_settings(cls, settings):
@@ -126,15 +129,43 @@ def name_ok(phone: str | None, card: dict) -> bool:
         card.get('view_title') and name_match(phone, card['view_title']))
 
 
-def lookup(by_key: dict[str, list[dict]], name: str | None, number: str | None,
-           language: str | None, options: GateOptions = GateOptions()) -> list[dict]:
-    if not name or not number:
-        return []
+def _strict_lookup(by_key: dict[str, list[dict]], name: str, number: str,
+                   language: str | None, options: GateOptions) -> list[dict]:
     pool = by_key.get(number_key(number) or '', [])
     # Existing bare slab numbers still work. Only additional promo-code aliases
     # are promo-scoped; dropping base hits here could auto-select a Prize Pack.
     return [card for card in pool if number_ok(number, card, options) and name_ok(name, card)
             and (language is None or card.get('language') == language)]
+
+
+def lookup(by_key: dict[str, list[dict]], name: str | None, number: str | None,
+           language: str | None, options: GateOptions = GateOptions()) -> list[dict]:
+    if not name or not number:
+        return []
+    hits = _strict_lookup(by_key, name, number, language, options)
+    if hits:
+        return hits
+    # Both repairs run only after the exact text found nothing, so they cannot
+    # change an answer the gate already gave. Neither can select a card by itself:
+    # the repaired number still has to be one the catalogue holds for a card whose
+    # name also agrees, and the vector or artwork must still agree after that.
+    variants = number_variants(number, by_key) if options.number_repair else []
+    seen: dict[str, dict] = {}
+    for variant in variants:
+        for card in _strict_lookup(by_key, name, variant, language, options):
+            seen.setdefault(card['id'], card)
+    if seen:
+        return list(seen.values())
+    if options.fuzzy_name:
+        # Only on a number with its set total, which has already narrowed the candidates.
+        for candidate in (number, *variants):
+            if '/' not in candidate:
+                continue
+            for card in by_key.get(number_key(candidate) or '', []):
+                if (number_ok(candidate, card, options) and (language is None or card.get('language') == language)
+                        and (fuzzy_name_ok(name, card.get('name')) or fuzzy_name_ok(name, card.get('view_title')))):
+                    seen.setdefault(card['id'], card)
+    return list(seen.values())
 
 
 def is_promo(card: dict) -> bool:
