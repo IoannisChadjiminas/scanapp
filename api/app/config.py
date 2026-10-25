@@ -73,6 +73,11 @@ class Settings(BaseSettings):
     # catalogue 078). Only removes false conflicts; names and totals still apply. A policy
     # change: replay the frozen panel before enabling it.
     ocr_set_code_prefix: bool = False
+    # A promo prefix one letter off its set id (MP078, ME078 for MEP078) agrees with that promo
+    # card when the number is the same 3 digits, and a bare 078 agrees only when the name and
+    # number name exactly one promo card. Restricted to the promo set table; never a
+    # different number, a two-letter error or an unrelated set. A policy change: replay first.
+    ocr_promo_prefix_near: bool = False
     # When an abstaining scan has a confident printed fraction plus a name read anywhere in
     # its OCR lines that together narrow the catalogue to 1-3 cards, add those cards as
     # candidates for local artwork verification and, if unverified, return them as
