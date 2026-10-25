@@ -1,0 +1,5863 @@
+{
+  "categories_in_index": {
+    "reprint": 2181,
+    "twin-en-ja": 114,
+    "unique": 39173
+  },
+  "corpus_unlabelled": {
+    "embed_ms_median_mac": 21.7,
+    "margin_share_at_least": {
+      "fp16": {
+        "0.01": 0.5417,
+        "0.02": 0.3205,
+        "0.03": 0.2083,
+        "0.05": 0.1058
+      },
+      "fp32": {
+        "0.01": 0.5417,
+        "0.02": 0.3205,
+        "0.03": 0.2083,
+        "0.05": 0.1058
+      },
+      "int8": {
+        "0.01": 0.5385,
+        "0.02": 0.3205,
+        "0.03": 0.2083,
+        "0.05": 0.1058
+      }
+    },
+    "photos": 312,
+    "top1_agreement_with_fp32": {
+      "fp16": 0.9936,
+      "fp32": 1.0,
+      "int8": 0.9583
+    }
+  },
+  "elapsed_s": 48.3,
+  "formats": {
+    "fp16": {
+      "bytes_in_memory": 33557760,
+      "groups": 41468,
+      "matrix_dtype": "float16",
+      "megabytes": 33.56
+    },
+    "fp32": {
+      "bytes_in_memory": 67115520,
+      "groups": 41468,
+      "matrix_dtype": "float32",
+      "megabytes": 67.12
+    },
+    "int8": {
+      "bytes_in_memory": 16953660,
+      "groups": 41468,
+      "matrix_dtype": "int8",
+      "megabytes": 16.95
+    }
+  },
+  "generated_utc": "2026-10-25T19:27:37+00:00",
+  "golden_phone_check": {
+    "fixtures": 8,
+    "keys_in_catalogue": 0,
+    "min_cosine": 1.0,
+    "top1_matches_key": 0
+  },
+  "misses_note": "card ids only; photo ids withheld from the write-up",
+  "panel": {
+    "embed_ms_median_mac": 14.7,
+    "frames_per_photo": 6,
+    "label_missing_from_index_excluded": 1,
+    "no_crop_excluded": 12,
+    "photos_in_panel": 157,
+    "scored": 144,
+    "with_warped_crop": 145
+  },
+  "panel_categories": {
+    "reprint": 3,
+    "unique": 141
+  },
+  "reference_fidelity": {
+    "median_cosine": 1.0,
+    "min_cosine": 1.0,
+    "sampled": 30
+  },
+  "search_timing_mac": {
+    "fp16": {
+      "median_ms": 1.7,
+      "p90_ms": 1.91,
+      "queries": 200,
+      "scan_bytes": 33557760
+    },
+    "fp32": {
+      "median_ms": 0.62,
+      "p90_ms": 0.77,
+      "queries": 200,
+      "scan_bytes": 67115520
+    },
+    "int8": {
+      "median_ms": 6.88,
+      "p90_ms": 7.14,
+      "queries": 200,
+      "scan_bytes": 16953660
+    }
+  },
+  "server_index": {
+    "catalogue_cards": 50270,
+    "catalogue_groups": 41468,
+    "catalogue_import_id": "PS-CATALOGUE-EN-JA-ENID2-20261019",
+    "duplicate_rows_collapsed": 2227,
+    "indexed_rows": 43695,
+    "languages": {
+      "en": 25430,
+      "ja": 16005,
+      "zh-tw": 2260
+    },
+    "model_file_sha256_prefix": "2ddf6ec79e377069",
+    "model_revision": "ed25f3a31f01632728cabb09d1542f84ab7b0056",
+    "model_sha256_prefix_manifest": "2ddf6ec79e377069",
+    "preprocess": "pad",
+    "rows": 43695,
+    "rows_without_catalogue_metadata": 0,
+    "source": "android-embedding-research-20261023/catalogue/vectors/pad (server export, read locally)",
+    "unique_ids": 43695
+  },
+  "text_coverage": {
+    "photos_with_name": 127,
+    "photos_with_number": 113
+  },
+  "variants": {
+    "image_only": {
+      "accuracy": {
+        "fp16": {
+          "all": {
+            "photos": 144,
+            "top1": 55,
+            "top1_family_rate": 0.3958333333333333,
+            "top1_rate": 0.3819444444444444,
+            "top5": 107,
+            "top5_lower95": 0.6660223577539519,
+            "top5_rate": 0.7430555555555556
+          },
+          "by_category": {
+            "reprint": {
+              "photos": 3,
+              "top1": 0,
+              "top1_family_rate": 0.6666666666666666,
+              "top1_rate": 0.0,
+              "top5": 2,
+              "top5_lower95": 0.2076549551264879,
+              "top5_rate": 0.6666666666666666
+            },
+            "twin-en-ja": {
+              "photos": 0
+            },
+            "twin-other": {
+              "photos": 0
+            },
+            "unique": {
+              "photos": 141,
+              "top1": 55,
+              "top1_family_rate": 0.3900709219858156,
+              "top1_rate": 0.3900709219858156,
+              "top5": 105,
+              "top5_lower95": 0.6668825936842737,
+              "top5_rate": 0.7446808510638298
+            }
+          }
+        },
+        "fp32": {
+          "all": {
+            "photos": 144,
+            "top1": 55,
+            "top1_family_rate": 0.3958333333333333,
+            "top1_rate": 0.3819444444444444,
+            "top5": 107,
+            "top5_lower95": 0.6660223577539519,
+            "top5_rate": 0.7430555555555556
+          },
+          "by_category": {
+            "reprint": {
+              "photos": 3,
+              "top1": 0,
+              "top1_family_rate": 0.6666666666666666,
+              "top1_rate": 0.0,
+              "top5": 2,
+              "top5_lower95": 0.2076549551264879,
+              "top5_rate": 0.6666666666666666
+            },
+            "twin-en-ja": {
+              "photos": 0
+            },
+            "twin-other": {
+              "photos": 0
+            },
+            "unique": {
+              "photos": 141,
+              "top1": 55,
+              "top1_family_rate": 0.3900709219858156,
+              "top1_rate": 0.3900709219858156,
+              "top5": 105,
+              "top5_lower95": 0.6668825936842737,
+              "top5_rate": 0.7446808510638298
+            }
+          }
+        },
+        "int8": {
+          "all": {
+            "photos": 144,
+            "top1": 55,
+            "top1_family_rate": 0.3958333333333333,
+            "top1_rate": 0.3819444444444444,
+            "top5": 107,
+            "top5_lower95": 0.6660223577539519,
+            "top5_rate": 0.7430555555555556
+          },
+          "by_category": {
+            "reprint": {
+              "photos": 3,
+              "top1": 0,
+              "top1_family_rate": 0.6666666666666666,
+              "top1_rate": 0.0,
+              "top5": 2,
+              "top5_lower95": 0.2076549551264879,
+              "top5_rate": 0.6666666666666666
+            },
+            "twin-en-ja": {
+              "photos": 0
+            },
+            "twin-other": {
+              "photos": 0
+            },
+            "unique": {
+              "photos": 141,
+              "top1": 55,
+              "top1_family_rate": 0.3900709219858156,
+              "top1_rate": 0.3900709219858156,
+              "top5": 105,
+              "top5_lower95": 0.6668825936842737,
+              "top5_rate": 0.7446808510638298
+            }
+          }
+        }
+      },
+      "best_rule": {
+        "fp16": {
+          "margin_min": 0.1,
+          "photos": 144,
+          "shown": 5,
+          "shown_rate": 0.034722222222222224,
+          "stable_frames": 2,
+          "wrong_card_shown": 0,
+          "wrong_rate": 0.0,
+          "wrong_rate_upper95": 0.43449149475208104,
+          "wrong_shown": 0
+        },
+        "fp32": {
+          "margin_min": 0.1,
+          "photos": 144,
+          "shown": 5,
+          "shown_rate": 0.034722222222222224,
+          "stable_frames": 2,
+          "wrong_card_shown": 0,
+          "wrong_rate": 0.0,
+          "wrong_rate_upper95": 0.43449149475208104,
+          "wrong_shown": 0
+        },
+        "int8": {
+          "margin_min": 0.1,
+          "photos": 144,
+          "shown": 5,
+          "shown_rate": 0.034722222222222224,
+          "stable_frames": 2,
+          "wrong_card_shown": 0,
+          "wrong_rate": 0.0,
+          "wrong_rate_upper95": 0.43449149475208104,
+          "wrong_shown": 0
+        }
+      },
+      "margins": {
+        "fp16": {
+          "correct_top1": {
+            "max": 0.2077275514602661,
+            "median": 0.027855634689331055,
+            "min": 0.00020307302474975586,
+            "n": 55,
+            "p05": 0.001071929931640625,
+            "p25": 0.008137226104736328,
+            "p75": 0.05407446622848511,
+            "p95": 0.10854411125183105
+          },
+          "wrong_top1": {
+            "max": 0.08244675397872925,
+            "median": 0.011590540409088135,
+            "min": 0.0,
+            "n": 89,
+            "p05": 0.0005639195442199707,
+            "p25": 0.005249142646789551,
+            "p75": 0.02801656723022461,
+            "p95": 0.05451083183288574
+          }
+        },
+        "fp32": {
+          "correct_top1": {
+            "max": 0.2077195644378662,
+            "median": 0.027868151664733887,
+            "min": 0.00018423795700073242,
+            "n": 55,
+            "p05": 0.001045823097229004,
+            "p25": 0.008143007755279541,
+            "p75": 0.054051339626312256,
+            "p95": 0.10855305194854736
+          },
+          "wrong_top1": {
+            "max": 0.08243292570114136,
+            "median": 0.011561393737792969,
+            "min": 0.0,
+            "n": 89,
+            "p05": 0.0005487799644470215,
+            "p25": 0.0052419304847717285,
+            "p75": 0.028028905391693115,
+            "p95": 0.05450737476348877
+          }
+        },
+        "int8": {
+          "correct_top1": {
+            "max": 0.20800822973251343,
+            "median": 0.02769559621810913,
+            "min": 0.0002675652503967285,
+            "n": 55,
+            "p05": 0.0019528865814208984,
+            "p25": 0.008767843246459961,
+            "p75": 0.05512511730194092,
+            "p95": 0.10877543687820435
+          },
+          "wrong_top1": {
+            "max": 0.08206957578659058,
+            "median": 0.011651217937469482,
+            "min": 0.0,
+            "n": 89,
+            "p05": 0.0005984902381896973,
+            "p25": 0.004810035228729248,
+            "p75": 0.027210593223571777,
+            "p95": 0.054549992084503174
+          }
+        }
+      },
+      "misses_top1": {
+        "fp16": [
+          {
+            "label_card": "en:sv02-204",
+            "label_category": "unique",
+            "label_rank_in_top5": 2,
+            "margin_frame0": 0.0205,
+            "top1_card_group": "SV2P-073",
+            "top1_in_family": false
+          },
+          {
+            "label_card": "en:sv01-203",
+            "label_category": "unique",
+            "label_rank_in_top5": 3,
+            "margin_frame0": 0.0545,
+            "top1_card_group": "SV1S-080",
+            "top1_in_family": false
+          },
+          {
+            "label_card": "en:sv01-212",
+            "label_category": "unique",
+            "label_rank_in_top5": null,
+            "margin_frame0": 0.0278,
+            "top1_card_group": "SV4M-077",
+            "top1_in_family": false
+          },
+          {
+            "label_card": "en:sv03.5-181",
+            "label_category": "unique",
+            "label_rank_in_top5": 2,
+            "margin_frame0": 0.008,
+            "top1_card_group": "SV2a-182",
+            "top1_in_family": false
+          },
+          {
+            "label_card": "en:sv03.5-178",
+            "label_category": "unique",
+            "label_rank_in_top5": 2,
+            "margin_frame0": 0.028,
+            "top1_card_group": "SV2a-178",
+            "top1_in_family": false
+          },
+          {
+            "label_card": "en:sv02-204",
+            "label_category": "unique",
+            "label_rank_in_top5": null,
+            "margin_frame0": 0.0287,
+            "top1_card_group": "SV2P-073",
+            "top1_in_family": false
+          },
+          {
+            "label_card": "en:sv01-212",
+            "label_category": "unique",
+            "label_rank_in_top5": 2,
+            "margin_frame0": 0.006,
+            "top1_card_group": "SV1S-084",
+            "top1_in_family": false
+          },
+          {
+            "label_card": "en:sv03.5-174",
+            "label_category": "unique",
+            "label_rank_in_top5": 2,
+            "margin_frame0": 0.0369,
+            "top1_card_group": "SV2a-174",
+            "top1_in_family": false
+          },
+          {
+            "label_card": "en:sv03.5-181",
+            "label_category": "unique",
+            "label_rank_in_top5": null,
+            "margin_frame0": 0.0147,
+            "top1_card_group": "SV2a-182",
+            "top1_in_family": false
+          },
+          {
+            "label_card": "en:sv03-209",
+            "label_category": "unique",
+            "label_rank_in_top5": 2,
+            "margin_frame0": 0.026,
+            "top1_card_group": "SV3-120",
+            "top1_in_family": false
+          },
+          {
+            "label_card": "en:sv02-204",
+            "label_category": "unique",
+            "label_rank_in_top5": 2,
+            "margin_frame0": 0.005,
+            "top1_card_group": "SV2P-073",
+            "top1_in_family": false
+          },
+          {
+            "label_card": "en:sv01-203",
+            "label_category": "unique",
+            "label_rank_in_top5": null,
+            "margin_frame0": 0.0038,
+            "top1_card_group": "SV1S-080",
+            "top1_in_family": false
+          },
+          {
+            "label_card": "en:sv03-205",
+            "label_category": "unique",
+            "label_rank_in_top5": 4,
+            "margin_frame0": 0.0039,
+            "top1_card_group": "SV3-116",
+            "top1_in_family": false
+          },
+          {
+            "label_card": "en:sv01-212",
+            "label_category": "unique",
+            "label_rank_in_top5": 4,
+            "margin_frame0": 0.0051,
+            "top1_card_group": "SV1S-084",
+            "top1_in_family": false
+          },
+          {
+            "label_card": "en:sv03.5-174",
+            "label_category": "unique",
+            "label_rank_in_top5": 2,
+            "margin_frame0": 0.0193,
+            "top1_card_group": "SV2a-174",
+            "top1_in_family": false
+          },
+          {
+            "label_card": "en:sv03.5-178",
+            "label_category": "unique",
+            "label_rank_in_top5": 4,
+            "margin_frame0": 0.0127,
+            "top1_card_group": "swsh6-185",
+            "top1_in_family": false
+          },
+          {
+            "label_card": "en:sv02-204",
+            "label_category": "unique",
+            "label_rank_in_top5": null,
+            "margin_frame0": 0.0116,
+            "top1_card_group": "SV6a-067",
+            "top1_in_family": false
+          },
+          {
+            "label_card": "en:sv01-203",
+            "label_category": "unique",
+            "label_rank_in_top5": 2,
+            "margin_frame0": 0.0353,
+            "top1_card_group": "SV1S-080",
+            "top1_in_family": false
+          },
+          {
+            "label_card": "en:sv01-210",
+            "label_category": "unique",
+            "label_rank_in_top5": 2,
+            "margin_frame0": 0.0114,
+            "top1_card_group": "SV1V-086",
+            "top1_in_family": false
+          },
+          {
+            "label_card": "en:sv02-204",
+            "label_category": "unique",
+            "label_rank_in_top5": 2,
+            "margin_frame0": 0.0255,
+            "top1_card_group": "SV2P-073",
+            "top1_in_family": false
+          },
+          {
+            "label_card": "en:sv01-203",
+            "label_category": "unique",
+            "label_rank_in_top5": 2,
+            "margin_frame0": 0.0343,
+            "top1_card_group": "SV1S-080",
+            "top1_in_family": false
+          },
+          {
+            "label_card": "en:sv02-204",
+            "label_category": "unique",
+            "label_rank_in_top5": null,
+            "margin_frame0": 0.0034,
+            "top1_card_group": "SV2P-073",
+            "top1_in_family": false
+          },
+          {
+            "label_card": "en:sv01-203",
+            "label_category": "unique",
+            "label_rank_in_top5": 2,
+            "margin_frame0": 0.0444,
+            "top1_card_group": "SV1S-080",
+            "top1_in_family": false
+          },
+          {
+            "label_card": "en:sv01-212",
+            "label_category": "unique",
+            "label_rank_in_top5": 2,
+            "margin_frame0": 0.0026,
+            "top1_card_group": "SV1S-084",
+            "top1_in_family": false
+          },
+          {
+            "label_card": "ja:SM9-038",
+            "label_category": "unique",
+            "label_rank_in_top5": 2,
+            "margin_frame0": 0.0375,
+            "top1_card_group": "sm9-53",
+            "top1_in_family": false
+          },
+          {
+            "label_card": "ja:SM9-065",
+            "label_category": "unique",
+            "label_rank_in_top5": null,
+            "margin_frame0": 0.0103,
+            "top1_card_group": "CP3-024",
+            "top1_in_family": false
+          },
+          {
+            "label_card": "en:sv03.5-200",
+            "label_category": "unique",
+            "label_rank_in_top5": 2,
+            "margin_frame0": 0.0174,
+            "top1_card_group": "SV2a-202",
+            "top1_in_family": false
+          },
+          {
+            "label_card": "en:svp-052",
+            "label_category": "unique",
+            "label_rank_in_top5": null,
+            "margin_frame0": 0.0052,
+            "top1_card_group": "PMCG5-068",
+            "top1_in_family": false
+          },
+          {
+            "label_card": "en:sv03.5-199",
+            "label_category": "unique",
+            "label_rank_in_top5": null,
+            "margin_frame0": 0.0053,
+            "top1_card_group": "SV2a-201",
+            "top1_in_family": false
+          },
+          {
+            "label_card": "en:g1-RC29",
+            "label_category": "unique",
+            "label_rank_in_top5": null,
+            "margin_frame0": 0.0371,
+            "top1_card_group": "CP3-010",
+            "top1_in_family": false
+          },
+          {
+            "label_card": "en:base1-15",
+            "label_category": "unique",
+            "label_rank_in_top5": 3,
+            "margin_frame0": 0.0002,
+            "top1_card_group": "S8a-P-002",
+            "top1_in_family": false
+          },
+          {
+            "label_card": "en:sv03.5-199",
+            "label_category": "unique",
+            "label_rank_in_top5": null,
+            "margin_frame0": 0.0061,
+            "top1_card_group": "SV2D-092",
+            "top1_in_family": false
+          },
+          {
+            "label_card": "en:sv08-247",
+            "label_category": "unique",
+            "label_rank_in_top5": null,
+            "margin_frame0": 0.0048,
+            "top1_card_group": "M2a-246",
+            "top1_in_family": false
+          },
+          {
+            "label_card": "en:sv10.5b-166",
+            "label_category": "unique",
+            "label_rank_in_top5": null,
+            "margin_frame0": 0.0085,
+            "top1_card_group": "sm8-144",
+            "top1_in_family": false
+          },
+          {
+            "label_card": "en:mep-023",
+            "label_category": "unique",
+            "label_rank_in_top5": null,
+            "margin_frame0": 0.012,
+            "top1_card_group": "M2a-223",
+            "top1_in_family": false
+          },
+          {
+            "label_card": "en:base1-15",
+            "label_category": "unique",
+            "label_rank_in_top5": 3,
+            "margin_frame0": 0.0144,
+            "top1_card_group": "S8a-P-002",
+            "top1_in_family": false
+          },
+          {
+            "label_card": "en:swsh3.5-16",
+            "label_category": "unique",
+            "label_rank_in_top5": 3,
+            "margin_frame0": 0.003,
+            "top1_card_group": "XY6-081",
+            "top1_in_family": false
+          },
+          {
+            "label_card": "en:sm7-8",
+            "label_category": "unique",
+            "label_rank_in_top5": null,
+            "margin_frame0": 0.0021,
+            "top1_card_group": "BKPR-DP-076",
+            "top1_in_family": false
+          },
+          {
+            "label_card": "en:sv03.5-063",
+            "label_category": "unique",
+            "label_rank_in_top5": null,
+            "margin_frame0": 0.0053,
+            "top1_card_group": "MC-157",
+            "top1_in_family": false
+          },
+          {
+            "label_card": "en:swsh9-013",
+            "label_category": "reprint",
+            "label_rank_in_top5": 2,
+            "margin_frame0": 0.0084,
+            "top1_card_group": "PPS2-BRS-013",
+            "top1_in_family": true
+          },
+          {
+            "label_card": "en:svp-085",
+            "label_category": "unique",
+            "label_rank_in_top5": null,
+            "margin_frame0": 0.0072,
+            "top1_card_group": "PMCG5-068",
+            "top1_in_family": false
+          },
+          {
+            "label_card": "ja:SM12a-083",
+            "label_category": "unique",
+            "label_rank_in_top5": null,
+            "margin_frame0": 0.0075,
+            "top1_card_group": "S10P-085",
+            "top1_in_family": false
+          },
+          {
+            "label_card": "en:base1-9",
+            "label_category": "unique",
+            "label_rank_in_top5": 3,
+            "margin_frame0": 0.0377,
+            "top1_card_group": "xy12-38",
+            "top1_in_family": false
+          },
+          {
+            "label_card": "ja:SM12a-041",
+            "label_category": "unique",
+            "label_rank_in_top5": null,
+            "margin_frame0": 0.0,
+            "top1_card_group": "PPS1-BST-085",
+            "top1_in_family": false
+          },
+          {
+            "label_card": "en:sv08.5-075",
+            "label_category": "reprint",
+            "label_rank_in_top5": null,
+            "margin_frame0": 0.0067,
+            "top1_card_group": "SV11W-169",
+            "top1_in_family": false
+          },
+          {
+            "label_card": "en:sv01-245",
+            "label_category": "unique",
+            "label_rank_in_top5": null,
+            "margin_frame0": 0.0096,
+            "top1_card_group": "tk-hs-r-21",
+            "top1_in_family": false
+          },
+          {
+            "label_card": "en:swsh12tg-TG05",
+            "label_category": "unique",
+            "label_rank_in_top5": null,
+            "margin_frame0": 0.0006,
+            "top1_card_group": "me02-034",
+            "top1_in_family": false
+          },
+          {
+            "label_card": "en:sv04.5-233",
+            "label_category": "unique",
+            "label_rank_in_top5": null,
+            "margin_frame0": 0.0005,
+            "top1_card_group": "me01-141",
+            "top1_in_family": false
+          },
+          {
+            "label_card": "en:sv06-188",
+            "label_category": "unique",
+            "label_rank_in_top5": null,
+            "margin_frame0": 0.0302,
+            "top1_card_group": "CP3-024",
+            "top1_in_family": false
+          },
+          {
+            "label_card": "en:xy9-115",
+            "label_category": "unique",
+            "label_rank_in_top5": 5,
+            "margin_frame0": 0.0315,
+            "top1_card_group": "XY9-082",
+            "top1_in_family": false
+          },
+          {
+            "label_card": "en:ex9-9",
+            "label_category": "unique",
+            "label_rank_in_top5": null,
+            "margin_frame0": 0.0176,
+            "top1_card_group": "svp-182",
+            "top1_in_family": false
+          },
+          {
+            "label_card": "en:sm115-16",
+            "label_category": "unique",
+            "label_rank_in_top5": 4,
+            "margin_frame0": 0.0036,
+            "top1_card_group": "M6-092",
+            "top1_in_family": false
+          },
+          {
+            "label_card": "en:base5-25",
+            "label_category": "unique",
+            "label_rank_in_top5": 2,
+            "margin_frame0": 0.0403,
+            "top1_card_group": "cel25cc-CC005",
+            "top1_in_family": false
+          },
+          {
+            "label_card": "en:sv06-188",
+            "label_category": "unique",
+            "label_rank_in_top5": null,
+            "margin_frame0": 0.0179,
+            "top1_card_group": "CP1-003",
+            "top1_in_family": false
+          },
+          {
+            "label_card": "en:base5-68",
+            "label_category": "unique",
+            "label_rank_in_top5": null,
+            "margin_frame0": 0.004,
+            "top1_card_group": "PCG6-058",
+            "top1_in_family": false
+          },
+          {
+            "label_card": "en:base1-6",
+            "label_category": "unique",
+            "label_rank_in_top5": null,
+            "margin_frame0": 0.0055,
+            "top1_card_group": "PMCG1-034",
+            "top1_in_family": false
+          },
+          {
+            "label_card": "en:CLB-007",
+            "label_category": "unique",
+            "label_rank_in_top5": null,
+            "margin_frame0": 0.0041,
+            "top1_card_group": "PCG9-045",
+            "top1_in_family": false
+          },
+          {
+            "label_card": "en:swsh12.5gg-GG38",
+            "label_category": "unique",
+            "label_rank_in_top5": 3,
+            "margin_frame0": 0.0488,
+            "top1_card_group": "S12a-215",
+            "top1_in_family": false
+          },
+          {
+            "label_card": "en:swsh12.5gg-GG42",
+            "label_category": "unique",
+            "label_rank_in_top5": null,
+            "margin_frame0": 0.0041,
+            "top1_card_group": "SV8a-222",
+            "top1_in_family": false
+          },
+          {
+            "label_card": "en:swsh12.5gg-GG47",
+            "label_category": "unique",
+            "label_rank_in_top5": 2,
+            "margin_frame0": 0.021,
+            "top1_card_group": "S12a-224",
+            "top1_in_family": false
+          },
+          {
+            "label_card": "en:swsh12.5gg-GG47",
+            "label_category": "unique",
+            "label_rank_in_top5": 2,
+            "margin_frame0": 0.001,
+            "top1_card_group": "S12a-224",
+            "top1_in_family": false
+          },
+          {
+            "label_card": "en:swsh12.5gg-GG64",
+            "label_category": "unique",
+            "label_rank_in_top5": 2,
+            "margin_frame0": 0.0007,
+            "top1_card_group": "S12a-244",
+            "top1_in_family": false
+          },
+          {
+            "label_card": "en:swsh12.5gg-GG66",
+            "label_category": "unique",
+            "label_rank_in_top5": 2,
+            "margin_frame0": 0.0191,
+            "top1_card_group": "S12a-242",
+            "top1_in_family": false
+          },
+          {
+            "label_card": "en:swsh12.5gg-GG66",
+            "label_category": "unique",
+            "label_rank_in_top5": 2,
+            "margin_frame0": 0.0511,
+            "top1_card_group": "S12a-242",
+            "top1_in_family": false
+          },
+          {
+            "label_card": "en:swsh12.5gg-GG66",
+            "label_category": "unique",
+            "label_rank_in_top5": 2,
+            "margin_frame0": 0.0632,
+            "top1_card_group": "S12a-242",
+            "top1_in_family": false
+          },
+          {
+            "label_card": "en:swsh12.5gg-GG66",
+            "label_category": "unique",
+            "label_rank_in_top5": null,
+            "margin_frame0": 0.0348,
+            "top1_card_group": "S12a-242",
+            "top1_in_family": false
+          },
+          {
+            "label_card": "en:base1-20",
+            "label_category": "unique",
+            "label_rank_in_top5": 2,
+            "margin_frame0": 0.0112,
+            "top1_card_group": "base4-24",
+            "top1_in_family": false
+          },
+          {
+            "label_card": "en:base1-20",
+            "label_category": "unique",
+            "label_rank_in_top5": null,
+            "margin_frame0": 0.0167,
+            "top1_card_group": "ecard2-H02",
+            "top1_in_family": false
+          },
+          {
+            "label_card": "en:base1-20",
+            "label_category": "unique",
+            "label_rank_in_top5": 2,
+            "margin_frame0": 0.0004,
+            "top1_card_group": "base4-24",
+            "top1_in_family": false
+          },
+          {
+            "label_card": "en:base1-43",
+            "label_category": "unique",
+            "label_rank_in_top5": 2,
+            "margin_frame0": 0.0055,
+            "top1_card_group": "base4-65",
+            "top1_in_family": false
+          },
+          {
+            "label_card": "en:base1-43",
+            "label_category": "unique",
+            "label_rank_in_top5": 3,
+            "margin_frame0": 0.0038,
+            "top1_card_group": "base4-65",
+            "top1_in_family": false
+          },
+          {
+            "label_card": "en:base2-58",
+            "label_category": "unique",
+            "label_rank_in_top5": 2,
+            "margin_frame0": 0.0037,
+            "top1_card_group": "PMCG2-002",
+            "top1_in_family": false
+          },
+          {
+            "label_card": "en:base2-58",
+            "label_category": "unique",
+            "label_rank_in_top5": null,
+            "margin_frame0": 0.0122,
+            "top1_card_group": "pl2-75",
+            "top1_in_family": false
+          },
+          {
+            "label_card": "en:base1-68",
+            "label_category": "unique",
+            "label_rank_in_top5": 2,
+            "margin_frame0": 0.0082,
+            "top1_card_group": "base4-99",
+            "top1_in_family": false
+          },
+          {
+            "label_card": "en:base1-62",
+            "label_category": "unique",
+            "label_rank_in_top5": 3,
+            "margin_frame0": 0.0193,
+            "top1_card_group": "base4-91",
+            "top1_in_family": false
+          },
+          {
+            "label_card": "en:base1-62",
+            "label_category": "unique",
+            "label_rank_in_top5": 5,
+            "margin_frame0": 0.0223,
+            "top1_card_group": "base4-91",
+            "top1_in_family": false
+          },
+          {
+            "label_card": "ja:SV5K-093",
+            "label_category": "unique",
+            "label_rank_in_top5": 2,
+            "margin_frame0": 0.0824,
+            "top1_card_group": "sv05-204",
+            "top1_in_family": false
+          },
+          {
+            "label_card": "ja:SV5K-093",
+            "label_category": "unique",
+            "label_rank_in_top5": 2,
+            "margin_frame0": 0.0581,
+            "top1_card_group": "sv05-204",
+            "top1_in_family": false
+          },
+          {
+            "label_card": "en:sv03-205",
+            "label_category": "unique",
+            "label_rank_in_top5": 2,
+            "margin_frame0": 0.0424,
+            "top1_card_group": "SV3-116",
+            "top1_in_family": false
+          },
+          {
+            "label_card": "en:swsh12.5gg-GG05",
+            "label_category": "unique",
+            "label_rank_in_top5": 2,
+            "margin_frame0": 0.0194,
+            "top1_card_group": "S12a-177",
+            "top1_in_family": false
+          },
+          {
+            "label_card": "en:swsh12.5gg-GG41",
+            "label_category": "unique",
+            "label_rank_in_top5": 2,
+            "margin_frame0": 0.0291,
+            "top1_card_group": "S12a-218",
+            "top1_in_family": false
+          },
+          {
+            "label_card": "en:swsh12.5gg-GG41",
+            "label_category": "unique",
+            "label_rank_in_top5": 2,
+            "margin_frame0": 0.0415,
+            "top1_card_group": "S12a-218",
+            "top1_in_family": false
+          },
+          {
+            "label_card": "en:swsh12.5gg-GG41",
+            "label_category": "unique",
+            "label_rank_in_top5": 2,
+            "margin_frame0": 0.0572,
+            "top1_card_group": "S12a-218",
+            "top1_in_family": false
+          },
+          {
+            "label_card": "en:base1-24",
+            "label_category": "unique",
+            "label_rank_in_top5": 2,
+            "margin_frame0": 0.0182,
+            "top1_card_group": "PMCG1-017",
+            "top1_in_family": false
+          },
+          {
+            "label_card": "en:xy12-35",
+            "label_category": "unique",
+            "label_rank_in_top5": null,
+            "margin_frame0": 0.0083,
+            "top1_card_group": "PCG6-030",
+            "top1_in_family": false
+          },
+          {
+            "label_card": "en:30th-077",
+            "label_category": "unique",
+            "label_rank_in_top5": null,
+            "margin_frame0": 0.0088,
+            "top1_card_group": "A3-080",
+            "top1_in_family": false
+          },
+          {
+            "label_card": "en:sv04-159",
+            "label_category": "reprint",
+            "label_rank_in_top5": 2,
+            "margin_frame0": 0.0073,
+            "top1_card_group": "PPS5-PAR-159",
+            "top1_in_family": true
+          },
+          {
+            "label_card": "ja:CLF-017",
+            "label_category": "unique",
+            "label_rank_in_top5": null,
+            "margin_frame0": 0.0171,
+            "top1_card_group": "S8b-038",
+            "top1_in_family": false
+          },
+          {
+            "label_card": "en:sm3-18a",
+            "label_category": "unique",
+            "label_rank_in_top5": null,
+            "margin_frame0": 0.0062,
+            "top1_card_group": "2015xy-3",
+            "top1_in_family": false
+          }
+        ],
+        "fp32": [
+          {
+            "label_card": "en:sv02-204",
+            "label_category": "unique",
+            "label_rank_in_top5": 2,
+            "margin_frame0": 0.0205,
+            "top1_card_group": "SV2P-073",
+            "top1_in_family": false
+          },
+          {
+            "label_card": "en:sv01-203",
+            "label_category": "unique",
+            "label_rank_in_top5": 3,
+            "margin_frame0": 0.0545,
+            "top1_card_group": "SV1S-080",
+            "top1_in_family": false
+          },
+          {
+            "label_card": "en:sv01-212",
+            "label_category": "unique",
+            "label_rank_in_top5": null,
+            "margin_frame0": 0.0278,
+            "top1_card_group": "SV4M-077",
+            "top1_in_family": false
+          },
+          {
+            "label_card": "en:sv03.5-181",
+            "label_category": "unique",
+            "label_rank_in_top5": 2,
+            "margin_frame0": 0.008,
+            "top1_card_group": "SV2a-182",
+            "top1_in_family": false
+          },
+          {
+            "label_card": "en:sv03.5-178",
+            "label_category": "unique",
+            "label_rank_in_top5": 2,
+            "margin_frame0": 0.028,
+            "top1_card_group": "SV2a-178",
+            "top1_in_family": false
+          },
+          {
+            "label_card": "en:sv02-204",
+            "label_category": "unique",
+            "label_rank_in_top5": null,
+            "margin_frame0": 0.0287,
+            "top1_card_group": "SV2P-073",
+            "top1_in_family": false
+          },
+          {
+            "label_card": "en:sv01-212",
+            "label_category": "unique",
+            "label_rank_in_top5": 2,
+            "margin_frame0": 0.0061,
+            "top1_card_group": "SV1S-084",
+            "top1_in_family": false
+          },
+          {
+            "label_card": "en:sv03.5-174",
+            "label_category": "unique",
+            "label_rank_in_top5": 2,
+            "margin_frame0": 0.0369,
+            "top1_card_group": "SV2a-174",
+            "top1_in_family": false
+          },
+          {
+            "label_card": "en:sv03.5-181",
+            "label_category": "unique",
+            "label_rank_in_top5": null,
+            "margin_frame0": 0.0147,
+            "top1_card_group": "SV2a-182",
+            "top1_in_family": false
+          },
+          {
+            "label_card": "en:sv03-209",
+            "label_category": "unique",
+            "label_rank_in_top5": 2,
+            "margin_frame0": 0.026,
+            "top1_card_group": "SV3-120",
+            "top1_in_family": false
+          },
+          {
+            "label_card": "en:sv02-204",
+            "label_category": "unique",
+            "label_rank_in_top5": 2,
+            "margin_frame0": 0.005,
+            "top1_card_group": "SV2P-073",
+            "top1_in_family": false
+          },
+          {
+            "label_card": "en:sv01-203",
+            "label_category": "unique",
+            "label_rank_in_top5": null,
+            "margin_frame0": 0.0038,
+            "top1_card_group": "SV1S-080",
+            "top1_in_family": false
+          },
+          {
+            "label_card": "en:sv03-205",
+            "label_category": "unique",
+            "label_rank_in_top5": 4,
+            "margin_frame0": 0.0039,
+            "top1_card_group": "SV3-116",
+            "top1_in_family": false
+          },
+          {
+            "label_card": "en:sv01-212",
+            "label_category": "unique",
+            "label_rank_in_top5": 4,
+            "margin_frame0": 0.0051,
+            "top1_card_group": "SV1S-084",
+            "top1_in_family": false
+          },
+          {
+            "label_card": "en:sv03.5-174",
+            "label_category": "unique",
+            "label_rank_in_top5": 2,
+            "margin_frame0": 0.0194,
+            "top1_card_group": "SV2a-174",
+            "top1_in_family": false
+          },
+          {
+            "label_card": "en:sv03.5-178",
+            "label_category": "unique",
+            "label_rank_in_top5": 4,
+            "margin_frame0": 0.0127,
+            "top1_card_group": "swsh6-185",
+            "top1_in_family": false
+          },
+          {
+            "label_card": "en:sv02-204",
+            "label_category": "unique",
+            "label_rank_in_top5": null,
+            "margin_frame0": 0.0116,
+            "top1_card_group": "SV6a-067",
+            "top1_in_family": false
+          },
+          {
+            "label_card": "en:sv01-203",
+            "label_category": "unique",
+            "label_rank_in_top5": 2,
+            "margin_frame0": 0.0353,
+            "top1_card_group": "SV1S-080",
+            "top1_in_family": false
+          },
+          {
+            "label_card": "en:sv01-210",
+            "label_category": "unique",
+            "label_rank_in_top5": 2,
+            "margin_frame0": 0.0114,
+            "top1_card_group": "SV1V-086",
+            "top1_in_family": false
+          },
+          {
+            "label_card": "en:sv02-204",
+            "label_category": "unique",
+            "label_rank_in_top5": 2,
+            "margin_frame0": 0.0254,
+            "top1_card_group": "SV2P-073",
+            "top1_in_family": false
+          },
+          {
+            "label_card": "en:sv01-203",
+            "label_category": "unique",
+            "label_rank_in_top5": 2,
+            "margin_frame0": 0.0343,
+            "top1_card_group": "SV1S-080",
+            "top1_in_family": false
+          },
+          {
+            "label_card": "en:sv02-204",
+            "label_category": "unique",
+            "label_rank_in_top5": null,
+            "margin_frame0": 0.0034,
+            "top1_card_group": "SV2P-073",
+            "top1_in_family": false
+          },
+          {
+            "label_card": "en:sv01-203",
+            "label_category": "unique",
+            "label_rank_in_top5": 2,
+            "margin_frame0": 0.0444,
+            "top1_card_group": "SV1S-080",
+            "top1_in_family": false
+          },
+          {
+            "label_card": "en:sv01-212",
+            "label_category": "unique",
+            "label_rank_in_top5": 2,
+            "margin_frame0": 0.0027,
+            "top1_card_group": "SV1S-084",
+            "top1_in_family": false
+          },
+          {
+            "label_card": "ja:SM9-038",
+            "label_category": "unique",
+            "label_rank_in_top5": 2,
+            "margin_frame0": 0.0376,
+            "top1_card_group": "sm9-53",
+            "top1_in_family": false
+          },
+          {
+            "label_card": "ja:SM9-065",
+            "label_category": "unique",
+            "label_rank_in_top5": null,
+            "margin_frame0": 0.0103,
+            "top1_card_group": "CP3-024",
+            "top1_in_family": false
+          },
+          {
+            "label_card": "en:sv03.5-200",
+            "label_category": "unique",
+            "label_rank_in_top5": 2,
+            "margin_frame0": 0.0175,
+            "top1_card_group": "SV2a-202",
+            "top1_in_family": false
+          },
+          {
+            "label_card": "en:svp-052",
+            "label_category": "unique",
+            "label_rank_in_top5": null,
+            "margin_frame0": 0.0052,
+            "top1_card_group": "PMCG5-068",
+            "top1_in_family": false
+          },
+          {
+            "label_card": "en:sv03.5-199",
+            "label_category": "unique",
+            "label_rank_in_top5": null,
+            "margin_frame0": 0.0053,
+            "top1_card_group": "SV2a-201",
+            "top1_in_family": false
+          },
+          {
+            "label_card": "en:g1-RC29",
+            "label_category": "unique",
+            "label_rank_in_top5": null,
+            "margin_frame0": 0.0371,
+            "top1_card_group": "CP3-010",
+            "top1_in_family": false
+          },
+          {
+            "label_card": "en:base1-15",
+            "label_category": "unique",
+            "label_rank_in_top5": 3,
+            "margin_frame0": 0.0002,
+            "top1_card_group": "S8a-P-002",
+            "top1_in_family": false
+          },
+          {
+            "label_card": "en:sv03.5-199",
+            "label_category": "unique",
+            "label_rank_in_top5": null,
+            "margin_frame0": 0.006,
+            "top1_card_group": "SV2D-092",
+            "top1_in_family": false
+          },
+          {
+            "label_card": "en:sv08-247",
+            "label_category": "unique",
+            "label_rank_in_top5": null,
+            "margin_frame0": 0.0049,
+            "top1_card_group": "M2a-246",
+            "top1_in_family": false
+          },
+          {
+            "label_card": "en:sv10.5b-166",
+            "label_category": "unique",
+            "label_rank_in_top5": null,
+            "margin_frame0": 0.0085,
+            "top1_card_group": "sm8-144",
+            "top1_in_family": false
+          },
+          {
+            "label_card": "en:mep-023",
+            "label_category": "unique",
+            "label_rank_in_top5": null,
+            "margin_frame0": 0.012,
+            "top1_card_group": "M2a-223",
+            "top1_in_family": false
+          },
+          {
+            "label_card": "en:base1-15",
+            "label_category": "unique",
+            "label_rank_in_top5": 3,
+            "margin_frame0": 0.0143,
+            "top1_card_group": "S8a-P-002",
+            "top1_in_family": false
+          },
+          {
+            "label_card": "en:swsh3.5-16",
+            "label_category": "unique",
+            "label_rank_in_top5": 3,
+            "margin_frame0": 0.003,
+            "top1_card_group": "XY6-081",
+            "top1_in_family": false
+          },
+          {
+            "label_card": "en:sm7-8",
+            "label_category": "unique",
+            "label_rank_in_top5": null,
+            "margin_frame0": 0.0021,
+            "top1_card_group": "BKPR-DP-076",
+            "top1_in_family": false
+          },
+          {
+            "label_card": "en:sv03.5-063",
+            "label_category": "unique",
+            "label_rank_in_top5": null,
+            "margin_frame0": 0.0054,
+            "top1_card_group": "MC-157",
+            "top1_in_family": false
+          },
+          {
+            "label_card": "en:swsh9-013",
+            "label_category": "reprint",
+            "label_rank_in_top5": 2,
+            "margin_frame0": 0.0084,
+            "top1_card_group": "PPS2-BRS-013",
+            "top1_in_family": true
+          },
+          {
+            "label_card": "en:svp-085",
+            "label_category": "unique",
+            "label_rank_in_top5": null,
+            "margin_frame0": 0.0073,
+            "top1_card_group": "PMCG5-068",
+            "top1_in_family": false
+          },
+          {
+            "label_card": "ja:SM12a-083",
+            "label_category": "unique",
+            "label_rank_in_top5": null,
+            "margin_frame0": 0.0075,
+            "top1_card_group": "S10P-085",
+            "top1_in_family": false
+          },
+          {
+            "label_card": "en:base1-9",
+            "label_category": "unique",
+            "label_rank_in_top5": 3,
+            "margin_frame0": 0.0377,
+            "top1_card_group": "xy12-38",
+            "top1_in_family": false
+          },
+          {
+            "label_card": "ja:SM12a-041",
+            "label_category": "unique",
+            "label_rank_in_top5": null,
+            "margin_frame0": 0.0,
+            "top1_card_group": "PPS2-BST-085",
+            "top1_in_family": false
+          },
+          {
+            "label_card": "en:sv08.5-075",
+            "label_category": "reprint",
+            "label_rank_in_top5": null,
+            "margin_frame0": 0.0067,
+            "top1_card_group": "SV11W-169",
+            "top1_in_family": false
+          },
+          {
+            "label_card": "en:sv01-245",
+            "label_category": "unique",
+            "label_rank_in_top5": null,
+            "margin_frame0": 0.0096,
+            "top1_card_group": "tk-hs-r-21",
+            "top1_in_family": false
+          },
+          {
+            "label_card": "en:swsh12tg-TG05",
+            "label_category": "unique",
+            "label_rank_in_top5": null,
+            "margin_frame0": 0.0005,
+            "top1_card_group": "me02-034",
+            "top1_in_family": false
+          },
+          {
+            "label_card": "en:sv04.5-233",
+            "label_category": "unique",
+            "label_rank_in_top5": null,
+            "margin_frame0": 0.0005,
+            "top1_card_group": "me01-141",
+            "top1_in_family": false
+          },
+          {
+            "label_card": "en:sv06-188",
+            "label_category": "unique",
+            "label_rank_in_top5": null,
+            "margin_frame0": 0.0302,
+            "top1_card_group": "CP3-024",
+            "top1_in_family": false
+          },
+          {
+            "label_card": "en:xy9-115",
+            "label_category": "unique",
+            "label_rank_in_top5": 5,
+            "margin_frame0": 0.0314,
+            "top1_card_group": "XY9-082",
+            "top1_in_family": false
+          },
+          {
+            "label_card": "en:ex9-9",
+            "label_category": "unique",
+            "label_rank_in_top5": null,
+            "margin_frame0": 0.0176,
+            "top1_card_group": "svp-182",
+            "top1_in_family": false
+          },
+          {
+            "label_card": "en:sm115-16",
+            "label_category": "unique",
+            "label_rank_in_top5": 4,
+            "margin_frame0": 0.0036,
+            "top1_card_group": "M6-092",
+            "top1_in_family": false
+          },
+          {
+            "label_card": "en:base5-25",
+            "label_category": "unique",
+            "label_rank_in_top5": 2,
+            "margin_frame0": 0.0403,
+            "top1_card_group": "cel25cc-CC005",
+            "top1_in_family": false
+          },
+          {
+            "label_card": "en:sv06-188",
+            "label_category": "unique",
+            "label_rank_in_top5": null,
+            "margin_frame0": 0.0179,
+            "top1_card_group": "CP1-003",
+            "top1_in_family": false
+          },
+          {
+            "label_card": "en:base5-68",
+            "label_category": "unique",
+            "label_rank_in_top5": null,
+            "margin_frame0": 0.0041,
+            "top1_card_group": "PCG6-058",
+            "top1_in_family": false
+          },
+          {
+            "label_card": "en:base1-6",
+            "label_category": "unique",
+            "label_rank_in_top5": null,
+            "margin_frame0": 0.0055,
+            "top1_card_group": "PMCG1-034",
+            "top1_in_family": false
+          },
+          {
+            "label_card": "en:CLB-007",
+            "label_category": "unique",
+            "label_rank_in_top5": null,
+            "margin_frame0": 0.0041,
+            "top1_card_group": "PCG9-045",
+            "top1_in_family": false
+          },
+          {
+            "label_card": "en:swsh12.5gg-GG38",
+            "label_category": "unique",
+            "label_rank_in_top5": 3,
+            "margin_frame0": 0.0487,
+            "top1_card_group": "S12a-215",
+            "top1_in_family": false
+          },
+          {
+            "label_card": "en:swsh12.5gg-GG42",
+            "label_category": "unique",
+            "label_rank_in_top5": null,
+            "margin_frame0": 0.0041,
+            "top1_card_group": "SV8a-222",
+            "top1_in_family": false
+          },
+          {
+            "label_card": "en:swsh12.5gg-GG47",
+            "label_category": "unique",
+            "label_rank_in_top5": 2,
+            "margin_frame0": 0.021,
+            "top1_card_group": "S12a-224",
+            "top1_in_family": false
+          },
+          {
+            "label_card": "en:swsh12.5gg-GG47",
+            "label_category": "unique",
+            "label_rank_in_top5": 2,
+            "margin_frame0": 0.001,
+            "top1_card_group": "S12a-224",
+            "top1_in_family": false
+          },
+          {
+            "label_card": "en:swsh12.5gg-GG64",
+            "label_category": "unique",
+            "label_rank_in_top5": 2,
+            "margin_frame0": 0.0007,
+            "top1_card_group": "S12a-244",
+            "top1_in_family": false
+          },
+          {
+            "label_card": "en:swsh12.5gg-GG66",
+            "label_category": "unique",
+            "label_rank_in_top5": 2,
+            "margin_frame0": 0.019,
+            "top1_card_group": "S12a-242",
+            "top1_in_family": false
+          },
+          {
+            "label_card": "en:swsh12.5gg-GG66",
+            "label_category": "unique",
+            "label_rank_in_top5": 2,
+            "margin_frame0": 0.0511,
+            "top1_card_group": "S12a-242",
+            "top1_in_family": false
+          },
+          {
+            "label_card": "en:swsh12.5gg-GG66",
+            "label_category": "unique",
+            "label_rank_in_top5": 2,
+            "margin_frame0": 0.0631,
+            "top1_card_group": "S12a-242",
+            "top1_in_family": false
+          },
+          {
+            "label_card": "en:swsh12.5gg-GG66",
+            "label_category": "unique",
+            "label_rank_in_top5": null,
+            "margin_frame0": 0.0347,
+            "top1_card_group": "S12a-242",
+            "top1_in_family": false
+          },
+          {
+            "label_card": "en:base1-20",
+            "label_category": "unique",
+            "label_rank_in_top5": 2,
+            "margin_frame0": 0.0112,
+            "top1_card_group": "base4-24",
+            "top1_in_family": false
+          },
+          {
+            "label_card": "en:base1-20",
+            "label_category": "unique",
+            "label_rank_in_top5": null,
+            "margin_frame0": 0.0167,
+            "top1_card_group": "ecard2-H02",
+            "top1_in_family": false
+          },
+          {
+            "label_card": "en:base1-20",
+            "label_category": "unique",
+            "label_rank_in_top5": 2,
+            "margin_frame0": 0.0003,
+            "top1_card_group": "base4-24",
+            "top1_in_family": false
+          },
+          {
+            "label_card": "en:base1-43",
+            "label_category": "unique",
+            "label_rank_in_top5": 2,
+            "margin_frame0": 0.0055,
+            "top1_card_group": "base4-65",
+            "top1_in_family": false
+          },
+          {
+            "label_card": "en:base1-43",
+            "label_category": "unique",
+            "label_rank_in_top5": 3,
+            "margin_frame0": 0.0038,
+            "top1_card_group": "base4-65",
+            "top1_in_family": false
+          },
+          {
+            "label_card": "en:base2-58",
+            "label_category": "unique",
+            "label_rank_in_top5": 2,
+            "margin_frame0": 0.0037,
+            "top1_card_group": "PMCG2-002",
+            "top1_in_family": false
+          },
+          {
+            "label_card": "en:base2-58",
+            "label_category": "unique",
+            "label_rank_in_top5": null,
+            "margin_frame0": 0.0123,
+            "top1_card_group": "pl2-75",
+            "top1_in_family": false
+          },
+          {
+            "label_card": "en:base1-68",
+            "label_category": "unique",
+            "label_rank_in_top5": 2,
+            "margin_frame0": 0.0083,
+            "top1_card_group": "base4-99",
+            "top1_in_family": false
+          },
+          {
+            "label_card": "en:base1-62",
+            "label_category": "unique",
+            "label_rank_in_top5": 3,
+            "margin_frame0": 0.0193,
+            "top1_card_group": "base4-91",
+            "top1_in_family": false
+          },
+          {
+            "label_card": "en:base1-62",
+            "label_category": "unique",
+            "label_rank_in_top5": 5,
+            "margin_frame0": 0.0223,
+            "top1_card_group": "base4-91",
+            "top1_in_family": false
+          },
+          {
+            "label_card": "ja:SV5K-093",
+            "label_category": "unique",
+            "label_rank_in_top5": 2,
+            "margin_frame0": 0.0824,
+            "top1_card_group": "sv05-204",
+            "top1_in_family": false
+          },
+          {
+            "label_card": "ja:SV5K-093",
+            "label_category": "unique",
+            "label_rank_in_top5": 2,
+            "margin_frame0": 0.0581,
+            "top1_card_group": "sv05-204",
+            "top1_in_family": false
+          },
+          {
+            "label_card": "en:sv03-205",
+            "label_category": "unique",
+            "label_rank_in_top5": 2,
+            "margin_frame0": 0.0425,
+            "top1_card_group": "SV3-116",
+            "top1_in_family": false
+          },
+          {
+            "label_card": "en:swsh12.5gg-GG05",
+            "label_category": "unique",
+            "label_rank_in_top5": 2,
+            "margin_frame0": 0.0194,
+            "top1_card_group": "S12a-177",
+            "top1_in_family": false
+          },
+          {
+            "label_card": "en:swsh12.5gg-GG41",
+            "label_category": "unique",
+            "label_rank_in_top5": 2,
+            "margin_frame0": 0.0292,
+            "top1_card_group": "S12a-218",
+            "top1_in_family": false
+          },
+          {
+            "label_card": "en:swsh12.5gg-GG41",
+            "label_category": "unique",
+            "label_rank_in_top5": 2,
+            "margin_frame0": 0.0415,
+            "top1_card_group": "S12a-218",
+            "top1_in_family": false
+          },
+          {
+            "label_card": "en:swsh12.5gg-GG41",
+            "label_category": "unique",
+            "label_rank_in_top5": 2,
+            "margin_frame0": 0.0572,
+            "top1_card_group": "S12a-218",
+            "top1_in_family": false
+          },
+          {
+            "label_card": "en:base1-24",
+            "label_category": "unique",
+            "label_rank_in_top5": 2,
+            "margin_frame0": 0.0182,
+            "top1_card_group": "PMCG1-017",
+            "top1_in_family": false
+          },
+          {
+            "label_card": "en:xy12-35",
+            "label_category": "unique",
+            "label_rank_in_top5": null,
+            "margin_frame0": 0.0083,
+            "top1_card_group": "PCG6-030",
+            "top1_in_family": false
+          },
+          {
+            "label_card": "en:30th-077",
+            "label_category": "unique",
+            "label_rank_in_top5": null,
+            "margin_frame0": 0.0088,
+            "top1_card_group": "A3-080",
+            "top1_in_family": false
+          },
+          {
+            "label_card": "en:sv04-159",
+            "label_category": "reprint",
+            "label_rank_in_top5": 2,
+            "margin_frame0": 0.0072,
+            "top1_card_group": "PPS5-PAR-159",
+            "top1_in_family": true
+          },
+          {
+            "label_card": "ja:CLF-017",
+            "label_category": "unique",
+            "label_rank_in_top5": null,
+            "margin_frame0": 0.0171,
+            "top1_card_group": "S8b-038",
+            "top1_in_family": false
+          },
+          {
+            "label_card": "en:sm3-18a",
+            "label_category": "unique",
+            "label_rank_in_top5": null,
+            "margin_frame0": 0.0062,
+            "top1_card_group": "2015xy-3",
+            "top1_in_family": false
+          }
+        ],
+        "int8": [
+          {
+            "label_card": "en:sv02-204",
+            "label_category": "unique",
+            "label_rank_in_top5": 2,
+            "margin_frame0": 0.0199,
+            "top1_card_group": "SV2P-073",
+            "top1_in_family": false
+          },
+          {
+            "label_card": "en:sv01-203",
+            "label_category": "unique",
+            "label_rank_in_top5": 3,
+            "margin_frame0": 0.0545,
+            "top1_card_group": "SV1S-080",
+            "top1_in_family": false
+          },
+          {
+            "label_card": "en:sv01-212",
+            "label_category": "unique",
+            "label_rank_in_top5": null,
+            "margin_frame0": 0.0267,
+            "top1_card_group": "SV4M-077",
+            "top1_in_family": false
+          },
+          {
+            "label_card": "en:sv03.5-181",
+            "label_category": "unique",
+            "label_rank_in_top5": 2,
+            "margin_frame0": 0.0089,
+            "top1_card_group": "SV2a-182",
+            "top1_in_family": false
+          },
+          {
+            "label_card": "en:sv03.5-178",
+            "label_category": "unique",
+            "label_rank_in_top5": 2,
+            "margin_frame0": 0.0272,
+            "top1_card_group": "SV2a-178",
+            "top1_in_family": false
+          },
+          {
+            "label_card": "en:sv02-204",
+            "label_category": "unique",
+            "label_rank_in_top5": null,
+            "margin_frame0": 0.0291,
+            "top1_card_group": "SV2P-073",
+            "top1_in_family": false
+          },
+          {
+            "label_card": "en:sv01-212",
+            "label_category": "unique",
+            "label_rank_in_top5": 2,
+            "margin_frame0": 0.0056,
+            "top1_card_group": "SV1S-084",
+            "top1_in_family": false
+          },
+          {
+            "label_card": "en:sv03.5-174",
+            "label_category": "unique",
+            "label_rank_in_top5": 2,
+            "margin_frame0": 0.0355,
+            "top1_card_group": "SV2a-174",
+            "top1_in_family": false
+          },
+          {
+            "label_card": "en:sv03.5-181",
+            "label_category": "unique",
+            "label_rank_in_top5": null,
+            "margin_frame0": 0.0142,
+            "top1_card_group": "SV2a-182",
+            "top1_in_family": false
+          },
+          {
+            "label_card": "en:sv03-209",
+            "label_category": "unique",
+            "label_rank_in_top5": 2,
+            "margin_frame0": 0.0265,
+            "top1_card_group": "SV3-120",
+            "top1_in_family": false
+          },
+          {
+            "label_card": "en:sv02-204",
+            "label_category": "unique",
+            "label_rank_in_top5": 2,
+            "margin_frame0": 0.0047,
+            "top1_card_group": "SV2P-073",
+            "top1_in_family": false
+          },
+          {
+            "label_card": "en:sv01-203",
+            "label_category": "unique",
+            "label_rank_in_top5": null,
+            "margin_frame0": 0.0038,
+            "top1_card_group": "SV1S-080",
+            "top1_in_family": false
+          },
+          {
+            "label_card": "en:sv03-205",
+            "label_category": "unique",
+            "label_rank_in_top5": 4,
+            "margin_frame0": 0.0052,
+            "top1_card_group": "SV3-116",
+            "top1_in_family": false
+          },
+          {
+            "label_card": "en:sv01-212",
+            "label_category": "unique",
+            "label_rank_in_top5": 4,
+            "margin_frame0": 0.0047,
+            "top1_card_group": "SV1S-084",
+            "top1_in_family": false
+          },
+          {
+            "label_card": "en:sv03.5-174",
+            "label_category": "unique",
+            "label_rank_in_top5": 2,
+            "margin_frame0": 0.0188,
+            "top1_card_group": "SV2a-174",
+            "top1_in_family": false
+          },
+          {
+            "label_card": "en:sv03.5-178",
+            "label_category": "unique",
+            "label_rank_in_top5": 4,
+            "margin_frame0": 0.012,
+            "top1_card_group": "swsh6-185",
+            "top1_in_family": false
+          },
+          {
+            "label_card": "en:sv02-204",
+            "label_category": "unique",
+            "label_rank_in_top5": null,
+            "margin_frame0": 0.0116,
+            "top1_card_group": "SV6a-067",
+            "top1_in_family": false
+          },
+          {
+            "label_card": "en:sv01-203",
+            "label_category": "unique",
+            "label_rank_in_top5": 2,
+            "margin_frame0": 0.0346,
+            "top1_card_group": "SV1S-080",
+            "top1_in_family": false
+          },
+          {
+            "label_card": "en:sv01-210",
+            "label_category": "unique",
+            "label_rank_in_top5": 2,
+            "margin_frame0": 0.0119,
+            "top1_card_group": "SV1V-086",
+            "top1_in_family": false
+          },
+          {
+            "label_card": "en:sv02-204",
+            "label_category": "unique",
+            "label_rank_in_top5": 2,
+            "margin_frame0": 0.0252,
+            "top1_card_group": "SV2P-073",
+            "top1_in_family": false
+          },
+          {
+            "label_card": "en:sv01-203",
+            "label_category": "unique",
+            "label_rank_in_top5": 2,
+            "margin_frame0": 0.0331,
+            "top1_card_group": "SV1S-080",
+            "top1_in_family": false
+          },
+          {
+            "label_card": "en:sv02-204",
+            "label_category": "unique",
+            "label_rank_in_top5": null,
+            "margin_frame0": 0.004,
+            "top1_card_group": "SV2P-073",
+            "top1_in_family": false
+          },
+          {
+            "label_card": "en:sv01-203",
+            "label_category": "unique",
+            "label_rank_in_top5": 2,
+            "margin_frame0": 0.0435,
+            "top1_card_group": "SV1S-080",
+            "top1_in_family": false
+          },
+          {
+            "label_card": "en:sv01-212",
+            "label_category": "unique",
+            "label_rank_in_top5": 2,
+            "margin_frame0": 0.0029,
+            "top1_card_group": "SV1S-084",
+            "top1_in_family": false
+          },
+          {
+            "label_card": "ja:SM9-038",
+            "label_category": "unique",
+            "label_rank_in_top5": 2,
+            "margin_frame0": 0.0369,
+            "top1_card_group": "sm9-53",
+            "top1_in_family": false
+          },
+          {
+            "label_card": "ja:SM9-065",
+            "label_category": "unique",
+            "label_rank_in_top5": null,
+            "margin_frame0": 0.0106,
+            "top1_card_group": "CP3-024",
+            "top1_in_family": false
+          },
+          {
+            "label_card": "en:sv03.5-200",
+            "label_category": "unique",
+            "label_rank_in_top5": 2,
+            "margin_frame0": 0.0177,
+            "top1_card_group": "SV2a-202",
+            "top1_in_family": false
+          },
+          {
+            "label_card": "en:svp-052",
+            "label_category": "unique",
+            "label_rank_in_top5": null,
+            "margin_frame0": 0.0044,
+            "top1_card_group": "PMCG5-068",
+            "top1_in_family": false
+          },
+          {
+            "label_card": "en:sv03.5-199",
+            "label_category": "unique",
+            "label_rank_in_top5": null,
+            "margin_frame0": 0.0056,
+            "top1_card_group": "SV2a-201",
+            "top1_in_family": false
+          },
+          {
+            "label_card": "en:g1-RC29",
+            "label_category": "unique",
+            "label_rank_in_top5": null,
+            "margin_frame0": 0.0388,
+            "top1_card_group": "CP3-010",
+            "top1_in_family": false
+          },
+          {
+            "label_card": "en:base1-15",
+            "label_category": "unique",
+            "label_rank_in_top5": 3,
+            "margin_frame0": 0.0002,
+            "top1_card_group": "S8a-P-002",
+            "top1_in_family": false
+          },
+          {
+            "label_card": "en:sv03.5-199",
+            "label_category": "unique",
+            "label_rank_in_top5": null,
+            "margin_frame0": 0.0073,
+            "top1_card_group": "SV2D-092",
+            "top1_in_family": false
+          },
+          {
+            "label_card": "en:sv08-247",
+            "label_category": "unique",
+            "label_rank_in_top5": null,
+            "margin_frame0": 0.0051,
+            "top1_card_group": "M2a-246",
+            "top1_in_family": false
+          },
+          {
+            "label_card": "en:sv10.5b-166",
+            "label_category": "unique",
+            "label_rank_in_top5": null,
+            "margin_frame0": 0.009,
+            "top1_card_group": "sm8-144",
+            "top1_in_family": false
+          },
+          {
+            "label_card": "en:mep-023",
+            "label_category": "unique",
+            "label_rank_in_top5": null,
+            "margin_frame0": 0.0117,
+            "top1_card_group": "M2a-223",
+            "top1_in_family": false
+          },
+          {
+            "label_card": "en:base1-15",
+            "label_category": "unique",
+            "label_rank_in_top5": 3,
+            "margin_frame0": 0.0146,
+            "top1_card_group": "S8a-P-002",
+            "top1_in_family": false
+          },
+          {
+            "label_card": "en:swsh3.5-16",
+            "label_category": "unique",
+            "label_rank_in_top5": 3,
+            "margin_frame0": 0.0025,
+            "top1_card_group": "XY6-081",
+            "top1_in_family": false
+          },
+          {
+            "label_card": "en:sm7-8",
+            "label_category": "unique",
+            "label_rank_in_top5": null,
+            "margin_frame0": 0.0037,
+            "top1_card_group": "BKPR-DP-076",
+            "top1_in_family": false
+          },
+          {
+            "label_card": "en:sv03.5-063",
+            "label_category": "unique",
+            "label_rank_in_top5": null,
+            "margin_frame0": 0.0048,
+            "top1_card_group": "MC-157",
+            "top1_in_family": false
+          },
+          {
+            "label_card": "en:swsh9-013",
+            "label_category": "reprint",
+            "label_rank_in_top5": 2,
+            "margin_frame0": 0.0083,
+            "top1_card_group": "PPS2-BRS-013",
+            "top1_in_family": true
+          },
+          {
+            "label_card": "en:svp-085",
+            "label_category": "unique",
+            "label_rank_in_top5": null,
+            "margin_frame0": 0.0072,
+            "top1_card_group": "PMCG5-068",
+            "top1_in_family": false
+          },
+          {
+            "label_card": "ja:SM12a-083",
+            "label_category": "unique",
+            "label_rank_in_top5": null,
+            "margin_frame0": 0.0084,
+            "top1_card_group": "S10P-085",
+            "top1_in_family": false
+          },
+          {
+            "label_card": "en:base1-9",
+            "label_category": "unique",
+            "label_rank_in_top5": 3,
+            "margin_frame0": 0.0378,
+            "top1_card_group": "xy12-38",
+            "top1_in_family": false
+          },
+          {
+            "label_card": "ja:SM12a-041",
+            "label_category": "unique",
+            "label_rank_in_top5": null,
+            "margin_frame0": 0.0,
+            "top1_card_group": "PPS1-BST-085",
+            "top1_in_family": false
+          },
+          {
+            "label_card": "en:sv08.5-075",
+            "label_category": "reprint",
+            "label_rank_in_top5": null,
+            "margin_frame0": 0.0075,
+            "top1_card_group": "SV11W-169",
+            "top1_in_family": false
+          },
+          {
+            "label_card": "en:sv01-245",
+            "label_category": "unique",
+            "label_rank_in_top5": null,
+            "margin_frame0": 0.0087,
+            "top1_card_group": "tk-hs-r-21",
+            "top1_in_family": false
+          },
+          {
+            "label_card": "en:swsh12tg-TG05",
+            "label_category": "unique",
+            "label_rank_in_top5": null,
+            "margin_frame0": 0.0008,
+            "top1_card_group": "me02-034",
+            "top1_in_family": false
+          },
+          {
+            "label_card": "en:sv04.5-233",
+            "label_category": "unique",
+            "label_rank_in_top5": null,
+            "margin_frame0": 0.0006,
+            "top1_card_group": "me01-141",
+            "top1_in_family": false
+          },
+          {
+            "label_card": "en:sv06-188",
+            "label_category": "unique",
+            "label_rank_in_top5": null,
+            "margin_frame0": 0.0308,
+            "top1_card_group": "CP3-024",
+            "top1_in_family": false
+          },
+          {
+            "label_card": "en:xy9-115",
+            "label_category": "unique",
+            "label_rank_in_top5": 5,
+            "margin_frame0": 0.031,
+            "top1_card_group": "XY9-082",
+            "top1_in_family": false
+          },
+          {
+            "label_card": "en:ex9-9",
+            "label_category": "unique",
+            "label_rank_in_top5": null,
+            "margin_frame0": 0.0184,
+            "top1_card_group": "svp-182",
+            "top1_in_family": false
+          },
+          {
+            "label_card": "en:sm115-16",
+            "label_category": "unique",
+            "label_rank_in_top5": 4,
+            "margin_frame0": 0.0042,
+            "top1_card_group": "M6-092",
+            "top1_in_family": false
+          },
+          {
+            "label_card": "en:base5-25",
+            "label_category": "unique",
+            "label_rank_in_top5": 2,
+            "margin_frame0": 0.0415,
+            "top1_card_group": "cel25cc-CC005",
+            "top1_in_family": false
+          },
+          {
+            "label_card": "en:sv06-188",
+            "label_category": "unique",
+            "label_rank_in_top5": null,
+            "margin_frame0": 0.0169,
+            "top1_card_group": "CP1-003",
+            "top1_in_family": false
+          },
+          {
+            "label_card": "en:base5-68",
+            "label_category": "unique",
+            "label_rank_in_top5": null,
+            "margin_frame0": 0.0025,
+            "top1_card_group": "PCG6-058",
+            "top1_in_family": false
+          },
+          {
+            "label_card": "en:base1-6",
+            "label_category": "unique",
+            "label_rank_in_top5": null,
+            "margin_frame0": 0.0053,
+            "top1_card_group": "PMCG1-034",
+            "top1_in_family": false
+          },
+          {
+            "label_card": "en:CLB-007",
+            "label_category": "unique",
+            "label_rank_in_top5": null,
+            "margin_frame0": 0.0046,
+            "top1_card_group": "PCG9-045",
+            "top1_in_family": false
+          },
+          {
+            "label_card": "en:swsh12.5gg-GG38",
+            "label_category": "unique",
+            "label_rank_in_top5": 3,
+            "margin_frame0": 0.0488,
+            "top1_card_group": "S12a-215",
+            "top1_in_family": false
+          },
+          {
+            "label_card": "en:swsh12.5gg-GG42",
+            "label_category": "unique",
+            "label_rank_in_top5": null,
+            "margin_frame0": 0.0038,
+            "top1_card_group": "SV8a-222",
+            "top1_in_family": false
+          },
+          {
+            "label_card": "en:swsh12.5gg-GG47",
+            "label_category": "unique",
+            "label_rank_in_top5": 2,
+            "margin_frame0": 0.0213,
+            "top1_card_group": "S12a-224",
+            "top1_in_family": false
+          },
+          {
+            "label_card": "en:swsh12.5gg-GG47",
+            "label_category": "unique",
+            "label_rank_in_top5": 2,
+            "margin_frame0": 0.0007,
+            "top1_card_group": "S12a-224",
+            "top1_in_family": false
+          },
+          {
+            "label_card": "en:swsh12.5gg-GG64",
+            "label_category": "unique",
+            "label_rank_in_top5": 2,
+            "margin_frame0": 0.0006,
+            "top1_card_group": "S12a-244",
+            "top1_in_family": false
+          },
+          {
+            "label_card": "en:swsh12.5gg-GG66",
+            "label_category": "unique",
+            "label_rank_in_top5": 2,
+            "margin_frame0": 0.0199,
+            "top1_card_group": "S12a-242",
+            "top1_in_family": false
+          },
+          {
+            "label_card": "en:swsh12.5gg-GG66",
+            "label_category": "unique",
+            "label_rank_in_top5": 2,
+            "margin_frame0": 0.0523,
+            "top1_card_group": "S12a-242",
+            "top1_in_family": false
+          },
+          {
+            "label_card": "en:swsh12.5gg-GG66",
+            "label_category": "unique",
+            "label_rank_in_top5": 2,
+            "margin_frame0": 0.0644,
+            "top1_card_group": "S12a-242",
+            "top1_in_family": false
+          },
+          {
+            "label_card": "en:swsh12.5gg-GG66",
+            "label_category": "unique",
+            "label_rank_in_top5": null,
+            "margin_frame0": 0.0357,
+            "top1_card_group": "S12a-242",
+            "top1_in_family": false
+          },
+          {
+            "label_card": "en:base1-20",
+            "label_category": "unique",
+            "label_rank_in_top5": 2,
+            "margin_frame0": 0.0115,
+            "top1_card_group": "base4-24",
+            "top1_in_family": false
+          },
+          {
+            "label_card": "en:base1-20",
+            "label_category": "unique",
+            "label_rank_in_top5": null,
+            "margin_frame0": 0.0156,
+            "top1_card_group": "ecard2-H02",
+            "top1_in_family": false
+          },
+          {
+            "label_card": "en:base1-20",
+            "label_category": "unique",
+            "label_rank_in_top5": 2,
+            "margin_frame0": 0.0002,
+            "top1_card_group": "base4-24",
+            "top1_in_family": false
+          },
+          {
+            "label_card": "en:base1-43",
+            "label_category": "unique",
+            "label_rank_in_top5": 2,
+            "margin_frame0": 0.0048,
+            "top1_card_group": "base4-65",
+            "top1_in_family": false
+          },
+          {
+            "label_card": "en:base1-43",
+            "label_category": "unique",
+            "label_rank_in_top5": 3,
+            "margin_frame0": 0.0032,
+            "top1_card_group": "base4-65",
+            "top1_in_family": false
+          },
+          {
+            "label_card": "en:base2-58",
+            "label_category": "unique",
+            "label_rank_in_top5": 2,
+            "margin_frame0": 0.0026,
+            "top1_card_group": "PMCG2-002",
+            "top1_in_family": false
+          },
+          {
+            "label_card": "en:base2-58",
+            "label_category": "unique",
+            "label_rank_in_top5": null,
+            "margin_frame0": 0.0117,
+            "top1_card_group": "pl2-75",
+            "top1_in_family": false
+          },
+          {
+            "label_card": "en:base1-68",
+            "label_category": "unique",
+            "label_rank_in_top5": 2,
+            "margin_frame0": 0.0086,
+            "top1_card_group": "base4-99",
+            "top1_in_family": false
+          },
+          {
+            "label_card": "en:base1-62",
+            "label_category": "unique",
+            "label_rank_in_top5": 3,
+            "margin_frame0": 0.0188,
+            "top1_card_group": "base4-91",
+            "top1_in_family": false
+          },
+          {
+            "label_card": "en:base1-62",
+            "label_category": "unique",
+            "label_rank_in_top5": 5,
+            "margin_frame0": 0.0224,
+            "top1_card_group": "base4-91",
+            "top1_in_family": false
+          },
+          {
+            "label_card": "ja:SV5K-093",
+            "label_category": "unique",
+            "label_rank_in_top5": 2,
+            "margin_frame0": 0.0821,
+            "top1_card_group": "sv05-204",
+            "top1_in_family": false
+          },
+          {
+            "label_card": "ja:SV5K-093",
+            "label_category": "unique",
+            "label_rank_in_top5": 2,
+            "margin_frame0": 0.0581,
+            "top1_card_group": "sv05-204",
+            "top1_in_family": false
+          },
+          {
+            "label_card": "en:sv03-205",
+            "label_category": "unique",
+            "label_rank_in_top5": 2,
+            "margin_frame0": 0.0424,
+            "top1_card_group": "SV3-116",
+            "top1_in_family": false
+          },
+          {
+            "label_card": "en:swsh12.5gg-GG05",
+            "label_category": "unique",
+            "label_rank_in_top5": 2,
+            "margin_frame0": 0.0185,
+            "top1_card_group": "S12a-177",
+            "top1_in_family": false
+          },
+          {
+            "label_card": "en:swsh12.5gg-GG41",
+            "label_category": "unique",
+            "label_rank_in_top5": 2,
+            "margin_frame0": 0.0288,
+            "top1_card_group": "S12a-218",
+            "top1_in_family": false
+          },
+          {
+            "label_card": "en:swsh12.5gg-GG41",
+            "label_category": "unique",
+            "label_rank_in_top5": 2,
+            "margin_frame0": 0.0409,
+            "top1_card_group": "S12a-218",
+            "top1_in_family": false
+          },
+          {
+            "label_card": "en:swsh12.5gg-GG41",
+            "label_category": "unique",
+            "label_rank_in_top5": 2,
+            "margin_frame0": 0.0567,
+            "top1_card_group": "S12a-218",
+            "top1_in_family": false
+          },
+          {
+            "label_card": "en:base1-24",
+            "label_category": "unique",
+            "label_rank_in_top5": 2,
+            "margin_frame0": 0.0166,
+            "top1_card_group": "PMCG1-017",
+            "top1_in_family": false
+          },
+          {
+            "label_card": "en:xy12-35",
+            "label_category": "unique",
+            "label_rank_in_top5": null,
+            "margin_frame0": 0.0084,
+            "top1_card_group": "PCG6-030",
+            "top1_in_family": false
+          },
+          {
+            "label_card": "en:30th-077",
+            "label_category": "unique",
+            "label_rank_in_top5": null,
+            "margin_frame0": 0.0091,
+            "top1_card_group": "A3-080",
+            "top1_in_family": false
+          },
+          {
+            "label_card": "en:sv04-159",
+            "label_category": "reprint",
+            "label_rank_in_top5": 2,
+            "margin_frame0": 0.0068,
+            "top1_card_group": "PPS5-PAR-159",
+            "top1_in_family": true
+          },
+          {
+            "label_card": "ja:CLF-017",
+            "label_category": "unique",
+            "label_rank_in_top5": null,
+            "margin_frame0": 0.0175,
+            "top1_card_group": "S8b-038",
+            "top1_in_family": false
+          },
+          {
+            "label_card": "en:sm3-18a",
+            "label_category": "unique",
+            "label_rank_in_top5": null,
+            "margin_frame0": 0.0066,
+            "top1_card_group": "2015xy-3",
+            "top1_in_family": false
+          }
+        ]
+      },
+      "rules": {
+        "fp16": [
+          {
+            "margin_min": 0.0,
+            "photos": 144,
+            "shown": 144,
+            "shown_rate": 1.0,
+            "stable_frames": 1,
+            "wrong_card_shown": 87,
+            "wrong_rate": 0.6180555555555556,
+            "wrong_rate_upper95": 0.6933677916889263,
+            "wrong_shown": 89
+          },
+          {
+            "margin_min": 0.005,
+            "photos": 144,
+            "shown": 141,
+            "shown_rate": 0.9791666666666666,
+            "stable_frames": 1,
+            "wrong_card_shown": 84,
+            "wrong_rate": 0.6099290780141844,
+            "wrong_rate_upper95": 0.6865035849742422,
+            "wrong_shown": 86
+          },
+          {
+            "margin_min": 0.01,
+            "photos": 144,
+            "shown": 130,
+            "shown_rate": 0.9027777777777778,
+            "stable_frames": 1,
+            "wrong_card_shown": 75,
+            "wrong_rate": 0.5846153846153846,
+            "wrong_rate_upper95": 0.66570940301561,
+            "wrong_shown": 76
+          },
+          {
+            "margin_min": 0.015,
+            "photos": 144,
+            "shown": 109,
+            "shown_rate": 0.7569444444444444,
+            "stable_frames": 1,
+            "wrong_card_shown": 62,
+            "wrong_rate": 0.5688073394495413,
+            "wrong_rate_upper95": 0.6578724663297693,
+            "wrong_shown": 62
+          },
+          {
+            "margin_min": 0.02,
+            "photos": 144,
+            "shown": 89,
+            "shown_rate": 0.6180555555555556,
+            "stable_frames": 1,
+            "wrong_card_shown": 43,
+            "wrong_rate": 0.48314606741573035,
+            "wrong_rate_upper95": 0.5854959627496036,
+            "wrong_shown": 43
+          },
+          {
+            "margin_min": 0.025,
+            "photos": 144,
+            "shown": 74,
+            "shown_rate": 0.5138888888888888,
+            "stable_frames": 1,
+            "wrong_card_shown": 34,
+            "wrong_rate": 0.4594594594594595,
+            "wrong_rate_upper95": 0.5721885478985324,
+            "wrong_shown": 34
+          },
+          {
+            "margin_min": 0.03,
+            "photos": 144,
+            "shown": 67,
+            "shown_rate": 0.4652777777777778,
+            "stable_frames": 1,
+            "wrong_card_shown": 30,
+            "wrong_rate": 0.44776119402985076,
+            "wrong_rate_upper95": 0.5664259846816114,
+            "wrong_shown": 30
+          },
+          {
+            "margin_min": 0.04,
+            "photos": 144,
+            "shown": 49,
+            "shown_rate": 0.3402777777777778,
+            "stable_frames": 1,
+            "wrong_card_shown": 20,
+            "wrong_rate": 0.40816326530612246,
+            "wrong_rate_upper95": 0.5475293002795374,
+            "wrong_shown": 20
+          },
+          {
+            "margin_min": 0.05,
+            "photos": 144,
+            "shown": 36,
+            "shown_rate": 0.25,
+            "stable_frames": 1,
+            "wrong_card_shown": 12,
+            "wrong_rate": 0.3333333333333333,
+            "wrong_rate_upper95": 0.49666302907033155,
+            "wrong_shown": 12
+          },
+          {
+            "margin_min": 0.06,
+            "photos": 144,
+            "shown": 24,
+            "shown_rate": 0.16666666666666666,
+            "stable_frames": 1,
+            "wrong_card_shown": 7,
+            "wrong_rate": 0.2916666666666667,
+            "wrong_rate_upper95": 0.49168063658709704,
+            "wrong_shown": 7
+          },
+          {
+            "margin_min": 0.08,
+            "photos": 144,
+            "shown": 11,
+            "shown_rate": 0.0763888888888889,
+            "stable_frames": 1,
+            "wrong_card_shown": 2,
+            "wrong_rate": 0.18181818181818182,
+            "wrong_rate_upper95": 0.4769861375782448,
+            "wrong_shown": 2
+          },
+          {
+            "margin_min": 0.1,
+            "photos": 144,
+            "shown": 7,
+            "shown_rate": 0.04861111111111111,
+            "stable_frames": 1,
+            "wrong_card_shown": 1,
+            "wrong_rate": 0.14285714285714285,
+            "wrong_rate_upper95": 0.51313450331903,
+            "wrong_shown": 1
+          },
+          {
+            "margin_min": 0.0,
+            "photos": 144,
+            "shown": 144,
+            "shown_rate": 1.0,
+            "stable_frames": 2,
+            "wrong_card_shown": 84,
+            "wrong_rate": 0.5902777777777778,
+            "wrong_rate_upper95": 0.6672406400025082,
+            "wrong_shown": 85
+          },
+          {
+            "margin_min": 0.005,
+            "photos": 144,
+            "shown": 122,
+            "shown_rate": 0.8472222222222222,
+            "stable_frames": 2,
+            "wrong_card_shown": 69,
+            "wrong_rate": 0.5819672131147541,
+            "wrong_rate_upper95": 0.6656796895988267,
+            "wrong_shown": 71
+          },
+          {
+            "margin_min": 0.01,
+            "photos": 144,
+            "shown": 97,
+            "shown_rate": 0.6736111111111112,
+            "stable_frames": 2,
+            "wrong_card_shown": 54,
+            "wrong_rate": 0.5567010309278351,
+            "wrong_rate_upper95": 0.6515257044001969,
+            "wrong_shown": 54
+          },
+          {
+            "margin_min": 0.015,
+            "photos": 144,
+            "shown": 83,
+            "shown_rate": 0.5763888888888888,
+            "stable_frames": 2,
+            "wrong_card_shown": 43,
+            "wrong_rate": 0.5180722891566265,
+            "wrong_rate_upper95": 0.6223699585617313,
+            "wrong_shown": 43
+          },
+          {
+            "margin_min": 0.02,
+            "photos": 144,
+            "shown": 67,
+            "shown_rate": 0.4652777777777778,
+            "stable_frames": 2,
+            "wrong_card_shown": 29,
+            "wrong_rate": 0.43283582089552236,
+            "wrong_rate_upper95": 0.5519147698349607,
+            "wrong_shown": 29
+          },
+          {
+            "margin_min": 0.025,
+            "photos": 144,
+            "shown": 59,
+            "shown_rate": 0.4097222222222222,
+            "stable_frames": 2,
+            "wrong_card_shown": 27,
+            "wrong_rate": 0.4576271186440678,
+            "wrong_rate_upper95": 0.583423849765719,
+            "wrong_shown": 27
+          },
+          {
+            "margin_min": 0.03,
+            "photos": 144,
+            "shown": 50,
+            "shown_rate": 0.3472222222222222,
+            "stable_frames": 2,
+            "wrong_card_shown": 21,
+            "wrong_rate": 0.42,
+            "wrong_rate_upper95": 0.5576680331222217,
+            "wrong_shown": 21
+          },
+          {
+            "margin_min": 0.04,
+            "photos": 144,
+            "shown": 35,
+            "shown_rate": 0.24305555555555555,
+            "stable_frames": 2,
+            "wrong_card_shown": 12,
+            "wrong_rate": 0.34285714285714286,
+            "wrong_rate_upper95": 0.5084835312726328,
+            "wrong_shown": 12
+          },
+          {
+            "margin_min": 0.05,
+            "photos": 144,
+            "shown": 27,
+            "shown_rate": 0.1875,
+            "stable_frames": 2,
+            "wrong_card_shown": 7,
+            "wrong_rate": 0.25925925925925924,
+            "wrong_rate_upper95": 0.4467893040261568,
+            "wrong_shown": 7
+          },
+          {
+            "margin_min": 0.06,
+            "photos": 144,
+            "shown": 17,
+            "shown_rate": 0.11805555555555555,
+            "stable_frames": 2,
+            "wrong_card_shown": 3,
+            "wrong_rate": 0.17647058823529413,
+            "wrong_rate_upper95": 0.41029929017375777,
+            "wrong_shown": 3
+          },
+          {
+            "margin_min": 0.08,
+            "photos": 144,
+            "shown": 10,
+            "shown_rate": 0.06944444444444445,
+            "stable_frames": 2,
+            "wrong_card_shown": 2,
+            "wrong_rate": 0.2,
+            "wrong_rate_upper95": 0.5098431532792765,
+            "wrong_shown": 2
+          },
+          {
+            "margin_min": 0.1,
+            "photos": 144,
+            "shown": 5,
+            "shown_rate": 0.034722222222222224,
+            "stable_frames": 2,
+            "wrong_card_shown": 0,
+            "wrong_rate": 0.0,
+            "wrong_rate_upper95": 0.43449149475208104,
+            "wrong_shown": 0
+          },
+          {
+            "margin_min": 0.0,
+            "photos": 144,
+            "shown": 109,
+            "shown_rate": 0.7569444444444444,
+            "stable_frames": 3,
+            "wrong_card_shown": 57,
+            "wrong_rate": 0.5412844036697247,
+            "wrong_rate_upper95": 0.6318299621706287,
+            "wrong_shown": 59
+          },
+          {
+            "margin_min": 0.005,
+            "photos": 144,
+            "shown": 90,
+            "shown_rate": 0.625,
+            "stable_frames": 3,
+            "wrong_card_shown": 48,
+            "wrong_rate": 0.5444444444444444,
+            "wrong_rate_upper95": 0.6434055434341024,
+            "wrong_shown": 49
+          },
+          {
+            "margin_min": 0.01,
+            "photos": 144,
+            "shown": 74,
+            "shown_rate": 0.5138888888888888,
+            "stable_frames": 3,
+            "wrong_card_shown": 36,
+            "wrong_rate": 0.4864864864864865,
+            "wrong_rate_upper95": 0.5981908173280549,
+            "wrong_shown": 36
+          },
+          {
+            "margin_min": 0.015,
+            "photos": 144,
+            "shown": 61,
+            "shown_rate": 0.4236111111111111,
+            "stable_frames": 3,
+            "wrong_card_shown": 29,
+            "wrong_rate": 0.47540983606557374,
+            "wrong_rate_upper95": 0.5984305828468899,
+            "wrong_shown": 29
+          },
+          {
+            "margin_min": 0.02,
+            "photos": 144,
+            "shown": 52,
+            "shown_rate": 0.3611111111111111,
+            "stable_frames": 3,
+            "wrong_card_shown": 22,
+            "wrong_rate": 0.4230769230769231,
+            "wrong_rate_upper95": 0.558059150205685,
+            "wrong_shown": 22
+          },
+          {
+            "margin_min": 0.025,
+            "photos": 144,
+            "shown": 45,
+            "shown_rate": 0.3125,
+            "stable_frames": 3,
+            "wrong_card_shown": 19,
+            "wrong_rate": 0.4222222222222222,
+            "wrong_rate_upper95": 0.566994672040555,
+            "wrong_shown": 19
+          },
+          {
+            "margin_min": 0.03,
+            "photos": 144,
+            "shown": 38,
+            "shown_rate": 0.2638888888888889,
+            "stable_frames": 3,
+            "wrong_card_shown": 15,
+            "wrong_rate": 0.39473684210526316,
+            "wrong_rate_upper95": 0.5528241300130403,
+            "wrong_shown": 15
+          },
+          {
+            "margin_min": 0.04,
+            "photos": 144,
+            "shown": 22,
+            "shown_rate": 0.1527777777777778,
+            "stable_frames": 3,
+            "wrong_card_shown": 7,
+            "wrong_rate": 0.3181818181818182,
+            "wrong_rate_upper95": 0.5268177721716065,
+            "wrong_shown": 7
+          },
+          {
+            "margin_min": 0.05,
+            "photos": 144,
+            "shown": 16,
+            "shown_rate": 0.1111111111111111,
+            "stable_frames": 3,
+            "wrong_card_shown": 4,
+            "wrong_rate": 0.25,
+            "wrong_rate_upper95": 0.49498768929398645,
+            "wrong_shown": 4
+          },
+          {
+            "margin_min": 0.06,
+            "photos": 144,
+            "shown": 12,
+            "shown_rate": 0.08333333333333333,
+            "stable_frames": 3,
+            "wrong_card_shown": 2,
+            "wrong_rate": 0.16666666666666666,
+            "wrong_rate_upper95": 0.44803635738467273,
+            "wrong_shown": 2
+          },
+          {
+            "margin_min": 0.08,
+            "photos": 144,
+            "shown": 6,
+            "shown_rate": 0.041666666666666664,
+            "stable_frames": 3,
+            "wrong_card_shown": 1,
+            "wrong_rate": 0.16666666666666666,
+            "wrong_rate_upper95": 0.563509436563646,
+            "wrong_shown": 1
+          },
+          {
+            "margin_min": 0.1,
+            "photos": 144,
+            "shown": 4,
+            "shown_rate": 0.027777777777777776,
+            "stable_frames": 3,
+            "wrong_card_shown": 0,
+            "wrong_rate": 0.0,
+            "wrong_rate_upper95": 0.48990002040399916,
+            "wrong_shown": 0
+          }
+        ],
+        "fp32": [
+          {
+            "margin_min": 0.0,
+            "photos": 144,
+            "shown": 144,
+            "shown_rate": 1.0,
+            "stable_frames": 1,
+            "wrong_card_shown": 87,
+            "wrong_rate": 0.6180555555555556,
+            "wrong_rate_upper95": 0.6933677916889263,
+            "wrong_shown": 89
+          },
+          {
+            "margin_min": 0.005,
+            "photos": 144,
+            "shown": 141,
+            "shown_rate": 0.9791666666666666,
+            "stable_frames": 1,
+            "wrong_card_shown": 84,
+            "wrong_rate": 0.6099290780141844,
+            "wrong_rate_upper95": 0.6865035849742422,
+            "wrong_shown": 86
+          },
+          {
+            "margin_min": 0.01,
+            "photos": 144,
+            "shown": 130,
+            "shown_rate": 0.9027777777777778,
+            "stable_frames": 1,
+            "wrong_card_shown": 75,
+            "wrong_rate": 0.5846153846153846,
+            "wrong_rate_upper95": 0.66570940301561,
+            "wrong_shown": 76
+          },
+          {
+            "margin_min": 0.015,
+            "photos": 144,
+            "shown": 109,
+            "shown_rate": 0.7569444444444444,
+            "stable_frames": 1,
+            "wrong_card_shown": 62,
+            "wrong_rate": 0.5688073394495413,
+            "wrong_rate_upper95": 0.6578724663297693,
+            "wrong_shown": 62
+          },
+          {
+            "margin_min": 0.02,
+            "photos": 144,
+            "shown": 89,
+            "shown_rate": 0.6180555555555556,
+            "stable_frames": 1,
+            "wrong_card_shown": 43,
+            "wrong_rate": 0.48314606741573035,
+            "wrong_rate_upper95": 0.5854959627496036,
+            "wrong_shown": 43
+          },
+          {
+            "margin_min": 0.025,
+            "photos": 144,
+            "shown": 74,
+            "shown_rate": 0.5138888888888888,
+            "stable_frames": 1,
+            "wrong_card_shown": 34,
+            "wrong_rate": 0.4594594594594595,
+            "wrong_rate_upper95": 0.5721885478985324,
+            "wrong_shown": 34
+          },
+          {
+            "margin_min": 0.03,
+            "photos": 144,
+            "shown": 67,
+            "shown_rate": 0.4652777777777778,
+            "stable_frames": 1,
+            "wrong_card_shown": 30,
+            "wrong_rate": 0.44776119402985076,
+            "wrong_rate_upper95": 0.5664259846816114,
+            "wrong_shown": 30
+          },
+          {
+            "margin_min": 0.04,
+            "photos": 144,
+            "shown": 49,
+            "shown_rate": 0.3402777777777778,
+            "stable_frames": 1,
+            "wrong_card_shown": 20,
+            "wrong_rate": 0.40816326530612246,
+            "wrong_rate_upper95": 0.5475293002795374,
+            "wrong_shown": 20
+          },
+          {
+            "margin_min": 0.05,
+            "photos": 144,
+            "shown": 36,
+            "shown_rate": 0.25,
+            "stable_frames": 1,
+            "wrong_card_shown": 12,
+            "wrong_rate": 0.3333333333333333,
+            "wrong_rate_upper95": 0.49666302907033155,
+            "wrong_shown": 12
+          },
+          {
+            "margin_min": 0.06,
+            "photos": 144,
+            "shown": 24,
+            "shown_rate": 0.16666666666666666,
+            "stable_frames": 1,
+            "wrong_card_shown": 7,
+            "wrong_rate": 0.2916666666666667,
+            "wrong_rate_upper95": 0.49168063658709704,
+            "wrong_shown": 7
+          },
+          {
+            "margin_min": 0.08,
+            "photos": 144,
+            "shown": 11,
+            "shown_rate": 0.0763888888888889,
+            "stable_frames": 1,
+            "wrong_card_shown": 2,
+            "wrong_rate": 0.18181818181818182,
+            "wrong_rate_upper95": 0.4769861375782448,
+            "wrong_shown": 2
+          },
+          {
+            "margin_min": 0.1,
+            "photos": 144,
+            "shown": 7,
+            "shown_rate": 0.04861111111111111,
+            "stable_frames": 1,
+            "wrong_card_shown": 1,
+            "wrong_rate": 0.14285714285714285,
+            "wrong_rate_upper95": 0.51313450331903,
+            "wrong_shown": 1
+          },
+          {
+            "margin_min": 0.0,
+            "photos": 144,
+            "shown": 144,
+            "shown_rate": 1.0,
+            "stable_frames": 2,
+            "wrong_card_shown": 84,
+            "wrong_rate": 0.5902777777777778,
+            "wrong_rate_upper95": 0.6672406400025082,
+            "wrong_shown": 85
+          },
+          {
+            "margin_min": 0.005,
+            "photos": 144,
+            "shown": 123,
+            "shown_rate": 0.8541666666666666,
+            "stable_frames": 2,
+            "wrong_card_shown": 69,
+            "wrong_rate": 0.5772357723577236,
+            "wrong_rate_upper95": 0.6608991786466951,
+            "wrong_shown": 71
+          },
+          {
+            "margin_min": 0.01,
+            "photos": 144,
+            "shown": 97,
+            "shown_rate": 0.6736111111111112,
+            "stable_frames": 2,
+            "wrong_card_shown": 54,
+            "wrong_rate": 0.5567010309278351,
+            "wrong_rate_upper95": 0.6515257044001969,
+            "wrong_shown": 54
+          },
+          {
+            "margin_min": 0.015,
+            "photos": 144,
+            "shown": 83,
+            "shown_rate": 0.5763888888888888,
+            "stable_frames": 2,
+            "wrong_card_shown": 43,
+            "wrong_rate": 0.5180722891566265,
+            "wrong_rate_upper95": 0.6223699585617313,
+            "wrong_shown": 43
+          },
+          {
+            "margin_min": 0.02,
+            "photos": 144,
+            "shown": 67,
+            "shown_rate": 0.4652777777777778,
+            "stable_frames": 2,
+            "wrong_card_shown": 29,
+            "wrong_rate": 0.43283582089552236,
+            "wrong_rate_upper95": 0.5519147698349607,
+            "wrong_shown": 29
+          },
+          {
+            "margin_min": 0.025,
+            "photos": 144,
+            "shown": 59,
+            "shown_rate": 0.4097222222222222,
+            "stable_frames": 2,
+            "wrong_card_shown": 27,
+            "wrong_rate": 0.4576271186440678,
+            "wrong_rate_upper95": 0.583423849765719,
+            "wrong_shown": 27
+          },
+          {
+            "margin_min": 0.03,
+            "photos": 144,
+            "shown": 50,
+            "shown_rate": 0.3472222222222222,
+            "stable_frames": 2,
+            "wrong_card_shown": 21,
+            "wrong_rate": 0.42,
+            "wrong_rate_upper95": 0.5576680331222217,
+            "wrong_shown": 21
+          },
+          {
+            "margin_min": 0.04,
+            "photos": 144,
+            "shown": 35,
+            "shown_rate": 0.24305555555555555,
+            "stable_frames": 2,
+            "wrong_card_shown": 12,
+            "wrong_rate": 0.34285714285714286,
+            "wrong_rate_upper95": 0.5084835312726328,
+            "wrong_shown": 12
+          },
+          {
+            "margin_min": 0.05,
+            "photos": 144,
+            "shown": 27,
+            "shown_rate": 0.1875,
+            "stable_frames": 2,
+            "wrong_card_shown": 7,
+            "wrong_rate": 0.25925925925925924,
+            "wrong_rate_upper95": 0.4467893040261568,
+            "wrong_shown": 7
+          },
+          {
+            "margin_min": 0.06,
+            "photos": 144,
+            "shown": 17,
+            "shown_rate": 0.11805555555555555,
+            "stable_frames": 2,
+            "wrong_card_shown": 3,
+            "wrong_rate": 0.17647058823529413,
+            "wrong_rate_upper95": 0.41029929017375777,
+            "wrong_shown": 3
+          },
+          {
+            "margin_min": 0.08,
+            "photos": 144,
+            "shown": 10,
+            "shown_rate": 0.06944444444444445,
+            "stable_frames": 2,
+            "wrong_card_shown": 2,
+            "wrong_rate": 0.2,
+            "wrong_rate_upper95": 0.5098431532792765,
+            "wrong_shown": 2
+          },
+          {
+            "margin_min": 0.1,
+            "photos": 144,
+            "shown": 5,
+            "shown_rate": 0.034722222222222224,
+            "stable_frames": 2,
+            "wrong_card_shown": 0,
+            "wrong_rate": 0.0,
+            "wrong_rate_upper95": 0.43449149475208104,
+            "wrong_shown": 0
+          },
+          {
+            "margin_min": 0.0,
+            "photos": 144,
+            "shown": 109,
+            "shown_rate": 0.7569444444444444,
+            "stable_frames": 3,
+            "wrong_card_shown": 57,
+            "wrong_rate": 0.5412844036697247,
+            "wrong_rate_upper95": 0.6318299621706287,
+            "wrong_shown": 59
+          },
+          {
+            "margin_min": 0.005,
+            "photos": 144,
+            "shown": 90,
+            "shown_rate": 0.625,
+            "stable_frames": 3,
+            "wrong_card_shown": 48,
+            "wrong_rate": 0.5444444444444444,
+            "wrong_rate_upper95": 0.6434055434341024,
+            "wrong_shown": 49
+          },
+          {
+            "margin_min": 0.01,
+            "photos": 144,
+            "shown": 74,
+            "shown_rate": 0.5138888888888888,
+            "stable_frames": 3,
+            "wrong_card_shown": 36,
+            "wrong_rate": 0.4864864864864865,
+            "wrong_rate_upper95": 0.5981908173280549,
+            "wrong_shown": 36
+          },
+          {
+            "margin_min": 0.015,
+            "photos": 144,
+            "shown": 61,
+            "shown_rate": 0.4236111111111111,
+            "stable_frames": 3,
+            "wrong_card_shown": 29,
+            "wrong_rate": 0.47540983606557374,
+            "wrong_rate_upper95": 0.5984305828468899,
+            "wrong_shown": 29
+          },
+          {
+            "margin_min": 0.02,
+            "photos": 144,
+            "shown": 52,
+            "shown_rate": 0.3611111111111111,
+            "stable_frames": 3,
+            "wrong_card_shown": 22,
+            "wrong_rate": 0.4230769230769231,
+            "wrong_rate_upper95": 0.558059150205685,
+            "wrong_shown": 22
+          },
+          {
+            "margin_min": 0.025,
+            "photos": 144,
+            "shown": 45,
+            "shown_rate": 0.3125,
+            "stable_frames": 3,
+            "wrong_card_shown": 19,
+            "wrong_rate": 0.4222222222222222,
+            "wrong_rate_upper95": 0.566994672040555,
+            "wrong_shown": 19
+          },
+          {
+            "margin_min": 0.03,
+            "photos": 144,
+            "shown": 38,
+            "shown_rate": 0.2638888888888889,
+            "stable_frames": 3,
+            "wrong_card_shown": 15,
+            "wrong_rate": 0.39473684210526316,
+            "wrong_rate_upper95": 0.5528241300130403,
+            "wrong_shown": 15
+          },
+          {
+            "margin_min": 0.04,
+            "photos": 144,
+            "shown": 22,
+            "shown_rate": 0.1527777777777778,
+            "stable_frames": 3,
+            "wrong_card_shown": 7,
+            "wrong_rate": 0.3181818181818182,
+            "wrong_rate_upper95": 0.5268177721716065,
+            "wrong_shown": 7
+          },
+          {
+            "margin_min": 0.05,
+            "photos": 144,
+            "shown": 16,
+            "shown_rate": 0.1111111111111111,
+            "stable_frames": 3,
+            "wrong_card_shown": 4,
+            "wrong_rate": 0.25,
+            "wrong_rate_upper95": 0.49498768929398645,
+            "wrong_shown": 4
+          },
+          {
+            "margin_min": 0.06,
+            "photos": 144,
+            "shown": 12,
+            "shown_rate": 0.08333333333333333,
+            "stable_frames": 3,
+            "wrong_card_shown": 2,
+            "wrong_rate": 0.16666666666666666,
+            "wrong_rate_upper95": 0.44803635738467273,
+            "wrong_shown": 2
+          },
+          {
+            "margin_min": 0.08,
+            "photos": 144,
+            "shown": 6,
+            "shown_rate": 0.041666666666666664,
+            "stable_frames": 3,
+            "wrong_card_shown": 1,
+            "wrong_rate": 0.16666666666666666,
+            "wrong_rate_upper95": 0.563509436563646,
+            "wrong_shown": 1
+          },
+          {
+            "margin_min": 0.1,
+            "photos": 144,
+            "shown": 4,
+            "shown_rate": 0.027777777777777776,
+            "stable_frames": 3,
+            "wrong_card_shown": 0,
+            "wrong_rate": 0.0,
+            "wrong_rate_upper95": 0.48990002040399916,
+            "wrong_shown": 0
+          }
+        ],
+        "int8": [
+          {
+            "margin_min": 0.0,
+            "photos": 144,
+            "shown": 144,
+            "shown_rate": 1.0,
+            "stable_frames": 1,
+            "wrong_card_shown": 87,
+            "wrong_rate": 0.6180555555555556,
+            "wrong_rate_upper95": 0.6933677916889263,
+            "wrong_shown": 89
+          },
+          {
+            "margin_min": 0.005,
+            "photos": 144,
+            "shown": 142,
+            "shown_rate": 0.9861111111111112,
+            "stable_frames": 1,
+            "wrong_card_shown": 85,
+            "wrong_rate": 0.6126760563380281,
+            "wrong_rate_upper95": 0.6888257912760646,
+            "wrong_shown": 87
+          },
+          {
+            "margin_min": 0.01,
+            "photos": 144,
+            "shown": 129,
+            "shown_rate": 0.8958333333333334,
+            "stable_frames": 1,
+            "wrong_card_shown": 75,
+            "wrong_rate": 0.5891472868217055,
+            "wrong_rate_upper95": 0.6702740209037995,
+            "wrong_shown": 76
+          },
+          {
+            "margin_min": 0.015,
+            "photos": 144,
+            "shown": 109,
+            "shown_rate": 0.7569444444444444,
+            "stable_frames": 1,
+            "wrong_card_shown": 61,
+            "wrong_rate": 0.5596330275229358,
+            "wrong_rate_upper95": 0.6492222055105674,
+            "wrong_shown": 61
+          },
+          {
+            "margin_min": 0.02,
+            "photos": 144,
+            "shown": 89,
+            "shown_rate": 0.6180555555555556,
+            "stable_frames": 1,
+            "wrong_card_shown": 44,
+            "wrong_rate": 0.4943820224719101,
+            "wrong_rate_upper95": 0.5963162472579548,
+            "wrong_shown": 44
+          },
+          {
+            "margin_min": 0.025,
+            "photos": 144,
+            "shown": 76,
+            "shown_rate": 0.5277777777777778,
+            "stable_frames": 1,
+            "wrong_card_shown": 36,
+            "wrong_rate": 0.47368421052631576,
+            "wrong_rate_upper95": 0.5844816734727798,
+            "wrong_shown": 36
+          },
+          {
+            "margin_min": 0.03,
+            "photos": 144,
+            "shown": 67,
+            "shown_rate": 0.4652777777777778,
+            "stable_frames": 1,
+            "wrong_card_shown": 30,
+            "wrong_rate": 0.44776119402985076,
+            "wrong_rate_upper95": 0.5664259846816114,
+            "wrong_shown": 30
+          },
+          {
+            "margin_min": 0.04,
+            "photos": 144,
+            "shown": 48,
+            "shown_rate": 0.3333333333333333,
+            "stable_frames": 1,
+            "wrong_card_shown": 19,
+            "wrong_rate": 0.3958333333333333,
+            "wrong_rate_upper95": 0.5368984540306487,
+            "wrong_shown": 19
+          },
+          {
+            "margin_min": 0.05,
+            "photos": 144,
+            "shown": 36,
+            "shown_rate": 0.25,
+            "stable_frames": 1,
+            "wrong_card_shown": 12,
+            "wrong_rate": 0.3333333333333333,
+            "wrong_rate_upper95": 0.49666302907033155,
+            "wrong_shown": 12
+          },
+          {
+            "margin_min": 0.06,
+            "photos": 144,
+            "shown": 24,
+            "shown_rate": 0.16666666666666666,
+            "stable_frames": 1,
+            "wrong_card_shown": 7,
+            "wrong_rate": 0.2916666666666667,
+            "wrong_rate_upper95": 0.49168063658709704,
+            "wrong_shown": 7
+          },
+          {
+            "margin_min": 0.08,
+            "photos": 144,
+            "shown": 11,
+            "shown_rate": 0.0763888888888889,
+            "stable_frames": 1,
+            "wrong_card_shown": 2,
+            "wrong_rate": 0.18181818181818182,
+            "wrong_rate_upper95": 0.4769861375782448,
+            "wrong_shown": 2
+          },
+          {
+            "margin_min": 0.1,
+            "photos": 144,
+            "shown": 7,
+            "shown_rate": 0.04861111111111111,
+            "stable_frames": 1,
+            "wrong_card_shown": 1,
+            "wrong_rate": 0.14285714285714285,
+            "wrong_rate_upper95": 0.51313450331903,
+            "wrong_shown": 1
+          },
+          {
+            "margin_min": 0.0,
+            "photos": 144,
+            "shown": 144,
+            "shown_rate": 1.0,
+            "stable_frames": 2,
+            "wrong_card_shown": 84,
+            "wrong_rate": 0.5902777777777778,
+            "wrong_rate_upper95": 0.6672406400025082,
+            "wrong_shown": 85
+          },
+          {
+            "margin_min": 0.005,
+            "photos": 144,
+            "shown": 124,
+            "shown_rate": 0.8611111111111112,
+            "stable_frames": 2,
+            "wrong_card_shown": 69,
+            "wrong_rate": 0.5725806451612904,
+            "wrong_rate_upper95": 0.656183523888156,
+            "wrong_shown": 71
+          },
+          {
+            "margin_min": 0.01,
+            "photos": 144,
+            "shown": 97,
+            "shown_rate": 0.6736111111111112,
+            "stable_frames": 2,
+            "wrong_card_shown": 53,
+            "wrong_rate": 0.5463917525773195,
+            "wrong_rate_upper95": 0.6418097379352757,
+            "wrong_shown": 53
+          },
+          {
+            "margin_min": 0.015,
+            "photos": 144,
+            "shown": 83,
+            "shown_rate": 0.5763888888888888,
+            "stable_frames": 2,
+            "wrong_card_shown": 43,
+            "wrong_rate": 0.5180722891566265,
+            "wrong_rate_upper95": 0.6223699585617313,
+            "wrong_shown": 43
+          },
+          {
+            "margin_min": 0.02,
+            "photos": 144,
+            "shown": 66,
+            "shown_rate": 0.4583333333333333,
+            "stable_frames": 2,
+            "wrong_card_shown": 29,
+            "wrong_rate": 0.4393939393939394,
+            "wrong_rate_upper95": 0.5591757856994607,
+            "wrong_shown": 29
+          },
+          {
+            "margin_min": 0.025,
+            "photos": 144,
+            "shown": 59,
+            "shown_rate": 0.4097222222222222,
+            "stable_frames": 2,
+            "wrong_card_shown": 27,
+            "wrong_rate": 0.4576271186440678,
+            "wrong_rate_upper95": 0.583423849765719,
+            "wrong_shown": 27
+          },
+          {
+            "margin_min": 0.03,
+            "photos": 144,
+            "shown": 50,
+            "shown_rate": 0.3472222222222222,
+            "stable_frames": 2,
+            "wrong_card_shown": 21,
+            "wrong_rate": 0.42,
+            "wrong_rate_upper95": 0.5576680331222217,
+            "wrong_shown": 21
+          },
+          {
+            "margin_min": 0.04,
+            "photos": 144,
+            "shown": 35,
+            "shown_rate": 0.24305555555555555,
+            "stable_frames": 2,
+            "wrong_card_shown": 12,
+            "wrong_rate": 0.34285714285714286,
+            "wrong_rate_upper95": 0.5084835312726328,
+            "wrong_shown": 12
+          },
+          {
+            "margin_min": 0.05,
+            "photos": 144,
+            "shown": 27,
+            "shown_rate": 0.1875,
+            "stable_frames": 2,
+            "wrong_card_shown": 7,
+            "wrong_rate": 0.25925925925925924,
+            "wrong_rate_upper95": 0.4467893040261568,
+            "wrong_shown": 7
+          },
+          {
+            "margin_min": 0.06,
+            "photos": 144,
+            "shown": 17,
+            "shown_rate": 0.11805555555555555,
+            "stable_frames": 2,
+            "wrong_card_shown": 3,
+            "wrong_rate": 0.17647058823529413,
+            "wrong_rate_upper95": 0.41029929017375777,
+            "wrong_shown": 3
+          },
+          {
+            "margin_min": 0.08,
+            "photos": 144,
+            "shown": 10,
+            "shown_rate": 0.06944444444444445,
+            "stable_frames": 2,
+            "wrong_card_shown": 2,
+            "wrong_rate": 0.2,
+            "wrong_rate_upper95": 0.5098431532792765,
+            "wrong_shown": 2
+          },
+          {
+            "margin_min": 0.1,
+            "photos": 144,
+            "shown": 5,
+            "shown_rate": 0.034722222222222224,
+            "stable_frames": 2,
+            "wrong_card_shown": 0,
+            "wrong_rate": 0.0,
+            "wrong_rate_upper95": 0.43449149475208104,
+            "wrong_shown": 0
+          },
+          {
+            "margin_min": 0.0,
+            "photos": 144,
+            "shown": 109,
+            "shown_rate": 0.7569444444444444,
+            "stable_frames": 3,
+            "wrong_card_shown": 57,
+            "wrong_rate": 0.5412844036697247,
+            "wrong_rate_upper95": 0.6318299621706287,
+            "wrong_shown": 59
+          },
+          {
+            "margin_min": 0.005,
+            "photos": 144,
+            "shown": 91,
+            "shown_rate": 0.6319444444444444,
+            "stable_frames": 3,
+            "wrong_card_shown": 48,
+            "wrong_rate": 0.5384615384615384,
+            "wrong_rate_upper95": 0.6372473756005981,
+            "wrong_shown": 49
+          },
+          {
+            "margin_min": 0.01,
+            "photos": 144,
+            "shown": 74,
+            "shown_rate": 0.5138888888888888,
+            "stable_frames": 3,
+            "wrong_card_shown": 37,
+            "wrong_rate": 0.5,
+            "wrong_rate_upper95": 0.6110759915173127,
+            "wrong_shown": 37
+          },
+          {
+            "margin_min": 0.015,
+            "photos": 144,
+            "shown": 61,
+            "shown_rate": 0.4236111111111111,
+            "stable_frames": 3,
+            "wrong_card_shown": 29,
+            "wrong_rate": 0.47540983606557374,
+            "wrong_rate_upper95": 0.5984305828468899,
+            "wrong_shown": 29
+          },
+          {
+            "margin_min": 0.02,
+            "photos": 144,
+            "shown": 51,
+            "shown_rate": 0.3541666666666667,
+            "stable_frames": 3,
+            "wrong_card_shown": 21,
+            "wrong_rate": 0.4117647058823529,
+            "wrong_rate_upper95": 0.5483490725258254,
+            "wrong_shown": 21
+          },
+          {
+            "margin_min": 0.025,
+            "photos": 144,
+            "shown": 45,
+            "shown_rate": 0.3125,
+            "stable_frames": 3,
+            "wrong_card_shown": 19,
+            "wrong_rate": 0.4222222222222222,
+            "wrong_rate_upper95": 0.566994672040555,
+            "wrong_shown": 19
+          },
+          {
+            "margin_min": 0.03,
+            "photos": 144,
+            "shown": 39,
+            "shown_rate": 0.2708333333333333,
+            "stable_frames": 3,
+            "wrong_card_shown": 16,
+            "wrong_rate": 0.41025641025641024,
+            "wrong_rate_upper95": 0.5658165152665509,
+            "wrong_shown": 16
+          },
+          {
+            "margin_min": 0.04,
+            "photos": 144,
+            "shown": 22,
+            "shown_rate": 0.1527777777777778,
+            "stable_frames": 3,
+            "wrong_card_shown": 7,
+            "wrong_rate": 0.3181818181818182,
+            "wrong_rate_upper95": 0.5268177721716065,
+            "wrong_shown": 7
+          },
+          {
+            "margin_min": 0.05,
+            "photos": 144,
+            "shown": 16,
+            "shown_rate": 0.1111111111111111,
+            "stable_frames": 3,
+            "wrong_card_shown": 4,
+            "wrong_rate": 0.25,
+            "wrong_rate_upper95": 0.49498768929398645,
+            "wrong_shown": 4
+          },
+          {
+            "margin_min": 0.06,
+            "photos": 144,
+            "shown": 12,
+            "shown_rate": 0.08333333333333333,
+            "stable_frames": 3,
+            "wrong_card_shown": 2,
+            "wrong_rate": 0.16666666666666666,
+            "wrong_rate_upper95": 0.44803635738467273,
+            "wrong_shown": 2
+          },
+          {
+            "margin_min": 0.08,
+            "photos": 144,
+            "shown": 6,
+            "shown_rate": 0.041666666666666664,
+            "stable_frames": 3,
+            "wrong_card_shown": 1,
+            "wrong_rate": 0.16666666666666666,
+            "wrong_rate_upper95": 0.563509436563646,
+            "wrong_shown": 1
+          },
+          {
+            "margin_min": 0.1,
+            "photos": 144,
+            "shown": 4,
+            "shown_rate": 0.027777777777777776,
+            "stable_frames": 3,
+            "wrong_card_shown": 0,
+            "wrong_rate": 0.0,
+            "wrong_rate_upper95": 0.48990002040399916,
+            "wrong_shown": 0
+          }
+        ]
+      }
+    },
+    "text_filtered": {
+      "accuracy": {
+        "fp16": {
+          "all": {
+            "photos": 144,
+            "top1": 111,
+            "top1_family_rate": 0.7847222222222222,
+            "top1_rate": 0.7708333333333334,
+            "top5": 119,
+            "top5_lower95": 0.756264144441322,
+            "top5_rate": 0.8263888888888888
+          },
+          "by_category": {
+            "reprint": {
+              "photos": 3,
+              "top1": 0,
+              "top1_family_rate": 0.3333333333333333,
+              "top1_rate": 0.0,
+              "top5": 1,
+              "top5_lower95": 0.0614903152761605,
+              "top5_rate": 0.3333333333333333
+            },
+            "twin-en-ja": {
+              "photos": 0
+            },
+            "twin-other": {
+              "photos": 0
+            },
+            "unique": {
+              "photos": 141,
+              "top1": 111,
+              "top1_family_rate": 0.7943262411347518,
+              "top1_rate": 0.7872340425531915,
+              "top5": 118,
+              "top5_lower95": 0.7671125887707618,
+              "top5_rate": 0.8368794326241135
+            }
+          }
+        },
+        "fp32": {
+          "all": {
+            "photos": 144,
+            "top1": 111,
+            "top1_family_rate": 0.7847222222222222,
+            "top1_rate": 0.7708333333333334,
+            "top5": 119,
+            "top5_lower95": 0.756264144441322,
+            "top5_rate": 0.8263888888888888
+          },
+          "by_category": {
+            "reprint": {
+              "photos": 3,
+              "top1": 0,
+              "top1_family_rate": 0.3333333333333333,
+              "top1_rate": 0.0,
+              "top5": 1,
+              "top5_lower95": 0.0614903152761605,
+              "top5_rate": 0.3333333333333333
+            },
+            "twin-en-ja": {
+              "photos": 0
+            },
+            "twin-other": {
+              "photos": 0
+            },
+            "unique": {
+              "photos": 141,
+              "top1": 111,
+              "top1_family_rate": 0.7943262411347518,
+              "top1_rate": 0.7872340425531915,
+              "top5": 118,
+              "top5_lower95": 0.7671125887707618,
+              "top5_rate": 0.8368794326241135
+            }
+          }
+        },
+        "int8": {
+          "all": {
+            "photos": 144,
+            "top1": 112,
+            "top1_family_rate": 0.7916666666666666,
+            "top1_rate": 0.7777777777777778,
+            "top5": 119,
+            "top5_lower95": 0.756264144441322,
+            "top5_rate": 0.8263888888888888
+          },
+          "by_category": {
+            "reprint": {
+              "photos": 3,
+              "top1": 0,
+              "top1_family_rate": 0.3333333333333333,
+              "top1_rate": 0.0,
+              "top5": 1,
+              "top5_lower95": 0.0614903152761605,
+              "top5_rate": 0.3333333333333333
+            },
+            "twin-en-ja": {
+              "photos": 0
+            },
+            "twin-other": {
+              "photos": 0
+            },
+            "unique": {
+              "photos": 141,
+              "top1": 112,
+              "top1_family_rate": 0.8014184397163121,
+              "top1_rate": 0.7943262411347518,
+              "top5": 118,
+              "top5_lower95": 0.7671125887707618,
+              "top5_rate": 0.8368794326241135
+            }
+          }
+        }
+      },
+      "best_rule": {
+        "fp16": null,
+        "fp32": null,
+        "int8": null
+      },
+      "margins": {
+        "fp16": {
+          "correct_top1": {
+            "max": 0.3648691177368164,
+            "median": 0.12084677815437317,
+            "min": 0.00020307302474975586,
+            "n": 40,
+            "p05": 0.015082240104675293,
+            "p25": 0.05679190158843994,
+            "p75": 0.17307764291763306,
+            "p95": 0.23908525705337524
+          },
+          "wrong_top1": {
+            "max": 0.11532384157180786,
+            "median": 0.010923027992248535,
+            "min": 0.0002853870391845703,
+            "n": 31,
+            "p05": 0.0018414855003356934,
+            "p25": 0.005315661430358887,
+            "p75": 0.021424412727355957,
+            "p95": 0.06518805027008057
+          }
+        },
+        "fp32": {
+          "correct_top1": {
+            "max": 0.3648946285247803,
+            "median": 0.12087363004684448,
+            "min": 0.00018423795700073242,
+            "n": 40,
+            "p05": 0.015081942081451416,
+            "p25": 0.05681127309799194,
+            "p75": 0.17309719324111938,
+            "p95": 0.2390027642250061
+          },
+          "wrong_top1": {
+            "max": 0.1152973473072052,
+            "median": 0.01094895601272583,
+            "min": 0.00027251243591308594,
+            "n": 31,
+            "p05": 0.0018756389617919922,
+            "p25": 0.005279123783111572,
+            "p75": 0.021397948265075684,
+            "p95": 0.06518834829330444
+          }
+        },
+        "int8": {
+          "correct_top1": {
+            "max": 0.3655001223087311,
+            "median": 0.11375391483306885,
+            "min": 0.00016248226165771484,
+            "n": 41,
+            "p05": 0.003517448902130127,
+            "p25": 0.05091017484664917,
+            "p75": 0.17285525798797607,
+            "p95": 0.24046176671981812
+          },
+          "wrong_top1": {
+            "max": 0.11577922105789185,
+            "median": 0.01079714298248291,
+            "min": 0.00044274330139160156,
+            "n": 30,
+            "p05": 0.002208530902862549,
+            "p25": 0.004828214645385742,
+            "p75": 0.02359241247177124,
+            "p95": 0.06562983989715576
+          }
+        }
+      },
+      "misses_top1": {
+        "fp16": [
+          {
+            "label_card": "en:sv01-212",
+            "label_category": "unique",
+            "label_rank_in_top5": null,
+            "margin_frame0": 0.0606,
+            "top1_card_group": "neo4-050",
+            "top1_in_family": false
+          },
+          {
+            "label_card": "en:sv02-204",
+            "label_category": "unique",
+            "label_rank_in_top5": 2,
+            "margin_frame0": 0.0003,
+            "top1_card_group": "M2a-204",
+            "top1_in_family": false
+          },
+          {
+            "label_card": "en:svp-053",
+            "label_category": "unique",
+            "label_rank_in_top5": null,
+            "margin_frame0": Infinity,
+            "top1_card_group": "xy12-53",
+            "top1_in_family": false
+          },
+          {
+            "label_card": "en:sv03.5-199",
+            "label_category": "unique",
+            "label_rank_in_top5": null,
+            "margin_frame0": 0.1153,
+            "top1_card_group": "neo4-051",
+            "top1_in_family": false
+          },
+          {
+            "label_card": "en:g1-RC29",
+            "label_category": "unique",
+            "label_rank_in_top5": 2,
+            "margin_frame0": 0.0106,
+            "top1_card_group": "30th-051",
+            "top1_in_family": false
+          },
+          {
+            "label_card": "en:mep-023",
+            "label_category": "unique",
+            "label_rank_in_top5": null,
+            "margin_frame0": 0.0109,
+            "top1_card_group": "BW2-071",
+            "top1_in_family": false
+          },
+          {
+            "label_card": "en:base1-15",
+            "label_category": "unique",
+            "label_rank_in_top5": null,
+            "margin_frame0": 0.0306,
+            "top1_card_group": "sv05-199",
+            "top1_in_family": false
+          },
+          {
+            "label_card": "en:sv03.5-063",
+            "label_category": "unique",
+            "label_rank_in_top5": 2,
+            "margin_frame0": 0.0093,
+            "top1_card_group": "SV2a-063",
+            "top1_in_family": false
+          },
+          {
+            "label_card": "en:swsh9-013",
+            "label_category": "reprint",
+            "label_rank_in_top5": null,
+            "margin_frame0": 0.0214,
+            "top1_card_group": "dpp-DP39",
+            "top1_in_family": false
+          },
+          {
+            "label_card": "en:svp-085",
+            "label_category": "unique",
+            "label_rank_in_top5": null,
+            "margin_frame0": 0.0652,
+            "top1_card_group": "neo3-032",
+            "top1_in_family": false
+          },
+          {
+            "label_card": "ja:SM12a-083",
+            "label_category": "unique",
+            "label_rank_in_top5": null,
+            "margin_frame0": 0.0201,
+            "top1_card_group": "S10D-083",
+            "top1_in_family": false
+          },
+          {
+            "label_card": "en:sv08.5-075",
+            "label_category": "reprint",
+            "label_rank_in_top5": null,
+            "margin_frame0": 0.0111,
+            "top1_card_group": "SM11a-075",
+            "top1_in_family": false
+          },
+          {
+            "label_card": "en:sv04.5-233",
+            "label_category": "unique",
+            "label_rank_in_top5": 5,
+            "margin_frame0": 0.0179,
+            "top1_card_group": "ja:pooka-adv-expansion-pack-29",
+            "top1_in_family": false
+          },
+          {
+            "label_card": "en:pl4-71",
+            "label_category": "unique",
+            "label_rank_in_top5": null,
+            "margin_frame0": 0.0075,
+            "top1_card_group": "S5I-021",
+            "top1_in_family": false
+          },
+          {
+            "label_card": "en:sv06-188",
+            "label_category": "unique",
+            "label_rank_in_top5": null,
+            "margin_frame0": 0.0236,
+            "top1_card_group": "MC-188",
+            "top1_in_family": false
+          },
+          {
+            "label_card": "en:svp-174",
+            "label_category": "unique",
+            "label_rank_in_top5": null,
+            "margin_frame0": 0.0652,
+            "top1_card_group": "svp-173",
+            "top1_in_family": false
+          },
+          {
+            "label_card": "en:ex9-9",
+            "label_category": "unique",
+            "label_rank_in_top5": null,
+            "margin_frame0": 0.0176,
+            "top1_card_group": "svp-182",
+            "top1_in_family": false
+          },
+          {
+            "label_card": "en:base5-68",
+            "label_category": "unique",
+            "label_rank_in_top5": null,
+            "margin_frame0": 0.004,
+            "top1_card_group": "PCG6-058",
+            "top1_in_family": false
+          },
+          {
+            "label_card": "en:CLB-007",
+            "label_category": "unique",
+            "label_rank_in_top5": null,
+            "margin_frame0": 0.0041,
+            "top1_card_group": "PCG9-045",
+            "top1_in_family": false
+          },
+          {
+            "label_card": "en:swsh12.5gg-GG38",
+            "label_category": "unique",
+            "label_rank_in_top5": null,
+            "margin_frame0": 0.0053,
+            "top1_card_group": "me02-026",
+            "top1_in_family": false
+          },
+          {
+            "label_card": "en:swsh12.5gg-GG42",
+            "label_category": "unique",
+            "label_rank_in_top5": null,
+            "margin_frame0": 0.0062,
+            "top1_card_group": "swsh6-165",
+            "top1_in_family": false
+          },
+          {
+            "label_card": "en:swsh12.5gg-GG42",
+            "label_category": "unique",
+            "label_rank_in_top5": null,
+            "margin_frame0": 0.0041,
+            "top1_card_group": "SV8a-222",
+            "top1_in_family": false
+          },
+          {
+            "label_card": "en:swsh12.5gg-GG47",
+            "label_category": "unique",
+            "label_rank_in_top5": null,
+            "margin_frame0": 0.0003,
+            "top1_card_group": "swsh12.5-065",
+            "top1_in_family": false
+          },
+          {
+            "label_card": "en:base1-20",
+            "label_category": "unique",
+            "label_rank_in_top5": 2,
+            "margin_frame0": 0.0029,
+            "top1_card_group": "pl1-128",
+            "top1_in_family": false
+          },
+          {
+            "label_card": "en:base2-58",
+            "label_category": "unique",
+            "label_rank_in_top5": 2,
+            "margin_frame0": 0.0037,
+            "top1_card_group": "PMCG2-002",
+            "top1_in_family": false
+          },
+          {
+            "label_card": "en:base2-58",
+            "label_category": "unique",
+            "label_rank_in_top5": null,
+            "margin_frame0": 0.0172,
+            "top1_card_group": "dp5-58",
+            "top1_in_family": false
+          },
+          {
+            "label_card": "en:swsh12.5gg-GG46",
+            "label_category": "unique",
+            "label_rank_in_top5": null,
+            "margin_frame0": 0.007,
+            "top1_card_group": "XY6-029",
+            "top1_in_family": false
+          },
+          {
+            "label_card": "en:swsh12.5gg-GG41",
+            "label_category": "unique",
+            "label_rank_in_top5": null,
+            "margin_frame0": 0.0486,
+            "top1_card_group": "S3a-015",
+            "top1_in_family": false
+          },
+          {
+            "label_card": "en:swsh12.5gg-GG41",
+            "label_category": "unique",
+            "label_rank_in_top5": null,
+            "margin_frame0": 0.0306,
+            "top1_card_group": "S3a-015",
+            "top1_in_family": false
+          },
+          {
+            "label_card": "en:swsh12.5gg-GG41",
+            "label_category": "unique",
+            "label_rank_in_top5": null,
+            "margin_frame0": 0.0018,
+            "top1_card_group": "S3a-015",
+            "top1_in_family": false
+          },
+          {
+            "label_card": "en:xy12-35",
+            "label_category": "unique",
+            "label_rank_in_top5": 2,
+            "margin_frame0": 0.0115,
+            "top1_card_group": "30th-035",
+            "top1_in_family": true
+          },
+          {
+            "label_card": "en:sv04-159",
+            "label_category": "reprint",
+            "label_rank_in_top5": 2,
+            "margin_frame0": 0.0073,
+            "top1_card_group": "PPS5-PAR-159",
+            "top1_in_family": true
+          },
+          {
+            "label_card": "ja:CLF-017",
+            "label_category": "unique",
+            "label_rank_in_top5": null,
+            "margin_frame0": Infinity,
+            "top1_card_group": "CLV-017",
+            "top1_in_family": false
+          }
+        ],
+        "fp32": [
+          {
+            "label_card": "en:sv01-212",
+            "label_category": "unique",
+            "label_rank_in_top5": null,
+            "margin_frame0": 0.0606,
+            "top1_card_group": "neo4-050",
+            "top1_in_family": false
+          },
+          {
+            "label_card": "en:sv02-204",
+            "label_category": "unique",
+            "label_rank_in_top5": 2,
+            "margin_frame0": 0.0003,
+            "top1_card_group": "M2a-204",
+            "top1_in_family": false
+          },
+          {
+            "label_card": "en:svp-053",
+            "label_category": "unique",
+            "label_rank_in_top5": null,
+            "margin_frame0": Infinity,
+            "top1_card_group": "xy12-53",
+            "top1_in_family": false
+          },
+          {
+            "label_card": "en:sv03.5-199",
+            "label_category": "unique",
+            "label_rank_in_top5": null,
+            "margin_frame0": 0.1153,
+            "top1_card_group": "neo4-051",
+            "top1_in_family": false
+          },
+          {
+            "label_card": "en:g1-RC29",
+            "label_category": "unique",
+            "label_rank_in_top5": 2,
+            "margin_frame0": 0.0106,
+            "top1_card_group": "30th-051",
+            "top1_in_family": false
+          },
+          {
+            "label_card": "en:mep-023",
+            "label_category": "unique",
+            "label_rank_in_top5": null,
+            "margin_frame0": 0.0109,
+            "top1_card_group": "BW2-071",
+            "top1_in_family": false
+          },
+          {
+            "label_card": "en:base1-15",
+            "label_category": "unique",
+            "label_rank_in_top5": null,
+            "margin_frame0": 0.0306,
+            "top1_card_group": "sv05-199",
+            "top1_in_family": false
+          },
+          {
+            "label_card": "en:sv03.5-063",
+            "label_category": "unique",
+            "label_rank_in_top5": 2,
+            "margin_frame0": 0.0092,
+            "top1_card_group": "SV2a-063",
+            "top1_in_family": false
+          },
+          {
+            "label_card": "en:swsh9-013",
+            "label_category": "reprint",
+            "label_rank_in_top5": null,
+            "margin_frame0": 0.0214,
+            "top1_card_group": "dpp-DP39",
+            "top1_in_family": false
+          },
+          {
+            "label_card": "en:svp-085",
+            "label_category": "unique",
+            "label_rank_in_top5": null,
+            "margin_frame0": 0.0652,
+            "top1_card_group": "neo3-032",
+            "top1_in_family": false
+          },
+          {
+            "label_card": "ja:SM12a-083",
+            "label_category": "unique",
+            "label_rank_in_top5": null,
+            "margin_frame0": 0.0201,
+            "top1_card_group": "S10D-083",
+            "top1_in_family": false
+          },
+          {
+            "label_card": "en:sv08.5-075",
+            "label_category": "reprint",
+            "label_rank_in_top5": null,
+            "margin_frame0": 0.011,
+            "top1_card_group": "SM11a-075",
+            "top1_in_family": false
+          },
+          {
+            "label_card": "en:sv04.5-233",
+            "label_category": "unique",
+            "label_rank_in_top5": 5,
+            "margin_frame0": 0.0178,
+            "top1_card_group": "ja:pooka-adv-expansion-pack-29",
+            "top1_in_family": false
+          },
+          {
+            "label_card": "en:pl4-71",
+            "label_category": "unique",
+            "label_rank_in_top5": null,
+            "margin_frame0": 0.0075,
+            "top1_card_group": "S5I-021",
+            "top1_in_family": false
+          },
+          {
+            "label_card": "en:sv06-188",
+            "label_category": "unique",
+            "label_rank_in_top5": null,
+            "margin_frame0": 0.0236,
+            "top1_card_group": "MC-188",
+            "top1_in_family": false
+          },
+          {
+            "label_card": "en:svp-174",
+            "label_category": "unique",
+            "label_rank_in_top5": null,
+            "margin_frame0": 0.0652,
+            "top1_card_group": "svp-173",
+            "top1_in_family": false
+          },
+          {
+            "label_card": "en:ex9-9",
+            "label_category": "unique",
+            "label_rank_in_top5": null,
+            "margin_frame0": 0.0176,
+            "top1_card_group": "svp-182",
+            "top1_in_family": false
+          },
+          {
+            "label_card": "en:base5-68",
+            "label_category": "unique",
+            "label_rank_in_top5": null,
+            "margin_frame0": 0.0041,
+            "top1_card_group": "PCG6-058",
+            "top1_in_family": false
+          },
+          {
+            "label_card": "en:CLB-007",
+            "label_category": "unique",
+            "label_rank_in_top5": null,
+            "margin_frame0": 0.0041,
+            "top1_card_group": "PCG9-045",
+            "top1_in_family": false
+          },
+          {
+            "label_card": "en:swsh12.5gg-GG38",
+            "label_category": "unique",
+            "label_rank_in_top5": null,
+            "margin_frame0": 0.0053,
+            "top1_card_group": "me02-026",
+            "top1_in_family": false
+          },
+          {
+            "label_card": "en:swsh12.5gg-GG42",
+            "label_category": "unique",
+            "label_rank_in_top5": null,
+            "margin_frame0": 0.0062,
+            "top1_card_group": "swsh6-165",
+            "top1_in_family": false
+          },
+          {
+            "label_card": "en:swsh12.5gg-GG42",
+            "label_category": "unique",
+            "label_rank_in_top5": null,
+            "margin_frame0": 0.0041,
+            "top1_card_group": "SV8a-222",
+            "top1_in_family": false
+          },
+          {
+            "label_card": "en:swsh12.5gg-GG47",
+            "label_category": "unique",
+            "label_rank_in_top5": null,
+            "margin_frame0": 0.0003,
+            "top1_card_group": "swsh12.5-065",
+            "top1_in_family": false
+          },
+          {
+            "label_card": "en:base1-20",
+            "label_category": "unique",
+            "label_rank_in_top5": 2,
+            "margin_frame0": 0.0028,
+            "top1_card_group": "pl1-128",
+            "top1_in_family": false
+          },
+          {
+            "label_card": "en:base2-58",
+            "label_category": "unique",
+            "label_rank_in_top5": 2,
+            "margin_frame0": 0.0037,
+            "top1_card_group": "PMCG2-002",
+            "top1_in_family": false
+          },
+          {
+            "label_card": "en:base2-58",
+            "label_category": "unique",
+            "label_rank_in_top5": null,
+            "margin_frame0": 0.0172,
+            "top1_card_group": "dp5-58",
+            "top1_in_family": false
+          },
+          {
+            "label_card": "en:swsh12.5gg-GG46",
+            "label_category": "unique",
+            "label_rank_in_top5": null,
+            "margin_frame0": 0.0071,
+            "top1_card_group": "XY6-029",
+            "top1_in_family": false
+          },
+          {
+            "label_card": "en:swsh12.5gg-GG41",
+            "label_category": "unique",
+            "label_rank_in_top5": null,
+            "margin_frame0": 0.0486,
+            "top1_card_group": "S3a-015",
+            "top1_in_family": false
+          },
+          {
+            "label_card": "en:swsh12.5gg-GG41",
+            "label_category": "unique",
+            "label_rank_in_top5": null,
+            "margin_frame0": 0.0306,
+            "top1_card_group": "S3a-015",
+            "top1_in_family": false
+          },
+          {
+            "label_card": "en:swsh12.5gg-GG41",
+            "label_category": "unique",
+            "label_rank_in_top5": null,
+            "margin_frame0": 0.0019,
+            "top1_card_group": "S3a-015",
+            "top1_in_family": false
+          },
+          {
+            "label_card": "en:xy12-35",
+            "label_category": "unique",
+            "label_rank_in_top5": 2,
+            "margin_frame0": 0.0115,
+            "top1_card_group": "30th-035",
+            "top1_in_family": true
+          },
+          {
+            "label_card": "en:sv04-159",
+            "label_category": "reprint",
+            "label_rank_in_top5": 2,
+            "margin_frame0": 0.0072,
+            "top1_card_group": "PPS5-PAR-159",
+            "top1_in_family": true
+          },
+          {
+            "label_card": "ja:CLF-017",
+            "label_category": "unique",
+            "label_rank_in_top5": null,
+            "margin_frame0": Infinity,
+            "top1_card_group": "CLV-017",
+            "top1_in_family": false
+          }
+        ],
+        "int8": [
+          {
+            "label_card": "en:sv01-212",
+            "label_category": "unique",
+            "label_rank_in_top5": null,
+            "margin_frame0": 0.0604,
+            "top1_card_group": "neo4-050",
+            "top1_in_family": false
+          },
+          {
+            "label_card": "en:svp-053",
+            "label_category": "unique",
+            "label_rank_in_top5": null,
+            "margin_frame0": Infinity,
+            "top1_card_group": "xy12-53",
+            "top1_in_family": false
+          },
+          {
+            "label_card": "en:sv03.5-199",
+            "label_category": "unique",
+            "label_rank_in_top5": null,
+            "margin_frame0": 0.1158,
+            "top1_card_group": "neo4-051",
+            "top1_in_family": false
+          },
+          {
+            "label_card": "en:g1-RC29",
+            "label_category": "unique",
+            "label_rank_in_top5": 2,
+            "margin_frame0": 0.0103,
+            "top1_card_group": "30th-051",
+            "top1_in_family": false
+          },
+          {
+            "label_card": "en:mep-023",
+            "label_category": "unique",
+            "label_rank_in_top5": null,
+            "margin_frame0": 0.0112,
+            "top1_card_group": "BW2-071",
+            "top1_in_family": false
+          },
+          {
+            "label_card": "en:base1-15",
+            "label_category": "unique",
+            "label_rank_in_top5": null,
+            "margin_frame0": 0.0299,
+            "top1_card_group": "sv05-199",
+            "top1_in_family": false
+          },
+          {
+            "label_card": "en:sv03.5-063",
+            "label_category": "unique",
+            "label_rank_in_top5": 2,
+            "margin_frame0": 0.0087,
+            "top1_card_group": "SV2a-063",
+            "top1_in_family": false
+          },
+          {
+            "label_card": "en:swsh9-013",
+            "label_category": "reprint",
+            "label_rank_in_top5": null,
+            "margin_frame0": 0.0222,
+            "top1_card_group": "dpp-DP39",
+            "top1_in_family": false
+          },
+          {
+            "label_card": "en:svp-085",
+            "label_category": "unique",
+            "label_rank_in_top5": null,
+            "margin_frame0": 0.0649,
+            "top1_card_group": "neo3-032",
+            "top1_in_family": false
+          },
+          {
+            "label_card": "ja:SM12a-083",
+            "label_category": "unique",
+            "label_rank_in_top5": null,
+            "margin_frame0": 0.0207,
+            "top1_card_group": "S10D-083",
+            "top1_in_family": false
+          },
+          {
+            "label_card": "en:sv08.5-075",
+            "label_category": "reprint",
+            "label_rank_in_top5": null,
+            "margin_frame0": 0.0099,
+            "top1_card_group": "SM11a-075",
+            "top1_in_family": false
+          },
+          {
+            "label_card": "en:sv04.5-233",
+            "label_category": "unique",
+            "label_rank_in_top5": 5,
+            "margin_frame0": 0.0183,
+            "top1_card_group": "ja:pooka-adv-expansion-pack-29",
+            "top1_in_family": false
+          },
+          {
+            "label_card": "en:pl4-71",
+            "label_category": "unique",
+            "label_rank_in_top5": null,
+            "margin_frame0": 0.0072,
+            "top1_card_group": "S5I-021",
+            "top1_in_family": false
+          },
+          {
+            "label_card": "en:sv06-188",
+            "label_category": "unique",
+            "label_rank_in_top5": null,
+            "margin_frame0": 0.0236,
+            "top1_card_group": "MC-188",
+            "top1_in_family": false
+          },
+          {
+            "label_card": "en:svp-174",
+            "label_category": "unique",
+            "label_rank_in_top5": null,
+            "margin_frame0": 0.0656,
+            "top1_card_group": "svp-173",
+            "top1_in_family": false
+          },
+          {
+            "label_card": "en:ex9-9",
+            "label_category": "unique",
+            "label_rank_in_top5": null,
+            "margin_frame0": 0.0184,
+            "top1_card_group": "svp-182",
+            "top1_in_family": false
+          },
+          {
+            "label_card": "en:base5-68",
+            "label_category": "unique",
+            "label_rank_in_top5": null,
+            "margin_frame0": 0.0025,
+            "top1_card_group": "PCG6-058",
+            "top1_in_family": false
+          },
+          {
+            "label_card": "en:CLB-007",
+            "label_category": "unique",
+            "label_rank_in_top5": null,
+            "margin_frame0": 0.0046,
+            "top1_card_group": "PCG9-045",
+            "top1_in_family": false
+          },
+          {
+            "label_card": "en:swsh12.5gg-GG38",
+            "label_category": "unique",
+            "label_rank_in_top5": null,
+            "margin_frame0": 0.0048,
+            "top1_card_group": "me02-026",
+            "top1_in_family": false
+          },
+          {
+            "label_card": "en:swsh12.5gg-GG42",
+            "label_category": "unique",
+            "label_rank_in_top5": null,
+            "margin_frame0": 0.0066,
+            "top1_card_group": "swsh6-165",
+            "top1_in_family": false
+          },
+          {
+            "label_card": "en:swsh12.5gg-GG42",
+            "label_category": "unique",
+            "label_rank_in_top5": null,
+            "margin_frame0": 0.0038,
+            "top1_card_group": "SV8a-222",
+            "top1_in_family": false
+          },
+          {
+            "label_card": "en:swsh12.5gg-GG47",
+            "label_category": "unique",
+            "label_rank_in_top5": null,
+            "margin_frame0": 0.0004,
+            "top1_card_group": "swsh12.5-065",
+            "top1_in_family": false
+          },
+          {
+            "label_card": "en:base1-20",
+            "label_category": "unique",
+            "label_rank_in_top5": 2,
+            "margin_frame0": 0.0029,
+            "top1_card_group": "pl1-128",
+            "top1_in_family": false
+          },
+          {
+            "label_card": "en:base2-58",
+            "label_category": "unique",
+            "label_rank_in_top5": 2,
+            "margin_frame0": 0.0026,
+            "top1_card_group": "PMCG2-002",
+            "top1_in_family": false
+          },
+          {
+            "label_card": "en:base2-58",
+            "label_category": "unique",
+            "label_rank_in_top5": null,
+            "margin_frame0": 0.0172,
+            "top1_card_group": "dp5-58",
+            "top1_in_family": false
+          },
+          {
+            "label_card": "en:swsh12.5gg-GG46",
+            "label_category": "unique",
+            "label_rank_in_top5": null,
+            "margin_frame0": 0.0079,
+            "top1_card_group": "XY6-029",
+            "top1_in_family": false
+          },
+          {
+            "label_card": "en:swsh12.5gg-GG41",
+            "label_category": "unique",
+            "label_rank_in_top5": null,
+            "margin_frame0": 0.0487,
+            "top1_card_group": "S3a-015",
+            "top1_in_family": false
+          },
+          {
+            "label_card": "en:swsh12.5gg-GG41",
+            "label_category": "unique",
+            "label_rank_in_top5": null,
+            "margin_frame0": 0.0309,
+            "top1_card_group": "S3a-015",
+            "top1_in_family": false
+          },
+          {
+            "label_card": "en:swsh12.5gg-GG41",
+            "label_category": "unique",
+            "label_rank_in_top5": null,
+            "margin_frame0": 0.0022,
+            "top1_card_group": "S3a-015",
+            "top1_in_family": false
+          },
+          {
+            "label_card": "en:xy12-35",
+            "label_category": "unique",
+            "label_rank_in_top5": 2,
+            "margin_frame0": 0.0128,
+            "top1_card_group": "30th-035",
+            "top1_in_family": true
+          },
+          {
+            "label_card": "en:sv04-159",
+            "label_category": "reprint",
+            "label_rank_in_top5": 2,
+            "margin_frame0": 0.0068,
+            "top1_card_group": "PPS5-PAR-159",
+            "top1_in_family": true
+          },
+          {
+            "label_card": "ja:CLF-017",
+            "label_category": "unique",
+            "label_rank_in_top5": null,
+            "margin_frame0": Infinity,
+            "top1_card_group": "CLV-017",
+            "top1_in_family": false
+          }
+        ]
+      },
+      "rules": {
+        "fp16": [
+          {
+            "margin_min": 0.0,
+            "photos": 144,
+            "shown": 144,
+            "shown_rate": 1.0,
+            "stable_frames": 1,
+            "wrong_card_shown": 31,
+            "wrong_rate": 0.22916666666666666,
+            "wrong_rate_upper95": 0.30431936475255367,
+            "wrong_shown": 33
+          },
+          {
+            "margin_min": 0.005,
+            "photos": 144,
+            "shown": 143,
+            "shown_rate": 0.9930555555555556,
+            "stable_frames": 1,
+            "wrong_card_shown": 31,
+            "wrong_rate": 0.23076923076923078,
+            "wrong_rate_upper95": 0.3063230687790195,
+            "wrong_shown": 33
+          },
+          {
+            "margin_min": 0.01,
+            "photos": 144,
+            "shown": 142,
+            "shown_rate": 0.9861111111111112,
+            "stable_frames": 1,
+            "wrong_card_shown": 28,
+            "wrong_rate": 0.2112676056338028,
+            "wrong_rate_upper95": 0.28555983509388483,
+            "wrong_shown": 30
+          },
+          {
+            "margin_min": 0.015,
+            "photos": 144,
+            "shown": 138,
+            "shown_rate": 0.9583333333333334,
+            "stable_frames": 1,
+            "wrong_card_shown": 25,
+            "wrong_rate": 0.18115942028985507,
+            "wrong_rate_upper95": 0.25376503681871554,
+            "wrong_shown": 25
+          },
+          {
+            "margin_min": 0.02,
+            "photos": 144,
+            "shown": 130,
+            "shown_rate": 0.9027777777777778,
+            "stable_frames": 1,
+            "wrong_card_shown": 18,
+            "wrong_rate": 0.13846153846153847,
+            "wrong_rate_upper95": 0.2082660090966238,
+            "wrong_shown": 18
+          },
+          {
+            "margin_min": 0.025,
+            "photos": 144,
+            "shown": 128,
+            "shown_rate": 0.8888888888888888,
+            "stable_frames": 1,
+            "wrong_card_shown": 15,
+            "wrong_rate": 0.1171875,
+            "wrong_rate_upper95": 0.18436759574098127,
+            "wrong_shown": 15
+          },
+          {
+            "margin_min": 0.03,
+            "photos": 144,
+            "shown": 126,
+            "shown_rate": 0.875,
+            "stable_frames": 1,
+            "wrong_card_shown": 13,
+            "wrong_rate": 0.10317460317460317,
+            "wrong_rate_upper95": 0.1685391226479226,
+            "wrong_shown": 13
+          },
+          {
+            "margin_min": 0.04,
+            "photos": 144,
+            "shown": 118,
+            "shown_rate": 0.8194444444444444,
+            "stable_frames": 1,
+            "wrong_card_shown": 7,
+            "wrong_rate": 0.059322033898305086,
+            "wrong_rate_upper95": 0.11740335015999528,
+            "wrong_shown": 7
+          },
+          {
+            "margin_min": 0.05,
+            "photos": 144,
+            "shown": 115,
+            "shown_rate": 0.7986111111111112,
+            "stable_frames": 1,
+            "wrong_card_shown": 7,
+            "wrong_rate": 0.06086956521739131,
+            "wrong_rate_upper95": 0.12033451094936126,
+            "wrong_shown": 7
+          },
+          {
+            "margin_min": 0.06,
+            "photos": 144,
+            "shown": 112,
+            "shown_rate": 0.7777777777777778,
+            "stable_frames": 1,
+            "wrong_card_shown": 6,
+            "wrong_rate": 0.05357142857142857,
+            "wrong_rate_upper95": 0.11197165358438729,
+            "wrong_shown": 6
+          },
+          {
+            "margin_min": 0.08,
+            "photos": 144,
+            "shown": 102,
+            "shown_rate": 0.7083333333333334,
+            "stable_frames": 1,
+            "wrong_card_shown": 4,
+            "wrong_rate": 0.0392156862745098,
+            "wrong_rate_upper95": 0.09652657175875834,
+            "wrong_shown": 4
+          },
+          {
+            "margin_min": 0.1,
+            "photos": 144,
+            "shown": 101,
+            "shown_rate": 0.7013888888888888,
+            "stable_frames": 1,
+            "wrong_card_shown": 3,
+            "wrong_rate": 0.0297029702970297,
+            "wrong_rate_upper95": 0.08371883842085293,
+            "wrong_shown": 3
+          },
+          {
+            "margin_min": 0.0,
+            "photos": 144,
+            "shown": 144,
+            "shown_rate": 1.0,
+            "stable_frames": 2,
+            "wrong_card_shown": 32,
+            "wrong_rate": 0.2361111111111111,
+            "wrong_rate_upper95": 0.3117697812292733,
+            "wrong_shown": 34
+          },
+          {
+            "margin_min": 0.005,
+            "photos": 144,
+            "shown": 137,
+            "shown_rate": 0.9513888888888888,
+            "stable_frames": 2,
+            "wrong_card_shown": 25,
+            "wrong_rate": 0.1897810218978102,
+            "wrong_rate_upper95": 0.26355469654553976,
+            "wrong_shown": 26
+          },
+          {
+            "margin_min": 0.01,
+            "photos": 144,
+            "shown": 133,
+            "shown_rate": 0.9236111111111112,
+            "stable_frames": 2,
+            "wrong_card_shown": 22,
+            "wrong_rate": 0.16541353383458646,
+            "wrong_rate_upper95": 0.23776524569709326,
+            "wrong_shown": 22
+          },
+          {
+            "margin_min": 0.015,
+            "photos": 144,
+            "shown": 128,
+            "shown_rate": 0.8888888888888888,
+            "stable_frames": 2,
+            "wrong_card_shown": 18,
+            "wrong_rate": 0.140625,
+            "wrong_rate_upper95": 0.2113539734403978,
+            "wrong_shown": 18
+          },
+          {
+            "margin_min": 0.02,
+            "photos": 144,
+            "shown": 123,
+            "shown_rate": 0.8541666666666666,
+            "stable_frames": 2,
+            "wrong_card_shown": 14,
+            "wrong_rate": 0.11382113821138211,
+            "wrong_rate_upper95": 0.18201214956012693,
+            "wrong_shown": 14
+          },
+          {
+            "margin_min": 0.025,
+            "photos": 144,
+            "shown": 120,
+            "shown_rate": 0.8333333333333334,
+            "stable_frames": 2,
+            "wrong_card_shown": 12,
+            "wrong_rate": 0.1,
+            "wrong_rate_upper95": 0.16668319985163604,
+            "wrong_shown": 12
+          },
+          {
+            "margin_min": 0.03,
+            "photos": 144,
+            "shown": 117,
+            "shown_rate": 0.8125,
+            "stable_frames": 2,
+            "wrong_card_shown": 9,
+            "wrong_rate": 0.07692307692307693,
+            "wrong_rate_upper95": 0.13975099776637948,
+            "wrong_shown": 9
+          },
+          {
+            "margin_min": 0.04,
+            "photos": 144,
+            "shown": 113,
+            "shown_rate": 0.7847222222222222,
+            "stable_frames": 2,
+            "wrong_card_shown": 7,
+            "wrong_rate": 0.061946902654867256,
+            "wrong_rate_upper95": 0.12237125007474489,
+            "wrong_shown": 7
+          },
+          {
+            "margin_min": 0.05,
+            "photos": 144,
+            "shown": 110,
+            "shown_rate": 0.7638888888888888,
+            "stable_frames": 2,
+            "wrong_card_shown": 6,
+            "wrong_rate": 0.05454545454545454,
+            "wrong_rate_upper95": 0.11391927231733298,
+            "wrong_shown": 6
+          },
+          {
+            "margin_min": 0.06,
+            "photos": 144,
+            "shown": 106,
+            "shown_rate": 0.7361111111111112,
+            "stable_frames": 2,
+            "wrong_card_shown": 6,
+            "wrong_rate": 0.05660377358490566,
+            "wrong_rate_upper95": 0.11802496292071323,
+            "wrong_shown": 6
+          },
+          {
+            "margin_min": 0.08,
+            "photos": 144,
+            "shown": 100,
+            "shown_rate": 0.6944444444444444,
+            "stable_frames": 2,
+            "wrong_card_shown": 3,
+            "wrong_rate": 0.03,
+            "wrong_rate_upper95": 0.08452078080402699,
+            "wrong_shown": 3
+          },
+          {
+            "margin_min": 0.1,
+            "photos": 144,
+            "shown": 99,
+            "shown_rate": 0.6875,
+            "stable_frames": 2,
+            "wrong_card_shown": 3,
+            "wrong_rate": 0.030303030303030304,
+            "wrong_rate_upper95": 0.08533823116525735,
+            "wrong_shown": 3
+          },
+          {
+            "margin_min": 0.0,
+            "photos": 144,
+            "shown": 137,
+            "shown_rate": 0.9513888888888888,
+            "stable_frames": 3,
+            "wrong_card_shown": 24,
+            "wrong_rate": 0.18248175182481752,
+            "wrong_rate_upper95": 0.2555171059653377,
+            "wrong_shown": 25
+          },
+          {
+            "margin_min": 0.005,
+            "photos": 144,
+            "shown": 131,
+            "shown_rate": 0.9097222222222222,
+            "stable_frames": 3,
+            "wrong_card_shown": 20,
+            "wrong_rate": 0.15267175572519084,
+            "wrong_rate_upper95": 0.22407667879417884,
+            "wrong_shown": 20
+          },
+          {
+            "margin_min": 0.01,
+            "photos": 144,
+            "shown": 124,
+            "shown_rate": 0.8611111111111112,
+            "stable_frames": 3,
+            "wrong_card_shown": 14,
+            "wrong_rate": 0.11290322580645161,
+            "wrong_rate_upper95": 0.18061535565235226,
+            "wrong_shown": 14
+          },
+          {
+            "margin_min": 0.015,
+            "photos": 144,
+            "shown": 121,
+            "shown_rate": 0.8402777777777778,
+            "stable_frames": 3,
+            "wrong_card_shown": 11,
+            "wrong_rate": 0.09090909090909091,
+            "wrong_rate_upper95": 0.15547440105614402,
+            "wrong_shown": 11
+          },
+          {
+            "margin_min": 0.02,
+            "photos": 144,
+            "shown": 118,
+            "shown_rate": 0.8194444444444444,
+            "stable_frames": 3,
+            "wrong_card_shown": 10,
+            "wrong_rate": 0.0847457627118644,
+            "wrong_rate_upper95": 0.14899481904471476,
+            "wrong_shown": 10
+          },
+          {
+            "margin_min": 0.025,
+            "photos": 144,
+            "shown": 115,
+            "shown_rate": 0.7986111111111112,
+            "stable_frames": 3,
+            "wrong_card_shown": 8,
+            "wrong_rate": 0.06956521739130435,
+            "wrong_rate_upper95": 0.13129014501456757,
+            "wrong_shown": 8
+          },
+          {
+            "margin_min": 0.03,
+            "photos": 144,
+            "shown": 113,
+            "shown_rate": 0.7847222222222222,
+            "stable_frames": 3,
+            "wrong_card_shown": 7,
+            "wrong_rate": 0.061946902654867256,
+            "wrong_rate_upper95": 0.12237125007474489,
+            "wrong_shown": 7
+          },
+          {
+            "margin_min": 0.04,
+            "photos": 144,
+            "shown": 107,
+            "shown_rate": 0.7430555555555556,
+            "stable_frames": 3,
+            "wrong_card_shown": 7,
+            "wrong_rate": 0.06542056074766354,
+            "wrong_rate_upper95": 0.12891693990952502,
+            "wrong_shown": 7
+          },
+          {
+            "margin_min": 0.05,
+            "photos": 144,
+            "shown": 105,
+            "shown_rate": 0.7291666666666666,
+            "stable_frames": 3,
+            "wrong_card_shown": 6,
+            "wrong_rate": 0.05714285714285714,
+            "wrong_rate_upper95": 0.11909801681367833,
+            "wrong_shown": 6
+          },
+          {
+            "margin_min": 0.06,
+            "photos": 144,
+            "shown": 102,
+            "shown_rate": 0.7083333333333334,
+            "stable_frames": 3,
+            "wrong_card_shown": 4,
+            "wrong_rate": 0.0392156862745098,
+            "wrong_rate_upper95": 0.09652657175875834,
+            "wrong_shown": 4
+          },
+          {
+            "margin_min": 0.08,
+            "photos": 144,
+            "shown": 100,
+            "shown_rate": 0.6944444444444444,
+            "stable_frames": 3,
+            "wrong_card_shown": 3,
+            "wrong_rate": 0.03,
+            "wrong_rate_upper95": 0.08452078080402699,
+            "wrong_shown": 3
+          },
+          {
+            "margin_min": 0.1,
+            "photos": 144,
+            "shown": 97,
+            "shown_rate": 0.6736111111111112,
+            "stable_frames": 3,
+            "wrong_card_shown": 3,
+            "wrong_rate": 0.030927835051546393,
+            "wrong_rate_upper95": 0.08702149011641547,
+            "wrong_shown": 3
+          }
+        ],
+        "fp32": [
+          {
+            "margin_min": 0.0,
+            "photos": 144,
+            "shown": 144,
+            "shown_rate": 1.0,
+            "stable_frames": 1,
+            "wrong_card_shown": 31,
+            "wrong_rate": 0.22916666666666666,
+            "wrong_rate_upper95": 0.30431936475255367,
+            "wrong_shown": 33
+          },
+          {
+            "margin_min": 0.005,
+            "photos": 144,
+            "shown": 143,
+            "shown_rate": 0.9930555555555556,
+            "stable_frames": 1,
+            "wrong_card_shown": 31,
+            "wrong_rate": 0.23076923076923078,
+            "wrong_rate_upper95": 0.3063230687790195,
+            "wrong_shown": 33
+          },
+          {
+            "margin_min": 0.01,
+            "photos": 144,
+            "shown": 142,
+            "shown_rate": 0.9861111111111112,
+            "stable_frames": 1,
+            "wrong_card_shown": 28,
+            "wrong_rate": 0.2112676056338028,
+            "wrong_rate_upper95": 0.28555983509388483,
+            "wrong_shown": 30
+          },
+          {
+            "margin_min": 0.015,
+            "photos": 144,
+            "shown": 138,
+            "shown_rate": 0.9583333333333334,
+            "stable_frames": 1,
+            "wrong_card_shown": 25,
+            "wrong_rate": 0.18115942028985507,
+            "wrong_rate_upper95": 0.25376503681871554,
+            "wrong_shown": 25
+          },
+          {
+            "margin_min": 0.02,
+            "photos": 144,
+            "shown": 130,
+            "shown_rate": 0.9027777777777778,
+            "stable_frames": 1,
+            "wrong_card_shown": 18,
+            "wrong_rate": 0.13846153846153847,
+            "wrong_rate_upper95": 0.2082660090966238,
+            "wrong_shown": 18
+          },
+          {
+            "margin_min": 0.025,
+            "photos": 144,
+            "shown": 128,
+            "shown_rate": 0.8888888888888888,
+            "stable_frames": 1,
+            "wrong_card_shown": 15,
+            "wrong_rate": 0.1171875,
+            "wrong_rate_upper95": 0.18436759574098127,
+            "wrong_shown": 15
+          },
+          {
+            "margin_min": 0.03,
+            "photos": 144,
+            "shown": 126,
+            "shown_rate": 0.875,
+            "stable_frames": 1,
+            "wrong_card_shown": 13,
+            "wrong_rate": 0.10317460317460317,
+            "wrong_rate_upper95": 0.1685391226479226,
+            "wrong_shown": 13
+          },
+          {
+            "margin_min": 0.04,
+            "photos": 144,
+            "shown": 118,
+            "shown_rate": 0.8194444444444444,
+            "stable_frames": 1,
+            "wrong_card_shown": 7,
+            "wrong_rate": 0.059322033898305086,
+            "wrong_rate_upper95": 0.11740335015999528,
+            "wrong_shown": 7
+          },
+          {
+            "margin_min": 0.05,
+            "photos": 144,
+            "shown": 115,
+            "shown_rate": 0.7986111111111112,
+            "stable_frames": 1,
+            "wrong_card_shown": 7,
+            "wrong_rate": 0.06086956521739131,
+            "wrong_rate_upper95": 0.12033451094936126,
+            "wrong_shown": 7
+          },
+          {
+            "margin_min": 0.06,
+            "photos": 144,
+            "shown": 112,
+            "shown_rate": 0.7777777777777778,
+            "stable_frames": 1,
+            "wrong_card_shown": 6,
+            "wrong_rate": 0.05357142857142857,
+            "wrong_rate_upper95": 0.11197165358438729,
+            "wrong_shown": 6
+          },
+          {
+            "margin_min": 0.08,
+            "photos": 144,
+            "shown": 102,
+            "shown_rate": 0.7083333333333334,
+            "stable_frames": 1,
+            "wrong_card_shown": 4,
+            "wrong_rate": 0.0392156862745098,
+            "wrong_rate_upper95": 0.09652657175875834,
+            "wrong_shown": 4
+          },
+          {
+            "margin_min": 0.1,
+            "photos": 144,
+            "shown": 101,
+            "shown_rate": 0.7013888888888888,
+            "stable_frames": 1,
+            "wrong_card_shown": 3,
+            "wrong_rate": 0.0297029702970297,
+            "wrong_rate_upper95": 0.08371883842085293,
+            "wrong_shown": 3
+          },
+          {
+            "margin_min": 0.0,
+            "photos": 144,
+            "shown": 144,
+            "shown_rate": 1.0,
+            "stable_frames": 2,
+            "wrong_card_shown": 32,
+            "wrong_rate": 0.2361111111111111,
+            "wrong_rate_upper95": 0.3117697812292733,
+            "wrong_shown": 34
+          },
+          {
+            "margin_min": 0.005,
+            "photos": 144,
+            "shown": 137,
+            "shown_rate": 0.9513888888888888,
+            "stable_frames": 2,
+            "wrong_card_shown": 25,
+            "wrong_rate": 0.1897810218978102,
+            "wrong_rate_upper95": 0.26355469654553976,
+            "wrong_shown": 26
+          },
+          {
+            "margin_min": 0.01,
+            "photos": 144,
+            "shown": 133,
+            "shown_rate": 0.9236111111111112,
+            "stable_frames": 2,
+            "wrong_card_shown": 22,
+            "wrong_rate": 0.16541353383458646,
+            "wrong_rate_upper95": 0.23776524569709326,
+            "wrong_shown": 22
+          },
+          {
+            "margin_min": 0.015,
+            "photos": 144,
+            "shown": 128,
+            "shown_rate": 0.8888888888888888,
+            "stable_frames": 2,
+            "wrong_card_shown": 18,
+            "wrong_rate": 0.140625,
+            "wrong_rate_upper95": 0.2113539734403978,
+            "wrong_shown": 18
+          },
+          {
+            "margin_min": 0.02,
+            "photos": 144,
+            "shown": 123,
+            "shown_rate": 0.8541666666666666,
+            "stable_frames": 2,
+            "wrong_card_shown": 14,
+            "wrong_rate": 0.11382113821138211,
+            "wrong_rate_upper95": 0.18201214956012693,
+            "wrong_shown": 14
+          },
+          {
+            "margin_min": 0.025,
+            "photos": 144,
+            "shown": 120,
+            "shown_rate": 0.8333333333333334,
+            "stable_frames": 2,
+            "wrong_card_shown": 12,
+            "wrong_rate": 0.1,
+            "wrong_rate_upper95": 0.16668319985163604,
+            "wrong_shown": 12
+          },
+          {
+            "margin_min": 0.03,
+            "photos": 144,
+            "shown": 117,
+            "shown_rate": 0.8125,
+            "stable_frames": 2,
+            "wrong_card_shown": 9,
+            "wrong_rate": 0.07692307692307693,
+            "wrong_rate_upper95": 0.13975099776637948,
+            "wrong_shown": 9
+          },
+          {
+            "margin_min": 0.04,
+            "photos": 144,
+            "shown": 113,
+            "shown_rate": 0.7847222222222222,
+            "stable_frames": 2,
+            "wrong_card_shown": 7,
+            "wrong_rate": 0.061946902654867256,
+            "wrong_rate_upper95": 0.12237125007474489,
+            "wrong_shown": 7
+          },
+          {
+            "margin_min": 0.05,
+            "photos": 144,
+            "shown": 110,
+            "shown_rate": 0.7638888888888888,
+            "stable_frames": 2,
+            "wrong_card_shown": 6,
+            "wrong_rate": 0.05454545454545454,
+            "wrong_rate_upper95": 0.11391927231733298,
+            "wrong_shown": 6
+          },
+          {
+            "margin_min": 0.06,
+            "photos": 144,
+            "shown": 106,
+            "shown_rate": 0.7361111111111112,
+            "stable_frames": 2,
+            "wrong_card_shown": 6,
+            "wrong_rate": 0.05660377358490566,
+            "wrong_rate_upper95": 0.11802496292071323,
+            "wrong_shown": 6
+          },
+          {
+            "margin_min": 0.08,
+            "photos": 144,
+            "shown": 100,
+            "shown_rate": 0.6944444444444444,
+            "stable_frames": 2,
+            "wrong_card_shown": 3,
+            "wrong_rate": 0.03,
+            "wrong_rate_upper95": 0.08452078080402699,
+            "wrong_shown": 3
+          },
+          {
+            "margin_min": 0.1,
+            "photos": 144,
+            "shown": 99,
+            "shown_rate": 0.6875,
+            "stable_frames": 2,
+            "wrong_card_shown": 3,
+            "wrong_rate": 0.030303030303030304,
+            "wrong_rate_upper95": 0.08533823116525735,
+            "wrong_shown": 3
+          },
+          {
+            "margin_min": 0.0,
+            "photos": 144,
+            "shown": 137,
+            "shown_rate": 0.9513888888888888,
+            "stable_frames": 3,
+            "wrong_card_shown": 24,
+            "wrong_rate": 0.18248175182481752,
+            "wrong_rate_upper95": 0.2555171059653377,
+            "wrong_shown": 25
+          },
+          {
+            "margin_min": 0.005,
+            "photos": 144,
+            "shown": 131,
+            "shown_rate": 0.9097222222222222,
+            "stable_frames": 3,
+            "wrong_card_shown": 20,
+            "wrong_rate": 0.15267175572519084,
+            "wrong_rate_upper95": 0.22407667879417884,
+            "wrong_shown": 20
+          },
+          {
+            "margin_min": 0.01,
+            "photos": 144,
+            "shown": 124,
+            "shown_rate": 0.8611111111111112,
+            "stable_frames": 3,
+            "wrong_card_shown": 14,
+            "wrong_rate": 0.11290322580645161,
+            "wrong_rate_upper95": 0.18061535565235226,
+            "wrong_shown": 14
+          },
+          {
+            "margin_min": 0.015,
+            "photos": 144,
+            "shown": 121,
+            "shown_rate": 0.8402777777777778,
+            "stable_frames": 3,
+            "wrong_card_shown": 11,
+            "wrong_rate": 0.09090909090909091,
+            "wrong_rate_upper95": 0.15547440105614402,
+            "wrong_shown": 11
+          },
+          {
+            "margin_min": 0.02,
+            "photos": 144,
+            "shown": 118,
+            "shown_rate": 0.8194444444444444,
+            "stable_frames": 3,
+            "wrong_card_shown": 10,
+            "wrong_rate": 0.0847457627118644,
+            "wrong_rate_upper95": 0.14899481904471476,
+            "wrong_shown": 10
+          },
+          {
+            "margin_min": 0.025,
+            "photos": 144,
+            "shown": 115,
+            "shown_rate": 0.7986111111111112,
+            "stable_frames": 3,
+            "wrong_card_shown": 8,
+            "wrong_rate": 0.06956521739130435,
+            "wrong_rate_upper95": 0.13129014501456757,
+            "wrong_shown": 8
+          },
+          {
+            "margin_min": 0.03,
+            "photos": 144,
+            "shown": 113,
+            "shown_rate": 0.7847222222222222,
+            "stable_frames": 3,
+            "wrong_card_shown": 7,
+            "wrong_rate": 0.061946902654867256,
+            "wrong_rate_upper95": 0.12237125007474489,
+            "wrong_shown": 7
+          },
+          {
+            "margin_min": 0.04,
+            "photos": 144,
+            "shown": 107,
+            "shown_rate": 0.7430555555555556,
+            "stable_frames": 3,
+            "wrong_card_shown": 7,
+            "wrong_rate": 0.06542056074766354,
+            "wrong_rate_upper95": 0.12891693990952502,
+            "wrong_shown": 7
+          },
+          {
+            "margin_min": 0.05,
+            "photos": 144,
+            "shown": 105,
+            "shown_rate": 0.7291666666666666,
+            "stable_frames": 3,
+            "wrong_card_shown": 6,
+            "wrong_rate": 0.05714285714285714,
+            "wrong_rate_upper95": 0.11909801681367833,
+            "wrong_shown": 6
+          },
+          {
+            "margin_min": 0.06,
+            "photos": 144,
+            "shown": 102,
+            "shown_rate": 0.7083333333333334,
+            "stable_frames": 3,
+            "wrong_card_shown": 4,
+            "wrong_rate": 0.0392156862745098,
+            "wrong_rate_upper95": 0.09652657175875834,
+            "wrong_shown": 4
+          },
+          {
+            "margin_min": 0.08,
+            "photos": 144,
+            "shown": 100,
+            "shown_rate": 0.6944444444444444,
+            "stable_frames": 3,
+            "wrong_card_shown": 3,
+            "wrong_rate": 0.03,
+            "wrong_rate_upper95": 0.08452078080402699,
+            "wrong_shown": 3
+          },
+          {
+            "margin_min": 0.1,
+            "photos": 144,
+            "shown": 97,
+            "shown_rate": 0.6736111111111112,
+            "stable_frames": 3,
+            "wrong_card_shown": 3,
+            "wrong_rate": 0.030927835051546393,
+            "wrong_rate_upper95": 0.08702149011641547,
+            "wrong_shown": 3
+          }
+        ],
+        "int8": [
+          {
+            "margin_min": 0.0,
+            "photos": 144,
+            "shown": 144,
+            "shown_rate": 1.0,
+            "stable_frames": 1,
+            "wrong_card_shown": 30,
+            "wrong_rate": 0.2222222222222222,
+            "wrong_rate_upper95": 0.29684385454399004,
+            "wrong_shown": 32
+          },
+          {
+            "margin_min": 0.005,
+            "photos": 144,
+            "shown": 143,
+            "shown_rate": 0.9930555555555556,
+            "stable_frames": 1,
+            "wrong_card_shown": 31,
+            "wrong_rate": 0.23076923076923078,
+            "wrong_rate_upper95": 0.3063230687790195,
+            "wrong_shown": 33
+          },
+          {
+            "margin_min": 0.01,
+            "photos": 144,
+            "shown": 141,
+            "shown_rate": 0.9791666666666666,
+            "stable_frames": 1,
+            "wrong_card_shown": 28,
+            "wrong_rate": 0.20567375886524822,
+            "wrong_rate_upper95": 0.27976749623140085,
+            "wrong_shown": 29
+          },
+          {
+            "margin_min": 0.015,
+            "photos": 144,
+            "shown": 138,
+            "shown_rate": 0.9583333333333334,
+            "stable_frames": 1,
+            "wrong_card_shown": 24,
+            "wrong_rate": 0.17391304347826086,
+            "wrong_rate_upper95": 0.2457450507386325,
+            "wrong_shown": 24
+          },
+          {
+            "margin_min": 0.02,
+            "photos": 144,
+            "shown": 130,
+            "shown_rate": 0.9027777777777778,
+            "stable_frames": 1,
+            "wrong_card_shown": 18,
+            "wrong_rate": 0.13846153846153847,
+            "wrong_rate_upper95": 0.2082660090966238,
+            "wrong_shown": 18
+          },
+          {
+            "margin_min": 0.025,
+            "photos": 144,
+            "shown": 128,
+            "shown_rate": 0.8888888888888888,
+            "stable_frames": 1,
+            "wrong_card_shown": 15,
+            "wrong_rate": 0.1171875,
+            "wrong_rate_upper95": 0.18436759574098127,
+            "wrong_shown": 15
+          },
+          {
+            "margin_min": 0.03,
+            "photos": 144,
+            "shown": 126,
+            "shown_rate": 0.875,
+            "stable_frames": 1,
+            "wrong_card_shown": 13,
+            "wrong_rate": 0.10317460317460317,
+            "wrong_rate_upper95": 0.1685391226479226,
+            "wrong_shown": 13
+          },
+          {
+            "margin_min": 0.04,
+            "photos": 144,
+            "shown": 118,
+            "shown_rate": 0.8194444444444444,
+            "stable_frames": 1,
+            "wrong_card_shown": 7,
+            "wrong_rate": 0.059322033898305086,
+            "wrong_rate_upper95": 0.11740335015999528,
+            "wrong_shown": 7
+          },
+          {
+            "margin_min": 0.05,
+            "photos": 144,
+            "shown": 115,
+            "shown_rate": 0.7986111111111112,
+            "stable_frames": 1,
+            "wrong_card_shown": 7,
+            "wrong_rate": 0.06086956521739131,
+            "wrong_rate_upper95": 0.12033451094936126,
+            "wrong_shown": 7
+          },
+          {
+            "margin_min": 0.06,
+            "photos": 144,
+            "shown": 112,
+            "shown_rate": 0.7777777777777778,
+            "stable_frames": 1,
+            "wrong_card_shown": 6,
+            "wrong_rate": 0.05357142857142857,
+            "wrong_rate_upper95": 0.11197165358438729,
+            "wrong_shown": 6
+          },
+          {
+            "margin_min": 0.08,
+            "photos": 144,
+            "shown": 102,
+            "shown_rate": 0.7083333333333334,
+            "stable_frames": 1,
+            "wrong_card_shown": 4,
+            "wrong_rate": 0.0392156862745098,
+            "wrong_rate_upper95": 0.09652657175875834,
+            "wrong_shown": 4
+          },
+          {
+            "margin_min": 0.1,
+            "photos": 144,
+            "shown": 101,
+            "shown_rate": 0.7013888888888888,
+            "stable_frames": 1,
+            "wrong_card_shown": 3,
+            "wrong_rate": 0.0297029702970297,
+            "wrong_rate_upper95": 0.08371883842085293,
+            "wrong_shown": 3
+          },
+          {
+            "margin_min": 0.0,
+            "photos": 144,
+            "shown": 144,
+            "shown_rate": 1.0,
+            "stable_frames": 2,
+            "wrong_card_shown": 32,
+            "wrong_rate": 0.2361111111111111,
+            "wrong_rate_upper95": 0.3117697812292733,
+            "wrong_shown": 34
+          },
+          {
+            "margin_min": 0.005,
+            "photos": 144,
+            "shown": 137,
+            "shown_rate": 0.9513888888888888,
+            "stable_frames": 2,
+            "wrong_card_shown": 25,
+            "wrong_rate": 0.1897810218978102,
+            "wrong_rate_upper95": 0.26355469654553976,
+            "wrong_shown": 26
+          },
+          {
+            "margin_min": 0.01,
+            "photos": 144,
+            "shown": 133,
+            "shown_rate": 0.9236111111111112,
+            "stable_frames": 2,
+            "wrong_card_shown": 22,
+            "wrong_rate": 0.16541353383458646,
+            "wrong_rate_upper95": 0.23776524569709326,
+            "wrong_shown": 22
+          },
+          {
+            "margin_min": 0.015,
+            "photos": 144,
+            "shown": 129,
+            "shown_rate": 0.8958333333333334,
+            "stable_frames": 2,
+            "wrong_card_shown": 19,
+            "wrong_rate": 0.14728682170542637,
+            "wrong_rate_upper95": 0.2186099004212382,
+            "wrong_shown": 19
+          },
+          {
+            "margin_min": 0.02,
+            "photos": 144,
+            "shown": 123,
+            "shown_rate": 0.8541666666666666,
+            "stable_frames": 2,
+            "wrong_card_shown": 14,
+            "wrong_rate": 0.11382113821138211,
+            "wrong_rate_upper95": 0.18201214956012693,
+            "wrong_shown": 14
+          },
+          {
+            "margin_min": 0.025,
+            "photos": 144,
+            "shown": 120,
+            "shown_rate": 0.8333333333333334,
+            "stable_frames": 2,
+            "wrong_card_shown": 12,
+            "wrong_rate": 0.1,
+            "wrong_rate_upper95": 0.16668319985163604,
+            "wrong_shown": 12
+          },
+          {
+            "margin_min": 0.03,
+            "photos": 144,
+            "shown": 116,
+            "shown_rate": 0.8055555555555556,
+            "stable_frames": 2,
+            "wrong_card_shown": 8,
+            "wrong_rate": 0.06896551724137931,
+            "wrong_rate_upper95": 0.1302081457113771,
+            "wrong_shown": 8
+          },
+          {
+            "margin_min": 0.04,
+            "photos": 144,
+            "shown": 113,
+            "shown_rate": 0.7847222222222222,
+            "stable_frames": 2,
+            "wrong_card_shown": 7,
+            "wrong_rate": 0.061946902654867256,
+            "wrong_rate_upper95": 0.12237125007474489,
+            "wrong_shown": 7
+          },
+          {
+            "margin_min": 0.05,
+            "photos": 144,
+            "shown": 110,
+            "shown_rate": 0.7638888888888888,
+            "stable_frames": 2,
+            "wrong_card_shown": 6,
+            "wrong_rate": 0.05454545454545454,
+            "wrong_rate_upper95": 0.11391927231733298,
+            "wrong_shown": 6
+          },
+          {
+            "margin_min": 0.06,
+            "photos": 144,
+            "shown": 106,
+            "shown_rate": 0.7361111111111112,
+            "stable_frames": 2,
+            "wrong_card_shown": 6,
+            "wrong_rate": 0.05660377358490566,
+            "wrong_rate_upper95": 0.11802496292071323,
+            "wrong_shown": 6
+          },
+          {
+            "margin_min": 0.08,
+            "photos": 144,
+            "shown": 100,
+            "shown_rate": 0.6944444444444444,
+            "stable_frames": 2,
+            "wrong_card_shown": 3,
+            "wrong_rate": 0.03,
+            "wrong_rate_upper95": 0.08452078080402699,
+            "wrong_shown": 3
+          },
+          {
+            "margin_min": 0.1,
+            "photos": 144,
+            "shown": 99,
+            "shown_rate": 0.6875,
+            "stable_frames": 2,
+            "wrong_card_shown": 3,
+            "wrong_rate": 0.030303030303030304,
+            "wrong_rate_upper95": 0.08533823116525735,
+            "wrong_shown": 3
+          },
+          {
+            "margin_min": 0.0,
+            "photos": 144,
+            "shown": 137,
+            "shown_rate": 0.9513888888888888,
+            "stable_frames": 3,
+            "wrong_card_shown": 24,
+            "wrong_rate": 0.18248175182481752,
+            "wrong_rate_upper95": 0.2555171059653377,
+            "wrong_shown": 25
+          },
+          {
+            "margin_min": 0.005,
+            "photos": 144,
+            "shown": 130,
+            "shown_rate": 0.9027777777777778,
+            "stable_frames": 3,
+            "wrong_card_shown": 19,
+            "wrong_rate": 0.14615384615384616,
+            "wrong_rate_upper95": 0.21701458803616952,
+            "wrong_shown": 19
+          },
+          {
+            "margin_min": 0.01,
+            "photos": 144,
+            "shown": 124,
+            "shown_rate": 0.8611111111111112,
+            "stable_frames": 3,
+            "wrong_card_shown": 14,
+            "wrong_rate": 0.11290322580645161,
+            "wrong_rate_upper95": 0.18061535565235226,
+            "wrong_shown": 14
+          },
+          {
+            "margin_min": 0.015,
+            "photos": 144,
+            "shown": 121,
+            "shown_rate": 0.8402777777777778,
+            "stable_frames": 3,
+            "wrong_card_shown": 11,
+            "wrong_rate": 0.09090909090909091,
+            "wrong_rate_upper95": 0.15547440105614402,
+            "wrong_shown": 11
+          },
+          {
+            "margin_min": 0.02,
+            "photos": 144,
+            "shown": 117,
+            "shown_rate": 0.8125,
+            "stable_frames": 3,
+            "wrong_card_shown": 9,
+            "wrong_rate": 0.07692307692307693,
+            "wrong_rate_upper95": 0.13975099776637948,
+            "wrong_shown": 9
+          },
+          {
+            "margin_min": 0.025,
+            "photos": 144,
+            "shown": 115,
+            "shown_rate": 0.7986111111111112,
+            "stable_frames": 3,
+            "wrong_card_shown": 8,
+            "wrong_rate": 0.06956521739130435,
+            "wrong_rate_upper95": 0.13129014501456757,
+            "wrong_shown": 8
+          },
+          {
+            "margin_min": 0.03,
+            "photos": 144,
+            "shown": 113,
+            "shown_rate": 0.7847222222222222,
+            "stable_frames": 3,
+            "wrong_card_shown": 7,
+            "wrong_rate": 0.061946902654867256,
+            "wrong_rate_upper95": 0.12237125007474489,
+            "wrong_shown": 7
+          },
+          {
+            "margin_min": 0.04,
+            "photos": 144,
+            "shown": 107,
+            "shown_rate": 0.7430555555555556,
+            "stable_frames": 3,
+            "wrong_card_shown": 7,
+            "wrong_rate": 0.06542056074766354,
+            "wrong_rate_upper95": 0.12891693990952502,
+            "wrong_shown": 7
+          },
+          {
+            "margin_min": 0.05,
+            "photos": 144,
+            "shown": 105,
+            "shown_rate": 0.7291666666666666,
+            "stable_frames": 3,
+            "wrong_card_shown": 6,
+            "wrong_rate": 0.05714285714285714,
+            "wrong_rate_upper95": 0.11909801681367833,
+            "wrong_shown": 6
+          },
+          {
+            "margin_min": 0.06,
+            "photos": 144,
+            "shown": 102,
+            "shown_rate": 0.7083333333333334,
+            "stable_frames": 3,
+            "wrong_card_shown": 4,
+            "wrong_rate": 0.0392156862745098,
+            "wrong_rate_upper95": 0.09652657175875834,
+            "wrong_shown": 4
+          },
+          {
+            "margin_min": 0.08,
+            "photos": 144,
+            "shown": 100,
+            "shown_rate": 0.6944444444444444,
+            "stable_frames": 3,
+            "wrong_card_shown": 3,
+            "wrong_rate": 0.03,
+            "wrong_rate_upper95": 0.08452078080402699,
+            "wrong_shown": 3
+          },
+          {
+            "margin_min": 0.1,
+            "photos": 144,
+            "shown": 97,
+            "shown_rate": 0.6736111111111112,
+            "stable_frames": 3,
+            "wrong_card_shown": 3,
+            "wrong_rate": 0.030927835051546393,
+            "wrong_rate_upper95": 0.08702149011641547,
+            "wrong_shown": 3
+          }
+        ]
+      }
+    }
+  }
+}
