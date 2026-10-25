@@ -1,7 +1,7 @@
 // Apple Vision text recognition for card crops: a stand-in for the phone's on-device OCR.
 //
 // Build: swiftc -O api/scripts/vision_text.swift -o vision_text
-// Use:   printf '%s\n' crop1.jpg crop2.jpg | ./vision_text [--fast]
+// Use:   printf '%s\n' crop1.jpg crop2.jpg | ./vision_text [--fast] [--min-height 0.015]
 //
 // One JSON object per input line: the image size, the time Vision took, and each
 // recognised line with its confidence and box (0...1, measured from the top-left).
@@ -10,7 +10,17 @@ import Foundation
 import Vision
 import ImageIO
 
-let fast = CommandLine.arguments.contains("--fast")
+var fast = false
+var minHeight = Float(-1)
+var args = CommandLine.arguments.dropFirst().makeIterator()
+while let arg = args.next() {
+  if arg == "--fast" {
+    fast = true
+  } else if arg == "--min-height", let raw = args.next(), let value = Float(raw), value > 0, value < 1 {
+    // Footer crops need a lower floor than the 1/32 default. The full-card read leaves this unset.
+    minHeight = value
+  }
+}
 
 func emit(_ object: [String: Any]) {
   let data = try! JSONSerialization.data(withJSONObject: object, options: [.sortedKeys])
@@ -30,6 +40,9 @@ while let path = readLine() {
   request.recognitionLevel = fast ? .fast : .accurate
   request.usesLanguageCorrection = false
   request.recognitionLanguages = ["en-US", "ja-JP"]
+  if minHeight > 0 {
+    request.minimumTextHeight = minHeight
+  }
   let handler = VNImageRequestHandler(cgImage: image, options: [:])
   let started = DispatchTime.now()
   var lines: [[String: Any]] = []
