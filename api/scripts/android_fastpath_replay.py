@@ -41,7 +41,7 @@ from dart_card_text_port import CardText, Line  # noqa: E402
 ROOT = Path(__file__).resolve().parents[2]
 MAIN = Path.home() / 'WebstormProjects/scanapp'
 PARITY = 'data/latency/android-recognition-parity-20261023'
-MODEL_ID = '2ddf6ec79e37/coreml-pal8'
+MODEL_ID = '2ddf6ec79e37/litert-fp16'
 
 
 RAW_NUMBER = re.compile(r'(?<![0-9])(?:[A-Za-z]{2,4}[0-9Oo]{2,3}|[0-9OoIl|]{1,4}[A-Za-z]?\s*[/T)]\s*[0-9OoIl|]{1,4}|[0-9OoIl|]{5,7})(?![0-9])')

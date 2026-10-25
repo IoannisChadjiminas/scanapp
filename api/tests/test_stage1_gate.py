@@ -176,3 +176,16 @@ def test_a_unit_vector_of_the_known_model_parses():
     })
     vector, reason = parse_client_embedding(payload)
     assert reason == 'ok' and vector is not None and abs(float(np.linalg.norm(vector)) - 1) < 1e-3
+
+
+def test_android_litert_model_id_is_accepted_but_other_runtime_ids_are_not():
+    values = np.zeros(384, np.float32)
+    values[0] = 1
+    vector = base64.b64encode(values.astype('<f2').tobytes()).decode()
+    android = json.dumps({'model': '2ddf6ec79e37/litert-fp16', 'vector': vector})
+    unknown = json.dumps({'model': '2ddf6ec79e37/onnx-fp16', 'vector': vector})
+
+    parsed, reason = parse_client_embedding(android)
+    assert reason == 'ok' and parsed is not None
+    parsed, reason = parse_client_embedding(unknown)
+    assert parsed is None and reason == 'bad_model'

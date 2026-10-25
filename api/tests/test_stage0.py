@@ -82,6 +82,11 @@ def test_a_wrong_embedding_length_or_an_oversized_text_is_left_out():
     assert evidence.glare is None
 
 
+def test_android_litert_embedding_id_is_recognized_as_phone_evidence():
+    embedding = '{"model":"2ddf6ec79e37/litert-fp16","vector":"%s"}' % VECTOR
+    assert phone_evidence(None, None, embedding).embedding
+
+
 def test_disagreement_is_a_boolean_and_not_the_phone_text():
     text = '{"v":1,"engine":"mlkit-latin","name":"Charmander","number":"18a/147"}'
     evidence = phone_evidence(text, None, None)
