@@ -16,7 +16,10 @@ TEXT_MAX_BYTES = 1280
 QUALITY_MAX_BYTES = 256
 EMBEDDING_MAX_BYTES = 2048
 EMBEDDING_DIM = 384
-EMBEDDING_MODELS = frozenset({'2ddf6ec79e37/coreml-pal8'})
+EMBEDDING_MODELS = frozenset({
+    '2ddf6ec79e37/coreml-pal8',
+    '2ddf6ec79e37/litert-fp16',
+})
 
 _ENGINE = re.compile(r'^[a-z0-9][a-z0-9._-]{0,31}$')
 _NUMBER = re.compile(

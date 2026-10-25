@@ -1,7 +1,8 @@
 """The phone's image-model vector, checked and then used only by the stage 1 gate.
 
-The wire format is the JSON object the simulation and `stage0` already accept:
-`{"model": "2ddf6ec79e37/coreml-pal8", "vector": "<base64 float16>"}`.
+The wire format is the JSON object `stage0` accepts. iOS and Android use
+separate IDs for the same pinned DINOv2 vector space:
+`2ddf6ec79e37/coreml-pal8` and `2ddf6ec79e37/litert-fp16`.
 Parsing follows the checks from the device-hints branch: known model, 384
 finite float16 values, and a vector that is already unit length.
 """
@@ -15,6 +16,7 @@ import re
 import numpy as np
 
 MODEL_ID = '2ddf6ec79e37/coreml-pal8'
+MODEL_IDS = frozenset({MODEL_ID, '2ddf6ec79e37/litert-fp16'})
 DIM = 384
 _MODEL = re.compile(r'^([0-9a-f]{12})/([a-z0-9][a-z0-9._-]{0,31})$')
 
@@ -36,7 +38,8 @@ def parse_client_embedding(raw: str | None, *, expected_model: str = MODEL_ID,
     vector = body.get('vector')
     match = _MODEL.fullmatch(model if isinstance(model, str) else '')
     expected = _MODEL.fullmatch(expected_model or '')
-    if match is None or expected is None or match.group(1) != expected.group(1):
+    if (match is None or expected is None or match.group(1) != expected.group(1)
+            or match.group(0) not in MODEL_IDS):
         return None, 'bad_model'
     if not isinstance(vector, str):
         return None, 'not_base64'
