@@ -40,6 +40,7 @@ class GateOptions:
     diagnostics: bool = False
     number_repair: bool = False
     fuzzy_name: bool = False
+    twin_guard: bool = False
 
     @classmethod
     def from_settings(cls, settings):
@@ -401,6 +402,18 @@ def printing_group(hits: list[dict], embeddings: np.ndarray, position: dict[str,
     return base, (base['id'], *sorted(card['id'] for card in hits if card is not base))
 
 
+def printing_twins(hits: list[dict]) -> bool:
+    """Two or more rows left after duplicate ids collapse, with one name, language and number.
+
+    Those rows are printings of one card (a base set and its reprint, a promo and its base).
+    """
+    if len(hits) < 2:
+        return False
+    keys = {(normalize_text(str(card.get('name') or '')), card.get('language') or '',
+             number_key(card.get('collector_number'))) for card in hits}
+    return len(keys) == 1
+
+
 def decide(vector: np.ndarray, embeddings: np.ndarray, card_ids: list[str], *,
            by_key: dict[str, list[dict]], by_id: dict[str, dict], bare_ids: set[str],
            name: str | None, number: str | None, language: str | None,
@@ -424,6 +437,7 @@ def decide(vector: np.ndarray, embeddings: np.ndarray, card_ids: list[str], *,
     for index, card_id in enumerate(card_ids):
         position.setdefault(card_id, index)
     base, printing_ids = printing_group(hits, embeddings, position) if options.printing_groups else (None, ())
+    twins = printing_twins(hits)
     if base is not None:
         hits = [base]
 
@@ -484,6 +498,10 @@ def decide(vector: np.ndarray, embeddings: np.ndarray, card_ids: list[str], *,
         if text_id is None:
             return finish(_empty('no_unique_text' if not hits else 'ambiguous_text', started, margin=margin))
         return finish(_empty('vector_disagree', started, margin=margin))
+    if options.twin_guard and twins:
+        # Stage 1 above answers a printing group only when the vector itself lands in that group.
+        # Here the artwork alone would pick one printing; the background check disagreed on that pick.
+        return finish(_empty('printing_twins', started, margin=margin))
     card = one_card(hits, language, embeddings, position)
     if card is None:
         return finish(_empty('no_unique_text' if not hits else 'ambiguous_text', started, margin=margin))

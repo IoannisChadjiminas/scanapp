@@ -49,6 +49,7 @@ SWITCHES = (
     'stage1_number_repair',
     'stage1_fuzzy_name',
     'stage1b_server_frame',
+    'stage1_twin_guard',
 )
 
 STAGES = (
