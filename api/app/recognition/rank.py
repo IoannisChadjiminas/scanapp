@@ -6,6 +6,7 @@ import re
 from typing import Any
 import unicodedata
 
+from app.config import get_settings
 from app.recognition.ocr import OcrHit
 
 COLLECTOR_RE = re.compile(
@@ -25,6 +26,13 @@ NON_COLLECTOR_NUMBER_RE = re.compile(
 # namespaces. Only remove a known code when it directly precedes a fraction.
 MODERN_SET_CODES = ('SVI', 'PAL', 'OBF', 'MEW', 'PAR', 'PAF', 'TEF',
                     'TWM', 'SFA', 'SCR', 'SSP', 'PRE', 'JTG', 'DRI')
+# Set codes that print glued to the front of a fraction (30C077/128, 30CEN 077/128, SV077/198) when
+# OCR_SET_CODE_PREFIX is on. Uppercase only: a lowercase or noisy read is not trusted.
+GLUED_SET_CODE_RE = re.compile(r'(?<![A-Z0-9])(?:30C(?:EN|JP|JA)?|SV(?=\d{3}/))(?=\d{1,4}/\d{1,4})')
+# Promo sets whose printed collector number carries the set id as a prefix (MEP078 for
+# catalogue number 078). SVP is always accepted; the rest only under OCR_SET_CODE_PREFIX.
+PROMO_NUMBER_PREFIX = {'mep': 'MEP', 'swshp': 'SWSH', 'smp': 'SM', 'bwp': 'BW', 'dpp': 'DP',
+                       'hgssp': 'HGSS', 'xyp': 'XY'}
 # Boxed modern regulation marks can touch the numeric fraction in OCR. This
 # cleanup is OCR-only: catalogue IDs and real collector namespaces are intact.
 REGULATION_FRACTION_RE = re.compile(r'\b[D-J](?=\d{1,4}/\d{1,4}\b)', re.IGNORECASE)
@@ -51,6 +59,10 @@ def similar(a: str, b: str) -> float:
     if not left or not right:
         return 0.0
     return SequenceMatcher(None, left, right).ratio()
+
+
+def set_code_prefix_enabled() -> bool:
+    return bool(get_settings().ocr_set_code_prefix)
 
 
 def parse_collector(value: str | None) -> CollectorParts | None:
@@ -133,6 +145,8 @@ def extract_collector_candidates(
             fractions = re.findall(r'(?i)\b((?:TG|GG)?\d{1,4}/(?:TG|GG)?\d{1,4})\b', cleaned)
             return [token for fraction in fractions for token in tokens(fraction)]
         compact = cleaned.replace(' ','')
+        if set_code_prefix_enabled():
+            compact = GLUED_SET_CODE_RE.sub('', compact)
         # Legacy Japanese set codes can abut their three-digit footer number.
         # Require a complete known series + fraction + printed rarity suffix;
         # English SM promo collectors and arbitrary prefix letters stay intact.
@@ -359,6 +373,9 @@ def accepted_collector_numbers(item: dict[str, Any]) -> list[str]:
         numbers.append(f"{numbers[0]}/{total}")
     if str(item.get('set_id') or '').lower()=='svp' and re.fullmatch(r'\d{1,3}',numbers[0]):
         numbers.append('SVP'+numbers[0].zfill(3))
+    promo_prefix = PROMO_NUMBER_PREFIX.get(str(item.get('set_id') or '').split(':')[-1].lower())
+    if promo_prefix and set_code_prefix_enabled() and re.fullmatch(r'\d{1,3}', numbers[0]):
+        numbers.append(promo_prefix + numbers[0].zfill(3))
     return [number for number in numbers if number]
 
 

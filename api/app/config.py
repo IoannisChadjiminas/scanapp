@@ -68,6 +68,11 @@ class Settings(BaseSettings):
     # name; with a label in the title strip, prefer a title read after it. A policy change:
     # replay the frozen panel before enabling it.
     ocr_label_name_filter: bool = False
+    # Read a set code glued to the front of a fraction (30C077/128, SV077/198) as the set
+    # code, not as part of the number, and accept a promo set's own prefix (MEP078 for
+    # catalogue 078). Only removes false conflicts; names and totals still apply. A policy
+    # change: replay the frozen panel before enabling it.
+    ocr_set_code_prefix: bool = False
     # When an abstaining scan has a confident printed fraction plus a name read anywhere in
     # its OCR lines that together narrow the catalogue to 1-3 cards, add those cards as
     # candidates for local artwork verification and, if unverified, return them as
