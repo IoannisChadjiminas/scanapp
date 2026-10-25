@@ -95,6 +95,8 @@ services:
       STAGE1B_SERVER_FRAME: ${STAGE1B_SERVER_FRAME:-true}
       STAGE1_NUMBER_REPAIR: ${STAGE1_NUMBER_REPAIR:-true}
       STAGE1_FUZZY_NAME: ${STAGE1_FUZZY_NAME:-false}
+      # Stage 1b abstains on printing twins (the 2026-10-25 Capsule scan). Staging only.
+      STAGE1_TWIN_GUARD: ${STAGE1_TWIN_GUARD:-true}
       CLIENT_TEXT_HINTS: ${CLIENT_TEXT_HINTS:-true}
       CLIENT_TEXT_OCR: ${CLIENT_TEXT_OCR:-footer}
       ENABLE_MATCHED: ${ENABLE_MATCHED:-true}

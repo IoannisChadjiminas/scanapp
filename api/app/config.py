@@ -226,6 +226,9 @@ class Settings(BaseSettings):
     stage1_number_repair: bool = True
     stage1_fuzzy_name: bool = False
     stage1b_server_frame: bool = False
+    # Stage 1b abstains when the text names printing twins (same name and number, other printing)
+    # and only the artwork would pick one. The full pipeline answers those instead. Off in code.
+    stage1_twin_guard: bool = False
     # Phone photo prep, sent through GET /config. Defaults match the app today.
     app_capture_preset: str = 'max'
     app_jpeg_quality: int = 95

@@ -58,7 +58,9 @@ def test_all_new_flags_default_off_and_are_staging_only():
         key = 'STAGE1_' + name.upper()
         assert f'{key}: ${{{key}:-true}}' in staging
         for production in repo.glob('compose*prod*.yaml'):
-            assert key not in production.read_text()
+            # Production may name a fix only to switch it explicitly off (stage1_twin_guard).
+            text = production.read_text()
+            assert key not in text or f'{key}: ${{{key}:-false}}' in text
 
 
 @pytest.mark.parametrize(('name', 'number', 'expected'), [
@@ -194,7 +196,9 @@ def test_stage1b_preserves_diagnostics_and_printing_choices_after_artwork(catalo
     ids = ['en:sv04-159', 'en:PPS5-PAR-159', 'en:xy12-35']
     vectors = np.stack([unit(1, 0, 0), unit(.9763, .2164, 0), unit(.999, 0, .04)])
     runtime = SimpleNamespace(snapshot=SimpleNamespace(embeddings=vectors, card_ids=ids))
-    settings = SimpleNamespace(stage1b_text_verify=True, **{'stage1_' + key: True for key in GateOptions.__dataclass_fields__})
+    # Every fix on, except the twin guard: this is the baseline the guard is measured against.
+    settings = SimpleNamespace(stage1b_text_verify=True, **{'stage1_' + key: key != 'twin_guard'
+                                                             for key in GateOptions.__dataclass_fields__})
     wire = json.dumps({'model':'2ddf6ec79e37/coreml-pal8','vector':base64.b64encode(vectors[0].astype('<f2').tobytes()).decode()})
     monkeypatch.setattr(stage1_answer, '_artwork', lambda *_a: 10)
     result = stage1_answer.evaluate_stage1(settings=settings,runtime=runtime,catalog=catalog,
@@ -207,6 +211,13 @@ def test_stage1b_preserves_diagnostics_and_printing_choices_after_artwork(catalo
         client_text=json.dumps({'name':'Ancient Booster Energy Capsule','number':'159/182'}),
         client_embedding=wire,card_quad=[(0,0),(1,0),(1,1),(0,1)],image_bytes=b'')
     assert not miss.answered and miss.reason == 'artwork_miss' and miss.vector_top
+    # With the guard on, the same twins never reach the artwork check: the full pipeline answers.
+    settings.stage1_twin_guard = True
+    monkeypatch.setattr(stage1_answer, '_artwork', lambda *_a: pytest.fail('artwork must not run on twins'))
+    guarded = stage1_answer.evaluate_stage1(settings=settings,runtime=runtime,catalog=catalog,
+        client_text=json.dumps({'name':'Ancient Booster Energy Capsule','number':'159/182'}),
+        client_embedding=wire,card_quad=[(0,0),(1,0),(1,1),(0,1)],image_bytes=b'')
+    assert not guarded.answered and guarded.reason == 'printing_twins' and guarded.stage is None
 
 
 def test_gate_logging_reports_vector_text_and_contradiction_without_ocr_or_vectors(catalog):
