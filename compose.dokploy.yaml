@@ -49,6 +49,8 @@ services:
       # weak visual match is rescued by printed number + name (verified artwork first).
       # docs/experiments/slab-text-identity-20261021.md
       OCR_LABEL_NAME_FILTER: ${OCR_LABEL_NAME_FILTER:-true}
+      # Set code glued to a fraction (30C077/128) and promo prefixes (MEP078). Off until replayed.
+      OCR_SET_CODE_PREFIX: ${OCR_SET_CODE_PREFIX:-false}
       TEXT_IDENTITY_CANDIDATES: ${TEXT_IDENTITY_CANDIDATES:-true}
       # Slab labels: set + number from CGC/PSA/BGS labels (18a, SV59, TG01) become verified
       # candidates. docs/experiments/slab-label-identity-20261021.md
