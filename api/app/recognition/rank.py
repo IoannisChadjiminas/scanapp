@@ -65,6 +65,69 @@ def set_code_prefix_enabled() -> bool:
     return bool(get_settings().ocr_set_code_prefix)
 
 
+def promo_prefix_near_enabled() -> bool:
+    return bool(get_settings().ocr_promo_prefix_near)
+
+
+# A promo prefix read as MP078 or ME078 for MEP078: exactly 3 digits, letters one edit away.
+PROMO_NEAR_RE = re.compile(r'([A-Z]{2,4})(\d{3})')
+
+
+def _one_letter_apart(read: str, canonical: str) -> bool:
+    """True for one missing letter, one wrong letter, or one swapped pair.
+
+    A 3-letter set id may lose one letter; a 2-letter id (SM, BW) may not, so a
+    stray letter cannot turn into a whole other set code.
+    """
+    if read == canonical:
+        return False
+    if len(read) == len(canonical) - 1 and len(canonical) >= 3:
+        return any(canonical[:i] + canonical[i + 1:] == read for i in range(len(canonical)))
+    if len(read) != len(canonical):
+        return False
+    differing = [i for i, (a, b) in enumerate(zip(read, canonical)) if a != b]
+    if len(differing) == 1:
+        return True
+    first, second = differing if len(differing) == 2 else (-1, -1)
+    return second == first + 1 and read[first] == canonical[second] and read[second] == canonical[first]
+
+
+def _near_promo_identifier(text: str, identifiers: list[str]) -> bool:
+    """MP078 agrees with a catalogue MEP078 identifier only under OCR_PROMO_PREFIX_NEAR.
+
+    Only the promo table's own set ids count. The read must be uppercase, with the
+    same 3 digits and a prefix one letter away; any other read stays a conflict.
+    """
+    if not promo_prefix_near_enabled():
+        return False
+    read = PROMO_NEAR_RE.fullmatch(text.replace(' ', ''))
+    if not read:
+        return False
+    for identifier in identifiers:
+        expected = PROMO_NEAR_RE.fullmatch(identifier.replace(' ', ''))
+        if (expected and expected.group(2) == read.group(2)
+                and expected.group(1) in PROMO_NUMBER_PREFIX.values()
+                and _one_letter_apart(read.group(1), expected.group(1))):
+            return True
+    return False
+
+
+def _promo_set_prefix(item: dict[str, Any]) -> str | None:
+    return PROMO_NUMBER_PREFIX.get(str(item.get('set_id') or '').split(':')[-1].lower())
+
+
+def promo_bare_number_agrees(ocr_name: str | None, item: dict[str, Any],
+                             candidates: list[dict[str, Any]]) -> bool:
+    """A bare promo number (078) agrees only when the name and number name exactly one promo card."""
+    number = parse_collector(str(item.get('collector_number') or ''))
+    if not _promo_set_prefix(item) or number is None or not ocr_name or not name_match(ocr_name, item['name']):
+        return False
+    same = [row for row in candidates if _promo_set_prefix(row)
+            and (other := parse_collector(str(row.get('collector_number') or ''))) is not None
+            and other.number == number.number and name_match(ocr_name, row.get('name') or '')]
+    return len(same) == 1 and same[0].get('card_id') == item.get('card_id')
+
+
 def parse_collector(value: str | None) -> CollectorParts | None:
     compact = (value or "").replace(" ", "").upper()
     if not compact:
@@ -267,7 +330,8 @@ def number_matches_identifiers(hits: list[OcrHit] | list[str], identifiers: list
         if parsed is None:
             continue
         expected = structured if parsed.denominator and structured else identifiers
-        results.append(any(number_match([hit], n) is True for n in expected))
+        results.append(any(number_match([hit], n) is True for n in expected)
+                       or _near_promo_identifier(text, identifiers))
     return any(results) if results else None
 
 
@@ -374,7 +438,7 @@ def accepted_collector_numbers(item: dict[str, Any]) -> list[str]:
     if str(item.get('set_id') or '').lower()=='svp' and re.fullmatch(r'\d{1,3}',numbers[0]):
         numbers.append('SVP'+numbers[0].zfill(3))
     promo_prefix = PROMO_NUMBER_PREFIX.get(str(item.get('set_id') or '').split(':')[-1].lower())
-    if promo_prefix and set_code_prefix_enabled() and re.fullmatch(r'\d{1,3}', numbers[0]):
+    if promo_prefix and (set_code_prefix_enabled() or promo_prefix_near_enabled()) and re.fullmatch(r'\d{1,3}', numbers[0]):
         numbers.append(promo_prefix + numbers[0].zfill(3))
     return [number for number in numbers if number]
 
@@ -462,6 +526,10 @@ def rerank(
         name_ok = name_match(ocr_name, item["name"])
         comparable_name = name_evidence_comparable(ocr_name, item)
         numbers = accepted_collector_numbers(item)
+        if (promo_prefix_near_enabled() and _promo_set_prefix(item)
+                and not promo_bare_number_agrees(ocr_name, item, visual)):
+            # A bare 078 is not promo proof unless its name and number name one promo card.
+            numbers = [n for n in numbers if (parts := parse_collector(n)) and parts.prefix]
         number_ok = _match_any(ocr_numbers, numbers)
         collector_conflict = _has_reliable_conflict(known_numbers if require_confident_ocr else ocr_numbers, numbers)
         language = str(item.get("language") or "")
