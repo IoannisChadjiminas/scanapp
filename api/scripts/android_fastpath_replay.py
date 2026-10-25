@@ -250,6 +250,19 @@ def summarize(result: dict, rows) -> dict:
     }
 
 
+def replay_extra(args) -> dict:
+    """The optional stage 1 / 1b flags a run turns on; each is off unless its switch is passed."""
+    extra = {}
+    for flag in ('number_repair', 'fuzzy_name'):
+        if getattr(args, flag):
+            extra['stage1_' + flag] = True
+    if args.server_frame:
+        extra['stage1b_server_frame'] = True
+    if args.twin_guard:
+        extra['stage1_twin_guard'] = True
+    return extra
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--ocr', type=Path, required=True, help='local A55 ML Kit capture (never committed)')
@@ -262,6 +275,7 @@ def main():
     parser.add_argument('--fuzzy-name', action='store_true')
     parser.add_argument('--server-frame', action='store_true')
     parser.add_argument('--whatif-raw-number', action='store_true', help='send the app\'s number_candidates when it sent no number (PokeSingle #161)')
+    parser.add_argument('--twin-guard', action='store_true', help='stage 1b abstains on printing twins (STAGE1_TWIN_GUARD)')
     args = parser.parse_args()
     data = args.data_root
     panel = data / 'data/latency/stage0-simulation-20261021'
@@ -274,12 +288,7 @@ def main():
             row['client_embedding'] = json.dumps({'model': MODEL_ID, 'vector': vector}) if vector else None
     runtime, catalog = build_runtime(panel / 'kit', ROOT / 'api/tests/fixtures/stage1-set-totals-20261022.json',
                                      data / 'data/android-embedding-research-20261023/teacher/dinov2_small.onnx')
-    extra = {}
-    for flag in ('number_repair', 'fuzzy_name'):
-        if getattr(args, flag):
-            extra['stage1_' + flag] = True
-    if args.server_frame:
-        extra['stage1b_server_frame'] = True
+    extra = replay_extra(args)
     result = run(rows, runtime, catalog, panel / 'panel', extra=extra)
     summary = summarize(result, rows)
     summary['text_sent_rebuilt'] = sum(r['client_text'] is not None for r in rows)
