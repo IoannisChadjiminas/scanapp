@@ -46,6 +46,9 @@ class Settings(BaseSettings):
     # Order an unproven printing group by a footer fraction read with look-alike
     # characters ("00z/03" for 007/034). Reorders only; never confirms a printing.
     ocr_damaged_footer_order: bool = False
+    # Order an unproven printing group by the printing the phone's own name and number name (set totals
+    # applied), when that card is among the candidates. Reorders only; the status stays printing_ambiguous.
+    ocr_printing_from_text: bool = False
     # One isolated footer reader overlaps initial title/footer inference.
     # Its auxiliary CPU lane is shared with optional grading, not added to it.
     ocr_parallel_regions: bool = False
@@ -234,6 +237,15 @@ class Settings(BaseSettings):
     # Stage 1b abstains when the text names printing twins (same name and number, other printing)
     # and only the artwork would pick one. The full pipeline answers those instead. Off in code.
     stage1_twin_guard: bool = False
+    # A vector whose leader is another printing of the text's own card (same name, other set or
+    # language) is not a contradiction; the text's number and set total still pick the printing.
+    # Footer-excluded printings: a same-name row whose known set total differs from the footer's total
+    # (`9/108`) is not a candidate for the leader. The text card's own total must agree. Off until the
+    # benchmark (api/scripts/stage1_bench) passes; see docs/family-rule-narrow-plan-20261026.md.
+    stage1_family_vector: bool = False
+    # Stage 1b with no server frame: frame the artwork check on the phone's corners (when card-shaped)
+    # or on the whole upload. The artwork check still runs. Off until measured.
+    stage1b_frame_fallback: bool = False
     # Phone photo prep, sent through GET /config. Defaults match the app today.
     app_capture_preset: str = 'max'
     app_jpeg_quality: int = 95

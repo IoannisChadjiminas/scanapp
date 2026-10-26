@@ -122,6 +122,45 @@ def _server_frame_vector(runtime, image_bytes: bytes):
         return None
 
 
+def card_shaped_quad(quad, size: tuple[int, int]) -> bool:
+    """Whether the phone's corners, in pixels, have a raw card's proportions (0.66 to 0.78 wide over tall)."""
+    if not quad or len(quad) != 4:
+        return False
+    width, height = size
+    pts = [(float(x) * (width - 1), float(y) * (height - 1)) for x, y in quad]
+
+    def edge(a, b):
+        return ((pts[a][0] - pts[b][0]) ** 2 + (pts[a][1] - pts[b][1]) ** 2) ** 0.5
+    wide = (edge(0, 1) + edge(3, 2)) / 2
+    tall = (edge(0, 3) + edge(1, 2)) / 2
+    return tall > 0 and 0.66 <= wide / tall <= 0.78
+
+
+def _phone_frame_vector(runtime, image_bytes: bytes, card_quad):
+    """Stage 1b frame when the server finds none: the phone's card-shaped corners, else the whole upload.
+
+    The artwork check still runs on this frame, so this only changes what is compared, never
+    whether a photo is accepted without verification.
+    """
+    embedder = getattr(runtime, 'embedder', None)
+    if embedder is None:
+        try:
+            embedder = runtime.require()[1]
+        except Exception:
+            return None
+    try:
+        photo = ImageOps.exif_transpose(Image.open(BytesIO(image_bytes))).convert('RGB')
+        if card_shaped_quad(card_quad, photo.size):
+            rect = _phone_rect(photo, card_quad)
+        else:
+            width, height = photo.size
+            rect = np.array([[0, 0], [width - 1, 0], [width - 1, height - 1], [0, height - 1]], dtype=np.float32)
+        return rect, np.asarray(embedder.embed(warp_to_rect(photo, rect), 'pad'), dtype=np.float32)
+    except Exception:
+        log.exception('stage1b phone frame failed')
+        return None
+
+
 def _evaluate_server_frame(*, settings, runtime, catalog, client_text, card_quad, image_bytes, options) -> Decision:
     """Stage 1b for a photo with no phone vector (usually no corners either): the text names one card.
 
@@ -146,6 +185,8 @@ def _evaluate_server_frame(*, settings, runtime, catalog, client_text, card_quad
         if printing_group(hits, embeddings, position)[0] is None and one_card(hits, language, embeddings, position) is None:
             return Decision(False, None, None, None, None, 'ambiguous_text', (time.perf_counter() - started) * 1000)
     framed = _server_frame_vector(runtime, image_bytes)
+    if framed is None and getattr(settings, 'stage1b_frame_fallback', False):
+        framed = _phone_frame_vector(runtime, image_bytes, card_quad)
     if framed is None:
         return Decision(False, None, None, None, None, 'no_server_frame', (time.perf_counter() - started) * 1000)
     rect, vector = framed

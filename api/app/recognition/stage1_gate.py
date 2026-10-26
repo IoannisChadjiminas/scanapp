@@ -41,6 +41,8 @@ class GateOptions:
     number_repair: bool = False
     fuzzy_name: bool = False
     twin_guard: bool = False
+    # A vector leader that is another printing of the text's card (same name) is not a contradiction.
+    family_vector: bool = False
 
     @classmethod
     def from_settings(cls, settings):
@@ -292,6 +294,7 @@ def load_catalogue(conn: sqlite3.Connection, options: GateOptions = GateOptions(
             'SELECT id, name, view_title, collector_number, printed_collector_number, language, set_id, image_path' + extras + ' '
             'FROM cards'):
         item = dict(row)
+        item['name_key'] = normalize_text(item.get('name') or '')
         item['keys'] = {key for key in (
             number_key(item['collector_number']), number_key(item['printed_collector_number'])) if key}
         if options.set_totals:
@@ -414,6 +417,33 @@ def printing_twins(hits: list[dict]) -> bool:
     return len(keys) == 1
 
 
+_FRACTION = re.compile(r'^\s*(\d{1,4})\s*/\s*(\d{1,4})\s*$')
+
+
+def footer_excluded_ids(by_id: dict[str, dict], hits: list[dict], number: str | None,
+                        options: GateOptions) -> frozenset[str]:
+    """Same-name rows that the phone's footer rules out as the printing of the text card.
+
+    The footer must read a full fraction whose total equals the text card's own known set total.
+    A same-name row with a different known total is then a different printing and cannot lead
+    the artwork. Rows with an unknown total are never excluded. See
+    docs/family-rule-narrow-plan-20261026.md.
+    """
+    if not options.family_vector or not options.set_totals or len(hits) != 1:
+        return frozenset()
+    match = _FRACTION.match(number or '')
+    if not match:
+        return frozenset()
+    read_total = int(match.group(2))
+    text = hits[0]
+    if text.get('set_total') is None or int(text['set_total']) != read_total or not text.get('name_key'):
+        return frozenset()
+    return frozenset(
+        card_id for card_id, row in by_id.items()
+        if row.get('name_key') == text['name_key'] and not same_card(card_id, text['id'])
+        and row.get('set_total') is not None and int(row['set_total']) != read_total)
+
+
 def decide(vector: np.ndarray, embeddings: np.ndarray, card_ids: list[str], *,
            by_key: dict[str, list[dict]], by_id: dict[str, dict], bare_ids: set[str],
            name: str | None, number: str | None, language: str | None,
@@ -432,6 +462,9 @@ def decide(vector: np.ndarray, embeddings: np.ndarray, card_ids: list[str], *,
     hits = collapse_hits(lookup(by_key, name, number, language, options), bare_ids)
     text_candidates = tuple(sorted(card['id'] for card in hits))
     scores = embeddings @ vector
+    excluded = footer_excluded_ids(by_id, hits, number, options)
+    if excluded:
+        scores = np.where(np.array([card_id in excluded for card_id in card_ids]), np.float32(-2.0), scores)
     top_id, top_score, margin = _top(scores, card_ids)
     position: dict[str, int] = {}
     for index, card_id in enumerate(card_ids):
