@@ -27,9 +27,15 @@ sys.path.insert(0, str(API / 'scripts' / 'stage1_bench'))
 
 
 def load_env(scratch: Path) -> None:
-    """The staging compose defaults, as environment, without overriding anything already set."""
+    """The staging compose defaults, as environment, without overriding anything already set.
+
+    The two bundles staging loads from its container environment are the copies in the scratch folder:
+    REFERENCE_FEATURES_DIR (matches the stored results' reference_features version) and ARTWORK_BUNDLE_DIR.
+    """
     for key, value in json.loads((scratch / 'staging_env.json').read_text()).items():
         os.environ.setdefault(key, value)
+    os.environ['REFERENCE_FEATURES_DIR'] = str(scratch / 'stagebundle' / 'reference-features' / '20261017-ja-sets')
+    os.environ['ARTWORK_BUNDLE_DIR'] = str(scratch / 'stagebundle' / 'artwork' / 'PS-CATALOGUE-EN-JA-SETH3-20261017')
 
 
 def main() -> None:
@@ -41,9 +47,18 @@ def main() -> None:
     parser.add_argument('--quad', choices=('none', 'full'), default='none',
                         help='card corners sent with the photo (full: the whole upload)')
     parser.add_argument('--out', type=Path)
+    parser.add_argument('--foreign-features', action='store_true',
+                        help='accept the staging reference bundle on this Mac (its processing contract is '
+                             'x86_64 with another OpenCV build). Approximate: features are not byte-identical.')
     args = parser.parse_args()
 
     load_env(args.data)
+    if args.foreign_features:
+        import json as _json
+        from app.recognition import reference_features as _rf
+        bundle = _json.loads((args.data / 'stagebundle' / 'reference-features' / '20261017-ja-sets'
+                              / 'manifest.json').read_text())['processing']
+        _rf.processing_contract = lambda: bundle
     from pathlib import Path as _P
     from app.config import Settings
     from app.db import connect
@@ -58,6 +73,8 @@ def main() -> None:
     if not runtime.ready:
         raise SystemExit(f'runtime not ready: {runtime.error}')
     catalog = connect(args.data / 'catalog.sqlite')
+    # The app binds the catalogue after opening it; that is where the reference feature store is attached.
+    runtime.bind_card_languages(catalog)
 
     cases = json.loads((args.cases / 'android_cases.json').read_text())
     if args.limit:

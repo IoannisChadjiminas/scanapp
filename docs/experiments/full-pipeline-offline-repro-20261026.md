@@ -29,3 +29,24 @@ The runner is not used for step 1 or later until it reproduces the stored result
 
 - The stored results' exact phone inputs and the 25–26 Oct reference-features state.
 - Any timing: the Mac timings (median about 2.9 s) are relative only.
+
+## Update: the reference features were the first cause (2026-10-26, later)
+
+- Staging sets `REFERENCE_FEATURES_DIR=/data/reference-features/20261017-ja-sets` and `ARTWORK_BUNDLE_DIR=/data/artwork/PS-CATALOGUE-EN-JA-SETH3-20261017`. The stored scans' `reference_features` version (`6584853e7a22`) is the prefix of that bundle's `catalogue_sha256`. Neither bundle was on the Mac. Both are copied read-only into the scratch folder (3.8 GB and 39 MB).
+- My catalogue's signature equals the bundle's (`6584853e7a228544`), so the catalogue is the same one.
+- The bundle's processing contract is x86_64 with another OpenCV build; this Mac is arm64. The loader refuses it. The runner accepts it only with `--foreign-features`, which is approximate: the features are not byte-identical to the server's.
+- The runtime attaches the feature store in `bind_card_languages(catalog)`, which the runner had not called. Now it does.
+
+| Run | Same status | Same first card |
+|---|---:|---:|
+| before (no bundles) | 136 of 226 (60%) | 146 (65%) |
+| bundles, first 20 | 17 of 20 | 16 of 20 |
+| bundles, all 226 | **175 of 226 (77%)** | **164 (73%)** |
+
+Still below the 95% gate. Remaining causes, in order of likelihood:
+
+1. The approximate contract match (arm64 OpenCV versus the server's x86_64 build). Measure it by running the runner on the staging host itself (x86_64, same contract), with `persist=False`, off peak.
+2. The phone's inputs the runner does not have: card corners, the phone's embedding and confidences.
+3. Stored early answers (stage 1) are not separated from full-pipeline results in the stored data.
+
+Runner: `api/scripts/full_bench/run_full.py` (the `--foreign-features` and `bind_card_languages` changes are committed with this note).
