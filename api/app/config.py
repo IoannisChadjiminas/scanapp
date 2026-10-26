@@ -234,6 +234,13 @@ class Settings(BaseSettings):
     # Stage 1b abstains when the text names printing twins (same name and number, other printing)
     # and only the artwork would pick one. The full pipeline answers those instead. Off in code.
     stage1_twin_guard: bool = False
+    # A vector whose leader is another printing of the text's own card (same name, other set or
+    # language) is not a contradiction; the text's number and set total still pick the printing.
+    # Off until the offline benchmark (api/scripts/stage1_bench) shows 0 wrong and no new disagreements.
+    stage1_family_vector: bool = False
+    # Stage 1b with no server frame: frame the artwork check on the phone's corners (when card-shaped)
+    # or on the whole upload. The artwork check still runs. Off until measured.
+    stage1b_frame_fallback: bool = False
     # Phone photo prep, sent through GET /config. Defaults match the app today.
     app_capture_preset: str = 'max'
     app_jpeg_quality: int = 95

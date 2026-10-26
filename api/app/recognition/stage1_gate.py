@@ -41,6 +41,8 @@ class GateOptions:
     number_repair: bool = False
     fuzzy_name: bool = False
     twin_guard: bool = False
+    # A vector leader that is another printing of the text's card (same name) is not a contradiction.
+    family_vector: bool = False
 
     @classmethod
     def from_settings(cls, settings):
@@ -292,6 +294,7 @@ def load_catalogue(conn: sqlite3.Connection, options: GateOptions = GateOptions(
             'SELECT id, name, view_title, collector_number, printed_collector_number, language, set_id, image_path' + extras + ' '
             'FROM cards'):
         item = dict(row)
+        item['name_key'] = normalize_text(item.get('name') or '')
         item['keys'] = {key for key in (
             number_key(item['collector_number']), number_key(item['printed_collector_number'])) if key}
         if options.set_totals:
@@ -414,6 +417,15 @@ def printing_twins(hits: list[dict]) -> bool:
     return len(keys) == 1
 
 
+def same_name_ids(by_id: dict[str, dict], text_id: str | None) -> frozenset[str]:
+    """Every catalogue row with the text card's name (any set, any printing)."""
+    card = by_id.get(text_id or '')
+    key = (card or {}).get('name_key')
+    if not key:
+        return frozenset()
+    return frozenset(card_id for card_id, row in by_id.items() if row.get('name_key') == key)
+
+
 def decide(vector: np.ndarray, embeddings: np.ndarray, card_ids: list[str], *,
            by_key: dict[str, list[dict]], by_id: dict[str, dict], bare_ids: set[str],
            name: str | None, number: str | None, language: str | None,
@@ -471,8 +483,10 @@ def decide(vector: np.ndarray, embeddings: np.ndarray, card_ids: list[str], *,
         if len(english) == 1:
             stage1_hits = english
     text_id = stage1_hits[0]['id'] if len(stage1_hits) == 1 else None
+    family_ids = same_name_ids(by_id, text_id) if options.family_vector and text_id else frozenset()
     if (text_id and text_id in position and top_id in position
-            and not same_card(top_id, text_id) and not (printing_ids and family(top_id))):
+            and not same_card(top_id, text_id) and not (printing_ids and family(top_id))
+            and top_id not in family_ids):
         cosine = float(embeddings[position[top_id]] @ embeddings[position[text_id]])
         vector_card, text_card = by_id.get(top_id), by_id.get(text_id)
         languages_differ = bool(vector_card and text_card and (vector_card.get('language') or '') != (text_card.get('language') or ''))
@@ -483,7 +497,12 @@ def decide(vector: np.ndarray, embeddings: np.ndarray, card_ids: list[str], *,
             low_margin = margin
         else:
             low_margin = None
-    elif text_id and (same_card(top_id, text_id) or (printing_ids and family(top_id))):
+    elif text_id and (same_card(top_id, text_id) or (printing_ids and family(top_id)) or top_id in family_ids):
+        if top_id in family_ids and not same_card(top_id, text_id) and not (printing_ids and family(top_id)):
+            # The text fixes the printing; the margin is the name family against every other card.
+            rest = [float(score) for card_id, score in zip(card_ids, scores) if card_id not in family_ids]
+            members = [float(score) for card_id, score in zip(card_ids, scores) if card_id in family_ids]
+            margin = max(members) - (max(rest) if rest else 0.0)
         if margin >= STAGE1_MARGIN:
             answer = text_id if text_id not in bare_ids else f'en:{text_id}'
             if answer not in by_id:
@@ -509,6 +528,10 @@ def decide(vector: np.ndarray, embeddings: np.ndarray, card_ids: list[str], *,
         matched_scores = [float(score) for card_id, score in zip(card_ids, scores) if family(card_id)]
         gap = top_score - max(matched_scores) if matched_scores else None
         blocked = gap is not None and not family(top_id) and gap >= CONTRADICTION
+    elif top_id in family_ids:
+        rest = [float(score) for card_id, score in zip(card_ids, scores) if card_id not in family_ids]
+        gap = max(rest) - float(scores[position[card['id']]]) if rest and card['id'] in position else None
+        blocked = gap is not None and gap >= CONTRADICTION
     else:
         gap = top_score - float(scores[position[card['id']]]) if card['id'] in position else None
         blocked = contradicts(scores, card_ids, embeddings, position, by_id, top_id, top_score, card['id'])

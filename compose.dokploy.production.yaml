@@ -77,6 +77,8 @@ services:
       STAGE1_NUMBER_REPAIR: ${STAGE1_NUMBER_REPAIR:-true}
       # Stage 1b printing-twin guard. Off in production until staging stays clean.
       STAGE1_TWIN_GUARD: ${STAGE1_TWIN_GUARD:-false}
+      STAGE1_FAMILY_VECTOR: ${STAGE1_FAMILY_VECTOR:-false}
+      STAGE1B_FRAME_FALLBACK: ${STAGE1B_FRAME_FALLBACK:-false}
       SCAN_STREAM_RESULTS: ${SCAN_STREAM_RESULTS:-true}
       PREVIEW_LANGUAGE_ORDER: ${PREVIEW_LANGUAGE_ORDER:-true}
       USE_CLIENT_QUAD: ${USE_CLIENT_QUAD:-false}
