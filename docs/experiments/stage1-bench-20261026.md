@@ -97,3 +97,19 @@ A same-name row is removed from the race only when the footer reads a full fract
 **Correction.** The earlier "+14" for the broad rule counted stage 1 answers only. Most of those came from cases that stage 1b already reached, so the net gain in answerable cards was about +4. The narrow rule moves 4 cases from stage 1b to stage 1 on the server's text and adds none; on the owner's text it adds 6 at stage 1 and moves 4 from 1b, a net +2. The gain is mainly that stage 1 answers skip the artwork check, so they are faster and less likely to fail.
 
 The plan's gate (0 wrong, 0 disagreements, a gain) passes on the server's text. The Charmander cases the rule frees (Base Set 46 leading against an 9/108 footer) are mostly stage 1b candidates, where the artwork check still runs.
+
+## Step 3: frame fallback (`STAGE1B_FRAME_FALLBACK`), on the real server-frame path
+
+`api/scripts/stage1_bench/run_server_frame.py` calls the real `evaluate_stage1` with no phone embedding, so it reaches `_evaluate_server_frame`: the server's frame finder, the real DINOv2 embedder, and the real local artwork check on the reference images. Only the fallback differs.
+
+| Text | Fallback | Family | Early answers (artwork passed) | Wrong | Disagreements | `no_server_frame` | `artwork_miss` |
+|---|---|---|---:|---:|---:|---:|---:|
+| server | off | off | 0 | 0 | 0 | 91 | 4 |
+| server | **on** | off | **10** | 0 | 0 | 0 | 46 |
+| server | on | on | 10 | 0 | 0 | 0 | 48 |
+| owner's card | off | off | 0 | 0 | 0 | 159 | 10 |
+| owner's card | **on** | off | **16** | 0 | 0 | 0 | 83 |
+
+The server's frame finder fails on 91 of 174 stored uploads (the uploads are already cropped to the card), and the fallback recovers those. Its frame is the whole upload here, since the bench sends no phone corners; in the app the phone's card-shaped corners are used when present, which should do better. The artwork check rejects the large majority of fallback frames (`artwork_miss`), which is the safety net working, not a failure. The reference images cover 876 cards, so some uploads cannot be artwork-checked at all.
+
+Gate (plan step 3): 0 wrong, 0 disagreements, a gain. Passed. Turned on in the staging compose file; off in production.
