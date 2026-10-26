@@ -241,6 +241,27 @@ def _detect_with_client_quad(image, fractions) -> tuple[Any, bool, str]:
     return warp_to_rect(image, server), True, note
 
 
+def _text_named_card(runtime, catalog, client_text, settings) -> str | None:
+    """The one catalogue card the phone's own name and number name, with set totals applied.
+
+    Used only to order a printing_ambiguous result. It never confirms a printing.
+    """
+    name = getattr(client_text, 'name', None)
+    number = getattr(client_text, 'number', None)
+    if not name or not number:
+        return None
+    from app.recognition.stage1_gate import GateOptions, collapse_hits, load_catalogue, lookup, set_total_conflicts
+    options = GateOptions(set_totals=True, normalize_duplicates=True, promo_numbers=True)
+    cached = getattr(runtime, 'printing_text_catalogue', None)
+    if cached is None:
+        cached = load_catalogue(catalog, options)
+        runtime.printing_text_catalogue = cached
+    by_key, _by_id, bare_ids = cached
+    hits = [row for row in collapse_hits(lookup(by_key, name, number, None, options), bare_ids)
+            if not set_total_conflicts(number, row, options)]
+    return str(hits[0]['id']) if len(hits) == 1 else None
+
+
 def _recognize_bytes_once(
     data: bytes,
     *,
@@ -1049,6 +1070,10 @@ def _recognize_bytes_once(
         damaged_order = bool(getattr(settings, 'ocr_damaged_footer_order', False))
         if not named and damaged_order and not stamp_hint:
             named = damaged_footer_named_printing(combined, printing.members, ocr.hits)
+        if not named and getattr(settings, 'ocr_printing_from_text', False) and not stamp_hint:
+            text_card = _text_named_card(runtime, catalog, client_text, settings)
+            if text_card and any(row.get('card_id') == text_card for row in combined):
+                named = text_card
         if named:
             combined.sort(key=lambda row: row.get('card_id') == named, reverse=True)
             if combined:

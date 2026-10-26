@@ -39,3 +39,22 @@ Flags as staging runs them, plus `family_vector` where marked. The baseline coun
 - The research catalogue, not PlanetScale. The production lookup has the same import id, but the number of rows per lookup was not checked against it.
 - Other phones and the Play-delivered model.
 - Whether the warnings in the replay tests (`invalid value encountered in matmul`) predate this change; not checked.
+
+## Step 1: the footer's printing orders the full pipeline (`OCR_PRINTING_FROM_TEXT`)
+
+The 16 family-vector disagreements were all printing choices where the server had not read a footer number, so the visual leader was shown first (`printing_ambiguous`, same card name). The phone's own name and number name one card (set totals applied) in every such case, and that card was already a candidate.
+
+- Change: when a printing is ambiguous and no earlier rule has named a printing, the card the phone's text names is moved to the front, if it is among the candidates. Status stays `printing_ambiguous`. Default off in code and in production; **on in the staging compose file** (gate below).
+- Offline measurement on the 174 labelled uploads, using the stored candidate lists (`visual_top20` and `predicted`) and the owner's card as the text (the oracle; see caveats above):
+
+| | Displayed first card is the owner's card |
+|---|---:|
+| Stored full pipeline | 143 of 174 |
+| With the reorder | **168 of 174** |
+| Wrong → correct | 25 |
+| Correct → wrong | **0** |
+
+- All 16 family-vector disagreements would be resolved: the owner's card is among their candidates, so the reordered full pipeline would agree with the family answer. Re-run the family rule against it, and its disagreements should drop from 16 to about 0 under the oracle text.
+- Caveats: this reads stored candidate lists, not a full pipeline run (the real `combined` list can differ); the phone's text is assumed right, and a misread number that names another card in the list would move that card to the front, still under `printing_ambiguous`.
+- Gate (plan step 1): 0 wrong first cards introduced, and a clear gain. Passed offline. Live confirmation: check the next staging scans of a reprint card show the footer's printing first.
+- Tests: `api/tests/test_printing_from_text.py` (5). Full suite: 1067 passed, 10 skipped.
