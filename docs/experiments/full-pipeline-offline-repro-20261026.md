@@ -50,3 +50,7 @@ Still below the 95% gate. Remaining causes, in order of likelihood:
 3. Stored early answers (stage 1) are not separated from full-pipeline results in the stored data.
 
 Runner: `api/scripts/full_bench/run_full.py` (the `--foreign-features` and `bind_card_languages` changes are committed with this note).
+
+## Result on linux/amd64 (the server's platform), 226 uploads
+
+Run in a local linux/amd64 container from the staging requirements (`api/requirements.txt`). The reference bundle's processing contract matches exactly (no override). Same status **175 of 226 (77%)**, same first card **164 (73%)**, the same as the arm64 run with the override. So the arm64 approximation was not the cause. The remaining gap is the inputs the runner does not have: the phone's card corners, embedding and real confidences, plus the stored data not separating stage 1 answers. Timings in the container are emulated and not representative.
