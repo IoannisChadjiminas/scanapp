@@ -80,12 +80,36 @@ def text_of(case: dict, label_row: dict | None, mode: str) -> tuple[str | None, 
     return name, (f'{match.group(1)}/{match.group(2)}' if match else None)
 
 
+def _full_top_after_reorder(case, candidates, stored, name, number, by_key, by_id, bare_ids, options):
+    """What the full pipeline would show first once OCR_PRINTING_FROM_TEXT is on.
+
+    Mirrors pipeline.py: only a printing_ambiguous result, only when the text names exactly one card
+    (set totals applied) and that card is among the candidates. Otherwise the stored top stands.
+    """
+    entry = candidates[case['scan']]
+    if entry.get('status') != 'printing_ambiguous' or not name or not number:
+        return stored
+    from app.recognition.stage1_gate import collapse_hits, lookup, set_total_conflicts
+    hits = [row for row in collapse_hits(lookup(by_key, name, number, None, options), bare_ids)
+            if not set_total_conflicts(number, row, options)]
+    if len(hits) != 1:
+        return stored
+    text_card = hits[0]['id']
+    shown = set(entry.get('visual', [])) | set(entry.get('predicted', []))
+    if text_card in shown:
+        return text_card
+    return stored
+
+
 def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument('--cases', type=Path, required=True)
     parser.add_argument('--data', type=Path, default=REPO / 'data/android-embedding-research-20261023')
     parser.add_argument('--family', action='store_true', help='turn STAGE1_FAMILY_VECTOR on')
     parser.add_argument('--text', choices=('server', 'oracle'), default='server')
+    parser.add_argument('--candidates', type=Path, help='stored full-pipeline candidates (cand_out.json)')
+    parser.add_argument('--printing-from-text', action='store_true',
+                        help='apply OCR_PRINTING_FROM_TEXT to the stored full-pipeline answer')
     parser.add_argument('--out', type=Path)
     args = parser.parse_args()
 
@@ -108,6 +132,7 @@ def main() -> None:
     embedder = OnnxEmbedder(args.data / 'teacher' / 'dinov2_small.onnx')
 
     cases = json.loads((args.cases / 'android_cases.json').read_text())
+    candidates = json.loads(args.candidates.read_text()) if args.candidates else {}
     rows, counts = [], Counter()
     for case in cases:
         label = OWNER.get((case.get('ocr_name') or case.get('top_name') or '').strip().lower())
@@ -132,6 +157,8 @@ def main() -> None:
                           name=name, number=number, language='en', quad_ok=True, stage1b=True,
                           label=False, options=options)
         stored = case.get('top')  # the stored full-pipeline top card
+        if args.printing_from_text and candidates and case['scan'] in candidates:
+            stored = _full_top_after_reorder(case, candidates, stored, name, number, by_key, by_id, bare_ids, options)
         row = {'scan': case['scan'], 'label': label, 'stage': decision.stage, 'reason': decision.reason,
                'card': decision.card_id, 'margin': None if decision.margin is None else round(decision.margin, 3)}
         if decision.stage == '1' and decision.answered:
