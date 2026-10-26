@@ -143,6 +143,7 @@ async def create_scan(
                 client_text_reason=hint_reason,
                 locale=locale,
                 card_quad=parse_quad(card_quad),
+                phone_inputs=phone_inputs(card_quad, hint, client_embedding),
                 _progress_observer=observer,
                 _grading_completion=lambda scan_id, job: schedule_grading_completion(
                     request.app.state.loop, request.app.state.dbs.results, scan_id, job),
@@ -418,3 +419,21 @@ async def session_results(request: Request, response: Response) -> dict:
         results=results,
         coverage=coverage_model,
     ).model_dump(mode="json")
+
+
+def phone_inputs(card_quad: str | None, hint, client_embedding: str | None) -> dict:
+    """The corners, text (with confidences) and embedding flag the phone sent, for the review record.
+
+    Diagnostics only: the embedding itself is not stored, only whether one came.
+    """
+    text = None
+    if hint is not None:
+        text = {
+            "engine": getattr(hint, "engine", None),
+            "name": getattr(hint, "name", None),
+            "name_conf": getattr(hint, "name_conf", None),
+            "number": getattr(hint, "number", None),
+            "number_conf": getattr(hint, "number_conf", None),
+            "number_candidates": list(getattr(hint, "number_candidates", ()) or ()),
+        }
+    return {"card_quad": card_quad, "client_text": text, "embedding_sent": bool(client_embedding)}
