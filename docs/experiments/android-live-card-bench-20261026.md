@@ -44,13 +44,53 @@ False outlines (frames with a quad, out of frames):
 
 A quad inside a background strip or half-card frame is a false outline for auto-capture only if it would fire a photo; the gate is 0 automatic photos with no card in view, so any rate this high needs a stability and fingerprint check on top, as iOS has.
 
+## Tuning round (same bench, same rules)
+
+Three new finders, each tried with three false-outline filters. "In 5%" is photos whose best candidate is within 5% of the reference (of 213 with a reference). False = frames with a quad out of the 542 no-card frames. Finder time is on the Mac at 320 px.
+
+- `adaptive`: Gaussian adaptive threshold (block 21), opened, morphological gradient, closed.
+- `sat`: Canny on the HSV saturation channel (two threshold pairs), closed.
+- `merge`: grey multi-threshold edges plus saturation edges, joined by a wide (9x9) close before the polygon fit.
+- Filter `border`: reject quads with any side within 2% of the frame edge (a card held in view has the whole outline inside the frame).
+- Filter `support`: reject quads where fewer than 70% of points along the four sides sit on an edge pixel.
+- Filter `both`: both of the above.
+
+| Finder + filter | Found (of 312) | In 5% | Median / p90 error | False (of 542) | ms |
+|---|---:|---:|---:|---:|---:|
+| canny, none | 114 | 50 | 2.4 / 17.5% | 120 | 1.0 |
+| multi, none | 179 | 85 | 2.4 / 27.3% | 157 | 1.0 |
+| adaptive, none | 181 | 82 | 3.3 / 23.1% | 165 | 1.4 |
+| sat, none | 191 | 80 | 3.9 / 29.8% | 159 | 1.9 |
+| merge, none | 192 | 74 | 4.2 / 31.0% | 150 | 1.9 |
+| multi, border | 30 | 23 | 1.2 / 8.2% | 6 | 1.1 |
+| adaptive, border | 52 | 25 | 3.4 / 16.5% | 24 | 1.5 |
+| sat, border | 53 | 33 | 1.6 / 10.3% | 5 | 1.9 |
+| merge, border | 23 | 16 | 1.6 / 15.3% | 2 | 2.1 |
+| sat, support | 115 | 50 | 3.4 / 30.5% | 105 | 2.2 |
+| merge, support | 122 | 50 | 4.5 / 31.9% | 121 | 2.3 |
+| adaptive, both | 21 | 14 | 1.6 / 16.4% | 3 | 1.5 |
+| sat, both | 39 | 24 | 1.4 / 7.9% | 3 | 1.9 |
+| merge, both | 18 | 13 | 1.2 / 9.3% | **0** | 1.9 |
+
+(All 20 combinations are in the script output; canny and multi with `support`/`both` are omitted above as dominated.)
+
+Findings:
+
+- No finder changes the unfiltered picture: 114–192 of 312 found, 74–85 of 213 within 5%, 120–165 of 542 false. Adaptive and saturation raise "found" a little but not the accurate finds.
+- The `border` filter does most of the work against false outlines (157 to 6 for multi, 159 to 5 for sat). The `support` filter alone helps little (unfiltered false outlines are real edges).
+- Best trade: **`sat` + `border`** (53 found, 33 within 5%, 5 false) or **`sat` + `both`** (39 found, 3 false, p90 error 7.9%). `merge` + `both` reaches **0 false outlines of 542** but finds only 18 of 312.
+- The false-outline rate can be driven to near zero (0.0–0.9%), but only by giving up most finds: the best near-zero-false setting finds 6–17% of corpus photos, against the 80% gate. Part of that loss is a corpus artefact (the `border` filter rejects the many listing photos where the card fills the frame); a live camera frame with the card inside the frame would lose less. This needs the phone test, not more bench tuning, to separate.
+- Quality of the negatives: they are cut from card photos, so a surviving false outline on half-card frames may be the real edge of the card.
+
+Stopped after this round as agreed. Step 2 not started; Android app untouched.
+
 ## Caveats
 
 - The corpus is 312 eBay listing images, not camera frames. The reference quad's median area is 57% of the photo, 85 of 213 reference quads cover 70% or more and 51 cover under 30%. Listing photos have varied backgrounds, sleeves, slabs and multi-card layouts (harder than a card on a plain mat), but no motion blur or preview noise (easier than live).
 - The reference is a stand-in for the correct card outline, not ground truth. Where the gallery detector missed (99 photos) there is nothing to score; those count only toward "found" rates.
 - The iOS live path also runs document segmentation per frame; this bench's reference includes it, the Android finder has no equivalent. Part of the gap is that.
 - The negatives are cut from card photos, so a quad found in a half-card frame can be a real edge of the card, not noise.
-- Tuning was not attempted beyond the two variants. `multi` roughly shows that edge-map choice alone moves the find rate by 20 points.
+- Tuning: see the tuning round above.
 
 ## Against the plan
 

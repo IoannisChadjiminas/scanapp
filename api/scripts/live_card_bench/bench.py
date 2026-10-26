@@ -89,44 +89,80 @@ def pick_reference(cands, w, h):
 
 
 # ---------------------------------------------------------------- finder
-def find_cards(gray, variant="canny"):
-    """Card-shaped convex quads in a small grey frame, corners in 0..1, best first."""
-    h, w = gray.shape
+K3, K5, K9 = (np.ones((n, n), np.uint8) for n in (3, 5, 9))
+
+
+def edge_map(bgr, variant):
+    gray = cv2.cvtColor(bgr, cv2.COLOR_BGR2GRAY)
     blur = cv2.GaussianBlur(gray, (5, 5), 0)
-    edge_maps = []
     if variant == "canny":
         med = float(np.median(blur))
-        edge_maps.append(cv2.Canny(blur, int(max(0, 0.66 * med)), int(min(255, 1.33 * med))))
-    else:  # "multi": several thresholds, merged, then closed so a broken outline joins up
-        em = np.zeros_like(blur)
-        for lo, hi in ((20, 60), (40, 120), (80, 200)):
-            em = cv2.bitwise_or(em, cv2.Canny(blur, lo, hi))
-        edge_maps.append(em)
+        return cv2.dilate(cv2.Canny(blur, int(max(0, 0.66 * med)), int(min(255, 1.33 * med))), K3)
+    multi = np.zeros_like(blur)
+    for lo, hi in ((20, 60), (40, 120), (80, 200)):
+        multi = cv2.bitwise_or(multi, cv2.Canny(blur, lo, hi))
+    if variant == "multi":
+        return cv2.morphologyEx(cv2.dilate(multi, K3), cv2.MORPH_CLOSE, K5)
+    if variant == "adaptive":  # local threshold, outline of the dark/light regions
+        binary = cv2.adaptiveThreshold(blur, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY_INV, 21, 6)
+        binary = cv2.morphologyEx(binary, cv2.MORPH_OPEN, K3)
+        grad = cv2.morphologyEx(binary, cv2.MORPH_GRADIENT, K3)
+        return cv2.morphologyEx(grad, cv2.MORPH_CLOSE, K5)
+    if variant == "sat":  # edges of the colour saturation channel (cards are more saturated than tables)
+        sat = cv2.GaussianBlur(cv2.cvtColor(bgr, cv2.COLOR_BGR2HSV)[:, :, 1], (5, 5), 0)
+        e = cv2.bitwise_or(cv2.Canny(sat, 15, 45), cv2.Canny(sat, 30, 90))
+        return cv2.morphologyEx(cv2.dilate(e, K3), cv2.MORPH_CLOSE, K5)
+    if variant == "merge":  # grey + saturation edges, broken edges joined by a wide close before the fit
+        sat = cv2.GaussianBlur(cv2.cvtColor(bgr, cv2.COLOR_BGR2HSV)[:, :, 1], (5, 5), 0)
+        e = cv2.bitwise_or(multi, cv2.bitwise_or(cv2.Canny(sat, 15, 45), cv2.Canny(sat, 30, 90)))
+        return cv2.morphologyEx(cv2.dilate(e, K3), cv2.MORPH_CLOSE, K9)
+    raise ValueError(variant)
+
+
+def perimeter_support(q, edges, w, h):
+    """Share of points along the quad's sides that sit on an edge pixel (edges already dilated)."""
+    hits = total = 0
+    p = np.round(q * [w - 1, h - 1]).astype(int)
+    for i in range(4):
+        for t in np.linspace(0.05, 0.95, 40):
+            x, y = np.round(p[i] * (1 - t) + p[(i + 1) % 4] * t).astype(int)
+            total += 1
+            hits += edges[min(max(y, 0), h - 1), min(max(x, 0), w - 1)] > 0
+    return hits / total
+
+
+def find_cards(bgr, variant="canny", filt="none"):
+    """Card-shaped convex quads in a small frame, corners in 0..1, best first.
+    filt: none | border (no side within 2% of the frame edge) | support (>= 70% of the
+    outline on edge pixels) | both."""
+    h, w = bgr.shape[:2]
+    edges = edge_map(bgr, variant)
+    cnts, _ = cv2.findContours(edges, cv2.RETR_LIST, cv2.CHAIN_APPROX_SIMPLE)
     out = []
-    for edges in edge_maps:
-        edges = cv2.dilate(edges, np.ones((3, 3), np.uint8), iterations=1)
-        if variant != "canny":
-            edges = cv2.morphologyEx(edges, cv2.MORPH_CLOSE, np.ones((5, 5), np.uint8))
-        cnts, _ = cv2.findContours(edges, cv2.RETR_LIST, cv2.CHAIN_APPROX_SIMPLE)
-        for cnt in cnts:
-            if cv2.contourArea(cnt) < MIN_AREA * w * h * 0.8:
-                continue
-            hull = cv2.convexHull(cnt)
-            per = cv2.arcLength(hull, True)
-            approx = None
-            for eps in (0.02, 0.03, 0.04, 0.05):
-                ap = cv2.approxPolyDP(hull, eps * per, True)
-                if len(ap) == 4:
-                    approx = ap
-                    break
-            if approx is None:
-                continue
-            q = order(approx.reshape(4, 2) / [w, h])
-            if area(q) < MIN_AREA or not cv2.isContourConvex(approx):
-                continue
-            if not (MIN_ASPECT <= side_aspect(q, w, h) <= MAX_ASPECT):
-                continue
-            out.append(q)
+    for cnt in cnts:
+        if cv2.contourArea(cnt) < MIN_AREA * w * h * 0.8:
+            continue
+        hull = cv2.convexHull(cnt)
+        per = cv2.arcLength(hull, True)
+        approx = None
+        for eps in (0.02, 0.03, 0.04, 0.05):
+            ap = cv2.approxPolyDP(hull, eps * per, True)
+            if len(ap) == 4:
+                approx = ap
+                break
+        if approx is None:
+            continue
+        q = order(approx.reshape(4, 2) / [w, h])
+        if area(q) < MIN_AREA or not cv2.isContourConvex(approx):
+            continue
+        if not (MIN_ASPECT <= side_aspect(q, w, h) <= MAX_ASPECT):
+            continue
+        if filt in ("border", "both") and (q.min() <= BORDER_SLACK or q[:, 0].max() >= 1 - BORDER_SLACK
+                                           or q[:, 1].max() >= 1 - BORDER_SLACK):
+            continue
+        if filt in ("support", "both") and perimeter_support(q, edges, w, h) < 0.70:
+            continue
+        out.append(q)
     out.sort(key=area, reverse=True)
     return out
 
@@ -162,6 +198,10 @@ def pct(v, p):
     return float(np.percentile(v, p)) if len(v) else float("nan")
 
 
+COMBOS = [f"{v}+{f}" for v in ("canny", "multi", "adaptive", "sat", "merge")
+          for f in ("none", "border", "support", "both")]
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--corpus", required=True)
@@ -174,7 +214,7 @@ def main():
     buckets = {r["photo"].split("/")[-1]: r["bucket"] for r in csv.DictReader(open(corpus / "manifest.csv"))}
 
     report = {"edge": a.edge, "variants": {}}
-    for variant in ("canny", "multi"):
+    for variant in COMBOS:
         rows, neg_rows, times = [], [], []
         for name in sorted(cands):
             img = cv2.imread(str(corpus / "raw" / name))
@@ -183,10 +223,10 @@ def main():
             h0, w0 = img.shape[:2]
             ref, why = pick_reference(cands[name], w0, h0)
             small = shrink(img, a.edge)
-            gray = cv2.cvtColor(small, cv2.COLOR_BGR2GRAY)
-            sh, sw = gray.shape
+            gray = small
+            sh, sw = gray.shape[:2]
             t0 = time.perf_counter()
-            found = find_cards(gray, variant)
+            found = find_cards(gray, *variant.split("+"))
             times.append((time.perf_counter() - t0) * 1000)
             row = {"id": name[:-4], "bucket": buckets.get(name, ""), "has_ref": ref is not None,
                    "found": bool(found), "err": None, "iou": None}
@@ -200,17 +240,18 @@ def main():
             rows.append(row)
             if ref is not None:
                 for kind, crop in negatives(img, ref):
-                    g = cv2.cvtColor(shrink(crop, a.edge), cv2.COLOR_BGR2GRAY)
-                    n = find_cards(g, variant)
+                    g = shrink(crop, a.edge)
+                    n = find_cards(g, *variant.split("+"))
                     neg_rows.append({"id": name[:-4], "kind": kind, "false": bool(n)})
         report["variants"][variant] = summarise(rows, neg_rows, times)
         report["variants"][variant]["rows"] = rows
         report["variants"][variant]["neg_rows"] = neg_rows
     Path(a.out).write_text(json.dumps(report, default=lambda o: o.item() if hasattr(o, "item") else str(o)))
     report = json.loads(Path(a.out).read_text())
+    print("variant            found  in5%  med%  p90%  false/542  ms")
     for v, s in report["variants"].items():
-        print(v, json.dumps({k: x for k, x in s.items() if k not in ("rows", "neg_rows")}, indent=1))
-
+        print(f"{v:<17} {s['found_all']:>5} {s['correct_within_5pct']:>5} {s['err_best_median']*100:>5.1f} "
+              f"{s['err_best_p90']*100:>5.1f} {s['negatives_total'][1]:>6}    {s['finder_ms_median']:.1f}")
 
 def summarise(rows, neg_rows, times):
     ref = [r for r in rows if r["has_ref"]]
