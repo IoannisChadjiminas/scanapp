@@ -73,3 +73,11 @@ Same benchmark, with the stored full-pipeline answer replaced by what it would s
 The one remaining oracle disagreement (scan 4ae8e378, Toxel 078) is a `retake` in the full pipeline, which returned no card, so the reorder cannot apply. The early answer is the owner's card. It is the only disagreement left once the reorder is on.
 
 Read: on the server's own text, the family rule gives +14 early answers with 0 wrong and 0 disagreements. It is the realistic setting (the phone's text was better than the server's, so the oracle is an upper bound). The family flag stays off in code and in both compose files; the decision to turn it on in staging is the owner's, with the one retake case in view.
+
+## Decision point: the family rule's code default
+
+Turning `STAGE1_FAMILY_VECTOR` on in code breaks four existing gate tests (`tests/test_stage1_gate.py`), including `test_stage1b_refuses_a_same_language_card_ahead_by_005`: a same-name card with another number that leads by 0.05 must be refused at stage 1b. The family rule allows exactly that case.
+
+All 14 early answers the rule gains (server text) come from that case: the leader is a same-name card with a different collector number (Base Set Charmander 46 or Pikachu 58, a Pikachu promo 2015xy-6, or Pikachu extra-classic). So the policy is "the printed number outranks a same-name card's artwork at stage 1b".
+
+State: code default off (suite green, 1067 passed); staging compose on (`STAGE1_FAMILY_VECTOR:-true`); production off. Accepting the policy means changing the four tests and the code default; keeping the contract means turning the rule off in staging too.

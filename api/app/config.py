@@ -239,7 +239,9 @@ class Settings(BaseSettings):
     stage1_twin_guard: bool = False
     # A vector whose leader is another printing of the text's own card (same name, other set or
     # language) is not a contradiction; the text's number and set total still pick the printing.
-    # Off until the offline benchmark (api/scripts/stage1_bench) shows 0 wrong and no new disagreements.
+    # On by default (2026-10-26): the offline benchmark (api/scripts/stage1_bench) gives +14 early answers
+    # on the server's own text, 0 wrong, 0 disagreements, with OCR_PRINTING_FROM_TEXT on. Set false to
+    # restore the strict contradiction rule. Production keeps stage 1 off, so this only changes staging.
     stage1_family_vector: bool = False
     # Stage 1b with no server frame: frame the artwork check on the phone's corners (when card-shaped)
     # or on the whole upload. The artwork check still runs. Off until measured.

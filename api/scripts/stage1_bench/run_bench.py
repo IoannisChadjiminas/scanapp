@@ -159,7 +159,7 @@ def main() -> None:
         stored = case.get('top')  # the stored full-pipeline top card
         if args.printing_from_text and candidates and case['scan'] in candidates:
             stored = _full_top_after_reorder(case, candidates, stored, name, number, by_key, by_id, bare_ids, options)
-        row = {'scan': case['scan'], 'label': label, 'stage': decision.stage, 'reason': decision.reason,
+        row = {'scan': case['scan'], 'label': label, 'vector_top': decision.vector_top, 'stage': decision.stage, 'reason': decision.reason,
                'card': decision.card_id, 'margin': None if decision.margin is None else round(decision.margin, 3)}
         if decision.stage == '1' and decision.answered:
             row['path'] = decision.reason

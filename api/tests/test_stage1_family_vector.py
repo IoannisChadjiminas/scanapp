@@ -5,6 +5,8 @@ Plan 2026-10-26 step 2. The Pikachu and Charmander uploads of 2026-10-25/26 were
 Evolutions card by number. With the flag on, the printing comes from the text and the same-name
 reprint is not a contradiction. Off by default: behaviour must be unchanged.
 """
+from pathlib import Path
+
 import numpy as np
 
 from app.config import Settings
@@ -75,9 +77,15 @@ def test_family_margin_is_against_other_names_only():
     assert decision.reason == 'low_margin'
 
 
-def test_flags_default_off_in_code():
+def test_flag_off_by_default_in_code_on_in_staging_off_in_production():
+    # Off in code: the stage 1b contradiction contract (test_stage1_gate) refuses a same-name card
+    # with another number. Staging runs the rule; the owner decides the code default.
     assert GateOptions().family_vector is False
     assert Settings(_env_file=None).stage1_family_vector is False
+    staging = (Path(__file__).resolve().parents[2] / 'compose.dokploy.yaml').read_text()
+    assert 'STAGE1_FAMILY_VECTOR: ${STAGE1_FAMILY_VECTOR:-true}' in staging
+    production = (Path(__file__).resolve().parents[2] / 'compose.dokploy.production.yaml').read_text()
+    assert 'STAGE1_FAMILY_VECTOR: ${STAGE1_FAMILY_VECTOR:-false}' in production
     assert Settings(_env_file=None).stage1b_frame_fallback is False
 
 
