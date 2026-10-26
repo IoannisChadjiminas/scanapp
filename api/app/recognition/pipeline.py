@@ -244,6 +244,7 @@ def _detect_with_client_quad(image, fractions) -> tuple[Any, bool, str]:
 def _recognize_bytes_once(
     data: bytes,
     *,
+    phone_inputs: dict | None = None,
     settings: Settings,
     runtime: Runtime,
     catalog: sqlite3.Connection,
@@ -1365,6 +1366,8 @@ def _recognize_bytes_once(
                         "rotation": rotation,
                         "skip_detect": skip_detect,
                         "language": language,
+                        # What the phone sent with the photo (diagnostics for offline replay).
+                        "phone": phone_inputs,
                     },
                     image_stats={
                         "input_size": list(input_image.size),
@@ -1436,6 +1439,7 @@ def recognize_bytes(
     graded: bool | None = None,
     client_text: ClientText | None = None,
     client_text_reason: str = 'absent',
+    phone_inputs: dict | None = None,
     _grading_job: GradingJob | None = None,
     _progress_observer: Callable | None = None,
     _grading_completion: Callable | None = None,
@@ -1463,6 +1467,8 @@ def recognize_bytes(
         kwargs['locale'] = locale
     if card_quad:
         kwargs['card_quad'] = card_quad
+    if phone_inputs is not None:
+        kwargs['phone_inputs'] = phone_inputs
     if _progress_observer is not None:
         kwargs['_progress_observer'] = _progress_observer
     if _grading_job is not None:
