@@ -81,3 +81,19 @@ Turning `STAGE1_FAMILY_VECTOR` on in code breaks four existing gate tests (`test
 All 14 early answers the rule gains (server text) come from that case: the leader is a same-name card with a different collector number (Base Set Charmander 46 or Pikachu 58, a Pikachu promo 2015xy-6, or Pikachu extra-classic). So the policy is "the printed number outranks a same-name card's artwork at stage 1b".
 
 State: code default off (suite green, 1067 passed); staging compose on (`STAGE1_FAMILY_VECTOR:-true`); production off. Accepting the policy means changing the four tests and the code default; keeping the contract means turning the rule off in staging too.
+
+## Narrow footer rule (`STAGE1_FAMILY_VECTOR`, plan docs/family-rule-narrow-plan-20261026.md)
+
+A same-name row is removed from the race only when the footer reads a full fraction whose total equals the text card's own known total and differs from that row's known total. Four existing gate tests and the stage 1b contradiction contract are unchanged; code default off; staging on.
+
+| Text | Rule | Stage 1 (correct) | Stage 1b, needs artwork (correct) | Wrong | Disagreements with full pipeline |
+|---|---|---:|---:|---:|---:|
+| server | off | 26 | 31 | 0 | 0 |
+| server | broad (earlier) | 40 | 21 | 0 | 0 |
+| server | **narrow** | **30** | 27 | 0 | 0 |
+| owner's card | off | 50 | 56 | 0 | 1 |
+| owner's card | **narrow** | **56** | 52 | 0 | 1 (the Toxel retake, unchanged) |
+
+**Correction.** The earlier "+14" for the broad rule counted stage 1 answers only. Most of those came from cases that stage 1b already reached, so the net gain in answerable cards was about +4. The narrow rule moves 4 cases from stage 1b to stage 1 on the server's text and adds none; on the owner's text it adds 6 at stage 1 and moves 4 from 1b, a net +2. The gain is mainly that stage 1 answers skip the artwork check, so they are faster and less likely to fail.
+
+The plan's gate (0 wrong, 0 disagreements, a gain) passes on the server's text. The Charmander cases the rule frees (Base Set 46 leading against an 9/108 footer) are mostly stage 1b candidates, where the artwork check still runs.
