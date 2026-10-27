@@ -1408,6 +1408,7 @@ def _recognize_bytes_once(
                     timings=timings,
                     versions=versions,
                     rebuild_index=False,
+                    upload_bytes=data,
                 )
             except Exception:  # noqa: BLE001 - capture files must never fail a scan
                 pass

@@ -102,6 +102,7 @@ services:
       # models and adds only its own OCR readers and workers. 1 = one scan at a time, as before.
       SCAN_LANES: ${SCAN_LANES:-1}
       STORE_CAPTURES: ${STORE_CAPTURES:-false}
+      STORE_ORIGINAL_UPLOADS: ${STORE_ORIGINAL_UPLOADS:-false}
       REVIEW_TOKEN: ${REVIEW_TOKEN:-}
       CARDMARKET_HELPER_ENABLED: ${CARDMARKET_HELPER_ENABLED:-false}
       CARDMARKET_WEBVIEW_ENABLED: ${CARDMARKET_WEBVIEW_ENABLED:-true}

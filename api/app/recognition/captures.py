@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import hashlib
 import io
 import json
 import threading
@@ -34,6 +35,19 @@ def _jpeg(image: Image.Image, max_side: int = REVIEW_MAX_SIDE) -> bytes:
     buffer = io.BytesIO()
     frame.save(buffer, format="JPEG", quality=88, optimize=True)
     return buffer.getvalue()
+
+
+def _upload_suffix(data: bytes) -> str:
+    """File extension from the leading bytes only; the upload itself is never re-encoded."""
+    if data[:3] == b"\xff\xd8\xff":
+        return ".jpg"
+    if data[:8] == b"\x89PNG\r\n\x1a\n":
+        return ".png"
+    if data[:4] == b"RIFF" and data[8:12] == b"WEBP":
+        return ".webp"
+    if data[4:8] == b"ftyp":
+        return ".heic"
+    return ".bin"
 
 
 def _write_bytes(path: Path, data: bytes) -> None:
@@ -110,6 +124,7 @@ def save_scan_capture(
     timings: dict[str, Any],
     versions: dict[str, Any],
     rebuild_index: bool = True,
+    upload_bytes: bytes | None = None,
 ) -> dict[str, Any] | None:
     if not bool(getattr(settings, "store_captures", True)):
         return None
@@ -117,6 +132,15 @@ def save_scan_capture(
     images = root / "images"
     input_name = f"{scan_id}.input.jpg"
     query_name = f"{scan_id}.query.jpg"
+    original = None
+    if bool(getattr(settings, "store_original_uploads", False)) and upload_bytes:
+        original_name = f"{scan_id}.original{_upload_suffix(upload_bytes)}"
+        _write_bytes(images / original_name, upload_bytes)
+        original = {
+            "file": f"images/{original_name}",
+            "bytes": len(upload_bytes),
+            "sha256": hashlib.sha256(upload_bytes).hexdigest(),
+        }
     _write_bytes(images / input_name, _jpeg(input_image))
     _write_bytes(images / query_name, _jpeg(query_image))
     record = {
@@ -137,6 +161,8 @@ def save_scan_capture(
         "rejected": False,
         "feedback_action": None,
     }
+    if original is not None:
+        record["original_upload"] = original
     record["review"] = review_flags(record)
     _write_json(case_path(root, scan_id), record)
     _index_changed(root, rebuild_index)
