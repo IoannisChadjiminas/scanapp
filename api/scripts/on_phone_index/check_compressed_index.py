@@ -67,7 +67,7 @@ RESCORE_K = 50
 RANK_POOL = 60
 VARIANTS = ('float32', 'int8', 'int8_top50_f32', 'float16')
 ANSWERED = ('answer', 'twin')
-EMB_REL = 'data/android-embedding-research-20261023'
+EMB_REL = 'android-embedding-research-20261023'
 
 
 def canon(card_id: str) -> str:
@@ -197,7 +197,7 @@ def android_queries(root: Path, embedder: DinoEmbedder, work: Path) -> list[dict
 
 
 def panel_queries(panel_root: Path, data_root: Path, model: Path, work: Path) -> list[dict]:
-    parity = data_root / 'data/latency/android-recognition-parity-20261023'
+    parity = data_root / 'latency/android-recognition-parity-20261023'
     manifest = json.loads((parity / 'frozen-panel/manifest.json').read_text())['photos']
     per_photo = {row['id']: row for row in json.loads((parity / 'a55-fresh157-per-photo.json').read_text())['panel']}
     comparison = {row['id']: row for row in json.loads((parity / 'a55-per-photo-comparison.json').read_text())['rows']}
@@ -350,7 +350,7 @@ def main() -> None:
 
     embedder = DinoEmbedder(str(model), 1, 1)
     queries = android_queries(args.android_dir, embedder, args.work)
-    queries += panel_queries(root / 'data/latency/stage0-simulation-20261021', root, model, args.work)
+    queries += panel_queries(root / 'latency/stage0-simulation-20261021', root, model, args.work)
     print(f'queries: {sum(q["set"] == "android" for q in queries)} android, '
           f'{sum(q["set"] == "panel" for q in queries)} panel')
 
