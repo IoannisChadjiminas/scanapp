@@ -106,3 +106,32 @@ def test_print_gap_is_kept_on_auto_events():
         {"event": "auto.wait", "wait_ms": 900, "print_gap": 12},
     ]})
     assert lines == ["phone event=auto.same print_gap=3.4", "phone event=auto.wait wait_ms=900 print_gap=12"]
+
+
+def test_phone_provisional_and_index_fields_are_kept():
+    lines = phone_diagnostic_lines({"events": [
+        {"event": "phone_provisional.decided", "scan": "s1", "card": "en:sv04-159", "reason": "one",
+         "ms_after_shutter": 1662},
+        {"event": "phone_provisional.final", "scan": "s1", "provisional": "en:sv04-159",
+         "final": "en:sv04-159", "agree": True},
+        {"event": "on_phone_index.search", "scan": "s1", "state": "ready", "native_ms": 18.4,
+         "round_trip_ms": 26, "shutter_to_done_ms": 1509, "text_name": True, "text_number": False},
+        {"event": "on_phone_index.load", "ok": True, "kind": "f16", "rows": 43695, "load_ms": 139.5},
+        {"event": "footer_full.used", "scan": "s1", "state": "added", "elapsed_ms": 1023, "extra_wait_ms": 123},
+    ]})
+    assert lines == [
+        "phone event=phone_provisional.decided scan=s1 card=en:sv04-159 reason=one ms_after_shutter=1662",
+        "phone event=phone_provisional.final scan=s1 provisional=en:sv04-159 final=en:sv04-159 agree=true",
+        "phone event=on_phone_index.search scan=s1 state=ready native_ms=18.4 round_trip_ms=26 "
+        "shutter_to_done_ms=1509 text_name=true text_number=false",
+        "phone event=on_phone_index.load kind=f16 rows=43695 load_ms=139.5 ok=true",
+        "phone event=footer_full.used scan=s1 elapsed_ms=1023 state=added extra_wait_ms=123",
+    ]
+
+
+def test_name_and_number_never_carry_card_text():
+    lines = phone_diagnostic_lines({"events": [
+        {"event": "client_text.done", "scan": "s1", "name": "Charizard ex", "number": "199/165",
+         "card": "Charizard ex 199/165", "reason": "free text with spaces"},
+    ]})
+    assert lines == ["phone event=client_text.done scan=s1"]
