@@ -87,6 +87,7 @@ Reuse:
 **Flags (code default off):**
 - `STAGE1_EARLY_EXIT`: answer at stage 1 when the gate passes.
 - `STAGE1_BACKGROUND_CHECK`: after a stage 1 answer, run the **full pipeline in the background** on the same upload and log whether it agrees.
+- `STAGE1_CHECK_PHONE_INPUTS`: the background check gets the phone's text, outline, crop and rotation, as the live full pipeline does. Off, it sees the photo alone, so it can disagree only because the server's own OCR missed a number the phone read (seen on 2026-10-27: Charmander 9/108 checked as Base Set 46/102). The `stage1_check` log line says `inputs=phone` or `inputs=photo`.
 - `STAGE1_SAMPLE_RATE` (0–1): the share of stage 1 answers that get the background check. Use 1.0 on staging and e.g. 0.1 in production later.
 - `STAGE1_REQUIRE_CONFIRMATION` (default true): stage 1 answers are shown as needing confirmation until it's switched off.
 - Turn all of them on in `compose.dokploy.yaml` (staging), with sample rate 1.0 and require-confirmation true. **Don't change production.**

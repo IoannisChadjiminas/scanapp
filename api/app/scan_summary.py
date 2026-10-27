@@ -40,6 +40,7 @@ SWITCHES = (
     'client_text_fast_path',
     'stage1_early_exit',
     'stage1_background_check',
+    'stage1_check_phone_inputs',
     'stage1b_text_verify',
     'stage1_set_totals',
     'stage1_normalize_duplicates',

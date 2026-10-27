@@ -23,6 +23,8 @@ class CheckJob:
     data: bytes
     recognize: object
     store_dir: Path | None = None
+    # 'phone': the re-run had the phone's text and outline; 'photo': the upload alone.
+    inputs: str = 'photo'
 
 
 class Stage1Checker:
@@ -75,8 +77,8 @@ class Stage1Checker:
         suggestions = list(getattr(result, 'suggestions', None) or [])
         full = suggestions[0].card_id if suggestions else None
         agree = bool(full) and (full == job.card_id or full.split(':', 1)[-1] == job.card_id.split(':', 1)[-1])
-        log.info('stage1_check scan_id=%s stage1_card=%s full_card=%s agree=%s',
-                 job.scan_id, job.card_id, full or 'none', str(agree).lower())
+        log.info('stage1_check scan_id=%s stage1_card=%s full_card=%s agree=%s inputs=%s',
+                 job.scan_id, job.card_id, full or 'none', str(agree).lower(), job.inputs)
         with self._lock:
             self.checks += 1
             if not agree:
