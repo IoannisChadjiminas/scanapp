@@ -434,6 +434,7 @@ def _recognize_bytes_once(
     client_text_skipped = []
     phone_ocr = None  # 'footer' or 'all' once the phone's read may stand in for server OCR
     phone_agree = False  # CLIENT_TEXT_AGREE stood in: the footer and its re-reads are not run
+    early_title = None  # the server's own title read, taken before the probe, when the phone's number stands in
     lead = None
     if fast_path_wanted:
         # The phone's text may only confirm the server's own pixel answer; then
@@ -487,9 +488,10 @@ def _recognize_bytes_once(
         if phone_ocr == 'footer' and scope == 'selected' and frame is artwork_image:
             # The server reads the title itself; the phone's number completes it
             # only when that title confidently agrees with the phone.
-            observed = read_card_with(frame, scope, read_footer=False)
+            observed = (early_title if early_title is not None
+                        else read_card_with(frame, scope, read_footer=False))
             if server_read_agrees(client_text, observed, require_title=True):
-                return with_phone_number(observed, client_text)
+                return with_phone_number(observed, client_text, as_footer=phone_agree)
             frame_selection['client_text_ocr'] = 'title_disagrees'
         if adaptive_footer and scope == 'selected' and frame is artwork_image:
             if title_only:
@@ -512,6 +514,14 @@ def _recognize_bytes_once(
         else:
             ocr_passes.extend(dict(scope=scope, **p) for p in observed.passes)
         return observed
+    if phone_agree and artwork_image is not None and settings.use_ocr and ocr_engine is not None and not retake:
+        # The server's own title decides whether the phone's number may stand in. It is read before the
+        # complete-frame probe, which is skipped only when the title agrees. A disagreeing title takes the
+        # full path exactly as with the flag off (probe and uncropped re-read included).
+        early_title = read_card_with(artwork_image, 'selected', read_footer=False)
+        if not server_read_agrees(client_text, early_title, require_title=True):
+            frame_selection['client_text_ocr'] = 'title_disagrees'
+            phone_ocr, phone_agree, early_title = None, False, None
     original_ocr = None
     original_identity_used = False
     mark = time.perf_counter()

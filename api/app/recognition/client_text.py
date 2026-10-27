@@ -355,10 +355,23 @@ def phone_read(hint: ClientText) -> OcrResult:
                      failed=False, client_text_used='all')
 
 
-def with_phone_number(observed: OcrResult, hint: ClientText) -> OcrResult:
-    """A server title-only read completed with the phone's collector number."""
+# identity.structured_identity_agrees counts a collector read only at or above this confidence.
+STRUCTURED_COLLECTOR_CONF = .85
+
+
+def with_phone_number(observed: OcrResult, hint: ClientText, *, as_footer: bool = False) -> OcrResult:
+    """A server title-only read completed with the phone's collector number.
+
+    `as_footer` (CLIENT_TEXT_AGREE only): the number is accepted at the confidence a reliable server
+    footer read would carry. The agreement rule already tied the number to exactly one printing in the
+    top 20 with set totals, and the cap keeps such a result from being 'matched'. Without it the
+    phone's ML Kit score (0.54-0.84 on the whole footer line) would leave the printing unproven.
+    """
+    confidence = hint.number_conf
+    if as_footer:
+        confidence = max(confidence or 0., STRUCTURED_COLLECTOR_CONF)
     return replace(observed, collector_text=hint.number, lines=[*observed.lines, hint.number],
-                   hits=[*observed.hits, OcrHit(hint.number, hint.number_conf, 'collector')],
+                   hits=[*observed.hits, OcrHit(hint.number, confidence, 'collector')],
                    footer_skipped=False, client_text_used='number')
 
 

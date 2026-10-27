@@ -530,3 +530,38 @@ def test_agree_counts_printings_with_their_set_totals():
                              min_visual=.78, min_gap=.04, top_n=20, set_totals=True) == (True, 'first', 'eligible_top')
     assert ocr_skip_decision(hint, top, lookup, rows, mode='footer', image_size=(600, 840), min_confidence=0.,
                              min_visual=.78, min_gap=.04, top_n=20)[2] == 'printings'
+
+
+def test_agree_with_a_disagreeing_title_matches_the_flag_off_outcome(tmp_path, monkeypatch):
+    """The title is read before the probe; a disagreeing title must end where the flag-off full path ends."""
+    (tmp_path / 'off').mkdir(); (tmp_path / 'on').mkdir()
+    off, _, _ = run_pipeline(tmp_path / 'off', monkeypatch, hint=payload(name_conf=.6, number_conf=.6),
+                             fast_path=False, ocr='footer', title='Pikachu', agree=False)
+    on, _, saved = run_pipeline(tmp_path / 'on', monkeypatch, hint=payload(name_conf=.6, number_conf=.6),
+                                fast_path=False, ocr='footer', title='Pikachu', agree=True)
+    assert saved['client_text']['ocr_skip'] == 'title_disagrees'
+    assert (on.status.value, on.best_match and on.best_match.card_id) == (
+        off.status.value, off.best_match and off.best_match.card_id)
+
+
+def test_the_phone_number_counts_as_footer_evidence_only_under_agree():
+    """AGREE: the number reaches the structured-identity check at footer confidence; OFF keeps the raw score."""
+    from app.recognition.client_text import STRUCTURED_COLLECTOR_CONF, with_phone_number
+    from app.recognition.ocr import OcrResult
+    base = OcrResult(name_text='Toxel', lines=['Toxel'], hits=[OcrHit('Toxel', .99, 'name')])
+    raw = parse_client_text(payload(number_conf=.6))[0]
+    assert STRUCTURED_COLLECTOR_CONF == .85
+    off_hit = with_phone_number(base, raw).hits[-1]
+    assert off_hit.text == '078/185' and off_hit.confidence == .6
+    on_hit = with_phone_number(base, raw, as_footer=True).hits[-1]
+    assert on_hit.confidence == .85
+    # A score already above the floor keeps its own value.
+    assert with_phone_number(base, parse_client_text(payload(number_conf=.95))[0], as_footer=True).hits[-1].confidence == .95
+
+
+def test_agree_on_an_eligible_scan_is_never_printing_ambiguous_and_never_matched(tmp_path, monkeypatch):
+    response, _, saved = run_pipeline(tmp_path, monkeypatch, hint=payload(name_conf=.6, number_conf=.6),
+                                      fast_path=False, ocr='footer', agree=True)
+    assert saved['client_text']['ocr_skip'] == 'used_number'
+    assert response.status.value == 'uncertain'
+    assert 'phone_number_standin' in json.dumps(saved)
