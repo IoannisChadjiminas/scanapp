@@ -135,6 +135,8 @@ class Settings(BaseSettings):
     session_cookie: str = "scanapp_session"
     session_ttl_days: int = 30
     store_captures: bool = True
+    # Only with STORE_CAPTURES on: also keep the exact upload bytes beside the review copies.
+    store_original_uploads: bool = False
     review_token: str = ""
     session_create_hourly: int = 30
     cardmarket_helper_enabled: bool = False
