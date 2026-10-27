@@ -19,6 +19,7 @@ services:
       MAX_UPLOAD_BYTES: ${MAX_UPLOAD_BYTES:-12582912}
       SCAN_WAIT_LIMIT: ${SCAN_WAIT_LIMIT:-6}
       STORE_CAPTURES: ${STORE_CAPTURES:-true}
+      STORE_ORIGINAL_UPLOADS: ${STORE_ORIGINAL_UPLOADS:-false}
       REVIEW_TOKEN: ${REVIEW_TOKEN:-}
     volumes:
       - scanapp-data:/data

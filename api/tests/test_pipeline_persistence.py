@@ -87,8 +87,21 @@ def test_background_check_with_real_recognition_logs_its_outcome(recognition, ca
     with caplog.at_level(logging.INFO, logger='scan.diagnostics'):
         assert checker.run_job(job) is agree
     expected = (f'stage1_check scan_id=original-scan stage1_card={card_id} '
-                f'full_card=card agree={str(agree).lower()}')
+                f'full_card=card agree={str(agree).lower()} inputs=photo')
     assert expected in [record.getMessage() for record in caplog.records]
     assert checker.checks == 1 and checker.disagreements == int(not agree)
     assert recognition.results.execute('SELECT COUNT(*) FROM scans').fetchone()[0] == 0
     assert recognition.captures == []
+
+
+def test_capture_receives_the_exact_upload_bytes(recognition, monkeypatch):
+    seen = {}
+
+    def record(**kwargs):
+        seen['upload_bytes'] = kwargs.get('upload_bytes')
+        seen['scan_id'] = kwargs['scan_id']
+
+    monkeypatch.setattr('app.recognition.pipeline.save_scan_capture', record)
+    recognition.run(results=recognition.results)
+    assert seen['scan_id']
+    assert seen['upload_bytes'] == recognition.data

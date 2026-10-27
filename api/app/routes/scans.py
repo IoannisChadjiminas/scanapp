@@ -105,6 +105,16 @@ async def create_scan(
             headers={"Retry-After": "3"},
         )
     gate_note: dict = {}
+
+    def phone_args() -> dict:
+        # What the phone sent with the photo, as the full pipeline takes it.
+        return dict(
+            crop_x=crop_x, crop_y=crop_y, crop_w=crop_w, crop_h=crop_h, rotation=rotation,
+            skip_detect=skip_detect and not detect_on_server,
+            client_text=hint, client_text_reason=hint_reason, locale=locale,
+            card_quad=parse_quad(card_quad),
+            phone_inputs=phone_inputs(card_quad, hint, client_embedding))
+
     def recognize(observer=None):
         # One free lane per admitted scan: its own OCR readers, the shared models.
         with scan_lane(request.app.state.runtime) as runtime:
@@ -131,19 +141,9 @@ async def create_scan(
                 catalog=request.app.state.dbs.catalog,
                 results=request.app.state.dbs.results,
                 session_id=session_id,
-                crop_x=crop_x,
-                crop_y=crop_y,
-                crop_w=crop_w,
-                crop_h=crop_h,
-                rotation=rotation,
-                skip_detect=skip_detect and not detect_on_server,
                 language=language,
                 graded=graded,
-                client_text=hint,
-                client_text_reason=hint_reason,
-                locale=locale,
-                card_quad=parse_quad(card_quad),
-                phone_inputs=phone_inputs(card_quad, hint, client_embedding),
+                **phone_args(),
                 _progress_observer=observer,
                 _grading_completion=lambda scan_id, job: schedule_grading_completion(
                     request.app.state.loop, request.app.state.dbs.results, scan_id, job),
@@ -197,14 +197,21 @@ async def create_scan(
         from app.recognition.captures import review_dir
         store = review_dir(settings) / 'images' if getattr(settings, 'store_captures', False) else None
 
+        # STAGE1_CHECK_PHONE_INPUTS: the check sees what the live full pipeline would have seen (the
+        # phone's text, outline, crop and rotation). Off, it sees the photo alone.
+        with_phone = bool(getattr(settings, 'stage1_check_phone_inputs', False))
+        extra = phone_args() if with_phone else {}
+
         def rerun(payload: bytes):
             with scan_lane(request.app.state.runtime) as runtime:
                 return recognize_bytes(
                     payload, settings=settings, runtime=runtime,
                     catalog=request.app.state.dbs.catalog, results=None, persist=False,
-                    session_id=session_id, language=language, graded=graded, store_capture=False)
+                    session_id=session_id, language=language, graded=graded, store_capture=False,
+                    **extra)
 
-        job = CheckJob(result.id, decision.card_id or '', data, rerun, store_dir=store)
+        job = CheckJob(result.id, decision.card_id or '', data, rerun, store_dir=store,
+                       inputs='phone' if with_phone else 'photo')
         checker.submit(job, sample_rate=float(getattr(settings, 'stage1_sample_rate', 1.0)), busy=busy)
 
     async def after_stream_release(result: ScanResponse | None) -> None:

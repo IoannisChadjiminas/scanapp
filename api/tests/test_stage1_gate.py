@@ -43,6 +43,7 @@ def test_flags_default_off_and_confirmation_stays_on():
     fields = Settings.model_fields
     assert fields['stage1_early_exit'].default is False
     assert fields['stage1_background_check'].default is False
+    assert fields['stage1_check_phone_inputs'].default is False
     assert fields['stage1b_text_verify'].default is False
     assert fields['stage1_require_confirmation'].default is True
     assert fields['stage1_sample_rate'].default == 1.0

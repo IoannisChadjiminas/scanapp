@@ -144,6 +144,8 @@ class Settings(BaseSettings):
     session_cookie: str = "scanapp_session"
     session_ttl_days: int = 30
     store_captures: bool = True
+    # Only with STORE_CAPTURES on: also keep the exact upload bytes beside the review copies.
+    store_original_uploads: bool = False
     review_token: str = ""
     session_create_hourly: int = 30
     cardmarket_helper_enabled: bool = False
@@ -230,6 +232,8 @@ class Settings(BaseSettings):
     # Production stays off until the background check has stayed clean.
     stage1_early_exit: bool = False
     stage1_background_check: bool = False
+    # The background check gets the phone's text, outline, crop and rotation, as the live scan does.
+    stage1_check_phone_inputs: bool = False
     stage1_sample_rate: float = 1.0
     stage1_require_confirmation: bool = True
     stage1b_text_verify: bool = False
