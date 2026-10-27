@@ -81,6 +81,11 @@ class Settings(BaseSettings):
     # number name exactly one promo card. Restricted to the promo set table; never a
     # different number, a two-letter error or an unrelated set. A policy change: replay first.
     ocr_promo_prefix_near: bool = False
+    # A number read without a total or set code ("20") can be attack damage or HP from a
+    # footer strip that missed the footer. It may not lift a card whose picture is much weaker
+    # than the picture's leader, and the leader's gap is measured to a real rival, not to its
+    # own print in another language. A policy change: replay first.
+    rank_bare_number_guard: bool = False
     # When an abstaining scan has a confident printed fraction plus a name read anywhere in
     # its OCR lines that together narrow the catalogue to 1-3 cards, add those cards as
     # candidates for local artwork verification and, if unverified, return them as

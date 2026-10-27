@@ -69,6 +69,15 @@ def promo_prefix_near_enabled() -> bool:
     return bool(get_settings().ocr_promo_prefix_near)
 
 
+def bare_number_guard_enabled() -> bool:
+    return bool(get_settings().rank_bare_number_guard)
+
+
+# RANK_BARE_NUMBER_GUARD: how much weaker than the visual leader a card's picture may be before
+# a bare number alone ("20", no total, no set code) can no longer put it first.
+BARE_NUMBER_MAX_DROP = 0.15
+
+
 # A promo prefix read as MP078 or ME078 for MEP078: exactly 3 digits, letters one edit away.
 PROMO_NEAR_RE = re.compile(r'([A-Z]{2,4})(\d{3})')
 
@@ -519,6 +528,7 @@ def rerank(
                 and ('/' in h.text or any(c.isalpha() for c in h.text))]
     if require_confident_ocr and explicit:
         known_numbers = explicit
+    guard = bare_number_guard_enabled()
     ranked: list[dict[str, Any]] = []
     for item in visual:
         combined = float(item["visual_score"])
@@ -589,6 +599,12 @@ def rerank(
         structured_conflict = any(h.region == 'collector' and h.confidence is not None
             and h.confidence >= .85 and '/' in h.text
             and _match_any([h], numbers) is False for h in known_numbers)
+        if guard:
+            # What a bare number cannot fake: the name, or a total or set code that agrees.
+            stored["name_agrees"] = bool(name_ok)
+            stored["structured_collector_match"] = any(
+                h.confidence >= .85 and ('/' in h.text or any(c.isalpha() for c in h.text))
+                and _match_any([h], numbers) is True for h in known_numbers)
         ranked.append(
             {
                 **stored,
@@ -604,7 +620,7 @@ def rerank(
     ranked.sort(key=lambda row: row["combined_score"], reverse=True)
     ranked = _prefer_language_print(ranked, detected_languages,
                                     qualified_evidence=require_confident_ocr)
-    return _keep_visual_leader(ranked, languages=detected_languages)
+    return _keep_visual_leader(ranked, languages=detected_languages, guard=guard)
 
 
 def _prefer_language_print(
@@ -642,6 +658,7 @@ def _keep_visual_leader(
     min_visual: float = 0.78,
     min_gap: float = 0.04,
     languages: tuple[str, ...] = (),
+    guard: bool = False,
 ) -> list[dict[str, Any]]:
     if len(ranked) < 2:
         return ranked
@@ -649,7 +666,12 @@ def _keep_visual_leader(
     lead = visual[0]
     if languages and lead.get('language') not in languages:
         return ranked
-    gap = float(lead["visual_score"]) - float(visual[1]["visual_score"])
+    second = visual[1]
+    if guard and languages:
+        # The leader's own print in another language is not a rival: measure to the next card
+        # in a language the scan reads as.
+        second = next((row for row in visual[1:] if row.get('language') in languages), second)
+    gap = float(lead["visual_score"]) - float(second["visual_score"])
     # Same name is not proof of a reprint: e.g. a rainbow trainer can share art
     # with its non-rainbow printing while having a different collector number.
     # Do not reinstate an explicitly conflicting visual leader over OCR ranking.
@@ -657,6 +679,9 @@ def _keep_visual_leader(
         not r.get('structured_collector_conflict') for r in ranked
     ):
         return ranked
+    if guard and _lifted_by_bare_number(ranked[0], lead, min_visual=min_visual):
+        rest = [row for row in ranked if row["card_id"] != lead["card_id"]]
+        return [lead, *rest]
     # A wide gap is the picture itself. A small one can still be a false
     # collector hit, such as "LV. 18" agreeing with catalogue number 018.
     if lead.get("collector_conflict") and not _same_name_reprint(lead, visual[1]) and gap < 0.10:
@@ -665,6 +690,23 @@ def _keep_visual_leader(
         return ranked
     rest = [row for row in ranked if row["card_id"] != lead["card_id"]]
     return [lead, *rest]
+
+
+def _lifted_by_bare_number(top: dict[str, Any], lead: dict[str, Any], *, min_visual: float) -> bool:
+    """Whether [top] is first over the visual [lead] only through a bare number.
+
+    Attack damage or HP read from a footer strip that missed the footer agrees with
+    whatever card has that number. That is not enough for a card whose picture is
+    BARE_NUMBER_MAX_DROP or more below a leader that clears the visual floor. The
+    leader keeps its conflict flags, so it still needs confirmation.
+    """
+    return bool(
+        top["card_id"] != lead["card_id"]
+        and float(lead["visual_score"]) >= min_visual
+        and float(lead["visual_score"]) - float(top["visual_score"]) >= BARE_NUMBER_MAX_DROP
+        and not top.get("name_agrees")
+        and not top.get("structured_collector_match")
+    )
 
 
 def _same_name_reprint(lead: dict[str, Any], other: dict[str, Any]) -> bool:
