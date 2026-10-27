@@ -87,7 +87,7 @@ def test_background_check_with_real_recognition_logs_its_outcome(recognition, ca
     with caplog.at_level(logging.INFO, logger='scan.diagnostics'):
         assert checker.run_job(job) is agree
     expected = (f'stage1_check scan_id=original-scan stage1_card={card_id} '
-                f'full_card=card agree={str(agree).lower()}')
+                f'full_card=card agree={str(agree).lower()} inputs=photo')
     assert expected in [record.getMessage() for record in caplog.records]
     assert checker.checks == 1 and checker.disagreements == int(not agree)
     assert recognition.results.execute('SELECT COUNT(*) FROM scans').fetchone()[0] == 0

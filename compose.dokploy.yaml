@@ -82,6 +82,8 @@ services:
       # Confirmation stays required. The background check runs on every stage 1 answer.
       STAGE1_EARLY_EXIT: ${STAGE1_EARLY_EXIT:-true}
       STAGE1_BACKGROUND_CHECK: ${STAGE1_BACKGROUND_CHECK:-true}
+      # The check sees the phone's text and outline too (off: the photo alone).
+      STAGE1_CHECK_PHONE_INPUTS: ${STAGE1_CHECK_PHONE_INPUTS:-false}
       STAGE1_SAMPLE_RATE: ${STAGE1_SAMPLE_RATE:-1.0}
       STAGE1_REQUIRE_CONFIRMATION: ${STAGE1_REQUIRE_CONFIRMATION:-true}
       STAGE1B_TEXT_VERIFY: ${STAGE1B_TEXT_VERIFY:-true}
