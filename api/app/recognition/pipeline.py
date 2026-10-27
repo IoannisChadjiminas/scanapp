@@ -31,7 +31,7 @@ from app.db import coverage_payload
 from app.recognition.captures import save_scan_capture
 from app.recognition.client_text import (OCR_MODES as CLIENT_TEXT_OCR_MODES, VERSION as CLIENT_TEXT_VERSION,
                                          ClientText, client_text_line, fast_path_decision, ocr_skip_decision,
-                                         phone_read, server_read_agrees, with_phone_number)
+                                         phone_read, server_read_agrees, skip_policy, with_phone_number)
 from app.recognition.detect import (card_frame_candidates, client_quad_rect, detect_and_rectify,
                                     quads_agree, server_frame_rect, warp_to_rect)
 from app.recognition.frame_fallback import line_frame_candidates, loose_frame_candidates, portrait_window_candidates, slab_interior_candidate
@@ -433,6 +433,8 @@ def _recognize_bytes_once(
     fast_path = False
     client_text_skipped = []
     phone_ocr = None  # 'footer' or 'all' once the phone's read may stand in for server OCR
+    phone_agree = False  # CLIENT_TEXT_AGREE stood in: the footer and its re-reads are not run
+    early_title = None  # the server's own title read, taken before the probe, when the phone's number stands in
     lead = None
     if fast_path_wanted:
         # The phone's text may only confirm the server's own pixel answer; then
@@ -459,14 +461,18 @@ def _recognize_bytes_once(
                 row['set_total'] = set_total(catalog, row['language'], row['set_id'])
                 return row
             try:
+                policy = skip_policy(ocr_mode=ocr_mode, top20=bool(getattr(settings, 'client_text_top20', False)),
+                    agree=bool(getattr(settings, 'client_text_agree', False)), min_confidence=min_confidence)
                 allowed, _, ocr_reason = ocr_skip_decision(client_text, full_candidates, lead_for, catalog,
-                    mode=ocr_mode, image_size=image.size, min_confidence=min_confidence,
-                    min_visual=settings.threshold_min_visual, min_gap=settings.threshold_min_gap)
+                    mode=ocr_mode, image_size=image.size, min_confidence=policy.min_confidence,
+                    min_visual=settings.threshold_min_visual, min_gap=settings.threshold_min_gap,
+                    top_n=policy.top_n, set_totals=policy.set_totals)
             except Exception:  # noqa: BLE001 - an optional hint keeps the full path
                 logging.getLogger(__name__).exception('Client text OCR decision failed')
                 allowed, ocr_reason = False, 'error'
             frame_selection['client_text_ocr'] = ocr_reason
             phone_ocr = ocr_mode if allowed else None
+            phone_agree = bool(allowed and phone_ocr == 'footer' and policy.agree)
     ocr = OcrResult(failed=True)
     ocr_passes = []
     ocr_cache_hits = []
@@ -482,9 +488,10 @@ def _recognize_bytes_once(
         if phone_ocr == 'footer' and scope == 'selected' and frame is artwork_image:
             # The server reads the title itself; the phone's number completes it
             # only when that title confidently agrees with the phone.
-            observed = read_card_with(frame, scope, read_footer=False)
+            observed = (early_title if early_title is not None
+                        else read_card_with(frame, scope, read_footer=False))
             if server_read_agrees(client_text, observed, require_title=True):
-                return with_phone_number(observed, client_text)
+                return with_phone_number(observed, client_text, as_footer=phone_agree)
             frame_selection['client_text_ocr'] = 'title_disagrees'
         if adaptive_footer and scope == 'selected' and frame is artwork_image:
             if title_only:
@@ -507,11 +514,19 @@ def _recognize_bytes_once(
         else:
             ocr_passes.extend(dict(scope=scope, **p) for p in observed.passes)
         return observed
+    if phone_agree and artwork_image is not None and settings.use_ocr and ocr_engine is not None and not retake:
+        # The server's own title decides whether the phone's number may stand in. It is read before the
+        # complete-frame probe, which is skipped only when the title agrees. A disagreeing title takes the
+        # full path exactly as with the flag off (probe and uncropped re-read included).
+        early_title = read_card_with(artwork_image, 'selected', read_footer=False)
+        if not server_read_agrees(client_text, early_title, require_title=True):
+            frame_selection['client_text_ocr'] = 'title_disagrees'
+            phone_ocr, phone_agree, early_title = None, False, None
     original_ocr = None
     original_identity_used = False
     mark = time.perf_counter()
     if settings.use_ocr and ocr_engine is not None and not retake:
-        if (getattr(settings, 'ocr_complete_frame_first', False) and phone_ocr != 'all'
+        if (getattr(settings, 'ocr_complete_frame_first', False) and phone_ocr != 'all' and not phone_agree
                 and complete_frame_probe_allowed(input_image,
                     profile=frame_selection.get('profile', ''),
                     orientation=timings.get('orientation_degrees', 0))):
@@ -547,7 +562,7 @@ def _recognize_bytes_once(
                 and ocr.client_text_gate and server_read_agrees(
                     client_text, ocr, require_title=fast_reason == 'eligible_title_required')):
             client_text_skipped.append('original')
-        elif inferred_frame and not ocr.failed and not original_identity_used:
+        elif inferred_frame and not ocr.failed and not original_identity_used and not phone_agree:
             first_numbers = extract_collector_candidates([], hits=ocr.hits)
             has_explicit = any(h.confidence is not None and h.confidence >= .85
                 and ('/' in h.text or any(c.isalpha() for c in h.text)) for h in first_numbers)
@@ -1203,6 +1218,11 @@ def _recognize_bytes_once(
             # 'sibling': the shared artwork verified on another printing; show both, sibling
             # first. Verified pixels exist, so the boundary retry is not needed.
             text_identity = 'sibling' if sibling and not sibling.get('local_artwork_verified') else 'verified'
+    if (getattr(settings, 'client_text_top20', False) or getattr(settings, 'client_text_agree', False)
+            ) and ocr.client_text_used and status == 'matched':
+        # The phone's number stood in for the footer read: never an automatic match on its word.
+        status = 'uncertain'
+        status_reasons.append('phone_number_standin')
     shown = [] if status in {"no_match", "retake", "failed"} else combined[:1]
     if text_identity in {'unverified', 'sibling'} and status == 'uncertain':
         shown = [r for r in combined if r['card_id'] in text_ids][:3]
