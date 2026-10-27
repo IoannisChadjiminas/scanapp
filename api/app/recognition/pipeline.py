@@ -31,7 +31,7 @@ from app.db import coverage_payload
 from app.recognition.captures import save_scan_capture
 from app.recognition.client_text import (OCR_MODES as CLIENT_TEXT_OCR_MODES, VERSION as CLIENT_TEXT_VERSION,
                                          ClientText, client_text_line, fast_path_decision, ocr_skip_decision,
-                                         phone_read, server_read_agrees, with_phone_number)
+                                         phone_read, server_read_agrees, with_phone_number, TOP_N_NAMED)
 from app.recognition.detect import (card_frame_candidates, client_quad_rect, detect_and_rectify,
                                     quads_agree, server_frame_rect, warp_to_rect)
 from app.recognition.frame_fallback import line_frame_candidates, loose_frame_candidates, portrait_window_candidates, slab_interior_candidate
@@ -461,7 +461,8 @@ def _recognize_bytes_once(
             try:
                 allowed, _, ocr_reason = ocr_skip_decision(client_text, full_candidates, lead_for, catalog,
                     mode=ocr_mode, image_size=image.size, min_confidence=min_confidence,
-                    min_visual=settings.threshold_min_visual, min_gap=settings.threshold_min_gap)
+                    min_visual=settings.threshold_min_visual, min_gap=settings.threshold_min_gap,
+                    top_n=TOP_N_NAMED if getattr(settings, 'client_text_top20', False) else 1)
             except Exception:  # noqa: BLE001 - an optional hint keeps the full path
                 logging.getLogger(__name__).exception('Client text OCR decision failed')
                 allowed, ocr_reason = False, 'error'
@@ -1203,6 +1204,10 @@ def _recognize_bytes_once(
             # 'sibling': the shared artwork verified on another printing; show both, sibling
             # first. Verified pixels exist, so the boundary retry is not needed.
             text_identity = 'sibling' if sibling and not sibling.get('local_artwork_verified') else 'verified'
+    if getattr(settings, 'client_text_top20', False) and ocr.client_text_used and status == 'matched':
+        # The phone's number stood in for the footer read: never an automatic match on its word.
+        status = 'uncertain'
+        status_reasons.append('phone_number_standin')
     shown = [] if status in {"no_match", "retake", "failed"} else combined[:1]
     if text_identity in {'unverified', 'sibling'} and status == 'uncertain':
         shown = [r for r in combined if r['card_id'] in text_ids][:3]

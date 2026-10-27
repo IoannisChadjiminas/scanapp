@@ -34,6 +34,8 @@ OCR_MODES = ('off', 'footer', 'all')
 MAX_BYTES = 1280
 CANDIDATE_REGIONS = ('footer', 'corner_left', 'corner_right', 'label')
 MAX_CANDIDATES = 5
+# With CLIENT_TEXT_TOP20 the phone's name and number may name a card anywhere in this many visual candidates.
+TOP_N_NAMED = 20
 _LABEL_KEYS = {
     'label_name', 'label_name_conf', 'label_number', 'label_number_conf',
     'label_set', 'label_language', 'label_grader', 'label_grade',
@@ -231,9 +233,37 @@ def fast_path_decision(hint: ClientText | None, candidates: list[dict], lead: di
     return True, 'eligible'
 
 
+def named_in_top(hint: ClientText, top: list[dict], lead_for, catalog, *, mode: str):
+    """The one card in the visual top list that the phone's name and number name. Decided before OCR.
+
+    Used only with CLIENT_TEXT_TOP20. The visual leader is not required: any card in the top list
+    whose name matches and whose collector number fits, counted with its set total. Exactly one card
+    may qualify (aliases of one card count once), and the catalogue must hold one printing of that
+    name with that number. A same-name reprint in the list makes two qualifying cards, so it is refused.
+    Returns (allowed, card_id, reason).
+    """
+    named: dict[str, tuple[dict, dict]] = {}
+    for candidate in top:
+        lead = lead_for(candidate['card_id'])
+        if lead is None or not name_match(hint.name, candidate['name']):
+            continue
+        if number_matches_identifiers([hint.number], accepted_collector_numbers(lead)) is not True:
+            continue
+        key = candidate['card_id'].split(':', 1)[-1]
+        named.setdefault(key, (candidate, lead))
+    if not named:
+        return False, None, 'not_in_top'
+    if len(named) > 1:
+        return False, None, 'several_in_top'
+    (candidate, lead), = named.values()
+    if printings_with_number(catalog, lead, hint.number) != {printing_key(lead)}:
+        return False, None, 'printings'
+    return True, candidate['card_id'], 'eligible_top'
+
+
 def ocr_skip_decision(hint: ClientText | None, candidates: list[dict], lead_for, catalog, *,
                       mode: str, image_size, min_confidence: float, min_visual: float,
-                      min_gap: float) -> tuple[bool, str | None, str]:
+                      min_gap: float, top_n: int = 1) -> tuple[bool, str | None, str]:
     """May the phone's read stand in for server OCR on this frame? Decided before OCR.
 
     The phone must confirm the visual leader by name and number, and the catalogue must
@@ -258,6 +288,8 @@ def ocr_skip_decision(hint: ClientText | None, candidates: list[dict], lead_for,
         return False, None, 'frame_shape'
     if not candidates:
         return False, None, 'no_candidates'
+    if top_n > 1:
+        return named_in_top(hint, candidates[:top_n], lead_for, catalog, mode=mode)
     first = candidates[0]
     lead = lead_for(first['card_id'])
     if lead is None:

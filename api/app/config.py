@@ -116,6 +116,10 @@ class Settings(BaseSettings):
     # number from the phone; 'all': the server reads no card text. 'off' (default): never.
     # The phone's text then becomes evidence: replay the frozen panel before enabling it.
     client_text_ocr: str = 'off'
+    # With CLIENT_TEXT_OCR on: the phone's name and number may name any card in the visual top 20
+    # (not only the visual leader), when they name exactly one card. A result that used the phone's
+    # number is never 'matched' (it stays 'uncertain'). Off (default): the leader rule only.
+    client_text_top20: bool = False
     # Optional NDJSON progress stream; legacy scans remain a single JSON response.
     scan_stream_results: bool = True
     enable_matched: bool = True

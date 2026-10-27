@@ -10,7 +10,7 @@ from PIL import Image
 
 from app.config import Settings
 from app.recognition import pipeline
-from app.recognition.client_text import (ClientText, fast_path_decision, ocr_skip_decision,
+from app.recognition.client_text import (ClientText, fast_path_decision, named_in_top, ocr_skip_decision,
                                          parse_client_text, server_read_agrees)
 from app.recognition.ocr import CardOcr, OcrHit, OcrResult
 from app.recognition.ocr_cache import RequestOcrCache
@@ -188,7 +188,7 @@ def test_cache_never_serves_a_fast_path_read_as_complete_evidence():
 
 
 def run_pipeline(tmp_path, monkeypatch, *, hint, fast_path=True, rows=(('first', 'Toxel', '078/185'),),
-                 ocr='off', title='Toxel'):
+                 ocr='off', title='Toxel', top20=False):
     from app.db import connect, init_catalog, init_results
     catalog = connect(tmp_path/'catalog.sqlite'); results = connect(tmp_path/'results.sqlite')
     init_catalog(catalog); init_results(results)
@@ -222,7 +222,8 @@ def run_pipeline(tmp_path, monkeypatch, *, hint, fast_path=True, rows=(('first',
     try:
         response = pipeline.recognize_bytes(buffer.getvalue(), settings=Settings(_env_file=None,
             data_dir=tmp_path, store_captures=False, use_grading=False, enable_matched=True,
-            client_text_hints=True, client_text_fast_path=fast_path, client_text_ocr=ocr), runtime=runtime,
+            client_text_hints=True, client_text_fast_path=fast_path, client_text_ocr=ocr,
+            client_text_top20=top20), runtime=runtime,
             catalog=catalog, results=results, session_id='test', skip_detect=True,
             client_text=parsed, client_text_reason=reason)
         saved = json.loads(results.execute('SELECT ocr_json FROM scans').fetchone()[0])
@@ -338,3 +339,74 @@ def test_the_same_art_in_another_language_ranked_first_keeps_the_server_read():
     japanese = [rival('エレズン', .91, 'ja:S1-001', 'ja')]
     assert skip(above=japanese) == (False, 'name_disagrees')
     assert skip(above=japanese, mode='all') == (False, 'name_disagrees')
+
+
+def top_skip(hint=None, *, above=(), top=None, rows=None, mode='footer'):
+    """ocr_skip_decision with CLIENT_TEXT_TOP20: the phone may name any card in the top 20."""
+    hint = hint or parse_client_text(payload())[0]
+    lead = card('first', '78')
+    catalogue = {'first': lead, 'second': card('second', '99', name='Other card')}
+    lookup = lambda cid: catalogue.get(cid, card(cid, '78'))  # noqa: E731
+    candidates = top if top is not None else [*above, dict(card_id='first', name='Toxel', visual_score=.90,
+                                                          language='en')]
+    allowed, card_id, reason = ocr_skip_decision(hint, candidates, lookup,
+        Catalog(rows or [lead]), mode=mode, image_size=(600, 840), min_confidence=.9, min_visual=.78,
+        min_gap=.04, top_n=20)
+    return allowed, card_id, reason
+
+
+def test_top20_lets_the_phone_name_a_card_below_the_visual_leader():
+    leader = rival('Pikachu', .93, card_id='pika')
+    below = dict(card_id='first', name='Toxel', visual_score=.84, language='en')
+    assert top_skip(top=[leader, below]) == (True, 'first', 'eligible_top')
+    # With the leader rule only, the same frame is refused.
+    assert skip(above=[leader], visual=.84) == (False, 'name_disagrees')
+
+
+def test_top20_refuses_a_name_or_number_that_is_not_in_the_list():
+    assert top_skip(hint=parse_client_text(payload(name='Pikachu'))[0]) == (False, None, 'not_in_top')
+    assert top_skip(hint=parse_client_text(payload(number='079/185'))[0]) == (False, None, 'not_in_top')
+
+
+def test_top20_refuses_when_two_cards_in_the_list_fit_the_phone_text():
+    twin = dict(card_id='reprint', name='Toxel', visual_score=.80, language='en')
+    assert top_skip(top=[dict(card_id='first', name='Toxel', visual_score=.90, language='en'), twin]) == (
+        False, None, 'several_in_top')
+    # An alias of the same card is one card, not two.
+    alias = dict(card_id='en:first', name='Toxel', visual_score=.80, language='en')
+    assert top_skip(top=[dict(card_id='first', name='Toxel', visual_score=.90, language='en'), alias])[0] is True
+
+
+def test_top20_refuses_a_number_that_the_catalogue_prints_twice():
+    assert top_skip(rows=[card('first', '78'), card('reprint', '78', set_id='cel')]) == (
+        False, None, 'printings')
+
+
+def test_the_default_keeps_the_leader_rule_for_the_same_list():
+    leader = rival('Pikachu', .93, card_id='pika')
+    below = dict(card_id='first', name='Toxel', visual_score=.84, language='en')
+    assert ocr_skip_decision(parse_client_text(payload())[0], [leader, below],
+        lambda cid: card(cid, '78') if cid == 'first' else card(cid, '99', name='Pikachu'), Catalog([card('first', '78')]),
+        mode='footer', image_size=(600, 840), min_confidence=.9, min_visual=.78, min_gap=.04)[2] == 'name_disagrees'
+
+
+def test_named_in_top_is_the_same_rule_on_its_own():
+    lead = card('first', '78')
+    hit = dict(card_id='first', name='Toxel', visual_score=.84, language='en')
+    assert named_in_top(parse_client_text(payload())[0], [hit], lambda cid: lead, Catalog([lead]), mode='footer') == (
+        True, 'first', 'eligible_top')
+
+
+def test_pipeline_with_top20_on_never_matches_on_the_phone_number(tmp_path, monkeypatch):
+    response, regions, saved = run_pipeline(tmp_path, monkeypatch, hint=payload(), fast_path=False,
+                                            ocr='footer', top20=True)
+    assert response.timings_ms['client_text_ocr'] == 1. and response.best_match.card_id == 'first'
+    assert response.status.value != 'matched'
+    assert 'phone_number_standin' in saved['status_reasons'] or 'phone_number_standin' in json.dumps(saved)
+
+
+def test_pipeline_with_top20_off_keeps_the_standin_result_unchanged(tmp_path, monkeypatch):
+    response, regions, saved = run_pipeline(tmp_path, monkeypatch, hint=payload(), fast_path=False,
+                                            ocr='footer', top20=False)
+    assert response.timings_ms['client_text_ocr'] == 1.
+    assert 'phone_number_standin' not in json.dumps(saved)
