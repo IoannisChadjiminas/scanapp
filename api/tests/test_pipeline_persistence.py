@@ -102,6 +102,6 @@ def test_capture_receives_the_exact_upload_bytes(recognition, monkeypatch):
         seen['scan_id'] = kwargs['scan_id']
 
     monkeypatch.setattr('app.recognition.pipeline.save_scan_capture', record)
-    recognition.run()
+    recognition.run(results=recognition.results)
     assert seen['scan_id']
     assert seen['upload_bytes'] == recognition.data
