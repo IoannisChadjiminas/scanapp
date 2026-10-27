@@ -120,6 +120,11 @@ class Settings(BaseSettings):
     # (not only the visual leader), when they name exactly one card. A result that used the phone's
     # number is never 'matched' (it stays 'uncertain'). Off (default): the leader rule only.
     client_text_top20: bool = False
+    # With CLIENT_TEXT_OCR=footer: the phone's name and number may stand in for the footer read with no
+    # confidence floor, when they name exactly one card in the visual top 20 and the server's own title read
+    # agrees (the rule in client_text.skip_policy). The footer and its re-reads are not run. A result that used
+    # the phone's number is never 'matched'. Off (default): the 0.9 rule above applies.
+    client_text_agree: bool = False
     # Optional NDJSON progress stream; legacy scans remain a single JSON response.
     scan_stream_results: bool = True
     enable_matched: bool = True

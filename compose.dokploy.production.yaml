@@ -89,6 +89,10 @@ services:
       APP_CLIENT_TEXT: ${APP_CLIENT_TEXT:-true}
       CLIENT_TEXT_HINTS: ${CLIENT_TEXT_HINTS:-true}
       CLIENT_TEXT_OCR: ${CLIENT_TEXT_OCR:-footer}
+      # Off by default. CLIENT_TEXT_AGREE: the phone's name and number may stand in for the footer read
+      # with no confidence floor when they name one card in the visual top 20 (footer mode only).
+      CLIENT_TEXT_TOP20: ${CLIENT_TEXT_TOP20:-false}
+      CLIENT_TEXT_AGREE: ${CLIENT_TEXT_AGREE:-false}
       ENABLE_MATCHED: ${ENABLE_MATCHED:-true}
       ORT_INTRA_THREADS: ${ORT_INTRA_THREADS:-1}
       ORT_INTER_THREADS: ${ORT_INTER_THREADS:-1}

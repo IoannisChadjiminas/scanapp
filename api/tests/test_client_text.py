@@ -11,7 +11,7 @@ from PIL import Image
 from app.config import Settings
 from app.recognition import pipeline
 from app.recognition.client_text import (ClientText, fast_path_decision, named_in_top, ocr_skip_decision,
-                                         parse_client_text, server_read_agrees)
+                                         parse_client_text, server_read_agrees, skip_policy)
 from app.recognition.ocr import CardOcr, OcrHit, OcrResult
 from app.recognition.ocr_cache import RequestOcrCache
 from app.routes.health import scan_price_config
@@ -58,6 +58,8 @@ class Catalog:
         self.rows = rows
 
     def execute(self, sql, params):
+        if 'set_totals' in sql:  # no printed total known for these rows
+            return SimpleNamespace(fetchone=lambda: None)
         name, language = params
         return SimpleNamespace(fetchall=lambda: [r for r in self.rows
                                                  if r['name'] == name and r['language'] == language])
@@ -188,7 +190,7 @@ def test_cache_never_serves_a_fast_path_read_as_complete_evidence():
 
 
 def run_pipeline(tmp_path, monkeypatch, *, hint, fast_path=True, rows=(('first', 'Toxel', '078/185'),),
-                 ocr='off', title='Toxel', top20=False):
+                 ocr='off', title='Toxel', top20=False, agree=False):
     from app.db import connect, init_catalog, init_results
     catalog = connect(tmp_path/'catalog.sqlite'); results = connect(tmp_path/'results.sqlite')
     init_catalog(catalog); init_results(results)
@@ -223,7 +225,7 @@ def run_pipeline(tmp_path, monkeypatch, *, hint, fast_path=True, rows=(('first',
         response = pipeline.recognize_bytes(buffer.getvalue(), settings=Settings(_env_file=None,
             data_dir=tmp_path, store_captures=False, use_grading=False, enable_matched=True,
             client_text_hints=True, client_text_fast_path=fast_path, client_text_ocr=ocr,
-            client_text_top20=top20), runtime=runtime,
+            client_text_top20=top20, client_text_agree=agree), runtime=runtime,
             catalog=catalog, results=results, session_id='test', skip_detect=True,
             client_text=parsed, client_text_reason=reason)
         saved = json.loads(results.execute('SELECT ocr_json FROM scans').fetchone()[0])
@@ -410,3 +412,121 @@ def test_pipeline_with_top20_off_keeps_the_standin_result_unchanged(tmp_path, mo
                                             ocr='footer', top20=False)
     assert response.timings_ms['client_text_ocr'] == 1.
     assert 'phone_number_standin' not in json.dumps(saved)
+
+
+def agree_skip(hint, top, *, rows=None, lookup=None):
+    """ocr_skip_decision as CLIENT_TEXT_AGREE calls it: no confidence floor, the top 20, footer mode."""
+    lead = card('first', '78')
+    catalogue = {'first': lead, 'second': card('second', '99', name='Other card'),
+                 'pika': card('pika', '99', name='Pikachu')}
+    look = lookup or (lambda cid: catalogue.get(cid, card(cid, '78')))
+    return ocr_skip_decision(hint, top, look, Catalog(rows or [lead]), mode='footer', image_size=(600, 840),
+                             min_confidence=0., min_visual=.78, min_gap=.04, top_n=20, set_totals=True)
+
+
+def test_agree_policy_drops_the_floor_only_for_footer_mode_and_only_when_switched_on():
+    off = skip_policy(ocr_mode='footer', top20=False, agree=False, min_confidence=.9)
+    assert (off.min_confidence, off.top_n, off.cap_matched, off.set_totals, off.agree) == (.9, 1, False, False, False)
+    top = skip_policy(ocr_mode='footer', top20=True, agree=False, min_confidence=.9)
+    assert (top.min_confidence, top.top_n, top.cap_matched, top.set_totals) == (.9, 20, True, False)
+    agree = skip_policy(ocr_mode='footer', top20=False, agree=True, min_confidence=.9)
+    assert (agree.min_confidence, agree.top_n, agree.cap_matched, agree.set_totals, agree.agree) == (
+        0., 20, True, True, True)
+    assert skip_policy(ocr_mode='footer', top20=True, agree=True, min_confidence=.9).agree
+    # 'all' reads no card text on the server, so the title check that makes the agreement safe is absent.
+    all_mode = skip_policy(ocr_mode='all', top20=False, agree=True, min_confidence=.9)
+    assert (all_mode.min_confidence, all_mode.top_n, all_mode.agree) == (.9, 1, False)
+
+
+def test_agree_one_card_in_the_top_20_is_eligible_at_any_confidence():
+    hint = parse_client_text(payload(name_conf=.55, number_conf=.54))[0]
+    top = [dict(card_id='pika', name='Pikachu', visual_score=.93, language='en'),
+           dict(card_id='first', name='Toxel', visual_score=.84, language='en')]
+    assert agree_skip(hint, top) == (True, 'first', 'eligible_top')
+    # The same frame with the 0.9 floor is refused: the floor is what agree removes.
+    assert top_skip(hint=hint, top=top) == (False, None, 'low_confidence')
+
+
+def test_agree_a_misread_number_names_no_card_and_is_refused():
+    lead = card('first', '174')
+    hint = parse_client_text(payload(number='74/165', number_conf=.5, name_conf=.6))[0]
+    top = [dict(card_id='first', name='Toxel', visual_score=.84, language='en')]
+    assert agree_skip(hint, top, rows=[lead]) == (False, None, 'not_in_top')
+
+
+def test_agree_name_and_number_naming_different_cards_is_refused():
+    hint = parse_client_text(payload(name='Pikachu', name_conf=.6, number='078/185', number_conf=.6))[0]
+    top = [dict(card_id='first', name='Toxel', visual_score=.84, language='en'),
+           dict(card_id='pika', name='Pikachu', visual_score=.80, language='en')]
+    assert agree_skip(hint, top)[2] == 'not_in_top'
+
+
+def test_agree_a_card_outside_the_top_20_is_refused():
+    hint = parse_client_text(payload(name_conf=.6, number_conf=.6))[0]
+    filler = [dict(card_id=f'other{i}', name='Filler', visual_score=.5, language='en') for i in range(20)]
+    named = dict(card_id='first', name='Toxel', visual_score=.45, language='en')
+    assert agree_skip(hint, filler + [named])[2] == 'not_in_top'
+    assert agree_skip(hint, [*filler[:19], named])[0] is True
+
+
+def test_agree_still_needs_both_fields_and_a_card_in_the_list():
+    assert agree_skip(parse_client_text(payload(number=None))[0], [])[2] == 'incomplete'
+    assert agree_skip(parse_client_text(payload())[0], [])[2] == 'no_candidates'
+
+
+def test_pipeline_agree_on_stands_in_for_the_footer_at_low_confidence(tmp_path, monkeypatch):
+    response, regions, saved = run_pipeline(tmp_path, monkeypatch,
+                                            hint=payload(name_conf=.6, number_conf=.6), fast_path=False,
+                                            ocr='footer', agree=True)
+    assert len(regions) == 1 and response.best_match.card_id == 'first'
+    assert response.timings_ms['client_text_ocr'] == 1. and saved['client_text']['ocr_skip'] == 'used_number'
+    # The phone's number never makes the result 'matched' on its own.
+    assert response.status.value != 'matched' and 'phone_number_standin' in json.dumps(saved)
+
+
+def test_pipeline_agree_off_keeps_the_floor_and_reads_the_footer(tmp_path, monkeypatch):
+    response, regions, saved = run_pipeline(tmp_path, monkeypatch,
+                                            hint=payload(name_conf=.6, number_conf=.6), fast_path=False,
+                                            ocr='footer', agree=False)
+    assert len(regions) > 1 and response.timings_ms['client_text_ocr'] == 0.
+    assert saved['client_text']['ocr_skip'] != 'used_number'
+    assert 'phone_number_standin' not in json.dumps(saved)
+
+
+def test_pipeline_agree_reads_the_footer_when_the_server_title_disagrees(tmp_path, monkeypatch):
+    response, regions, saved = run_pipeline(tmp_path, monkeypatch,
+                                            hint=payload(name_conf=.6, number_conf=.6), fast_path=False,
+                                            ocr='footer', title='Pikachu', agree=True)
+    assert len(regions) > 1 and response.timings_ms['client_text_ocr'] == 0.
+    assert saved['client_text']['ocr_skip'] == 'title_disagrees'
+
+
+def test_agree_counts_printings_with_their_set_totals():
+    """Charmander 9/108: a 25-card promo and a 48-card set also print a 9 and must not fit 9/108."""
+    # Rows as the catalogue returns them: no set_total column, only the set_totals table.
+    bare = lambda row: {k: v for k, v in row.items() if k != 'set_total'}  # noqa: E731
+    xy = bare(card('first', '9', set_id='xy12', name='Charmander'))
+    promo = bare(card('promo', '9', set_id='2021swsh', name='Charmander'))
+    mcd = bare(card('mcd', '9', set_id='mfb', name='Charmander'))
+    totals = {'xy12': 108, '2021swsh': 25, 'mfb': 48}
+
+    class Totals(Catalog):
+        def execute(self, sql, params):
+            if 'set_totals' in sql:
+                return SimpleNamespace(fetchone=lambda: (totals[params[1]],) if params[1] in totals else None)
+            return super().execute(sql, params)
+
+    from app.recognition.client_text import printings_with_number
+    from app.recognition.printing import printing_key
+    lead = dict(xy, set_total=108)
+    rows = Totals([xy, promo, mcd])
+    # Without totals a bare 9 fits any denominator: all three printings are counted (the over-count).
+    assert printings_with_number(rows, lead, '9/108') == {printing_key(lead), printing_key(promo), printing_key(mcd)}
+    assert printings_with_number(rows, lead, '9/108', set_totals=True) == {printing_key(lead)}
+    hint = parse_client_text(payload(name='Charmander', number='9/108', name_conf=.6, number_conf=.6))[0]
+    top = [dict(card_id='first', name='Charmander', visual_score=.84, language='en')]
+    lookup = lambda cid: dict(xy, set_total=108) if cid == 'first' else None  # noqa: E731
+    assert ocr_skip_decision(hint, top, lookup, rows, mode='footer', image_size=(600, 840), min_confidence=0.,
+                             min_visual=.78, min_gap=.04, top_n=20, set_totals=True) == (True, 'first', 'eligible_top')
+    assert ocr_skip_decision(hint, top, lookup, rows, mode='footer', image_size=(600, 840), min_confidence=0.,
+                             min_visual=.78, min_gap=.04, top_n=20)[2] == 'printings'
