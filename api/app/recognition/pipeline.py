@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import hashlib
 import json
 import logging
 import re
@@ -58,6 +59,8 @@ from app.recognition.rank import artwork_evidence_compatible, decide_status_with
 from app.recognition.rank import name_match, normalize_text
 from app.recognition.runtime import Runtime
 from app.recognition.title_retry import read_conflicting_title, title_retry_allowed
+from app.recognition.vintage_name import (GUIDANCE as VINTAGE_NAME_GUIDANCE,
+                                           VERSION as VINTAGE_NAME_VERSION, vintage_name_choices)
 from app.recognition.text_identity import (VERSION as TEXT_IDENTITY_VERSION, confident_fractions, name_agrees,
                                            name_tokens, read_whole_image, text_identity_candidates)
 from app.recognition.label_identity import (VERSION as LABEL_IDENTITY_VERSION, label_identity_candidates,
@@ -66,6 +69,7 @@ from app.schemas import (
     Candidate,
     GradingEvidence,
     OcrEvidence,
+    PlausiblePrinting,
     PrintingReview,
     ScanResponse,
     ScanStatus,
@@ -1224,6 +1228,29 @@ def _recognize_bytes_once(
         # The phone's number stood in for the footer read: never an automatic match on its word.
         status = 'uncertain'
         status_reasons.append('phone_number_standin')
+    vintage_choices = None
+    if getattr(settings, 'vintage_name_choices', False) and status in {'uncertain', 'printing_ambiguous'} and combined:
+        # VINTAGE_NAME_CHOICES: a confident name on an unnumbered PMCG/neo card adds those cards
+        # to choose from. The card shown first and the status stay; the collector decides.
+        offered = {combined[0]['card_id'], *(p.card_id for p in (printing_review.plausible_printings
+                                                                   if printing_review else ()))}
+        extra_ids, vintage_reason = vintage_name_choices(catalog, hits=ocr.hits, numbers=numbers,
+                                                         languages=rank_languages, exclude=offered)
+        vintage_choices = dict(reason=vintage_reason, card_ids=extra_ids)
+        if extra_ids:
+            extra = [PlausiblePrinting.model_validate(row) for row in _preview_candidates(catalog, extra_ids)]
+            if printing_review:
+                printing_review.plausible_printings.extend(extra)
+            else:
+                ids = [combined[0]['card_id'], *extra_ids]
+                printing_review = PrintingReview(
+                    reason='vintage_name_choice',
+                    candidate_group_id='vintage-name:' + hashlib.sha256('\n'.join(ids).encode()).hexdigest()[:16],
+                    grouping_basis='confident_name_unnumbered_vintage',
+                    plausible_printings=[PlausiblePrinting.model_validate(row) for row in
+                                         _preview_candidates(catalog, ids[:1])] + extra,
+                    guidance=VINTAGE_NAME_GUIDANCE)
+            status_reasons.append('vintage_name_choice')
     shown = [] if status in {"no_match", "retake", "failed"} else combined[:1]
     if text_identity in {'unverified', 'sibling'} and status == 'uncertain':
         shown = [r for r in combined if r['card_id'] in text_ids][:3]
@@ -1293,6 +1320,8 @@ def _recognize_bytes_once(
         versions['text_identity'] = TEXT_IDENTITY_VERSION
         if slab_label:
             versions['label_identity'] = LABEL_IDENTITY_VERSION
+    if vintage_choices is not None:
+        versions['vintage_name_choices'] = VINTAGE_NAME_VERSION
     presentation = match_presentation(combined, status=status, printing_review=printing_review,
                                       min_visual=settings.threshold_min_visual_ocr)
     confidence = confidence_payload(combined, status=status,
@@ -1339,6 +1368,7 @@ def _recognize_bytes_once(
         "requested_language": decision.requested,
         "search_languages": list(decision.search),
         "printing_review": printing_review.model_dump(mode="json") if printing_review else None,
+        **({"vintage_name_choices": vintage_choices} if vintage_choices is not None else {}),
         "local_artwork_matches": [vars(m) for m in local_matches],
         "layout_matches": [vars(m) for m in layout_matches],
         "layout_review_supported": layout_review_supported,
