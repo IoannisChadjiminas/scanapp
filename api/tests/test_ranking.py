@@ -714,3 +714,37 @@ def test_guard_measures_the_gap_to_a_rival_in_the_scan_language(monkeypatch):
     assert _keep_visual_leader(ranked, languages=("en",), min_gap=.06)[0]["card_id"] != "en:mep-078"
     assert _keep_visual_leader(ranked, languages=("en",), min_gap=.06,
                                guard=True)[0]["card_id"] == "en:mep-078"
+
+
+def _cutoff(monkeypatch, on: bool) -> None:
+    from app.config import get_settings
+
+    monkeypatch.setattr(get_settings(), "ocr_cutoff_total", on)
+
+
+def test_cutoff_total_is_a_conflict_without_the_switch(monkeypatch):
+    from app.recognition.rank import number_match
+    _cutoff(monkeypatch, False)
+    assert number_match([OcrHit("9/10", .99, "collector")], "9/108") is False
+
+
+def test_cutoff_total_agrees_with_one_lost_digit(monkeypatch):
+    from app.recognition.rank import number_match
+    _cutoff(monkeypatch, True)
+    assert number_match([OcrHit("9/10", .99, "collector")], "9/108") is True
+    assert number_match([OcrHit("9/1", .99, "collector")], "9/108") is False   # two digits lost
+    assert number_match([OcrHit("9/1", .99, "collector")], "9/10") is False    # read keeps < 2 digits
+    assert number_match([OcrHit("8/10", .99, "collector")], "9/108") is False  # other number
+    assert number_match([OcrHit("9/18", .99, "collector")], "9/108") is False  # not a prefix
+
+
+def test_cutoff_total_moves_evolutions_over_same_artwork_prints(monkeypatch):
+    _cutoff(monkeypatch, True)
+    cards = [_card("base1-46", "Charmander", "46", .891), _card("lc-70", "Charmander", "70", .870),
+             _card("xy12-9", "Charmander", "9", .849)]
+    cards[-1]["set_total"] = 108
+    cards[0]["set_total"] = 102
+    cards[1]["set_total"] = 110
+    ranked = rerank(cards, "Charmander", [OcrHit("9/10", .99, "collector")], False,
+                    detected_languages=("en",), name_confidence=.95, require_confident_ocr=True)
+    assert ranked[0]["card_id"] == "xy12-9"

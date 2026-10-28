@@ -83,6 +83,9 @@ class Settings(BaseSettings):
     # number name exactly one promo card. Restricted to the promo set table; never a
     # different number, a two-letter error or an unrelated set. A policy change: replay first.
     ocr_promo_prefix_near: bool = False
+    # A read set total that lost its last digit at the crop edge ("9/10" for 9/108) still agrees
+    # with the card when the number before the slash is the same. One digit only. Replay first.
+    ocr_cutoff_total: bool = False
     # A number read without a total or set code ("20") can be attack damage or HP from a
     # footer strip that missed the footer. It may not lift a card whose picture is much weaker
     # than the picture's leader, and the leader's gap is measured to a real rival, not to its
