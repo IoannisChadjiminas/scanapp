@@ -46,7 +46,7 @@ Docs: `docs/full-pipeline-speed-plan-20261026.md`, `docs/on-phone-match-best-fra
 - A55: 7–9 of 16 photos answered early (30–590 ms server), all confirmed by the background check; provisional cards on 7–8 of 16, 1.4–1.9 s after the shutter, 0 overturned.
 - iPhone 15: fingerprint on all 15 photos (65–113 ms), 9 of 15 early answers, all confirmed; a provisional card 0.38 s after the shutter, confirmed.
 - Index download: iPhone 35.7 MB in 16.5 s, A55 in 3.2 s (Wi-Fi), checksums verified, swap OK.
-- Staging published index: version `2bcfd9b9e3b4166238df5efcaf211fda767e9e56890bf3a0cf93b8f065ccde51` (43,695 rows, model `2ddf6ec79e37`, catalogue import `PS-CATALOGUE-EN-JA-ENID2-20261019`).
+- Staging published index (updated 2026-10-28): version `033ea5e4e7d96c24dd689d39d5266553f870bd7d93252043696633b9fadabffd` (43,696 rows, unchanged model `2ddf6ec79e37`, catalogue import `PS-CATALOGUE-EN-JA-NEO2057-20261028`). Adds the reviewed `ja:neo2-057` reference. Public API/image checks and full phone-file download checksums passed; physical-phone scan/save checks remain pending. Parent `2bcfd9b9…` is retained for rollback. See `docs/experiments/neo2-057-reference-20261028.md`.
 
 ## Open issues (next work, in priority order)
 
@@ -73,6 +73,12 @@ Scripts and details: `api/scripts/stored_scan_replay/README.md`. Use it for any 
 5. Limits: it reranks the stored picture top 20 and OCR read; it does not re-run OCR or the picture search. OCR or crop changes need the photo replays instead (`STORE_ORIGINAL_UPLOADS` originals).
 
 ## Missing cards (catalogue coverage)
+
+**Staging update — 2026-10-28:** The reviewed missing Japanese image and vectors
+for `ja:neo2-057` are now active. Japanese own-image coverage is 16,319/16,319;
+Japanese picture vectors are 16,006 and total vectors 43,696. The older parent
+snapshot counts below remain historical. The 326 deliberately excluded vectors
+remain excluded. No recognition thresholds or ranking rules changed.
 
 **Correction — 2026-10-28:** The counts below describe coverage, not 326 cards
 that can safely be added to picture search. The earlier recommendation to embed
