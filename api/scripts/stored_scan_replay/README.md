@@ -7,7 +7,9 @@ switch off and then on, and every scan whose answer changes is checked by hand.
 1. Export (read-only on staging; the script is streamed, nothing is written):
    `ssh auctaro-staging "docker exec -i scanapp-scanapp-z1mwj4-api-1 python3 -" < api/scripts/stored_scan_replay/export_cases.py > <work>/cases.jsonl`
    The file holds OCR text: keep `<work>` outside Git and delete it afterwards.
-2. For number rules that need set totals, use the catalogue and totals files of
+2. `--flag ocr_known_set_prefixes` needs `--catalog` (the catalogue's real collector
+   prefixes); without it the switch changes nothing.
+   For number rules that need set totals, use the catalogue and totals files of
    the last phone-index export (`api/scripts/on_phone_index/README.md`).
 3. Replay from the branch with the change:
    `cd api && .venv/bin/python scripts/stored_scan_replay/replay_ranking.py <work>/cases.jsonl --flag <setting> [--catalog ... --totals ...]`

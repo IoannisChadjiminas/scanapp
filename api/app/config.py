@@ -87,6 +87,11 @@ class Settings(BaseSettings):
     # A read set total that lost its last digit at the crop edge ("9/10" for 9/108) still agrees
     # with the card when the number before the slash is the same. One digit only. Replay first.
     ocr_cutoff_total: bool = False
+    # A footer read with letters before its number ("KNE2" from a misread line) counts as a
+    # set-code collector number only when that prefix exists in the catalogue (SV, TG, SWSH...).
+    # Otherwise it is noise: no conflict, no agreement. Genuine prefixed numbers, fractions and
+    # photo-quality checks are unchanged. A policy change: replay first.
+    ocr_known_set_prefixes: bool = False
     # A number read without a total or set code ("20") can be attack damage or HP from a
     # footer strip that missed the footer. It may not lift a card whose picture is much weaker
     # than the picture's leader, and the leader's gap is measured to a real rival, not to its

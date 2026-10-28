@@ -65,6 +65,7 @@ services:
       OCR_PROMO_PREFIX_NEAR: ${OCR_PROMO_PREFIX_NEAR:-false}
       # "9/10" read for 9/108 still agrees (one cut-off digit; replay first).
       OCR_CUTOFF_TOTAL: ${OCR_CUTOFF_TOTAL:-false}
+      OCR_KNOWN_SET_PREFIXES: ${OCR_KNOWN_SET_PREFIXES:-false}
       # A bare number cannot lift a much weaker picture over the leader (replay first).
       RANK_BARE_NUMBER_GUARD: ${RANK_BARE_NUMBER_GUARD:-false}
       # Offer more same-name prints when the printing is unsure (replay first).

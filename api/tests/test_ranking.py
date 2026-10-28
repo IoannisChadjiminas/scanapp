@@ -748,3 +748,95 @@ def test_cutoff_total_moves_evolutions_over_same_artwork_prints(monkeypatch):
     ranked = rerank(cards, "Charmander", [OcrHit("9/10", .99, "collector")], False,
                     detected_languages=("en",), name_confidence=.95, require_confident_ocr=True)
     assert ranked[0]["card_id"] == "xy12-9"
+
+
+def _known_prefixes(monkeypatch, on: bool) -> None:
+    import sqlite3
+
+    from app.config import get_settings
+    from app.recognition import rank
+
+    monkeypatch.setattr(get_settings(), "ocr_known_set_prefixes", on)
+    monkeypatch.setattr(rank, "_active_prefixes", None)
+    monkeypatch.setattr(rank, "_collector_prefixes", {})
+    catalog = sqlite3.connect(":memory:")
+    catalog.execute("CREATE TABLE cards (collector_number, printed_collector_number)")
+    catalog.executemany("INSERT INTO cards VALUES (?, ?)", [
+        ("135", "135/132"), ("SV001", None), ("TG05", "TG05/TG30"), ("SWSH050", None), ("H12", "H12/H32")])
+    rank.register_collector_prefixes(catalog)
+
+
+def _exeggutor() -> dict:
+    card = _card("en:gym2-135", "Exeggutor", "135", .82)
+    card["set_total"] = 132
+    return card
+
+
+def _footer(*texts: str) -> list[OcrHit]:
+    return extract_collector_candidates(list(texts), hits=[OcrHit(t, .95, "collector") for t in texts])
+
+
+def test_catalogue_prefixes_come_from_real_collector_numbers(monkeypatch):
+    from app.recognition import rank
+
+    _known_prefixes(monkeypatch, True)
+    assert {"SV", "TG", "SWSH", "H", "SVP", "MEP"} <= rank._active_prefixes
+    assert "KNE" not in rank._active_prefixes
+
+
+def test_unknown_prefix_read_is_dropped_only_with_the_switch(monkeypatch):
+    _known_prefixes(monkeypatch, False)
+    assert [h.text for h in _footer("KNE2", "135/132")] == ["KNE2", "135/132"]
+    _known_prefixes(monkeypatch, True)
+    assert [h.text for h in _footer("KNE2", "135/132")] == ["135/132"]
+    # Real catalogue prefixes stay.
+    assert [h.text for h in _footer("TG05", "SV001", "H12")] == ["TG05", "SV001", "H12"]
+
+
+def test_unknown_prefix_is_not_a_conflict_with_the_switch(monkeypatch):
+    # Android, Exeggutor 135/132: the footer read KNE2, which conflicted with the right card.
+    _known_prefixes(monkeypatch, False)
+    off = rerank([_exeggutor()], "Exeggutor", _footer("KNE2"), False,
+                 detected_languages=("en",), name_confidence=.95, require_confident_ocr=True)
+    assert off[0]["collector_conflict"] is True
+    _known_prefixes(monkeypatch, True)
+    on = rerank([_exeggutor()], "Exeggutor", _footer("KNE2"), False,
+                detected_languages=("en",), name_confidence=.95, require_confident_ocr=True)
+    assert on[0]["collector_conflict"] is False
+
+
+def test_a_real_set_code_still_conflicts_with_the_switch(monkeypatch):
+    _known_prefixes(monkeypatch, True)
+    ranked = rerank([_exeggutor()], "Exeggutor", _footer("TG05"), False,
+                    detected_languages=("en",), name_confidence=.95, require_confident_ocr=True)
+    assert ranked[0]["collector_conflict"] is True
+
+
+def test_unknown_prefix_no_longer_vetoes_the_review_rescue(monkeypatch):
+    # An unverified outline becomes a review instead of a retake when the name and a printed
+    # number agree; KNE2 counted as a contradicting identifier and blocked that.
+    from app.recognition.identity import structured_identity_agrees
+
+    def rescue(on: bool, *texts: str) -> bool:
+        _known_prefixes(monkeypatch, on)
+        numbers = _footer(*texts)
+        item = rerank([_exeggutor()], "Exeggutor", numbers, False, detected_languages=("en",),
+                      name_confidence=.95, require_confident_ocr=True)[0]
+        return structured_identity_agrees(item, ocr_name="Exeggutor", name_confidence=.95,
+                                          numbers=numbers, languages=("en",))
+
+    assert rescue(False, "KNE2", "135/132") is False
+    assert rescue(True, "KNE2", "135/132") is True
+    # Without a printed number the rescue still has nothing to stand on.
+    assert rescue(True, "KNE2") is False
+    # A real conflicting set code still vetoes it.
+    assert rescue(True, "TG05", "135/132") is False
+
+
+def test_without_a_registered_catalogue_nothing_changes(monkeypatch):
+    from app.config import get_settings
+    from app.recognition import rank
+
+    monkeypatch.setattr(get_settings(), "ocr_known_set_prefixes", True)
+    monkeypatch.setattr(rank, "_active_prefixes", None)
+    assert [h.text for h in _footer("KNE2")] == ["KNE2"]

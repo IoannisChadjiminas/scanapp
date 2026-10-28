@@ -19,7 +19,7 @@ import sqlite3
 from app.config import get_settings
 from app.recognition.ocr import OcrHit
 from app.recognition.printing import PRINTING_CHOICES_WIDER_GAP, assess_printings
-from app.recognition.rank import extract_collector_candidates, rerank
+from app.recognition.rank import extract_collector_candidates, register_collector_prefixes, rerank
 
 
 def parse_value(raw):
@@ -106,6 +106,9 @@ def main():
         setattr(settings, name, parse_value(value))
 
     details = card_details(args.catalog, args.totals)
+    if args.catalog:
+        # OCR_KNOWN_SET_PREFIXES needs the catalogue's real collector prefixes.
+        register_collector_prefixes(sqlite3.connect(args.catalog))
     n = top_changed = choices_changed = 0
     for line in rows:
         case = json.loads(line)

@@ -56,7 +56,7 @@ from app.recognition.holder_printing import holder_printing_hint
 from app.recognition.orientation import retrieve_oriented
 from app.recognition.printing import PRINTING_CHOICES_WIDER_GAP, PrintingDecision, assess_printings
 from app.recognition.rank import artwork_evidence_compatible, decide_status_with_reason, damaged_footer_named_printing, extract_collector_candidates, fraction_named_printing, rerank
-from app.recognition.rank import name_match, normalize_text
+from app.recognition.rank import name_match, normalize_text, register_collector_prefixes
 from app.recognition.runtime import Runtime
 from app.recognition.title_retry import read_conflicting_title, title_retry_allowed
 from app.recognition.vintage_name import (GUIDANCE as VINTAGE_NAME_GUIDANCE,
@@ -1534,6 +1534,8 @@ def recognize_bytes(
     started = time.perf_counter()
     if not persist:
         _grading_completion = None
+    if getattr(settings, 'ocr_known_set_prefixes', False):
+        register_collector_prefixes(catalog)
     ocr_cache = RequestOcrCache()
     kwargs = dict(settings=settings, runtime=runtime, catalog=catalog,
                   results=results, session_id=session_id, crop_x=crop_x,

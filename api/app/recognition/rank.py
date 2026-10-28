@@ -65,6 +65,35 @@ def set_code_prefix_enabled() -> bool:
     return bool(get_settings().ocr_set_code_prefix)
 
 
+# OCR_KNOWN_SET_PREFIXES: the letter prefixes the catalogue's collector numbers really use,
+# loaded once per catalogue connection. None until a catalogue is registered.
+_collector_prefixes: dict[int, frozenset[str]] = {}
+_active_prefixes: frozenset[str] | None = None
+
+
+def register_collector_prefixes(catalog) -> frozenset[str]:
+    """Load the catalogue's collector-number prefixes (SV, TG, SWSH...) and use them."""
+    global _active_prefixes
+    key = id(catalog)
+    if key not in _collector_prefixes:
+        found = {'SVP', *PROMO_NUMBER_PREFIX.values()}
+        for row in catalog.execute('SELECT collector_number, printed_collector_number FROM cards'):
+            for value in row:
+                if (parts := parse_collector(value)) is not None and parts.prefix:
+                    found.add(parts.prefix)
+        _collector_prefixes[key] = frozenset(found)
+    _active_prefixes = _collector_prefixes[key]
+    return _active_prefixes
+
+
+def unknown_set_prefix(token: str) -> bool:
+    """A read like KNE2 whose letters are no catalogue prefix, under OCR_KNOWN_SET_PREFIXES."""
+    if _active_prefixes is None or not get_settings().ocr_known_set_prefixes:
+        return False
+    parts = parse_collector(token)
+    return bool(parts and parts.prefix and parts.prefix not in _active_prefixes)
+
+
 def promo_prefix_near_enabled() -> bool:
     return bool(get_settings().ocr_promo_prefix_near)
 
@@ -199,7 +228,8 @@ def extract_collector_candidates(
                 found.remove(previous)
                 found.append(OcrHit(token,item.confidence,item.region))
             return
-        if parse_collector(token) is None:
+        if parse_collector(token) is None or unknown_set_prefix(token):
+            # KNE2 from a misread footer line is not a set code: no conflict, no agreement.
             return
         seen.add(token)
         found.append(OcrHit(text=token, confidence=item.confidence, region=item.region))
