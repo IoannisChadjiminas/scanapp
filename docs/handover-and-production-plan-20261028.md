@@ -9,6 +9,7 @@ For the next agent. Repos: **scanapp** (server, `/Users/ioannischadjiminas/Webst
 - 0 wrong cards shown and 0 background-check disagreements are the gate for anything that answers early.
 - Photos and OCR text never in git; never print secrets (`config/auth.local.json`, PlanetScale URL).
 - Commits end with `Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>`; PR bodies end with `🤖 Generated with [Claude Code](https://claude.com/claude-code)`.
+- Every server ranking change (number rules, guards, choose list) is replayed on all stored staging scans before merging, switch off vs on; 0 scans may move to a wrong card (see "Testing a ranking change on stored scans").
 - Staging auto-deploys scanapp `main` (Dokploy). The owner sets Dokploy environment values.
 - Helpers: the owner asks for Haiku 5.5 helpers (high or normal effort) for implementation.
 
@@ -25,6 +26,7 @@ For the next agent. Repos: **scanapp** (server, `/Users/ioannischadjiminas/Webst
 | #86 | Diagnostics keep provisional/index/footer fields | — | — | — | — |
 | #87 | Phone card index: export script, `/api/v1/card-index/manifest` + immutable file routes, cached validation | `CARD_INDEX_PUBLISH` | **on** | on (index published) | off |
 | #88 | When the printing is unsure, the choose list also offers same-name prints up to 0.08 lower (Evolutions 9/108 under Base Set 46/102) | `PRINTING_CHOICES_WIDER` | off | owner setting it on | off |
+| #90 | A set total cut off by its last digit at the photo edge ("9/10" for 9/108) counts as the card's number, not a conflict. Replay: 8,093 scans, 1 change (Charmander 0a4f643b, lc-70 → xy12-9, right) | `OCR_CUTOFF_TOTAL` | off | owner setting it on | off |
 
 Docs: `docs/full-pipeline-speed-plan-20261026.md`, `docs/on-phone-match-best-frame-plan-20261027.md`, `docs/ios-parity-plan-20261027.md`, `docs/phone-index-shipping-plan-20261028.md`, `docs/phone-index-shipping-fixes-20261028.md`, `api/scripts/on_phone_index/README.md` (operator sequence), `docs/experiments/*` (results).
 
@@ -49,12 +51,26 @@ Docs: `docs/full-pipeline-speed-plan-20261026.md`, `docs/on-phone-match-best-fra
 ## Open issues (next work, in priority order)
 
 1. **326 cards have a reference image but no picture vector** (313 Japanese, 13 English; see "Missing cards"). Cheapest catalogue win: embed them and publish an additive snapshot, then a new phone index.
-2. **Cut-off collector numbers**: Evolutions Charmander 9/108 read as "9/10" / "801/6" (server) or nothing (phone); the footer crop misses the bottom-right corner. Options: accept a cut-off fraction when the numerator matches and the read total is a prefix of the card's total (behind a switch, replay first), and widen the footer crop on old-style layouts.
+2. **Cut-off collector numbers**: Evolutions Charmander 9/108 read as "9/10" / "801/6" (server) or nothing (phone); the footer crop misses the bottom-right corner. The "9/10" case is handled by #90 (`OCR_CUTOFF_TOTAL`). Still open: widening the footer crop on old-style layouts, and the phone reading no number at all.
 3. **Prize Pack totals**: `PPS5-PAR-*` sets have no row in `set_totals`, so a bare number fits them and the Prize Pack copy is often shown first. Add the base set's printed total for Prize Pack mirror sets.
 4. **Toxel MEP 078**: the number in the black promo box is never read on either phone.
 5. **Name rules gaps** still seen: stage words alone ("STAGE"), Pokédex lines, short noise ("Ee f Chm"). A noisy but "valid-looking" photo name beats a correct live name (`LIVE_NAME_WINS` only replaces names that fail the rules).
 6. **Tests**: 2 known failing tests on main (`inapp_cardmarket_reader_test` "the loading bar stops once a read has an answer", `match_sheet_test` "Retake keeps the photo in place…"); `batch_mini_strip_test` "a listing sample from today says 'Today'" fails just after midnight.
-7. **Live checks still to do**: `PRINTING_CHOICES_WIDER` on a real Charmander scan; `CLIENT_TEXT_AGREE` applies to few scans (phone rarely sends name+number) — revisit after the number fixes.
+7. **Live checks still to do**: `PRINTING_CHOICES_WIDER` and `OCR_CUTOFF_TOTAL` on a real Charmander 9/108 scan with the number cut off at the edge; `CLIENT_TEXT_AGREE` applies to few scans (phone rarely sends name+number) — revisit after the number fixes.
+
+## Testing a ranking change on stored scans
+
+Scripts and details: `api/scripts/stored_scan_replay/README.md`. Use it for any change to `rank.py`, `printing.py` or the number rules, before the PR is merged.
+
+1. **Export** the stored scans, read-only (the script is streamed into the container; nothing is written on staging):
+   `ssh auctaro-staging "docker exec -i scanapp-scanapp-z1mwj4-api-1 python3 -" < api/scripts/stored_scan_replay/export_cases.py > <work>/cases.jsonl`
+   About 8,100 scans and 40 MB on 2026-10-28. The first line carries staging's own ranking switches, so the replay ranks as staging does. The file holds OCR text: keep it outside git (scratchpad) and delete it afterwards.
+2. **Set totals** (needed by number rules such as `OCR_CUTOFF_TOTAL`): the stored top 20 doesn't carry them; pass `--catalog` and `--totals` from the last phone-index export (step 6 of "Adding new cards").
+3. **Replay** from the branch with the change, the new switch off and then on:
+   `cd api && .venv/bin/python scripts/stored_scan_replay/replay_ranking.py <work>/cases.jsonl --flag <setting_name> [--catalog … --totals …] [--set name=value]`
+   It prints each scan whose first card or choose list changes (card ids and names only) and the totals.
+4. **Gate**: look at every changed scan (its stored photo if `STORE_ORIGINAL_UPLOADS` kept it, or the owner's confirmation). Each must move to the right card or a fair choose list; 0 to a wrong card. Put the counts in the PR body.
+5. Limits: it reranks the stored picture top 20 and OCR read; it does not re-run OCR or the picture search. OCR or crop changes need the photo replays instead (`STORE_ORIGINAL_UPLOADS` originals).
 
 ## Missing cards (catalogue coverage)
 
@@ -95,7 +111,7 @@ For each batch of new cards (English, Japanese, Chinese):
 
 ## Production rollout (proposal, needs the owner's go per step)
 
-1. Freeze the server flags that passed on staging and set them in the production environment one by one, watching the logs: `RANK_BARE_NUMBER_GUARD`, `STAGE1_CHECK_PHONE_INPUTS`, `CLIENT_TEXT_AGREE`, `PRINTING_CHOICES_WIDER` (after its live check), `STORE_ORIGINAL_UPLOADS` (disk ~0.4–0.8 GB per 1,000 scans), `CARD_INDEX_PUBLISH` (after placing a production index built from the production snapshot).
+1. Freeze the server flags that passed on staging and set them in the production environment one by one, watching the logs: `RANK_BARE_NUMBER_GUARD`, `STAGE1_CHECK_PHONE_INPUTS`, `CLIENT_TEXT_AGREE`, `PRINTING_CHOICES_WIDER` and `OCR_CUTOFF_TOTAL` (after their live check), `STORE_ORIGINAL_UPLOADS` (disk ~0.4–0.8 GB per 1,000 scans), `CARD_INDEX_PUBLISH` (after placing a production index built from the production snapshot).
 2. App release: new build numbers; Android AAB with the `card_embedding` asset pack (Play); iOS with the on-demand Core ML model (TestFlight; see open PokeSingle #174 `deploy_ios.sh`). All new app switches are on by default; production builds must point at the production API and production Firebase.
 3. Before the release: run one full round on both phones against production-like settings.
 4. After the release: watch `card_index.download`, `phone_provisional.final` (agree must stay true), stage 1 background-check disagreements (must stay 0), and download volume on the server/Cloudflare.
