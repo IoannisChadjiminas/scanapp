@@ -92,15 +92,19 @@ class Settings(BaseSettings):
     # than the picture's leader, and the leader's gap is measured to a real rival, not to its
     # own print in another language. A policy change: replay first.
     rank_bare_number_guard: bool = False
-    # Only a number the card prints counts as number evidence. A card from a set that prints no
-    # collector number (Japanese PMCG and neo) neither agrees nor conflicts with a number read,
-    # and a bare number ("006", no total or set code) gives no bonus to a card that prints a
-    # fraction. A bare number that disagrees is still a conflict. A policy change: replay first.
-    rank_printed_number_only: bool = False
+    # Japanese PMCG and neo cards print no collector number, only the Pokedex number ("No.006").
+    # A read of that number is not a conflict with the card's catalogue number (the set order);
+    # any other number still is, and the read gives no bonus. A policy change: replay first.
+    rank_pokedex_number: bool = False
     # When the printing is already unsure, also offer same-name prints up to 0.08 below the shown
     # card in the list to choose from (e.g. Evolutions 9/108 under Base Set 46/102). The shown card
     # and the status do not change. Replay first.
     printing_choices_wider: bool = False
+    # The printing family behind a review list (same artwork, beyond the retrieved top K) is
+    # found by species, not by the exact catalogue name, so a Japanese row stored as "Charizard"
+    # and one stored as "リザードン" with the same artwork are offered together. It only adds
+    # choices; the artwork correlation floor still applies. Gen 1-2 species only. Replay first.
+    printing_family_species: bool = False
     # When an abstaining scan has a confident printed fraction plus a name read anywhere in
     # its OCR lines that together narrow the catalogue to 1-3 cards, add those cards as
     # candidates for local artwork verification and, if unverified, return them as

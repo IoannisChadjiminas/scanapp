@@ -67,8 +67,10 @@ services:
       OCR_CUTOFF_TOTAL: ${OCR_CUTOFF_TOTAL:-false}
       # A bare number cannot lift a much weaker picture over the leader (replay first).
       RANK_BARE_NUMBER_GUARD: ${RANK_BARE_NUMBER_GUARD:-false}
+      RANK_POKEDEX_NUMBER: ${RANK_POKEDEX_NUMBER:-false}
       # Offer more same-name prints when the printing is unsure (replay first).
       PRINTING_CHOICES_WIDER: ${PRINTING_CHOICES_WIDER:-false}
+      PRINTING_FAMILY_SPECIES: ${PRINTING_FAMILY_SPECIES:-false}
       TEXT_IDENTITY_CANDIDATES: ${TEXT_IDENTITY_CANDIDATES:-true}
       # Slab labels: set + number from CGC/PSA/BGS labels (18a, SV59, TG01) become verified
       # candidates. docs/experiments/slab-label-identity-20261021.md

@@ -1048,6 +1048,7 @@ def _recognize_bytes_once(
         min_visual=settings.threshold_min_visual, min_gap=settings.threshold_min_gap,
         retake=retake,
         wider_gap=PRINTING_CHOICES_WIDER_GAP if getattr(settings, 'printing_choices_wider', False) else 0.0,
+        by_species=bool(getattr(settings, 'printing_family_species', False)),
     )
     printing_review = None
     stamp_hint = None

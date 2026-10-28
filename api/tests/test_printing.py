@@ -186,3 +186,67 @@ def test_wider_list_skips_other_names_languages_and_respects_the_cap():
     ids = [r["card_id"] for r in result.members]
     assert "ja:x" not in ids and "vulpix" not in ids
     assert len(ids) == 4
+
+
+class _ArtByCard:
+    # Base-set Charizard artwork for the 1996 card and its reprints; other art for the rest.
+    BASE_ART = {"ja:PMCG1-021", "ja:CP6-011", "ja:S8a-P-001"}
+
+    def thumbnail(self, card_id, raw_path):
+        del raw_path
+        vector = np.zeros(8, dtype=np.float32)
+        vector[0 if card_id in self.BASE_ART else 1] = 1
+        return vector
+
+
+def _species_catalog():
+    import sqlite3
+
+    conn = sqlite3.connect(":memory:")
+    conn.row_factory = sqlite3.Row
+    conn.execute("CREATE TABLE cards (id, name, language, set_id, set_name, collector_number, image_path)")
+    conn.executemany("INSERT INTO cards VALUES (?, ?, ?, ?, ?, ?, 'x')", [
+        ("ja:PMCG1-021", "リザードン", "ja", "PMCG1", "拡張パック", "021"),
+        ("ja:CP6-011", "Charizard", "ja", "CP6", "20th Anniversary", "011"),
+        ("ja:S8a-P-001", "リザードン", "ja", "S8a-P", "25th Anniversary", "001"),
+        ("ja:M6a-137", "メガリザードンXex", "ja", "M6a", "M6a", "137"),
+        ("ja:PMCG1-020", "リザード", "ja", "PMCG1", "拡張パック", "020"),
+    ])
+    return conn
+
+
+def _species_switch(monkeypatch, on):
+    from app.config import get_settings
+
+    monkeypatch.setattr(get_settings(), "printing_family_species", on)
+
+
+def test_printing_family_by_exact_name_misses_a_reprint_stored_in_latin(monkeypatch, tmp_path):
+    _species_switch(monkeypatch, False)
+    index = ReferencePrintingIndex(tmp_path, feature_store=_ArtByCard())
+    top = {"card_id": "ja:CP6-011", "name": "Charizard", "language": "ja"}
+    members, _ = index.family(_species_catalog(), top)
+    assert [m["id"] for m in members] == ["ja:CP6-011"]
+
+
+def test_printing_family_by_species_finds_same_artwork_across_scripts(monkeypatch, tmp_path):
+    _species_switch(monkeypatch, True)
+    index = ReferencePrintingIndex(tmp_path, feature_store=_ArtByCard())
+    top = {"card_id": "ja:CP6-011", "name": "Charizard", "language": "ja"}
+    members, _ = index.family(_species_catalog(), top)
+    # Same species and same artwork only: not the Mega Charizard art, not Charmeleon.
+    assert sorted(m["id"] for m in members) == ["ja:CP6-011", "ja:PMCG1-021", "ja:S8a-P-001"]
+
+
+def test_assess_printings_offers_same_species_family_only_with_the_switch():
+    top = dict(card_id="ja:CP6-011", name="Charizard", language="ja", set_id="CP6", set_name="20th Anniversary",
+               collector_number="011", visual_score=.9, combined_score=.9)
+    base = dict(card_id="ja:PMCG1-021", id="ja:PMCG1-021", name="リザードン", language="ja", set_id="PMCG1",
+                set_name="拡張パック", collector_number="021")
+    off = assess_printings([top], family=[top, base], hits=[], reference_incomplete=False,
+                           min_visual=.78, min_gap=.04, retake=False)
+    on = assess_printings([top], family=[top, base], hits=[], reference_incomplete=False,
+                          min_visual=.78, min_gap=.04, retake=False, by_species=True)
+    assert not off.ambiguous
+    assert on.ambiguous
+    assert sorted(m["card_id"] for m in on.members) == ["ja:CP6-011", "ja:PMCG1-021"]

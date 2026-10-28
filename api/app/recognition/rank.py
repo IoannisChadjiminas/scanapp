@@ -2,6 +2,9 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from difflib import SequenceMatcher
+from functools import lru_cache
+import json
+from pathlib import Path
 import re
 from typing import Any
 import unicodedata
@@ -83,19 +86,19 @@ def bare_number_guard_enabled() -> bool:
     return bool(get_settings().rank_bare_number_guard)
 
 
-def printed_number_only_enabled() -> bool:
-    return bool(get_settings().rank_printed_number_only)
+def pokedex_number_enabled() -> bool:
+    return bool(get_settings().rank_pokedex_number)
 
 
-# RANK_PRINTED_NUMBER_ONLY: Japanese sets whose cards print no collector number. The catalogue
-# number is only the set order (TCG Collector's "No. 001"), and the number a scan reads on
-# these cards is the Pokedex number, HP or attack damage, e.g. "No.006" on Charizard PMCG1-021.
+# RANK_POKEDEX_NUMBER: Japanese sets whose cards print no collector number. The catalogue
+# number is only the set order (TCG Collector's "No. 001"); the number these cards print is
+# the Pokedex number, e.g. "No.006" on Charizard PMCG1-021 (catalogue 021).
 UNNUMBERED_SETS = frozenset(('ja', set_id) for set_id in (
     'pmcg1', 'pmcg2', 'pmcg3', 'pmcg4', 'pmcg5', 'pmcg6', 'neo1', 'neo2', 'neo3', 'neo4'))
 
 
 def number_not_printed(item: dict[str, Any]) -> bool:
-    """Whether the card prints no collector number, so a number read says nothing about it."""
+    """Whether the card prints no collector number."""
     if item.get('printed_collector_number'):
         return False
     set_id = str(item.get('set_id') or '').split(':')[-1]
@@ -105,11 +108,55 @@ def number_not_printed(item: dict[str, Any]) -> bool:
     return (str(item.get('language') or ''), set_id.lower()) in UNNUMBERED_SETS
 
 
-def _bare_read_of_fraction(hit: OcrHit | str, numbers: list[str]) -> bool:
-    """A read without total or set code ("006") against a card that prints a fraction (006/070)."""
+def _species_key(name: str) -> str:
+    # normalize_text drops the symbols that tell Nidoran female from male.
+    return normalize_text(name.replace('♀', 'f').replace('♂', 'm'))
+
+
+@lru_cache(maxsize=1)
+def _pokedex_species() -> dict[int, tuple[str, ...]]:
+    data = json.loads((Path(__file__).with_name('assets')/'pokedex_gen1_2.json').read_text(encoding='utf-8'))
+    return {int(number): tuple(names) for number, names in data['species'].items()}
+
+
+def species_names(number: int) -> tuple[str, ...]:
+    """The English and Japanese names of a Gen 1-2 species, e.g. (リザードン, Charizard)."""
+    return _pokedex_species().get(number, ())
+
+
+@lru_cache(maxsize=1)
+def _pokedex_names() -> dict[str, int]:
+    """Gen 1-2 species names (English and Japanese) to Pokedex number; ambiguous names dropped."""
+    found: dict[str, set[int]] = {}
+    for number, names in _pokedex_species().items():
+        for name in names:
+            if key := _species_key(name):
+                found.setdefault(key, set()).add(int(number))
+    return {key: next(iter(numbers)) for key, numbers in found.items() if len(numbers) == 1}
+
+
+@lru_cache(maxsize=8192)
+def pokedex_number(name: str | None) -> int | None:
+    """The species in a card name, longest match: わるいリザードン, Erika's Oddish, アンノーンK.
+
+    Two different species of the same length in one name stay unknown, as do Trainers and Energy.
+    """
+    key = _species_key(name or '')
+    if not key:
+        return None
+    hits = [(len(species), number) for species, number in _pokedex_names().items() if species in key]
+    if not hits:
+        return None
+    longest = max(length for length, _ in hits)
+    numbers = {number for length, number in hits if length == longest}
+    return next(iter(numbers)) if len(numbers) == 1 else None
+
+
+def _pokedex_read(hit: OcrHit | str, dex: int | None) -> bool:
+    """A read without total or set code that is the card's printed Pokedex number."""
     parsed = parse_collector(hit.text if isinstance(hit, OcrHit) else str(hit))
-    return bool(parsed and not parsed.prefix and not parsed.denominator
-                and any((p := parse_collector(n)) and p.denominator for n in numbers))
+    return bool(dex and parsed and not parsed.prefix and not parsed.denominator
+                and parsed.number == str(dex))
 
 
 # RANK_BARE_NUMBER_GUARD: how much weaker than the visual leader a card's picture may be before
@@ -569,7 +616,7 @@ def rerank(
     if require_confident_ocr and explicit:
         known_numbers = explicit
     guard = bare_number_guard_enabled()
-    printed_only = printed_number_only_enabled()
+    pokedex = pokedex_number_enabled()
     ranked: list[dict[str, Any]] = []
     for item in visual:
         combined = float(item["visual_score"])
@@ -581,14 +628,14 @@ def rerank(
                 and not promo_bare_number_agrees(ocr_name, item, visual)):
             # A bare 078 is not promo proof unless its name and number name one promo card.
             numbers = [n for n in numbers if (parts := parse_collector(n)) and parts.prefix]
-        if printed_only and number_not_printed(item):
-            numbers = []
-        number_ok = _match_any(ocr_numbers, numbers)
-        if (printed_only and number_ok is True and
-                all(_bare_read_of_fraction(h, numbers) for h in ocr_numbers if _match_any([h], numbers) is True)):
-            # A bare 006 is not agreement with 006/070. Disagreement still counts below.
-            number_ok = None
-        collector_conflict = _has_reliable_conflict(known_numbers if require_confident_ocr else ocr_numbers, numbers)
+        item_numbers, item_known = ocr_numbers, known_numbers
+        if pokedex and number_not_printed(item):
+            # The card's printed No.006 says nothing either way; any other number still conflicts.
+            dex = pokedex_number(item.get("name"))
+            item_numbers = [h for h in ocr_numbers if not _pokedex_read(h, dex)]
+            item_known = [h for h in known_numbers if not _pokedex_read(h, dex)]
+        number_ok = _match_any(item_numbers, numbers)
+        collector_conflict = _has_reliable_conflict(item_known if require_confident_ocr else item_numbers, numbers)
         language = str(item.get("language") or "")
         if detected_languages:
             if language in detected_languages:
@@ -598,10 +645,9 @@ def rerank(
         if ocr_failed:
             consistent = None
         elif require_confident_ocr:
-            match_weight = max((max(0.0, min(1.0, h.confidence)) for h in known_numbers
-                                if _match_any([h], numbers) is True
-                                and not (printed_only and _bare_read_of_fraction(h, numbers))), default=0.0)
-            conflict_weight = max((max(0.0, min(1.0, h.confidence)) for h in known_numbers
+            match_weight = max((max(0.0, min(1.0, h.confidence)) for h in item_known
+                                if _match_any([h], numbers) is True), default=0.0)
+            conflict_weight = max((max(0.0, min(1.0, h.confidence)) for h in item_known
                                    if _match_any([h], numbers) is False), default=0.0)
             combined += .08*match_weight - .12*conflict_weight
             if not explicit and name_ok and name_weight >= .85:
@@ -622,7 +668,7 @@ def rerank(
                 consistent = True
             elif comparable_name and ocr_name and name_weight >= RELIABLE_COLLECTOR_CONF and similar(ocr_name, item["name"]) < .4:
                 consistent = False
-        elif number_ok is False and ocr_numbers:
+        elif number_ok is False and item_numbers:
             consistent = False
             combined -= 0.12
             if collector_conflict:

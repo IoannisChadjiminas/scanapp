@@ -162,25 +162,52 @@ cards, while holo/printing similarity can still prevent correct retrieval or
 selection even after better framing. No one of the tested name, number or crop
 interventions establishes a safe complete fix.
 
-## Next step: RANK_PRINTED_NUMBER_ONLY (default off)
+## RANK_PRINTED_NUMBER_ONLY: rejected
 
-The number half is now a narrow, switchable change rather than the global
-bare-number ablation above:
+The first switch made unnumbered PMCG/neo cards ignore every number read, and
+gave no bonus for a bare number on a card printing a fraction. The stored-scan
+replay (8,106 scans) changed 103 first cards and 52 choice lists, and the full
+scanner turned a user-confirmed Gengar `ja:VS1-021` (bare 021 read) into
+Sabrina's Mr. Mime `ja:PMCG6-046`, and Charizard photo 1 into Aipom. Both rules
+were wrong: unnumbered cards lost real conflicts, and numbered cards lost real
+agreement when the total was not read. A holder-label path also kept the bonus.
+The switch is removed.
 
-- A card from a Japanese set that prints no collector number (PMCG1-6, neo1-4)
-  neither agrees nor conflicts with a number read, unless the catalogue records a
-  printed number. This removes the conflict penalty that the "No.006" read put on
-  `ja:PMCG1-021`.
-- A bare read ("006", no total or set code) gives no agreement bonus to a card
-  that prints a fraction (`006/070`). A bare read that disagrees is still a
-  conflict, and a full fraction or set code still agrees.
+## RANK_POKEDEX_NUMBER (default off)
 
-The unit tests reproduce the Cherrim lift with the switch off and keep the
-Charizard first with it on. That is a ranking-step test, not evidence about the
-two photos: photo 2's expected card sits 21st in the ranking input, so it may
-still end as `uncertain` on another card or `no_match`, which this gate accepts.
-Before turning it on: the stored-scan replay (`api/scripts/stored_scan_replay`)
-with `--flag rank_printed_number_only` and the phone-index `--catalog/--totals`,
-every changed answer reviewed by hand, 0 moves to a wrong card; then the two
-photos and `vintage/panel-vintage-18.json` through the full pipeline. The picture
-half (photo 2 at rank 80) is not addressed by this switch.
+What an unnumbered PMCG/neo card prints is its Pokedex number. A bare read equal
+to that number (006 on Charizard) is no longer a conflict with the card's
+catalogue number; it gives no bonus. Any other number still conflicts, so
+Mr. Mime (122) and Aipom (190) keep their conflicts, and numbered cards are
+unchanged. Species come from `api/app/recognition/assets/pokedex_gen1_2.json`
+(PokeAPI, Gen 1-2, English and Japanese), matched as the longest species name in
+the card name (わるいリザードン, Erika's Oddish, アンノーンK).
+
+Expected effect is limited: Cherrim keeps up to +0.08 for the bare 006, so it
+still wins when its picture is within about that margin of Charizard. Photo 2 is
+mainly a picture problem (below).
+
+## PRINTING_FAMILY_SPECIES (default off)
+
+The printing family behind a review list (same artwork, beyond the retrieved top
+K, artwork correlation >= 0.84) was found by exact catalogue name. Japanese rows
+mix scripts (`ja:CP6-011` "Charizard", `ja:PMCG1-021` "リザードン"), so a
+same-artwork reprint stored in the other script was never offered. With the
+switch, Gen 1-2 Pokemon are grouped by species, and the artwork floor still
+decides membership. It only adds choices. It cannot help when the shown card has
+different artwork (e.g. a Mega Charizard), or when the expected card is not in
+any retrieved card's family.
+
+`api/scripts/printing_family_probe.py` measures this before any replay: for a
+saved response's retrieved cards it prints the artwork correlation with the
+expected card and whether the family by name or by species reaches it.
+
+## Before enabling either switch
+
+1. Probe both Charizard photos' retrieved cards with `--expected ja:PMCG1-021`.
+2. Stored-scan replay with `--flag rank_pokedex_number` (ranking only; the
+   replay does not build printing families, so it cannot test the second switch).
+3. Full-scanner runs with each switch on: the vintage panel, the four review
+   negatives (including Gengar `ja:VS1-021`), and both Charizard photos.
+   0 moves to a wrong card; record changed choice lists and latency, since the
+   species family can load more reference images for common species.

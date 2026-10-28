@@ -15,9 +15,11 @@ from typing import Any
 import numpy as np
 from PIL import Image, ImageOps
 
+from app.config import get_settings
 from app.physical_cards import is_tcg_pocket_card
 from app.recognition.ocr import OcrHit
-from app.recognition.rank import accepted_collector_numbers, number_matches_identifiers, normalize_text
+from app.recognition.rank import (accepted_collector_numbers, number_matches_identifiers, normalize_text,
+                                  pokedex_number, species_names)
 
 
 ART_BOX = (.12, .19, .88, .46)
@@ -47,6 +49,17 @@ def artwork_thumbnail(image: Image.Image) -> np.ndarray | None:
     return pixels.reshape(-1) / norm if norm > 0 else None
 
 
+def same_printing_family_name(a: Any, b: Any, *, by_species: bool = False) -> bool:
+    """Same catalogue name, or under PRINTING_FAMILY_SPECIES the same Gen 1-2 species.
+
+    Japanese rows mix scripts (リザードン, Charizard), so an exact name misses reprints.
+    """
+    if normalize_text(a) == normalize_text(b):
+        return True
+    species = pokedex_number(a) if by_species else None
+    return species is not None and species == pokedex_number(b)
+
+
 def printing_key(row: dict[str, Any]) -> tuple[str, str, str, str]:
     # Provider aliases of the same catalogue printing do not create a fake
     # choice. Different sets retain distinct IDs; finishes stay in variants.
@@ -72,14 +85,23 @@ class ReferencePrintingIndex:
 
     def family(self, catalog: Any, top: dict[str, Any]) -> tuple[list[dict], bool]:
         name, language = str(top["name"]), str(top.get("language") or "")
-        key = (name, language)
+        species = pokedex_number(name) if get_settings().printing_family_species else None
+        key = (f"#{species}" if species else name, language)
         with self._lock:
             cached = self._groups.get(key)
             if cached is None:
-                rows = catalog.execute(
-                    "SELECT * FROM cards WHERE name = ? AND language = ? ORDER BY id LIMIT 513",
-                    (name, language),
-                ).fetchall()
+                if species:
+                    names = species_names(species)
+                    rows = [row for row in catalog.execute(
+                        "SELECT * FROM cards WHERE language = ? AND ("
+                        + " OR ".join("name LIKE ?" for _ in names) + ") ORDER BY id LIMIT 2049",
+                        (language, *(f"%{n}%" for n in names))).fetchall()
+                        if pokedex_number(row["name"]) == species][:513]
+                else:
+                    rows = catalog.execute(
+                        "SELECT * FROM cards WHERE name = ? AND language = ? ORDER BY id LIMIT 513",
+                        (name, language),
+                    ).fetchall()
                 cached = []
                 for row in rows[:512]:
                     card = dict(row)
@@ -139,6 +161,7 @@ def assess_printings(
     retake: bool,
     wider_gap: float = 0.0,
     max_choices: int = 6,
+    by_species: bool = False,
 ) -> PrintingDecision:
     if retake or not ranked or (float(ranked[0]["visual_score"]) < min_visual
         and not ranked[0].get("local_artwork_verified") and not ranked[0].get('ocr_identity_verified')
@@ -155,7 +178,8 @@ def assess_printings(
     members: dict[tuple, dict] = {}
     for row in [*family, *nearby, top]:
         item = dict(row)
-        if normalize_text(item["name"]) != normalize_text(top["name"]) or item.get("language") != top.get("language"):
+        if (not same_printing_family_name(item["name"], top["name"], by_species=by_species)
+                or item.get("language") != top.get("language")):
             continue
         item.setdefault("card_id", item.get("id"))
         k = printing_key(item)
