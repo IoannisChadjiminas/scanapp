@@ -88,6 +88,10 @@ class Settings(BaseSettings):
     # than the picture's leader, and the leader's gap is measured to a real rival, not to its
     # own print in another language. A policy change: replay first.
     rank_bare_number_guard: bool = False
+    # When the printing is already unsure, also offer same-name prints up to 0.08 below the shown
+    # card in the list to choose from (e.g. Evolutions 9/108 under Base Set 46/102). The shown card
+    # and the status do not change. Replay first.
+    printing_choices_wider: bool = False
     # When an abstaining scan has a confident printed fraction plus a name read anywhere in
     # its OCR lines that together narrow the catalogue to 1-3 cards, add those cards as
     # candidates for local artwork verification and, if unverified, return them as

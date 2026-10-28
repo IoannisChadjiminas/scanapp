@@ -53,7 +53,7 @@ from app.recognition.grading import VERSION as GRADING_VERSION
 from app.recognition.grading_parallel import GradingJob, grading_requested, parallel_grading_scope
 from app.recognition.holder_printing import holder_printing_hint
 from app.recognition.orientation import retrieve_oriented
-from app.recognition.printing import PrintingDecision, assess_printings
+from app.recognition.printing import PRINTING_CHOICES_WIDER_GAP, PrintingDecision, assess_printings
 from app.recognition.rank import artwork_evidence_compatible, decide_status_with_reason, damaged_footer_named_printing, extract_collector_candidates, fraction_named_printing, rerank
 from app.recognition.rank import name_match, normalize_text
 from app.recognition.runtime import Runtime
@@ -1047,6 +1047,7 @@ def _recognize_bytes_once(
         combined, family=family, hits=numbers, reference_incomplete=incomplete,
         min_visual=settings.threshold_min_visual, min_gap=settings.threshold_min_gap,
         retake=retake,
+        wider_gap=PRINTING_CHOICES_WIDER_GAP if getattr(settings, 'printing_choices_wider', False) else 0.0,
     )
     printing_review = None
     stamp_hint = None
