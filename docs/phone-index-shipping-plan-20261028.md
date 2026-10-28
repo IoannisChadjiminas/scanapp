@@ -26,7 +26,7 @@ A script under `api/scripts/on_phone_index/` that exports the phone index from t
 
 ### 1. Publish it (server)
 
-The export runs when the catalogue snapshot changes (deploy or catalogue update) and writes the files to a versioned folder. Two read-only routes: `GET /api/v1/card-index/manifest` (version, model id, catalogue version, per-file name, bytes, sha256, url) and the files themselves, with ETag and long cache headers so Cloudflare serves repeat downloads. Switch: `CARD_INDEX_PUBLISH`.
+Publication is manual: after each catalogue snapshot change, export and vet a matching candidate, copy it into a versioned folder and atomically update ACTIVE (see api/scripts/on_phone_index/README.md). Until then the manifest returns 503 and phones keep the previous index. Two read-only routes: `GET /api/v1/card-index/manifest` (version, model id, catalogue version, per-file name, bytes, sha256, url) and the files themselves, with ETag and long cache headers so Cloudflare serves repeat downloads. Switch: `CARD_INDEX_PUBLISH`.
 
 ### 2. Download on the phone (Android and iPhone, shared Dart)
 
