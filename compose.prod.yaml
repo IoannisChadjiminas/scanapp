@@ -11,6 +11,7 @@ services:
       CARDMARKET_WEBVIEW_ENABLED: ${CARDMARKET_WEBVIEW_ENABLED:-true}
       # Production stays off: the Python default is now true (staging).
       CARD_INDEX_PUBLISH: ${CARD_INDEX_PUBLISH:-false}
+      HEALTH_VECTOR_COVERAGE: ${HEALTH_VECTOR_COVERAGE:-false}
     mem_limit: 1536m
     cpus: "1.5"
     pids_limit: 256

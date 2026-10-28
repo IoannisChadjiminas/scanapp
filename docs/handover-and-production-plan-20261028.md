@@ -50,7 +50,7 @@ Docs: `docs/full-pipeline-speed-plan-20261026.md`, `docs/on-phone-match-best-fra
 
 ## Open issues (next work, in priority order)
 
-1. **326 cards have a reference image but no picture vector** (313 Japanese, 13 English; see "Missing cards"). Cheapest catalogue win: embed them and publish an additive snapshot, then a new phone index.
+1. **326 cards have a reference image but no picture vector** (313 Japanese, 13 English; see "Missing cards"). These include deliberately excluded look-alikes and known regressions. Review the existing curation before considering changes; do not publish them as one batch.
 2. **Cut-off collector numbers**: Evolutions Charmander 9/108 read as "9/10" / "801/6" (server) or nothing (phone); the footer crop misses the bottom-right corner. The "9/10" case is handled by #90 (`OCR_CUTOFF_TOTAL`). Still open: widening the footer crop on old-style layouts, and the phone reading no number at all.
 3. **Prize Pack totals**: `PPS5-PAR-*` sets have no row in `set_totals`, so a bare number fits them and the Prize Pack copy is often shown first. Add the base set's printed total for Prize Pack mirror sets.
 4. **Toxel MEP 078**: the number in the black promo box is never read on either phone.
@@ -74,6 +74,20 @@ Scripts and details: `api/scripts/stored_scan_replay/README.md`. Use it for any 
 
 ## Missing cards (catalogue coverage)
 
+**Correction — 2026-10-28:** The counts below describe coverage, not 326 cards
+that can safely be added to picture search. The earlier recommendation to embed
+all 326 overlooked the release curation documented in
+`catalogue-completion-handoff-20261016.md` §4.9. Of the 313 Japanese images,
+310 have a same-language cosine of at least 0.95 to an existing or another
+missing reference; close reprints were intentionally left as printing
+alternatives. The other three (`ja:S5R-006`, `ja:S3a-030`, `ja:CP6-011`)
+were removed after vintage Charizard scans changed to wrong matches. The 13
+English cards also have documented intentional treatments: ten display-only,
+plus MFB Switch and two EX Latias printing alternatives. Do not add all 326
+vectors without reviewing these decisions and running the relevant photo gates.
+An experimental local build and its 134-photo vector-only replay did not test
+the full recognition pipeline and do not override the earlier regressions.
+
 Counted on 2026-10-28 from the live cloud snapshot (export `PS-CATALOGUE-EN-JA-ENID2-20261019`): catalogue cards against rows in the picture-vector snapshot (= the phone index).
 
 | Language | Cards | With a vector | No vector | of which: image but no vector |
@@ -84,9 +98,9 @@ Counted on 2026-10-28 from the live cloud snapshot (export `PS-CATALOGUE-EN-JA-E
 | Chinese (traditional) | 7,436 | 2,260 | 5,176 | 0 |
 | **Total** | 50,270 | **43,695** | **6,575** | **326** |
 
-**Why `/health` says 44,021 and the phone index has 43,695.** `/health` `coverage.indexed` (`app/db.py` `coverage()`) counts catalogue cards with `has_image = 1`, not vectors. 326 cards have `has_image = 1` and a reference image (`image_path` under `/data/reference-images/…`, 324 also a remote URL) but no row in the vector snapshot, so neither the server's picture match nor the phone index can find them (text can still reach them). By set: Shiny Star V (ja S4a) 150, Rapid Strike Master (S5R) 23, Amazing Volt Tackle (S4) 21, Matchless Fighters (S5a) 17, Infinity Zone (S3) 11, My First Battle (en mfb) 10, Expansion Pack 20th Anniversary (CP6) 10, SV promos 9, others. They look like images added in later batches (e.g. `en-20261015-mfb-*`) whose vectors were never appended. The phone index is correct: it has every vector the server has (same ids sha256 `ab5b4059…`). None of the 326 are visual-image aliases (the snapshot's 34 aliases are separate).
+**Why `/health` says 44,021 and the phone index has 43,695.** `/health` `coverage.indexed` (`app/db.py` `coverage()`) counts catalogue cards with `has_image = 1`, not vectors. 326 cards have `has_image = 1` and a reference image (`image_path` under `/data/reference-images/…`, 324 also a remote URL) but no row in the vector snapshot, so neither the server's picture match nor the phone index can retrieve them directly by vector. Some can still be offered as printing alternatives. By set: Shiny Star V (ja S4a) 150, Rapid Strike Master (S5R) 23, Amazing Volt Tackle (S4) 21, Matchless Fighters (S5a) 17, Infinity Zone (S3) 11, My First Battle (en mfb) 10, Expansion Pack 20th Anniversary (CP6) 10, SV promos 9, others. Their exclusions reflect the curation above. The phone index is correct: it has every vector the server has (same ids sha256 `ab5b4059…`). None of the 326 are visual-image aliases (the snapshot's 34 aliases are separate).
 
-So: `/health` overstates picture coverage by 326; the real numbers are 43,695 with a vector and 6,575 without. Two follow-ups: (a) embed the 326 (images exist) in the next additive snapshot; (b) have `/health` report the vector count too (e.g. `coverage.vectors` from `snapshot.indexed_count`) so the two numbers can't be confused again.
+So: `/health` overstates picture coverage by 326; the real numbers are 43,695 with a vector and 6,575 without. Review each deliberate exclusion before proposing any change; also consider having `/health` report the vector count (e.g. `coverage.vectors` from `snapshot.indexed_count`) so the two numbers can't be confused again.
 
 ## Adding new cards: what has to be regenerated
 

@@ -13,6 +13,7 @@ class Settings(BaseSettings):
     data_dir: Path = Path("/data")
     card_index_publish: bool = True
     card_index_publish_dir: Path = Path('/data/phone-index')
+    health_vector_coverage: bool = False
     catalogue_backend: str = "sqlite"
     planetscale_database_url: SecretStr = SecretStr("")
     # Writable portfolio store: PlanetScale database pokesingle-product.

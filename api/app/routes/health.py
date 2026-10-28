@@ -134,13 +134,16 @@ def app_config(request: Request) -> AppConfigResponse:
     return config
 
 
-@router.get("/health", response_model=HealthResponse)
+@router.get("/health", response_model=HealthResponse, response_model_exclude_unset=True)
 def health(request: Request) -> HealthResponse:
     settings = request.app.state.settings
     runtime = request.app.state.runtime
     dbs = request.app.state.dbs
     coverage_model = coverage_payload(dbs.catalog)
     snapshot = runtime.snapshot
+    if settings.health_vector_coverage:
+        coverage_model.with_images = coverage_model.indexed
+        coverage_model.vectors = snapshot.indexed_count if snapshot is not None else None
     ready = runtime.ready
     return HealthResponse(
         status="ok" if ready else "not_ready",

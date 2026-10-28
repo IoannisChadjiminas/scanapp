@@ -6,6 +6,7 @@ services:
     image: scanapp-api:local
     environment:
       DATA_DIR: /data
+      HEALTH_VECTOR_COVERAGE: ${HEALTH_VECTOR_COVERAGE:-false}
       TMP_DIR: /tmp/scanapp
       PREPROCESS_CONFIG: ${PREPROCESS_CONFIG:-pad}
       USE_OCR: ${USE_OCR:-true}

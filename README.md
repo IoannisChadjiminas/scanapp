@@ -37,6 +37,12 @@ Runtime containers do not include Node.js, PyTorch, or PaddlePaddle. Those are o
 - `POST /api/v1/scans/{id}/feedback` — confirm, correct, or reject
 - `GET /api/v1/session/results` — anonymous session results
 - `GET /api/v1/health` — catalogue and model readiness
+
+`HEALTH_VECTOR_COVERAGE=true` adds `coverage.with_images` and
+`coverage.vectors` to health responses. The existing `coverage.indexed` field
+counts catalogue rows with images and is retained for compatibility. `vectors`
+is the loaded recognition snapshot's vector count, or `null` when no snapshot
+is loaded. The switch defaults to false in every deployment profile.
 - `GET /api/v1/review` — saved scan photos and rankings (`needs_attention`, `status`, `limit`, `offset`)
 - `GET /api/v1/review/summary` — markdown failure list
 - `GET /api/v1/review/cases/{id}` — one scan sidecar

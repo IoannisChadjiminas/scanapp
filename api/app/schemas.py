@@ -181,6 +181,8 @@ class Coverage(BaseModel):
     indexed: int
     missing_images: int
     languages: list[LanguageCoverage] = Field(default_factory=list)
+    with_images: int | None = None
+    vectors: int | None = None
 
 
 class HealthResponse(BaseModel):
