@@ -17,7 +17,7 @@ Sources: the 53 case files in `/data/review/cases`, the stored photos, and the `
 | Item | Result |
 |---|---|
 | Final status | matched 1, uncertain 23, printing_ambiguous 20, retake 9 |
-| Top candidate right (44 scans with a candidate) | 26 right; 9 right name and number with the printing unconfirmed; **7 wrong**; 2 for the owner to confirm |
+| Top candidate right (44 scans with a candidate) | 26 right; 9 right name and number with the printing unconfirmed; **7 wrong**; 2 more wrong if the owner's copies are the plain Paradox Rift print (`NO?`: the top card is the Prize Pack sibling). Owner confirmed Charmander and Pikachu are Evolutions, Brute Bonnet 123/182, Capsule 159/182 |
 | Wrong top candidates | 5 Charmander (shows Base Set `base1-46`, the card is Evolutions 9/108), 2 Pikachu (`en:base1-58`, `en:30th-c-014`; the card is Evolutions 35/108). All 7 stayed `printing_ambiguous`, and the right card was in the alternatives list in all 7 |
 | Phone sent an embedding | 0 of 53 (`embedding.none state=no_reader` in all 46 scans that logged it) |
 | Phone sent text | 21 of 53. Its name agreed with the server's read in 12, its number in 8, and disagreed in 4 and 2. Raw number candidates: 0 |
@@ -57,7 +57,7 @@ Contributing to everything: no phone embedding (53 of 53), phone text on 21 of 5
 
 **NP, parser (7).** `0c8772bf`, `903af2db`, `0b28268b`, `63a29eef` (Comfey), `2e503903` (Zorua): the card prints the set code and the fraction together, with no space (30th Celebration: `30C` then the number). The parser strips known set codes (PAL, SV, M24 and so on) but not `30C`, so it keeps only the denominator `128`, which contradicts card number 077. `8fd2e758`, `94a13d29` (Toxel): the promo number is printed with its `MEP` prefix; the catalogue number is the bare `078`, and the only promo prefix the matcher accepts is `SVP`, so it calls this a conflict. I reproduced both with the repo's own functions (`extract_collector_candidates`, `number_matches_identifiers`) on typed examples of the printed formats and on the stored hits: a `30C`-prefixed fraction is cut down to its denominator, which does not match; `MEP078` and `M078` return `False`; the bare fraction returns `True`. All 7 had visual scores of 0.74 to 0.88 and correct names or numbers, and up to 5 of them (visual 0.80 or more, gap 0.04 or more, no local artwork: `0c8772bf`, `903af2db`, `8fd2e758`, `94a13d29`, and `2e503903` on the 0.04 edge) would have reached `visual_ok` without the false conflict.
 
-**TW, twins (7).** Capsule: `a0381ec0`, `759d82f9`, `6d96ea3e`, `79cda6b3`, `453aaf28`. Brute Bonnet: `8224e3f4`, `5c65499a`. Name, number and total are right; the catalogue holds Paradox Rift and Prize Pack Series Five with the same number, and the stamp check saw no stamp (it says that not seeing a stamp does not prove its absence). `printing_ambiguous` is the right answer. Two scans, `c0781852` (Brute Bonnet) and `759d82f9` (Capsule), show the Prize Pack sibling on top; that needs the owner's word (below).
+**TW, twins (7).** Capsule: `a0381ec0`, `759d82f9`, `6d96ea3e`, `79cda6b3`, `453aaf28`. Brute Bonnet: `8224e3f4`, `5c65499a`. Name, number and total are right; the catalogue holds Paradox Rift and Prize Pack Series Five with the same number, and the stamp check saw no stamp (it says that not seeing a stamp does not prove its absence). `printing_ambiguous` is the right answer. Two scans, `c0781852` (Brute Bonnet) and `759d82f9` (Capsule), show the Prize Pack sibling on top. The owner gave the card numbers but did not say whether the copies carry the Prize Pack stamp; treated here as the plain print (so `NO?`), still unconfirmed.
 
 **VT, reprint ties (6).** Pikachu `297086be`, `124e824f`, `1608bbc6`, `9a6fdfa7`, `39084433` and Charmeleon `fe5f2a08`. The right number was read (35/108 or 24/102) and the right card is top, but the picture's leader is the older print (Base Set Pikachu `base1-58`, 0.03 to 0.06 above the Evolutions card), so the rule "a visual leader that contradicts the footer means conflict" fires and the status stays `uncertain`. This is the safe behavior; it is the cost of not letting the footer override the picture.
 
@@ -94,12 +94,17 @@ Every change goes behind a new switch, default off, per the project rule. Gain f
 
 Even with 1 to 3, the early-answer path stays off until the phone embedding ships (another session is on it), and `STAGE1_REQUIRE_CONFIRMATION=true` keeps early answers visibly `uncertain`. Tell me if you want that switch discussed as a separate decision.
 
-## Questions for the owner
+## Owner's answers (2026-10-25)
 
-- **Brute Bonnet and the Capsule:** are your copies the plain Paradox Rift print, or the Play! Pokémon Prize Pack Series Five print with the small stamp? `759d82f9` (Capsule) and `c0781852` (Brute Bonnet) show the Prize Pack card on top and I could not judge from the photo.
-- **Charmeleon:** which edition (unlimited, shadowless, 1st edition)? The photos cannot tell, and the catalogue lists five printings of 24/102.
-- **The three unidentified retakes** `00449c1d`, `25bc9fd7`, `4f09be32`: which cards were they?
-- Please confirm the Charmander (Evolutions 9/108) and Pikachu (Evolutions 35/108) copies; I read the footers by eye on `5ab7d290`, `127e43f4` and `1608bbc6`.
+- Brute Bonnet is 123/182 and the Capsule is 159/182. The owner did not say Prize Pack, so they are treated as the plain Paradox Rift print (`sv04`); the stamp question is not explicitly confirmed.
+- Charmeleon is 24/102, normal edition (not 1st edition). Shadowless versus unlimited was not stated.
+- Charmander (Evolutions 9/108) and Pikachu (Evolutions 35/108) are confirmed.
+
+## Still open for the owner
+
+- Prize Pack stamp or plain print on the Brute Bonnet and Capsule copies (decides `759d82f9` and `c0781852`).
+- Charmeleon: shadowless or unlimited.
+- The three unidentified retakes `00449c1d`, `25bc9fd7`, `4f09be32`: which cards were they?
 
 ## What I could not verify
 
@@ -107,13 +112,13 @@ Even with 1 to 3, the early-answer path stays off until the phone embedding ship
 - What the phone's text actually contained (only its agreement with the server's read is logged), and why it was late or absent on 32 scans; 7 scans have no phone event lines at all.
 - The Android still's real resolution. The code asks for 4000 x 3000, but the upload is 641 x 896 and the queued source is about 0.65 MB against 2.5 MB on iPhone. The digit height (about 8 pixels) is my estimate from viewing the crops, not a measurement.
 - Every "would become matched" count in this report. They come from the logged scores and rules, not from a replay.
-- The Prize Pack, Charmeleon edition and the three unidentified cards (see above).
+- The Prize Pack stamp, Charmeleon shadowless versus unlimited, and the three unidentified cards (see above).
 - Whether `fix 2` covers the live camera path.
 - The catalogue entries themselves: the catalogue SQLite on staging holds only a subset of ids, so the set totals (128, 112, 182, 108, 102) come from the stored case rows, not from the catalogue file.
 
 ## Per-scan results
 
-Columns: status; top candidate; whether it is the right card (`yes`, `yes*` = right name and number with the printing unconfirmed, `NO`, `owner?`, `-` = no candidate); what the phone sent (text yes or no, with `n` for name and `#` for number agreeing with the server's read: Y, N or `-` for not comparable; then the outline state, `a` or `n/a` = not logged); what the server read of name and number (`ok`/`no`; number `read ok` = parsed and usable, `read, lost in parser` = on the page but dropped, `garbled`, `misread or stray digits`, `none`); the top candidate's visual score and its gap to the best different card (negative means another card looked better); main cause; stage 0 sharpness; share of the upload the card fills. The phone sent no embedding on any scan, and no scan was answered early.
+Columns: status; top candidate; whether it is the right card (`yes`, `yes*` = right name and number with the printing unconfirmed, `NO`, `NO?` = Prize Pack sibling on top, wrong if the copy is the plain print, `-` = no candidate); what the phone sent (text yes or no, with `n` for name and `#` for number agreeing with the server's read: Y, N or `-` for not comparable; then the outline state, `a` or `n/a` = not logged); what the server read of name and number (`ok`/`no`; number `read ok` = parsed and usable, `read, lost in parser` = on the page but dropped, `garbled`, `misread or stray digits`, `none`); the top candidate's visual score and its gap to the best different card (negative means another card looked better); main cause; stage 0 sharpness; share of the upload the card fills. The phone sent no embedding on any scan, and no scan was answered early.
 
 #### Comfey (30th Celebration 077/128, `en:30th-077`): 9 scans
 
@@ -158,7 +163,7 @@ Columns: status; top candidate; whether it is the right card (`yes`, `yes*` = ri
 |---|---|---|---|---|---|---|---|---|---|---|
 
 | `a0381ec0` | printing_ambiguous | en:sv04-159 | yes* | yes n:Y #:Y / found | ok / read ok | 0.78 | -0.02 | TW | 503.9 | 0.538 |
-| `759d82f9` | uncertain | en:PPS5-PAR-159 | owner? | no / found | ok / read ok | 0.77 | -0.01 | TW | none | none |
+| `759d82f9` | uncertain | en:PPS5-PAR-159 | NO? \| no / found | ok / read ok | 0.77 | -0.01 | TW | none | none |
 | `6d96ea3e` | printing_ambiguous | en:sv04-159 | yes* | no / found | no / read ok | 0.79 | -0.03 | TW | none | 0.220 |
 | `79cda6b3` | printing_ambiguous | en:sv04-159 | yes* | no / found | no / read ok | 0.85 | -0.00 | TW | 760.2 | 0.578 |
 | `453aaf28` | printing_ambiguous | en:sv04-159 | yes* | no / found | ok / read ok | 0.79 | -0.00 | TW | 407.4 | 0.225 |
@@ -170,7 +175,7 @@ Columns: status; top candidate; whether it is the right card (`yes`, `yes*` = ri
 
 | `8224e3f4` | printing_ambiguous | en:sv04-123 | yes* | yes n:Y #:N / found | ok / read ok | 0.84 | -0.02 | TW | 1232.0 | 0.559 |
 | `75c27ac6` | retake | - | - | no / full_frame_card | no / none | - | - | RB | 361.7 | 1.000 |
-| `c0781852` | printing_ambiguous | en:PPS5-PAR-123 | owner? | yes n:N #:- / found | ok / none | 0.59 | -0.08 | NM | 455.0 | 0.370 |
+| `c0781852` | printing_ambiguous | en:PPS5-PAR-123 | NO? \| yes n:N #:- / found | ok / none | 0.59 | -0.08 | NM | 455.0 | 0.370 |
 | `5c65499a` | printing_ambiguous | en:sv04-123 | yes* | no / found | ok / read ok | 0.82 | -0.03 | TW | 1000.1 | 0.118 |
 | `f537d664` | printing_ambiguous | en:sv04-123 | yes* | yes n:N #:- / n/a | ok / none | 0.67 | -0.07 | NM | 782.1 | 0.230 |
 | `cd4d3cb0` | printing_ambiguous | en:sv04-123 | yes* | yes n:N #:- / found | ok / misread or stray digits | 0.74 | -0.04 | NM | 905.6 | 0.147 |
