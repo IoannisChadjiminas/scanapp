@@ -227,3 +227,33 @@ exact-name rows. A Pokedex number on a holder label still added the holder
 bonus (Bulbasaur 001, +0.0792); it no longer does. The probe now reads saved
 API responses (`best_match`, `alternatives`, `printing_review`) and stops when
 it finds no card ids.
+
+## VINTAGE_NAME_CHOICES (default off)
+
+Since no number, name or picture change recovers `ja:PMCG1-021`, this switch
+stops trying to pick it and offers it instead. When a scan already needs
+confirmation (`uncertain` or `printing_ambiguous`), reads as Japanese, reads no
+printed fraction, and has a name-strip OCR read at >= 0.99 that is exactly the
+catalogue name of 1-3 cards in PMCG1-6 or neo1-4, those cards are added to the
+scan's `printing_review` list. Without an existing review list, one is created
+with the shown card first. The card shown first, the status and the confidence
+do not change, so it cannot create a wrong answer; the cost of a bad trigger is
+an extra choice.
+
+The phone app shows `printing_review` for any status, and the feedback endpoint
+accepts a confirm of any offered card (and of any card on `uncertain` scans), so
+no app change is needed. On `uncertain` scans the app pre-selects no carousel
+card; check this on a device.
+
+Both Charizard photos read リザードン in the name strip at >= 0.9995 and print no
+fraction, so both should now offer `ja:PMCG1-021`; this needs the full-scanner
+run to confirm. Gengar `ja:VS1-021` reads 021/141 and is not touched.
+
+Before enabling:
+1. Export again (the export now includes `confirmed_card_id`) and run
+   `scripts/stored_scan_replay/replay_vintage_name.py <cases> --catalog <catalog>`.
+   Review every listed scan; `offered_but_confirmed_other` counts noise.
+2. Full scanner with the switch on: both Charizard photos must offer
+   `ja:PMCG1-021` with the same first card and status; the vintage panel and the
+   four review negatives must show no first-card or status change.
+3. On a phone: choose `ja:PMCG1-021` from the list on each photo and save.

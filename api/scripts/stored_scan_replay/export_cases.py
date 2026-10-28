@@ -44,4 +44,5 @@ for path in glob.glob('/data/review/cases/*.json'):
         'collector': o.get('collector_text'), 'name': o.get('name_text'),
         'failed': o.get('failed'), 'lang': o.get('detected_language'),
         'review': [p.get('card_id') for p in plausible],
+        'confirmed': d.get('confirmed_card_id'), 'feedback': d.get('feedback_action'),
     }))
