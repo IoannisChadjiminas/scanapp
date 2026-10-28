@@ -22,7 +22,8 @@ def _lane(runtime):
     yield runtime
 
 
-def _client(monkeypatch, *, early=False, background=False, decision=None, stream=False, diagnostics=False):
+def _client(monkeypatch, *, early=False, background=False, decision=None, stream=False, diagnostics=False,
+            phone_inputs=False):
     from concurrent.futures import ThreadPoolExecutor
 
     from fastapi import FastAPI
@@ -62,7 +63,8 @@ def _client(monkeypatch, *, early=False, background=False, decision=None, stream
     executor = ThreadPoolExecutor(max_workers=1)
     app.state.settings = Settings(
         _env_file=None, scan_stream_results=stream, stage1_early_exit=early,
-        stage1_background_check=background, stage1_sample_rate=1.0, store_captures=False)
+        stage1_background_check=background, stage1_sample_rate=1.0, store_captures=False,
+        stage1_check_phone_inputs=phone_inputs, client_text_hints=True)
     app.state.settings.stage1_diagnostics = diagnostics
     app.state.executor = executor
     app.state.scan_limiter = ScanLimiter(0)
@@ -160,7 +162,8 @@ def test_background_check_logs_a_disagreement_and_keeps_the_photo(tmp_path, capl
         assert checker.run_job(job) is False
     assert checker.checks == 1 and checker.disagreements == 1
     line = next(record.getMessage() for record in caplog.records if record.getMessage().startswith('stage1_check'))
-    assert line == 'stage1_check scan_id=scan-1 stage1_card=en:base1-25 full_card=en:base1-4 agree=false'
+    assert line == ('stage1_check scan_id=scan-1 stage1_card=en:base1-25 full_card=en:base1-4 agree=false '
+                    'inputs=photo')
     assert (tmp_path / 'scan-1-stage1-disagree.jpg').read_bytes() == b'photo-bytes'
 
 
@@ -188,3 +191,66 @@ def test_route_logs_gate_metadata_only_when_the_diagnostics_flag_is_on(monkeypat
             assert 'text_candidates=en:base1-24 text_candidate_count=1' in line
         else:
             assert 'vector_top=off' in line and 'text_candidates=' not in line
+
+
+_PHONE_FORM = {
+    'client_text': '{"v":1,"engine":"mlkit-latin","name":"Charmander","name_conf":0.9,'
+                   '"number":"9/108","number_conf":0.9,"ms":300}',
+    'card_quad': '0.1,0.1,0.9,0.1,0.9,0.9,0.1,0.9',
+    'crop_x': '0.05', 'crop_y': '0.05', 'crop_w': '0.9', 'crop_h': '0.9', 'rotation': '90',
+    'locale': 'en_GB',
+}
+
+
+def _check_kwargs(monkeypatch, *, phone_inputs):
+    decision = Decision(True, '1b', 'en:xy12-9', 0.0147, None, 'artwork', 277.0)
+    client, executor, calls = _client(
+        monkeypatch, early=True, background=True, decision=decision, phone_inputs=phone_inputs)
+    with client, executor:
+        response = client.post('/scans', data=_PHONE_FORM, files={'image': ('card.jpg', b'jpeg', 'image/jpeg')})
+    assert response.status_code == 200
+    job = client.app.state.stage1_checker._queue.get_nowait()
+    job.recognize(b'photo-bytes')
+    return job, calls['pipeline_kwargs'][-1]
+
+
+def test_background_check_sees_the_photo_alone_by_default(monkeypatch):
+    job, kwargs = _check_kwargs(monkeypatch, phone_inputs=False)
+    assert job.inputs == 'photo'
+    for key in ('client_text', 'card_quad', 'crop_x', 'rotation', 'locale', 'phone_inputs'):
+        assert key not in kwargs
+    assert kwargs['results'] is None and kwargs['persist'] is False and kwargs['store_capture'] is False
+
+
+def test_background_check_with_the_flag_sees_what_the_phone_sent(monkeypatch):
+    job, kwargs = _check_kwargs(monkeypatch, phone_inputs=True)
+    assert job.inputs == 'phone'
+    assert kwargs['client_text'].name == 'Charmander' and kwargs['client_text'].number == '9/108'
+    assert kwargs['client_text_reason'] == 'ok'
+    assert kwargs['card_quad'] == [(0.1, 0.1), (0.9, 0.1), (0.9, 0.9), (0.1, 0.9)]
+    assert (kwargs['crop_x'], kwargs['crop_y'], kwargs['crop_w'], kwargs['crop_h']) == (0.05, 0.05, 0.9, 0.9)
+    assert kwargs['rotation'] == 90 and kwargs['locale'] == 'en_GB' and kwargs['skip_detect'] is False
+    assert kwargs['phone_inputs'] is not None
+    # Still a check: nothing saved, nothing scheduled.
+    assert kwargs['results'] is None and kwargs['persist'] is False and kwargs['store_capture'] is False
+    assert '_progress_observer' not in kwargs and '_grading_completion' not in kwargs
+
+
+def test_background_check_logs_which_inputs_it_had(caplog):
+    class Full:
+        suggestions = [SimpleNamespace(card_id='en:xy12-9')]
+
+    job = CheckJob('scan-3', 'en:xy12-9', b'', lambda _data: Full(), inputs='phone')
+    with caplog.at_level(logging.INFO, logger='scan.diagnostics'):
+        assert Stage1Checker().run_job(job) is True
+    assert caplog.records[-1].getMessage().endswith('agree=true inputs=phone')
+
+
+def test_live_full_pipeline_gets_the_same_phone_inputs(monkeypatch):
+    client, executor, calls = _client(monkeypatch, early=False)
+    with client, executor:
+        client.post('/scans', data=_PHONE_FORM, files={'image': ('card.jpg', b'jpeg', 'image/jpeg')})
+    kwargs = calls['pipeline_kwargs'][-1]
+    assert kwargs['client_text'].number == '9/108' and kwargs['rotation'] == 90
+    assert kwargs['card_quad'] == [(0.1, 0.1), (0.9, 0.1), (0.9, 0.9), (0.1, 0.9)]
+    assert kwargs['crop_w'] == 0.9 and kwargs['locale'] == 'en_GB'

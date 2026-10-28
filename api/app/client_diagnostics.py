@@ -11,9 +11,16 @@ _EVENT = re.compile(r"^[a-zA-Z0-9._-]{1,64}$")
 _BUILD = re.compile(r"^[0-9A-Za-z.]{1,20}\+[0-9]{1,6}$|^[0-9A-Za-z.]{1,20}$")
 _INT_KEYS = {"status", "elapsed_ms", "bytes", "queued", "entries", "quality", "frames", "found",
              "wait_ms", "missed_ms", "steady_ms", "focus_ms", "held_ms", "looks", "holder", "coasted",
-             "same_ms", "busy_ms", "jumps", "ratio"}
-_NUMBER_KEYS = {"fps", "detect_ms", "print_gap"}
-_TEXT_KEYS = {"route", "host", "cf_ray", "server_trace", "language", "server_scan", "error_type", "state", "scan", "codec", "price_source"}
+             "same_ms", "busy_ms", "jumps", "ratio",
+             # The phone's own match and provisional card, and the footer read.
+             "ms_after_shutter", "round_trip_ms", "shutter_to_done_ms", "rows", "read_ms",
+             "extra_wait_ms", "crop_w", "crop_h", "candidates", "guide_w", "guide_h"}
+_NUMBER_KEYS = {"fps", "detect_ms", "print_gap", "native_ms", "load_ms"}
+_TEXT_KEYS = {"route", "host", "cf_ray", "server_trace", "language", "server_scan", "error_type", "state", "scan", "codec", "price_source",
+              # Catalogue card ids and short reason words only (the token pattern), never card text.
+              "card", "provisional", "final", "reason", "kind"}
+# Yes/no fields. Only a real boolean is kept, so "name"/"number" can never carry the card's text.
+_BOOL_KEYS = {"cancelled", "stored", "guessed", "agree", "ok", "name", "number", "text_name", "text_number"}
 _MAX_EVENTS = 40
 _MAX_TIMINGS = 40
 
@@ -80,6 +87,30 @@ def _event_line(item: Any) -> str | None:
         "ratio",
         "print_gap",
         "build",
+        "card",
+        "provisional",
+        "final",
+        "agree",
+        "reason",
+        "ms_after_shutter",
+        "native_ms",
+        "round_trip_ms",
+        "shutter_to_done_ms",
+        "kind",
+        "rows",
+        "load_ms",
+        "ok",
+        "name",
+        "number",
+        "text_name",
+        "text_number",
+        "read_ms",
+        "extra_wait_ms",
+        "crop_w",
+        "crop_h",
+        "candidates",
+        "guide_w",
+        "guide_h",
     ):
         value = _scalar(key, item.get(key))
         if value is not None:
@@ -107,7 +138,7 @@ def _scalar(key: str, value: Any) -> str | None:
         return _token(value)
     if key == "build" and isinstance(value, str) and _BUILD.match(value):
         return value
-    if key in {"cancelled", "stored", "guessed"} and isinstance(value, bool):
+    if key in _BOOL_KEYS and isinstance(value, bool):
         return "true" if value else "false"
     if key == "status" and isinstance(value, str):
         return _token(value)

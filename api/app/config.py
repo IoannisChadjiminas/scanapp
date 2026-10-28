@@ -81,6 +81,11 @@ class Settings(BaseSettings):
     # number name exactly one promo card. Restricted to the promo set table; never a
     # different number, a two-letter error or an unrelated set. A policy change: replay first.
     ocr_promo_prefix_near: bool = False
+    # A number read without a total or set code ("20") can be attack damage or HP from a
+    # footer strip that missed the footer. It may not lift a card whose picture is much weaker
+    # than the picture's leader, and the leader's gap is measured to a real rival, not to its
+    # own print in another language. A policy change: replay first.
+    rank_bare_number_guard: bool = False
     # When an abstaining scan has a confident printed fraction plus a name read anywhere in
     # its OCR lines that together narrow the catalogue to 1-3 cards, add those cards as
     # candidates for local artwork verification and, if unverified, return them as
@@ -116,6 +121,15 @@ class Settings(BaseSettings):
     # number from the phone; 'all': the server reads no card text. 'off' (default): never.
     # The phone's text then becomes evidence: replay the frozen panel before enabling it.
     client_text_ocr: str = 'off'
+    # With CLIENT_TEXT_OCR on: the phone's name and number may name any card in the visual top 20
+    # (not only the visual leader), when they name exactly one card. A result that used the phone's
+    # number is never 'matched' (it stays 'uncertain'). Off (default): the leader rule only.
+    client_text_top20: bool = False
+    # With CLIENT_TEXT_OCR=footer: the phone's name and number may stand in for the footer read with no
+    # confidence floor, when they name exactly one card in the visual top 20 and the server's own title read
+    # agrees (the rule in client_text.skip_policy). The footer and its re-reads are not run. A result that used
+    # the phone's number is never 'matched'. Off (default): the 0.9 rule above applies.
+    client_text_agree: bool = False
     # Optional NDJSON progress stream; legacy scans remain a single JSON response.
     scan_stream_results: bool = True
     enable_matched: bool = True
@@ -135,6 +149,8 @@ class Settings(BaseSettings):
     session_cookie: str = "scanapp_session"
     session_ttl_days: int = 30
     store_captures: bool = True
+    # Only with STORE_CAPTURES on: also keep the exact upload bytes beside the review copies.
+    store_original_uploads: bool = False
     review_token: str = ""
     session_create_hourly: int = 30
     cardmarket_helper_enabled: bool = False
@@ -221,6 +237,8 @@ class Settings(BaseSettings):
     # Production stays off until the background check has stayed clean.
     stage1_early_exit: bool = False
     stage1_background_check: bool = False
+    # The background check gets the phone's text, outline, crop and rotation, as the live scan does.
+    stage1_check_phone_inputs: bool = False
     stage1_sample_rate: float = 1.0
     stage1_require_confirmation: bool = True
     stage1b_text_verify: bool = False

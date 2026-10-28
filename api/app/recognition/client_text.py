@@ -21,6 +21,7 @@ import unicodedata
 from typing import Any
 
 from app.physical_cards import is_tcg_pocket_card
+from app.set_totals import set_total
 from app.recognition.ocr import OcrHit, OcrResult
 from app.recognition.printing import printing_key
 from app.recognition.rank import (RELIABLE_COLLECTOR_CONF, accepted_collector_numbers,
@@ -34,6 +35,8 @@ OCR_MODES = ('off', 'footer', 'all')
 MAX_BYTES = 1280
 CANDIDATE_REGIONS = ('footer', 'corner_left', 'corner_right', 'label')
 MAX_CANDIDATES = 5
+# With CLIENT_TEXT_TOP20 the phone's name and number may name a card anywhere in this many visual candidates.
+TOP_N_NAMED = 20
 _LABEL_KEYS = {
     'label_name', 'label_name_conf', 'label_number', 'label_number_conf',
     'label_set', 'label_language', 'label_grader', 'label_grade',
@@ -163,11 +166,13 @@ def parse_client_text(raw: str | None) -> tuple[ClientText | None, str]:
     return hint, 'ok'
 
 
-def printings_with_number(catalog, lead: dict[str, Any], number: str) -> set[tuple] | None:
+def printings_with_number(catalog, lead: dict[str, Any], number: str, *,
+                          set_totals: bool = False) -> set[tuple] | None:
     """Printings of the leader's name and language that a phone number fits.
 
-    A bare catalogue number fits any denominator, so this can only over-count.
-    None when the family is too large to inspect.
+    A bare catalogue number fits any denominator, so without `set_totals` this can only over-count
+    (Charmander 9 in a 25-card set would fit "9/108"). With `set_totals` every row gets its printed
+    set total first, as the leader already does. None when the family is too large to inspect.
     """
     rows = catalog.execute(
         'SELECT id, name, set_id, set_name, collector_number, printed_collector_number, language '
@@ -180,6 +185,11 @@ def printings_with_number(catalog, lead: dict[str, Any], number: str) -> set[tup
         card = dict(row)
         if is_tcg_pocket_card(card.get('language'), card.get('set_id')):
             continue
+        if set_totals:
+            # An unknown total keeps the bare number, which then fits any denominator (over-count, refused).
+            known = set_total(catalog, card.get('language'), card.get('set_id'))
+            if known is not None:
+                card['set_total'] = known
         if number_matches_identifiers([number], accepted_collector_numbers(card)) is True:
             found.add(printing_key(card))
     return found
@@ -231,9 +241,38 @@ def fast_path_decision(hint: ClientText | None, candidates: list[dict], lead: di
     return True, 'eligible'
 
 
+def named_in_top(hint: ClientText, top: list[dict], lead_for, catalog, *, mode: str,
+                 set_totals: bool = False):
+    """The one card in the visual top list that the phone's name and number name. Decided before OCR.
+
+    Used only with CLIENT_TEXT_TOP20. The visual leader is not required: any card in the top list
+    whose name matches and whose collector number fits, counted with its set total. Exactly one card
+    may qualify (aliases of one card count once), and the catalogue must hold one printing of that
+    name with that number. A same-name reprint in the list makes two qualifying cards, so it is refused.
+    Returns (allowed, card_id, reason).
+    """
+    named: dict[str, tuple[dict, dict]] = {}
+    for candidate in top:
+        lead = lead_for(candidate['card_id'])
+        if lead is None or not name_match(hint.name, candidate['name']):
+            continue
+        if number_matches_identifiers([hint.number], accepted_collector_numbers(lead)) is not True:
+            continue
+        key = candidate['card_id'].split(':', 1)[-1]
+        named.setdefault(key, (candidate, lead))
+    if not named:
+        return False, None, 'not_in_top'
+    if len(named) > 1:
+        return False, None, 'several_in_top'
+    (candidate, lead), = named.values()
+    if printings_with_number(catalog, lead, hint.number, set_totals=set_totals) != {printing_key(lead)}:
+        return False, None, 'printings'
+    return True, candidate['card_id'], 'eligible_top'
+
+
 def ocr_skip_decision(hint: ClientText | None, candidates: list[dict], lead_for, catalog, *,
                       mode: str, image_size, min_confidence: float, min_visual: float,
-                      min_gap: float) -> tuple[bool, str | None, str]:
+                      min_gap: float, top_n: int = 1, set_totals: bool = False) -> tuple[bool, str | None, str]:
     """May the phone's read stand in for server OCR on this frame? Decided before OCR.
 
     The phone must confirm the visual leader by name and number, and the catalogue must
@@ -258,6 +297,8 @@ def ocr_skip_decision(hint: ClientText | None, candidates: list[dict], lead_for,
         return False, None, 'frame_shape'
     if not candidates:
         return False, None, 'no_candidates'
+    if top_n > 1:
+        return named_in_top(hint, candidates[:top_n], lead_for, catalog, mode=mode, set_totals=set_totals)
     first = candidates[0]
     lead = lead_for(first['card_id'])
     if lead is None:
@@ -280,6 +321,32 @@ def ocr_skip_decision(hint: ClientText | None, candidates: list[dict], lead_for,
     return True, first['card_id'], 'eligible'
 
 
+@dataclass(frozen=True)
+class SkipPolicy:
+    min_confidence: float  # both phone confidences must reach this (0 = no floor)
+    top_n: int  # visual candidates the phone may name (1 = the leader only)
+    cap_matched: bool  # a result that used the phone's number is never 'matched'
+    set_totals: bool  # printings are counted with their printed set totals
+    agree: bool  # CLIENT_TEXT_AGREE stands in (the footer and its re-reads are not run)
+
+
+def skip_policy(*, ocr_mode: str, top20: bool, agree: bool, min_confidence: float) -> SkipPolicy:
+    """Which rule decides whether the phone's read may stand in for the footer read.
+
+    CLIENT_TEXT_AGREE (footer mode only, so the server's own title read stays in the loop) drops the
+    confidence floor: the agreement itself is the test. The phone's name and number must name exactly one
+    card in the visual top 20, counted with set totals, and the server's title read must agree (see
+    `server_read_agrees`). CLIENT_TEXT_TOP20 searches the top 20 with the confidence floor. Neither flag
+    leaves the leader rule with the floor, unchanged.
+    """
+    if agree and ocr_mode == 'footer':
+        return SkipPolicy(min_confidence=0., top_n=TOP_N_NAMED, cap_matched=True, set_totals=True, agree=True)
+    if top20:
+        return SkipPolicy(min_confidence=min_confidence, top_n=TOP_N_NAMED, cap_matched=True,
+                          set_totals=False, agree=False)
+    return SkipPolicy(min_confidence=min_confidence, top_n=1, cap_matched=False, set_totals=False, agree=False)
+
+
 def phone_read(hint: ClientText) -> OcrResult:
     """The phone's text as the card read, for CLIENT_TEXT_OCR=all."""
     return OcrResult(name_text=hint.name, collector_text=hint.number, lines=[hint.name, hint.number],
@@ -288,10 +355,23 @@ def phone_read(hint: ClientText) -> OcrResult:
                      failed=False, client_text_used='all')
 
 
-def with_phone_number(observed: OcrResult, hint: ClientText) -> OcrResult:
-    """A server title-only read completed with the phone's collector number."""
+# identity.structured_identity_agrees counts a collector read only at or above this confidence.
+STRUCTURED_COLLECTOR_CONF = .85
+
+
+def with_phone_number(observed: OcrResult, hint: ClientText, *, as_footer: bool = False) -> OcrResult:
+    """A server title-only read completed with the phone's collector number.
+
+    `as_footer` (CLIENT_TEXT_AGREE only): the number is accepted at the confidence a reliable server
+    footer read would carry. The agreement rule already tied the number to exactly one printing in the
+    top 20 with set totals, and the cap keeps such a result from being 'matched'. Without it the
+    phone's ML Kit score (0.54-0.84 on the whole footer line) would leave the printing unproven.
+    """
+    confidence = hint.number_conf
+    if as_footer:
+        confidence = max(confidence or 0., STRUCTURED_COLLECTOR_CONF)
     return replace(observed, collector_text=hint.number, lines=[*observed.lines, hint.number],
-                   hits=[*observed.hits, OcrHit(hint.number, hint.number_conf, 'collector')],
+                   hits=[*observed.hits, OcrHit(hint.number, confidence, 'collector')],
                    footer_skipped=False, client_text_used='number')
 
 

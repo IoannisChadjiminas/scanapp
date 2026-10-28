@@ -640,3 +640,77 @@ def test_japanese_visual_leader_keeps_its_print_without_english_words() -> None:
                     detected_languages=ranking_languages(decision, texts, "ja"),
                     name_confidence=0., require_confident_ocr=True)
     assert ranked[0]["card_id"] == "ja:SV2a-185"
+
+
+def _guard(monkeypatch, on: bool) -> None:
+    from app.config import get_settings
+
+    monkeypatch.setattr(get_settings(), "rank_bare_number_guard", on)
+
+
+def _bare_number_scan() -> list[dict]:
+    # The shape of a real scan: the picture's leader, its Japanese print just behind,
+    # English look-alikes, and a much weaker card whose number is the attack damage
+    # the footer strip read instead of the card's own number.
+    return [
+        _card("en:mep-078", "Toxel", "078", .85),
+        _card("ja:M-P-047", "エレズン", "047", .80, language="ja"),
+        _card("en:a-17", "Flaaffy", "17", .785),
+        _card("en:b-5", "Hoothoot", "HGSS05", .776),
+        _card("en:dp1-20", "Bibarel", "20", .60),
+    ]
+
+
+def test_bare_number_lifts_a_much_weaker_picture_without_the_guard(monkeypatch):
+    _guard(monkeypatch, False)
+    ranked = rerank(_bare_number_scan(), None, [OcrHit("20", .99, "collector")], False,
+                    detected_languages=("en",), require_confident_ocr=True)
+    assert ranked[0]["card_id"] == "en:dp1-20"
+    assert "name_agrees" not in ranked[0]
+
+
+def test_guard_keeps_the_visual_leader_over_a_bare_number(monkeypatch):
+    _guard(monkeypatch, True)
+    ranked = rerank(_bare_number_scan(), None, [OcrHit("20", .99, "collector")], False,
+                    detected_languages=("en",), require_confident_ocr=True)
+    assert ranked[0]["card_id"] == "en:mep-078"
+    # The leader still carries the conflict, so it still needs confirmation.
+    assert ranked[0]["collector_conflict"] is True
+
+
+def test_guard_lets_a_full_fraction_win(monkeypatch):
+    _guard(monkeypatch, True)
+    cards = _bare_number_scan()
+    cards[-1]["collector_number"] = "20"
+    cards[-1]["printed_collector_number"] = "20/130"
+    ranked = rerank(cards, None, [OcrHit("20/130", .99, "collector")], False,
+                    detected_languages=("en",), require_confident_ocr=True)
+    assert ranked[0]["card_id"] == "en:dp1-20"
+
+
+def test_guard_lets_a_name_that_agrees_win(monkeypatch):
+    _guard(monkeypatch, True)
+    ranked = rerank(_bare_number_scan(), "Bibarel", [OcrHit("20", .99, "collector")], False,
+                    detected_languages=("en",), name_confidence=.95, require_confident_ocr=True)
+    assert ranked[0]["card_id"] == "en:dp1-20"
+
+
+def test_guard_leaves_close_pictures_to_the_number(monkeypatch):
+    _guard(monkeypatch, True)
+    cards = _bare_number_scan()
+    cards[-1]["visual_score"] = cards[-1]["combined_score"] = .80
+    ranked = rerank(cards, None, [OcrHit("20", .99, "collector")], False,
+                    detected_languages=("en",), require_confident_ocr=True)
+    assert ranked[0]["card_id"] == "en:dp1-20"
+
+
+def test_guard_measures_the_gap_to_a_rival_in_the_scan_language(monkeypatch):
+    from app.recognition.rank import _keep_visual_leader
+
+    rows = [dict(r, combined_score=r["visual_score"]) for r in _bare_number_scan()[:3]]
+    rows[0]["combined_score"] = .70  # an OCR penalty dropped the leader below the others
+    ranked = sorted(rows, key=lambda r: r["combined_score"], reverse=True)
+    # Without the guard the Japanese print (.05 behind) sets the gap; with it, Flaaffy (.065).
+    assert _keep_visual_leader(ranked, languages=("en",), min_gap=.06)[0]["card_id"] != "en:mep-078"
+    assert _keep_visual_leader(ranked, languages=("en",), min_gap=.06,
+                               guard=True)[0]["card_id"] == "en:mep-078"

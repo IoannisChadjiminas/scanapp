@@ -53,6 +53,8 @@ services:
       OCR_SET_CODE_PREFIX: ${OCR_SET_CODE_PREFIX:-false}
       # Promo prefix one letter off (MP078 for MEP078) and bare promo numbers gated by name. Off until replayed.
       OCR_PROMO_PREFIX_NEAR: ${OCR_PROMO_PREFIX_NEAR:-false}
+      # A bare number cannot lift a much weaker picture over the leader (replay first).
+      RANK_BARE_NUMBER_GUARD: ${RANK_BARE_NUMBER_GUARD:-false}
       TEXT_IDENTITY_CANDIDATES: ${TEXT_IDENTITY_CANDIDATES:-true}
       # Slab labels: set + number from CGC/PSA/BGS labels (18a, SV59, TG01) become verified
       # candidates. docs/experiments/slab-label-identity-20261021.md
@@ -82,6 +84,8 @@ services:
       # Confirmation stays required. The background check runs on every stage 1 answer.
       STAGE1_EARLY_EXIT: ${STAGE1_EARLY_EXIT:-true}
       STAGE1_BACKGROUND_CHECK: ${STAGE1_BACKGROUND_CHECK:-true}
+      # The check sees the phone's text and outline too (off: the photo alone).
+      STAGE1_CHECK_PHONE_INPUTS: ${STAGE1_CHECK_PHONE_INPUTS:-false}
       STAGE1_SAMPLE_RATE: ${STAGE1_SAMPLE_RATE:-1.0}
       STAGE1_REQUIRE_CONFIRMATION: ${STAGE1_REQUIRE_CONFIRMATION:-true}
       STAGE1B_TEXT_VERIFY: ${STAGE1B_TEXT_VERIFY:-true}
@@ -104,6 +108,10 @@ services:
       OCR_PRINTING_FROM_TEXT: ${OCR_PRINTING_FROM_TEXT:-true}
       CLIENT_TEXT_HINTS: ${CLIENT_TEXT_HINTS:-true}
       CLIENT_TEXT_OCR: ${CLIENT_TEXT_OCR:-footer}
+      # Off by default. CLIENT_TEXT_AGREE: the phone's name and number may stand in for the footer read
+      # with no confidence floor when they name one card in the visual top 20 (footer mode only).
+      CLIENT_TEXT_TOP20: ${CLIENT_TEXT_TOP20:-false}
+      CLIENT_TEXT_AGREE: ${CLIENT_TEXT_AGREE:-false}
       ENABLE_MATCHED: ${ENABLE_MATCHED:-true}
       ORT_INTRA_THREADS: ${ORT_INTRA_THREADS:-1}
       ORT_INTER_THREADS: ${ORT_INTER_THREADS:-1}
@@ -114,6 +122,7 @@ services:
       MAX_UPLOAD_BYTES: ${MAX_UPLOAD_BYTES:-12582912}
       SCAN_WAIT_LIMIT: ${SCAN_WAIT_LIMIT:-6}
       STORE_CAPTURES: ${STORE_CAPTURES:-true}
+      STORE_ORIGINAL_UPLOADS: ${STORE_ORIGINAL_UPLOADS:-false}
       REVIEW_TOKEN: ${REVIEW_TOKEN:-}
       CARDMARKET_HELPER_ENABLED: ${CARDMARKET_HELPER_ENABLED:-false}
       CARDMARKET_WEBVIEW_ENABLED: ${CARDMARKET_WEBVIEW_ENABLED:-true}
