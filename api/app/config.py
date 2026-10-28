@@ -96,6 +96,11 @@ class Settings(BaseSettings):
     # card in the list to choose from (e.g. Evolutions 9/108 under Base Set 46/102). The shown card
     # and the status do not change. Replay first.
     printing_choices_wider: bool = False
+    # A scan that already needs confirmation, reads as Japanese, reads no printed fraction and
+    # has a name-strip read at >= 0.99 that is exactly the name of 1-3 cards in PMCG1-6 or neo1-4
+    # (which print no collector number) also offers those cards in its printing review list.
+    # The card shown first and the status do not change. Replay first.
+    vintage_name_choices: bool = False
     # When an abstaining scan has a confident printed fraction plus a name read anywhere in
     # its OCR lines that together narrow the catalogue to 1-3 cards, add those cards as
     # candidates for local artwork verification and, if unverified, return them as
