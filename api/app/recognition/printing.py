@@ -123,6 +123,11 @@ class PrintingDecision:
     guidance: str | None = None
 
 
+# PRINTING_CHOICES_WIDER: how far below the shown card (visual score) another same-name print
+# may be and still be offered when the printing is already unsure.
+PRINTING_CHOICES_WIDER_GAP = 0.08
+
+
 def assess_printings(
     ranked: list[dict[str, Any]],
     *,
@@ -132,6 +137,8 @@ def assess_printings(
     min_visual: float,
     min_gap: float,
     retake: bool,
+    wider_gap: float = 0.0,
+    max_choices: int = 6,
 ) -> PrintingDecision:
     if retake or not ranked or (float(ranked[0]["visual_score"]) < min_visual
         and not ranked[0].get("local_artwork_verified") and not ranked[0].get('ocr_identity_verified')
@@ -183,6 +190,30 @@ def assess_printings(
         number_matches_identifiers([h], accepted_collector_numbers(r)) is True for h in reliable)]
     if len(matching) == 1 and printing_key(matching[0]) == top_key and top_consistent and not reference_incomplete:
         return PrintingDecision(False)
+    if wider_gap > min_gap:
+        # PRINTING_CHOICES_WIDER: the printing is already unsure, so also offer the other
+        # same-name prints a little further down the picture match (the same artwork reprinted
+        # with another number, e.g. Evolutions 9/108 under Base Set 46/102). The card shown
+        # first and the status do not change; only the list to choose from grows.
+        taken = {printing_key(r) for r in choices}
+        extra = sorted((r for r in ranked
+                        if normalize_text(r["name"]) == normalize_text(top["name"])
+                        and r.get("language") == top.get("language")
+                        and float(r["visual_score"]) >= min_visual
+                        and abs(float(r["visual_score"]) - float(top["visual_score"])) < wider_gap),
+                       key=lambda r: -float(r["visual_score"]))
+        for row in extra:
+            if len(choices) >= max_choices:
+                break
+            item = dict(row)
+            item.setdefault("card_id", item.get("id"))
+            if printing_key(item) in taken:
+                continue
+            if top_consistent and any(number_matches_identifiers([h], accepted_collector_numbers(item)) is False
+                                      for h in reliable):
+                continue
+            taken.add(printing_key(item))
+            choices.append(item)
     reason = "shared_printing_identifier" if len(matching) > 1 else "printing_not_proven"
     ids = sorted(str(r["card_id"]) for r in choices)
     group_id = "reference-group:" + hashlib.sha256("\n".join(ids).encode()).hexdigest()[:16]

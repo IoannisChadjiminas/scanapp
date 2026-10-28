@@ -136,3 +136,53 @@ def test_reference_index_expands_beyond_top_k_and_keeps_distinct_cards(tmp_path)
         assert artwork_thumbnail(Image.new("RGB", (224, 320), "white")) is None
     finally:
         conn.close()
+
+
+def _charmander_scan():
+    # The shape of a real scan: four same-artwork Charmander prints, the true one (9/108)
+    # 0.042 below the shown card, just outside the 0.04 window.
+    def char(i, number, score, set_name):
+        return dict(card_id=i, name="Charmander", language="en", set_name=set_name,
+                    collector_number=number, visual_score=score, combined_score=score)
+    return [char("base1-46", "46", .891, "Base Set"), char("lc-70", "70", .870, "Legendary Collection"),
+            char("base4-69", "69", .858, "Base Set 2"), char("xy12-9", "9", .849, "Evolutions"),
+            char("cel-1", "1", .80, "Celebrations")]
+
+
+def test_without_the_wider_list_the_true_print_is_left_out():
+    result = assess(_charmander_scan())
+    assert result.ambiguous
+    assert "xy12-9" not in {r["card_id"] for r in result.members}
+
+
+def test_wider_list_offers_the_same_name_print_and_keeps_the_shown_card():
+    ranked = _charmander_scan()
+    result = assess_printings(ranked, family=[], hits=[], reference_incomplete=False,
+                              min_visual=.78, min_gap=.04, retake=False, wider_gap=.08)
+    ids = [r["card_id"] for r in result.members]
+    assert ids[0] == "base1-46"
+    assert "xy12-9" in ids
+    assert "cel-1" not in ids  # 0.091 below the shown card: outside the wider window
+
+
+def test_wider_list_never_makes_a_sure_printing_unsure():
+    lone = [dict(card_id="base1-46", name="Charmander", language="en", set_name="Base Set",
+                 collector_number="46", visual_score=.95, combined_score=.95),
+            dict(card_id="xy12-9", name="Charmander", language="en", set_name="Evolutions",
+                 collector_number="9", visual_score=.89, combined_score=.89)]
+    result = assess_printings(lone, family=[], hits=[], reference_incomplete=False,
+                              min_visual=.78, min_gap=.04, retake=False, wider_gap=.08)
+    assert not result.ambiguous
+
+
+def test_wider_list_skips_other_names_languages_and_respects_the_cap():
+    ranked = _charmander_scan()
+    ranked.append(dict(card_id="ja:x", name="Charmander", language="ja", set_name="JP",
+                       collector_number="4", visual_score=.86, combined_score=.86))
+    ranked.append(dict(card_id="vulpix", name="Vulpix", language="en", set_name="Base Set",
+                       collector_number="68", visual_score=.86, combined_score=.86))
+    result = assess_printings(ranked, family=[], hits=[], reference_incomplete=False,
+                              min_visual=.78, min_gap=.04, retake=False, wider_gap=.08, max_choices=4)
+    ids = [r["card_id"] for r in result.members]
+    assert "ja:x" not in ids and "vulpix" not in ids
+    assert len(ids) == 4
