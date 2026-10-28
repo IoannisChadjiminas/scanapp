@@ -83,6 +83,35 @@ def bare_number_guard_enabled() -> bool:
     return bool(get_settings().rank_bare_number_guard)
 
 
+def printed_number_only_enabled() -> bool:
+    return bool(get_settings().rank_printed_number_only)
+
+
+# RANK_PRINTED_NUMBER_ONLY: Japanese sets whose cards print no collector number. The catalogue
+# number is only the set order (TCG Collector's "No. 001"), and the number a scan reads on
+# these cards is the Pokedex number, HP or attack damage, e.g. "No.006" on Charizard PMCG1-021.
+UNNUMBERED_SETS = frozenset(('ja', set_id) for set_id in (
+    'pmcg1', 'pmcg2', 'pmcg3', 'pmcg4', 'pmcg5', 'pmcg6', 'neo1', 'neo2', 'neo3', 'neo4'))
+
+
+def number_not_printed(item: dict[str, Any]) -> bool:
+    """Whether the card prints no collector number, so a number read says nothing about it."""
+    if item.get('printed_collector_number'):
+        return False
+    set_id = str(item.get('set_id') or '').split(':')[-1]
+    if not set_id:
+        # Stored scans keep the card id only: ja:PMCG1-021.
+        set_id = str(item.get('card_id') or '').split(':')[-1].rpartition('-')[0]
+    return (str(item.get('language') or ''), set_id.lower()) in UNNUMBERED_SETS
+
+
+def _bare_read_of_fraction(hit: OcrHit | str, numbers: list[str]) -> bool:
+    """A read without total or set code ("006") against a card that prints a fraction (006/070)."""
+    parsed = parse_collector(hit.text if isinstance(hit, OcrHit) else str(hit))
+    return bool(parsed and not parsed.prefix and not parsed.denominator
+                and any((p := parse_collector(n)) and p.denominator for n in numbers))
+
+
 # RANK_BARE_NUMBER_GUARD: how much weaker than the visual leader a card's picture may be before
 # a bare number alone ("20", no total, no set code) can no longer put it first.
 BARE_NUMBER_MAX_DROP = 0.15
@@ -540,6 +569,7 @@ def rerank(
     if require_confident_ocr and explicit:
         known_numbers = explicit
     guard = bare_number_guard_enabled()
+    printed_only = printed_number_only_enabled()
     ranked: list[dict[str, Any]] = []
     for item in visual:
         combined = float(item["visual_score"])
@@ -551,7 +581,13 @@ def rerank(
                 and not promo_bare_number_agrees(ocr_name, item, visual)):
             # A bare 078 is not promo proof unless its name and number name one promo card.
             numbers = [n for n in numbers if (parts := parse_collector(n)) and parts.prefix]
+        if printed_only and number_not_printed(item):
+            numbers = []
         number_ok = _match_any(ocr_numbers, numbers)
+        if (printed_only and number_ok is True and
+                all(_bare_read_of_fraction(h, numbers) for h in ocr_numbers if _match_any([h], numbers) is True)):
+            # A bare 006 is not agreement with 006/070. Disagreement still counts below.
+            number_ok = None
         collector_conflict = _has_reliable_conflict(known_numbers if require_confident_ocr else ocr_numbers, numbers)
         language = str(item.get("language") or "")
         if detected_languages:
@@ -563,7 +599,8 @@ def rerank(
             consistent = None
         elif require_confident_ocr:
             match_weight = max((max(0.0, min(1.0, h.confidence)) for h in known_numbers
-                                if _match_any([h], numbers) is True), default=0.0)
+                                if _match_any([h], numbers) is True
+                                and not (printed_only and _bare_read_of_fraction(h, numbers))), default=0.0)
             conflict_weight = max((max(0.0, min(1.0, h.confidence)) for h in known_numbers
                                    if _match_any([h], numbers) is False), default=0.0)
             combined += .08*match_weight - .12*conflict_weight

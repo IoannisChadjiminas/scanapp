@@ -92,6 +92,11 @@ class Settings(BaseSettings):
     # than the picture's leader, and the leader's gap is measured to a real rival, not to its
     # own print in another language. A policy change: replay first.
     rank_bare_number_guard: bool = False
+    # Only a number the card prints counts as number evidence. A card from a set that prints no
+    # collector number (Japanese PMCG and neo) neither agrees nor conflicts with a number read,
+    # and a bare number ("006", no total or set code) gives no bonus to a card that prints a
+    # fraction. A bare number that disagrees is still a conflict. A policy change: replay first.
+    rank_printed_number_only: bool = False
     # When the printing is already unsure, also offer same-name prints up to 0.08 below the shown
     # card in the list to choose from (e.g. Evolutions 9/108 under Base Set 46/102). The shown card
     # and the status do not change. Replay first.

@@ -748,3 +748,81 @@ def test_cutoff_total_moves_evolutions_over_same_artwork_prints(monkeypatch):
     ranked = rerank(cards, "Charmander", [OcrHit("9/10", .99, "collector")], False,
                     detected_languages=("en",), name_confidence=.95, require_confident_ocr=True)
     assert ranked[0]["card_id"] == "xy12-9"
+
+
+def _printed_only(monkeypatch, on: bool) -> None:
+    from app.config import get_settings
+
+    monkeypatch.setattr(get_settings(), "rank_printed_number_only", on)
+
+
+def _pokedex_number_scan() -> list[dict]:
+    # The shape of the PMCG1-021 photos: the 1996 Charizard prints "No.006" (its Pokedex
+    # number) and no collector number; its catalogue number 021 is only the set order.
+    # Cherrim prints 006/070, so a bare 006 read lifts it.
+    cards = [_card("ja:PMCG1-021", "リザードン", "021", .80, language="ja"),
+             _card("ja:M6a-137", "リザードン", "137", .79, language="ja"),
+             _card("ja:S5R-006", "Cherrim", "006", .77, language="ja")]
+    for card, total in zip(cards, (102, 98, 70)):
+        card["set_total"] = total
+    return cards
+
+
+def _rank_pokedex(cards: list[dict], hit: str = "006") -> list[dict]:
+    return rerank(cards, None, [OcrHit(hit, .99, "collector")], False,
+                  detected_languages=("ja",), require_confident_ocr=True)
+
+
+def test_pokedex_number_lifts_a_bare_number_match_without_the_switch(monkeypatch):
+    _printed_only(monkeypatch, False)
+    ranked = _rank_pokedex(_pokedex_number_scan())
+    assert ranked[0]["card_id"] == "ja:S5R-006"
+    charizard = next(r for r in ranked if r["card_id"] == "ja:PMCG1-021")
+    assert charizard["collector_conflict"] is True
+
+
+def test_printed_only_keeps_the_unnumbered_card_out_of_number_evidence(monkeypatch):
+    _printed_only(monkeypatch, True)
+    ranked = _rank_pokedex(_pokedex_number_scan())
+    assert ranked[0]["card_id"] == "ja:PMCG1-021"
+    assert ranked[0]["collector_conflict"] is False
+    assert ranked[0]["ocr_consistent"] is None
+    cherrim = next(r for r in ranked if r["card_id"] == "ja:S5R-006")
+    assert cherrim["ocr_consistent"] is not True
+
+
+def test_printed_only_reads_the_set_from_a_stored_card_id(monkeypatch):
+    from app.recognition.rank import number_not_printed
+
+    assert number_not_printed({"card_id": "ja:PMCG1-021", "language": "ja"}) is True
+    assert number_not_printed({"card_id": "ja:neo2-057", "set_id": "ja:neo2", "language": "ja"}) is True
+    assert number_not_printed({"card_id": "en:neo2-57", "set_id": "neo2", "language": "en"}) is False
+    assert number_not_printed({"card_id": "ja:S8a-P-001", "language": "ja"}) is False
+    # A printed alias in the catalogue is a number on the card.
+    assert number_not_printed({"card_id": "ja:PMCG1-021", "language": "ja",
+                               "printed_collector_number": "021"}) is False
+
+
+def test_printed_only_keeps_a_bare_number_that_disagrees_a_conflict(monkeypatch):
+    _printed_only(monkeypatch, True)
+    ranked = _rank_pokedex(_pokedex_number_scan(), hit="045")
+    cherrim = next(r for r in ranked if r["card_id"] == "ja:S5R-006")
+    assert cherrim["collector_conflict"] is True
+    assert cherrim["ocr_consistent"] is False
+
+
+def test_printed_only_lets_a_full_fraction_agree(monkeypatch):
+    _printed_only(monkeypatch, True)
+    ranked = _rank_pokedex(_pokedex_number_scan(), hit="006/070")
+    assert ranked[0]["card_id"] == "ja:S5R-006"
+    assert ranked[0]["ocr_consistent"] is True
+
+
+def test_printed_only_lets_a_bare_number_agree_with_a_bare_printed_number(monkeypatch):
+    # A card with no known total prints the number alone, so a bare read is the whole number.
+    _printed_only(monkeypatch, True)
+    cards = _bare_number_scan()
+    ranked = rerank(cards, None, [OcrHit("20", .99, "collector")], False,
+                    detected_languages=("en",), require_confident_ocr=True)
+    assert ranked[0]["card_id"] == "en:dp1-20"
+    assert ranked[0]["ocr_consistent"] is True

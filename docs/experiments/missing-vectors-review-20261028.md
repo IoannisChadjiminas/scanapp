@@ -161,3 +161,26 @@ The evidence now separates two problems: numeric hints can promote unrelated
 cards, while holo/printing similarity can still prevent correct retrieval or
 selection even after better framing. No one of the tested name, number or crop
 interventions establishes a safe complete fix.
+
+## Next step: RANK_PRINTED_NUMBER_ONLY (default off)
+
+The number half is now a narrow, switchable change rather than the global
+bare-number ablation above:
+
+- A card from a Japanese set that prints no collector number (PMCG1-6, neo1-4)
+  neither agrees nor conflicts with a number read, unless the catalogue records a
+  printed number. This removes the conflict penalty that the "No.006" read put on
+  `ja:PMCG1-021`.
+- A bare read ("006", no total or set code) gives no agreement bonus to a card
+  that prints a fraction (`006/070`). A bare read that disagrees is still a
+  conflict, and a full fraction or set code still agrees.
+
+The unit tests reproduce the Cherrim lift with the switch off and keep the
+Charizard first with it on. That is a ranking-step test, not evidence about the
+two photos: photo 2's expected card sits 21st in the ranking input, so it may
+still end as `uncertain` on another card or `no_match`, which this gate accepts.
+Before turning it on: the stored-scan replay (`api/scripts/stored_scan_replay`)
+with `--flag rank_printed_number_only` and the phone-index `--catalog/--totals`,
+every changed answer reviewed by hand, 0 moves to a wrong card; then the two
+photos and `vintage/panel-vintage-18.json` through the full pipeline. The picture
+half (photo 2 at rank 80) is not addressed by this switch.
