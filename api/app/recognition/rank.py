@@ -69,6 +69,16 @@ def promo_prefix_near_enabled() -> bool:
     return bool(get_settings().ocr_promo_prefix_near)
 
 
+def cutoff_total_enabled() -> bool:
+    return bool(get_settings().ocr_cutoff_total)
+
+
+def _cutoff_total(read: str, total: str) -> bool:
+    """OCR_CUTOFF_TOTAL: a set total that lost only its last digit at the edge of the read
+    ("9/10" for 9/108). One digit, never two, and the read must keep at least two digits."""
+    return len(read) >= 2 and len(total) == len(read) + 1 and total.startswith(read)
+
+
 def bare_number_guard_enabled() -> bool:
     return bool(get_settings().rank_bare_number_guard)
 
@@ -317,7 +327,8 @@ def number_match(
         if got.number != expected.number:
             continue
         if got.denominator and expected.denominator and got.denominator != expected.denominator:
-            continue
+            if not (cutoff_total_enabled() and _cutoff_total(got.denominator, expected.denominator)):
+                continue
         return True
     return False
 
