@@ -62,6 +62,7 @@ services:
       RANK_BARE_NUMBER_GUARD: ${RANK_BARE_NUMBER_GUARD:-false}
       # Offer more same-name prints when the printing is unsure (replay first).
       PRINTING_CHOICES_WIDER: ${PRINTING_CHOICES_WIDER:-false}
+      VINTAGE_NAME_CHOICES: ${VINTAGE_NAME_CHOICES:-false}
       TEXT_IDENTITY_CANDIDATES: ${TEXT_IDENTITY_CANDIDATES:-true}
       # Slab labels: set + number from CGC/PSA/BGS labels (18a, SV59, TG01) become verified
       # candidates. docs/experiments/slab-label-identity-20261021.md

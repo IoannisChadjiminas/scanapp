@@ -161,3 +161,50 @@ The evidence now separates two problems: numeric hints can promote unrelated
 cards, while holo/printing similarity can still prevent correct retrieval or
 selection even after better framing. No one of the tested name, number or crop
 interventions establishes a safe complete fix.
+
+## Switches tried and not kept
+
+Three ranking/family switches were built and reviewed on a separate branch
+(commits `1b99503`, `b006919`, `bf238d7`); none is in this change.
+
+- `RANK_PRINTED_NUMBER_ONLY` (unnumbered PMCG/neo cards ignore every number
+  read; a bare number gives no bonus to a card printing a fraction). Rejected:
+  in the 8,106-scan replay it changed 103 first cards, and the full scanner
+  turned the user-confirmed Gengar `ja:VS1-021` into Sabrina's Mr. Mime
+  `ja:PMCG6-046` and Charizard photo 1 into Aipom.
+- `RANK_POKEDEX_NUMBER` (a bare read equal to an unnumbered card's Pokedex
+  number is not a conflict) and `PRINTING_FAMILY_SPECIES` (the same-artwork
+  printing family found by Gen 1-2 species instead of exact catalogue name).
+  No ranking change in the 8,106-scan replay and no first-card, status or
+  review change on 22 photos under all four combinations; both Charizard
+  photos stayed wrong. Not kept: no demonstrated benefit.
+
+## VINTAGE_NAME_CHOICES (default off)
+
+Since no number, name or picture change recovers `ja:PMCG1-021`, this switch
+offers it instead of picking it. When a scan already needs confirmation
+(`uncertain` or `printing_ambiguous`), reads as Japanese, reads no printed
+fraction, and has a name-strip OCR read at >= 0.99 that is exactly the
+catalogue name of 1-3 cards in PMCG1-6 or neo1-4, those cards are added to the
+scan's `printing_review` list. Without an existing list, one is created with the
+shown card first. The card shown first, the status and the confidence do not
+change, so it cannot create a wrong answer; a bad trigger costs an extra choice.
+
+The phone app shows `printing_review` for any status, and the feedback endpoint
+accepts a confirm of any offered card (and of any card on `uncertain` scans), so
+no app change is needed.
+
+Review (full scanner and emulator, switch on):
+
+- Charizard photo 2 now offers `ja:PMCG1-021`. Photo 1 already offered it; no
+  duplicate is added.
+- 22 photo pairs: first card, status and confidence unchanged; Gengar
+  `ja:VS1-021` stays correct. Some photos get irrelevant extra choices.
+- Emulator: on an `uncertain` scan no carousel card is pre-selected; choosing
+  and confirming the vintage card saves it.
+- Stored-scan replay: choices added to 374 scans. Most have no confirmation,
+  so usefulness and noise remain open.
+
+Open before enabling: a physical-phone save against staging, and a judgement on
+the noise from the stored replay (`scripts/stored_scan_replay/replay_vintage_name.py`
+on an export that includes `confirmed_card_id`).
