@@ -54,10 +54,11 @@ research check and physical-device gates remain required before enabling it.
    `ACTIVE.next` to `ACTIVE` in that same directory. The manifest validates it
    against the loaded recognition snapshot. Keep older published directories for
    phones still finishing downloads; changing ACTIVE does not invalidate their URLs.
-5. The owner enables `CARD_INDEX_PUBLISH=true` in Dokploy and redeploys using the
-   existing full Dokploy environment. Both staging and production compose files
-   expose the switch with a false default and `CARD_INDEX_PUBLISH_DIR` with the
-   `/data/phone-index` default. Production requires a separate owner decision.
+5. Staging defaults `CARD_INDEX_PUBLISH` to true (`compose.dokploy.yaml`), so a
+   staging redeploy with the merged code exposes the routes; they return 503 until
+   a candidate is active. Production (`compose.dokploy.production.yaml` and
+   `compose.prod.yaml`) keeps `CARD_INDEX_PUBLISH` false. Changing production is a
+   separate owner decision. `CARD_INDEX_PUBLISH_DIR` defaults to `/data/phone-index`.
 6. Check the manifest and a ranged file request, then run the shipping plan's
    physical-device download, replacement and 16-photo gates with
    `CARD_INDEX_DOWNLOAD=true`. Both platforms must pass before rollout.
