@@ -651,7 +651,7 @@ def rerank(
                                    if _match_any([h], numbers) is False), default=0.0)
             combined += .08*match_weight - .12*conflict_weight
             if not explicit and name_ok and name_weight >= .85:
-                holder_weight=max((h.confidence or 0. for h in ocr_numbers
+                holder_weight=max((h.confidence or 0. for h in item_numbers
                     if isinstance(h,OcrHit) and h.region == 'holder_collector'
                     and _match_any([h],numbers) is True),default=0.)
                 combined += .08*holder_weight

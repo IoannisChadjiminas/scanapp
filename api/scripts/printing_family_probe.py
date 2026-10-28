@@ -25,12 +25,30 @@ from app.recognition.printing import MIN_REFERENCE_CORRELATION, ReferencePrintin
 from app.recognition.rank import pokedex_number
 
 
+def response_ids(data) -> list[str]:
+    """Card ids in shown order: best_match, alternatives, the printing review, then the
+    stored visual top 20 when present. A plain list holds ids or card rows."""
+    if isinstance(data, list):
+        rows = data
+    else:
+        review = data.get('printing_review') or {}
+        rows = [data.get('best_match'), *(data.get('alternatives') or []),
+                *(review.get('plausible_printings') or []), *(data.get('visual_top20') or [])]
+    ids = []
+    for row in rows:
+        card_id = row if isinstance(row, str) else (row or {}).get('card_id')
+        if card_id and card_id not in ids:
+            ids.append(card_id)
+    return ids
+
+
 def retrieved_ids(sources: list[str]) -> list[str]:
     if len(sources) == 1 and Path(sources[0]).is_file():
-        data = json.loads(Path(sources[0]).read_text(encoding='utf-8'))
-        rows = data if isinstance(data, list) else (
-            data.get('visual_top20') or data.get('candidates') or data.get('ranked') or [])
-        return [row if isinstance(row, str) else row['card_id'] for row in rows]
+        ids = response_ids(json.loads(Path(sources[0]).read_text(encoding='utf-8')))
+        if not ids:
+            sys.exit(f'no card ids in {sources[0]}: expected best_match, alternatives, '
+                     'printing_review or visual_top20; pass the ids instead')
+        return ids
     return sources
 
 

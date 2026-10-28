@@ -853,3 +853,17 @@ def test_pokedex_number_finds_the_species_in_a_card_name():
     assert pokedex_number("ニドラン♂") == 32
     assert pokedex_number("Energy Removal") is None
     assert pokedex_number("ポケモンセンター") is None
+
+
+def test_pokedex_number_on_a_holder_label_gives_no_bonus(monkeypatch):
+    # Review: the holder-label path used the unfiltered reads, so Bulbasaur's No.001 still
+    # added .08 x .99 with the switch on.
+    def combined(on: bool) -> float:
+        _pokedex(monkeypatch, on)
+        card = _card("ja:PMCG1-001", "フシギダネ", "001", .80, language="ja")
+        card["set_total"] = 102
+        ranked = rerank([card], "フシギダネ", [OcrHit("001", .99, "holder_collector")], False,
+                        detected_languages=("ja",), name_confidence=.99, require_confident_ocr=True)
+        return ranked[0]["combined_score"]
+
+    assert round(combined(False) - combined(True), 4) == .0792

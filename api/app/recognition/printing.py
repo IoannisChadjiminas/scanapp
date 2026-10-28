@@ -9,6 +9,7 @@ from collections import OrderedDict
 from dataclasses import dataclass
 import hashlib
 from pathlib import Path
+import re
 from threading import RLock
 from typing import Any
 
@@ -91,13 +92,19 @@ class ReferencePrintingIndex:
             cached = self._groups.get(key)
             if cached is None:
                 if species:
-                    names = species_names(species)
-                    rows = [row for row in catalog.execute(
-                        "SELECT * FROM cards WHERE language = ? AND ("
-                        + " OR ".join("name LIKE ?" for _ in names) + ") ORDER BY id LIMIT 2049",
-                        (language, *(f"%{n}%" for n in names))).fetchall()
-                        if pokedex_number(row["name"]) == species][:513]
+                    # Catalogue spelling varies (Farfetch'd/Farfetch’d, "Nidoran ♂"), so any
+                    # punctuation or spacing matches any (Farfetch%d, Nidoran%), the species is
+                    # checked in Python, and the exact-name rows of the switch-off family stay.
+                    words = {"%".join(re.findall(r"\w+", n)) for n in species_names(species)}
+                    rows = catalog.execute(
+                        "SELECT * FROM cards WHERE language = ? AND (name = ? OR "
+                        + " OR ".join("name LIKE ?" for _ in words) + ") ORDER BY id LIMIT 2049",
+                        (language, name, *(f"%{w}%" for w in words))).fetchall()
+                    truncated = len(rows) >= 2049
+                    rows = [row for row in rows
+                            if row["name"] == name or pokedex_number(row["name"]) == species][:513]
                 else:
+                    truncated = False
                     rows = catalog.execute(
                         "SELECT * FROM cards WHERE name = ? AND language = ? ORDER BY id LIMIT 513",
                         (name, language),
@@ -119,7 +126,7 @@ class ReferencePrintingIndex:
                         except (OSError, ValueError):
                             pass
                     cached.append((card, probe))
-                if len(rows) > 512:
+                if len(rows) > 512 or truncated:
                     cached.append(({"id": "uninspected"}, None))
                 self._groups[key] = cached
                 while len(self._groups) > self.max_groups:

@@ -250,3 +250,40 @@ def test_assess_printings_offers_same_species_family_only_with_the_switch():
     assert not off.ambiguous
     assert on.ambiguous
     assert sorted(m["card_id"] for m in on.members) == ["ja:CP6-011", "ja:PMCG1-021"]
+
+
+def _spelled_catalog():
+    import sqlite3
+
+    conn = sqlite3.connect(":memory:")
+    conn.row_factory = sqlite3.Row
+    conn.execute("CREATE TABLE cards (id, name, language, set_id, set_name, collector_number, image_path)")
+    conn.executemany("INSERT INTO cards VALUES (?, ?, 'en', ?, ?, ?, 'x')", [
+        ("en:base1-27", "Farfetch'd", "base1", "Base", "27"),
+        ("en:base2-27", "Farfetch'd", "base2", "Base Set 2", "27"),
+        ("en:lc-31", "Farfetch'd", "lc", "Legendary Collection", "31"),
+        ("en:base1-55", "Nidoran ♂", "base1", "Base", "55"),
+        ("en:base2-60", "Nidoran ♂", "base2", "Base Set 2", "60"),
+        ("en:jungle-57", "Nidoran ♀", "jungle", "Jungle", "57"),
+    ])
+    return conn
+
+
+class _OneArt:
+    def thumbnail(self, card_id, raw_path):
+        del card_id, raw_path
+        return np.ones(8, dtype=np.float32) / np.sqrt(8)
+
+
+def test_species_family_keeps_every_member_whatever_the_spelling(monkeypatch, tmp_path):
+    # Review: the species list spells Farfetch’d with a curly apostrophe and Nidoran♂ unspaced,
+    # and the SQL lookup lost the catalogue's Farfetch'd and "Nidoran ♂" families.
+    for on in (False, True):
+        _species_switch(monkeypatch, on)
+        index = ReferencePrintingIndex(tmp_path, feature_store=_OneArt())
+        farfetchd, _ = index.family(_spelled_catalog(), {"card_id": "en:base1-27", "name": "Farfetch'd",
+                                                         "language": "en"})
+        assert sorted(m["id"] for m in farfetchd) == ["en:base1-27", "en:base2-27", "en:lc-31"]
+        nidoran, _ = index.family(_spelled_catalog(), {"card_id": "en:base1-55", "name": "Nidoran ♂",
+                                                       "language": "en"})
+        assert sorted(m["id"] for m in nidoran) == ["en:base1-55", "en:base2-60"]  # not the female

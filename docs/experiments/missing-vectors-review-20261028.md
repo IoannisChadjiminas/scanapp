@@ -211,3 +211,19 @@ expected card and whether the family by name or by species reaches it.
    negatives (including Gengar `ja:VS1-021`), and both Charizard photos.
    0 moves to a wrong card; record changed choice lists and latency, since the
    species family can load more reference images for common species.
+
+## Review of both switches (b006919)
+
+Stored-scan replay, 8,106 scans: no ranking changes with `RANK_POKEDEX_NUMBER`.
+Full scanner, 22 photos under all four switch combinations: no first-card,
+status or printing-review change. Gengar `ja:VS1-021` stays correct; both
+Charizard photos stay wrong. Neither switch helps these photos, and both stay
+off.
+
+Fixed after the review: the species family's SQL lookup missed catalogue
+spellings (Farfetch'd went from three family members to none, as did a spaced
+"Nidoran ♂"); it now tolerates punctuation and spacing and always keeps the
+exact-name rows. A Pokedex number on a holder label still added the holder
+bonus (Bulbasaur 001, +0.0792); it no longer does. The probe now reads saved
+API responses (`best_match`, `alternatives`, `printing_review`) and stops when
+it finds no card ids.
