@@ -87,6 +87,7 @@ async def _daily_prices(stop: asyncio.Event) -> None:
 from app.config import get_settings
 from app.db import Databases
 from app.recognition.runtime import Runtime
+from app.routes.card_index import router as card_index_router
 from app.routes.cardmarket import router as cardmarket_router
 from app.routes.cards import router as cards_router
 from app.routes.health import router as health_router
@@ -214,6 +215,7 @@ from app.planetscale import CatalogueReadOnly
 async def catalogue_read_only(request, exc):
     return JSONResponse(status_code=409, content={"detail": str(exc)})
 
+app.include_router(card_index_router, prefix="/api/v1", tags=["card-index"])
 app.include_router(health_router, prefix="/api/v1", tags=["health"])
 app.include_router(images_router, prefix="/api/v1", tags=["images"])
 app.include_router(review_router, prefix="/api/v1", tags=["review"])

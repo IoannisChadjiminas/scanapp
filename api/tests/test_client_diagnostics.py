@@ -135,3 +135,15 @@ def test_name_and_number_never_carry_card_text():
          "card": "Charizard ex 199/165", "reason": "free text with spaces"},
     ]})
     assert lines == ["phone event=client_text.done scan=s1"]
+
+
+def test_card_index_download_diagnostics_accept_bounded_version_and_size():
+    version = 'a' * 64
+    lines = phone_diagnostic_lines({'events': [{'event': 'card_index.download',
+        'state': 'ready', 'version': version, 'bytes': 35_000_000,
+        'elapsed_ms': 1234, 'installed_age_days': 3}]})
+    assert f'version={version}' in lines[0]
+    assert 'bytes=35000000' in lines[0]
+    assert 'installed_age_days=3' in lines[0]
+    assert 'version=' not in phone_diagnostic_lines({'events': [
+        {'event': 'card_index.download', 'version': 'private-value'}]})[0]

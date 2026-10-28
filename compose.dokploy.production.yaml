@@ -20,6 +20,8 @@ services:
         format: raw
     environment:
       DATA_DIR: /data
+      CARD_INDEX_PUBLISH: ${CARD_INDEX_PUBLISH:-false}
+      CARD_INDEX_PUBLISH_DIR: ${CARD_INDEX_PUBLISH_DIR:-/data/phone-index}
       CATALOGUE_BACKEND: ${CATALOGUE_BACKEND:-planetscale}
       PORTFOLIO_DATABASE_URL: ${PORTFOLIO_DATABASE_URL:?Set the production ScanApp portfolio database URL}
       SCANAPP_SERVICE_TOKEN: ${SCANAPP_SERVICE_TOKEN:?Set the shared production service token}

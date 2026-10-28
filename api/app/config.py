@@ -11,6 +11,8 @@ class Settings(BaseSettings):
     model_config = SettingsConfigDict(env_file=".env", extra="ignore")
 
     data_dir: Path = Path("/data")
+    card_index_publish: bool = True
+    card_index_publish_dir: Path = Path('/data/phone-index')
     catalogue_backend: str = "sqlite"
     planetscale_database_url: SecretStr = SecretStr("")
     # Writable portfolio store: PlanetScale database pokesingle-product.

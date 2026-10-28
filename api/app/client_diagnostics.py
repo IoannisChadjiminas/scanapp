@@ -14,9 +14,9 @@ _INT_KEYS = {"status", "elapsed_ms", "bytes", "queued", "entries", "quality", "f
              "same_ms", "busy_ms", "jumps", "ratio",
              # The phone's own match and provisional card, and the footer read.
              "ms_after_shutter", "round_trip_ms", "shutter_to_done_ms", "rows", "read_ms",
-             "extra_wait_ms", "crop_w", "crop_h", "candidates", "guide_w", "guide_h"}
+             "extra_wait_ms", "crop_w", "crop_h", "candidates", "guide_w", "guide_h", "installed_age_days"}
 _NUMBER_KEYS = {"fps", "detect_ms", "print_gap", "native_ms", "load_ms"}
-_TEXT_KEYS = {"route", "host", "cf_ray", "server_trace", "language", "server_scan", "error_type", "state", "scan", "codec", "price_source",
+_TEXT_KEYS = {"route", "host", "cf_ray", "server_trace", "language", "server_scan", "error_type", "state", "scan", "codec", "price_source", "version",
               # Catalogue card ids and short reason words only (the token pattern), never card text.
               "card", "provisional", "final", "reason", "kind"}
 # Yes/no fields. Only a real boolean is kept, so "name"/"number" can never carry the card's text.
@@ -61,6 +61,8 @@ def _event_line(item: Any) -> str | None:
         "server_scan",
         "error_type",
         "state",
+        "version",
+        "installed_age_days",
         "cf_ray",
         "server_trace",
         "cancelled",
@@ -131,10 +133,13 @@ def _scalar(key: str, value: Any) -> str | None:
     if key in _INT_KEYS and isinstance(value, bool):
         return None
     if key in _INT_KEYS and isinstance(value, int) and not isinstance(value, bool):
-        return str(value) if abs(value) <= 10_000_000 else None
+        limit = 1_000_000_000 if key == 'bytes' else 10_000_000
+        return str(value) if abs(value) <= limit else None
     if key in _NUMBER_KEYS and isinstance(value, (int, float)) and not isinstance(value, bool):
         return f"{float(value):g}" if abs(value) <= 1_000_000 else None
     if key in _TEXT_KEYS:
+        if key == 'version':
+            return value if isinstance(value, str) and re.fullmatch(r'[a-f0-9]{64}', value) else None
         return _token(value)
     if key == "build" and isinstance(value, str) and _BUILD.match(value):
         return value

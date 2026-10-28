@@ -18,6 +18,8 @@ services:
         format: raw
     environment:
       DATA_DIR: /data
+      CARD_INDEX_PUBLISH: ${CARD_INDEX_PUBLISH:-true}
+      CARD_INDEX_PUBLISH_DIR: ${CARD_INDEX_PUBLISH_DIR:-/data/phone-index}
       CATALOGUE_BACKEND: ${CATALOGUE_BACKEND:-planetscale}
       PORTFOLIO_DATABASE_URL: ${PORTFOLIO_DATABASE_URL:-}
       TMP_DIR: /tmp/scanapp

@@ -3,6 +3,9 @@
 Does a compressed copy of the server's card fingerprint index reach the same stage 1
 vector decision as the float32 index?
 
+The reference snapshot vectors are used as stored, without re-normalization. Earlier
+research gate numbers used re-normalized references and are not directly comparable.
+
 Queries (vectors come from the server's DINOv2-small, ``DinoEmbedder.embed(crop, 'pad')``):
 
 * ``android``: the stored Android manual uploads whose card the owner's list names. The crop is the
@@ -86,7 +89,6 @@ def text_row_of(name: str | None, pos: dict[str, int]) -> str | None:
 def load_index(index_dir: Path, catalog: Path):
     ids = np.load(index_dir / 'embedding_card_ids.npy', allow_pickle=False).astype(str).tolist()
     emb = np.asarray(np.load(index_dir / 'embeddings.npy'), dtype=np.float32)
-    emb /= np.clip(np.linalg.norm(emb, axis=1, keepdims=True), 1e-8, None)
     con = sqlite3.connect(f'file:{catalog}?mode=ro', uri=True)
     lang = {row[0]: row[1] for row in con.execute('SELECT id, language FROM cards')}
     con.close()
@@ -257,6 +259,7 @@ def evaluate(queries, ids, emb, pos, lang, emb16, q8, scale, timings):
             per_variant[name] = {
                 'top1': canon(ids[top_rows[0]]), 'margin': float(margin),
                 'top5': [canon(ids[r]) for r in top_rows],
+                'top20': [canon(ids[r]) for r in distinct_top(scores, ids, 20)],
                 'cat': cat, 'answer': None if answer is None else canon(answer),
                 'answered_wrong': cat in ANSWERED and not same_card(answer, label),
                 'adv': adv,
@@ -276,6 +279,7 @@ def summarise(records: list[dict], sizes: dict[str, int], timings: dict[str, lis
         agree = sum(d['cat'] == f['cat'] for d, f in zip(decisions, ref))
         answered_agree = sum((d['cat'] in ANSWERED) == (f['cat'] in ANSWERED) for d, f in zip(decisions, ref))
         top1 = sum(d['top1'] == f['top1'] for d, f in zip(decisions, ref))
+        top20 = sum(d['top20'] == f['top20'] for d, f in zip(decisions, ref))
         overlap = [len(set(d['top5']) & set(f['top5'])) / 5 for d, f in zip(decisions, ref)]
         dmargin = [abs(d['margin'] - f['margin']) for d, f in zip(decisions, ref)]
         adv_pairs = adv_agree = new_wrong = f32_wrong = 0
@@ -292,6 +296,8 @@ def summarise(records: list[dict], sizes: dict[str, int], timings: dict[str, lis
             'answered_agree': answered_agree,
             'top1_agree': top1,
             'top1_agree_pct': round(100 * top1 / len(rows), 2) if rows else None,
+            'top20_agree': top20,
+            'top20_agree_pct': round(100 * top20 / len(rows), 2) if rows else None,
             'top5_overlap_mean_pct': round(100 * statistics.mean(overlap), 2) if overlap else None,
             'margin_change_median': round(statistics.median(dmargin), 5) if dmargin else None,
             'margin_change_max': round(max(dmargin), 5) if dmargin else None,
@@ -312,7 +318,9 @@ def gate(summary: dict) -> dict:
     result = {}
     for name in ('int8', 'int8_top50_f32', 'float16'):
         v = summary['all']['variants'][name]
-        result[name] = bool(v['decision_agree_pct'] is not None and v['decision_agree_pct'] >= 99.0
+        result[name] = bool(summary['all']['queries'] > 0
+                            and v['decision_agree'] * 100 >= summary['all']['queries'] * 99
+                            and v['top20_agree'] * 100 >= summary['all']['queries'] * 99
                             and v['new_wrong_passes'] == 0)
     return result
 
@@ -324,13 +332,17 @@ def main() -> None:
                         help='folder with android_cases.json and images/ (the stored Android uploads, copied read only)')
     parser.add_argument('--work', type=Path, required=True, help='scratch folder for caches and index copies (not in git)')
     parser.add_argument('--out', type=Path, required=True)
+    parser.add_argument('--index-dir', type=Path, help='server snapshot vectors directory')
+    parser.add_argument('--catalog', type=Path, help='catalogue paired with the server snapshot')
+    parser.add_argument('--model', type=Path, help='model paired with the server snapshot')
+    parser.add_argument('--phone-index', type=Path, help='exported candidate directory to test')
     args = parser.parse_args()
     args.work.mkdir(parents=True, exist_ok=True)
 
     root = args.data_root
-    index_dir = root / EMB_REL / 'catalogue/vectors/pad'
-    catalog = root / EMB_REL / 'catalogue/catalog.sqlite'
-    model = root / EMB_REL / 'teacher/dinov2_small.onnx'
+    index_dir = args.index_dir or root / EMB_REL / 'catalogue/vectors/pad'
+    catalog = args.catalog or root / EMB_REL / 'catalogue/catalog.sqlite'
+    model = args.model or root / EMB_REL / 'teacher/dinov2_small.onnx'
     manifest = json.loads((index_dir / 'manifest.json').read_text())
     if hashlib.sha256(model.read_bytes()).hexdigest() != manifest['dinov2_sha256']:
         raise SystemExit('model checksum does not match the index manifest')
@@ -339,6 +351,23 @@ def main() -> None:
     print(f'index rows {len(ids)} x {emb.shape[1]}; model checksum matches the manifest')
     q8, scale = quantize(emb)
     emb16 = emb.astype(np.float16)
+    if args.phone_index:
+        phone = args.phone_index
+        version = json.loads((phone / 'card_index.version.json').read_text())
+        if (version.get('model_id') != manifest['dinov2_sha256'][:12]
+                or version.get('catalogue_version') != manifest['catalogue_version']
+                or version.get('rows') != len(ids) or version.get('dims') != emb.shape[1]
+                or (phone / 'card_index.ids.txt').read_text().splitlines() != ids):
+            raise SystemExit('phone candidate does not match the snapshot')
+        for name in ('card_index.f16.bin', 'card_index.ids.txt', 'card_index.meta.tsv'):
+            path = phone / name
+            info = version.get('files', {}).get(name, {})
+            if path.stat().st_size != info.get('bytes') or hashlib.sha256(path.read_bytes()).hexdigest() != info.get('sha256'):
+                raise SystemExit(f'phone candidate checksum mismatch: {name}')
+        stored = np.fromfile(phone / 'card_index.f16.bin', dtype='<f2').reshape(emb.shape)
+        if not np.array_equal(stored, emb16):
+            raise SystemExit('phone candidate vectors differ from snapshot conversion')
+        emb16 = stored
     np.save(args.work / 'index_int8.npy', q8)
     np.save(args.work / 'index_scale.npy', scale)
     np.save(args.work / 'index_float16.npy', emb16)
@@ -368,6 +397,7 @@ def main() -> None:
             v = block['variants'][name]
             print(f'{name:16s} decision {v["decision_agree"]}/{block["queries"]} ({v["decision_agree_pct"]}%) '
                   f'top1 {v["top1_agree_pct"]}% top5 {v["top5_overlap_mean_pct"]}% '
+                  f'top20 exact {v["top20_agree_pct"]}% '
                   f'dmargin med {v["margin_change_median"]} max {v["margin_change_max"]} '
                   f'new_wrong {v["new_wrong_passes"]}/{v["adversarial_pairs"]} '
                   f'size {v["size_bytes"]} search med {v["search_ms_median"]} ms p90 {v["search_ms_p90"]} ms')

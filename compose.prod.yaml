@@ -9,6 +9,8 @@ services:
       ENABLE_MATCHED: ${ENABLE_MATCHED:-true}
       CARDMARKET_HELPER_ENABLED: ${CARDMARKET_HELPER_ENABLED:-false}
       CARDMARKET_WEBVIEW_ENABLED: ${CARDMARKET_WEBVIEW_ENABLED:-true}
+      # Production stays off: the Python default is now true (staging).
+      CARD_INDEX_PUBLISH: ${CARD_INDEX_PUBLISH:-false}
     mem_limit: 1536m
     cpus: "1.5"
     pids_limit: 256
