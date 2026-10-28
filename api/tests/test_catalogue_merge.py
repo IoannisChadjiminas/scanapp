@@ -103,6 +103,21 @@ def test_display_prefers_tcgdex_url() -> None:
     assert display_image_url(extra) == "/api/v1/cards/extra-gengar/image"
 
 
+def test_charizard_retired_remote_uses_stored_image() -> None:
+    row = {
+        "id": "ja:PMCG1-021",
+        "has_image": 1,
+        "image_path": "/data/reference-images/ja/PMCG1-021.jpg",
+        "remote_image_url": (
+            "https://static.tcgcollector.com/content/images/8e/40/88/"
+            "8e4088feac274f152f050116b685af4e18bb9a4de47dd5291ca935f879c5d5bf.jpg"
+        ),
+    }
+    assert display_image_url(row) == "/api/v1/cards/ja:PMCG1-021/image"
+    # Do not advertise the broken URL if the stored image is unavailable too.
+    assert display_image_url(dict(row, has_image=0, image_path=None)) is None
+
+
 def test_backfill_remote_url_from_tcgdex_cache(tmp_path: Path) -> None:
     conn = connect(tmp_path / "catalog.sqlite")
     init_catalog(conn)

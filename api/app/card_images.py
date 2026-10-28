@@ -8,6 +8,14 @@ from urllib.parse import quote
 from app.visual_aliases import visual_image_owner
 
 
+# This retired provider URL returns 404. Keep using the catalogue's stored
+# reference image instead, including in recognition's printing suggestions.
+_UNAVAILABLE_REMOTE_IMAGES = frozenset({
+    "https://static.tcgcollector.com/content/images/8e/40/88/"
+    "8e4088feac274f152f050116b685af4e18bb9a4de47dd5291ca935f879c5d5bf.jpg",
+})
+
+
 def tcgdex_display_url(image_base: str | None, quality: str = "high") -> str | None:
     base = (image_base or "").strip().rstrip("/")
     if not base.startswith("https://"):
@@ -21,7 +29,7 @@ def display_image_url(row: Any, catalog: Any = None) -> str | None:
         return f"/api/v1/cards/{quote(str(row['id']), safe=':')}/image"
     keys = set(row.keys()) if hasattr(row, "keys") else set()
     remote = str(row["remote_image_url"] or "") if "remote_image_url" in keys else ""
-    if remote.startswith("https://"):
+    if remote.startswith("https://") and remote not in _UNAVAILABLE_REMOTE_IMAGES:
         return remote
     card_id = str(row["id"] if "id" in keys else "")
     has_image = bool(row["has_image"]) if "has_image" in keys else False
