@@ -58,3 +58,39 @@ repeat reads, confirm page/file trend and finish parity, then choose the
 listing/gap crossovers and clamp from median/p90 errors and sample counts.
 Two to four weeks can inform short windows; validating a 60-day lifetime
 requires observations spanning that interval.
+
+## Staging deployment authorized and verified — 29 October 2026
+
+The owner subsequently authorized deployment. Runtime revision `c0a413d`
+was applied to the API alone using a small image layer over the running
+image. The full effective environment matched before/after; web and scraper
+container IDs were unchanged. The paid scraper and PC helper remain off,
+phone reads remain enabled, and production was not accessed.
+
+Public health is `ok` on the same catalogue import
+`PS-CATALOGUE-EN-JA-NEO2057-20261028`. The startup import successfully wrote
+75,295 nonempty guide-history rows and the 2026-10-29 import-day marker.
+Sales-history batching was verified by retaining 30 real points from an
+already stored chart; no synthetic market values were introduced.
+
+All 474 existing listing observations were copied into numeric history using
+their original observed/fetched timestamps and no invented historical guide
+values. The accepted-read write path was also exercised inside a transaction
+and rolled back. Ordinary future phone reads append observations automatically.
+The initial baseline still contains only one read per sample key, so there
+are no backtest pairs yet.
+
+`deployment.json` records the container/image identities and retained rollback
+location; `staging-after-deploy.json` records the actual post-deployment audit.
+Rollback image: `scanapp-staging-rollback:price-valuation-p0-20261029`.
+Protected rollback/source/configuration archive:
+`/etc/scanapp-staging/rollback-price-valuation-p0-20261029/` on staging.
+
+All 96 tracked runtime/dependency source files were compared against the
+running image and matched the P0 branch. No other local work was published.
+There are no GitHub CI checks configured for this PR; the previously reported
+150 focused and 4 real PostgreSQL tests and runtime verification apply.
+
+P0's collection infrastructure is now enabled. Its calibrated listing/gap
+lifetimes and clamp remain pending real repeated observations and page/file
+finish-parity verification. No recurring monitor was created.

@@ -1,0 +1,12 @@
+{
+  "before_container": "c9e655904574",
+  "after_container": "f57dbbaf15e0",
+  "old_image": "sha256:82b1aa4cfc182006c4da1810358e9027020dddd6200e757bb021e7dd18823b1e",
+  "new_image": "sha256:ca8c5346c86bcb967d5a5de2446e44886e48b4e205e4249fd24d64fa0561fb23",
+  "revision": "c0a413d",
+  "environment_identical": true,
+  "other_containers_unchanged": true,
+  "health": "healthy",
+  "rollback_image": "scanapp-staging-rollback:price-valuation-p0-20261029",
+  "rollback_directory": "/etc/scanapp-staging/rollback-price-valuation-p0-20261029"
+}
