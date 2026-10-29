@@ -128,3 +128,24 @@ def test_preprovisioned_schema_supports_a_runtime_role_without_create_or_auth_ac
     finally:
         service.admin.execute(sql.SQL("DROP OWNED BY {}").format(sql.Identifier(role)))
         service.admin.execute(sql.SQL("DROP ROLE {}").format(sql.Identifier(role)))
+
+
+def test_price_history_writes_with_real_psycopg_cursor(pg_service):
+    from app import price_history
+
+    with pg_service.connect('') as conn:
+        assert not hasattr(conn, 'executemany')
+        assert price_history.record_guide(conn, '2026-10-29', [
+            {'id_product': 1, 'trend': 10, 'trend_holo': 20}]) == 1
+        assert price_history.record_guide(conn, '2026-10-30', [
+            {'id_product': 1, 'trend': 10, 'trend_holo': 20}]) == 0
+        price_history.bind(conn)
+        try:
+            assert price_history.record_sales(
+                'https://www.cardmarket.com/en/Pokemon/Products/Singles/Base-Set/Pikachu',
+                [{'label': 'Avg 29.10.2026', 'amount': 10}]) == 1
+        finally:
+            price_history.bind(None)
+        assert conn.execute('SELECT count(*) AS n FROM price_history_daily').fetchone()['n'] == 1
+        assert conn.execute('SELECT count(*) AS n FROM price_guide_import_days').fetchone()['n'] == 2
+        assert conn.execute('SELECT count(*) AS n FROM price_sales_daily').fetchone()['n'] == 1

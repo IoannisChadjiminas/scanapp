@@ -1,0 +1,275 @@
+{
+  "snapshot_count": 474,
+  "read_count_including_history": 474,
+  "snapshot_gap_diagnostics_not_a_backtest": [
+    {
+      "language": "1",
+      "finish": "plain",
+      "n": 352,
+      "median_gap": 0.9560116889915256,
+      "p10_gap": 0.28536881837374445,
+      "p90_gap": 1.9712184873949579,
+      "outside_0.5_2": 107,
+      "outside_0.25_4": 41
+    },
+    {
+      "language": "1",
+      "finish": "reverse",
+      "n": 2,
+      "median_gap": 1.4046634297209284,
+      "p10_gap": 0.4053771303886301,
+      "p90_gap": 2.4039497290532266,
+      "outside_0.5_2": 2,
+      "outside_0.25_4": 1
+    },
+    {
+      "language": "7",
+      "finish": "plain",
+      "n": 97,
+      "median_gap": 0.9216192937123169,
+      "p10_gap": 0.1311688311688312,
+      "p90_gap": 1.8276168236290389,
+      "outside_0.5_2": 31,
+      "outside_0.25_4": 14
+    }
+  ],
+  "history_counts": {
+    "price_history_daily": 75295,
+    "price_sales_daily": 30,
+    "price_guide_import_days": 1
+  },
+  "guide_import_days": [
+    "2026-10-29"
+  ],
+  "guide_meta": [
+    {
+      "guide_date": "2026-10-29T01:52:59Z",
+      "row_count": 80170,
+      "imported_at": "2026-10-29T09:19:41Z"
+    }
+  ],
+  "page_file_same_day_parity": {},
+  "backtest": {
+    "eligible_keys": 473,
+    "invalid_or_unpriced_reads": 1,
+    "all_pairs": {
+      "pairs": 0,
+      "sample_keys": 0,
+      "A_frozen": {
+        "n": 0,
+        "median_ape_pct": null,
+        "p90_ape_pct": null
+      },
+      "B_trend": {
+        "n": 0,
+        "median_ape_pct": null,
+        "p90_ape_pct": null
+      },
+      "C_unclamped": {
+        "n": 0,
+        "median_ape_pct": null,
+        "p90_ape_pct": null
+      },
+      "C_0.5_2": {
+        "n": 0,
+        "median_ape_pct": null,
+        "p90_ape_pct": null
+      },
+      "C_0.75_1.5": {
+        "n": 0,
+        "median_ape_pct": null,
+        "p90_ape_pct": null
+      }
+    },
+    "common_cohort": {
+      "pairs": 0,
+      "sample_keys": 0,
+      "A_frozen": {
+        "n": 0,
+        "median_ape_pct": null,
+        "p90_ape_pct": null
+      },
+      "B_trend": {
+        "n": 0,
+        "median_ape_pct": null,
+        "p90_ape_pct": null
+      },
+      "C_unclamped": {
+        "n": 0,
+        "median_ape_pct": null,
+        "p90_ape_pct": null
+      },
+      "C_0.5_2": {
+        "n": 0,
+        "median_ape_pct": null,
+        "p90_ape_pct": null
+      },
+      "C_0.75_1.5": {
+        "n": 0,
+        "median_ape_pct": null,
+        "p90_ape_pct": null
+      }
+    },
+    "strata": {
+      "age": {
+        "3\u20137": {
+          "pairs": 0,
+          "sample_keys": 0,
+          "A_frozen": {
+            "n": 0,
+            "median_ape_pct": null,
+            "p90_ape_pct": null
+          },
+          "B_trend": {
+            "n": 0,
+            "median_ape_pct": null,
+            "p90_ape_pct": null
+          },
+          "C_unclamped": {
+            "n": 0,
+            "median_ape_pct": null,
+            "p90_ape_pct": null
+          },
+          "C_0.5_2": {
+            "n": 0,
+            "median_ape_pct": null,
+            "p90_ape_pct": null
+          },
+          "C_0.75_1.5": {
+            "n": 0,
+            "median_ape_pct": null,
+            "p90_ape_pct": null
+          }
+        },
+        "8\u201314": {
+          "pairs": 0,
+          "sample_keys": 0,
+          "A_frozen": {
+            "n": 0,
+            "median_ape_pct": null,
+            "p90_ape_pct": null
+          },
+          "B_trend": {
+            "n": 0,
+            "median_ape_pct": null,
+            "p90_ape_pct": null
+          },
+          "C_unclamped": {
+            "n": 0,
+            "median_ape_pct": null,
+            "p90_ape_pct": null
+          },
+          "C_0.5_2": {
+            "n": 0,
+            "median_ape_pct": null,
+            "p90_ape_pct": null
+          },
+          "C_0.75_1.5": {
+            "n": 0,
+            "median_ape_pct": null,
+            "p90_ape_pct": null
+          }
+        },
+        "15\u201330": {
+          "pairs": 0,
+          "sample_keys": 0,
+          "A_frozen": {
+            "n": 0,
+            "median_ape_pct": null,
+            "p90_ape_pct": null
+          },
+          "B_trend": {
+            "n": 0,
+            "median_ape_pct": null,
+            "p90_ape_pct": null
+          },
+          "C_unclamped": {
+            "n": 0,
+            "median_ape_pct": null,
+            "p90_ape_pct": null
+          },
+          "C_0.5_2": {
+            "n": 0,
+            "median_ape_pct": null,
+            "p90_ape_pct": null
+          },
+          "C_0.75_1.5": {
+            "n": 0,
+            "median_ape_pct": null,
+            "p90_ape_pct": null
+          }
+        },
+        "31\u201360": {
+          "pairs": 0,
+          "sample_keys": 0,
+          "A_frozen": {
+            "n": 0,
+            "median_ape_pct": null,
+            "p90_ape_pct": null
+          },
+          "B_trend": {
+            "n": 0,
+            "median_ape_pct": null,
+            "p90_ape_pct": null
+          },
+          "C_unclamped": {
+            "n": 0,
+            "median_ape_pct": null,
+            "p90_ape_pct": null
+          },
+          "C_0.5_2": {
+            "n": 0,
+            "median_ape_pct": null,
+            "p90_ape_pct": null
+          },
+          "C_0.75_1.5": {
+            "n": 0,
+            "median_ape_pct": null,
+            "p90_ape_pct": null
+          }
+        },
+        "61+": {
+          "pairs": 0,
+          "sample_keys": 0,
+          "A_frozen": {
+            "n": 0,
+            "median_ape_pct": null,
+            "p90_ape_pct": null
+          },
+          "B_trend": {
+            "n": 0,
+            "median_ape_pct": null,
+            "p90_ape_pct": null
+          },
+          "C_unclamped": {
+            "n": 0,
+            "median_ape_pct": null,
+            "p90_ape_pct": null
+          },
+          "C_0.5_2": {
+            "n": 0,
+            "median_ape_pct": null,
+            "p90_ape_pct": null
+          },
+          "C_0.75_1.5": {
+            "n": 0,
+            "median_ape_pct": null,
+            "p90_ape_pct": null
+          }
+        }
+      },
+      "language": {},
+      "condition": {},
+      "finish": {},
+      "band": {},
+      "age_language_condition_finish_band": []
+    },
+    "recommendations": {
+      "status": "insufficient_history",
+      "listing_max_age_s": null,
+      "gap_max_age_s": null,
+      "clamp": null
+    },
+    "methodology": "All ordered pairs >=3 days; fractional elapsed days; 60+ means >60 complete days. Strata use the same A/B/C cohort. Clamp n may be smaller after rejection outside [0.25,4]. Price bands use later fair ask. Pairs overlap and are not independent. Errors are absolute prediction/actual minus one; p90 uses linear interpolation."
+  }
+}
