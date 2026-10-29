@@ -28,16 +28,48 @@ gaps selected for manual review (12 Japanese reads are below 0.25).
 
 ## Manual review status
 
-**Pending.** Cardmarket returned a security verification page in the manual
-Haunter tab; automated page opens were also unavailable. None of the ten reads
-is certified correct or incorrect. Their URLs, amounts, timestamps and pending
-status are recorded in `staging-gap-diagnostics.json`.
+**Current-page checks completed on 29 October 2026.** Cardmarket's initial
+security page cleared without solving a challenge. All ten exact saved URLs
+were then opened in the visible browser. Their headings match the expected
+products/expansions, and the reviewed low offers are Japanese NM/MT.
+
+| Product | Current page From EUR | Current page trend EUR | First three offer prices EUR |
+| --- | ---: | ---: | --- |
+| Haunter sv2a 093 | 0.02 | 3.31 | 0.02, 0.02, 0.02 |
+| Goldeen sv2a 118 | 0.02 | 0.53 | 0.02, 0.02, 0.02 |
+| Magikarp sv2a 129 | 0.02 | 0.32 | 0.02, 0.02, 0.02 |
+| Gholdengo ex sv3a 050 | 0.10 | 2.84 | 0.10, 0.10, 0.10 |
+| Oddish sm10 002 | 0.09 | 3.59 | 0.09, 0.10, 0.15 |
+| Greninja ex m6a 015 | 0.02 | 0.27 | 0.02, 0.02, 0.10 |
+| Pikachu m6a 018 | 0.04 | 0.59 | 0.04, 0.30, 0.30 |
+| Lurantis ex m5 004 | 0.02 | 0.21 | 0.02, 0.02, 0.05 |
+| Nidoqueen m6 043 | 0.02 | 0.06 | 0.02, 0.02, 0.02 |
+| Pidgeotto XY2 062 | 0.49 | 0.44 | 0.49, 0.50, 0.90 |
+
+**From above means Cardmarket's current lowest offer**, not the app's saved
+fair ask. No fair ask was recomputed from these three-offer samples. Saved
+observations and their timestamps remain unchanged. Pidgeotto's saved 0.05
+fair ask is not reproduced by today's offers; this alone does not prove a
+historical parser error. Pikachu has one 0.04 offer followed by 0.30 offers,
+which illustrates why lowest listing and fair ask cannot be interchanged.
+
+Finish checks found qualifications: Oddish's Only Reverse switch is unchecked;
+Haunter has a later seller comment mentioning pokeball reverse and links to
+separate additional versions; Pidgeotto's first three offers are First Edition.
+No reverse-only parameter was supplied in any of the ten saved sample URLs.
+Do not certify these pages as a homogeneous finish series solely from their
+URL or heading. The JSON records these per-product notes.
+
+The large page-trend/listing gaps are visible on the marketplace itself for
+several correctly named Japanese products. This rules out the assumption that
+every small legacy gap necessarily means a wrong product URL. It does **not**
+certify the cloud catalogue ID/finish used for the price-file denominator or
+reconstruct the original seller rows. That mapping should be verified while
+preparing P3a before carrying a saved price-file gap forward.
 
 The local SQLite `cards` table returned no catalogue matches for these URLs.
 The deployed catalogue is loaded from the cloud into application memory; the
-empty local lookup is not evidence of a mapping bug. Confirm product identity,
-Japanese language, finish, seller/listing filters and amounts against the live
-pages before treating the diagnostic gate for P3a as complete.
+empty local lookup is not evidence of a mapping bug.
 
 ## Evaluator correction
 

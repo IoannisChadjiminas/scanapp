@@ -130,7 +130,23 @@
       "sample_key": "https://www.cardmarket.com/en/Pokemon/Products/Singles/Pokemon-Card-151/Haunter-sv2a093?language=7&minCondition=2",
       "observed_at": "2026-10-12T17:11:40Z",
       "catalogue_matches": [],
-      "review_status": "pending_manual_cardmarket_check"
+      "review_status": "current_cardmarket_page_checked_mapping_not_certified",
+      "manual_review": {
+        "checked_at": "2026-10-29T11:50:16.302884+00:00",
+        "page_heading": "Haunter (sv2a 093)",
+        "listing_language": "Japanese",
+        "lowest_listing_condition": "NM",
+        "page_from_eur": 0.02,
+        "page_trend_eur": 3.31,
+        "first_three_offer_unit_prices_eur": [
+          0.02,
+          0.02,
+          0.02
+        ],
+        "finish_notes": "No reverse-only parameter; page also lists separate additional versions. One later seller comment mentions pokeball reverse, so unfiltered results must not be treated as a finish certification.",
+        "price_file_mapping_verified": false,
+        "historical_fair_ask_recomputed": false
+      }
     },
     {
       "fair_ask": 0.02,
@@ -144,7 +160,23 @@
       "sample_key": "https://www.cardmarket.com/en/Pokemon/Products/Singles/Pokemon-Card-151/Goldeen-sv2a118?language=7&minCondition=2",
       "observed_at": "2026-10-12T17:29:08Z",
       "catalogue_matches": [],
-      "review_status": "pending_manual_cardmarket_check"
+      "review_status": "current_cardmarket_page_checked_mapping_not_certified",
+      "manual_review": {
+        "checked_at": "2026-10-29T11:50:16.302884+00:00",
+        "page_heading": "Goldeen (sv2a 118)",
+        "listing_language": "Japanese",
+        "lowest_listing_condition": "MT",
+        "page_from_eur": 0.02,
+        "page_trend_eur": 0.53,
+        "first_three_offer_unit_prices_eur": [
+          0.02,
+          0.02,
+          0.02
+        ],
+        "finish_notes": "No reverse-only parameter; visible low offers are Japanese mint.",
+        "price_file_mapping_verified": false,
+        "historical_fair_ask_recomputed": false
+      }
     },
     {
       "fair_ask": 0.02,
@@ -158,7 +190,23 @@
       "sample_key": "https://www.cardmarket.com/en/Pokemon/Products/Singles/Pokemon-Card-151/Magikarp-sv2a129?language=7&minCondition=2",
       "observed_at": "2026-10-12T17:13:45Z",
       "catalogue_matches": [],
-      "review_status": "pending_manual_cardmarket_check"
+      "review_status": "current_cardmarket_page_checked_mapping_not_certified",
+      "manual_review": {
+        "checked_at": "2026-10-29T11:50:16.302884+00:00",
+        "page_heading": "Magikarp (sv2a 129)",
+        "listing_language": "Japanese",
+        "lowest_listing_condition": "NM",
+        "page_from_eur": 0.02,
+        "page_trend_eur": 0.32,
+        "first_three_offer_unit_prices_eur": [
+          0.02,
+          0.02,
+          0.02
+        ],
+        "finish_notes": "Separate additional versions are linked on the page; no reverse-only parameter.",
+        "price_file_mapping_verified": false,
+        "historical_fair_ask_recomputed": false
+      }
     },
     {
       "fair_ask": 0.10000000000000002,
@@ -172,7 +220,23 @@
       "sample_key": "https://www.cardmarket.com/en/Pokemon/Products/Singles/Raging-Surf/Gholdengo-ex-V1-sv3a050?language=7&minCondition=2",
       "observed_at": "2026-10-12T17:14:24Z",
       "catalogue_matches": [],
-      "review_status": "pending_manual_cardmarket_check"
+      "review_status": "current_cardmarket_page_checked_mapping_not_certified",
+      "manual_review": {
+        "checked_at": "2026-10-29T11:50:16.302884+00:00",
+        "page_heading": "Gholdengo ex (sv3a 050)",
+        "listing_language": "Japanese",
+        "lowest_listing_condition": "NM",
+        "page_from_eur": 0.1,
+        "page_trend_eur": 2.84,
+        "first_three_offer_unit_prices_eur": [
+          0.1,
+          0.1,
+          0.1
+        ],
+        "finish_notes": "Double Rare base-number product, no explicit reverse marker on reviewed low offers.",
+        "price_file_mapping_verified": false,
+        "historical_fair_ask_recomputed": false
+      }
     },
     {
       "fair_ask": 0.09666666666666668,
@@ -186,7 +250,23 @@
       "sample_key": "https://www.cardmarket.com/en/Pokemon/Products/Singles/Double-Blaze/Oddish-V2?language=7&minCondition=2",
       "observed_at": "2026-10-12T17:14:11Z",
       "catalogue_matches": [],
-      "review_status": "pending_manual_cardmarket_check"
+      "review_status": "current_cardmarket_page_checked_mapping_not_certified",
+      "manual_review": {
+        "checked_at": "2026-10-29T11:50:16.302884+00:00",
+        "page_heading": "Oddish (sm10 002)",
+        "listing_language": "Japanese",
+        "lowest_listing_condition": "NM",
+        "page_from_eur": 0.09,
+        "page_trend_eur": 3.59,
+        "first_three_offer_unit_prices_eur": [
+          0.09,
+          0.1,
+          0.15
+        ],
+        "finish_notes": "Only Reverse switch (foilMode) is unchecked. No explicit reverse marker on first five reviewed offers; this is not a reverse-only sample.",
+        "price_file_mapping_verified": false,
+        "historical_fair_ask_recomputed": false
+      }
     },
     {
       "fair_ask": 0.02,
@@ -200,7 +280,23 @@
       "sample_key": "https://www.cardmarket.com/en/Pokemon/Products/Singles/30th-Celebration-JP/Greninja-ex-V1-m6a015?language=7&minCondition=2",
       "observed_at": "2026-10-22T13:12:28Z",
       "catalogue_matches": [],
-      "review_status": "pending_manual_cardmarket_check"
+      "review_status": "current_cardmarket_page_checked_mapping_not_certified",
+      "manual_review": {
+        "checked_at": "2026-10-29T11:50:16.302884+00:00",
+        "page_heading": "Greninja ex (m6a 015)",
+        "listing_language": "Japanese",
+        "lowest_listing_condition": "NM",
+        "page_from_eur": 0.02,
+        "page_trend_eur": 0.27,
+        "first_three_offer_unit_prices_eur": [
+          0.02,
+          0.02,
+          0.1
+        ],
+        "finish_notes": "Double Rare base-number product, no explicit reverse marker on reviewed low offers.",
+        "price_file_mapping_verified": false,
+        "historical_fair_ask_recomputed": false
+      }
     },
     {
       "fair_ask": 0.04,
@@ -214,7 +310,23 @@
       "sample_key": "https://www.cardmarket.com/en/Pokemon/Products/Singles/30th-Celebration-JP/Pikachu-m6a018?language=7&minCondition=2",
       "observed_at": "2026-10-22T21:54:56Z",
       "catalogue_matches": [],
-      "review_status": "pending_manual_cardmarket_check"
+      "review_status": "current_cardmarket_page_checked_mapping_not_certified",
+      "manual_review": {
+        "checked_at": "2026-10-29T11:50:16.302884+00:00",
+        "page_heading": "Pikachu (m6a 018)",
+        "listing_language": "Japanese",
+        "lowest_listing_condition": "NM",
+        "page_from_eur": 0.04,
+        "page_trend_eur": 0.59,
+        "first_three_offer_unit_prices_eur": [
+          0.04,
+          0.3,
+          0.3
+        ],
+        "finish_notes": "Pikachu Rare product; only the first reviewed offer is four cents. Low From is not a recomputed fair ask.",
+        "price_file_mapping_verified": false,
+        "historical_fair_ask_recomputed": false
+      }
     },
     {
       "fair_ask": 0.02,
@@ -228,7 +340,23 @@
       "sample_key": "https://www.cardmarket.com/en/Pokemon/Products/Singles/Abyss-Eye/Lurantis-ex-V1-m5004?language=7&minCondition=2",
       "observed_at": "2026-10-17T21:52:26Z",
       "catalogue_matches": [],
-      "review_status": "pending_manual_cardmarket_check"
+      "review_status": "current_cardmarket_page_checked_mapping_not_certified",
+      "manual_review": {
+        "checked_at": "2026-10-29T11:50:16.302884+00:00",
+        "page_heading": "Lurantis ex (m5 004)",
+        "listing_language": "Japanese",
+        "lowest_listing_condition": "NM",
+        "page_from_eur": 0.02,
+        "page_trend_eur": 0.21,
+        "first_three_offer_unit_prices_eur": [
+          0.02,
+          0.02,
+          0.05
+        ],
+        "finish_notes": "Double Rare base-number product, no explicit reverse marker on reviewed low offers.",
+        "price_file_mapping_verified": false,
+        "historical_fair_ask_recomputed": false
+      }
     },
     {
       "fair_ask": 0.02,
@@ -242,7 +370,23 @@
       "sample_key": "https://www.cardmarket.com/en/Pokemon/Products/Singles/Storm-Emeralda/Nidoqueen-m6043?language=7&minCondition=2",
       "observed_at": "2026-10-17T21:51:33Z",
       "catalogue_matches": [],
-      "review_status": "pending_manual_cardmarket_check"
+      "review_status": "current_cardmarket_page_checked_mapping_not_certified",
+      "manual_review": {
+        "checked_at": "2026-10-29T11:50:16.302884+00:00",
+        "page_heading": "Nidoqueen (m6 043)",
+        "listing_language": "Japanese",
+        "lowest_listing_condition": "NM",
+        "page_from_eur": 0.02,
+        "page_trend_eur": 0.06,
+        "first_three_offer_unit_prices_eur": [
+          0.02,
+          0.02,
+          0.02
+        ],
+        "finish_notes": "Correct named product/expansion and Japanese offers; product image was unavailable. No explicit reverse marker on reviewed low offers.",
+        "price_file_mapping_verified": false,
+        "historical_fair_ask_recomputed": false
+      }
     },
     {
       "fair_ask": 0.05,
@@ -256,7 +400,24 @@
       "sample_key": "https://www.cardmarket.com/en/Pokemon/Products/Singles/Wild-Blaze/Pidgeotto?language=7&minCondition=2",
       "observed_at": "2026-10-11T10:50:16Z",
       "catalogue_matches": [],
-      "review_status": "pending_manual_cardmarket_check"
+      "review_status": "current_cardmarket_page_checked_mapping_not_certified",
+      "manual_review": {
+        "checked_at": "2026-10-29T11:50:16.302884+00:00",
+        "page_heading": "Pidgeotto (XY2 062)",
+        "listing_language": "Japanese",
+        "lowest_listing_condition": "NM",
+        "page_from_eur": 0.49,
+        "page_trend_eur": 0.44,
+        "first_three_offer_unit_prices_eur": [
+          0.49,
+          0.5,
+          0.9
+        ],
+        "finish_notes": "First three reviewed offers explicitly marked First Edition. Saved fair ask 0.05 is not reproduced by the current page.",
+        "price_file_mapping_verified": false,
+        "historical_fair_ask_recomputed": false
+      }
     }
-  ]
+  ],
+  "manual_review_scope": "All ten exact saved sample URLs opened in the visible browser. Product headings, Japanese language, condition and current offer rows reviewed. Values are current page values, not replacements for saved history. Cloud catalogue IDs, price-file denominator mapping and historical seller rows are not certified."
 }
