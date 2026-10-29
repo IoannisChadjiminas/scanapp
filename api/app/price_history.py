@@ -17,6 +17,7 @@ from __future__ import annotations
 import logging
 import re
 import threading
+from contextlib import closing
 from typing import Any, Iterable
 
 log = logging.getLogger("price.history")
@@ -134,7 +135,8 @@ def record_guide(conn, date: str, entries: Iterable[dict[str, Any]]) -> int:
         + ", ".join(f"{name} = excluded.{name}" for name in HISTORY_FIELDS),
     )
     for start in range(0, len(pending), CHUNK):
-        conn.executemany(sql, pending[start : start + CHUNK])
+        with closing(conn.cursor()) as cursor:
+            cursor.executemany(sql, pending[start : start + CHUNK])
         conn.commit()
     conn.execute(_sql(conn, "INSERT INTO price_guide_import_days(day) VALUES (?) ON CONFLICT (day) DO NOTHING"), (day,))
     conn.commit()
@@ -192,7 +194,8 @@ def record_sales(url: str, prices: Iterable[dict[str, Any]], *, own: Any = None)
             "ON CONFLICT (product_url, day) DO UPDATE SET price = excluded.price",
         )
         with _lock:
-            conn.executemany(sql, [(product, day, price) for day, price in points])
+            with closing(conn.cursor()) as cursor:
+                cursor.executemany(sql, [(product, day, price) for day, price in points])
             if conn is not own:
                 conn.commit()
         return len(points)

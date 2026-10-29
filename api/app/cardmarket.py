@@ -2575,6 +2575,15 @@ def write_snapshot(
         existing_observed = str((existing or {}).get("observed_at") or "")
         if existing_observed and existing_observed > stamp:
             return key
+        from app.valuation_history import record_read
+
+        # Preserve the pre-deployment snapshot before its first overwrite.
+        # Today's guide must never be attached to this older observation.
+        if existing and existing.get("prices"):
+            previous_stamp = existing.get("observed_at") or existing.get("fetched_at")
+            if previous_stamp:
+                record_read(conn, key, previous_stamp, existing["prices"],
+                            existing.get("parser_version"), capture_guide=False)
         conn.execute(
             """
             INSERT INTO cardmarket_snapshots (
@@ -2618,6 +2627,7 @@ def write_snapshot(
     if prices:
         from app.price_history import record_sales
 
+        record_read(conn, key, stamp, prices, parser_version)
         record_sales(url, prices, own=conn)
     if commit:
         conn.commit()

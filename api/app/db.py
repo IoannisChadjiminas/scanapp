@@ -249,6 +249,9 @@ def init_catalog(conn: sqlite3.Connection) -> None:
         },
     )
     _migrate_snapshots(conn)
+    from app.valuation_history import SCHEMA as valuation_history_schema
+
+    conn.execute(valuation_history_schema)
     conn.executescript(
         """
         CREATE TABLE IF NOT EXISTS cardmarket_scrapes (
