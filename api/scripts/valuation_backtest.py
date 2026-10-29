@@ -19,7 +19,7 @@ from app.valuation_history import fair_ask, page_trend, positive
 
 BUCKETS = (("3–7", 3, 8), ("8–14", 8, 15), ("15–30", 15, 31),
            ("31–60", 31, 61), ("61+", 61, math.inf))
-CLAMPS = {"C_unclamped": None, "C_0.5_2": (0.5, 2), "C_0.75_1.5": (0.75, 1.5)}
+CLAMPS = {"C_unclamped": None, "C_reject_0.25_4": None, "C_0.5_2": (0.5, 2), "C_0.75_1.5": (0.75, 1.5)}
 
 
 def stamp(value):
@@ -42,7 +42,8 @@ def percentile(values, fraction):
 
 
 def summarize(rows):
-    result = {"pairs": len(rows), "sample_keys": len({r['key'] for r in rows})}
+    result = {"pairs": len(rows), "sample_keys": len({r['key'] for r in rows}),
+              "rejected_gaps": sum(r.get("gap_rejected", False) for r in rows)}
     methods = ["A_frozen", "B_trend", *CLAMPS]
     for method in methods:
         errors = [r[method] for r in rows if method in r]
@@ -79,14 +80,19 @@ def backtest(reads, later_trend):
                 trend = later_trend(later)
                 if positive(trend):
                     row["B_trend"] = abs(trend / actual - 1) * 100
-                    if positive(earlier.get("page_trend")):
-                        gap = earlier["fair_ask"] / earlier["page_trend"]
+                    earlier_file_trend = later_trend(earlier)
+                    if positive(earlier_file_trend):
+                        gap = earlier["fair_ask"] / earlier_file_trend
                         row["C_unclamped"] = abs(trend * gap / actual - 1) * 100
-                        if .25 <= gap <= 4:
-                            for name, bounds in CLAMPS.items():
-                                if bounds:
-                                    adjusted = min(bounds[1], max(bounds[0], gap))
-                                    row[name] = abs(trend * adjusted / actual - 1) * 100
+                        row["gap_rejected"] = not .25 <= gap <= 4
+                        for name, bounds in CLAMPS.items():
+                            if name == "C_unclamped":
+                                continue
+                            # Match the app policy: rejected gaps fall back to
+                            # the current trend, keeping the comparison cohort.
+                            adjusted = 1 if row["gap_rejected"] else (
+                                min(bounds[1], max(bounds[0], gap)) if bounds else gap)
+                            row[name] = abs(trend * adjusted / actual - 1) * 100
                 all_rows.append(row)
                 if all(method in row for method in ["A_frozen", "B_trend", "C_unclamped"]):
                     common.append(row)
@@ -107,7 +113,8 @@ def backtest(reads, later_trend):
             "recommendations": {"status": "requires_review" if common else "insufficient_history",
                                 "listing_max_age_s": None, "gap_max_age_s": None, "clamp": None},
             "methodology": "All ordered pairs >=3 days; fractional elapsed days; 60+ means >60 complete days. "
-                "Strata use the same A/B/C cohort. Clamp n may be smaller after rejection outside [0.25,4]. "
+                "C uses price-file trends at both read dates, never page-header trends. "
+                "Strata use the same A/B/C cohort. Guarded methods fall back to B outside [0.25,4]. "
                 "Price bands use later fair ask. Pairs overlap and are not independent. "
                 "Errors are absolute prediction/actual minus one; p90 uses linear interpolation."}
 

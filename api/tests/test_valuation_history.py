@@ -46,9 +46,9 @@ def test_history_deduplicates_and_joins_snapshot_transaction(tmp_path):
 
 
 def test_backtest_known_market_move_and_common_cohort():
-    reads = [dict(sample_key=URL, observed_at='2026-10-01T00:00:00Z', fair_ask=20, page_trend=16),
+    reads = [dict(sample_key=URL, observed_at='2026-10-01T00:00:00Z', fair_ask=20, page_trend=999),
              dict(sample_key=URL, observed_at='2026-10-11T00:00:00Z', fair_ask=22.5, page_trend=18)]
-    result = backtest_module.backtest(reads, lambda read: 18)
+    result = backtest_module.backtest(reads, lambda read: 16 if '10-01' in read['observed_at'] else 18)
     cohort = result['common_cohort']
     assert cohort['A_frozen']['median_ape_pct'] == pytest.approx(11.111111)
     assert cohort['B_trend']['median_ape_pct'] == pytest.approx(20)
@@ -77,7 +77,10 @@ def test_clamp_rejection_and_percentile():
     reads[0]['fair_ask'] = .1
     cohort = backtest_module.backtest(reads, lambda r: 1)['common_cohort']
     assert cohort['C_unclamped']['n'] == 1
-    assert cohort['C_0.5_2']['n'] == 0
+    assert cohort['C_0.5_2']['n'] == 1
+    assert cohort['C_0.5_2'] == cohort['B_trend']
+    assert cohort['C_reject_0.25_4'] == cohort['B_trend']
+    assert cohort['rejected_gaps'] == 1
     assert backtest_module.percentile([0, 10], .9) == 9
 
 
@@ -130,3 +133,13 @@ def test_read_captures_reverse_guide_and_audit_fills_only_imported_days(tmp_path
     assert result['page_file_same_day_parity']['reverse']['n'] == 2
     conn.execute("DELETE FROM price_guide_import_days WHERE day='2026-10-11'")
     assert backtest_module.audit(conn)['backtest']['common_cohort']['pairs'] == 0
+
+
+def test_method_c_never_uses_a_page_trend_when_earlier_file_is_missing():
+    reads = [dict(sample_key=URL, observed_at='2026-10-01T00:00:00Z', fair_ask=20, page_trend=16),
+             dict(sample_key=URL, observed_at='2026-10-11T00:00:00Z', fair_ask=22.5, page_trend=18)]
+    result = backtest_module.backtest(reads, lambda r: None if '10-01' in r['observed_at'] else 18)
+    assert result['all_pairs']['A_frozen']['n'] == 1
+    assert result['all_pairs']['B_trend']['n'] == 1
+    assert result['all_pairs']['C_unclamped']['n'] == 0
+    assert result['common_cohort']['pairs'] == 0
