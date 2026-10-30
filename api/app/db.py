@@ -586,6 +586,11 @@ class Databases:
         self.results = connect(settings.results_sqlite, factory=shared)
         init_catalog(self.catalog)
         init_results(self.results)
+        from app.card_image_mirror import load_card_image_cdn
+
+        # None until CARD_IMAGE_CDN_BASE_URL is set; display_image_url then
+        # prefers mirrored art. Read by card routes, never written here.
+        self.catalog.card_image_cdn = load_card_image_cdn(settings)
         self._portfolio_owned = False
         self.portfolio = self.catalog
         url = settings.portfolio_database_url.get_secret_value().strip()
