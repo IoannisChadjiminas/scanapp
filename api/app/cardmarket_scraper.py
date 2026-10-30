@@ -32,6 +32,9 @@ from app.cardmarket_queue import (
 )
 from app.config import Settings
 from app.db import connect
+from app.paid_refresh_requests import requests_for_job
+from app.paid_sample_lease import acquire as acquire_paid_lease, release as release_paid_lease
+from app.subscription_client import SubscriptionClient, SubscriptionUnavailable
 
 def classify_503(response: httpx.Response) -> str:
     """Busy and restarts did not reach Cardmarket. A long Retry-After is a rate limit."""
@@ -289,13 +292,53 @@ class ScraperWorker:
             log.info("paid skipped reason=fresh-cache job=%s url=%s", job["id"], target)
             self._mark_done(conn, job)
             return
+        if not self.settings.product_api_paid_gate_ready:
+            return self._handle_authorized(conn, job, target)
+        try:
+            client = SubscriptionClient(self.settings)
+            requests = requests_for_job(conn, job['id'], target)
+            authorized = any(client.authorize_price(request_id, permit_id, target)
+                             for request_id, permit_id in requests)
+        except SubscriptionUnavailable:
+            self._release(conn, job, 'subscription-unavailable', delay_seconds=5)
+            return
+        if not requests:
+            log.info("paid failed reason=no-permit job=%s url=%s", job["id"], target)
+            fail_proxy_job(conn, job["id"], job["claim_token"], "permit-missing", terminal=True)
+            return
+        if not authorized:
+            # Counts toward the job's attempts, so a lapsed subscription cannot spin forever.
+            fail_proxy_job(conn, job["id"], job["claim_token"], "subscription-required")
+            return
+        token = acquire_paid_lease(conn, target, self.name, int(self.settings.scraper_attempt_seconds) + 90)
+        if token is None:
+            self._release(conn, job, 'already-reading', delay_seconds=5)
+            return
+        try:
+            if sample_is_fresh(conn, target):
+                self._mark_done(conn, job)
+                return
+            # A subscription may have changed while this worker waited for the lease.
+            if not any(client.authorize_price(request_id, permit_id, target)
+                       for request_id, permit_id in requests):
+                fail_proxy_job(conn, job["id"], job["claim_token"], "subscription-required")
+                return
+            pages, megabytes = client.price_budget()
+            budget = self.settings.model_copy(update={'scraper_daily_pages': pages, 'scraper_daily_mb': megabytes})
+            return self._handle_authorized(conn, job, target, budget_settings=budget)
+        except SubscriptionUnavailable:
+            self._release(conn, job, 'subscription-unavailable', delay_seconds=5)
+        finally:
+            release_paid_lease(conn, target, token)
+
+    def _handle_authorized(self, conn, job: dict, target: str, *, budget_settings=None) -> None:
         remaining = cooldown_remaining()
         if remaining > 0:
             self._release(conn, job, "cooldown", delay_seconds=remaining)
             return
         try:
             reservation = reserve_attempt(
-                conn, sample=target, session_id="proxy", ip=""
+                conn, sample=target, session_id="proxy", ip="", budget_settings=budget_settings
             )
         except QueueError as exc:
             log.info("paid failed reason=budget detail=%s url=%s", exc.detail, target)

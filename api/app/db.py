@@ -236,6 +236,7 @@ def init_catalog(conn: sqlite3.Connection) -> None:
             "priority": "INTEGER NOT NULL DEFAULT 10",
             "deadline_at": "TEXT",
             "job_source": "TEXT",
+            "product_refresh_request_id": "TEXT",
         },
     )
     _add_columns(
@@ -301,6 +302,26 @@ def init_catalog(conn: sqlite3.Connection) -> None:
     )
     conn.executescript(
         """
+        CREATE TABLE IF NOT EXISTS paid_sample_lease (
+            sample_key TEXT PRIMARY KEY,
+            claim_token TEXT NOT NULL,
+            worker_id TEXT NOT NULL,
+            expires_at TEXT NOT NULL,
+            created_at TEXT NOT NULL
+        );
+        CREATE INDEX IF NOT EXISTS idx_paid_sample_lease_expiry
+            ON paid_sample_lease(expires_at);
+        CREATE TABLE IF NOT EXISTS paid_refresh_request (
+            request_id TEXT PRIMARY KEY,
+            permit_id TEXT NOT NULL UNIQUE,
+            sample_key TEXT NOT NULL,
+            job_id TEXT,
+            state TEXT NOT NULL CHECK (state IN ('accepted','cached','queued','completed','rejected')),
+            created_at TEXT NOT NULL,
+            updated_at TEXT NOT NULL
+        );
+        CREATE INDEX IF NOT EXISTS idx_paid_refresh_request_sample
+            ON paid_refresh_request(sample_key, state);
         CREATE INDEX IF NOT EXISTS idx_cardmarket_jobs_claim
             ON cardmarket_jobs(claim_token);
         CREATE INDEX IF NOT EXISTS idx_cardmarket_jobs_helper
@@ -448,7 +469,40 @@ def init_results(conn: sqlite3.Connection) -> None:
     _add_columns(
         conn,
         "scans",
-        {"chosen_cardmarket_url": "TEXT"},
+        {"chosen_cardmarket_url": "TEXT", "product_scan_attempt_id": "TEXT", "product_scan_permit_id": "TEXT"},
+    )
+    conn.executescript(
+        """
+        CREATE UNIQUE INDEX IF NOT EXISTS idx_scans_product_attempt ON scans(product_scan_attempt_id);
+        CREATE TABLE IF NOT EXISTS scan_permit_execution (
+            attempt_id TEXT PRIMARY KEY,
+            execution_id TEXT NOT NULL UNIQUE,
+            permit_id TEXT UNIQUE,
+            scan_session_id TEXT NOT NULL REFERENCES sessions(id),
+            scan_session_hash TEXT NOT NULL,
+            state TEXT NOT NULL CHECK (state IN ('claiming','running','completed','failed')),
+            scan_id TEXT,
+            outcome TEXT CHECK (outcome IN ('usable','retake','no_match','failed','cancelled')),
+            lease_expires_at TEXT NOT NULL,
+            created_at TEXT NOT NULL,
+            updated_at TEXT NOT NULL
+        );
+        CREATE INDEX IF NOT EXISTS idx_scan_permit_execution_recovery
+            ON scan_permit_execution(state, lease_expires_at);
+        CREATE TABLE IF NOT EXISTS scan_permit_settlement (
+            attempt_id TEXT PRIMARY KEY REFERENCES scan_permit_execution(attempt_id),
+            permit_id TEXT NOT NULL,
+            scan_id TEXT,
+            outcome TEXT NOT NULL CHECK (outcome IN ('usable','retake','no_match','failed','cancelled')),
+            state TEXT NOT NULL DEFAULT 'pending' CHECK (state IN ('pending','acknowledged')),
+            attempts INTEGER NOT NULL DEFAULT 0 CHECK (attempts >= 0),
+            retry_at TEXT NOT NULL,
+            created_at TEXT NOT NULL,
+            acknowledged_at TEXT
+        );
+        CREATE INDEX IF NOT EXISTS idx_scan_permit_settlement_retry
+            ON scan_permit_settlement(state, retry_at);
+        """
     )
     conn.execute(
         """

@@ -41,6 +41,8 @@ from app.cardmarket_budget import (
 )
 from app.session import client_ip, existing_session, get_or_create_session
 from app.config import get_settings
+from app.subscription_client import SubscriptionClient, SubscriptionUnavailable
+from app.paid_refresh_requests import PriceRequestConflict, attach as attach_paid_request, register as register_paid_request
 from app.cardmarket_queue import (
     AuthError,
     QueueError,
@@ -696,6 +698,21 @@ def escalate_price(payload: EscalationRequest, request: Request) -> JobResponse:
         log.info("escalate refused reason=bad-url url=%s", payload.url)
         raise HTTPException(status_code=400, detail="Need a Cardmarket product URL")
     catalog = request.app.state.dbs.catalog
+    paid_request_id = None
+    if settings.product_api_paid_gate_ready:
+        permit = request.headers.get('x-pokesingle-price-permit', '')
+        if not 40 <= len(permit) <= 100:
+            raise HTTPException(status_code=403, detail='Paid refresh permit required')
+        try:
+            paid_request_id, permit_id = SubscriptionClient(settings).claim_price(permit, sample)
+            previous = register_paid_request(catalog, paid_request_id, permit_id, sample)
+            if previous:
+                row = catalog.execute('SELECT status FROM cardmarket_jobs WHERE id=?', (previous,)).fetchone()
+                return JobResponse(id=previous, url=sample, status=row['status'] if row else 'pending')
+        except PriceRequestConflict as exc:
+            raise HTTPException(status_code=409, detail='Price request conflict') from exc
+        except SubscriptionUnavailable as exc:
+            raise HTTPException(status_code=503, detail='Paid refresh unavailable') from exc
     challenged = has_recent_challenge(catalog, session_id, payload.url)
     fallback = phone_scraper_fallback_active(catalog, session_id)
     if settings.cardmarket_webview_enabled and not challenged and not fallback:
@@ -724,6 +741,8 @@ def escalate_price(payload: EscalationRequest, request: Request) -> JobResponse:
     try:
         record_escalation(catalog, session_id=session_id, ip=ip, url=payload.url)
         job_id = enqueue_job(catalog, payload.url, tier="proxy")
+        if paid_request_id is not None:
+            attach_paid_request(catalog, paid_request_id, job_id)
     except QueueError as exc:
         log.info("escalate refused reason=%s url=%s", exc.detail, sample)
         _raise_queue(exc)

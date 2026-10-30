@@ -117,6 +117,45 @@ def test_webviews_default_on_and_api_reports_disabled_policy(direct_scraper, mon
     assert client.post("/api/v1/cardmarket/escalations", json={"url": GERMAN}).status_code == 200
 
 
+def test_paid_gate_requires_a_claim_and_rechecks_the_owner_before_spending(direct_scraper, monkeypatch):
+    client, catalog, settings = direct_scraper
+    monkeypatch.setattr(settings, 'product_api_paid_gate_ready', True)
+    permitted = {'value': False, 'checks': 0}
+    class Product:
+        def __init__(self, _settings): pass
+        def claim_price(self, secret, sample):
+            assert secret == 'p' * 43 and sample == sample_key(ENGLISH)
+            return ('00000000-0000-4000-8000-000000000001', '42')
+        def authorize_price(self, request_id, permit_id, sample):
+            assert (request_id, permit_id, sample) == ('00000000-0000-4000-8000-000000000001', '42', sample_key(ENGLISH))
+            permitted['checks'] += 1
+            return permitted['value']
+        def price_budget(self): return (50, 50)
+    monkeypatch.setattr('app.routes.cardmarket.SubscriptionClient', Product)
+    monkeypatch.setattr('app.cardmarket_scraper.SubscriptionClient', Product)
+    missing = client.post('/api/v1/cardmarket/escalations', json={'url': ENGLISH})
+    assert missing.status_code == 403
+    headers = {'x-pokesingle-price-permit': 'p' * 43}
+    first = client.post('/api/v1/cardmarket/escalations', json={'url': ENGLISH}, headers=headers)
+    assert first.status_code == 200
+    repeated = client.post('/api/v1/cardmarket/escalations', json={'url': ENGLISH}, headers=headers)
+    assert repeated.json()['id'] == first.json()['id']
+    job = claim_proxy_job(catalog)
+    worker = ScraperWorker(settings)
+    calls = []
+    worker._scrape = lambda url: (calls.append(url), {'outcome': 'empty', 'url': url, 'bytes': 10})[1]
+    worker._handle(catalog, job)
+    assert not calls and usage_today(catalog) == (0, 0)
+    catalog.execute("UPDATE cardmarket_jobs SET next_attempt_at='2020-01-01T00:00:00Z' WHERE id=?", (job['id'],))
+    catalog.commit()
+    permitted['value'] = True
+    job = claim_proxy_job(catalog)
+    worker._handle(catalog, job)
+    assert calls == [sample_key(ENGLISH)]
+    assert permitted['checks'] >= 3
+    assert catalog.execute('SELECT COUNT(*) FROM paid_sample_lease').fetchone()[0] == 0
+
+
 @pytest.mark.parametrize("restriction, expected", [
     ("session", 401), ("enabled", 503), ("budget", 429), ("hourly", 429), ("cooldown", 429),
 ])

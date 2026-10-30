@@ -9,6 +9,7 @@ import threading
 import time
 import uuid
 from copy import deepcopy
+from contextlib import nullcontext
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from typing import Any, Callable
@@ -291,6 +292,7 @@ def _recognize_bytes_once(
     _progress_observer: Callable | None = None,
     _ocr_cache: RequestOcrCache | None = None,
     _title_retry_ocr: OcrResult | None = None,
+    _on_persist: Callable | None = None,
     client_text: ClientText | None = None,
 ) -> _ScanEvaluation:
     started = time.perf_counter()
@@ -1392,7 +1394,7 @@ def _recognize_bytes_once(
         "query_size": list(image.size),
     }
     def save() -> None:
-        with _results_write:
+        with _results_write, getattr(results, '_cache_lock', nullcontext()):
             results.execute(
                 """
             INSERT INTO scans (
@@ -1421,7 +1423,13 @@ def _recognize_bytes_once(
                     json.dumps(timings),
                 ),
             )
-            results.commit()
+            try:
+                if _on_persist is not None:
+                    _on_persist(results, scan_id, status)
+                results.commit()
+            except Exception:
+                results.rollback()
+                raise
         persist = settings.store_captures if store_capture is None else store_capture
         if persist:
             try:
@@ -1520,6 +1528,7 @@ def recognize_bytes(
     _grading_job: GradingJob | None = None,
     _progress_observer: Callable | None = None,
     _grading_completion: Callable | None = None,
+    _on_persist: Callable | None = None,
 ) -> ScanResponse:
     """Evaluate first, then optionally persist one result and its capture.
 
@@ -1540,6 +1549,8 @@ def recognize_bytes(
                   crop_y=crop_y, crop_w=crop_w, crop_h=crop_h, rotation=rotation,
                   skip_detect=skip_detect, language=language, store_capture=store_capture)
     kwargs['_ocr_cache'] = ocr_cache
+    if _on_persist is not None:
+        kwargs['_on_persist'] = _on_persist
     if locale:
         kwargs['locale'] = locale
     if card_quad:
