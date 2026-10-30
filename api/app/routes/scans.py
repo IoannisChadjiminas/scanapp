@@ -105,6 +105,9 @@ async def create_scan(
             raise HTTPException(status_code=503, detail='Scan allowance temporarily unavailable') from exc
     attempt_id = request.headers.get('x-pokesingle-scan-attempt', '')
     permit_secret = request.headers.get('x-pokesingle-scan-permit', '')
+    # A presented permit means the product API enforces this account even when quotas are off for everyone.
+    if quota_client is not None and not quota_required and attempt_id and 40 <= len(permit_secret) <= 100:
+        quota_required = True
     if quota_required and (not attempt_id or not 40 <= len(permit_secret) <= 100):
         raise HTTPException(status_code=403, detail='Scan permit required')
     data = await read_upload_limited(image, settings.max_upload_bytes)

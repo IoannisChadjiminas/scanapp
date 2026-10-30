@@ -20,7 +20,8 @@ from app.schemas import Coverage, OcrEvidence, ScanResponse, ScanStatus
     (False, 'retake', 'retake'), (True, 'no_match', 'no_match'),
     (False, 'error', 'failed'), (True, 'error', 'failed'),
 ])
-def test_scan_permit_is_claimed_once_and_outcome_settled(monkeypatch, tmp_path, stream, status, expected_outcome):
+@pytest.mark.parametrize('global_enforced', [True, False])
+def test_scan_permit_is_claimed_once_and_outcome_settled(monkeypatch, tmp_path, stream, status, expected_outcome, global_enforced):
     from app.routes import scans
     session, attempt = str(uuid.uuid4()), str(uuid.uuid4())
     settings = Settings(_env_file=None, data_dir=tmp_path, product_api_scan_gate_ready=True)
@@ -32,7 +33,7 @@ def test_scan_permit_is_claimed_once_and_outcome_settled(monkeypatch, tmp_path, 
 
     class Product:
         def __init__(self, _settings): pass
-        def scan_quota_enforced(self): return True
+        def scan_quota_enforced(self): return global_enforced
         def claim_scan(self, _secret, _execution, actual_session, actual_attempt):
             assert actual_session == session and actual_attempt == attempt
             calls['claims'] += 1
@@ -81,8 +82,9 @@ def test_scan_permit_is_claimed_once_and_outcome_settled(monkeypatch, tmp_path, 
     headers = {'x-pokesingle-scan-attempt': attempt, 'x-pokesingle-scan-permit': 'p' * 43}
     image = {'image': ('card.jpg', b'jpeg', 'image/jpeg')}
     with TestClient(app) as client, executor:
-        missing = client.post('/scans', files=image)
-        assert missing.status_code == 403
+        if global_enforced:
+            missing = client.post('/scans', files=image)
+            assert missing.status_code == 403
         response = client.post('/scans', headers=headers, data={'stream_results': str(stream).lower()}, files=image)
         assert response.status_code == (400 if status == 'error' and not stream else 200)
         event = json.loads(response.text.splitlines()[-1]) if stream else response.json()
