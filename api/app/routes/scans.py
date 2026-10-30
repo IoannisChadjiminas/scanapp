@@ -33,6 +33,10 @@ from app.schemas import (
     ScanResponse,
 )
 from app.session import get_or_create_session, require_scan_owner
+from app.subscription_client import SubscriptionClient, SubscriptionUnavailable
+from app.scan_permit_execution import ExecutionConflict, fail as fail_scan_execution, record_result
+from app.scan_settlement_worker import admit as admit_scan, keepalive as scan_keepalive, run_once as settle_scans
+from app.db import connect
 
 router = APIRouter()
 
@@ -91,6 +95,18 @@ async def create_scan(
     session_id = get_or_create_session(
         request, response, request.app.state.dbs, settings
     )
+    quota_client = None
+    quota_required = False
+    if settings.product_api_scan_gate_ready:
+        try:
+            quota_client = SubscriptionClient(settings)
+            quota_required = await asyncio.to_thread(quota_client.scan_quota_enforced)
+        except SubscriptionUnavailable as exc:
+            raise HTTPException(status_code=503, detail='Scan allowance temporarily unavailable') from exc
+    attempt_id = request.headers.get('x-pokesingle-scan-attempt', '')
+    permit_secret = request.headers.get('x-pokesingle-scan-permit', '')
+    if quota_required and (not attempt_id or not 40 <= len(permit_secret) <= 100):
+        raise HTTPException(status_code=403, detail='Scan permit required')
     data = await read_upload_limited(image, settings.max_upload_bytes)
     hint, hint_reason = None, 'absent'
     if (getattr(settings, 'client_text_hints', False) or getattr(settings, 'client_text_fast_path', False)
@@ -104,7 +120,46 @@ async def create_scan(
             detail="Recognition is busy. Try again shortly.",
             headers={"Retry-After": "3"},
         )
+    execution = None
+    keepalive_task = None
+    if quota_required:
+        try:
+            execution = await asyncio.to_thread(admit_scan, settings, quota_client, attempt_id, session_id, permit_secret)
+            if execution['state'] != 'running':
+                raise HTTPException(status_code=409, detail='Scan attempt already started')
+        except ExecutionConflict as exc:
+            await limiter.release()
+            raise HTTPException(status_code=409, detail='Scan attempt unavailable') from exc
+        except SubscriptionUnavailable as exc:
+            await limiter.release()
+            raise HTTPException(status_code=503, detail='Scan allowance temporarily unavailable') from exc
+        except BaseException:
+            await limiter.release()
+            raise
     gate_note: dict = {}
+
+    def persist_quota(conn, scan_id: str, status: str) -> None:
+        if execution is not None:
+            outcome = status if status in {'retake', 'no_match', 'failed'} else 'usable'
+            record_result(conn, execution['attempt_id'], execution['execution_id'], scan_id, outcome)
+
+    async def finish_quota() -> None:
+        if execution is None:
+            return
+        if keepalive_task is not None:
+            keepalive_task.cancel()
+            await asyncio.gather(keepalive_task, return_exceptions=True)
+        def finish():
+            conn = connect(settings.results_sqlite)
+            try:
+                fail_scan_execution(conn, execution['attempt_id'], execution['execution_id'])
+            finally:
+                conn.close()
+            settle_scans(settings, quota_client)
+        try:
+            await asyncio.to_thread(finish)
+        except Exception as exc:
+            logger.info('quota settlement deferred error_type=%s', type(exc).__name__)
 
     def phone_args() -> dict:
         # What the phone sent with the photo, as the full pipeline takes it.
@@ -133,7 +188,8 @@ async def create_scan(
                     return answer_stage1(
                         decision=decision, settings=settings, runtime=runtime,
                         catalog=request.app.state.dbs.catalog, results=request.app.state.dbs.results,
-                        session_id=session_id, client_text=client_text, graded=graded, image_bytes=data)
+                        session_id=session_id, client_text=client_text, graded=graded, image_bytes=data,
+                        **({'on_persist': persist_quota} if execution is not None else {}))
             return recognize_bytes(
                 data,
                 settings=settings,
@@ -147,6 +203,7 @@ async def create_scan(
                 _progress_observer=observer,
                 _grading_completion=lambda scan_id, job: schedule_grading_completion(
                     request.app.state.loop, request.app.state.dbs.results, scan_id, job),
+                **({'_on_persist': persist_quota} if execution is not None else {}),
             )
 
     streaming = bool(stream_results and settings.scan_stream_results)
@@ -215,7 +272,10 @@ async def create_scan(
         checker.submit(job, sample_rate=float(getattr(settings, 'stage1_sample_rate', 1.0)), busy=busy)
 
     async def after_stream_release(result: ScanResponse | None) -> None:
-        stage1_followup(result, busy=await limiter.busy())
+        try:
+            stage1_followup(result, busy=await limiter.busy())
+        finally:
+            await finish_quota()
 
     def schedule_parallel_read(result: ScanResponse) -> None:
         from app.cardmarket_queue import schedule_scan_parallel_read
@@ -227,6 +287,9 @@ async def create_scan(
             url=top,
         )
 
+    if execution is not None:
+        keepalive_task = asyncio.create_task(scan_keepalive(
+            settings, quota_client, execution['attempt_id'], execution['execution_id'], session_id))
     if streaming:
         # The stream owns the admission slot from here and releases it itself.
         return scan_stream(loop=request.app.state.loop, executor=request.app.state.executor,
@@ -261,7 +324,10 @@ async def create_scan(
         raise HTTPException(status_code=400, detail=str(exc)) from exc
     finally:
         await limiter.release()
-        stage1_followup(result, busy=await limiter.busy())
+        try:
+            stage1_followup(result, busy=await limiter.busy())
+        finally:
+            await finish_quota()
 
 
 @router.get("/scans/{scan_id}/grading")

@@ -21,6 +21,11 @@ class Settings(BaseSettings):
     portfolio_database_url: SecretStr = SecretStr("")
     # Server-to-server portfolio registration; never supplied to mobile clients.
     scanapp_service_token: SecretStr = SecretStr("")
+    # Internal product API, used only for server-to-server entitlement checks.
+    product_api_url: str = ""
+    # Deployment readiness switch; the product API controls actual quota rollout.
+    product_api_scan_gate_ready: bool = False
+    product_api_paid_gate_ready: bool = False
     planetscale_schema: str = "pokesingle_import_20261001"
     planetscale_import_id: str = "PS-IMPORT-001-20261001"
     tmp_dir: Path = Path("/tmp/scanapp")

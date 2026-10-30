@@ -115,9 +115,9 @@ def scraper_is_ready(conn: sqlite3.Connection) -> bool:
 
 
 def reserve_attempt(
-    conn: sqlite3.Connection, *, sample: str, session_id: str, ip: str
+    conn: sqlite3.Connection, *, sample: str, session_id: str, ip: str, budget_settings=None
 ) -> str:
-    settings = get_settings()
+    settings = budget_settings or get_settings()
     reserve = settings.scraper_reserve_kb * 1024
     with immediate_transaction(conn):
         _expire_stale_reservations(conn)

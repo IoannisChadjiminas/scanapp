@@ -35,7 +35,7 @@ _quiet_health_access()
 
 from app.admission import ScanLimiter
 from app.cardmarket_events import bind_loop
-from app.cardmarket_daily import run_once, should_schedule
+from app.cardmarket_daily import next_configured_run, run_once, should_schedule
 from app.cardmarket_scraper import LanePool
 
 log = logging.getLogger("cardmarket.daily")
@@ -79,6 +79,13 @@ async def _daily_prices(stop: asyncio.Event) -> None:
             log.info("daily pass failed error=%s", type(exc).__name__)
             status = "blocked"
         delay = _seconds_until_utc_day() if status in {"done", "capped"} else 60
+        if status in {"done", "capped"} and settings.product_api_paid_gate_ready:
+            from datetime import datetime, timezone
+            from app.subscription_client import SubscriptionUnavailable
+            try:
+                delay = await asyncio.to_thread(next_configured_run, settings, datetime.now(timezone.utc))
+            except SubscriptionUnavailable:
+                delay = 60
         try:
             await asyncio.wait_for(stop.wait(), timeout=delay)
         except TimeoutError:
@@ -140,6 +147,15 @@ async def lifespan(app: FastAPI):
         worker.start()
     app.state.scraper_worker = worker
     daily_stop = asyncio.Event()
+    quota_stop = asyncio.Event()
+    quota_task = None
+    if settings.product_api_scan_gate_ready:
+        from app.subscription_client import SubscriptionClient, SubscriptionUnavailable
+        from app.scan_settlement_worker import run_worker as run_quota_worker
+        try:
+            quota_task = asyncio.create_task(run_quota_worker(quota_stop, settings, SubscriptionClient(settings)))
+        except SubscriptionUnavailable:
+            logging.getLogger('scan.quota').warning('quota recovery is not configured')
     daily_task = asyncio.create_task(_daily_prices(daily_stop)) if should_schedule(settings) else None
     sources_task = None
     if settings.price_guide_enabled or settings.tcgdex_prices_enabled:
@@ -160,6 +176,9 @@ async def lifespan(app: FastAPI):
         bind_loop(None)
         from app.recognition.progress import drain_scan_streams
         await drain_scan_streams()
+        quota_stop.set()
+        if quota_task is not None:
+            await quota_task
         from app.recognition.grading_completion import drain_grading_updates
         await drain_grading_updates()
         app.state.executor.shutdown(wait=False, cancel_futures=True)

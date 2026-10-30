@@ -6,6 +6,7 @@ The job posts to the existing scraper. It does not open a browser itself.
 from __future__ import annotations
 
 import logging
+import math
 import random
 import threading
 import time
@@ -21,6 +22,7 @@ from app.cardmarket_budget import (
     QueueError,
     current_pool,
     reconcile_attempt,
+    release_attempt,
     reserve_attempt,
     scraper_block_reason,
     usage_today,
@@ -30,6 +32,8 @@ from app.config import Settings, get_settings
 from app.db import connect
 from app.price_sources import market_trend, parse_tiers, trend_for_url
 from app.portfolio_db import has_synced_at, portfolio_keys, statement
+from app.paid_sample_lease import acquire as acquire_paid_lease, release as release_paid_lease
+from app.subscription_client import SubscriptionClient, SubscriptionUnavailable
 
 log = logging.getLogger("cardmarket.daily")
 daily_lane_url: ContextVar[str] = ContextVar("daily_lane_url", default="")
@@ -248,6 +252,8 @@ def due_urls(
     portfolio=None,
     settings: Settings | None = None,
     rng: random.Random | None = None,
+    candidates: list[str] | None = None,
+    refresh: dict | None = None,
 ) -> list[str]:
     """Holdings whose last listing read is older than their value tier.
 
@@ -257,9 +263,10 @@ def due_urls(
     settings = settings or get_settings()
     rng = rng or random.Random()
     day = date.fromisoformat(today)
-    max_age = max(1, int(settings.cardmarket_listing_max_age_days))
+    max_age = max(1, int((refresh or {}).get('maximumListingAgeDays', settings.cardmarket_listing_max_age_days)))
     groups: list[list[str]] = [[], [], [], []]
-    for key in portfolio_keys(portfolio or conn, settings.daily_install_max_age_days):
+    keys = candidates if candidates is not None else portfolio_keys(portfolio or conn, settings.daily_install_max_age_days)
+    for key in keys:
         record = snapshot_record(conn, key)
         if str((record or {}).get("fetched_at") or "").startswith(today):
             continue
@@ -273,15 +280,48 @@ def due_urls(
             continue
         if age >= max_age - 1:
             groups[0].append(key)
-        elif trend_moved(trend, _listing_trend(record), settings.daily_move_pct):
+        elif trend_moved(trend, _listing_trend(record), (refresh or {}).get('trendMovePercent', settings.daily_move_pct)):
             groups[1].append(key)
-        elif age >= tier_days(settings, trend):
+        elif age >= _policy_tier_days(settings, trend, refresh):
             groups[2 if trend is None or trend >= 20 else 3].append(key)
     pending: list[str] = []
     for group in groups:
         rng.shuffle(group)
         pending.extend(group)
     return pending
+
+
+def _policy_tier_days(settings: Settings, trend: float | None, refresh: dict | None) -> int:
+    if refresh is None:
+        return tier_days(settings, trend)
+    if trend is None or trend <= 0:
+        seconds = refresh['unknownPriceMinimumAgeSeconds']
+    else:
+        seconds = next(tier['minimumAgeSeconds'] for tier in refresh['tiers']
+                       if tier['lessThanEur'] is None or trend < tier['lessThanEur'])
+    return max(1, math.ceil(seconds / 86400))
+
+
+class PaidReadSkipped(Exception):
+    pass
+
+
+def _protected_daily_load(conn, settings: Settings, client: SubscriptionClient, today: str,
+                          url: str, pace: DailyPace, reservation: str, scrape, started: float) -> dict:
+    if not client.eligible(url):
+        raise PaidReadSkipped()
+    token = None
+    try:
+        token = acquire_paid_lease(conn, url, 'daily', int(settings.scraper_attempt_seconds) + 90)
+        if token is None or not client.eligible(url):
+            raise PaidReadSkipped()
+        record = snapshot_record(conn, url)
+        if str((record or {}).get('fetched_at') or '').startswith(today):
+            raise PaidReadSkipped()
+        return _load(conn, url, pace, reservation, scrape, started)
+    finally:
+        if token is not None:
+            release_paid_lease(conn, url, token)
 
 
 def jittered(gap: float, jitter: float, rng: random.Random | None = None) -> float:
@@ -299,6 +339,18 @@ def seconds_until(deadline: str, now: datetime) -> float:
     if target < now:
         target += timedelta(days=1)
     return (target - now).total_seconds()
+
+
+def next_configured_run(settings: Settings, now: datetime) -> float:
+    """Read the current published UTC schedule from the product API."""
+    _, _, refresh = SubscriptionClient(settings).candidates(limit=1)
+    schedule = refresh.get('dailyScheduleUtc')
+    if (not isinstance(schedule, str) or len(schedule) != 5 or schedule[2] != ':' or
+            not schedule[:2].isascii() or not schedule[:2].isdigit() or
+            not schedule[3:].isascii() or not schedule[3:].isdigit() or
+            int(schedule[:2]) > 23 or int(schedule[3:]) > 59):
+        raise SubscriptionUnavailable('invalid daily schedule')
+    return max(1.0, seconds_until(schedule, now))
 
 
 def deadline_gap(gap: float, gap_min: float, remaining: int, seconds_left: float, load_s: float) -> float:
@@ -371,6 +423,8 @@ def run_pass(
     now=time.monotonic,
     clock=None,
     queue: WorkQueue | None = None,
+    subscription_client: SubscriptionClient | None = None,
+    interactive_reserve: int | None = None,
 ) -> str:
     """Walk tonight's due holdings. Returns done, capped, paused, or blocked.
 
@@ -405,7 +459,8 @@ def run_pass(
             log.info("daily stop reason=%s", reason)
             return "capped"
         pages, _used = usage_today(conn)
-        if settings.scraper_daily_pages - pages <= settings.interactive_reserve_pages():
+        reserve_pages = settings.interactive_reserve_pages() if interactive_reserve is None else interactive_reserve
+        if settings.scraper_daily_pages - pages <= reserve_pages:
             log.info("daily stop reason=interactive-reserve")
             return "capped"
         if reason:
@@ -426,7 +481,7 @@ def run_pass(
         token = daily_lane_url.set(lane.settings.scraper_url) if lane is not None else None
         try:
             try:
-                reservation = reserve_attempt(conn, sample=url, session_id=pace.session_id, ip="daily")
+                reservation = reserve_attempt(conn, sample=url, session_id=pace.session_id, ip="daily", budget_settings=settings)
             except QueueError as exc:
                 log.info("daily stop reason=budget detail=%s", exc.detail)
                 return "capped"
@@ -434,16 +489,24 @@ def run_pass(
             resumed = False
             while True:
                 try:
-                    result = _load(conn, url, pace, reservation, scrape, started)
+                    load = lambda res, start: (_protected_daily_load(conn, settings, subscription_client, today, url, pace, res, scrape, start)
+                        if subscription_client is not None else _load(conn, url, pace, res, scrape, start))
+                    result = load(reservation, started)
                     if str(result.get("outcome") or "") == "challenge_unsolved":
                         try:
                             reservation = reserve_attempt(
-                                conn, sample=url, session_id=pace.session_id, ip="daily"
+                                conn, sample=url, session_id=pace.session_id, ip="daily", budget_settings=settings
                             )
                         except QueueError:
                             return "capped"
-                        result = _load(conn, url, pace, reservation, scrape, time.monotonic())
+                        result = load(reservation, time.monotonic())
                     break
+                except PaidReadSkipped:
+                    release_attempt(conn, reservation, 'subscription-or-cache')
+                    break
+                except SubscriptionUnavailable:
+                    release_attempt(conn, reservation, 'subscription-unavailable')
+                    return 'blocked'
                 except DailyRateLimit as exc:
                     reconcile_attempt(
                         conn,
@@ -459,7 +522,7 @@ def run_pass(
                     resumed = True
                     try:
                         reservation = reserve_attempt(
-                            conn, sample=url, session_id=pace.session_id, ip="daily"
+                            conn, sample=url, session_id=pace.session_id, ip="daily", budget_settings=settings
                         )
                     except QueueError:
                         return "capped"
@@ -502,23 +565,80 @@ def _combine(statuses: list[str]) -> str:
     return "done"
 
 
+def _subscriber_candidates(client: SubscriptionClient) -> tuple[list[str], dict]:
+    items: list[str] = []
+    seen: set[str] = set()
+    cursors: set[str] = set()
+    cursor = None
+    refresh = None
+    for _ in range(400):
+        page, next_cursor, policy = client.candidates(after=cursor, limit=250)
+        if refresh is not None and policy != refresh:
+            raise SubscriptionUnavailable('price policy changed during pagination')
+        refresh = policy
+        for item in page:
+            if sample_key(item) != item:
+                raise SubscriptionUnavailable('invalid listing candidate')
+            if item not in seen:
+                seen.add(item)
+                items.append(item)
+        if next_cursor is None:
+            break
+        if next_cursor in cursors:
+            raise SubscriptionUnavailable('repeated listing cursor')
+        cursors.add(next_cursor)
+        cursor = next_cursor
+    else:
+        raise SubscriptionUnavailable('too many listing candidates')
+    if refresh is None:
+        raise SubscriptionUnavailable('missing price policy')
+    try:
+        tiers = refresh['tiers']
+        if (not isinstance(tiers, list) or not tiers or tiers[-1]['lessThanEur'] is not None or
+                any(not isinstance(t['minimumAgeSeconds'], int) or t['minimumAgeSeconds'] < 1 for t in tiers) or
+                any(not isinstance(refresh[k], int) or refresh[k] < 0 for k in
+                    ('dailyPageBudget', 'dailyMegabyteBudget', 'interactiveReservePercent',
+                     'maximumListingAgeDays', 'unknownPriceMinimumAgeSeconds')) or
+                refresh['interactiveReservePercent'] > 100 or
+                not isinstance(refresh['trendMovePercent'], (int, float))):
+            raise ValueError('invalid policy')
+    except (KeyError, TypeError, ValueError) as exc:
+        raise SubscriptionUnavailable('invalid price policy') from exc
+    return items, refresh
+
+
 def run_once(settings: Settings | None = None) -> str:
     settings = settings or get_settings()
     if not should_schedule(settings):
         return "disabled"
     conn = connect(settings.catalog_sqlite)
-    portfolio = _portfolio_conn(settings)
+    portfolio = None if settings.product_api_paid_gate_ready else _portfolio_conn(settings)
     try:
         today = time.strftime("%Y-%m-%d", time.gmtime())
         scrape = lambda url, session_id: scrape_product(settings, url, session_id)  # noqa: E731
+        client = None
+        reserve_pages = None
+        queue = None
+        if settings.product_api_paid_gate_ready:
+            try:
+                client = SubscriptionClient(settings)
+                candidates, refresh = _subscriber_candidates(client)
+                settings = settings.model_copy(update={'scraper_daily_pages': refresh['dailyPageBudget'],
+                                                       'scraper_daily_mb': refresh['dailyMegabyteBudget']})
+                reserve_pages = math.ceil(refresh['dailyPageBudget'] * refresh['interactiveReservePercent'] / 100)
+                queue = WorkQueue(due_urls(conn, today, settings=settings, candidates=candidates, refresh=refresh))
+            except SubscriptionUnavailable:
+                log.info('daily stopped reason=subscription-unavailable')
+                return 'blocked'
         workers = accepted_daily_browsers(settings.daily_browsers, len(settings.lane_urls))
         if workers != settings.daily_browsers:
             log.info("daily browsers requested=%s using=%s", settings.daily_browsers, workers)
         if workers == 1:
             return run_pass(
-                conn, settings, scrape=scrape, sleep=time.sleep, today=today, portfolio=portfolio
+                conn, settings, scrape=scrape, sleep=time.sleep, today=today, portfolio=portfolio,
+                queue=queue, subscription_client=client, interactive_reserve=reserve_pages,
             )
-        queue = WorkQueue(due_urls(conn, today, portfolio, settings))
+        queue = queue or WorkQueue(due_urls(conn, today, portfolio, settings))
         log.info("daily start due=%s workers=%s", queue.total, workers)
         statuses: list[str] = []
 
@@ -527,7 +647,8 @@ def run_once(settings: Settings | None = None) -> str:
             try:
                 statuses.append(
                     run_pass(
-                        own, settings, scrape=scrape, sleep=time.sleep, today=today, queue=queue
+                        own, settings, scrape=scrape, sleep=time.sleep, today=today, queue=queue,
+                        subscription_client=client, interactive_reserve=reserve_pages,
                     )
                 )
             except Exception as exc:  # one worker failing must not stop the others

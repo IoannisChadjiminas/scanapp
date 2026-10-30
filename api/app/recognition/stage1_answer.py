@@ -11,6 +11,7 @@ import sqlite3
 import time
 import uuid
 from dataclasses import replace
+from contextlib import nullcontext
 from io import BytesIO
 from pathlib import Path
 
@@ -249,7 +250,8 @@ def evaluate_stage1(*, settings, runtime, catalog, client_text: str | None,
 
 
 def answer_stage1(*, decision: Decision, settings, runtime, catalog, results, session_id: str,
-                  client_text: str | None, graded: bool | None, image_bytes: bytes) -> ScanResponse:
+                  client_text: str | None, graded: bool | None, image_bytes: bytes,
+                  on_persist=None) -> ScanResponse:
     name, number, _language, _label = text_fields(client_text)
     shown = _preview_candidates(catalog, [decision.card_id or ''])
     if not shown:
@@ -307,7 +309,7 @@ def answer_stage1(*, decision: Decision, settings, runtime, catalog, results, se
     from app.schemas import Candidate
     response.suggestions = [Candidate.model_validate(item)]
     if results is not None:
-        with _results_write:
+        with _results_write, getattr(results, '_cache_lock', nullcontext()):
             results.execute(
                 """
                 INSERT INTO scans (
@@ -323,5 +325,11 @@ def answer_stage1(*, decision: Decision, settings, runtime, catalog, results, se
                  json.dumps({}), json.dumps({'stage': decision.stage, 'card_id': decision.card_id,
                      **({'printing_review': printing_review.model_dump(mode='json')} if printing_review else {})}),
                  json.dumps([item]), json.dumps([item]), json.dumps(timings)))
-            results.commit()
+            try:
+                if on_persist is not None:
+                    on_persist(results, scan_id, status.value)
+                results.commit()
+            except Exception:
+                results.rollback()
+                raise
     return response
