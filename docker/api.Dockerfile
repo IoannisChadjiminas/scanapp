@@ -27,6 +27,7 @@ RUN pip install --no-cache-dir -r /app/requirements.txt
 
 COPY api/app /app/app
 COPY api/scripts/valuation_backtest.py /app/scripts/valuation_backtest.py
+COPY api/scripts/mirror_card_images.py /app/scripts/mirror_card_images.py
 
 # Validate the packaged import graph without running the lifespan or accessing
 # the catalogue. Missing runtime helpers must fail the build, not live startup.

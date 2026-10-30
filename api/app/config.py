@@ -21,6 +21,13 @@ class Settings(BaseSettings):
     portfolio_database_url: SecretStr = SecretStr("")
     # Server-to-server portfolio registration; never supplied to mobile clients.
     scanapp_service_token: SecretStr = SecretStr("")
+    # Public card-art mirror (docs/card-image-cdn.md). Empty keeps TCGdex URLs.
+    # The R2 values are used only by scripts/mirror_card_images.py.
+    card_image_cdn_base_url: str = ""
+    card_image_r2_account_id: str = ""
+    card_image_r2_access_key_id: SecretStr = SecretStr("")
+    card_image_r2_secret_access_key: SecretStr = SecretStr("")
+    card_image_r2_bucket: str = ""
     # Internal product API, used only for server-to-server entitlement checks.
     product_api_url: str = ""
     # Deployment readiness switch; the product API controls actual quota rollout.
@@ -365,6 +372,19 @@ class Settings(BaseSettings):
     @property
     def images_dir(self) -> Path:
         return self.data_dir / "reference-images"
+
+    @property
+    def card_image_mirror_sqlite(self) -> Path:
+        return self.data_dir / "card-image-mirror.sqlite"
+
+    def card_image_r2(self) -> dict[str, str] | None:
+        values = {
+            "account_id": self.card_image_r2_account_id.strip(),
+            "access_key_id": self.card_image_r2_access_key_id.get_secret_value().strip(),
+            "secret_access_key": self.card_image_r2_secret_access_key.get_secret_value().strip(),
+            "bucket": self.card_image_r2_bucket.strip(),
+        }
+        return values if all(values.values()) else None
 
     @property
     def review_dir(self) -> Path:

@@ -1,0 +1,94 @@
+# Card image CDN (Cloudflare R2 mirror)
+
+Card art reaches the apps as `image_url` on every card the catalogue API returns.
+Until a card is mirrored that URL points at TCGdex (`assets.tcgdex.net/.../high.webp`).
+This document covers copying that art into a public Cloudflare R2 bucket served
+through Cloudflare's CDN, and switching the API to hand out the mirrored URLs.
+
+Why: the files are static, identical for every user and read heavily, so the
+CDN cache absorbs almost everything; R2 charges nothing for egress and the whole
+catalogue (two WebP sizes per card) fits in or near the 10 GB free tier. Owning
+the host also lets us send `Cache-Control: public, max-age=31536000, immutable`,
+which the phone's image cache honours ahead of its 90 day fallback.
+
+## What is mirrored
+
+- Only TCGdex art: cards whose `remote_image_url` is on `assets.tcgdex.net`.
+  Both `high.webp` and `low.webp` are stored under TCGdex's own path layout,
+  `{language}/{serie}/{set}/{number}/{quality}.webp`, so the Flutter thumbnail
+  rule (swap `high.webp` for `low.webp`) keeps working on the CDN host.
+- Never Cardmarket product photos (`product-images.s3.cardmarket.com`), which
+  Cardmarket serves only with its own Referer, and never locally supplied
+  reference images that have no TCGdex source. Those keep their current URLs.
+- The bootstrap's `reference-images/{language}/{provider_id}.webp` is TCGdex's
+  `high.webp`, so the job uploads it from disk and downloads only `low.webp`.
+  Anything that is not a WebP file (an HTML error page, say) is rejected.
+
+Ownership: the catalogue API (this repository) owns `image_url`, so the mirror
+lives here. The PokeSingle product API keeps its separate, private R2 bucket
+for user captures and is not involved.
+
+## One-time Cloudflare setup (manual)
+
+1. R2 → Create bucket, e.g. `pokesingle-card-art`, location hint EU.
+2. Bucket → Settings → Custom Domains → connect a zone hostname such as
+   `img.pokesingle.com`. A custom domain is what puts Cloudflare's cache in
+   front of the bucket; the `r2.dev` development URL is rate limited and uncached.
+   Objects carry their own `Cache-Control`, so no Cache Rule is required.
+3. R2 → Manage API tokens → create a token with **Object Read & Write** scoped
+   to that one bucket. Note the Account ID, Access Key ID and Secret Access Key.
+4. Keep the bucket's public access limited to the custom domain; do not enable
+   the public `r2.dev` URL.
+
+## Configuration
+
+Environment on the ScanApp API service (see `.env.example`, both Dokploy
+compose files pass them through):
+
+| Variable | Used by | Meaning |
+|---|---|---|
+| `CARD_IMAGE_R2_ACCOUNT_ID` | mirror job | Cloudflare account id |
+| `CARD_IMAGE_R2_ACCESS_KEY_ID` | mirror job | bucket-scoped token |
+| `CARD_IMAGE_R2_SECRET_ACCESS_KEY` | mirror job | bucket-scoped token |
+| `CARD_IMAGE_R2_BUCKET` | mirror job | bucket name |
+| `CARD_IMAGE_CDN_BASE_URL` | API | `https://img.pokesingle.com`; empty keeps TCGdex URLs |
+
+Set the base URL only once a bucket has been mirrored for that environment.
+Never use the production bucket's token against the staging API or vice versa.
+
+## Running the mirror
+
+Inside the API container, where the catalogue and the `/data` volume are:
+
+```bash
+docker compose -f compose.dokploy.yaml exec api python scripts/mirror_card_images.py --dry-run
+docker compose -f compose.dokploy.yaml exec api python scripts/mirror_card_images.py --limit 200
+docker compose -f compose.dokploy.yaml exec api python scripts/mirror_card_images.py
+```
+
+- The job is resumable. `/data/card-image-mirror.sqlite` records a card only
+  after both files are stored; a rerun skips recorded cards whose art has not
+  moved and prints `candidates`, `uploaded`, `already_mirrored`, `failed`.
+- `--language en` limits a run to one catalogue language; `--gap` (default
+  0.1 s) spaces the TCGdex downloads.
+- The running API re-reads the registry when the file changes, checked at most
+  once a minute, so mirrored URLs appear without a restart.
+- A card whose catalogue `remote_image_url` later moves to a different TCGdex
+  path falls back to the live TCGdex file until the next run re-mirrors it.
+
+Verify after the first batch: `GET /api/v1/cards/{id}` for a mirrored card
+returns an `image_url` on the CDN host, and the file loads there with
+`content-type: image/webp` and the one-year `cache-control`.
+
+## Rollback
+
+Unset `CARD_IMAGE_CDN_BASE_URL` and restart the API: every card returns to its
+TCGdex URL. The bucket and registry can stay for a later retry.
+
+## Cost (order of magnitude)
+
+For roughly 50,000 cards at two sizes (about 9 GB) and a few million image views
+a month: storage $0.015/GB after 10 GB free, class A writes $4.50 per million
+(one-off for the upload), egress $0, cache hits free. Expect $0 to $2 a month.
+Cloudflare Images or on-the-fly transformations would cost tens of dollars for
+the same traffic, which is why the sizes are pre-generated by TCGdex and copied.
