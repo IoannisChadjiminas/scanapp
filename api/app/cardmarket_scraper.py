@@ -302,8 +302,13 @@ class ScraperWorker:
         except SubscriptionUnavailable:
             self._release(conn, job, 'subscription-unavailable', delay_seconds=5)
             return
+        if not requests:
+            log.info("paid failed reason=no-permit job=%s url=%s", job["id"], target)
+            fail_proxy_job(conn, job["id"], job["claim_token"], "permit-missing", terminal=True)
+            return
         if not authorized:
-            self._release(conn, job, 'subscription-required', delay_seconds=5)
+            # Counts toward the job's attempts, so a lapsed subscription cannot spin forever.
+            fail_proxy_job(conn, job["id"], job["claim_token"], "subscription-required")
             return
         token = acquire_paid_lease(conn, target, self.name, int(self.settings.scraper_attempt_seconds) + 90)
         if token is None:
@@ -316,7 +321,7 @@ class ScraperWorker:
             # A subscription may have changed while this worker waited for the lease.
             if not any(client.authorize_price(request_id, permit_id, target)
                        for request_id, permit_id in requests):
-                self._release(conn, job, 'subscription-required', delay_seconds=5)
+                fail_proxy_job(conn, job["id"], job["claim_token"], "subscription-required")
                 return
             pages, megabytes = client.price_budget()
             budget = self.settings.model_copy(update={'scraper_daily_pages': pages, 'scraper_daily_mb': megabytes})

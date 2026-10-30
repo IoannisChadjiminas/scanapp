@@ -622,6 +622,9 @@ def schedule_scan_parallel_read(
     settings = get_settings()
     if settings.scan_server_read_mode() != "parallel":
         return None
+    if settings.product_api_paid_gate_ready:
+        # A scan-owned read has no subscriber permit, so the paid gate would only bounce it.
+        return None
     if status not in settings.scan_server_read_statuses():
         return None
     if not url:
