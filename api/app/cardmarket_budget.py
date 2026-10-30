@@ -12,6 +12,7 @@ from app.cardmarket import datetime_now, sample_key
 from app.cardmarket_queue import QueueError, immediate_transaction
 from app.config import get_settings
 
+INFLIGHT_DETAIL = "A paid read is already running"
 _health_lock = threading.Lock()
 _health = {"ok": False, "checked_at": 0.0, "cooldown_until": 0.0}
 
@@ -130,7 +131,7 @@ def reserve_attempt(
             (sample,),
         ).fetchone()
         if inflight is not None:
-            raise QueueError("A paid read is already running", status_code=429)
+            raise QueueError(INFLIGHT_DETAIL, status_code=429)
         pages, used = usage_today(conn)
         if pages + 1 > settings.scraper_daily_pages or used + reserve > settings.scraper_daily_mb * 1024 * 1024:
             raise QueueError("Paid read budget is exhausted", status_code=429)

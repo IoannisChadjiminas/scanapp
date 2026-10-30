@@ -22,6 +22,7 @@ from app.cardmarket_budget import (
     QueueError,
     current_pool,
     reconcile_attempt,
+    INFLIGHT_DETAIL,
     release_attempt,
     reserve_attempt,
     scraper_block_reason,
@@ -483,8 +484,13 @@ def run_pass(
             try:
                 reservation = reserve_attempt(conn, sample=url, session_id=pace.session_id, ip="daily", budget_settings=settings)
             except QueueError as exc:
+                if exc.detail == INFLIGHT_DETAIL:
+                    # Someone else is reading this product right now; the night goes on.
+                    log.info("daily skipped reason=in-flight url=%s", url)
+                    continue
                 log.info("daily stop reason=budget detail=%s", exc.detail)
                 return "capped"
+            skipped = False
             started = time.monotonic()
             resumed = False
             while True:
@@ -503,6 +509,7 @@ def run_pass(
                     break
                 except PaidReadSkipped:
                     release_attempt(conn, reservation, 'subscription-or-cache')
+                    skipped = True
                     break
                 except SubscriptionUnavailable:
                     release_attempt(conn, reservation, 'subscription-unavailable')
@@ -532,6 +539,9 @@ def run_pass(
                 daily_lane_url.reset(token)
             if lane is not None and pool is not None:
                 pool.release_lease(lane)
+        if skipped:
+            # Nothing reached Cardmarket, so there is no gap to keep.
+            continue
         done += 1
         sleep(extra_sleep(jittered(pace.gap, settings.daily_gap_jitter), settings.scraper_page_gap_s))
     log.info("daily worker done read=%s", done)
