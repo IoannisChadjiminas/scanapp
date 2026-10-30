@@ -26,6 +26,8 @@ services:
       CATALOGUE_BACKEND: ${CATALOGUE_BACKEND:-planetscale}
       PORTFOLIO_DATABASE_URL: ${PORTFOLIO_DATABASE_URL:?Set the production ScanApp portfolio database URL}
       SCANAPP_SERVICE_TOKEN: ${SCANAPP_SERVICE_TOKEN:?Set the shared production service token}
+      PRODUCT_API_URL: ${PRODUCT_API_URL:-}
+      PRODUCT_API_SCAN_GATE_READY: ${PRODUCT_API_SCAN_GATE_READY:-false}
       PRICE_GUIDE_ENABLED: ${PRICE_GUIDE_ENABLED:-false}
       TCGDEX_PRICES_ENABLED: ${TCGDEX_PRICES_ENABLED:-false}
       TMP_DIR: /tmp/scanapp
