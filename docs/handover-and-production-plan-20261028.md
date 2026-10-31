@@ -74,6 +74,29 @@ Scripts and details: `api/scripts/stored_scan_replay/README.md`. Use it for any 
 
 ## Missing cards (catalogue coverage)
 
+**Local collection decision — 2026-10-29:** The owner requires the recovery scraper to run natively on their Mac in visible Chrome, with a dedicated persistent profile and manual Cloudflare checkbox completion. Do not use/deploy the staging scraper for this collection. See the agent execution handoff for details.
+
+**Execution handoff — 2026-10-29:** `docs/experiments/japanese-set-recovery-agent-handoff-20261029.md`. One resumable acquisition queue for all 336 absent/possibly incomplete groups; retrieve and reconcile images/Cardmarket links before vectors, then perform one bulk vector/feature run and build one combined catalogue/phone-index release (owner decision on 2026-10-29). Chunks are checkpoints only. The scraper set-listing mode still needs implementation and a successful pilot.
+
+**Set-level audit completed — 2026-10-28:** Compared all 462 Japanese checklist
+groups in TCG Collector with live catalogue counts, resolving legacy/code aliases,
+reused SC/MP codes and all source-specific recovery prefixes. 281 groups have no
+identified catalogue rows (8 Mega-era, 20 Scarlet & Violet-era); 55 present groups
+have fewer rows than their reference checklists and need card-level verification.
+The other 126 have equal/greater row counts, which is not proof of full coverage.
+These are checklist groups including decks, promos, energy pools and some overlapping
+bundles, not 281 unique set codes. Full lists, method and limits:
+`docs/experiments/japanese-set-completeness-audit-20261028.md`.
+Recovery and exact-print Cardmarket-linking plan: `docs/experiments/japanese-set-retrieval-and-cardmarket-plan-20261028.md`. Start with MBG/MBD; the 28 modern groups represent 1,088 checklist entries before reconciliation.
+
+**Additional catalogue gap found — 2026-10-28:** Japanese MBG (Starter Set MEGA
+Mega Gengar ex) is entirely absent from the active catalogue. The owner’s
+MBG 003/021 scan therefore cannot return its exact card; completed scans instead
+offered unrelated MCharizard EX printings despite a correctly read Gengar title
+and fraction. Adding images for every existing row does not prove that every
+printed card/set is represented. Audit absent sets as well as missing assets;
+see `docs/experiments/mbg-gengar-catalogue-gap-20261028.md`.
+
 **Staging update — 2026-10-28:** The reviewed missing Japanese image and vectors
 for `ja:neo2-057` are now active. Japanese own-image coverage is 16,319/16,319;
 Japanese picture vectors are 16,006 and total vectors 43,696. The older parent
@@ -141,3 +164,7 @@ For each batch of new cards (English, Japanese, Chinese):
 - Test builds: `flutter build appbundle --profile …` then `bundletool build-apks --local-testing --connected-device` + `install-apks` (bundletool from Homebrew, 1.18.3). Git-ignored model files must be copied into worktrees: `android/card_embedding/src/main/assets/CardEmbedding.tflite`, `ios/OnDemand/EmbeddingAssets/CardEmbedding.mlpackage`, and `config/auth.local.json`. Before installing over the A55 app, check no scan is in flight (`queue.enqueued` = `scan.result` for the running process). Never uninstall (keeps the index and data).
 - iPhone install: `flutter build ios --profile …` then `xcrun devicectl device install app`; the phone must be unlocked to launch; the device console stays empty — read the iPhone's events from the staging log (`scan.diagnostics phone event=…`).
 - The A55's adb connection drops now and then; restart `adb logcat` recording before each round.
+
+### Japanese routing discovery checkpoint — 2026-10-29
+
+See [the routing update](experiments/japanese-set-routing-update-20261029.md): all 336 groups were checked against 800 observed local Cardmarket index links. There are 276 collection routes, 59 held shared/combined/pool cases, and one unresolved Creatures Deck route. These are routing counts, not completed card inventories. Reuse shared listings, reconcile exact printings, then retain the owner-selected single bulk vector job and combined release.

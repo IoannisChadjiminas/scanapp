@@ -119,3 +119,28 @@ def capture_screenshot(websocket_url: str) -> bytes:
                 return base64.b64decode(str((message.get("result") or {}).get("data") or ""))
     finally:
         sock.close()
+
+
+def evaluate(websocket_url: str, expression: str, timeout: float = 5.0):
+    """Evaluate a read-only expression through a fresh DevTools connection."""
+    parsed = urllib.request.urlparse(websocket_url)
+    sock = _ws_open(parsed.hostname or "127.0.0.1", parsed.port or 80, parsed.path or "/")
+    sock.settimeout(timeout)
+    try:
+        _ws_send(sock, json.dumps({
+            "id": 1,
+            "method": "Runtime.evaluate",
+            "params": {"expression": expression, "returnByValue": True, "awaitPromise": True},
+        }))
+        while True:
+            message = json.loads(_ws_recv(sock) or "{}")
+            if message.get("id") != 1:
+                continue
+            if "error" in message:
+                raise RuntimeError("Chrome DevTools evaluation failed")
+            result = message.get("result", {}).get("result", {})
+            if "exceptionDetails" in message.get("result", {}):
+                raise RuntimeError("Chrome DevTools evaluation raised an exception")
+            return result.get("value")
+    finally:
+        sock.close()

@@ -12,6 +12,7 @@ import time
 import traceback
 from pathlib import Path
 from contextlib import asynccontextmanager
+from urllib.parse import parse_qs, urlsplit
 
 from fastapi import FastAPI, Header, HTTPException
 from pydantic import BaseModel, Field
@@ -21,7 +22,7 @@ API = HERE.parent / "api"
 sys.path.insert(0, str(HERE))
 sys.path.insert(0, str(API))
 
-from allow import cardmarket_product  # noqa: E402
+from allow import cardmarket_expansion_listing, cardmarket_product  # noqa: E402
 from browser import (  # noqa: E402
     ATTEMPT_SECONDS,
     BROWSER_LIFETIME_S,
@@ -35,6 +36,7 @@ from browser import (  # noqa: E402
 from proxy import proxy_direct, proxy_enabled, proxy_exit, proxy_server  # noqa: E402
 from supervisor import LaneBusy, LaneUnavailable, Supervisor  # noqa: E402
 from app.cardmarket_html import parse_cardmarket_html  # noqa: E402
+from listings import parse_expansion_listing  # noqa: E402
 
 log = logging.getLogger("scraper")
 logging.basicConfig(level=logging.INFO, format="%(message)s")
@@ -62,6 +64,7 @@ MAX_BROWSERS = max(1, int(os.environ.get("MAX_BROWSERS", "1")))
 COOLDOWN_SECONDS = float(os.environ.get("SCRAPER_RATE_LIMIT_S", "900"))
 # Pause after one Cardmarket page before the next one is opened.
 PAGE_GAP_S = max(0.0, float(os.environ.get("SCRAPER_PAGE_GAP_S", "0")))
+LISTING_PAGE_GAP_S = max(1.0, float(os.environ.get("SCRAPER_LISTING_PAGE_GAP_S", str(PAGE_GAP_S))))
 # Costs one extra paid page load per attempt; leave off outside diagnosis.
 DIRECT_PROBE = os.environ.get("SCRAPER_DIRECT_PROBE", "").strip().lower() in {"1", "true", "yes"}
 
@@ -78,10 +81,11 @@ async def lifespan(app: FastAPI):
     log.info(
         "scraper config api_key_configured=%s proxy_enabled=%s proxy_host_configured=%s "
         "proxy_user_configured=%s proxy_password_configured=%s max_browsers=%s deadline_s=%s "
-        "direct_probe=%s net_log=%s browser_lifetime_s=%s page_gap_s=%s",
+        "direct_probe=%s net_log=%s browser_lifetime_s=%s page_gap_s=%s listing_page_gap_s=%s",
         bool(API_KEY), proxy_enabled(), bool(os.environ.get("PROXY_HOST", "").strip()),
         bool(os.environ.get("PROXY_USER", "").strip()), bool(os.environ.get("PROXY_PASS")),
         MAX_BROWSERS, ATTEMPT_SECONDS, DIRECT_PROBE, NET_LOG, BROWSER_LIFETIME_S, PAGE_GAP_S,
+        LISTING_PAGE_GAP_S,
     )
     try:
         yield
@@ -96,23 +100,34 @@ _cooldown_until = 0.0
 _cooldown_lock = threading.Lock()
 _last_page_at = 0.0
 _gap_lock = threading.Lock()
+_last_listing_page_at = 0.0
+_local_pause_lock = threading.Lock()
+_local_waiting_for_owner = False
+_local_waiting_session = ""
+_local_waiting_url = ""
+_local_active_session: ChromeSession | None = None
 
 
-def wait_for_page_gap() -> None:
+def wait_for_page_gap(*, listing: bool = False) -> None:
     """Hold the next page until SCRAPER_PAGE_GAP_S has passed since the previous one."""
-    if PAGE_GAP_S <= 0:
+    gap = LISTING_PAGE_GAP_S if listing else PAGE_GAP_S
+    if gap <= 0:
         return
     with _gap_lock:
-        wait = _last_page_at + PAGE_GAP_S - time.time()
+        last_at = _last_listing_page_at if listing else _last_page_at
+        wait = last_at + gap - time.time()
     if wait > 0:
         log.info("page gap sleep_s=%.1f", wait)
         time.sleep(wait)
 
 
-def note_page_finished() -> None:
-    global _last_page_at
+def note_page_finished(*, listing: bool = False) -> None:
+    global _last_page_at, _last_listing_page_at
     with _gap_lock:
-        _last_page_at = time.time()
+        if listing:
+            _last_listing_page_at = time.time()
+        else:
+            _last_page_at = time.time()
 
 
 class ScrapeRequest(BaseModel):
@@ -124,8 +139,16 @@ class WarmRequest(BaseModel):
     session_id: str = Field(min_length=1, max_length=80)
 
 
+class ListingConfirmationRequest(BaseModel):
+    session_id: str = Field(min_length=1, max_length=80)
+    url: str = Field(min_length=8, max_length=500)
+
+
 def _unavailable_detail(state: str) -> str:
-    return {"starting": "Starting", "restarting": "Restarting", "cooling": "Rate limited"}.get(
+    return {
+        "starting": "Starting", "restarting": "Restarting", "cooling": "Rate limited",
+        "waiting_for_owner": "Paused for manual Cardmarket verification",
+    }.get(
         state, "Busy"
     )
 
@@ -223,9 +246,11 @@ def status() -> dict:
     if _supervisor is None:
         with _cooldown_lock:
             left = max(0.0, _cooldown_until - time.time())
+        with _local_pause_lock:
+            waiting = _local_waiting_for_owner
         return {
             "lane": os.environ.get("SCRAPER_LANE", "a"),
-            "state": "cooling" if left else "idle",
+            "state": "waiting_for_owner" if waiting else "cooling" if left else "idle",
             "attempt_seconds": ATTEMPT_SECONDS,
             "cooldown_until": time.time() + left if left else 0,
         }
@@ -257,6 +282,10 @@ def scrape(payload: ScrapeRequest, authorization: str | None = Header(default=No
         raise HTTPException(status_code=401, detail="Unauthorized")
     if not cardmarket_product(payload.url):
         raise HTTPException(status_code=400, detail="Cardmarket product URL required")
+    with _local_pause_lock:
+        if _local_waiting_for_owner:
+            raise HTTPException(status_code=503, detail="Paused for manual Cardmarket verification",
+                                headers={"Retry-After": "15"})
     with _cooldown_lock:
         left = _cooldown_until - time.time()
     if left > 0:
@@ -332,7 +361,117 @@ def scrape(payload: ScrapeRequest, authorization: str | None = Header(default=No
     return result
 
 
-def _scrape_supervised(payload: ScrapeRequest) -> dict:
+@app.post("/catalogue-listing")
+def catalogue_listing(payload: ScrapeRequest, authorization: str | None = Header(default=None)) -> dict:
+    """Read one allowlisted Pokémon expansion listing page through the supervised lane."""
+    global _local_active_session, _local_waiting_for_owner, _local_waiting_session, _local_waiting_url
+    global _cooldown_until
+    if not _authorized(authorization):
+        raise HTTPException(status_code=401, detail="Unauthorized")
+    if not cardmarket_expansion_listing(payload.url):
+        raise HTTPException(status_code=400, detail="Cardmarket Pokémon expansion URL required")
+    with _local_pause_lock:
+        if _local_waiting_for_owner:
+            raise HTTPException(status_code=503, detail="Paused for manual Cardmarket verification",
+                                headers={"Retry-After": "15"})
+    with _cooldown_lock:
+        left = _cooldown_until - time.time()
+    if left > 0:
+        raise HTTPException(status_code=503, detail="Rate limited", headers={"Retry-After": str(int(left) + 1)})
+    wait_for_page_gap(listing=True)
+    if _supervisor is not None:
+        return _scrape_supervised(payload, catalogue_listing=True)
+    if not _slots.acquire(timeout=30):
+        raise HTTPException(status_code=503, detail="Busy", headers={"Retry-After": "5"})
+    started = time.time()
+    session = None
+    try:
+        reap_stale_browsers(ATTEMPT_SECONDS + 15, keep=held_pids())
+        session = open_session(payload.session_id)
+        _local_active_session = session
+        result = run_attempt(session, payload.url, parse_html=parse_expansion_listing, catalogue_listing=True)
+    except Exception as exc:
+        log.error("catalogue listing failed session=%s error=%s", payload.session_id, type(exc).__name__)
+        raise HTTPException(status_code=500, detail="Catalogue listing attempt failed") from None
+    finally:
+        note_page_finished(listing=True)
+        _slots.release()
+        log_chrome_page(payload.session_id, session)
+        log_chrome_net(payload.session_id, session)
+    if result.get("outcome") == "rate_limited":
+        with _cooldown_lock:
+            _cooldown_until = time.time() + COOLDOWN_SECONDS
+        raise HTTPException(status_code=503, detail="Rate limited", headers={"Retry-After": str(int(COOLDOWN_SECONDS))})
+    result["reused"] = bool(getattr(session, "reused", False))
+    if result.get("owner_verification_required") is True:
+        with _local_pause_lock:
+            _local_waiting_for_owner = True
+            _local_waiting_session = payload.session_id
+            _local_waiting_url = payload.url
+    result["elapsed_ms"] = result.get("elapsed_ms") or int((time.time() - started) * 1000)
+    result["products"] = list(result.get("products") or [])
+    result.pop("rows", None)
+    return result
+
+
+@app.post("/catalogue-listing/confirm")
+def confirm_catalogue_listing(payload: ListingConfirmationRequest,
+                              authorization: str | None = Header(default=None)) -> dict:
+    """Resume only after manual clearance in the same visible local browser tab."""
+    global _local_waiting_for_owner, _local_waiting_session, _local_waiting_url
+    if not _authorized(authorization):
+        raise HTTPException(status_code=401, detail="Unauthorized")
+    if _supervisor is not None:
+        raise HTTPException(status_code=501, detail="Owner confirmation is available in local mode only")
+    if not cardmarket_expansion_listing(payload.url):
+        raise HTTPException(status_code=400, detail="Cardmarket Pokémon expansion URL required")
+    with _local_pause_lock:
+        if not _local_waiting_for_owner or payload.session_id != _local_waiting_session \
+                or payload.url != _local_waiting_url:
+            raise HTTPException(status_code=409, detail="No matching owner-verification pause")
+        session = _local_active_session
+        expected_url = _local_waiting_url
+    if session is None or not callable(getattr(session, "current_url", None)):
+        raise HTTPException(status_code=503, detail="Paused browser session is unavailable")
+    inspect_listing = getattr(session, "inspect_listing", None)
+    if callable(inspect_listing):
+        current, outcome, page_html = inspect_listing(expected_url)
+    else:
+        current = str(session.current_url() or "")
+        outcome = session.probe()
+        page_html = session.html()
+    expected_slug = urlsplit(expected_url).path.rstrip("/").split("/")[-1].casefold()
+    current_parts = urlsplit(current)
+    if current_parts.netloc.lower() not in {"www.cardmarket.com", "cardmarket.com"} \
+            or current_parts.path.rstrip("/").split("/")[-1].casefold() != expected_slug:
+        raise HTTPException(status_code=409, detail="The visible tab is not on the expected expansion")
+    if outcome not in {"offers", "empty"}:
+        raise HTTPException(status_code=409, detail="The same tab has not cleared to catalogue content")
+    expected_parts = urlsplit(expected_url)
+    locales = {"en", "de", "fr", "es", "it", "pt", "nl"}
+
+    def route_path(path: str) -> str:
+        segments = [part.casefold() for part in path.strip("/").split("/") if part]
+        if segments and segments[0] in locales:
+            segments.pop(0)
+        return "/".join(segments)
+
+    if (route_path(current_parts.path) != route_path(expected_parts.path)
+            or any(parse_qs(current_parts.query).get(k) != v
+                   for k, v in parse_qs(expected_parts.query).items())):
+        raise HTTPException(status_code=409, detail="The visible tab changed listing or page filters")
+    parsed = parse_expansion_listing(expected_url, page_html)
+    if parsed["outcome"] not in {"offers", "empty", "listing_links"}:
+        raise HTTPException(status_code=409, detail="The cleared page has no usable catalogue evidence")
+    with _local_pause_lock:
+        _local_waiting_for_owner = False
+        _local_waiting_session = ""
+        _local_waiting_url = ""
+    return {"ok": True, **parsed, "url": expected_url, "session_id": payload.session_id,
+            "owner_verification_required": False}
+
+
+def _scrape_supervised(payload: ScrapeRequest, *, catalogue_listing: bool = False) -> dict:
     """One attempt in the browser process. A hang comes back as timeout, not a stuck slot."""
     global _cooldown_until
     started = time.time()
@@ -342,7 +481,7 @@ def _scrape_supervised(payload: ScrapeRequest) -> dict:
     log_cardmarket_direct(payload.session_id, proxy, payload.url)
     assert _supervisor is not None
     try:
-        result = _supervisor.scrape(payload.url, payload.session_id)
+        result = _supervisor.scrape(payload.url, payload.session_id, catalogue_listing=catalogue_listing)
     except LaneBusy:
         raise HTTPException(status_code=503, detail="Busy", headers={"Retry-After": "5"}) from None
     except LaneUnavailable as exc:
@@ -355,7 +494,7 @@ def _scrape_supervised(payload: ScrapeRequest) -> dict:
             headers={"Retry-After": retry},
         ) from None
     finally:
-        note_page_finished()
+        note_page_finished(listing=catalogue_listing)
     if result.get("outcome") == "error":
         log.error(
             "scrape failed session=%s error=%s stage=%s frames=%s elapsed_ms=%s",
