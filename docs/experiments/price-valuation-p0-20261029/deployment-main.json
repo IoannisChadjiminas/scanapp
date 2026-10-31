@@ -1,0 +1,10 @@
+{
+  "merge_commit": "a7d862bea1d161b006c20bd62c2656099f4af69c",
+  "pull_request": "https://github.com/IoannisChadjiminas/scanapp/pull/93",
+  "api_container": "97f79ba60254",
+  "image": "sha256:a10e24c50c2d4d1fabce78e501044c041b9712c286d4aea997c1bf081e799681",
+  "health": "healthy",
+  "runtime_environment_identical": true,
+  "automatic_dokploy_rollout_complete": true,
+  "rollback_image": "scanapp-staging-rollback:price-valuation-p0-20261029"
+}
