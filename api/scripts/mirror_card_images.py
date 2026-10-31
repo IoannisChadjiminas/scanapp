@@ -57,6 +57,7 @@ def main() -> int:
                 limit=args.limit,
                 language=args.language,
                 gap_s=0.0 if args.dry_run else args.gap,
+                record=not args.dry_run,
                 log=print,
             )
     finally:

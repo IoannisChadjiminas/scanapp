@@ -222,13 +222,16 @@ def mirror_card_images(
     limit: int | None = None,
     language: str | None = None,
     gap_s: float = 0.0,
+    record: bool = True,
     sleep: Callable[[float], None] = time.sleep,
     log: Callable[[str], None] = print,
 ) -> MirrorReport:
     """Upload high and low art for every TCGdex card not yet in the registry.
 
     Resumable: a card is recorded only after both files are stored, and a
-    second run skips recorded cards whose art has not moved.
+    second run skips recorded cards whose art has not moved. With
+    ``record=False`` (a dry run) the registry is read but never written, so a
+    later real run still sees every card.
     """
     report = MirrorReport()
     registry = open_registry(settings.card_image_mirror_sqlite)
@@ -265,12 +268,13 @@ def mirror_card_images(
                 report.failed += 1
                 log(f"skip {card_id}: {type(exc).__name__}")
             else:
-                registry.execute(
-                    "INSERT OR REPLACE INTO mirrored_images VALUES (?, ?, ?, ?)",
-                    (card_id, base, uploaded_sha, datetime.now(timezone.utc).isoformat(timespec="seconds")),
-                )
-                registry.commit()
-                mirrored[card_id] = base
+                if record:
+                    registry.execute(
+                        "INSERT OR REPLACE INTO mirrored_images VALUES (?, ?, ?, ?)",
+                        (card_id, base, uploaded_sha, datetime.now(timezone.utc).isoformat(timespec="seconds")),
+                    )
+                    registry.commit()
+                    mirrored[card_id] = base
                 report.uploaded += 1
                 log(f"mirrored {card_id}")
             if gap_s > 0:
