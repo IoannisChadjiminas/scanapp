@@ -195,6 +195,27 @@ def test_mirror_limit_and_dry_run(tmp_path: Path) -> None:
     assert len(store.keys) == 4
 
 
+def test_dry_run_records_nothing_so_a_real_run_still_sees_every_card(tmp_path: Path) -> None:
+    settings = _settings(tmp_path)
+    catalog = connect(tmp_path / "catalog.sqlite")
+    init_catalog(catalog)
+    for number in ("001", "002"):
+        _card(catalog, f"en:sv03.5-{number}", remote_image_url=f"https://assets.tcgdex.net/en/sv/sv03.5/{number}/high.webp")
+
+    dry = mirror_card_images(catalog, settings, store=DryRunStore(), bucket="x", fetch=lambda url: WEBP, record=False)
+    assert dry.candidates == 2 and dry.already_mirrored == 0
+    registry = sqlite3.connect(settings.card_image_mirror_sqlite)
+    assert registry.execute("SELECT COUNT(*) FROM mirrored_images").fetchone()[0] == 0
+    registry.close()
+
+    again = mirror_card_images(catalog, settings, store=DryRunStore(), bucket="x", fetch=lambda url: WEBP, record=False)
+    assert again.candidates == 2 and again.already_mirrored == 0
+
+    real = RecordingStore()
+    report = mirror_card_images(catalog, settings, store=real, bucket="x", fetch=lambda url: WEBP)
+    assert report.uploaded == 2 and report.already_mirrored == 0
+
+
 def test_running_api_picks_up_a_mirror_run_without_restart(tmp_path: Path) -> None:
     settings = _settings(tmp_path)
     now = [0.0]
