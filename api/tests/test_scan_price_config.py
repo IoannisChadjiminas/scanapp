@@ -112,14 +112,14 @@ def test_config_sends_phone_capture_and_warp_switches():
     body = scan_price_config(Settings(_env_file=None))
     assert body.card_warp is False
     assert body.capture.model_dump() == dict(preset='max', jpeg_quality=95, max_edge=2000, native_codec=False,
-                                                live_outline=True, auto_capture=True, native_camera=False, native_camera_android=False, card_anywhere=True,
+                                                live_outline=True, auto_capture=True, native_camera=False, native_camera_android=False, number_recognizer_android=True, card_anywhere=True,
                                                 **PHOTO_CHECK, finder_frames=FINDER_FRAMES_OFF)
     body = scan_price_config(Settings(_env_file=None, app_card_warp=True, app_capture_preset='ultraHigh',
                                       app_jpeg_quality=85, app_max_edge=1400, app_native_codec=True,
                                       app_live_outline=True, app_auto_capture=True, app_native_camera=True, native_camera_android=False, card_anywhere=True))
     assert body.card_warp is True
     assert body.capture.model_dump() == dict(preset='ultraHigh', jpeg_quality=85, max_edge=1400, native_codec=True,
-                                                live_outline=True, auto_capture=True, native_camera=True, native_camera_android=False, card_anywhere=True,
+                                                live_outline=True, auto_capture=True, native_camera=True, native_camera_android=False, number_recognizer_android=True, card_anywhere=True,
                                                 **PHOTO_CHECK, finder_frames=FINDER_FRAMES_OFF)
 
 
@@ -157,6 +157,12 @@ def test_android_camera_switch_is_separate_from_the_iphone_one():
     on = scan_price_config(Settings(_env_file=None, app_native_camera_android=True))
     assert on.capture.native_camera is False
     assert on.capture.native_camera_android is True
+
+
+def test_android_number_reader_kill_switch_is_on_unless_turned_off():
+    assert scan_price_config(Settings(_env_file=None)).capture.number_recognizer_android is True
+    off = scan_price_config(Settings(_env_file=None, app_number_recognizer_android=False))
+    assert off.capture.number_recognizer_android is False
 
 
 def test_photo_check_uses_the_server_blur_limit_and_can_be_switched_off():
