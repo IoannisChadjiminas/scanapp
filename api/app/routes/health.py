@@ -27,6 +27,14 @@ class ScanPriceConfig(BaseModel):
 CAPTURE_PRESETS = ('max', 'ultraHigh', 'veryHigh', 'high')
 
 
+class FinderFramesConfig(BaseModel):
+    # Whether a phone whose collector opted in may send preview pictures.
+    enabled: bool = False
+    per_visit: int = 40
+    per_day: int = 300
+    per_month: int = 2000
+
+
 class CaptureConfig(BaseModel):
     preset: str = 'max'
     jpeg_quality: int = 95
@@ -43,6 +51,7 @@ class CaptureConfig(BaseModel):
     sharpness_edge: int = 1000
     max_glare: float = 0.08
     auto_retakes: int = 2
+    finder_frames: FinderFramesConfig = FinderFramesConfig()
 
 
 class AppConfigResponse(BaseModel):
@@ -100,6 +109,14 @@ def scan_price_config(settings) -> AppConfigResponse:
             sharpness_edge=max(200, min(int(settings.threshold_blur_edge or 1000), 4000)),
             max_glare=max(0.0, min(float(settings.app_max_glare), 1.0)),
             auto_retakes=max(0, min(int(settings.app_auto_retakes), 5)),
+            # The product API holds its own caps per token (300 a day, 2,000 a
+            # month); these may only be lower.
+            finder_frames=FinderFramesConfig(
+                enabled=bool(settings.app_finder_frames),
+                per_visit=max(0, min(int(settings.app_finder_frames_per_visit), 40)),
+                per_day=max(0, min(int(settings.app_finder_frames_per_day), 300)),
+                per_month=max(0, min(int(settings.app_finder_frames_per_month), 2000)),
+            ),
         ),
         scan_prices=ScanPriceConfig(
             start_on_provisional=bool(settings.scan_price_start_on_provisional),

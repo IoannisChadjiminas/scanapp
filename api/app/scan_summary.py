@@ -35,6 +35,7 @@ SWITCHES = (
     'app_native_camera',
     'app_native_camera_android',
     'app_card_anywhere',
+    'app_finder_frames',
     'trust_client_warp',
     'client_text_hints',
     'client_text_fast_path',

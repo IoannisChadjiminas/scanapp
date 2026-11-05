@@ -98,19 +98,29 @@ def test_a_fresh_stored_price_is_not_read_again(tmp_path, monkeypatch):
 PHOTO_CHECK = dict(photo_check=True, min_sharpness=40.0, sharpness_edge=1000, max_glare=0.08, auto_retakes=2)
 
 
+FINDER_FRAMES_OFF = dict(enabled=False, per_visit=40, per_day=300, per_month=2000)
+
+
+def test_finder_frames_stay_off_until_switched_on_and_never_exceed_the_api_caps():
+    assert scan_price_config(Settings(_env_file=None)).capture.finder_frames.enabled is False
+    body = scan_price_config(Settings(_env_file=None, app_finder_frames=True, app_finder_frames_per_visit=10,
+                                      app_finder_frames_per_day=9999, app_finder_frames_per_month=-5))
+    assert body.capture.finder_frames.model_dump() == dict(enabled=True, per_visit=10, per_day=300, per_month=0)
+
+
 def test_config_sends_phone_capture_and_warp_switches():
     body = scan_price_config(Settings(_env_file=None))
     assert body.card_warp is False
     assert body.capture.model_dump() == dict(preset='max', jpeg_quality=95, max_edge=2000, native_codec=False,
                                                 live_outline=True, auto_capture=True, native_camera=False, native_camera_android=False, card_anywhere=True,
-                                                **PHOTO_CHECK)
+                                                **PHOTO_CHECK, finder_frames=FINDER_FRAMES_OFF)
     body = scan_price_config(Settings(_env_file=None, app_card_warp=True, app_capture_preset='ultraHigh',
                                       app_jpeg_quality=85, app_max_edge=1400, app_native_codec=True,
                                       app_live_outline=True, app_auto_capture=True, app_native_camera=True, native_camera_android=False, card_anywhere=True))
     assert body.card_warp is True
     assert body.capture.model_dump() == dict(preset='ultraHigh', jpeg_quality=85, max_edge=1400, native_codec=True,
                                                 live_outline=True, auto_capture=True, native_camera=True, native_camera_android=False, card_anywhere=True,
-                                                **PHOTO_CHECK)
+                                                **PHOTO_CHECK, finder_frames=FINDER_FRAMES_OFF)
 
 
 def test_config_never_sends_an_unknown_preset_or_silly_quality():
