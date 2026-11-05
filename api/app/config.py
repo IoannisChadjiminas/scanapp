@@ -307,6 +307,9 @@ class Settings(BaseSettings):
     # The same for Android's own camera. Separate so Android can be switched on
     # and off without touching iPhone. Off until checked on an Android phone.
     app_native_camera_android: bool = False
+    # Kill switch for the PP-OCR collector-number reader on Android phones (the app's
+    # ANDROID_NUMBER_RECOGNIZER, step 3 of its phone-first plan). On: the build decides.
+    app_number_recognizer_android: bool = True
     # Let a card count anywhere in the camera view, not only inside the middle box.
     app_card_anywhere: bool = True
     # Measure each photo on the phone as it is taken, against threshold_blur at

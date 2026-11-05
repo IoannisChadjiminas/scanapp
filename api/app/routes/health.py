@@ -44,6 +44,10 @@ class CaptureConfig(BaseModel):
     auto_capture: bool = False
     native_camera: bool = False
     native_camera_android: bool = False
+    # The kill switch for the PP-OCR collector-number reader on Android (step 3 of
+    # the app's phone-first plan). The app's build flag must be on too; True here
+    # leaves it to the build, False turns it off on every phone.
+    number_recognizer_android: bool = True
     card_anywhere: bool = True
     # The phone's own check of each photo, with the server's blur limit.
     photo_check: bool = True
@@ -103,6 +107,7 @@ def scan_price_config(settings) -> AppConfigResponse:
             auto_capture=bool(settings.app_live_outline and settings.app_auto_capture),
             native_camera=bool(settings.app_native_camera),
             native_camera_android=bool(settings.app_native_camera_android),
+            number_recognizer_android=bool(getattr(settings, 'app_number_recognizer_android', True)),
             card_anywhere=bool(settings.app_card_anywhere),
             photo_check=bool(settings.app_photo_check),
             min_sharpness=max(0.0, float(settings.threshold_blur)),
