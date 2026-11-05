@@ -318,6 +318,14 @@ class Settings(BaseSettings):
     # How many times the phone takes an automatic photo again before sending
     # its best try anyway, for the server to judge.
     app_auto_retakes: int = 2
+    # Preview pictures shared by collectors who opted in, for training the
+    # card finder (Flutter docs/user-frames-collection-plan.md). The kill
+    # switch: off until the product API's finder-frames endpoint is deployed.
+    # The collector's own switch is a second condition, never replaced by this.
+    app_finder_frames: bool = False
+    app_finder_frames_per_visit: int = 40
+    app_finder_frames_per_day: int = 300
+    app_finder_frames_per_month: int = 2000
     # Tell the phone to find and flatten the card before upload.
     app_card_warp: bool = False
     # Honour skip_detect from the phone. Off: the server still runs its own
