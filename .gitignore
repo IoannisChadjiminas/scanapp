@@ -58,3 +58,4 @@ venv/
 /exports/
 playwright-report/
 test-results/
+/.local-candidate/

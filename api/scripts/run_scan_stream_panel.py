@@ -1,4 +1,8 @@
-"""One upload per case through the public staging gateway; no confirmations."""
+"""One upload per case through the public staging gateway; no confirmations.
+
+--base-url points the same panel at a local copy of the API (scripts/local_candidate.py).
+--resume keeps finished cases from an earlier, interrupted run and scans only the rest.
+"""
 import argparse
 import json
 from pathlib import Path
@@ -17,17 +21,29 @@ def main():
     p.add_argument('--photos-root', type=Path, required=True)
     p.add_argument('--extra-photos', type=Path)
     p.add_argument('--output', type=Path, required=True)
+    p.add_argument('--base-url', default='https://scan.pokesingle.com')
+    p.add_argument('--resume', action='store_true')
+    p.add_argument('--pause', type=float, default=2.0)
     a = p.parse_args()
     cases = [(c, a.photos_root) for c in json.loads(a.panel.read_text())]
     if a.extra_photos:
         cases.extend((c, a.extra_photos) for c in json.loads((a.extra_photos/'cases.json').read_text()))
     for c, root in cases: assert sha256_file(root/c['photo_file']) == c['sha256']
     rows = []
-    with httpx.Client(timeout=90, follow_redirects=False) as client, a.output.open('x') as handle:
+    if a.resume and a.output.exists():
+        # Only complete lines count; a scan cut off mid-write is repeated.
+        for line in a.output.read_text().splitlines():
+            try: rows.append(json.loads(line))
+            except json.JSONDecodeError: break
+        a.output.write_text(''.join(json.dumps(r)+'\n' for r in rows))
+    done = {r['case']['id'] for r in rows}
+    url = a.base_url.rstrip('/')+'/api/v1/scans'
+    with httpx.Client(timeout=90, follow_redirects=False) as client, a.output.open('a' if a.resume else 'x') as handle:
         for case, root in cases:
+            if case['id'] in done: continue
             start = time.perf_counter(); events = []
             with (root/case['photo_file']).open('rb') as photo, client.stream('POST',
-                'https://scan.pokesingle.com/api/v1/scans',
+                url,
                 data={'stream_results':'true', 'language':'auto'},
                 files={'image':(case['photo_file'], photo, 'image/jpeg')}) as response:
                 response.raise_for_status()
@@ -52,7 +68,7 @@ def main():
             print(json.dumps(dict(id=case['id'],card_id=cid,status=result['status'],
                 preview_ms=round(row['first_provisional_ms']) if previews else None,
                 http_ms=round(row['http_ms']))), flush=True)
-            time.sleep(2)
+            time.sleep(a.pause)
     previews = [r['first_provisional_ms'] for r in rows if r['first_provisional_ms'] is not None]
     summary = dict(scans=len(rows), previews=len(previews), final_results=len(rows),
         median_preview_ms=statistics.median(previews) if previews else None,
