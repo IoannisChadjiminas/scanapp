@@ -73,8 +73,10 @@ def test_the_catalogue_is_cached_on_the_runtime_once():
     assert runtime.printing_text_catalogue is cached
 
 
-def test_the_flag_defaults_off_in_code_and_in_production_compose():
-    assert Settings(_env_file=None).ocr_printing_from_text is False
+def test_the_flag_defaults_on_in_code_and_in_production_compose():
+    # On since 6 November 2026 (stage 1 bench: 0 wrong first cards introduced;
+    # on in staging since 26 October); the environment can still turn it off.
+    assert Settings(_env_file=None).ocr_printing_from_text is True
     from pathlib import Path
     production = (Path(__file__).resolve().parents[2] / 'compose.dokploy.production.yaml').read_text()
-    assert 'OCR_PRINTING_FROM_TEXT: ${OCR_PRINTING_FROM_TEXT:-false}' in production
+    assert 'OCR_PRINTING_FROM_TEXT: ${OCR_PRINTING_FROM_TEXT:-true}' in production

@@ -10,6 +10,8 @@ Read-only analysis of staging scan `bd643ddd` (Redmi Note 10 Pro, the PP-OCR foo
 
 ## Change (under `OCR_PRINTING_FROM_TEXT`, no new switch)
 
+The switch is on by default in code and in the production compose file since this change merged (6 November 2026); `OCR_PRINTING_FROM_TEXT=false` turns it off.
+
 - When the name-and-number lookup names no card, the phone's number alone goes through the footer fraction rule (`fraction_named_printing`) against the printings the picture could not tell apart: parsed like a footer read with its own confidence (0.85 or more, the footer bar), matched with set totals, naming a printing only when exactly one of the ambiguous printings agrees and the card shown first does not. `_hint_number_named_printing` in `pipeline.py`.
 - It only orders: the status stays `printing_ambiguous`, the stage 1 shortcut (name, number and the embedding's agreement) is untouched, and a number that matches none, several, or the card already shown changes nothing. Tests in `api/tests/test_printing_from_number.py` (the stored top 3 of `bd643ddd`, a number matching none, two printings sharing it, a wrong total, no confidence).
 
