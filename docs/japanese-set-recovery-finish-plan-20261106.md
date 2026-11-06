@@ -144,3 +144,25 @@ Steps 4–7 cannot be finished from this session without the owner:
 - **Product ids, `read_product_ids.py`:** read from Cardmarket list view in the owner's Chrome (no Cloudflare stops). The list view shows at most 10 pages (300 rows), so the four biggest promo sets were read again in descending order. 26 ids are already on English XY promo cards (`en:xyp-*`, which carry Japanese XY-P product ids) and are held (`catalogue-id-collisions.json`). **Linked cards with a product id: 8,619 of 8,645.**
 - **Card records, `prepare_cards.py`:** `cards.json` has all 11,706 new cards: id `ja:<set>-<number>`, English name, image, Cardmarket url and id. Partial sets keep their catalogue code; absent sets use their checklist code when unique, otherwise `jr-<name>` (132 sets). Unnumbered rows are `u01`, `u02`… One id repeats (`ja:SP-123`: the Lance's Charizard / Pikachu VMAX conflict) and is held. 10,258 have an image, 8,085 have both image and Cardmarket page.
 - **Vectors, `build_vectors.py`:** built locally with `dinov2_small.onnx` from the staging data snapshot and the API's pinned numpy/pillow/onnxruntime. Re-embedding two cards of the 2026-10-17 wave here gave cosine 1.0 against that wave's stored vectors. Then `decide_lookalikes.py` applies the 0.95 rule against the local copy of the served pad index (`data/android-embedding-research-20261023/catalogue/vectors/pad`, 43,695 vectors).
+
+## Checkpoint 2026-11-07 (resume here)
+
+**Owner decisions in chat:** all recovery image sources that pass the catalogue gate are approved; reading Cardmarket list pages from the owner's connection is fine; old staging rollback folders could be deleted (done); stored reference images must stay full quality for vectors (full resolution, JPEG quality 95, as earlier waves).
+
+**Done**
+- Branch `claude/ja-recovery-finish` (local commits, not pushed). Scripts in `api/scripts/ja_set_recovery/`: `match_existing`, `choose_images`, `match_cardmarket`, `read_product_ids` (`desc` mode for >300-row sets), `attach_product_ids`, `prepare_cards`, `build_vectors`, `decide_lookalikes`.
+- Run folder `data/catalogue-gaps/ja-set-recovery-20261029-v3/`: `cards.json` = 11,706 new cards (10,258 with image, 8,645 Cardmarket page, 8,619 product id; `ja:SP-123` held as a duplicate). `catalogue-id-collisions.json` (26 ids already on `en:xyp-*`), `catalogue-url-collisions-20261106.txt` (116 pages already on catalogue cards).
+- Staging cleanup: 74 old feature/artwork folders deleted (list in `/etc/scanapp-staging/cleanup-20261107/deleted-folders.txt`); 5.4 GB free; current (`20261028-neo2-057`) and previous (`20261017-ja-sets`, `PS-CATALOGUE-EN-JA-SETH3-20261017`) kept; API healthy.
+- `pscale auth login` done by the owner on 2026-11-07 (token may expire again).
+
+**Running**: `build_vectors.py` (full-quality JPEGs in `reference-images/`, vectors in `vectors/chunks/`, resumable). If it stopped, rerun the same command; finished chunks are skipped:
+`<venv>/bin/python -W ignore -u api/scripts/ja_set_recovery/build_vectors.py data/catalogue-gaps/ja-set-recovery-20261029-v3 data/catalogue-completion/20261004-01/local-first-validation-20261014/staging-data-snapshot/models/dinov2_small.onnx`
+(venv = Python 3.13 with numpy 2.2.6, pillow 11.3.0, onnxruntime 1.22.1, pydantic 2.11.7, pydantic-settings 2.10.1, opencv-python-headless.)
+
+**Next**
+1. `decide_lookalikes.py RUN_DIR data/android-embedding-research-20261023/catalogue/vectors/pad` (scannable vs printing alternative; check the parent pad file equals the served 43,696 one in `data/catalogue-completion/20261028-neo2-057/release-package-v2/vectors/pad`).
+2. Release builder (to write), modelled on the neo2-057 release (`data/catalogue-completion/20261028-neo2-057/release-package-v2`, parent = `pokesingle_completion_20261028_neo2057`): pad vectors appended to the parent order (square not extended, as in neo2-057), artwork bundle = parent + 2 regions per scannable card (append after max row_index 21,559), images to `/data/reference-images/ja-20261107-recovery/`, feature records for every new card (`available: false` for no-image cards).
+3. Features on staging in a separate memory-limited container from the retained API image (x86 OpenCV contract), into a new `reference-features/<new>` dir hard-linked from `20261028-neo2-057`.
+4. SQL candidate (inactive) with a short-lived pscale role; `verify-cloud-candidate`-style check; switch only the release env; panels (28-photo regression + earlier eBay panels); keep or roll back.
+
+**Disk** for full quality: about 2.25 GB images + about 0.9 GB features = about 3.2 GB of 5.4 GB free (leaves about 2.2 GB, 97% used). Not yet decided by the owner, more room is possible from: `catalogue-completion/20261004-01/batch-preparation-20261012` (4.1 GB, 12 October upload staging), Docker images not in use (9.8 GB reclaimable) and Docker build cache (25.5 GB, 3.6 GB reclaimable). These are infrastructure changes, so ask first.

@@ -6,13 +6,18 @@ that wave's images here gives cosine 1.0 against its stored pad vectors.
 
     python3 build_vectors.py RUN_DIR MODEL_ONNX
 
-Reads RUN_DIR/cards.json (cards with an image and no problem), writes RUN_DIR/vectors/.
-Works in chunks of 500 cards under vectors/chunks/ so an interrupted run resumes.
+Reads RUN_DIR/cards.json (cards with an image and no problem). Like the earlier waves, each
+image is first stored as the JPEG staging will serve (RUN_DIR/reference-images/<id with _>.jpg)
+and the vectors are taken from that JPEG. Full resolution, JPEG quality 95 (owner: keep reference
+quality for vectors); JPEG originals are copied unchanged.
+Writes RUN_DIR/vectors/. Works in chunks of 500 cards under vectors/chunks/ so an interrupted
+run resumes.
 """
 from __future__ import annotations
 
 import hashlib
 import json
+import shutil
 import sys
 from pathlib import Path
 
@@ -22,8 +27,12 @@ from PIL import Image
 API = Path(__file__).resolve().parents[2]
 REPO = API.parent
 sys.path.insert(0, str(API))
+from app.recognition.artifacts import sha256_file  # noqa: E402
 from app.recognition.artwork import PROFILES, crop_profile  # noqa: E402
 from app.recognition.embed import DinoEmbedder  # noqa: E402
+
+sys.path.insert(0, str(REPO))
+from catalogue.bootstrap.checks import BLUR_LIMIT, MIN_SIDE, load_facts  # noqa: E402
 
 CHUNK = 500
 
@@ -37,6 +46,8 @@ def main(run_dir: str, model_path: str) -> None:
     out = run / "vectors"
     chunks = out / "chunks"
     chunks.mkdir(parents=True, exist_ok=True)
+    images = run / "reference-images"
+    images.mkdir(exist_ok=True)
     cards = [c for c in json.loads((run / "cards.json").read_text()) if c["local_file"] and not c["problem"]]
     cards.sort(key=lambda card: card["id"].encode())
     assert len(cards) == len({card["id"] for card in cards})
@@ -47,7 +58,19 @@ def main(run_dir: str, model_path: str) -> None:
             continue
         pads, squares, arts, records = [], [], [], []
         for card in cards[start:start + CHUNK]:
-            with Image.open(REPO / card["local_file"]) as image:
+            src = REPO / card["local_file"]
+            dst = images / (card["id"].replace(":", "_") + ".jpg")
+            if not dst.exists():
+                tmp_img = dst.with_suffix(".tmp")
+                if src.suffix.lower() in (".jpg", ".jpeg"):
+                    shutil.copyfile(src, tmp_img)
+                else:
+                    with Image.open(src) as im:
+                        im.convert("RGB").save(tmp_img, "JPEG", quality=95)
+                tmp_img.rename(dst)
+            facts = load_facts(dst)
+            assert min(facts.width, facts.height) >= MIN_SIDE and facts.blur is not None and facts.blur >= BLUR_LIMIT, card["id"]
+            with Image.open(dst) as image:
                 rgb = image.convert("RGB")
                 pad = model.embed(rgb, "pad").astype(np.float32)
                 square = model.embed(rgb, "square").astype(np.float32)
@@ -60,6 +83,7 @@ def main(run_dir: str, model_path: str) -> None:
                         "name": card["name"], "set_name": card["set_name"],
                         "collector_number": card["collector_number"],
                         "source_vector_sha256": vh(vector), "source_file": card["local_file"],
+                        "reference_sha256": sha256_file(dst),
                     })
             for vector in (pad, square):
                 assert vector.shape == (384,) and np.isfinite(vector).all()
