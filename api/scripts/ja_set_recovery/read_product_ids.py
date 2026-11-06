@@ -8,7 +8,11 @@ started; Chrome needs View > Developer > Allow JavaScript from Apple Events).
 On a human check it waits up to 10 minutes for the owner to clear it and never
 clicks it. Resumable. Does not change the catalogue.
 
-    python3 read_product_ids.py RUN_DIR
+    python3 read_product_ids.py RUN_DIR [desc]
+
+Cardmarket's list view stops after 10 pages (300 rows). For larger sets, run again
+with `desc`: it reads only the sets that still have targets without an id, sorted by
+collector number descending, so the tail of the set becomes visible.
 """
 
 from __future__ import annotations
@@ -26,7 +30,8 @@ ROOT = Path(sys.argv[1]).resolve()
 TARGETS = ROOT / "verified-mappings.jsonl"
 OUT = ROOT / "cardmarket-ids.jsonl"
 STATE = ROOT / "cardmarket-ids-state.json"
-DONE = ROOT / "cardmarket-ids-done.json"
+DESC = len(sys.argv) > 2 and sys.argv[2] == "desc"
+DONE = ROOT / ("cardmarket-ids-done-desc.json" if DESC else "cardmarket-ids-done.json")
 GAP_S = 2
 HUMAN_WAIT_S = 600
 TAB = ""
@@ -128,7 +133,7 @@ def list_url(slug: str, expansion_id: str | None, page: int) -> str:
     if expansion_id:
         return (
             "https://www.cardmarket.com/en/Pokemon/Products/Singles?idExpansion="
-            + expansion_id + "&sortBy=collectorsnumber_asc&site=" + str(page) + "&mode=list"
+            + expansion_id + "&sortBy=collectorsnumber_" + ("desc" if DESC else "asc") + "&site=" + str(page) + "&mode=list"
         )
     url = "https://www.cardmarket.com/en/Pokemon/Products/Singles/" + slug + "?mode=list"
     if page > 1:
