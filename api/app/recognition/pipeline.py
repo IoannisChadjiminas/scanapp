@@ -267,6 +267,23 @@ def _text_named_card(runtime, catalog, client_text, settings) -> str | None:
     return str(hits[0]['id']) if len(hits) == 1 else None
 
 
+def _hint_number_named_printing(ranked, members, client_text) -> str | None:
+    """The one ambiguous printing the phone's own footer number names, name or no name.
+
+    The phone's number with its confidence goes through the footer fraction rule
+    (`fraction_named_printing`): matched with set totals against the printings the
+    picture could not tell apart, naming one only when exactly one agrees and the card
+    shown first does not. A number read without confidence names nothing. Used only to
+    order a printing_ambiguous result; it never confirms a printing.
+    """
+    number = getattr(client_text, 'number', None)
+    confidence = getattr(client_text, 'number_conf', None)
+    if not number or confidence is None:
+        return None
+    hit = OcrHit(text=str(number), confidence=float(confidence), region='collector')
+    return fraction_named_printing(ranked, members, [hit])
+
+
 def _recognize_bytes_once(
     data: bytes,
     *,
@@ -1097,6 +1114,11 @@ def _recognize_bytes_once(
             text_card = _text_named_card(runtime, catalog, client_text, settings)
             if text_card and any(row.get('card_id') == text_card for row in combined):
                 named = text_card
+            # The phone's number alone, when its text has no name (or the name and number
+            # named no single catalogue card): the Evolutions Charmander read as 9/108 by
+            # the phone and as "3" by the server, shown as Base Set 46 (6 November 2026).
+            if not named:
+                named = _hint_number_named_printing(combined, printing.members, client_text)
         if named:
             combined.sort(key=lambda row: row.get('card_id') == named, reverse=True)
             if combined:
