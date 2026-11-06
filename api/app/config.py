@@ -62,8 +62,11 @@ class Settings(BaseSettings):
     # characters ("00z/03" for 007/034). Reorders only; never confirms a printing.
     ocr_damaged_footer_order: bool = False
     # Order an unproven printing group by the printing the phone's own name and number name (set totals
-    # applied), when that card is among the candidates. Reorders only; the status stays printing_ambiguous.
-    ocr_printing_from_text: bool = False
+    # applied), or its number alone, when that card is among the candidates. Reorders only; the status
+    # stays printing_ambiguous. On by default since 6 November 2026 (measured offline on 174 uploads, 0
+    # wrong first cards introduced; on in staging since 26 October 2026; the number-alone rule replayed on
+    # 192 stored cases, 1 moved, 0 wrong); OCR_PRINTING_FROM_TEXT=false turns it off.
+    ocr_printing_from_text: bool = True
     # One isolated footer reader overlaps initial title/footer inference.
     # Its auxiliary CPU lane is shared with optional grading, not added to it.
     ocr_parallel_regions: bool = False

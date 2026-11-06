@@ -44,7 +44,7 @@ Flags as staging runs them, plus `family_vector` where marked. The baseline coun
 
 The 16 family-vector disagreements were all printing choices where the server had not read a footer number, so the visual leader was shown first (`printing_ambiguous`, same card name). The phone's own name and number name one card (set totals applied) in every such case, and that card was already a candidate.
 
-- Change: when a printing is ambiguous and no earlier rule has named a printing, the card the phone's text names is moved to the front, if it is among the candidates. Status stays `printing_ambiguous`. Default off in code and in production; **on in the staging compose file** (gate below).
+- Change: when a printing is ambiguous and no earlier rule has named a printing, the card the phone's text names is moved to the front, if it is among the candidates. Status stays `printing_ambiguous`. Default off in code and in production at the time; **on in the staging compose file** (gate below). On by default in code and in the production compose file since 6 November 2026, after the number-alone rule's replay (`printing-from-number-20261106.md`): 0 wrong first cards in either measurement.
 - Offline measurement on the 174 labelled uploads, using the stored candidate lists (`visual_top20` and `predicted`) and the owner's card as the text (the oracle; see caveats above):
 
 | | Displayed first card is the owner's card |
