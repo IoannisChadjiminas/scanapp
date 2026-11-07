@@ -39,6 +39,7 @@ from app.recognition.detect import (card_frame_candidates, client_quad_rect, det
 from app.recognition.frame_fallback import line_frame_candidates, loose_frame_candidates, portrait_window_candidates, slab_interior_candidate
 from app.recognition.images import apply_crop, blur_variance, decode_image
 from app.recognition.embed import top_k
+from app.recognition.family_verify import promote_family, verify_families
 from app.recognition.identity import layout_identity_agrees, likely_identity_agrees, structured_identity_agrees
 from app.recognition.confidence import confidence_payload
 from app.recognition.presentation import match_presentation
@@ -844,6 +845,7 @@ def _recognize_bytes_once(
     # candidate is never automatically accepted as a single printing.
     mark = time.perf_counter()
     local_matches = []
+    verified_family, family_verify = None, None
     text_aligned: list[str] = []
     framing_unverified = False
     verifier = getattr(runtime, "artwork_verifier", None)
@@ -905,6 +907,20 @@ def _recognize_bytes_once(
                 found = verifier.verify(aligned, [reference]) if aligned is not None else []
                 local_matches.extend(found)
                 text_aligned.extend(m.card_id for m in found)
+        if getattr(settings, 'rank_family_verify', False):
+            family_mark = time.perf_counter()
+            positions = getattr(runtime, 'card_positions', None) or {}
+
+            def full_vector(card_id):
+                i = positions.get(card_id)
+                return None if i is None else snapshot.embeddings[i]
+            family_order = [r['card_id'] for r in combined]
+            verified_family, family_matches, family_verify = verify_families(
+                verifier, image, combined, cards, full_vector,
+                int(getattr(settings, 'local_verify_families', 16)))
+            timings['family_verify_ms'] = (time.perf_counter() - family_mark) * 1000
+            known = {m.card_id for m in local_matches}
+            local_matches.extend(m for m in family_matches if m.card_id not in known)
         framing_unverified = not local_matches and (
             not .62 <= ratio <= .80 or
             (not skip_detect and not detected and
@@ -927,6 +943,9 @@ def _recognize_bytes_once(
                 item["local_artwork_verified"] = item["card_id"] in verified_ids
             combined.sort(key=lambda r: (r["card_id"] == chosen_id,
                                         r["card_id"] in verified_ids), reverse=True)
+            # A leader already in the family keeps today's order; only another artwork moves.
+            if verified_family and combined[0]['card_id'] not in {r['card_id'] for r in verified_family}:
+                promote_family(combined, verified_family, family_order)
     timings["local_artwork_ms"] = (time.perf_counter() - mark) * 1000
     framing_review_supported = bool(combined and not retake
         and float(combined[0]['visual_score']) >= settings.threshold_min_visual_ocr
@@ -972,6 +991,8 @@ def _recognize_bytes_once(
     if local_matches:
         status = "uncertain"
         status_reasons.append('local_artwork_used')
+    if verified_family:
+        status_reasons.append('family_verified')
     if any(h.region=='holder_name' for h in ocr.hits) and status=='matched':
         status='uncertain'
         status_reasons.append('holder_name')
@@ -1154,7 +1175,7 @@ def _recognize_bytes_once(
             } for row in review_members],
             guidance=printing.guidance,
         )
-    elif local_matches and not framing_review_supported and not (
+    elif local_matches and not framing_review_supported and not verified_family and not (
         # A slab label's own number, with verified artwork, outranks a footer misread.
         recovery and combined[0]['card_id'] in label_ids and combined[0].get('local_artwork_verified')
     ) and not artwork_evidence_compatible(
@@ -1394,6 +1415,7 @@ def _recognize_bytes_once(
         "printing_review": printing_review.model_dump(mode="json") if printing_review else None,
         **({"vintage_name_choices": vintage_choices} if vintage_choices is not None else {}),
         "local_artwork_matches": [vars(m) for m in local_matches],
+        "family_verify": family_verify,
         "layout_matches": [vars(m) for m in layout_matches],
         "layout_review_supported": layout_review_supported,
         "layout_footer_hits": [vars(h) for h in layout_footer_hits],
