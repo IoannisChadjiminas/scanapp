@@ -335,6 +335,12 @@ def init_catalog(conn: sqlite3.Connection) -> None:
             avg1_holo REAL, avg7_holo REAL, avg30_holo REAL,
             guide_date TEXT NOT NULL
         );
+        CREATE TABLE IF NOT EXISTS price_spike_episodes (
+            series TEXT PRIMARY KEY,
+            active INTEGER NOT NULL,
+            started_at TEXT,
+            guide_date TEXT NOT NULL
+        );
         CREATE TABLE IF NOT EXISTS card_market_stats (
             id_product INTEGER NOT NULL, basis TEXT NOT NULL, as_of TEXT NOT NULL,
             trend_7d_ago REAL, trend_30d_ago REAL, sales_days_30 INTEGER,

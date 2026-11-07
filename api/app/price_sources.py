@@ -91,6 +91,10 @@ def import_guide(conn: sqlite3.Connection, payload: Any, history: Any = None) ->
             "VALUES (1, ?, ?, ?)",
             (date, len(rows), _now()),
         )
+        from app.config import get_settings
+        from app.price_moves import record_guide_spikes
+
+        record_guide_spikes(conn, date, rows, get_settings(), _now())
     if history is not None:
         try:
             from app.price_history import record_guide
@@ -232,13 +236,17 @@ def parse_tiers(text: str) -> list[tuple[float | None, int]]:
     return tiers
 
 
-def tier_window(settings: Settings, trend: float | None) -> int | None:
-    """Seconds a listing sample stays fresh for a card worth `trend` EUR."""
+def tier_window(settings: Settings, trend: float | None, *, condition: bool = False) -> int | None:
+    """Seconds a listing sample stays fresh for a card worth `trend` EUR.
+
+    A condition listing worse than Near Mint uses the next cheaper tier.
+    """
     if not settings.cardmarket_fresh_by_value or trend is None or trend <= 0:
         return None
-    for bound, window in parse_tiers(settings.cardmarket_fresh_tiers):
+    tiers = parse_tiers(settings.cardmarket_fresh_tiers)
+    for index, (bound, window) in enumerate(tiers):
         if bound is None or trend < bound:
-            return window
+            return tiers[max(0, index - 1)][1] if condition else window
     return None
 
 
@@ -297,9 +305,11 @@ def fresh_window(conn: sqlite3.Connection, url: str | None, *, trend: float | No
     settings = get_settings()
     if not settings.cardmarket_fresh_by_value:
         return fresh_seconds()
+    from app.price_moves import is_condition_key
+
     try:
         value = trend if trend is not None else trend_for_url(conn, url)
-        return tier_window(settings, value) or fresh_seconds()
+        return tier_window(settings, value, condition=is_condition_key(url)) or fresh_seconds()
     except sqlite3.Error:
         return fresh_seconds()
 

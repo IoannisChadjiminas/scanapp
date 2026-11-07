@@ -1288,6 +1288,12 @@ def prices_payload(
         observed = (record or {}).get("empty_observed_at") or observed
     freshness = None
     window = fresh_window(conn, url)
+    if sample and record:
+        from app.cardmarket import datetime_now
+        from app.price_moves import moving
+
+        if moving(conn, sample, record, get_settings(), datetime_now()):
+            window = min(window, int(get_settings().moving_fresh_s))
     if record and (prices or unlisted or record.get("empty")):
         age = _age_seconds(str(observed or ""))
         if age is None:

@@ -31,6 +31,7 @@ from app.cardmarket_budget import (
 from app.cardmarket_queue import header_prices, rows_to_prices
 from app.config import Settings, get_settings
 from app.db import connect
+from app import price_moves
 from app.price_sources import market_trend, parse_tiers, trend_for_url
 from app.portfolio_db import has_synced_at, portfolio_keys, statement
 from app.paid_sample_lease import acquire as acquire_paid_lease, release as release_paid_lease
@@ -61,8 +62,10 @@ def accepted_daily_browsers(requested: int, lanes: int = 1) -> int:
 class WorkQueue:
     """The night's URLs, shared by every worker so no product is read twice."""
 
-    def __init__(self, items: list[str]) -> None:
+    def __init__(self, items: list[str], early: set[str] | None = None) -> None:
         self._items = list(items)
+        # Keys queued only because they were moving; checked again before reading.
+        self.early = set(early or ())
         self._lock = threading.Lock()
         self.total = len(self._items)
 
@@ -231,20 +234,75 @@ def tier_days(settings: Settings, trend: float | None) -> int:
     return 1
 
 
-def _listing_trend(record: dict | None) -> float | None:
-    """The trend Cardmarket's own page showed on the last listing read."""
-    for quote in (record or {}).get("prices") or []:
-        if quote.get("label") == "Trend":
-            amount = quote.get("amount")
-            if isinstance(amount, (int, float)) and amount > 0:
-                return float(amount)
-    return None
+def trend_moved(file_trend: float | None, read_trend: float | None, pct: float,
+                floor: float = 0.0) -> bool:
+    return price_moves.trend_moved(file_trend, read_trend, pct, floor)
 
 
-def trend_moved(file_trend: float | None, read_trend: float | None, pct: float) -> bool:
-    if not file_trend or not read_trend or pct <= 0:
-        return False
-    return abs(file_trend - read_trend) / read_trend * 100 > pct
+@dataclass
+class NightPlan:
+    """Tonight's keys in order, and the ones only there because they are moving."""
+
+    urls: list[str]
+    early: set[str]
+
+
+def plan_night(
+    conn,
+    today: str,
+    portfolio=None,
+    settings: Settings | None = None,
+    rng: random.Random | None = None,
+    candidates: list[str] | None = None,
+    refresh: dict | None = None,
+    early_limit: int | None = None,
+) -> NightPlan:
+    """Holdings whose last listing read is older than their value tier.
+
+    Order: cards about to pass the listing age limit, moving cards read early,
+    dearer cards, then the rest. Each group is shuffled. A condition listing
+    worse than Near Mint waits one tier longer and is skipped for a card whose
+    trend is under the condition threshold. At most `early_limit` keys are
+    read early; a moving key already due by age is in the normal groups.
+    """
+    settings = settings or get_settings()
+    rng = rng or random.Random()
+    day = date.fromisoformat(today)
+    now = _utc_now()
+    max_age = max(1, int((refresh or {}).get('maximumListingAgeDays', settings.cardmarket_listing_max_age_days)))
+    pct = (refresh or {}).get('trendMovePercent', settings.daily_move_pct)
+    groups: list[list[str]] = [[], [], [], []]
+    keys = candidates if candidates is not None else portfolio_keys(portfolio or conn, settings.daily_install_max_age_days)
+    for key in keys:
+        condition = price_moves.is_condition_key(key)
+        first_edition = price_moves.is_first_edition(key)
+        trend = None if first_edition else trend_for_url(conn, key)
+        if (condition and trend is not None and trend > 0
+                and trend < settings.condition_read_min_trend):
+            continue
+        record = snapshot_record(conn, key)
+        if str((record or {}).get("fetched_at") or "").startswith(today):
+            continue
+        read_on = _read_date(record) if (record or {}).get("prices") else None
+        if read_on is None:
+            groups[2 if trend is None or trend >= 2 else 3].append(key)
+            continue
+        age = (day - read_on).days
+        if age <= 0:
+            continue
+        if age >= max_age - 1:
+            groups[0].append(key)
+        elif age >= _policy_tier_days(settings, trend, refresh, condition=condition):
+            groups[2 if trend is None or trend >= 20 else 3].append(key)
+        elif price_moves.moving(conn, key, record, settings, now, trend=trend, pct=pct):
+            groups[1].append(key)
+    for group in groups:
+        rng.shuffle(group)
+    # A moving card's Near Mint key goes before its condition keys.
+    groups[1].sort(key=lambda key: price_moves.condition_rank(key) or 0)
+    if early_limit is not None:
+        groups[1] = groups[1][:max(0, early_limit)]
+    return NightPlan([key for group in groups for key in group], set(groups[1]))
 
 
 def due_urls(
@@ -256,51 +314,40 @@ def due_urls(
     candidates: list[str] | None = None,
     refresh: dict | None = None,
 ) -> list[str]:
-    """Holdings whose last listing read is older than their value tier.
-
-    Order: cards about to pass the listing age limit, cards whose trend moved,
-    dearer cards, then the rest. Each group is shuffled.
-    """
-    settings = settings or get_settings()
-    rng = rng or random.Random()
-    day = date.fromisoformat(today)
-    max_age = max(1, int((refresh or {}).get('maximumListingAgeDays', settings.cardmarket_listing_max_age_days)))
-    groups: list[list[str]] = [[], [], [], []]
-    keys = candidates if candidates is not None else portfolio_keys(portfolio or conn, settings.daily_install_max_age_days)
-    for key in keys:
-        record = snapshot_record(conn, key)
-        if str((record or {}).get("fetched_at") or "").startswith(today):
-            continue
-        read_on = _read_date(record) if (record or {}).get("prices") else None
-        trend = trend_for_url(conn, key)
-        if read_on is None:
-            groups[2 if trend is None or trend >= 2 else 3].append(key)
-            continue
-        age = (day - read_on).days
-        if age <= 0:
-            continue
-        if age >= max_age - 1:
-            groups[0].append(key)
-        elif trend_moved(trend, _listing_trend(record), (refresh or {}).get('trendMovePercent', settings.daily_move_pct)):
-            groups[1].append(key)
-        elif age >= _policy_tier_days(settings, trend, refresh):
-            groups[2 if trend is None or trend >= 20 else 3].append(key)
-    pending: list[str] = []
-    for group in groups:
-        rng.shuffle(group)
-        pending.extend(group)
-    return pending
+    return plan_night(conn, today, portfolio, settings, rng, candidates, refresh).urls
 
 
-def _policy_tier_days(settings: Settings, trend: float | None, refresh: dict | None) -> int:
+def early_read_limit(settings: Settings, pages: int, reserve_pages: int) -> int:
+    """Pages moving keys may use tonight, from the allocation left after the reserve."""
+    return math.floor(max(0, pages - reserve_pages) * settings.daily_early_share_pct / 100)
+
+
+def _utc_now() -> str:
+    return time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())
+
+
+def _policy_tier_days(settings: Settings, trend: float | None, refresh: dict | None,
+                      *, condition: bool = False) -> int:
     if refresh is None:
+        if condition and trend is not None and trend > 0:
+            return _later_tier_days(settings, trend)
         return tier_days(settings, trend)
     if trend is None or trend <= 0:
         seconds = refresh['unknownPriceMinimumAgeSeconds']
     else:
-        seconds = next(tier['minimumAgeSeconds'] for tier in refresh['tiers']
-                       if tier['lessThanEur'] is None or trend < tier['lessThanEur'])
+        tiers = refresh['tiers']
+        index = next(i for i, tier in enumerate(tiers)
+                     if tier['lessThanEur'] is None or trend < tier['lessThanEur'])
+        seconds = tiers[max(0, index - 1) if condition else index]['minimumAgeSeconds']
     return max(1, math.ceil(seconds / 86400))
+
+
+def _later_tier_days(settings: Settings, trend: float) -> int:
+    tiers = parse_tiers(settings.daily_tiers)
+    for index, (bound, _days) in enumerate(tiers):
+        if bound is None or trend < bound:
+            return max(1, tiers[max(0, index - 1)][1])
+    return 1
 
 
 class PaidReadSkipped(Exception):
@@ -436,7 +483,10 @@ def run_pass(
         return "paused"
     pace = DailyPace.from_settings(settings, now)
     if queue is None:
-        queue = WorkQueue(due_urls(conn, today, portfolio, settings))
+        reserve = settings.interactive_reserve_pages() if interactive_reserve is None else interactive_reserve
+        night = plan_night(conn, today, portfolio, settings,
+                           early_limit=early_read_limit(settings, settings.scraper_daily_pages, reserve))
+        queue = WorkQueue(night.urls, night.early)
         log.info("daily start due=%s", queue.total)
     clock = clock or (lambda: datetime.now(timezone.utc))
     began = now()
@@ -455,6 +505,10 @@ def run_pass(
             log.info("daily pace gap=%.1f left=%s", pace.gap, queue.left() + 1)
         if settings.photo_scrape_active:
             return "paused"
+        if url in queue.early and not price_moves.moving(conn, url, snapshot_record(conn, url), settings, _utc_now()):
+            # A phone or an earlier worker has read it since the plan was made.
+            log.info("daily skipped reason=no-longer-moving url=%s", url)
+            continue
         reason = scraper_block_reason(conn)
         if reason in {"daily-pages", "daily-mb"}:
             log.info("daily stop reason=%s", reason)
@@ -636,7 +690,10 @@ def run_once(settings: Settings | None = None) -> str:
                 settings = settings.model_copy(update={'scraper_daily_pages': refresh['dailyPageBudget'],
                                                        'scraper_daily_mb': refresh['dailyMegabyteBudget']})
                 reserve_pages = math.ceil(refresh['dailyPageBudget'] * refresh['interactiveReservePercent'] / 100)
-                queue = WorkQueue(due_urls(conn, today, settings=settings, candidates=candidates, refresh=refresh))
+                night = plan_night(conn, today, settings=settings, candidates=candidates, refresh=refresh,
+                                   early_limit=early_read_limit(settings, refresh['dailyPageBudget'], reserve_pages))
+                queue = WorkQueue(night.urls, night.early)
+                log.info("daily plan due=%s early=%s", len(night.urls), len(night.early))
             except SubscriptionUnavailable:
                 log.info('daily stopped reason=subscription-unavailable')
                 return 'blocked'
@@ -648,7 +705,10 @@ def run_once(settings: Settings | None = None) -> str:
                 conn, settings, scrape=scrape, sleep=time.sleep, today=today, portfolio=portfolio,
                 queue=queue, subscription_client=client, interactive_reserve=reserve_pages,
             )
-        queue = queue or WorkQueue(due_urls(conn, today, portfolio, settings))
+        if queue is None:
+            night = plan_night(conn, today, portfolio, settings, early_limit=early_read_limit(
+                settings, settings.scraper_daily_pages, settings.interactive_reserve_pages()))
+            queue = WorkQueue(night.urls, night.early)
         log.info("daily start due=%s workers=%s", queue.total, workers)
         statuses: list[str] = []
 

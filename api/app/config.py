@@ -236,6 +236,22 @@ class Settings(BaseSettings):
     # A card is read tonight whatever its tier when the price file's trend has
     # moved this many percent from the trend on its last listing read.
     daily_move_pct: float = 10.0
+    # ...and at least this many EUR, so a cheap card's cents do not count.
+    daily_move_floor_eur: float = 0.5
+    # A spike: yesterday's average at least this many times the 7-day average
+    # and this many EUR higher. Each listing key is read once per spike.
+    daily_spike_ratio: float = 1.5
+    daily_spike_floor_eur: float = 1.0
+    # Reads made early for a move or a spike may use at most this share of the
+    # night's pages after the interactive reserve. Normally due reads do not count.
+    daily_early_share_pct: float = 30.0
+    # A moving key's snapshot stays fresh this long, so the phone reads it again sooner.
+    moving_fresh_s: int = 21600
+    # Prices that follow each copy's condition (GET /config). The app needs its
+    # own complete build as well. Cards whose trend is below the threshold are
+    # valued from the Near Mint read, by the phone and overnight.
+    condition_prices_enabled: bool = False
+    condition_read_min_trend: float = 2.0
     # The night's reads should be finished by this UTC time (HH:MM).
     daily_deadline_utc: str = "08:00"
     daily_gap_max_s: float = 60
