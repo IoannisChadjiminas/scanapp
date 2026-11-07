@@ -101,3 +101,49 @@ four unlabelled photos.
 
 Files (git-ignored run folder `replay-local/work/`): `families-fail2.jsonl`,
 `families-panels.jsonl`, `families-panels-summary.json`, `families-panels.log`.
+
+## Step 3: family verification (built, flag off)
+
+Branch `claude/rank-family-verify` (from `main`): commits `fd528f2` and `3bb74a1`. The setting is
+`RANK_FAMILY_VERIFY`, default off, with `LOCAL_VERIFY_FAMILIES=16`. Deeper retrieval (k=100/50)
+is left out: the experiment showed it gains little.
+
+A trace of the pipeline's own verifier changed the design. The right artwork was usually not
+crowded out. Instead:
+
+- the verifier confirmed it and the misread title vetoed it (`local_artwork_incompatible` →
+  retake: `PCG1-048-2`, `SM1S-068-1`); or
+- the OCR filter removed it before verification (`S5I-085-2`, `S7D-083-2`).
+
+When the shortlist goes to verification, the flag also checks one reference per artwork family
+(reprints and other-language prints), without the OCR filter.
+
+A family that leads (≥ 12 inliers, 1.5× the next family):
+- moves up as a whole and keeps today's order inside it;
+- its matches join the verified list only when another artwork led, or when nothing was verified;
+- otherwise it only stops the OCR-incompatibility retake.
+
+The status is never `matched`.
+
+Panel replay (98 photos, API image `e99c2332` with the branch code mounted):
+
+| Release | Flag | Best/status changes |
+|---|---|---|
+| served `jarec5` | off | 0 |
+| served `jarec5` | on | 3, all fixes: `S5I-085-2`, `S7D-083-2`, `SM1S-068-1` retake → right card (review) |
+| all-eras `jarec` | on, vs `jarec` off | 4, all fixes: the same 3 plus `PCG1-048-2` |
+
+The first version moved a trainer-kit Potion photo from one wrong printing to another;
+`3bb74a1` removed that.
+
+Tests: 6 new unit tests. The API suite has 1,217 passed and 1 failed, an unrelated `.webp` extension
+check in `test_photo_corpus_collect`.
+
+**Not fixed: `PMCG4-017-2` on the all-eras catalogue.** The verifier never runs there: the
+vintage name choice (`VINTAGE_NAME_CHOICES`) picks the new Mewtwo promo and the scan ends
+`printing_ambiguous`. The held older-era cards therefore still cannot get vectors with this flag
+alone; that needs a fix in the vintage name choice. The two base Charizard photos are already wrong
+on the served release and do not change.
+
+Before switching the flag on staging: the stored-upload replay (plan, "Gates"), and
+`family_verify_ms` measured on the staging CPU.
