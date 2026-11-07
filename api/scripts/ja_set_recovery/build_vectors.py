@@ -4,7 +4,10 @@ Adapted from data/catalogue-gaps/tcgdex-empty-sets-20261017/build_vectors.py (sa
 modes, artwork profiles and output files). Checked on 2026-11-06: re-embedding two of
 that wave's images here gives cosine 1.0 against its stored pad vectors.
 
-    python3 build_vectors.py RUN_DIR MODEL_ONNX
+    python3 build_vectors.py RUN_DIR MODEL_ONNX [WORKER/WORKERS]
+
+With WORKER/WORKERS (for example 0/5) a process embeds only its share of the chunks and
+stops; run once more without it to merge.
 
 Reads RUN_DIR/cards.json (cards with an image and no problem). Like the earlier waves, each
 image is first stored as the JPEG staging will serve (RUN_DIR/reference-images/<id with _>.jpg)
@@ -41,7 +44,7 @@ def vh(vector: np.ndarray) -> str:
     return hashlib.sha256(np.asarray(vector, dtype=">f4").tobytes()).hexdigest()
 
 
-def main(run_dir: str, model_path: str) -> None:
+def main(run_dir: str, model_path: str, share: str | None = None) -> None:
     run = Path(run_dir).resolve()
     out = run / "vectors"
     chunks = out / "chunks"
@@ -52,9 +55,10 @@ def main(run_dir: str, model_path: str) -> None:
     cards.sort(key=lambda card: card["id"].encode())
     assert len(cards) == len({card["id"] for card in cards})
     model = DinoEmbedder(model_path, 2, 1)
+    worker, workers = (int(x) for x in share.split("/")) if share else (0, 1)
     for start in range(0, len(cards), CHUNK):
         part = chunks / f"{start:05d}.npz"
-        if part.exists():
+        if part.exists() or (start // CHUNK) % workers != worker:
             continue
         pads, squares, arts, records = [], [], [], []
         for card in cards[start:start + CHUNK]:
@@ -95,6 +99,8 @@ def main(run_dir: str, model_path: str) -> None:
                  art=np.asarray(arts, np.float32), records=np.asarray([json.dumps(r, ensure_ascii=False) for r in records]))
         tmp.rename(part)
         print(json.dumps({"embedded": min(start + CHUNK, len(cards)), "of": len(cards)}), flush=True)
+    if share:
+        return
 
     parts = [np.load(chunks / f"{s:05d}.npz") for s in range(0, len(cards), CHUNK)]
     pad = np.concatenate([p["pad"] for p in parts])
@@ -112,4 +118,4 @@ def main(run_dir: str, model_path: str) -> None:
 
 
 if __name__ == "__main__":
-    main(*sys.argv[1:3])
+    main(*sys.argv[1:4])
