@@ -15,6 +15,7 @@ rows for the feature-store signature) and RELEASE_DIR/sql/prepared.json.
 """
 import hashlib
 import json
+import os
 import sys
 from pathlib import Path
 
@@ -24,8 +25,8 @@ import psycopg
 
 PARENT = "pokesingle_completion_20261028_neo2057"
 PARENT_IMPORT = "PS-CATALOGUE-EN-JA-NEO2057-20261028"
-TARGET = "pokesingle_completion_20261107_jarec"
-IMPORT = "PS-CATALOGUE-EN-JA-REC-20261107"
+TARGET = os.environ.get("JAREC_TARGET", "pokesingle_completion_20261107_jarec")
+IMPORT = os.environ.get("JAREC_IMPORT", "PS-CATALOGUE-EN-JA-REC-20261107")
 TABLES = ["cards", "cardmarket_products", "card_embeddings", "reference_metadata", "import_manifest",
           "artwork_embeddings", "cardmarket_review", "cardmarket_url_helpers", "source_records"]
 PROVENANCE = "ja-recovery-listing-20261106"

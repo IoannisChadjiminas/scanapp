@@ -174,3 +174,16 @@ Steps 4–7 cannot be finished from this session without the owner:
 - **Staging** served it from 07:44Z: ready, no restarts, 1.25 GiB. Then **rolled back** to NEO2057 because the regression panels could not run: `POST /api/v1/scans` returns 403 `Scan permit required` (product API scan gate). Rollback file: `/etc/scanapp-staging/catalogue-rollback/ja-rec-20261107/catalogue-release.env.before`.
 - **To finish**: run the four panels (`data/catalogue-gaps/ja-set-recovery-20261029-v3/panels/panel-{28,32,20,18}.json`, runner `…/staging-directed-panel-20261014/run_staging_panel.py`) with a valid scan permit, or as an offline replay, on both NEO2057 and JAREC. Switch again only if best card and status are unchanged for every photo. To switch: install the four JAREC keys into `/etc/scanapp-staging/catalogue-release.env` and recreate only the API (`docker compose -p scanapp-scanapp-z1mwj4 -f compose.dokploy.yaml up -d --no-deps api`).
 - Spot check: `ja:20th-001` (Venusaur-EX) links to a `BREAK-Starter-Pack` page. Review set-route agreement for groups whose Cardmarket route name differs from the set name before keeping.
+
+## 2026-11-07: JAREC2 kept on staging
+
+- **Offline replay** (staging API image in local Docker, x86, staging features/images, read-only role; `replay_panels.py`): the all-eras candidate JAREC changed 4 of 98 photos (2 correct matches lost). Dropping all new vectors restored the baseline, so the cause is vectors, not the new rows. Keeping vectors only for new **modern-era** cards (Mega Evolution, Scarlet & Violet, Sword & Shield, Sun & Moon) minus `ja:CLL-003` (base Charizard art reprint) gave 0 changes.
+- **Kept**: `pokesingle_completion_20261107_jarec2` / `PS-CATALOGUE-EN-JA-REC2-20261107`, artwork `/data/artwork/20261107-ja-recovery-v2`, features `/data/reference-features/20261107-ja-recovery`. 61,975 cards; Japanese 28,024 (26,576 with image, 24,962 with a Cardmarket page, 24,936 with a product id). New: 1,516 scannable, 8,741 printing alternatives, 1,448 without an image. Replay on the real candidate: 0 best/status changes, correct 71/88, suggestions and printing choices identical, lower alternatives differ on 22 photos.
+- **Staging** serves it (ready, restarts 0, no OOM). Rollback to NEO2057: `/etc/scanapp-staging/catalogue-rollback/ja-rec2-20261107/catalogue-release.env.before`, then recreate only the API.
+
+**Follow-ups**
+1. Older-era new cards (5,670 printing alternatives) get vectors in their own batches, tested with more vintage photos (the panel's vintage photos are low-similarity eBay shots that new vintage vectors crowd out).
+2. 1,448 new cards without an image (395 shared-file reprints, 267 small/blurry, 786 no file; 581 of those need the promo identity settled first).
+3. 44 new cards have an empty name (Shiny Treasure ex 30, LEGEND Promos 12, Pokémon VS 2).
+4. Check Cardmarket routes whose expansion name differs from the set name (for example `ja:20th-001` → `BREAK-Starter-Pack`).
+5. Phone index export for the new catalogue (`api/scripts/on_phone_index/`); phones keep the previous index until then.
