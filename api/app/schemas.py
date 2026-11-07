@@ -273,6 +273,8 @@ class CardSummary(BaseModel):
     image_owner_id: str | None = None
     variants: dict[str, Any] = Field(default_factory=dict)
     cardmarket_url: str | None = None
+    # Cardmarket's numeric product ID for cardmarket_url, for CSV exports.
+    cardmarket_id: int | None = None
     market: CardMarket | None = None
     # The same stored figures a scan shows at once: a fresh listing read, the
     # Cardmarket price file, or TCGdex. Never fetched while searching.

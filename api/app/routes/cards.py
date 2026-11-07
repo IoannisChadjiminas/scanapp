@@ -13,7 +13,7 @@ from fastapi.responses import FileResponse
 
 from app.card_images import display_image_url
 from app.catalogue_titles import stored_view_title
-from app.cardmarket import url_for_row, variants_for_row
+from app.cardmarket import mapping_from_row, variants_for_row
 from app.price_sources import scan_finishes, scan_prices
 from app.market_stats import capabilities
 from app.recognition.language import expand_language
@@ -40,7 +40,8 @@ _PHYSICAL = (
 def _summary(row, catalog=None) -> CardSummary:  # noqa: ANN001
     image_url = display_image_url(row, catalog)
     owner = visual_image_owner(row, catalog)
-    url = url_for_row(row)
+    mapping = mapping_from_row(row)
+    url = mapping.public_url()
     return CardSummary(
         id=row["id"],
         name=row["name"],
@@ -57,6 +58,8 @@ def _summary(row, catalog=None) -> CardSummary:  # noqa: ANN001
         image_owner_id=owner["id"] if owner is not row else None,
         variants=json.loads(row["variants_json"] or "{}"),
         cardmarket_url=url,
+        # Only alongside the verified URL it was stored with.
+        cardmarket_id=mapping.product_id if url else None,
         cardmarket_prices=scan_prices(catalog, row["id"], url) if catalog is not None else [],
         **(scan_finishes(catalog, row["id"]) if catalog is not None else {}),
     )
