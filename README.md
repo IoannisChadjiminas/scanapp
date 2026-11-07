@@ -101,10 +101,20 @@ the price file's trend.
 
 The nightly job reads each held card on its value tier (`DAILY_TIERS`, default
 `2:6,20:2,*:1`: trend under EUR 2 every 6 days, under 20 every 2 days, above
-that or unknown every night). A card whose price file trend moved more than
-`DAILY_MOVE_PCT` (10) from the trend on its last read is read tonight. Order:
-cards about to pass the listing age limit, then moved cards, then dearer cards,
-then the rest, shuffled within each group. Gaps are `DAILY_GAP_MIN_S` (5) to
+that or unknown every night). A raw copy's condition listing worse than Near
+Mint waits one tier longer and is skipped for a card whose trend is under
+`CONDITION_READ_MIN_TREND` (2); unknown trends and 1st edition keys are kept.
+A key not yet due is read early when its price file trend moved at least
+`DAILY_MOVE_PCT` (10) and `DAILY_MOVE_FLOOR_EUR` (0.50) from the trend on its
+last read, or during a spike: yesterday's average at least `DAILY_SPIKE_RATIO`
+(1.5) times the 7-day average and `DAILY_SPIKE_FLOOR_EUR` (1) higher. A spike
+is an episode per product and finish (`price_spike_episodes`); any accepted
+read of a key after it began consumes it for that key, so it is read once until
+the spike clears and a new one starts. Early reads use at most
+`DAILY_EARLY_SHARE_PCT` (30) of the night's pages after the interactive
+reserve, NM key first; while a key is moving its snapshot's `fresh_for_s` is
+`MOVING_FRESH_S` (6 hours). Order: cards about to pass the listing age limit,
+then early reads, then dearer cards, then the rest, shuffled within each group. Gaps are `DAILY_GAP_MIN_S` (5) to
 `DAILY_GAP_MAX_S` with `DAILY_GAP_JITTER` (30%) of random spread, and shrink
 toward the minimum when the night would not finish by `DAILY_DEADLINE_UTC`.
 `DAILY_BROWSERS` (1) sets how many held browsers read at once, each on its own

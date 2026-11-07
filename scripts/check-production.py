@@ -51,6 +51,9 @@ def main():
         profiles = (values.get("COMPOSE_PROFILES") or "").split(",")
         if "scraping" not in profiles and not (values.get("SCRAPER_URLS") or values.get("SCRAPER_URL")):
             failures.append("Enabled scraping needs its Compose profile or an external scraper URL")
+    if (values.get("DAILY_PRICES_ENABLED", "false").lower() == "true"
+            and values.get("PRODUCT_API_PAID_GATE_READY", "false").lower() != "true"):
+        failures.append("DAILY_PRICES_ENABLED needs PRODUCT_API_PAID_GATE_READY=true, or every synced holding is read overnight")
     if args.api_env_file:
         api = load(args.api_env_file)
         if not token or api.get("SCANAPP_SERVICE_TOKEN") != token:

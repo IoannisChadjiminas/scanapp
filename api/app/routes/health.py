@@ -75,6 +75,10 @@ class AppConfigResponse(BaseModel):
     card_warp: bool = False
     capture: CaptureConfig = CaptureConfig()
     scan_prices: ScanPriceConfig
+    # Prices that follow each copy's condition. The app also needs its own
+    # complete build; a missing value is off.
+    condition_prices_enabled: bool = False
+    condition_read_min_trend: float = 2.0
 
 
 def scan_price_config(settings) -> AppConfigResponse:
@@ -98,6 +102,8 @@ def scan_price_config(settings) -> AppConfigResponse:
         client_quality=bool(getattr(settings, 'app_client_quality', False)),
         client_number_candidates=bool(getattr(settings, 'app_client_number_candidates', False)),
         card_warp=bool(settings.app_card_warp),
+        condition_prices_enabled=bool(getattr(settings, 'condition_prices_enabled', False)),
+        condition_read_min_trend=max(0.0, float(getattr(settings, 'condition_read_min_trend', 2.0))),
         capture=CaptureConfig(
             preset=settings.app_capture_preset if settings.app_capture_preset in CAPTURE_PRESETS else 'max',
             jpeg_quality=max(50, min(int(settings.app_jpeg_quality), 100)),
