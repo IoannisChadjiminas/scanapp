@@ -271,6 +271,22 @@ def test_net_log_is_written_to_a_private_file_and_removed(tmp_path):
     assert ChromeSession(None, net_log=False)._net_path is None
 
 
+def test_macos_collection_launch_uses_visible_dedicated_profile_without_xvfb(tmp_path, monkeypatch):
+    import browser
+
+    monkeypatch.setattr(browser.sys, "platform", "darwin")
+    monkeypatch.setenv("SCRAPER_MAC_MODE", "1")
+    monkeypatch.setenv("SCRAPER_CHROME_PROFILE", str(tmp_path / "Cardmarket Profile"))
+    options = browser.chrome_launch_options(None)
+    assert options["xvfb"] is False
+    assert "xvfb_metrics" not in options
+    assert options["headed"] is True
+    args = options["chromium_arg"].split(",")
+    assert f"--user-data-dir={tmp_path / 'Cardmarket Profile'}" in args
+    assert "--no-sandbox" not in args
+    assert "--disable-dev-shm-usage" not in args
+
+
 def test_deadline_aborts_a_stalled_call(monkeypatch):
     monkeypatch.setattr("browser.ATTEMPT_SECONDS", 0.2)
 

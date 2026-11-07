@@ -102,7 +102,7 @@ class Supervisor:
     def warm(self, session_id: str) -> dict:
         return self._call({"op": "warm", "session_id": session_id}, timeout=self.kill_grace + 30)
 
-    def scrape(self, url: str, session_id: str) -> dict:
+    def scrape(self, url: str, session_id: str, *, catalogue_listing: bool = False) -> dict:
         self._recycle_if_due(session_id)
         with self._lock:
             if self.state == "cooling" and self.cooldown_until <= time.time():
@@ -119,7 +119,7 @@ class Supervisor:
         try:
             result = self._call(
                 {
-                    "op": "scrape",
+                    "op": "listing" if catalogue_listing else "scrape",
                     "url": url,
                     "session_id": session_id,
                     "deadline_s": self.attempt_seconds,
@@ -155,6 +155,8 @@ class Supervisor:
                 self.last_ok_at = time.time()
             if result.get("outcome") in {"offers", "empty", "timeout", "challenge_unsolved", "rate_limited", "wrong_product"}:
                 self.pages += 1
+            if result.get("owner_verification_required") is True:
+                self.state = "waiting_for_owner"
             if not self.session_id:
                 self.session_id = session_id
                 self.window_started = time.time()
