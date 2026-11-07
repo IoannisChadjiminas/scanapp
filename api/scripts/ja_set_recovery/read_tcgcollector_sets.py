@@ -1,7 +1,7 @@
 """Read TCG Collector set pages (card label + image URL) in the owner's Chrome. No downloads.
 
 TCG Collector is an owner-approved Japanese image source; its pages answer 403 to plain HTTP,
-so this drives the front Chrome window (window and tab pinned at start) the way the handoff's
+so this drives a new Chrome window it opens at start (window and tab pinned) the way the handoff's
 section 4.1 describes: one page every 15 seconds, and a human-check page stops the run (the
 owner clears it, then rerun; finished sets are skipped). Records every <img> whose source is
 under /content/images/ and whose alt ends in "(...)".
@@ -35,6 +35,8 @@ def osa(script):
 def main(run_dir):
     out = Path(run_dir).resolve() / "source-pages/tcgcollector-20261107"
     targets = json.loads((out / "targets.json").read_text())
+    # always work in a new window of our own, never in the tab the owner is using; then pin it
+    osa('tell application "Google Chrome" to make new window')
     window = osa('tell application "Google Chrome" to get id of window 1')
     tab = osa('tell application "Google Chrome" to get id of active tab of window 1')
     where = f'(first tab of window id {window} whose id is {tab})'

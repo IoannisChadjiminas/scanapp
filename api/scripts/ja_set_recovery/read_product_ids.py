@@ -3,8 +3,7 @@
 
 Adapted from data/catalogue-gaps/tcgdex-empty-sets-20261017/read_cm_id_lists.py.
 Grid view has no product id. List view puts it on each row as productRow<id>.
-One page every 2 seconds, in the owner's Chrome (front window, active tab when
-started; Chrome needs View > Developer > Allow JavaScript from Apple Events).
+One page every 2 seconds, in the owner's Chrome (a new window it opens at start; Chrome needs View > Developer > Allow JavaScript from Apple Events).
 On a human check it waits up to 10 minutes for the owner to clear it and never
 clicks it. Resumable. Does not change the catalogue.
 
@@ -181,7 +180,8 @@ def mark_finished(slug: str) -> None:
 
 def main() -> None:
     global TAB, WINDOW
-    # pin the window and tab at start: "window 1" means whichever window is in front
+    # always work in a new window of our own, never in the tab the owner is using; then pin it
+    osa('tell application "Google Chrome" to make new window')
     WINDOW = osa('tell application "Google Chrome" to get id of window 1')
     TAB = osa('tell application "Google Chrome" to get id of active tab of window 1')
     counts = needed_slugs()

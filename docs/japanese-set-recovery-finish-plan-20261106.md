@@ -201,3 +201,9 @@ Steps 4–7 cannot be finished from this session without the owner:
 - `pokesingle_completion_20261107_jarec4` / `PS-CATALOGUE-EN-JA-REC4-20261107` on top of JAREC3: 613 cards get images; 18 scannable, 595 printing alternatives (older eras are held from vectors as in JAREC2). Replay: 0 changes on all 98 photos.
 - Staging serves it: **Japanese cards with an image 27,275 of 28,024**; vectors 45,258. Rollback to JAREC3: `/etc/scanapp-staging/catalogue-rollback/ja-rec4-20261107/catalogue-release.env.before`.
 - Still without an image: 749 new cards (listed with reasons in `review/tcgcollector-fill-held-20261107.jsonl`).
+
+## 2026-11-07: JAREC5 names and links kept on staging
+
+- The 44 nameless cards now have names: Shiny Treasure ex 127–167 (official Japanese name, English in `view_title`, image-checked against the official image), LEGEND Promos No. 500–511 and Pokémon VS 077/142 (TCG Collector labels).
+- 31 new Cardmarket links with prices (30 Shiny Treasure ex, Will's Slowking). 25 name-only links from shared pools were cleared (Neo Premium File 1–3 → Unnumbered Promos; unnumbered energies of Leaders' Pokémon: Movie Limited Edition). The other route-name mismatches were checked and are correct (vending Expansion Sheet, MSM movie pack, EC1 starter deck, Cardweb, 20th Anniversary Starter Pack = BREAK Starter Pack).
+- `pokesingle_completion_20261107_jarec5` / `PS-CATALOGUE-EN-JA-REC5-20261107` (`prepare_sql_fixes.py`). Replay: 0 changes on 98 photos. Staging serves it. Rollback to JAREC4: `/etc/scanapp-staging/catalogue-rollback/ja-rec5-20261107/catalogue-release.env.before`.
