@@ -194,3 +194,10 @@ Steps 4–7 cannot be finished from this session without the owner:
 - `pokesingle_completion_20261107_jarec3` / `PS-CATALOGUE-EN-JA-REC3-20261107` on top of JAREC2 (`build_image_batch.py`, `prepare_sql_images.py`): those 86 cards get the image, the official Japanese name (English in `view_title`), 28 scannable, 58 printing alternatives. Replay: 0 changes on all 98 photos versus both NEO2057 and JAREC2.
 - Staging serves it: Japanese cards with an image 26,662 of 28,024; vectors 45,240. Rollback to JAREC2: `/etc/scanapp-staging/catalogue-rollback/ja-rec3-20261107/catalogue-release.env.before`.
 - Still without an image: 1,362 new cards. Next sources: TCG Collector for the older sets whose official images are tiny (World Champions Pack, Arceus LV.X decks, Dawn Dash/Moonlit Pursuit), then shops for known promos, and identity research for the roster-only promos.
+
+## 2026-11-07: JAREC4 TCG Collector image batch kept on staging
+
+- TCG Collector set pages (161 sets) read in the owner's Chrome (`read_tcgcollector_sets.py`, 15 s per page). `match_tcgcollector_images.py`: a card gets an image only on a unique number + English-name match in its set (unnumbered energies: unique name on a roster label, "Basic" ignored), and must look like any earlier weak image (pad cosine >= 0.85). **613 matched**; 749 held (545 no label match, 109 looks different, 43 image claimed by another card, 22 failed gate, 16 several labels, 14 no name).
+- `pokesingle_completion_20261107_jarec4` / `PS-CATALOGUE-EN-JA-REC4-20261107` on top of JAREC3: 613 cards get images; 18 scannable, 595 printing alternatives (older eras are held from vectors as in JAREC2). Replay: 0 changes on all 98 photos.
+- Staging serves it: **Japanese cards with an image 27,275 of 28,024**; vectors 45,258. Rollback to JAREC3: `/etc/scanapp-staging/catalogue-rollback/ja-rec4-20261107/catalogue-release.env.before`.
+- Still without an image: 749 new cards (listed with reasons in `review/tcgcollector-fill-held-20261107.jsonl`).
