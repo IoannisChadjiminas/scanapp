@@ -8,11 +8,13 @@ from __future__ import annotations
 
 import json
 import os
+import sys
 import shutil
 import tempfile
 import threading
 import time
 from typing import Protocol
+from urllib.parse import parse_qs, urlsplit
 
 CHALLENGE_BLOCKED = [
     "*.png",
@@ -93,6 +95,25 @@ PROBE_JS = r"""
 })()
 """
 
+LISTING_PROBE_JS = r"""
+(() => {
+  const title = document.title || "";
+  const href = location.href || "";
+  const text = String((document.body && document.body.innerText) || "").slice(0, 1500);
+  const blob = (title + " " + href + " " + text).toLowerCase();
+  if (/error 1015|you are being rate limited|access denied/.test(blob)) return "rate_limited";
+  if (document.querySelector("#challenge-form, .cf-turnstile, iframe[src*='challenges.cloudflare.com']")
+      || /just a moment|verify you are human|checking your browser|attention required/.test(blob)) return "challenge";
+  if (/\/pokemon\/expansions\/?(?:[?#]|$)/i.test(href)
+      && document.querySelector('a[href*="/Pokemon/Expansions/"]')) return "offers";
+  if (!/\/pokemon\/(expansions\/|products\/singles(?:[/?]|$))/i.test(href)) return "wrong_product";
+  if (document.querySelector('a[href*="/pokemon/products/singles/" i]')) return "offers";
+
+  if (document.querySelector("[data-test-empty], .noProducts") || /no products in this expansion|no products found/.test(blob)) return "empty";
+  return "pending";
+})()
+"""
+
 ATTEMPT_SECONDS = float(os.environ.get("SCRAPER_ATTEMPT_SECONDS", "25"))
 CLICK_EVERY_S = float(os.environ.get("SCRAPER_CLICK_EVERY_S", "4"))
 NET_LOG = os.environ.get("SCRAPER_NET_LOG", "true").strip().lower() not in {"0", "false", "no"}
@@ -102,7 +123,7 @@ BROWSER_LIFETIME_S = float(os.environ.get("SCRAPER_BROWSER_LIFETIME_S", "1800"))
 _held: ChromeSession | None = None
 _held_at = 0.0
 _held_lock = threading.Lock()
-TERMINAL = {"offers", "empty", "wrong_product", "rate_limited"}
+TERMINAL = {"offers", "empty", "wrong_product", "rate_limited", "challenge_unsolved"}
 
 
 class PageSession(Protocol):
@@ -236,20 +257,33 @@ def chrome_launch_options(proxy: str | None, net_log: str | None = None) -> dict
     """Headed UC Chrome. ``log_cdp`` turns on the performance log used for bytes."""
     from proxy import seleniumbase_proxy
 
-    args = ["--no-sandbox", "--disable-dev-shm-usage", *_QUIET_CHROME]
+    mac_mode = os.environ.get("SCRAPER_MAC_MODE", "").strip().lower() in {"1", "true", "yes"}
+    if mac_mode and sys.platform != "darwin":
+        raise RuntimeError("SCRAPER_MAC_MODE requires macOS")
+    args = list(_QUIET_CHROME)
+    if not mac_mode:
+        args[:0] = ["--no-sandbox", "--disable-dev-shm-usage"]
+    if mac_mode:
+        profile = os.path.abspath(os.path.expanduser(os.environ.get("SCRAPER_CHROME_PROFILE", "")))
+        if not os.environ.get("SCRAPER_CHROME_PROFILE") or "," in profile:
+            raise RuntimeError("A dedicated SCRAPER_CHROME_PROFILE without commas is required")
+        os.makedirs(profile, mode=0o700, exist_ok=True)
+        os.chmod(profile, 0o700)
+        args.append(f"--user-data-dir={profile}")
     if net_log:
         # Default capture mode leaves credentials and cookies out of the file.
         args += [f"--log-net-log={net_log}", "--net-log-capture-mode=Default"]
     options = {
         "uc": True,
-        "xvfb": True,
-        "xvfb_metrics": "1920,1080",
+        "xvfb": not mac_mode,
         "window_size": "1920,1080",
         "headed": True,
         "locale": "en",
         "log_cdp": True,
         "chromium_arg": ",".join(args),
     }
+    if not mac_mode:
+        options["xvfb_metrics"] = "1920,1080"
     formatted = seleniumbase_proxy(proxy)
     if formatted:
         options["proxy"] = formatted
@@ -268,7 +302,7 @@ def _sample_page(session: object, stop: threading.Event) -> None:
             continue
 
 
-def run_attempt(session: PageSession, url: str, *, parse_html) -> dict:
+def run_attempt(session: PageSession, url: str, *, parse_html, catalogue_listing: bool = False) -> dict:
     """Drive one page. `parse_html(url, html)` returns the scanapp parser dict.
 
     Navigation, captcha handling, and cleanup all share one deadline. A stalled
@@ -294,13 +328,18 @@ def run_attempt(session: PageSession, url: str, *, parse_html) -> dict:
     try:
         try:
             _before_deadline(deadline)
+            setattr(session, "catalogue_listing", catalogue_listing)
             session.open(url)
             _before_deadline(deadline)
             session.block_extra_resources()
             next_click = 0.0
             while time.monotonic() < deadline:
                 _before_deadline(deadline)
+                setattr(session, "catalogue_listing", catalogue_listing)
                 outcome = session.probe() or "pending"
+                if catalogue_listing and outcome == "challenge":
+                    outcome = "challenge_unsolved"
+                    break
                 if (
                     outcome == "challenge"
                     and getattr(session, "cleared", False)
@@ -329,13 +368,17 @@ def run_attempt(session: PageSession, url: str, *, parse_html) -> dict:
             if time.monotonic() < deadline:
                 if outcome in {"offers", "empty", "wrong_product"}:
                     page = session.html() or ""
-                session.stop()
+                if outcome != "challenge_unsolved":
+                    session.stop()
         except _AttemptDeadline:
             pass
         except Exception:
             failed = True
             raise
     finally:
+        if catalogue_listing and outcome == "challenge_unsolved":
+            stop.set()
+            watcher.join(timeout=2)
         try:
             keep = not failed and getattr(session, "alive", lambda: False)()
             close = getattr(session, "finish", None) if keep else None
@@ -348,7 +391,9 @@ def run_attempt(session: PageSession, url: str, *, parse_html) -> dict:
     if outcome not in TERMINAL:
         outcome = "challenge_unsolved" if outcome == "challenge" else "timeout"
     parsed = parse_html(url, page) if page else {}
-    if outcome == "offers" and not parsed.get("rows"):
+    if catalogue_listing and parsed.get("outcome"):
+        outcome = parsed["outcome"]
+    if outcome == "offers" and not (parsed.get("rows") or parsed.get("products")):
         outcome = "timeout"
     if parsed.get("blocked") and outcome not in {"rate_limited", "wrong_product"}:
         outcome = "challenge_unsolved"
@@ -359,6 +404,11 @@ def run_attempt(session: PageSession, url: str, *, parse_html) -> dict:
         "url": str(parsed.get("url") or url),
         "title": str(parsed.get("title") or ""),
         "rows": rows,
+        "products": list(parsed.get("products") or []) if outcome == "offers" else [],
+        "expansions": list(parsed.get("expansions") or []),
+        "pagination_urls": list(parsed.get("pagination_urls") or []),
+        "listing_urls": list(parsed.get("listing_urls") or []),
+        "owner_verification_required": bool(catalogue_listing and outcome == "challenge_unsolved"),
         "header": header,
         "image": str(parsed.get("image") or ""),
         "bytes": (
@@ -450,7 +500,10 @@ class ChromeSession:
             self._reload_challenge = False
             if not reload:
                 self.challenge_reloaded = False
-            self._block_urls = blocked_urls(cleared=self.cleared, challenge_reload=reload)
+            self._block_urls = blocked_urls(
+                cleared=self.cleared and not getattr(self, "catalogue_listing", False),
+                challenge_reload=reload,
+            )
             self.block_extra_resources()
             self.stage = "cdp_navigation"
             self._sb.cdp.get(url)
@@ -488,8 +541,73 @@ class ChromeSession:
     def probe(self) -> str:
         self.stage = "page_probe"
         # Keep page reads on the existing CDP connection.
-        value = self._sb.cdp.evaluate(PROBE_JS)
+        value = self._sb.cdp.evaluate(LISTING_PROBE_JS if getattr(self, "catalogue_listing", False) else PROBE_JS)
         return str(value or "pending")
+
+    def current_url(self) -> str:
+        """Read the active tab URL without navigating or replacing the held session."""
+        if self._sb is None:
+            return ""
+        return str(self._sb.cdp.evaluate("location.href") or "")
+
+    def inspect_listing(self, expected_url: str) -> tuple[str, str, str]:
+        """Read the paused listing through a separate CDP socket.
+
+        SeleniumBase's CDP event loop continues running after a listing attempt,
+        so calling ``cdp.evaluate`` from the API worker can raise
+        ``RuntimeError: This event loop is already running``. A fresh DevTools
+        socket avoids touching that loop and selects the exact paused listing tab.
+        """
+        import psutil
+
+        from page_shot import chrome_pages, debug_port, evaluate
+
+        try:
+            children = psutil.Process().children(recursive=True)
+        except Exception as exc:
+            raise RuntimeError("Scraper Chrome process is unavailable") from exc
+        pages = []
+        for child in children:
+            try:
+                port = debug_port(child.cmdline())
+                if port:
+                    pages = chrome_pages(port)
+                    break
+            except Exception:
+                continue
+
+        locales = {"en", "de", "fr", "es", "it", "pt", "nl"}
+
+        def route(url: str) -> tuple[str, ...]:
+            path = [part.casefold() for part in urlsplit(url).path.strip("/").split("/") if part]
+            if path and path[0] in locales:
+                path.pop(0)
+            return tuple(path)
+
+        expected = urlsplit(expected_url)
+        expected_query = parse_qs(expected.query)
+        target = None
+        for candidate in pages:
+            candidate_url = str(candidate.get("url") or "")
+            current = urlsplit(candidate_url)
+            if current.netloc.casefold() not in {"www.cardmarket.com", "cardmarket.com"}:
+                continue
+            if route(candidate_url) != route(expected_url):
+                continue
+            current_query = parse_qs(current.query)
+            if any(current_query.get(key) != values for key, values in expected_query.items()):
+                continue
+            target = candidate
+            break
+        if target is None:
+            raise RuntimeError("Paused Cardmarket listing tab is unavailable")
+        socket_url = str(target.get("webSocketDebuggerUrl") or "")
+        if not socket_url:
+            raise RuntimeError("Paused Cardmarket listing has no DevTools connection")
+        current_url = str(target.get("url") or "")
+        outcome = str(evaluate(socket_url, LISTING_PROBE_JS) or "pending")
+        html = str(evaluate(socket_url, "document.documentElement.outerHTML") or "")
+        return current_url, outcome, html
 
     def solve_captcha(self) -> None:
         self.stage = "challenge_interaction"

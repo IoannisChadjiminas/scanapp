@@ -52,13 +52,20 @@ def main() -> None:
             if op == "warm":
                 _emit({"ok": True, "reused": bool(session.reused), "stage": session.stage})
                 continue
-            if op != "scrape":
+            if op not in {"scrape", "listing"}:
                 _emit({"outcome": "error", "error": "unknown-op"})
                 continue
             _stage("navigation")
-            result = run_attempt(
-                session, str(command.get("url") or ""), parse_html=parse_cardmarket_html
-            )
+            if op == "listing":
+                from listings import parse_expansion_listing
+                result = run_attempt(
+                    session, str(command.get("url") or ""), parse_html=parse_expansion_listing,
+                    catalogue_listing=True,
+                )
+            else:
+                result = run_attempt(
+                    session, str(command.get("url") or ""), parse_html=parse_cardmarket_html
+                )
             result["reused"] = bool(getattr(session, "reused", False))
             result["cleared"] = bool(getattr(session, "cleared", False))
             result["stage"] = str(getattr(session, "stage", "") or "")
