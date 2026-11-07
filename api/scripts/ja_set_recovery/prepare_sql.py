@@ -52,6 +52,11 @@ def vlit(vector):
     return lit("[" + ",".join(repr(float(x)) for x in np.asarray(vector, dtype=np.float32)) + "]") + "::public.vector"
 
 
+def agg_md5(hashes):
+    """Loader's vector aggregate: md5 over the sha256 hex values in card-id byte order."""
+    return hashlib.md5("".join(hashes[k] for k in sorted(hashes, key=lambda x: x.encode())).encode()).hexdigest()
+
+
 def token(value):
     return "N" if value is None else "V" + str(value).encode().hex()
 
@@ -118,7 +123,7 @@ def main(release_dir, role_file, feature_sha):
     # vector aggregate (loader: md5 over sha256 hex in id byte order)
     vh = dict(conn.execute(f"SELECT card_id, source_vector_sha256 FROM {PARENT}.card_embeddings WHERE mode='pad'").fetchall())
     assert len(vh) == n_parent
-    agg = lambda d: hashlib.md5("".join(d[k] for k in sorted(d, key=lambda x: x.encode())).encode()).hexdigest()
+    agg = agg_md5
     assert agg(vh) == meta["vectors"]["pad"]["aggregate_md5"]
     for i, cid in enumerate(scannable):
         vh[cid] = vhash(pad[n_parent + i])

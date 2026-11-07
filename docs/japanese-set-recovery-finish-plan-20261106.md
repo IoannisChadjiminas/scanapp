@@ -187,3 +187,10 @@ Steps 4–7 cannot be finished from this session without the owner:
 3. 44 new cards have an empty name (Shiny Treasure ex 30, LEGEND Promos 12, Pokémon VS 2).
 4. Check Cardmarket routes whose expansion name differs from the set name (for example `ja:20th-001` → `BREAK-Starter-Pack`).
 5. Phone index export for the new catalogue (`api/scripts/on_phone_index/`); phones keep the previous index until then.
+
+## 2026-11-07: JAREC3 image batch kept on staging
+
+- Official pokemon-card.com search for the 1,448 new cards without an image (`fill_official_images.py`): 58 sets have official entries; **86 images attached** (unique printed number in the exact set pool; Pokémon names checked against the Pokédex, trainers/energies by hand; 6 wrong-pool matches dropped). 433 held: 152 roster/unnumbered, 136 no official number, 124 official image under 180 px (older sets), 15 shared numbers, 6 wrong pool.
+- `pokesingle_completion_20261107_jarec3` / `PS-CATALOGUE-EN-JA-REC3-20261107` on top of JAREC2 (`build_image_batch.py`, `prepare_sql_images.py`): those 86 cards get the image, the official Japanese name (English in `view_title`), 28 scannable, 58 printing alternatives. Replay: 0 changes on all 98 photos versus both NEO2057 and JAREC2.
+- Staging serves it: Japanese cards with an image 26,662 of 28,024; vectors 45,240. Rollback to JAREC2: `/etc/scanapp-staging/catalogue-rollback/ja-rec3-20261107/catalogue-release.env.before`.
+- Still without an image: 1,362 new cards. Next sources: TCG Collector for the older sets whose official images are tiny (World Champions Pack, Arceus LV.X decks, Dawn Dash/Moonlit Pursuit), then shops for known promos, and identity research for the roster-only promos.
