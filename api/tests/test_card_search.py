@@ -182,3 +182,20 @@ def test_japanese_set_codes_and_names_combine_with_printed_numbers(tmp_path: Pat
     # An import invalidates the metadata cache rather than requiring a restart.
     conn.execute("INSERT INTO cards (id, provider_id, name, set_id, set_name, collector_number, language) VALUES ('ja:new-1', 'ja:new-1', 'New', 'XYZ9', 'New', '1', 'ja')")
     assert find('xyz9') == ['ja:new-1']
+
+
+def test_card_ids_lookup_carries_the_cardmarket_id_of_a_verified_url(tmp_path: Path) -> None:
+    conn = _catalog(tmp_path)
+    conn.execute(
+        "UPDATE cards SET cardmarket_id = 273685, cardmarket_verified = 1, "
+        "cardmarket_url = 'https://www.cardmarket.com/en/Pokemon/Products/Singles/Base-Set/Pikachu-BS58' "
+        "WHERE id = 'base-000'"
+    )
+    # An ID with no verified product URL is not paired with anything.
+    conn.execute("UPDATE cards SET cardmarket_id = 1, cardmarket_verified = 0 WHERE id = 'base-001'")
+    conn.commit()
+    response = search_cards(_request(conn), q="", card_ids=["base-000", "base-001"])
+    items = {item.id: item for item in response.items}
+    assert items["base-000"].cardmarket_id == 273685
+    assert items["base-000"].cardmarket_url.endswith("/Pikachu-BS58")
+    assert items["base-001"].cardmarket_id is None
