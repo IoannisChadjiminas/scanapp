@@ -919,8 +919,14 @@ def _recognize_bytes_once(
                 verifier, image, combined, cards, full_vector,
                 int(getattr(settings, 'local_verify_families', 16)))
             timings['family_verify_ms'] = (time.perf_counter() - family_mark) * 1000
-            known = {m.card_id for m in local_matches}
-            local_matches.extend(m for m in family_matches if m.card_id not in known)
+            # Family evidence joins the shortlist's only when it changes something: another
+            # artwork led, or the shortlist check verified nothing. Otherwise it may only stop
+            # an OCR-incompatibility retake (below); printing order stays today's.
+            family_ids = {r['card_id'] for r in verified_family or []}
+            if verified_family and (combined[0]['card_id'] not in family_ids or not local_matches):
+                local_matches.extend(family_matches)
+            elif verified_family and not any(m.card_id in family_ids for m in local_matches):
+                verified_family = None
         framing_unverified = not local_matches and (
             not .62 <= ratio <= .80 or
             (not skip_detect and not detected and
