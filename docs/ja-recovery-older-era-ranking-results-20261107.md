@@ -368,3 +368,28 @@ Built with `build_held_release.py` and `prepare_sql_held.py`; applied in one tra
      (Illumise, a different Pokémon). The right card is the first alternative in both.
 
 Gate not met: staging is not switched. Both need a trace.
+
+### Traces of the two upload changes (served JAREC5 flags off against JAREC6 flags on)
+
+**`e6c4043e` (English base Charizard, graded).**
+- The new leader `ja:jr-miscellaneous-promos-123` (from the JAREC4 image batch, new vectors
+  here) is a real Japanese release: a スペシャルジャンボカード of base Charizard **printed in
+  English**, visual 0.82.
+- `ranking_languages` keeps an `en` detection only when the visual leader is English or the text
+  has English rule words. With a Japanese-catalogued leader and only "Charizard" read, the
+  ranking languages become `()`:
+  - the English printings lose their +0.05;
+  - the family check keeps the leader's language;
+  - `base1-4` (27 inliers on served) is no longer verified.
+- Cause: a Japanese row with an English-printed reference image. Its jumbo frame keeps it under
+  the 0.95 twin rule against `base1-4`.
+
+**`b28fa245` (Drifblim GYM promo `ja:SV-P-235`).**
+- The footer `235/SV-P` is read as `235/5V-P`, giving a bogus explicit fraction `235/5` and
+  `5V`. That reliable "fraction" conflicts with the right card on served too, which is why
+  served shows the wrong `SMP-260`.
+- On JAREC6 the held row `ja:jr-miracle-of-the-desert-005` (Illumise, `005`, one of the 5,670
+  replayed vectors) takes the stray `5`. It leads at 0.870 despite the species mismatch
+  (ルギア-style penalty −0.04).
+- Cause: an OCR S→5 misread of the `SV-P` promo code. It exists on served already; the new
+  vectors only change which wrong card wins.
