@@ -339,3 +339,32 @@ reprint that offers it as a printing choice (item 2).
 **Owner decision, 2026-11-08:** all four groups above are accepted (right-card matched upgrades,
 same-artwork reprints first with the original offered, the Charmeleon and `b9c67517` wrong-to-wrong
 changes, `PMCG2-047-2` matched → uncertain). Step 5 may start.
+
+## Step 5: the real candidate JAREC6, 2026-11-08
+
+`pokesingle_completion_20261108_jarec6` / `PS-CATALOGUE-EN-JA-REC6-20261108` (inactive). JAREC5
+plus vectors for 5,995 held older-era cards:
+- 5,670 exactly as replayed in the all-eras gates;
+- 325 from the JAREC3/4 image batches;
+- 229 batch cards stay printing alternatives at the 0.95 twin rule.
+
+Totals: 51,253 pad vectors, 36,668 artwork rows, artwork bundle `20261108-ja-recovery-held`.
+Built with `build_held_release.py` and `prepare_sql_held.py`; applied in one transaction (38 s).
+
+**Replays (served image, five flags on):**
+- 98 photos and vintage panel: identical to the accepted step 4d results (0 changes).
+  Vintage: 118 / 12 / 0 / 5.
+- Flags off on JAREC6: `PCG1-048-2` and `PMCG4-017-2` regress. The vectors must never be
+  served without the flags.
+- Stored uploads: one change against 4d, and one older change the owner never saw:
+  1. **`e6c4043e`** (new in JAREC6). The photo is a graded English base Charizard; the panel's
+     confirmed id `en:ex14-99` (Alakazam ☆) is a wrong label. Served shows `en:30th-c-001`, the
+     same artwork, with `base1-4` as a printing choice. JAREC6 shows
+     `ja:jr-miscellaneous-promos-123` first (a Japanese-catalogued Charizard promo of the same
+     art, from an image batch), and `base1-4` is no longer a printing choice.
+  2. **`b28fa245`** (present on every all-eras run; the 4d report compared all-eras runs with
+     the all-eras baseline and missed it). The photo is Drifblim GYM promo `ja:SV-P-235`.
+     Served shows the wrong `ja:SMP-260` first; all-eras shows `ja:jr-miracle-of-the-desert-005`
+     (Illumise, a different Pokémon). The right card is the first alternative in both.
+
+Gate not met: staging is not switched. Both need a trace.
