@@ -393,3 +393,11 @@ Gate not met: staging is not switched. Both need a trace.
   (ルギア-style penalty −0.04).
 - Cause: an OCR S→5 misread of the `SV-P` promo code. It exists on served already; the new
   vectors only change which wrong card wins.
+
+## Switched, 2026-11-08 23:01Z
+
+JAREC6b and seven flags on staging. Details, replays and rollback are in
+`docs/japanese-set-recovery-finish-plan-20261106.md`. Both JAREC6 upload blockers are fixed in
+JAREC6b:
+- `b28fa245` Drifblim is now right (`OCR_PROMO_S5_GUARD`);
+- `e6c4043e` shows served's answer again (the jumbo Charizard is held).

@@ -207,3 +207,32 @@ Steps 4–7 cannot be finished from this session without the owner:
 - The 44 nameless cards now have names: Shiny Treasure ex 127–167 (official Japanese name, English in `view_title`, image-checked against the official image), LEGEND Promos No. 500–511 and Pokémon VS 077/142 (TCG Collector labels).
 - 31 new Cardmarket links with prices (30 Shiny Treasure ex, Will's Slowking). 25 name-only links from shared pools were cleared (Neo Premium File 1–3 → Unnumbered Promos; unnumbered energies of Leaders' Pokémon: Movie Limited Edition). The other route-name mismatches were checked and are correct (vending Expansion Sheet, MSM movie pack, EC1 starter deck, Cardweb, 20th Anniversary Starter Pack = BREAK Starter Pack).
 - `pokesingle_completion_20261107_jarec5` / `PS-CATALOGUE-EN-JA-REC5-20261107` (`prepare_sql_fixes.py`). Replay: 0 changes on 98 photos. Staging serves it. Rollback to JAREC4: `/etc/scanapp-staging/catalogue-rollback/ja-rec5-20261107/catalogue-release.env.before`.
+
+## 2026-11-08: JAREC6b switched on staging (older-era vectors released)
+
+- `pokesingle_completion_20261108_jarec6b` / `PS-CATALOGUE-EN-JA-REC6B-20261108` on top of JAREC5
+  (`build_held_release.py`, `prepare_sql_held.py`).
+  - 5,992 held older-era cards get vectors: 51,250 pad vectors and 36,662 artwork regions,
+    bundle `/data/artwork/20261108-ja-recovery-held-b`.
+  - Three English-printed Japanese releases (`jr-miscellaneous-promos-123`, `-068`, `-069`) stay
+    printing alternatives. They were found by an OCR sweep of all 5,995 references and checked
+    by eye.
+- Code: `main` `6a5a16f` (PR 108), seven ranking flags set in
+  `/etc/scanapp-staging/catalogue-release.env` in the same step as the catalogue:
+  `RANK_FAMILY_VERIFY`, `VERIFY_UNMATCHED_NAME`, `RANK_SPECIES_NAMES`, `OCR_DEX_NUMBER_GUARD`,
+  `OCR_CJK_MINUS_GUARD`, `OCR_PROMO_S5_GUARD`, `RANK_TWIN_INCUMBENCY`. The vectors must never be
+  served without them.
+- Replays against what staging served, on the served image: every change is of an accepted kind.
+
+  | Vintage panel (135) | Right first | Right offered | Wrong | Retake | No match |
+  |---|---|---|---|---|---|
+  | Served before | 82 | 6 | 17 | 29 | 1 |
+  | JAREC6b | 118 | 12 | 0 | 4 | 1 |
+
+- Health: ready, restarts 0, no OOM, 1.6 GB available. Family check on the staging CPU: +0.44 s
+  median, +2.1 s p95 on scans that trigger it.
+- Rollback: `/etc/scanapp-staging/catalogue-rollback/ja-rec6b-20261108/catalogue-release.env.before`.
+  Install it as the release env and recreate only the API. Rehearsed at 22:59Z: 71 s, healthy,
+  JAREC5 with the flags off, then forward again. The rollback state's photos: the merged code
+  with the flags off on JAREC5 gives 0 changes on the 98-photo panel.
+- Not yet covered: the sealed eBay proof panel (Phase T) does not exist yet.

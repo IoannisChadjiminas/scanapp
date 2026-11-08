@@ -27,7 +27,8 @@ TARGET = os.environ["TARGET"]
 IMPORT = os.environ["IMPORT"]
 ARTWORK_BUNDLE = os.environ["ARTWORK_BUNDLE"]
 REASON = ("older-era vectors released (step 5, docs/ja-recovery-older-era-ranking-plan-20261107.md); "
-          "ranking flags RANK_FAMILY_VERIFY, VERIFY_UNMATCHED_NAME, RANK_SPECIES_NAMES, OCR_DEX_NUMBER_GUARD, OCR_CJK_MINUS_GUARD")
+          "ranking flags RANK_FAMILY_VERIFY, VERIFY_UNMATCHED_NAME, RANK_SPECIES_NAMES, OCR_DEX_NUMBER_GUARD, OCR_CJK_MINUS_GUARD, "
+          "OCR_PROMO_S5_GUARD, RANK_TWIN_INCUMBENCY")
 
 
 def main(release_dir, role_file, feature_sha):
