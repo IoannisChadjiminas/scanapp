@@ -236,3 +236,28 @@ Steps 4–7 cannot be finished from this session without the owner:
   JAREC5 with the flags off, then forward again. The rollback state's photos: the merged code
   with the flags off on JAREC5 gives 0 changes on the 98-photo panel.
 - Not yet covered: the sealed eBay proof panel (Phase T) does not exist yet.
+
+## 2026-11-09: JAREC7 image batch switched on staging (Phase B step 1)
+
+- `pokesingle_completion_20261109_jarec7` / `PS-CATALOGUE-EN-JA-REC7-20261109` on top of JAREC6b
+  (`build_image_batch.py`, `prepare_sql_images.py`).
+  - 104 TCG Collector images that were held as "looks different", each eye-checked against its
+    row on contact sheets. Most rows' earlier image was a card back or a weak scan.
+  - The earlier weak images of PCG-P 059 (Psychic Energy) and 060 (Fighting Energy) were on each
+    other's rows.
+  - 4 cards are scannable and 100 are printing alternatives.
+  - Five gym-deck Double Colorless Energy rows shared one image file with
+    `jr-hanada-city-gym-deck-u03`, so they stay without an image (one file, one card).
+- Provenance fix: JAREC4's 613 TCG Collector images had been recorded as official pokemon-card.com
+  images (hard-coded source). They are now `tcgcollector_scan`.
+- Replays against JAREC6b with the seven flags: 0 changes on the 98 photos (flags on and off), the
+  203 stored uploads and the 135 vintage photos. Health: ready, restarts 0, no OOM.
+- Rollback: `/etc/scanapp-staging/catalogue-rollback/ja-rec7-20261109/catalogue-release.env.before`.
+- Still without an image: 645 Japanese cards, each with its next source in
+  `data/catalogue-gaps/ja-set-recovery-20261029-v3/phase-b-20261109/no-image-worklist.csv`:
+
+  | Next source | Cards |
+  |---|---|
+  | Page-only image (eye-checked, sub-180 px), next fixes batch | 22 |
+  | Cardmarket product images (Chrome) | 227 |
+  | Bulbapedia identity, then Japanese shops (Chrome) | 396 |
