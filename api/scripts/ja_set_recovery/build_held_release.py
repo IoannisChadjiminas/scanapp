@@ -16,10 +16,14 @@ scan index since JAREC2 get pad vectors and two artwork regions, on top of the s
   The release rule applies as before: a card whose pad cosine to an indexed Japanese card, or to
   another card added here, is >= 0.95 stays a printing alternative.
 
+With HOLD_FILE set (a JSON list of {"id", "reason"}, step 5a), those cards keep no vectors and stay
+printing alternatives with that reason.
+
 Writes RUN_DIR/<NAME>/: vectors/pad/, artwork/, held.json, art-added.json, release.json.
 """
 import hashlib
 import json
+import os
 import sys
 from pathlib import Path
 
@@ -69,8 +73,10 @@ def main(run_dir, served_dir, all_eras_dir, jarec2_dir, model_path, name, *batch
     served = set(p_ids)
 
     # held cards from the first release: vectors exactly as replayed
-    held_a = [cid for cid in a_ids if cid not in j2_ids]
-    assert held_a and all(c.startswith("ja:") for c in held_a) and not set(held_a) & served
+    hold = {h["id"]: h["reason"] for h in json.loads(Path(os.environ["HOLD_FILE"]).read_text())} if os.environ.get("HOLD_FILE") else {}
+    held_all = [cid for cid in a_ids if cid not in j2_ids]
+    assert held_all and all(c.startswith("ja:") for c in held_all) and not set(held_all) & served
+    held_a = [cid for cid in held_all if cid not in hold]
     a_pos = {cid: i for i, cid in enumerate(a_ids)}
     pads = {cid: a_pad[a_pos[cid]].astype(np.float32) for cid in held_a}
     held_a_set = set(held_a)
@@ -88,10 +94,13 @@ def main(run_dir, served_dir, all_eras_dir, jarec2_dir, model_path, name, *batch
         for u in json.loads((bdir / "updates.json").read_text()):
             if u["treatment"] == "printing_alternative" and u["reason"].startswith("older era"):
                 batch.append((bdir, u))
-    alternatives, kept_b = [], []
+    alternatives, kept_b = [{"id": cid, "reason": hold[cid], "nearest_indexed": None} for cid in held_all if cid in hold], []
     for bdir, u in sorted(batch, key=lambda x: x[1]["id"].encode()):
         cid = u["id"]
         assert cid not in served and cid not in held_a_set, cid
+        if cid in hold:
+            alternatives.append({"id": cid, "reason": hold[cid], "nearest_indexed": None})
+            continue
         jpg = bdir / "images" / (cid.replace(":", "_") + ".jpg")
         assert sha_file(jpg) == u["image_sha256"], cid
         with Image.open(jpg) as im:
@@ -147,6 +156,7 @@ def main(run_dir, served_dir, all_eras_dir, jarec2_dir, model_path, name, *batch
     (out / "held.json").write_text(json.dumps({"vectors_added": held, "still_alternatives": alternatives},
                                               ensure_ascii=False, indent=1) + "\n")
     report = {"name": name, "served_pad_sha256": pman["embeddings_sha256"], "held_from_all_eras": len(held_a),
+              "hold_list": len(hold), "held_by_hold_list": sum(1 for a in alternatives if a["id"] in hold),
               "held_from_batches": len(batch), "batch_vectors_added": len(kept_b), "batch_twins_kept_alternative": len(alternatives),
               "pad_vectors": len(ids), "artwork_regions": len(recs), "artwork_added": len(add_recs)}
     (out / "release.json").write_text(json.dumps(report, indent=1) + "\n")
