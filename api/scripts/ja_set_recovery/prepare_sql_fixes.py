@@ -4,7 +4,12 @@
       python3 prepare_sql_fixes.py FIXES_JSON ROLE_JSON OUT_DIR
 
 Read-only on PlanetScale. FIXES_JSON maps card id -> any of: name_ja, name_en (with name_source),
-url/product_name/product_id (new Cardmarket link), clear_link + reason (drop a link). Vectors,
+url/product_name/product_id (new Cardmarket link), clear_link + reason (drop a link),
+display_image_url + display_reason (a page-only image for a card with no image: remote_image_url
+only, has_image stays 0, so no features and no vectors).
+COVERAGE_QUEUE (optional env, a JSON list of {id, status, reason}) is stored in the import manifest
+as `coverage_queue`: the recorded reason for every card that is neither scannable nor a printing
+alternative. Vectors,
 artwork, features and images are unchanged, so the parent's vector/artwork metadata and feature
 manifest stay valid. Same transaction shape as prepare_sql.py; only cards, the cards' provenance
 rows and the import manifest change. Writes OUT_DIR/candidate.sql and prepared.json.
@@ -22,6 +27,7 @@ PARENT = os.environ["PARENT"]
 PARENT_IMPORT = os.environ["PARENT_IMPORT"]
 TARGET = os.environ["TARGET"]
 IMPORT = os.environ["IMPORT"]
+COVERAGE_QUEUE = os.environ.get("COVERAGE_QUEUE")
 PROVENANCE = "ja-recovery-name-link-fix-20261107"
 VERIFIED_AT = "2026-11-07T16:00:00Z"
 
@@ -67,6 +73,10 @@ def main(fixes_file, role_file, out_dir):
             urls_in_use.add(fix["url"])
             if pid:
                 ids_in_use.add(pid)
+        if fix.get("display_image_url"):
+            assert fix["display_image_url"].startswith("https://") and fix.get("display_reason"), cid
+            assert row["has_image"] == 0 and not row["remote_image_url"], cid
+            change["remote_image_url"] = fix["display_image_url"]
         row.update(change)
         updates.append((cid, change, fix))
     cards_md5 = hashlib.md5("".join(hashlib.md5("|".join(token(r[k]) for k in cols).encode()).hexdigest()
@@ -98,13 +108,20 @@ END $acl$;""")
                      "cardmarket_fix": ({"cleared": True, "reason": fix.get("reason"), "old_url": fix.get("old_url")} if fix.get("clear_link")
                                         else {"url": fix.get("url"), "product_name": fix.get("product_name"), "product_id": fix.get("product_id")}
                                         if fix.get("url") else None),
+                     "display_only": ({"remote_image_url": fix["display_image_url"], "reason": fix["display_reason"]}
+                                      if fix.get("display_image_url") else None),
                      "fix_batch": IMPORT}
             s.append(f"UPDATE {TARGET}.reference_metadata SET metadata = metadata || {jlit(patch)}::jsonb WHERE source_key={lit(prov_keys[cid])};")
     patch = {"parent_schema": PARENT, "parent_import_id": PARENT_IMPORT, "state": "candidate_ja_recovery_fixes_inactive",
              "activation_allowed": False, "rebuilt_from": {"schema": PARENT, "import_id": PARENT_IMPORT, "metadata_md5": meta_md5},
              "ja_recovery_fixes": {"names": sum(1 for f in fixes.values() if f.get("name_en")),
                                    "links_added": sum(1 for f in fixes.values() if f.get("url") and not f.get("clear_link")),
-                                   "links_cleared": sum(1 for f in fixes.values() if f.get("clear_link"))}}
+                                   "links_cleared": sum(1 for f in fixes.values() if f.get("clear_link")),
+                                   "display_only_images": sum(1 for f in fixes.values() if f.get("display_image_url"))}}
+    if COVERAGE_QUEUE:
+        queue = json.loads(Path(COVERAGE_QUEUE).read_text())
+        assert all(q.get("id") and q.get("status") and q.get("reason") for q in queue)
+        patch["coverage_queue"] = queue
     s.append(f"UPDATE {TARGET}.import_manifest SET metadata = jsonb_set(jsonb_set(metadata,'{{digests,cards,md5}}',{jlit(cards_md5)}::jsonb),"
              f"'{{target,schema}}',{jlit(TARGET)}::jsonb) || {jlit(patch)}::jsonb, validated_at = now(), import_id = {lit(IMPORT)} "
              f"WHERE import_id={lit(PARENT_IMPORT)};")
