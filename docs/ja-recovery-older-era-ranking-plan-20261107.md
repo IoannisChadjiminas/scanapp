@@ -395,3 +395,59 @@ Unchanged, with all five flags on:
 
 If `neo1-072-1` still fails with no stray number left, the remaining cause is visual and name
 evidence alone. I stop and report that rather than add another rule.
+
+## Amendment, 2026-11-08: two fixes before the JAREC6 switch (steps 5a and 4e)
+
+The real candidate JAREC6 matches the accepted step 4d results on the 98 photos and the vintage
+panel. It changes two stored uploads (results doc, "Step 5" and its traces). Both are fixed here,
+then the candidate is rebuilt and every gate replayed.
+
+### Step 5a (data): Japanese rows printed in English stay printing alternatives
+
+**Why.** `ja:jr-miscellaneous-promos-123` is a Japanese release (スペシャルジャンボカード) of base
+Charizard printed in English. As the visual leader it makes `ranking_languages` drop a confident
+English read, so an English base Charizard scan shows the Japanese jumbo card first and
+`base1-4` is no longer verified. Such a row is the same artwork in English print. For a
+Japanese-catalogue scan it adds nothing the English printings do not already cover.
+
+**What.** Before building the release, run OCR over the reference image of every card that would
+get a vector (5,995). A card is held, and stays a printing alternative with
+`reason: "English-printed Japanese release"`, when:
+- its reference text has English print evidence (`english_print_evidence`: an English phrase or
+  two rule words); and
+- the Japanese script classifier finds no Japanese body text.
+
+The script lists every held card with its OCR text. I check the list by eye before the rebuild.
+`jr-miscellaneous-promos-123` must be on it; a random sample of 20 kept cards must contain no
+English-printed card.
+
+### Step 4e (code): `5V-P` is the `SV-P` promo code
+
+**Why.** On `b28fa245` the footer `235/SV-P` reads as `235/5V-P`. That gives a reliable-looking
+fraction `235/5`, which contradicts the right card `ja:SV-P-235` (served shows `SMP-260`), plus a
+stray `5`. With JAREC6 the stray `5` makes held Illumise `005` lead instead.
+
+**What.** Flag `OCR_PROMO_S5_GUARD` (default off). In footer text, a Japanese promo suffix whose
+leading `S` was read as `5` is restored before tokenising:
+- `NNN/5V-P` → `NNN/SV-P`;
+- `NNN/5-P` → `NNN/S-P`;
+- `NNN/5M-P` → `NNN/SM-P`.
+
+The pattern needs the slash, the digits before it and the `-P` after it. A real denominator such
+as `235/5` with no `V-P` / `-P` is untouched.
+
+**Tests.** The three promo forms; a plain fraction `012/5`; `SV-P 025`; the `b28fa245` footer
+yielding `235/SV-P` and no bare `5`; flag default off.
+
+### Then
+
+1. Rebuild the held release without the 5a cards, as JAREC6b on top of JAREC5. Same scripts,
+   plus a hold list.
+2. Replay with all six flags:
+   - the 98 photos, flags off and on;
+   - the 203 stored uploads, compared with **served** (the comparison the 4d report missed);
+   - the 135 vintage photos, compared with served.
+3. Gates as before: no change outside the accepted list. `e6c4043e` back to the base Charizard
+   artwork with `base1-4` offered; `b28fa245` no worse than served.
+4. Staging CPU timing, then report. The switch still needs PR 108 merged (owner decision), and
+   the flags go on in the same step as the catalogue.
