@@ -175,3 +175,36 @@ and 3. Add them to the panels when they exist.
 - Approve the eBay photo collection as a coverage task.
 - Baseline first: the last replays ran on the previous API image (`e99c2332…`); staging now runs
   `cbbf83b2…`. Re-run the 98-photo baseline on the running image once before any switch.
+
+## Amendment, 2026-11-08: the verification trigger (step 3b)
+
+The trace of `PMCG4-017-2` (results doc) showed the vintage name choice is not the blocker:
+
+- the OCR name strip read the evolution note at 0.995;
+- that "confident name" skipped local verification;
+- on the shortlist it vetoed the right, Japanese-named card, while new cards with English-only
+  names stayed neutral.
+
+Step 3b, flag `VERIFY_UNMATCHED_NAME` (default off, used together with `RANK_FAMILY_VERIFY`): a
+confident name read that names none of the shortlisted cards counts as no name for:
+
+- the local verification trigger (the close-neighbour condition then applies as for a weak read);
+- every artwork-compatibility filter in the verification step: the reference filter, the eligible
+  matches, and the incompatible-artwork retake.
+
+Ranking and all other rules still see the read. The flag is scoped to **Japanese scans with no
+printed collector fraction**, where the name is otherwise the strongest text evidence.
+
+**The rule itself is language-independent.** Any scan whose confident "name" names no candidate
+is reading something else. **Next step: the general version**, for every language and for
+numbered cards. It needs its own replay on the English panels and the stored uploads, because
+there a confident collector fraction usually decides first and the interaction differs.
+
+Gates for 3b, unchanged from this plan:
+- `PMCG4-017-2` fixed on the all-eras catalogue;
+- zero other best/status changes across the 98 photos and the stored uploads (203 confirmed
+  uploads);
+- the staging CPU cost reported.
+
+The new vintage eBay panel (135 photos) is baselined with flags off and on; its right and wrong
+counts decide whether it is large enough.
