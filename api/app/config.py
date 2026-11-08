@@ -124,6 +124,7 @@ class Settings(BaseSettings):
     # rule is language-independent; the scope is deliberately narrow. Replay first.
     verify_unmatched_name: bool = False
     rank_species_names: bool = False
+    ocr_dex_number_guard: bool = False
     # When the printing is already unsure, also offer same-name prints up to 0.08 below the shown
     # card in the list to choose from (e.g. Evolutions 9/108 under Base Set 46/102). The shown card
     # and the status do not change. Replay first.

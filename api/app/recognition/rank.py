@@ -22,6 +22,9 @@ NON_COLLECTOR_NUMBER_RE = re.compile(
     r"(?:[×x]\s*\d+|(?<!\w)[−–-]\s*\d+\b|#\s*\d+|\b(?:HP|LV\.?|IV|STAGE)\s*\d+|\d+\s*HP\b)",
     re.IGNORECASE,
 )
+# OCR_DEX_NUMBER_GUARD: a number printed after "No" is the Pokedex number (vintage No.025, modern
+# Japanese 全国図鑑No.025, English NO. 025), never a collector number. A fraction is left alone.
+DEX_NUMBER_RE = re.compile(r"(?<![A-Za-z])N[oO0][.,]?\s*\d{1,4}\b(?!\s*/)")
 # These are set abbreviations, not the distinct TG/GG/SM/SWSH collector
 # namespaces. Only remove a known code when it directly precedes a fraction.
 MODERN_SET_CODES = ('SVI', 'PAL', 'OBF', 'MEW', 'PAR', 'PAF', 'TEF',
@@ -89,6 +92,10 @@ def _cutoff_total(read: str, total: str) -> bool:
     """OCR_CUTOFF_TOTAL: a set total that lost only its last digit at the edge of the read
     ("9/10" for 9/108). One digit, never two, and the read must keep at least two digits."""
     return len(read) >= 2 and len(total) == len(read) + 1 and total.startswith(read)
+
+
+def dex_number_guard_enabled() -> bool:
+    return bool(getattr(get_settings(), "ocr_dex_number_guard", False))
 
 
 def bare_number_guard_enabled() -> bool:
@@ -227,10 +234,14 @@ def extract_collector_candidates(
                 if match:
                     add(OcrHit(match[1],hit.confidence,'holder_collector'))
 
+    dex_guard = dex_number_guard_enabled()
+
     def tokens(text: str) -> list[str]:
         # Bottom-of-card OCR also contains weakness, level and Pokedex text.
         # Region/confidence alone cannot make those numbers collectors.
         cleaned = NON_COLLECTOR_NUMBER_RE.sub(" ", text)
+        if dex_guard:
+            cleaned = DEX_NUMBER_RE.sub(" ", cleaned)
         if (re.search(r'(?i)(?:©|copyright|Nintendo|GAME\s*FREAK|\bIllus\b)', cleaned)
                 or re.search(r'(?i)\bL[VY]\.?\s*\d+', text)
                 or len(re.findall(r'\b[a-z]{3,}\b', text)) >= 4):
