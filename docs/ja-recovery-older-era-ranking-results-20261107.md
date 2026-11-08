@@ -335,3 +335,7 @@ offered.
 
 No photo loses a right card it had first on the served catalogue, except to a same-artwork
 reprint that offers it as a printing choice (item 2).
+
+**Owner decision, 2026-11-08:** all four groups above are accepted (right-card matched upgrades,
+same-artwork reprints first with the original offered, the Charmeleon and `b9c67517` wrong-to-wrong
+changes, `PMCG2-047-2` matched → uncertain). Step 5 may start.
