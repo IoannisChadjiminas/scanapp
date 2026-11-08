@@ -70,6 +70,19 @@ class ReferencePrintingIndex:
         self._lock = RLock()
         self.feature_store = feature_store
 
+    def probe(self, card_id: str, raw_path: str) -> np.ndarray | None:
+        """The reference's artwork thumbnail, from the feature store or a local file."""
+        if self.feature_store is not None:
+            return self.feature_store.thumbnail(card_id, raw_path)
+        path = Path(raw_path).resolve()
+        if path.is_relative_to(self.root) and path.is_file():
+            try:
+                with Image.open(path) as image:
+                    return artwork_thumbnail(image)
+            except (OSError, ValueError):
+                pass
+        return None
+
     def family(self, catalog: Any, top: dict[str, Any]) -> tuple[list[dict], bool]:
         name, language = str(top["name"]), str(top.get("language") or "")
         key = (name, language)
@@ -85,18 +98,7 @@ class ReferencePrintingIndex:
                     card = dict(row)
                     if is_tcg_pocket_card(card.get("language"), card.get("set_id")):
                         continue
-                    probe = None
-                    raw_path = str(card.get("image_path") or "")
-                    path = Path(raw_path).resolve()
-                    if self.feature_store is not None:
-                        probe = self.feature_store.thumbnail(str(card['id']), raw_path)
-                    elif path.is_relative_to(self.root) and path.is_file():
-                        try:
-                            with Image.open(path) as image:
-                                probe = artwork_thumbnail(image)
-                        except (OSError, ValueError):
-                            pass
-                    cached.append((card, probe))
+                    cached.append((card, self.probe(str(card['id']), str(card.get("image_path") or ""))))
                 if len(rows) > 512:
                     cached.append(({"id": "uninspected"}, None))
                 self._groups[key] = cached

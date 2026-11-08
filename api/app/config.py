@@ -113,6 +113,11 @@ class Settings(BaseSettings):
     # shown for review instead of a retake; never matched. A policy change: replay first.
     rank_family_verify: bool = False
     local_verify_families: int = 16
+    # Retrieval depth for the family check only (today's shortlist uses 20 full-card and 15
+    # artwork hits). Deeper rows are ranked apart and join the shortlist only as members of a
+    # decided family. Raise both with the flag; replay first.
+    family_verify_full_k: int = 20
+    family_verify_artwork_k: int = 15
     # When the printing is already unsure, also offer same-name prints up to 0.08 below the shown
     # card in the list to choose from (e.g. Evolutions 9/108 under Base Set 46/102). The shown card
     # and the status do not change. Replay first.

@@ -206,13 +206,26 @@ class LocalArtworkVerifier:
         return Image.fromarray(cv2.warpPerspective(np.asarray(image.convert('RGB')),matrix,(width,height)))
 
     def verify(self, image: Image.Image, references: list[tuple[str, str]],
-               limit: int = 8) -> list[LocalArtworkMatch]:
+               limit: int = 8, prepared: dict | None = None) -> list[LocalArtworkMatch]:
         # Preserve established geometry before increasing the texture budget.
         # A denser matcher is recovery only, not a competing printing vote.
-        first=self._verify(image,references,limit,1000,.04,False)
-        return first or self._verify(image,references,limit,2000,.02,True)
+        # `prepared` is one scan's cache of this image's query features, so two
+        # checks of the same photo extract them once; results are unchanged.
+        first=self._verify(image,references,limit,1000,.04,False,prepared)
+        return first or self._verify(image,references,limit,2000,.02,True,prepared)
 
-    def _verify(self, image, references, limit, features, contrast, lower_regions):
+    def _verify(self, image, references, limit, features, contrast, lower_regions, prepared=None):
+        key = (id(image), image.size, features, contrast, lower_regions)
+        queries = None if prepared is None else prepared.get(key)
+        if queries is None:
+            queries = self._queries(image, features, contrast, lower_regions)
+            if prepared is not None:
+                prepared[key] = queries
+        if not queries:
+            return []
+        return self._match(queries, references, limit, features, contrast)
+
+    def _queries(self, image, features, contrast, lower_regions):
         detector = cv2.SIFT_create(nfeatures=features,contrastThreshold=contrast)
         # A full photograph can spend its keypoint budget on sleeves,
         # stands and rules text. Probe at most two unwarped region crops
@@ -237,8 +250,9 @@ class LocalArtworkVerifier:
             qkeys, qdesc = detector.detectAndCompute(query, None)
             if qdesc is not None and len(qkeys) >= 16:
                 queries.append((profile, query, qkeys, qdesc))
-        if not queries:
-            return []
+        return queries
+
+    def _match(self, queries, references, limit, features, contrast):
         matches = []
         for card_id, raw_path in references[:limit]:
             art_box = self.reference_boxes.get(card_id, ART_BOX)
