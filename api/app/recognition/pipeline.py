@@ -40,6 +40,7 @@ from app.recognition.frame_fallback import line_frame_candidates, loose_frame_ca
 from app.recognition.images import apply_crop, blur_variance, decode_image
 from app.recognition.embed import top_k
 from app.recognition.family_verify import promote_family, scan_language_members, verify_families
+from app.recognition.twin_incumbency import incumbent_first, new_release_start
 from app.recognition.name_evidence import verification_name
 from app.recognition.identity import layout_identity_agrees, likely_identity_agrees, structured_identity_agrees
 from app.recognition.confidence import confidence_payload
@@ -1018,6 +1019,12 @@ def _recognize_bytes_once(
             # A leader already in the family keeps today's order; only another artwork moves.
             if verified_family and combined[0]['card_id'] not in {r['card_id'] for r in verified_family}:
                 promote_family(combined, verified_family, family_order)
+    twin_incumbent = None
+    if combined and getattr(settings, 'rank_twin_incumbency', False):
+        start = new_release_start(getattr(snapshot, 'retrieval_segments', None), len(snapshot.card_ids),
+                                  int(getattr(settings, 'twin_incumbency_new_segments', 1)))
+        twin_positions = getattr(runtime, 'card_positions', None) or {str(c): i for i, c in enumerate(snapshot.card_ids)}
+        twin_incumbent = incumbent_first(combined, twin_positions, snapshot.embeddings, start, tuple(rank_languages))
     timings["local_artwork_ms"] = (time.perf_counter() - mark) * 1000
     framing_review_supported = bool(combined and not retake
         and float(combined[0]['visual_score']) >= settings.threshold_min_visual_ocr
@@ -1065,6 +1072,8 @@ def _recognize_bytes_once(
         status_reasons.append('local_artwork_used')
     if verified_family:
         status_reasons.append('family_verified')
+    if twin_incumbent:
+        status_reasons.append('twin_incumbent')
     if name_set_aside:
         status_reasons.append('unmatched_name_set_aside')
     if any(h.region=='holder_name' for h in ocr.hits) and status=='matched':
