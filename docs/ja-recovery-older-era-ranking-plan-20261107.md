@@ -303,3 +303,48 @@ wrong card to another with the flags on:
 1. Script, table, rule and tests on PR 108's branch, flag off.
 2. The step 3 gate replays again on the served image (16 GB Docker, five lanes, about 25 minutes).
 3. Report. Step 5 starts only after that.
+
+## Amendment, 2026-11-08: Pokédex numbers are not collector numbers (step 4c)
+
+### Why
+
+With 4b, the vintage panel has one regression against the served catalogue:
+`jr-miscellaneous-promos-014-1`, Surfing Pikachu, now shows `web1-025` first (results doc).
+`web1-025` shares the illustration and now, correctly, the species. It leads because the card's
+printed Pokédex number `No.025` is read as collector number `025`, which matches it.
+
+A logging pass over the footer OCR of all 135 vintage photos (`trace_numbers.py`, no behaviour
+change) shows this is systematic:
+- 80 of 135 photos read a `No.NNN` Pokédex number, and **all 80** pass it on as a bare collector
+  candidate (`No.249` → `249`, `No.143` → `143`, `No.009` → `009`);
+- on none of the 80 does that number equal the right card's own number. On this panel it is only
+  ever evidence for a wrong card.
+
+`NON_COLLECTOR_NUMBER_RE` already removes weakness, resistance, HP, LV and `#` numbers from footer
+text. It has no rule for `No.`. Every era prints the Pokédex number that way: vintage `No.025`,
+modern Japanese `全国図鑑No.025`, English `NO. 025`.
+
+### What
+
+Flag `OCR_DEX_NUMBER_GUARD` (default off). In `extract_collector_candidates`, a number directly
+after `No` (`No.`, `No,`, `NO.`, `N0.`, optional space) is a Pokédex number and is removed with the
+other non-collector numbers. Fractions (`025/048`) and prefixed promo numbers are untouched.
+
+### Tests
+
+- `No.025`, `No 025`, `NO.025`, `N0.025` and `全国図鑑No.025` yield no collector candidate.
+- `025/048`, `SV-P 025` and a bare `025` with no `No` stay as today.
+- The `neo1-072-1` footer (`No.249` plus `30`) no longer yields `249`.
+- Flag default off.
+
+### Gates
+
+Unchanged from 4b, run with all four flags on:
+- `jr-miscellaneous-promos-014-1` right first again;
+- `neo1-072-1` and `PMCG4-017-2` still fixed;
+- 98 photos: 0 changes with the flags off;
+- stored uploads: 0 other changes. These include English and modern Japanese cards, where the
+  rule also applies;
+- vintage panel: no photo worse than on the served catalogue.
+
+The owner decisions recorded in the results doc stay open. 4c does not change them.
