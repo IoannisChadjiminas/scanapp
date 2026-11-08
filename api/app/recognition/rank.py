@@ -24,6 +24,10 @@ NON_COLLECTOR_NUMBER_RE = re.compile(
 )
 # OCR_DEX_NUMBER_GUARD: a number printed after "No" is the Pokedex number (vintage No.025, modern
 # Japanese 全国図鑑No.025, English NO. 025), never a collector number. A fraction is left alone.
+# OCR_CJK_MINUS_GUARD: the minus-number rule above skips a minus after any word character, and
+# kana/kanji are word characters, so ダメージ-30 / 抵抗力-30 (resistance) became collector 30. With
+# the flag, only an ASCII letter or digit before the minus (SV-P, S-P) keeps the number.
+CJK_MINUS_NUMBER_RE = re.compile(r"(?<=[^\x00-\x7f])[−–-]\s*\d+\b")
 DEX_NUMBER_RE = re.compile(r"(?<![A-Za-z])N[oO0][.,]?\s*\d{1,4}\b(?!\s*/)")
 # These are set abbreviations, not the distinct TG/GG/SM/SWSH collector
 # namespaces. Only remove a known code when it directly precedes a fraction.
@@ -96,6 +100,10 @@ def _cutoff_total(read: str, total: str) -> bool:
 
 def dex_number_guard_enabled() -> bool:
     return bool(getattr(get_settings(), "ocr_dex_number_guard", False))
+
+
+def cjk_minus_guard_enabled() -> bool:
+    return bool(getattr(get_settings(), "ocr_cjk_minus_guard", False))
 
 
 def bare_number_guard_enabled() -> bool:
@@ -235,6 +243,7 @@ def extract_collector_candidates(
                     add(OcrHit(match[1],hit.confidence,'holder_collector'))
 
     dex_guard = dex_number_guard_enabled()
+    cjk_minus_guard = cjk_minus_guard_enabled()
 
     def tokens(text: str) -> list[str]:
         # Bottom-of-card OCR also contains weakness, level and Pokedex text.
@@ -242,6 +251,8 @@ def extract_collector_candidates(
         cleaned = NON_COLLECTOR_NUMBER_RE.sub(" ", text)
         if dex_guard:
             cleaned = DEX_NUMBER_RE.sub(" ", cleaned)
+        if cjk_minus_guard:
+            cleaned = CJK_MINUS_NUMBER_RE.sub(" ", cleaned)
         if (re.search(r'(?i)(?:©|copyright|Nintendo|GAME\s*FREAK|\bIllus\b)', cleaned)
                 or re.search(r'(?i)\bL[VY]\.?\s*\d+', text)
                 or len(re.findall(r'\b[a-z]{3,}\b', text)) >= 4):
