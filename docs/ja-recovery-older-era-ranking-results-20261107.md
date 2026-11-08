@@ -297,3 +297,41 @@ offered.
 - That happens on 54 of 135 vintage photos (87 `ダメージ-30` lines, 34 `抵抗力-30`).
 
 4b's fix for `neo1-072-1` therefore rested on one misread number cancelling another.
+
+## Step 4d gate replays, 2026-11-08 (PR 108 at `3e28c1b`, all five flags)
+
+**Compared with 4c:**
+- 98 photos (both catalogues), flags off, and stored uploads (both catalogues): 0 changes.
+- Vintage panel: 11 changes.
+  - `neo1-072-1` fixed: Lugia first, now with no stray footer number left.
+  - `PMCG4-053-1`: wrong card → no match.
+  - Nine photos uncertain → matched, right card.
+
+**Every gate, with all five flags against the flags-off baselines:**
+
+| Gate | Result |
+|---|---|
+| `PMCG4-017-2`, `neo1-072-1`, Surfing Pikachu | all right first |
+| 98 photos, flags off | 0 changes |
+| 98 photos, flags on | 8 fixes (all-eras), 6 (served); no right card lost |
+| Stored uploads (203) | 3–4 fixes; no right card lost |
+| Vintage (135) against served today | 118 first / 12 offered / **0 wrong** / 5 retake, against 82 / 6 / 17 / 30. All 41 held cards are first or offered. |
+| Matched on a wrong card | unchanged: 98 photos 3 → 3, uploads 2 → 2, vintage 0 → 0 |
+| Staging CPU | family check +0.44 s median / +2.3 s p95 on scans that run it (step 3 timing); species lookup about 3 ms per scan; the two footer rules are a regular expression each |
+
+**Changes that are not plain fixes, for the owner:**
+1. Uncertain → matched on the right card: 98 photos `E4-091-1`, `PCG3-064-1`; upload
+   `51c3d0bb`; vintage `PMCG2-017-2`, `PMCG5-020-1`, `PMCG5-041-1`, `neo1-072-2`, `neo2-042-1`,
+   `web1-042-1`, `jr-miscellaneous-promos-028-1`, `-029-1`, `jr-southern-islands-u09-2`,
+   `-u11-1`, `jr-vending-machine-series-2-red-u02-1`, and both `series-3-green-u27` photos.
+   Vintage matched rises from 16 to 28, still with 0 wrong.
+2. A same-artwork reprint shown first, with the original as a printing choice: base Charizard
+   (98 photos and vintage `PMCG1-021-1`), `PMCG2-017-1` (`CLF-006`) and `PMCG2-047-1`
+   (`XYP-261`).
+3. One wrong card for another: base Charmeleon upload `49dc3c8a` (`ja:PMCG1-017` →
+   `en:xy12-10`, same artwork, `base1-24` an alternative). `b9c67517`: same wrong card, now with
+   printing choices.
+4. With the flags off on all-eras: `PMCG2-047-2`, matched → uncertain, right card.
+
+No photo loses a right card it had first on the served catalogue, except to a same-artwork
+reprint that offers it as a printing choice (item 2).
