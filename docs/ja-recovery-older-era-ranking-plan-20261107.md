@@ -348,3 +348,50 @@ Unchanged from 4b, run with all four flags on:
 - vintage panel: no photo worse than on the served catalogue.
 
 The owner decisions recorded in the results doc stay open. 4c does not change them.
+
+## Amendment, 2026-11-08: Japanese resistance values are not collector numbers (step 4d)
+
+### Why
+
+With 4c, `neo1-072-1` is a retake again (results doc). Its 4b fix rested on one misread number
+cancelling another:
+- the footer read `No.249` (Pokédex, removed by 4c) and `30`;
+- the `30` matches "Ho-Oh ex" (`030`) and conflicts with Lugia;
+- once the `249` conflict is gone, "Ho-Oh ex" leads, 0.792 against 0.739.
+
+The `30` is the resistance value. `NON_COLLECTOR_NUMBER_RE` already removes a minus number
+(`-30`), but only when no word character precedes the minus (`(?<!\w)`). Kana and kanji are word
+characters, so `ダメージ-30` and `抵抗力-30` reach the collector candidates as `30`. Measured on
+the vintage logging pass: 54 of 135 photos, from 87 `ダメージ-30` lines and 34 `抵抗力-30` lines.
+
+### What
+
+Flag `OCR_CJK_MINUS_GUARD` (default off). The minus-number rule accepts any non-ASCII character
+before the minus: the lookbehind becomes "no ASCII letter or digit". So:
+- `ダメージ-30`, `抵抗力-30`, `规力-30` and `ダメ-シ-30` lose the `30`;
+- `-30` and `×2 -30` lose it as today;
+- `SV-P 025` and `S-P` / `SM-P` promo codes are untouched (an ASCII letter precedes the minus);
+- fractions are untouched.
+
+This is a separate flag from 4c's, so each rule's effect stays separable in the replays.
+
+### Tests
+
+- Each Japanese resistance form above yields no collector candidate.
+- `SV-P 025`, `025/048` and a bare `025` keep today's reading.
+- The `neo1-072-1` footer (`ダメージ`/`抵抗力 -30`, `No.249`) yields no candidate with both guards
+  on.
+- Flag default off.
+
+### Gates
+
+Unchanged, with all five flags on:
+- `neo1-072-1` right first;
+- Surfing Pikachu right first;
+- `PMCG4-017-2` fixed;
+- 98 photos: 0 changes with the flags off;
+- stored uploads: 0 other changes;
+- vintage panel: no photo worse than on the served catalogue.
+
+If `neo1-072-1` still fails with no stray number left, the remaining cause is visual and name
+evidence alone. I stop and report that rather than add another rule.
