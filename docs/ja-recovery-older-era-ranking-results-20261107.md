@@ -156,3 +156,75 @@ on the served release and do not change.
 
 Before switching the flag on staging: the stored-upload replay (plan, "Gates"), and
 `family_verify_ms` measured on the staging CPU.
+
+## Step 3, second version: after the review (2026-11-08)
+
+The review asked for four changes, now on `claude/rank-family-verify` as commit `1af7bb4` (PR 108,
+flag still off).
+
+1. **Families by artwork, not title.** Measured on the reference scans, cosine on DINO vectors
+   cannot separate reprints from other artworks. Dark Charizard `PMCG4-017`/`web1-042` scores
+   0.74 full-card and 0.76 artwork crop; the different-artwork Mewtwo promo scores 0.72 and 0.65.
+   The family test is therefore the printing index's own same-artwork check: the
+   exposure-normalised illustration thumbnail, correlation ≥ 0.84. It measures:
+   - Potion kit reprints: ≥ 0.97
+   - Marill EN/JP: 0.96
+   - two different Charizards: about 0
+
+   Before verification, rows join a family only when they are full-card twins (≥ 0.95), or when
+   titles are equal **and** thumbnails correlate. A title alone never joins. After verification,
+   families whose verified members share a title merge. This catches reprints whose scans differ
+   (Dark Charizard thumbnails 0.45): two different illustrations cannot both pass the geometric
+   check on one photo. The tests now include same-name, different-artwork rows that must stay
+   apart.
+2. **Depth setting.** `FAMILY_VERIFY_FULL_K` / `FAMILY_VERIFY_ARTWORK_K`, default 20/15 (today).
+   Deeper rows are ranked apart and join the shortlist only as members of a decided family.
+3. **One SIFT extraction per scan.** `LocalArtworkVerifier.verify(prepared=...)`. The shortlist
+   check and the family check share the photo's query features.
+4. **Replays on the served API image** `24856ba9`, the image staging runs since 2026-11-07 15:24
+   UTC; its `app/` tree is byte-identical to `main`. The `cbbf83b2` image is no longer deployed.
+
+### Gate replays (98 photos, image `24856ba9`)
+
+| Run | Changes |
+|---|---|
+| served `jarec5`, image as served, vs the earlier `e99c2332` replay | 0 |
+| served `jarec5`, branch code, flag off | **0** |
+| served `jarec5`, flag on, depth 100/50 | 3, all fixes: `S5I-085-2`, `S7D-083-2`, `SM1S-068-1` retake → right card (review) |
+| all-eras `jarec`, flag on, depth 100/50, vs `jarec` as served | 4, all fixes: the same 3 plus `PCG1-048-2` |
+| all-eras `jarec`, flag on, depth 20/15 | identical to depth 100/50 |
+
+On this panel the deeper retrieval changes nothing. It only matters when the check runs and the
+right card is outside the top 20, and that does not happen here. The setting stays at today's
+values unless a panel shows a gain.
+
+### Cost on the staging CPU
+
+16 of the 98 photos trigger local verification. The recorded inputs were timed in a 1-CPU,
+700 MB container on staging with the served feature bundle (`bench-staging-20261108.json`):
+
+| Per triggered scan | Median | p95 |
+|---|---|---|
+| shortlist check (today) | 0.49 s | 1.52 s |
+| family check, shared SIFT | 0.28 s | 1.13 s |
+| family check, own SIFT | 0.49 s | 1.92 s |
+| two extra artwork-crop embeddings (only when the artwork depth is raised) | 0.26 s | 0.27 s |
+
+With the flag on at today's depth, a triggered scan costs about 0.28 s more at the median and
+1.1 s more at p95. Untriggered scans cost nothing extra.
+
+### Why `PMCG4-017-2` is still wrong (trace)
+
+The vintage name choice does not pick the printing. It runs after verification, only adds
+choices, and never changes the first card. The scan is decided earlier:
+
+- The OCR "name" is the evolution note モンスターカードに重ねて使います, read at 0.995.
+- The top five full-card candidates are all newly added cards (Mewtwo promo, Cyndaquil, Bayleef,
+  Hitmontop, Articuno) at 0.80–0.82. Dark Charizard is found only by the artwork stream.
+- Local verification is skipped. The top score (0.818) is above 0.78, and the close-neighbour
+  condition is bypassed because the bogus "name" is confident.
+
+The step 1 experiment showed that once verification runs on this photo, Dark Charizard leads
+(`web1-042` 31, `PMCG4-017` 18) and the Mewtwo promo does not verify. The older-era fix is
+therefore a change to the verification **trigger** for unnumbered Japanese vintage scans. The
+vintage name choice itself needs no change.
