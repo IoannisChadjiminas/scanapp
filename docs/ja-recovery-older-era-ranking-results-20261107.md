@@ -1,9 +1,20 @@
-# Older-era ranking plan: step 0 and step 1 results (2026-11-07)
+# Older-era ranking plan: results (2026-11-07, amended 2026-11-08)
 
-Results for steps 0 and 1 of `ja-recovery-older-era-ranking-plan-20261107.md`. Both were
-read-only: nothing on staging or PlanetScale changed, and no flag or code in `api/app` changed.
+Results for `ja-recovery-older-era-ranking-plan-20261107.md`. Nothing on staging or PlanetScale
+has changed.
 
-## Step 0: demand
+**Status: the held older eras remain blocked.** Family verification (step 3, PR 108) fixes
+blurry retakes, including `PCG1-048-2`. It cannot fix `PMCG4-017-2` on the all-eras catalogue:
+there the vintage name choice picks a printing (the new Mewtwo promo) before the artwork check
+runs. The older-era vectors stay unreleased until the vintage name choice is changed and every
+gate in the plan passes.
+
+## Step 0: a scan count, not a demand measure
+
+Staging has no real users. Its scans are the owner's own tests and the regression panels, so the
+count below says nothing about how often collectors scan older-era Japanese cards. **No product
+decision rests on it.** The held-card mask is decided on product grounds: Japanese vintage is part
+of the product.
 
 Source: staging `results.sqlite` (read-only), 10,187 scans from 2026-09-16 to 2026-11-07. A scan
 counts when its first card or its confirmed card is a Japanese card in a held era (any era except
@@ -12,7 +23,7 @@ language fields and timestamps were read. No photos or OCR text were read.
 
 | | Scans | Sessions |
 |---|---|---|
-| All scans | 10,187 | 834 |
+| All scans | 10,187 | 446 |
 | Japanese-language scans (search, detected or requested `ja`) | 2,862 | 299 |
 | Held-era first or confirmed card | 1,200 | 104 |
 | — in automated bursts (median gap under 15 s, mostly 15–19 Oct) | 1,174 | 97 |
@@ -23,10 +34,8 @@ held-era first or confirmed card. Those 26 split as: XY 7, Original 7, Black & W
 VS 1, other 1. Their statuses were: retake 14, uncertain 10, matched 1, no match 1. Only 2 were
 confirmed.
 
-Under the plan's rule this is "a handful". Step 2, the held-card mask, is not worth building for
-demand alone.
-
-Script: `scratchpad/demand.py`, run over a staging export of ids only.
+The script, `api/scripts/ja_set_recovery/count_held_era_scans.py`, reads only scan ids, session
+ids, timestamps, language fields and card ids.
 
 ## Step 1: verifier experiment
 
@@ -77,9 +86,10 @@ Staging CPU is not measured yet.
 
 ### Verdict
 
-**Pass, with one design change.** Both known failures come out with the right artwork family on
-top, or with no decision. No labelled photo gets the wrong artwork. Three current retakes would
-be fixed.
+**Passes for what it measures, not for the motivating problem.** On the panel, the inlier leader
+never names a wrong artwork, and three current retakes would be fixed. That makes the verifier a
+safe tie-breaker. It does not make the older eras scannable: in the real pipeline `PMCG4-017-2`
+never reaches the verifier (see the status above and step 3).
 
 The change: families must span languages and reprints. Verified inliers show *shared artwork*,
 which is exactly what joins `PMCG4-017`/`web1-042` and `PCG6-075`/`ex11-113`. So step 3 must:
@@ -92,12 +102,11 @@ four unlabelled photos.
 
 ## What this means for the plan
 
-- **Step 3 (family verify)** is worth building. The benefit is not only for held cards: 3 of the 3
-  fixes are modern cards that are retakes today.
-- **Step 2 (held-card mask)** has almost no demand behind it: 26 human scans in 7 weeks. Build it
-  only together with step 3, if at all.
-- Before building: an eye check of the 4 unlabelled cross-language leaders, and the stored-upload
-  replay as the main gate (plan, "Gates").
+- **Step 3 (family verify)** is worth building. Its fixes so far are modern cards that are
+  retakes today.
+- **The vintage name choice** must change before any older-era vectors can be released.
+- The stored-upload replay is the main gate (plan, "Gates"). The 4 unlabelled cross-language
+  leaders still need an eye check.
 
 Files (git-ignored run folder `replay-local/work/`): `families-fail2.jsonl`,
 `families-panels.jsonl`, `families-panels-summary.json`, `families-panels.log`.
