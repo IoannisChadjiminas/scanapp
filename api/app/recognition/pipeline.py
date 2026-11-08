@@ -40,6 +40,7 @@ from app.recognition.frame_fallback import line_frame_candidates, loose_frame_ca
 from app.recognition.images import apply_crop, blur_variance, decode_image
 from app.recognition.embed import top_k
 from app.recognition.family_verify import promote_family, verify_families
+from app.recognition.name_evidence import verification_name
 from app.recognition.identity import layout_identity_agrees, likely_identity_agrees, structured_identity_agrees
 from app.recognition.confidence import confidence_payload
 from app.recognition.presentation import match_presentation
@@ -854,6 +855,12 @@ def _recognize_bytes_once(
     framing_unverified = False
     verifier = getattr(runtime, "artwork_verifier", None)
     ratio = image.width / image.height
+    # VERIFY_UNMATCHED_NAME: a confident read that names no shortlisted card is no name for the
+    # verification trigger and the artwork compatibility filters (see name_evidence).
+    verify_name, verify_name_confidence, name_set_aside = ocr.name_text, name_confidence, False
+    if getattr(settings, 'verify_unmatched_name', False):
+        verify_name, verify_name_confidence, name_set_aside = verification_name(
+            ocr.name_text, name_confidence, combined, languages=rank_languages, numbers=numbers)
     if combined and not retake and verifier is not None and (
         float(combined[0]["visual_score"]) < settings.threshold_min_visual
         or bool(geometry_ids)
@@ -864,7 +871,7 @@ def _recognize_bytes_once(
         # A high global score with weak OCR and close visual neighbours can
         # still be unresolved. Verify geometry instead of lowering thresholds
         # or requiring a missing title to become confident identity evidence.
-        or (name_confidence < .85 and len(combined) > 1
+        or (verify_name_confidence < .85 and len(combined) > 1
             and float(combined[0]['visual_score']) - float(combined[1]['visual_score']) < settings.threshold_min_gap)
     ):
         references = []
@@ -889,7 +896,7 @@ def _recognize_bytes_once(
         # whole family. Name/language constrain identity verification, while
         # collector compatibility constrains the chosen printing below.
         local_order = [r for r in local_order if artwork_evidence_compatible(
-            r, ocr_name=ocr.name_text, name_confidence=name_confidence,
+            r, ocr_name=verify_name, name_confidence=verify_name_confidence,
             numbers=[], languages=rank_languages)]
         for item in local_order:
             row = cards.get(item["card_id"])
@@ -987,7 +994,7 @@ def _recognize_bytes_once(
             verified_ids = {m.card_id for m in local_matches}
             eligible = [m for m in local_matches if artwork_evidence_compatible(
                 next(r for r in combined if r["card_id"] == m.card_id),
-                ocr_name=ocr.name_text, name_confidence=name_confidence,
+                ocr_name=verify_name, name_confidence=verify_name_confidence,
                 numbers=numbers, languages=rank_languages)]
             # If none resolve the metadata, use only an artwork family seed;
             # below it must expand to review choices or request a retake.
@@ -1050,6 +1057,8 @@ def _recognize_bytes_once(
         status_reasons.append('local_artwork_used')
     if verified_family:
         status_reasons.append('family_verified')
+    if name_set_aside:
+        status_reasons.append('unmatched_name_set_aside')
     if any(h.region=='holder_name' for h in ocr.hits) and status=='matched':
         status='uncertain'
         status_reasons.append('holder_name')
@@ -1236,7 +1245,7 @@ def _recognize_bytes_once(
         # A slab label's own number, with verified artwork, outranks a footer misread.
         recovery and combined[0]['card_id'] in label_ids and combined[0].get('local_artwork_verified')
     ) and not artwork_evidence_compatible(
-        combined[0], ocr_name=ocr.name_text, name_confidence=name_confidence,
+        combined[0], ocr_name=verify_name, name_confidence=verify_name_confidence,
         numbers=numbers, languages=rank_languages
     ):
         status = "retake"

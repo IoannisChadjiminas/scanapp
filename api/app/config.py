@@ -118,6 +118,11 @@ class Settings(BaseSettings):
     # decided family. Raise both with the flag; replay first.
     family_verify_full_k: int = 20
     family_verify_artwork_k: int = 15
+    # On a Japanese scan with no printed collector fraction, a confident name read that names no
+    # shortlisted card (other card text in the name strip) counts as no name for the local
+    # verification trigger and the artwork compatibility filters. Ranking still sees it. The
+    # rule is language-independent; the scope is deliberately narrow. Replay first.
+    verify_unmatched_name: bool = False
     # When the printing is already unsure, also offer same-name prints up to 0.08 below the shown
     # card in the list to choose from (e.g. Evolutions 9/108 under Base Set 46/102). The shown card
     # and the status do not change. Replay first.
