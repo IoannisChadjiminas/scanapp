@@ -228,3 +228,47 @@ The step 1 experiment showed that once verification runs on this photo, Dark Cha
 (`web1-042` 31, `PMCG4-017` 18) and the Mewtwo promo does not verify. The older-era fix is
 therefore a change to the verification **trigger** for unnumbered Japanese vintage scans. The
 vintage name choice itself needs no change.
+
+## Steps 3 and 4b gate replays, 2026-11-08 (served image `24856ba9`, PR 108 at `7586db4`)
+
+All three flags together (`RANK_FAMILY_VERIFY`, `VERIFY_UNMATCHED_NAME`, `RANK_SPECIES_NAMES`).
+Flags-off baselines from the step 2 and vintage runs are reused.
+
+**Step 3 found and fixed one bug.** The family check promoted a different-language printing of
+the same artwork on two English uploads: Brute Bonnet got the Chinese print, Comfey the Japanese
+one. Commit `087cdc1` limits promotion to the scan's languages. Both uploads are right again.
+
+**Step 4b** (species names, commit `7586db4`) fixes `neo1-072-1`. The trace: a new row,
+"Ho-Oh ex", led over ルギア because English-only names were never compared with the Japanese read,
+and a stray `30` matched its number.
+
+| Gate | Result |
+|---|---|
+| `PMCG4-017-2` on all-eras | fixed |
+| `neo1-072-1` on all-eras | fixed (step 3 alone: retake) |
+| 98 photos, flags off | 0 changes |
+| 98 photos, flags on | fixes `PMCG4-017-2`, `PCG1-048-2`, `PCG5-041-1/-2`, `S5I-085-2`, `S7D-083-2`, `SM1S-068-1`; base Charizard now shows the `CLL-003` reprint first, with the original as a printing choice; **`E4-091-1` and `PCG3-064-1`: uncertain → matched, right card** |
+| Stored uploads (203), compared with the flags-off baseline | 3 fixes; **`51c3d0bb`: uncertain → matched, right card**; base Charmeleon `49dc3c8a`: one wrong card for another (`ja:PMCG1-017` → `en:xy12-10`, same artwork, `base1-24` still an alternative); `b9c67517`: same wrong card, now with printing choices |
+| Vintage (135), all-eras, flags on | 116 first / 14 offered / 0 wrong / 5 retake (served today: 82 / 6 / 17 / 30) |
+| Staging CPU | Family check: median 0.44 s, p95 2.3 s extra, on 92 of 203 uploads. Species lookup: about 3 ms per 60 candidates. |
+
+**Gate not met: vintage photos worse than on the served catalogue.**
+
+- **`jr-miscellaneous-promos-014-1`, Surfing Pikachu: right first → `web1-025`.** A regression
+  that 4b exposes.
+  - `web1-025` has the same illustration in an e-Card frame, and its catalogue name is a
+    transliteration (サーフィンピカチュ). That name used to keep it out of artwork verification. With
+    species names it resolves to ピカチュウ, enters verification and verifies (86 inliers against
+    101).
+  - It then leads only because the Pokédex number `No.025` printed on the card is read as a
+    collector number and matches its `025`.
+  - The number read is the cause. The species rule removed an accidental shield.
+- **Same artwork, the reprint now first and the original offered as a printing choice:**
+  `PMCG1-021-1` (`CLL-003`), `PMCG2-017-1` (`CLF-006`) and `PMCG2-047-1` (`XYP-261`). The
+  English-named reprints now get the same name evidence as the originals, so visual similarity
+  decides.
+- **Already present with the flags off on all-eras:** `PMCG2-047-2`, matched → uncertain, right
+  card.
+
+The older-era vectors stay blocked. Step 5 waits for an owner decision on the items in bold and on
+the Pokédex-number read.
