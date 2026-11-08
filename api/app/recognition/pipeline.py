@@ -39,6 +39,9 @@ from app.recognition.detect import (card_frame_candidates, client_quad_rect, det
 from app.recognition.frame_fallback import line_frame_candidates, loose_frame_candidates, portrait_window_candidates, slab_interior_candidate
 from app.recognition.images import apply_crop, blur_variance, decode_image
 from app.recognition.embed import top_k
+from app.recognition.family_verify import promote_family, scan_language_members, verify_families
+from app.recognition.twin_incumbency import incumbent_first, new_release_start
+from app.recognition.name_evidence import verification_name
 from app.recognition.identity import layout_identity_agrees, likely_identity_agrees, structured_identity_agrees
 from app.recognition.confidence import confidence_payload
 from app.recognition.presentation import match_presentation
@@ -787,17 +790,9 @@ def _recognize_bytes_once(
                    for i, score in zip(indices, scores, strict=True)}
     positions = getattr(runtime, 'card_positions', None) or (
         {str(cid): i for i, cid in enumerate(snapshot.card_ids)} if artwork_hits or metadata_ids or title_ids or geometry_ids or text_ids else {})
-    for card_id in selected_ids:
-        score = full_scores.get(card_id)
-        if score is None:
-            position = positions.get(card_id)
-            score = float(snapshot.embeddings[position] @ query_vectors[id(image)]) if position is not None else 0.
-        row = cards.get(card_id)
-        if row is None:
-            continue
-        if "set_id" in row.keys() and is_tcg_pocket_card(row["language"], row["set_id"]):
-            continue
-        visual.append(
+
+    def visual_row(card_id: str, row: Any, score: float, via: list[str] | None = None) -> dict[str, Any]:
+        return (
             {
                 "card_id": card_id,
                 "name": row["name"],
@@ -819,7 +814,7 @@ def _recognize_bytes_once(
                 "rarity": str(row["rarity"] or ""),
                 "cardmarket_url": url_for_row(row),
                 "supports_first_edition": _supports_first_edition(row),
-                "retrieved_via": (["full_card"] if card_id in full_ids else []) +
+                "retrieved_via": via if via is not None else (["full_card"] if card_id in full_ids else []) +
                                  (["artwork"] if card_id in artwork_by_id else []) +
                                  (["ocr_metadata"] if card_id in metadata_ids else []) +
                                  (["ocr_title"] if card_id in title_ids else []) +
@@ -829,6 +824,18 @@ def _recognize_bytes_once(
                 "artwork_profile": artwork_by_id[card_id].reference_profile if card_id in artwork_by_id else None,
             }
         )
+
+    for card_id in selected_ids:
+        score = full_scores.get(card_id)
+        if score is None:
+            position = positions.get(card_id)
+            score = float(snapshot.embeddings[position] @ query_vectors[id(image)]) if position is not None else 0.
+        row = cards.get(card_id)
+        if row is None:
+            continue
+        if "set_id" in row.keys() and is_tcg_pocket_card(row["language"], row["set_id"]):
+            continue
+        visual.append(visual_row(card_id, row, score))
 
     combined = rerank(
         visual,
@@ -844,10 +851,17 @@ def _recognize_bytes_once(
     # candidate is never automatically accepted as a single printing.
     mark = time.perf_counter()
     local_matches = []
+    verified_family, family_verify = None, None
     text_aligned: list[str] = []
     framing_unverified = False
     verifier = getattr(runtime, "artwork_verifier", None)
     ratio = image.width / image.height
+    # VERIFY_UNMATCHED_NAME: a confident read that names no shortlisted card is no name for the
+    # verification trigger and the artwork compatibility filters (see name_evidence).
+    verify_name, verify_name_confidence, name_set_aside = ocr.name_text, name_confidence, False
+    if getattr(settings, 'verify_unmatched_name', False):
+        verify_name, verify_name_confidence, name_set_aside = verification_name(
+            ocr.name_text, name_confidence, combined, languages=rank_languages, numbers=numbers)
     if combined and not retake and verifier is not None and (
         float(combined[0]["visual_score"]) < settings.threshold_min_visual
         or bool(geometry_ids)
@@ -858,7 +872,7 @@ def _recognize_bytes_once(
         # A high global score with weak OCR and close visual neighbours can
         # still be unresolved. Verify geometry instead of lowering thresholds
         # or requiring a missing title to become confident identity evidence.
-        or (name_confidence < .85 and len(combined) > 1
+        or (verify_name_confidence < .85 and len(combined) > 1
             and float(combined[0]['visual_score']) - float(combined[1]['visual_score']) < settings.threshold_min_gap)
     ):
         references = []
@@ -883,7 +897,7 @@ def _recognize_bytes_once(
         # whole family. Name/language constrain identity verification, while
         # collector compatibility constrains the chosen printing below.
         local_order = [r for r in local_order if artwork_evidence_compatible(
-            r, ocr_name=ocr.name_text, name_confidence=name_confidence,
+            r, ocr_name=verify_name, name_confidence=verify_name_confidence,
             numbers=[], languages=rank_languages)]
         for item in local_order:
             row = cards.get(item["card_id"])
@@ -891,7 +905,14 @@ def _recognize_bytes_once(
             if row is not None and key not in seen_printings:
                 seen_printings.add(key)
                 references.append((item["card_id"], str(row["image_path"] or "")))
-        local_matches = verifier.verify(image, references) if references else []
+        family_on = bool(getattr(settings, 'rank_family_verify', False))
+        sift_cache: dict = {}
+        if not references:
+            local_matches = []
+        elif family_on:
+            local_matches = verifier.verify(image, references, prepared=sift_cache)
+        else:
+            local_matches = verifier.verify(image, references)
         if text_ids and hasattr(verifier, 'propose_frame') and not any(
                 m.card_id in text_ids for m in local_matches):
             # The selected frame may be a whole screenshot or slab. Project each
@@ -905,6 +926,74 @@ def _recognize_bytes_once(
                 found = verifier.verify(aligned, [reference]) if aligned is not None else []
                 local_matches.extend(found)
                 text_aligned.extend(m.card_id for m in found)
+        if family_on:
+            family_mark = time.perf_counter()
+            family_positions = getattr(runtime, 'card_positions', None) or {}
+            reference_index = getattr(runtime, 'printing_index', None)
+            probes: dict[str, Any] = {}
+
+            def full_vector(card_id):
+                i = family_positions.get(card_id)
+                return None if i is None else snapshot.embeddings[i]
+
+            def thumbnail(card_id):
+                if card_id not in probes:
+                    card = cards.get(card_id)
+                    probes[card_id] = (reference_index.probe(card_id, str(card['image_path'] or ''))
+                                       if reference_index is not None and card is not None else None)
+                return probes[card_id]
+            # Deeper retrieval for this check only: extra rows are ranked on their own and
+            # enter the shortlist only as members of a decided family.
+            known_ids = {r['card_id'] for r in combined}
+            deep_ids = []
+            full_k = int(getattr(settings, 'family_verify_full_k', 20))
+            art_k = int(getattr(settings, 'family_verify_artwork_k', 15))
+            if full_k > 20:
+                deep_idx, _ = top_k(snapshot.embeddings, query_vectors[id(image)], k=full_k, keep=keep,
+                                    segments=getattr(snapshot, 'retrieval_segments', None))
+                deep_ids.extend(str(snapshot.card_ids[i]) for i in deep_idx)
+            if art_k > 15 and artwork_index is not None:
+                deep_hits, _ = artwork_index.search(
+                    image, embedder, mode=settings.preprocess_config,
+                    as_supplied_vector=query_vectors[id(image)],
+                    languages=tuple(requested.search) if requested.reason == "user" else (), k=art_k)
+                deep_ids.extend(h.card_id for h in deep_hits)
+            deep_ids = [cid for cid in dict.fromkeys(deep_ids) if cid not in known_ids]
+            deep_rows = []
+            if deep_ids:
+                deep_cards = _lookup_cards(catalog, deep_ids)
+                cards.update(deep_cards)
+                deep_rows = rerank(
+                    [visual_row(cid, deep_cards[cid], float(full_vector(cid) @ query_vectors[id(image)]), ['family_depth'])
+                     for cid in deep_ids if cid in deep_cards and full_vector(cid) is not None
+                     and not ("set_id" in deep_cards[cid].keys()
+                              and is_tcg_pocket_card(deep_cards[cid]["language"], deep_cards[cid]["set_id"]))],
+                    ocr.name_text, numbers, ocr.failed, detected_languages=rank_languages,
+                    name_confidence=name_confidence, require_confident_ocr=True)
+            family_order = [r['card_id'] for r in combined]
+            verified_family, family_matches, family_verify = verify_families(
+                verifier, image, [*combined, *deep_rows], cards, full_vector, thumbnail,
+                int(getattr(settings, 'local_verify_families', 16)), prepared=sift_cache)
+            family_verify['deep_candidates'] = len(deep_rows)
+            if verified_family:
+                kept = scan_language_members(verified_family, rank_languages,
+                                             str(combined[0].get('language') or '') or None)
+                if len(kept) < len(verified_family):
+                    family_verify['other_language'] = [r['card_id'] for r in verified_family if r not in kept]
+                kept_ids = {r['card_id'] for r in kept}
+                verified_family = kept or None
+                family_matches = [m for m in family_matches if m.card_id in kept_ids]
+            timings['family_verify_ms'] = (time.perf_counter() - family_mark) * 1000
+            # Family evidence joins the shortlist's only when it changes something: another
+            # artwork led, or the shortlist check verified nothing. Otherwise it may only stop
+            # an OCR-incompatibility retake (below); printing order stays today's.
+            family_ids = {r['card_id'] for r in verified_family or []}
+            if verified_family and (combined[0]['card_id'] not in family_ids or not local_matches):
+                combined.extend(r for r in verified_family if r['card_id'] not in known_ids)
+                family_order.extend(r['card_id'] for r in verified_family if r['card_id'] not in known_ids)
+                local_matches.extend(family_matches)
+            elif verified_family and not any(m.card_id in family_ids for m in local_matches):
+                verified_family = None
         framing_unverified = not local_matches and (
             not .62 <= ratio <= .80 or
             (not skip_detect and not detected and
@@ -914,7 +1003,7 @@ def _recognize_bytes_once(
             verified_ids = {m.card_id for m in local_matches}
             eligible = [m for m in local_matches if artwork_evidence_compatible(
                 next(r for r in combined if r["card_id"] == m.card_id),
-                ocr_name=ocr.name_text, name_confidence=name_confidence,
+                ocr_name=verify_name, name_confidence=verify_name_confidence,
                 numbers=numbers, languages=rank_languages)]
             # If none resolve the metadata, use only an artwork family seed;
             # below it must expand to review choices or request a retake.
@@ -927,6 +1016,15 @@ def _recognize_bytes_once(
                 item["local_artwork_verified"] = item["card_id"] in verified_ids
             combined.sort(key=lambda r: (r["card_id"] == chosen_id,
                                         r["card_id"] in verified_ids), reverse=True)
+            # A leader already in the family keeps today's order; only another artwork moves.
+            if verified_family and combined[0]['card_id'] not in {r['card_id'] for r in verified_family}:
+                promote_family(combined, verified_family, family_order)
+    twin_incumbent = None
+    if combined and getattr(settings, 'rank_twin_incumbency', False):
+        start = new_release_start(getattr(snapshot, 'retrieval_segments', None), len(snapshot.card_ids),
+                                  int(getattr(settings, 'twin_incumbency_new_segments', 1)))
+        twin_positions = getattr(runtime, 'card_positions', None) or {str(c): i for i, c in enumerate(snapshot.card_ids)}
+        twin_incumbent = incumbent_first(combined, twin_positions, snapshot.embeddings, start, tuple(rank_languages))
     timings["local_artwork_ms"] = (time.perf_counter() - mark) * 1000
     framing_review_supported = bool(combined and not retake
         and float(combined[0]['visual_score']) >= settings.threshold_min_visual_ocr
@@ -972,6 +1070,12 @@ def _recognize_bytes_once(
     if local_matches:
         status = "uncertain"
         status_reasons.append('local_artwork_used')
+    if verified_family:
+        status_reasons.append('family_verified')
+    if twin_incumbent:
+        status_reasons.append('twin_incumbent')
+    if name_set_aside:
+        status_reasons.append('unmatched_name_set_aside')
     if any(h.region=='holder_name' for h in ocr.hits) and status=='matched':
         status='uncertain'
         status_reasons.append('holder_name')
@@ -1154,11 +1258,11 @@ def _recognize_bytes_once(
             } for row in review_members],
             guidance=printing.guidance,
         )
-    elif local_matches and not framing_review_supported and not (
+    elif local_matches and not framing_review_supported and not verified_family and not (
         # A slab label's own number, with verified artwork, outranks a footer misread.
         recovery and combined[0]['card_id'] in label_ids and combined[0].get('local_artwork_verified')
     ) and not artwork_evidence_compatible(
-        combined[0], ocr_name=ocr.name_text, name_confidence=name_confidence,
+        combined[0], ocr_name=verify_name, name_confidence=verify_name_confidence,
         numbers=numbers, languages=rank_languages
     ):
         status = "retake"
@@ -1394,6 +1498,7 @@ def _recognize_bytes_once(
         "printing_review": printing_review.model_dump(mode="json") if printing_review else None,
         **({"vintage_name_choices": vintage_choices} if vintage_choices is not None else {}),
         "local_artwork_matches": [vars(m) for m in local_matches],
+        "family_verify": family_verify,
         "layout_matches": [vars(m) for m in layout_matches],
         "layout_review_supported": layout_review_supported,
         "layout_footer_hits": [vars(h) for h in layout_footer_hits],

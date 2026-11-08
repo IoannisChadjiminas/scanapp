@@ -107,6 +107,28 @@ class Settings(BaseSettings):
     # than the picture's leader, and the leader's gap is measured to a real rival, not to its
     # own print in another language. A policy change: replay first.
     rank_bare_number_guard: bool = False
+    # When the shortlist goes to local artwork verification, also check one reference per artwork
+    # family (reprints and other-language prints of one illustration) without the OCR filter. A
+    # family that clearly leads by inliers moves up as a whole, keeps its internal order and is
+    # shown for review instead of a retake; never matched. A policy change: replay first.
+    rank_family_verify: bool = False
+    local_verify_families: int = 16
+    # Retrieval depth for the family check only (today's shortlist uses 20 full-card and 15
+    # artwork hits). Deeper rows are ranked apart and join the shortlist only as members of a
+    # decided family. Raise both with the flag; replay first.
+    family_verify_full_k: int = 20
+    family_verify_artwork_k: int = 15
+    # On a Japanese scan with no printed collector fraction, a confident name read that names no
+    # shortlisted card (other card text in the name strip) counts as no name for the local
+    # verification trigger and the artwork compatibility filters. Ranking still sees it. The
+    # rule is language-independent; the scope is deliberately narrow. Replay first.
+    verify_unmatched_name: bool = False
+    rank_species_names: bool = False
+    ocr_dex_number_guard: bool = False
+    ocr_cjk_minus_guard: bool = False
+    ocr_promo_s5_guard: bool = False
+    rank_twin_incumbency: bool = False
+    twin_incumbency_new_segments: int = 1
     # When the printing is already unsure, also offer same-name prints up to 0.08 below the shown
     # card in the list to choose from (e.g. Evolutions 9/108 under Base Set 46/102). The shown card
     # and the status do not change. Replay first.

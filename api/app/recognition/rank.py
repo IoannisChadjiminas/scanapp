@@ -22,6 +22,16 @@ NON_COLLECTOR_NUMBER_RE = re.compile(
     r"(?:[×x]\s*\d+|(?<!\w)[−–-]\s*\d+\b|#\s*\d+|\b(?:HP|LV\.?|IV|STAGE)\s*\d+|\d+\s*HP\b)",
     re.IGNORECASE,
 )
+# OCR_DEX_NUMBER_GUARD: a number printed after "No" is the Pokedex number (vintage No.025, modern
+# Japanese 全国図鑑No.025, English NO. 025), never a collector number. A fraction is left alone.
+# OCR_CJK_MINUS_GUARD: the minus-number rule above skips a minus after any word character, and
+# kana/kanji are word characters, so ダメージ-30 / 抵抗力-30 (resistance) became collector 30. With
+# the flag, only an ASCII letter or digit before the minus (SV-P, S-P) keeps the number.
+CJK_MINUS_NUMBER_RE = re.compile(r"(?<=[^\x00-\x7f])[−–-]\s*\d+\b")
+# OCR_PROMO_S5_GUARD: the leading S of a Japanese promo suffix read as 5 (235/5V-P, 001/5-P,
+# 012/5M-P) turns into a bogus fraction or a stray number. Restore it; a fraction with no -P stays.
+PROMO_S5_RE = re.compile(r"(\d{1,4})\s*/\s*5\s*([VM]?)\s*-\s*P\b", re.IGNORECASE)
+DEX_NUMBER_RE = re.compile(r"(?<![A-Za-z])N[oO0][.,]?\s*\d{1,4}\b(?!\s*/)")
 # These are set abbreviations, not the distinct TG/GG/SM/SWSH collector
 # namespaces. Only remove a known code when it directly precedes a fraction.
 MODERN_SET_CODES = ('SVI', 'PAL', 'OBF', 'MEW', 'PAR', 'PAF', 'TEF',
@@ -69,6 +79,18 @@ def promo_prefix_near_enabled() -> bool:
     return bool(get_settings().ocr_promo_prefix_near)
 
 
+def species_names_enabled() -> bool:
+    return bool(getattr(get_settings(), "rank_species_names", False))
+
+
+def _species_verdict(ocr_name: str | None, item: dict[str, Any]) -> bool | None:
+    """RANK_SPECIES_NAMES: see species_names. None keeps the name rules unchanged."""
+    if not species_names_enabled():
+        return None
+    from app.recognition.species_names import species_verdict
+    return species_verdict(ocr_name, item)
+
+
 def cutoff_total_enabled() -> bool:
     return bool(get_settings().ocr_cutoff_total)
 
@@ -77,6 +99,18 @@ def _cutoff_total(read: str, total: str) -> bool:
     """OCR_CUTOFF_TOTAL: a set total that lost only its last digit at the edge of the read
     ("9/10" for 9/108). One digit, never two, and the read must keep at least two digits."""
     return len(read) >= 2 and len(total) == len(read) + 1 and total.startswith(read)
+
+
+def dex_number_guard_enabled() -> bool:
+    return bool(getattr(get_settings(), "ocr_dex_number_guard", False))
+
+
+def cjk_minus_guard_enabled() -> bool:
+    return bool(getattr(get_settings(), "ocr_cjk_minus_guard", False))
+
+
+def promo_s5_guard_enabled() -> bool:
+    return bool(getattr(get_settings(), "ocr_promo_s5_guard", False))
 
 
 def bare_number_guard_enabled() -> bool:
@@ -215,10 +249,20 @@ def extract_collector_candidates(
                 if match:
                     add(OcrHit(match[1],hit.confidence,'holder_collector'))
 
+    dex_guard = dex_number_guard_enabled()
+    cjk_minus_guard = cjk_minus_guard_enabled()
+    promo_s5_guard = promo_s5_guard_enabled()
+
     def tokens(text: str) -> list[str]:
+        if promo_s5_guard:
+            text = PROMO_S5_RE.sub(lambda m: f"{m[1]}/S{m[2].upper()}-P", text)
         # Bottom-of-card OCR also contains weakness, level and Pokedex text.
         # Region/confidence alone cannot make those numbers collectors.
         cleaned = NON_COLLECTOR_NUMBER_RE.sub(" ", text)
+        if dex_guard:
+            cleaned = DEX_NUMBER_RE.sub(" ", cleaned)
+        if cjk_minus_guard:
+            cleaned = CJK_MINUS_NUMBER_RE.sub(" ", cleaned)
         if (re.search(r'(?i)(?:©|copyright|Nintendo|GAME\s*FREAK|\bIllus\b)', cleaned)
                 or re.search(r'(?i)\bL[VY]\.?\s*\d+', text)
                 or len(re.findall(r'\b[a-z]{3,}\b', text)) >= 4):
@@ -489,7 +533,11 @@ def artwork_evidence_compatible(item: dict[str, Any], *, ocr_name: str | None,
         return False
     name = normalize_text(ocr_name)
     min_name_length = 2 if any(ord(c) > 0x2E80 for c in name) else 4
-    if name_evidence_comparable(ocr_name, item) and name_confidence >= .85 and len(name) >= min_name_length and not name_match(ocr_name, item["name"]):
+    verdict = _species_verdict(ocr_name, item)
+    if verdict is not None:
+        if name_confidence >= .85 and not verdict:
+            return False
+    elif name_evidence_comparable(ocr_name, item) and name_confidence >= .85 and len(name) >= min_name_length and not name_match(ocr_name, item["name"]):
         return False
     reliable = [h for h in numbers if h.region == "collector" and
                 h.confidence is not None and h.confidence >= .85 and
@@ -546,6 +594,11 @@ def rerank(
         consistent: bool | None = None
         name_ok = name_match(ocr_name, item["name"])
         comparable_name = name_evidence_comparable(ocr_name, item)
+        verdict = _species_verdict(ocr_name, item)
+        if verdict is not None:
+            # Both the read and the row resolve to known species: compare those instead.
+            name_ok, comparable_name = verdict, True
+        name_far = (not verdict) if verdict is not None else similar(ocr_name, item["name"]) < .4
         numbers = accepted_collector_numbers(item)
         if (promo_prefix_near_enabled() and _promo_set_prefix(item)
                 and not promo_bare_number_agrees(ocr_name, item, visual)):
@@ -576,14 +629,14 @@ def rerank(
                 combined -= .08*conflict_weight
             if name_ok:
                 combined += .06*name_weight
-            elif comparable_name and ocr_name and similar(ocr_name, item["name"]) < .4:
+            elif comparable_name and ocr_name and name_far:
                 combined -= .04*name_weight
             if collector_conflict or (conflict_weight >= RELIABLE_COLLECTOR_CONF and
                                       match_weight < RELIABLE_COLLECTOR_CONF):
                 consistent = False
             elif match_weight >= RELIABLE_COLLECTOR_CONF or (name_ok and name_weight >= RELIABLE_COLLECTOR_CONF):
                 consistent = True
-            elif comparable_name and ocr_name and name_weight >= RELIABLE_COLLECTOR_CONF and similar(ocr_name, item["name"]) < .4:
+            elif comparable_name and ocr_name and name_weight >= RELIABLE_COLLECTOR_CONF and name_far:
                 consistent = False
         elif number_ok is False and ocr_numbers:
             consistent = False
@@ -597,14 +650,14 @@ def rerank(
             if number_ok is True:
                 combined += 0.08
         elif ocr_name and not name_ok:
-            consistent = False if name_weight >= RELIABLE_COLLECTOR_CONF and similar(ocr_name, item["name"]) < 0.4 else None
+            consistent = False if name_weight >= RELIABLE_COLLECTOR_CONF and name_far else None
             if consistent is False:
                 combined -= 0.04 * name_weight
         stored = dict(item)
         language_conflict = bool(detected_languages and language and language not in detected_languages)
         strong_name_conflict = bool(comparable_name and require_confident_ocr and name_weight >= .85
             and len(normalize_text(ocr_name)) >= (2 if any(ord(c)>0x2E80 for c in normalize_text(ocr_name)) else 4)
-            and not name_ok and similar(ocr_name,item['name']) < .4)
+            and not name_ok and name_far)
         if require_confident_ocr and (language_conflict or strong_name_conflict):
             consistent = False
         structured_conflict = any(h.region == 'collector' and h.confidence is not None
