@@ -272,3 +272,28 @@ and a stray `30` matched its number.
 
 The older-era vectors stay blocked. Step 5 waits for an owner decision on the items in bold and on
 the Pokédex-number read.
+
+## Step 4c gate replays, 2026-11-08 (PR 108 at `7dc6659`, all four flags)
+
+**Compared with 4b:**
+- 98 photos (both catalogues), stored uploads (both catalogues) and flags off: 0 changes.
+- Vintage panel: 7 changes.
+  - Fixes: Surfing Pikachu `jr-miscellaneous-promos-014-1` (right card first, with printing
+    choices) and `PMCG3-022-1` (retake → right card).
+  - Uncertain → matched on the right card: `PMCG5-041-1`, `jr-southern-islands-u09-2` and both
+    `jr-vending-machine-series-3-green-u27` photos.
+  - **`neo1-072-1` back to a retake.**
+
+Vintage totals: 117 first / 13 offered / 0 wrong / 5 retake. All 41 held cards are first or
+offered.
+
+**Gate not met: `neo1-072-1`.**
+- With the Pokédex `249` gone, the only number left is `30`. It matches "Ho-Oh ex" (`030`), and
+  "Ho-Oh ex" no longer pays the `249` conflict that held it down in 4b. It leads again,
+  0.792 against 0.739.
+- The `30` is the resistance value: 抵抗力 / ダメージ `-30`. `NON_COLLECTOR_NUMBER_RE` removes
+  `-30` only when no word character precedes the minus (`(?<!\w)`). Kana and kanji are word
+  characters, so `ダメージ-30` and `抵抗力-30` pass through as collector `30`.
+- That happens on 54 of 135 vintage photos (87 `ダメージ-30` lines, 34 `抵抗力-30`).
+
+4b's fix for `neo1-072-1` therefore rested on one misread number cancelling another.
