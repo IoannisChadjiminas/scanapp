@@ -145,3 +145,17 @@ def test_flag_and_depth_are_off_by_default():
     settings = Settings()
     assert settings.rank_family_verify is False
     assert (settings.family_verify_full_k, settings.family_verify_artwork_k) == (20, 15)
+
+
+def test_other_language_prints_of_the_artwork_are_never_promoted():
+    from app.recognition.family_verify import scan_language_members
+    # stored upload 8dcaf41f: an English Brute Bonnet photo; the decided family was the
+    # Chinese print of the same artwork, which must not replace the English leader
+    family = [{"card_id": "zh-tw:SV8a-099", "language": "zh-tw"}, {"card_id": "ja:SV8a-099", "language": "ja"}]
+    assert scan_language_members(family, ("en",), "en") == []
+    mixed = [*family, {"card_id": "en:sv04-123", "language": "en"}]
+    assert [r["card_id"] for r in scan_language_members(mixed, ("en",), "en")] == ["en:sv04-123"]
+    # unknown scan language: the leader's language decides
+    assert [r["card_id"] for r in scan_language_members(mixed, (), "ja")] == ["ja:SV8a-099"]
+    # Japanese vintage scan: Japanese family members stay
+    assert [r["card_id"] for r in scan_language_members(mixed, ("ja",), "ja")] == ["ja:SV8a-099"]

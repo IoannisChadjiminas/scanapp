@@ -39,7 +39,7 @@ from app.recognition.detect import (card_frame_candidates, client_quad_rect, det
 from app.recognition.frame_fallback import line_frame_candidates, loose_frame_candidates, portrait_window_candidates, slab_interior_candidate
 from app.recognition.images import apply_crop, blur_variance, decode_image
 from app.recognition.embed import top_k
-from app.recognition.family_verify import promote_family, verify_families
+from app.recognition.family_verify import promote_family, scan_language_members, verify_families
 from app.recognition.name_evidence import verification_name
 from app.recognition.identity import layout_identity_agrees, likely_identity_agrees, structured_identity_agrees
 from app.recognition.confidence import confidence_payload
@@ -974,6 +974,14 @@ def _recognize_bytes_once(
                 verifier, image, [*combined, *deep_rows], cards, full_vector, thumbnail,
                 int(getattr(settings, 'local_verify_families', 16)), prepared=sift_cache)
             family_verify['deep_candidates'] = len(deep_rows)
+            if verified_family:
+                kept = scan_language_members(verified_family, rank_languages,
+                                             str(combined[0].get('language') or '') or None)
+                if len(kept) < len(verified_family):
+                    family_verify['other_language'] = [r['card_id'] for r in verified_family if r not in kept]
+                kept_ids = {r['card_id'] for r in kept}
+                verified_family = kept or None
+                family_matches = [m for m in family_matches if m.card_id in kept_ids]
             timings['family_verify_ms'] = (time.perf_counter() - family_mark) * 1000
             # Family evidence joins the shortlist's only when it changes something: another
             # artwork led, or the shortlist check verified nothing. Otherwise it may only stop

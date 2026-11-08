@@ -13,6 +13,10 @@ own same-artwork floor). After verification, two families whose best members bot
 against this photo and share a title are one artwork: two different illustrations cannot both
 pass the geometric check on the same photo.
 
+A family spans languages, but a print in another language is another product, not a printing
+choice: only members in the scan's languages (or the leader's, when the scan's are unknown)
+may be promoted. A family with none of those is not a decision.
+
 Inliers certify shared artwork, never which reprint it is: the chosen family moves up as a
 whole and keeps the existing order inside it (number, name, language, visual). A scan decided
 this way is never matched, only reviewed.
@@ -97,6 +101,12 @@ def promote_family(combined: list[dict], members: list[dict], order: list[str]) 
     rank = {card_id: i for i, card_id in enumerate(order)}
     ids = {r["card_id"] for r in members}
     combined.sort(key=lambda r: (r["card_id"] not in ids, rank.get(r["card_id"], len(rank)) if r["card_id"] in ids else 0))
+
+
+def scan_language_members(members: list[dict], languages: Iterable[str], leader_language: str | None) -> list[dict]:
+    """The family members a scan in `languages` may be shown first (see the module note)."""
+    allowed = set(languages) or ({leader_language} if leader_language else set())
+    return [r for r in members if str(r.get("language") or "") in allowed] if allowed else list(members)
 
 
 def verify_families(verifier, image, candidates: list[dict], cards: dict, vector: Lookup,
