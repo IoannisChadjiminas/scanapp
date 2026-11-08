@@ -17,7 +17,7 @@ from __future__ import annotations
 from typing import Any
 
 from app.recognition.ocr import OcrHit
-from app.recognition.rank import name_match
+from app.recognition.rank import _species_verdict, name_match
 from app.recognition.text_identity import confident_fractions
 
 MIN_CONFIDENT_NAME = .85
@@ -31,6 +31,7 @@ def in_scope(languages: tuple[str, ...], numbers: list[OcrHit]) -> bool:
 def names_a_candidate(ocr_name: str | None, candidates: list[dict[str, Any]]) -> bool:
     return any(name_match(ocr_name, str(row.get('name') or ''))
                or (row.get('view_title') and name_match(ocr_name, str(row['view_title'])))
+               or _species_verdict(ocr_name, row) is True
                for row in candidates)
 
 

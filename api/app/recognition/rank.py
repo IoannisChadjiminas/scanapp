@@ -69,6 +69,18 @@ def promo_prefix_near_enabled() -> bool:
     return bool(get_settings().ocr_promo_prefix_near)
 
 
+def species_names_enabled() -> bool:
+    return bool(getattr(get_settings(), "rank_species_names", False))
+
+
+def _species_verdict(ocr_name: str | None, item: dict[str, Any]) -> bool | None:
+    """RANK_SPECIES_NAMES: see species_names. None keeps the name rules unchanged."""
+    if not species_names_enabled():
+        return None
+    from app.recognition.species_names import species_verdict
+    return species_verdict(ocr_name, item)
+
+
 def cutoff_total_enabled() -> bool:
     return bool(get_settings().ocr_cutoff_total)
 
@@ -489,7 +501,11 @@ def artwork_evidence_compatible(item: dict[str, Any], *, ocr_name: str | None,
         return False
     name = normalize_text(ocr_name)
     min_name_length = 2 if any(ord(c) > 0x2E80 for c in name) else 4
-    if name_evidence_comparable(ocr_name, item) and name_confidence >= .85 and len(name) >= min_name_length and not name_match(ocr_name, item["name"]):
+    verdict = _species_verdict(ocr_name, item)
+    if verdict is not None:
+        if name_confidence >= .85 and not verdict:
+            return False
+    elif name_evidence_comparable(ocr_name, item) and name_confidence >= .85 and len(name) >= min_name_length and not name_match(ocr_name, item["name"]):
         return False
     reliable = [h for h in numbers if h.region == "collector" and
                 h.confidence is not None and h.confidence >= .85 and
@@ -546,6 +562,11 @@ def rerank(
         consistent: bool | None = None
         name_ok = name_match(ocr_name, item["name"])
         comparable_name = name_evidence_comparable(ocr_name, item)
+        verdict = _species_verdict(ocr_name, item)
+        if verdict is not None:
+            # Both the read and the row resolve to known species: compare those instead.
+            name_ok, comparable_name = verdict, True
+        name_far = (not verdict) if verdict is not None else similar(ocr_name, item["name"]) < .4
         numbers = accepted_collector_numbers(item)
         if (promo_prefix_near_enabled() and _promo_set_prefix(item)
                 and not promo_bare_number_agrees(ocr_name, item, visual)):
@@ -576,14 +597,14 @@ def rerank(
                 combined -= .08*conflict_weight
             if name_ok:
                 combined += .06*name_weight
-            elif comparable_name and ocr_name and similar(ocr_name, item["name"]) < .4:
+            elif comparable_name and ocr_name and name_far:
                 combined -= .04*name_weight
             if collector_conflict or (conflict_weight >= RELIABLE_COLLECTOR_CONF and
                                       match_weight < RELIABLE_COLLECTOR_CONF):
                 consistent = False
             elif match_weight >= RELIABLE_COLLECTOR_CONF or (name_ok and name_weight >= RELIABLE_COLLECTOR_CONF):
                 consistent = True
-            elif comparable_name and ocr_name and name_weight >= RELIABLE_COLLECTOR_CONF and similar(ocr_name, item["name"]) < .4:
+            elif comparable_name and ocr_name and name_weight >= RELIABLE_COLLECTOR_CONF and name_far:
                 consistent = False
         elif number_ok is False and ocr_numbers:
             consistent = False
@@ -597,14 +618,14 @@ def rerank(
             if number_ok is True:
                 combined += 0.08
         elif ocr_name and not name_ok:
-            consistent = False if name_weight >= RELIABLE_COLLECTOR_CONF and similar(ocr_name, item["name"]) < 0.4 else None
+            consistent = False if name_weight >= RELIABLE_COLLECTOR_CONF and name_far else None
             if consistent is False:
                 combined -= 0.04 * name_weight
         stored = dict(item)
         language_conflict = bool(detected_languages and language and language not in detected_languages)
         strong_name_conflict = bool(comparable_name and require_confident_ocr and name_weight >= .85
             and len(normalize_text(ocr_name)) >= (2 if any(ord(c)>0x2E80 for c in normalize_text(ocr_name)) else 4)
-            and not name_ok and similar(ocr_name,item['name']) < .4)
+            and not name_ok and name_far)
         if require_confident_ocr and (language_conflict or strong_name_conflict):
             consistent = False
         structured_conflict = any(h.region == 'collector' and h.confidence is not None
