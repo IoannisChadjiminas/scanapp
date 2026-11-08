@@ -28,6 +28,9 @@ NON_COLLECTOR_NUMBER_RE = re.compile(
 # kana/kanji are word characters, so ダメージ-30 / 抵抗力-30 (resistance) became collector 30. With
 # the flag, only an ASCII letter or digit before the minus (SV-P, S-P) keeps the number.
 CJK_MINUS_NUMBER_RE = re.compile(r"(?<=[^\x00-\x7f])[−–-]\s*\d+\b")
+# OCR_PROMO_S5_GUARD: the leading S of a Japanese promo suffix read as 5 (235/5V-P, 001/5-P,
+# 012/5M-P) turns into a bogus fraction or a stray number. Restore it; a fraction with no -P stays.
+PROMO_S5_RE = re.compile(r"(\d{1,4})\s*/\s*5\s*([VM]?)\s*-\s*P\b", re.IGNORECASE)
 DEX_NUMBER_RE = re.compile(r"(?<![A-Za-z])N[oO0][.,]?\s*\d{1,4}\b(?!\s*/)")
 # These are set abbreviations, not the distinct TG/GG/SM/SWSH collector
 # namespaces. Only remove a known code when it directly precedes a fraction.
@@ -104,6 +107,10 @@ def dex_number_guard_enabled() -> bool:
 
 def cjk_minus_guard_enabled() -> bool:
     return bool(getattr(get_settings(), "ocr_cjk_minus_guard", False))
+
+
+def promo_s5_guard_enabled() -> bool:
+    return bool(getattr(get_settings(), "ocr_promo_s5_guard", False))
 
 
 def bare_number_guard_enabled() -> bool:
@@ -244,8 +251,11 @@ def extract_collector_candidates(
 
     dex_guard = dex_number_guard_enabled()
     cjk_minus_guard = cjk_minus_guard_enabled()
+    promo_s5_guard = promo_s5_guard_enabled()
 
     def tokens(text: str) -> list[str]:
+        if promo_s5_guard:
+            text = PROMO_S5_RE.sub(lambda m: f"{m[1]}/S{m[2].upper()}-P", text)
         # Bottom-of-card OCR also contains weakness, level and Pokedex text.
         # Region/confidence alone cannot make those numbers collectors.
         cleaned = NON_COLLECTOR_NUMBER_RE.sub(" ", text)
