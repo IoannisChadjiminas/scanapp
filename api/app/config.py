@@ -128,6 +128,7 @@ class Settings(BaseSettings):
     ocr_cjk_minus_guard: bool = False
     ocr_promo_s5_guard: bool = False
     rank_twin_incumbency: bool = False
+    rank_unmatched_name: bool = False
     twin_incumbency_new_segments: int = 1
     # When the printing is already unsure, also offer same-name prints up to 0.08 below the shown
     # card in the list to choose from (e.g. Evolutions 9/108 under Base Set 46/102). The shown card
