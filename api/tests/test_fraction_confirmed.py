@@ -52,3 +52,35 @@ def test_same_name_across_languages_uses_the_english_title():
 def test_an_unprefixed_english_duplicate_counts_as_the_same_card():
     bare = card('base1-88', 'Professor Oak', '88', 102)
     assert fraction_confirmed_twin([OAK_116, bare, OAK_88], 'en:base4-116', hit('88/102')) == 'en:base1-88'
+
+
+from app.recognition.fraction_confirmed import guard_fraction_total
+
+
+def _texts(hits):
+    return [(h.text, h.region, h.confidence) for h in hits]
+
+
+def test_bare_total_beside_a_fraction_becomes_the_fraction():
+    hits = [OcrHit('070', 0.92, 'collector'), OcrHit('074/070', None, 'unknown'), OcrHit('210', None, 'unknown')]
+    assert _texts(guard_fraction_total(hits)) == [('074/070', 'collector', 0.92), ('210', 'unknown', None)]
+
+
+def test_bare_number_that_is_not_a_total_stays():
+    hits = [OcrHit('074', 0.92, 'collector'), OcrHit('074/070', None, 'unknown')]
+    assert _texts(guard_fraction_total(hits)) == _texts(hits)
+
+
+def test_fraction_whose_number_equals_its_total_does_not_count():
+    hits = [OcrHit('070', 0.92, 'collector'), OcrHit('070/070', None, 'unknown')]
+    assert _texts(guard_fraction_total(hits)) == _texts(hits)
+
+
+def test_two_different_fractions_with_that_total_are_ambiguous():
+    hits = [OcrHit('060', 0.9, 'collector'), OcrHit('015/060', None, 'unknown'), OcrHit('016/060', None, 'unknown')]
+    assert _texts(guard_fraction_total(hits)) == _texts(hits)
+
+
+def test_promo_and_non_collector_reads_are_left_alone():
+    hits = [OcrHit('060', 0.9, 'holder_name'), OcrHit('015/060', None, 'unknown'), OcrHit('SM60', 0.9, 'collector')]
+    assert _texts(guard_fraction_total(hits)) == _texts(hits)

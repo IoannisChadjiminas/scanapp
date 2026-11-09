@@ -61,7 +61,7 @@ from app.recognition.orientation import retrieve_oriented
 from app.recognition.printing import PRINTING_CHOICES_WIDER_GAP, PrintingDecision, assess_printings
 from app.recognition.rank import artwork_evidence_compatible, decide_status_with_reason, damaged_footer_named_printing, extract_collector_candidates, fraction_named_printing, rerank
 from app.recognition.rank import name_match, normalize_text
-from app.recognition.fraction_confirmed import fraction_confirmed_twin
+from app.recognition.fraction_confirmed import fraction_confirmed_twin, guard_fraction_total
 from app.recognition.runtime import Runtime
 from app.recognition.title_retry import read_conflicting_title, title_retry_allowed
 from app.recognition.vintage_name import (GUIDANCE as VINTAGE_NAME_GUIDANCE,
@@ -659,6 +659,8 @@ def _recognize_bytes_once(
     decision = resolve_search_languages(language, language_texts)
     numbers = extract_collector_candidates(
         [line for line in [ocr.collector_text, *ocr.lines] if line], hits=ocr.hits)
+    if getattr(settings, 'ocr_fraction_total_guard', False):
+        numbers = guard_fraction_total(numbers)
     leader_id = str(snapshot.card_ids[indices[0]]) if len(indices) else None
     leader = _lookup_cards(catalog, [leader_id]).get(leader_id) if leader_id else None
     rank_languages = ranking_languages(decision, language_texts,

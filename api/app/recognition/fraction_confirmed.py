@@ -46,3 +46,31 @@ def fraction_confirmed_twin(combined: list[dict[str, Any]], chosen_id: str, numb
 
 def _card_key(card_id: str) -> str:
     return card_id if ':' in card_id else 'en:' + card_id
+
+
+def guard_fraction_total(numbers: list) -> list:
+    """A bare collector read equal to another fraction's total is that total, not a card number.
+
+    The footer crop can catch only "070" while the whole card reads "074/070": the bare 070 then
+    names a different card (S10D-070). Drop the bare number and use the fraction as the collector
+    read at the bare read's confidence. Flag OCR_FRACTION_TOTAL_GUARD.
+    """
+    from app.recognition.ocr import OcrHit
+    from app.recognition.rank import parse_collector
+    fractions = []
+    for h in numbers or []:
+        parts = parse_collector(h.text)
+        if parts and parts.denominator and not parts.prefix and parts.number != parts.denominator:
+            fractions.append((h, parts))
+    out = list(numbers or [])
+    for h in numbers or []:
+        parts = parse_collector(h.text)
+        if not parts or parts.denominator or parts.prefix or h.region != 'collector':
+            continue
+        totals = [(f, p) for f, p in fractions if p.denominator == parts.number and f is not h]
+        if len({p.number for _, p in totals}) != 1:
+            continue
+        fraction = totals[0][0]
+        out = [x for x in out if x is not h and x is not fraction]
+        out.insert(0, OcrHit(fraction.text, h.confidence, 'collector'))
+    return out
