@@ -128,15 +128,15 @@ class Settings(BaseSettings):
     ocr_cjk_minus_guard: bool = True
     ocr_promo_s5_guard: bool = True
     rank_twin_incumbency: bool = True
-    rank_unmatched_name: bool = False
+    rank_unmatched_name: bool = True
     # A printing review also offers same-language prints that share the English title and the
     # artwork (a recovered row named "Umbreon V" beside ブラッキーV). Replay first.
-    printing_title_family: bool = False
+    printing_title_family: bool = True
     # The Sun & Moon "TRAINER'S" banner is never a name read. Replay first.
-    ocr_trainers_banner: bool = False
+    ocr_trainers_banner: bool = True
     # Japanese two-half sets whose TCGdex total is stored under another set id (XY1a for
     # Collection X), and TCGdex totals known to be wrong (SM7a prints /060). Replay first.
-    set_total_aliases: bool = False
+    set_total_aliases: bool = True
     twin_incumbency_new_segments: int = 1
     # When the printing is already unsure, also offer same-name prints up to 0.08 below the shown
     # card in the list to choose from (e.g. Evolutions 9/108 under Base Set 46/102). The shown card
