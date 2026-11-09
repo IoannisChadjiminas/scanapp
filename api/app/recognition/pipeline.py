@@ -39,7 +39,7 @@ from app.recognition.detect import (card_frame_candidates, client_quad_rect, det
 from app.recognition.frame_fallback import line_frame_candidates, loose_frame_candidates, portrait_window_candidates, slab_interior_candidate
 from app.recognition.images import apply_crop, blur_variance, decode_image
 from app.recognition.embed import top_k
-from app.recognition.family_verify import promote_family, scan_language_members, verify_families
+from app.recognition.family_verify import promote_family, scan_language_members, verify_families, verify_shared
 from app.recognition.twin_incumbency import incumbent_first, new_release_start
 from app.recognition.name_evidence import verification_name
 from app.recognition.identity import layout_identity_agrees, likely_identity_agrees, structured_identity_agrees
@@ -917,7 +917,7 @@ def _recognize_bytes_once(
         if not references:
             local_matches = []
         elif family_on:
-            local_matches = verifier.verify(image, references, prepared=sift_cache)
+            local_matches = verify_shared(verifier, image, references, prepared=sift_cache)
         else:
             local_matches = verifier.verify(image, references)
         if text_ids and hasattr(verifier, 'propose_frame') and not any(

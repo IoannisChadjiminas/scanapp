@@ -111,7 +111,7 @@ class Settings(BaseSettings):
     # family (reprints and other-language prints of one illustration) without the OCR filter. A
     # family that clearly leads by inliers moves up as a whole, keeps its internal order and is
     # shown for review instead of a retake; never matched. A policy change: replay first.
-    rank_family_verify: bool = False
+    rank_family_verify: bool = True
     local_verify_families: int = 16
     # Retrieval depth for the family check only (today's shortlist uses 20 full-card and 15
     # artwork hits). Deeper rows are ranked apart and join the shortlist only as members of a
@@ -122,12 +122,12 @@ class Settings(BaseSettings):
     # shortlisted card (other card text in the name strip) counts as no name for the local
     # verification trigger and the artwork compatibility filters. Ranking still sees it. The
     # rule is language-independent; the scope is deliberately narrow. Replay first.
-    verify_unmatched_name: bool = False
-    rank_species_names: bool = False
-    ocr_dex_number_guard: bool = False
-    ocr_cjk_minus_guard: bool = False
-    ocr_promo_s5_guard: bool = False
-    rank_twin_incumbency: bool = False
+    verify_unmatched_name: bool = True
+    rank_species_names: bool = True
+    ocr_dex_number_guard: bool = True
+    ocr_cjk_minus_guard: bool = True
+    ocr_promo_s5_guard: bool = True
+    rank_twin_incumbency: bool = True
     rank_unmatched_name: bool = False
     twin_incumbency_new_segments: int = 1
     # When the printing is already unsure, also offer same-name prints up to 0.08 below the shown
