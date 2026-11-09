@@ -377,3 +377,17 @@ Whatever is left ships without an image, with its reason in the coverage queue.
   `/etc/scanapp-staging/catalogue-rollback/ja-rec12-20261109/catalogue-release.env.before`.
 - After this batch, 296 Japanese cards have no image. Each ships with its reason in the JAREC13
   coverage queue.
+
+## 2026-11-09: JAREC13 final coverage queue switched on staging (Phase B closed)
+
+- `pokesingle_completion_20261109_jarec13` / `PS-CATALOGUE-EN-JA-REC13-20261109` on top of JAREC12.
+  No card changes. The queue has 524 entries:
+  - 491 with no image;
+  - 20 display-only;
+  - 10 imaged cards without a vector;
+  - 3 English-printed holds.
+- 296 Japanese cards ship without an image (749 at the start of Phase B). Each records what was
+  tried (TCG Collector, Cardmarket, Japanese shops, Bulbapedia identity, eBay listings) and why
+  nothing was usable.
+- Replays against JAREC12 showed 0 changes on every panel. Rollback:
+  `/etc/scanapp-staging/catalogue-rollback/ja-rec13-20261109/catalogue-release.env.before`.
