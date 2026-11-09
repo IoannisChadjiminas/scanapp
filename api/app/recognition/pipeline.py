@@ -846,6 +846,13 @@ def _recognize_bytes_once(
         name_confidence=name_confidence,
         require_confident_ocr=True,
     )
+    if combined and getattr(settings, 'rank_unmatched_name', False):
+        # RANK_UNMATCHED_NAME: a confident read that names none of the candidates (an evolution
+        # note, a misread) is no name for ranking either. Otherwise it costs a Japanese-named
+        # original a name penalty that an English-named reprint never pays (dev-ja-vintage-110).
+        if verification_name(ocr.name_text, name_confidence, combined, languages=rank_languages, numbers=numbers)[2]:
+            combined = rerank(visual, None, numbers, ocr.failed, detected_languages=rank_languages,
+                              name_confidence=0.0, require_confident_ocr=True)
     # Shortlist-only local verification can recover artwork from a crop. Its
     # feature counts never become embedding scores/probabilities, and a rescued
     # candidate is never automatically accepted as a single printing.
