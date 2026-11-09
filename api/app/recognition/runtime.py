@@ -87,7 +87,8 @@ class Runtime:
                     self._free_lanes.put(lane)
                 self.card_languages = None
                 self.physical_cards = None
-                self.printing_index = ReferencePrintingIndex(self.settings.data_dir)
+                self.printing_index = ReferencePrintingIndex(
+                    self.settings.data_dir, by_title=bool(getattr(self.settings, 'printing_title_family', False)))
                 self.artwork_verifier = LocalArtworkVerifier(self.settings.data_dir)
                 self.layout_verifier = (CardLayoutVerifier(self.settings.data_dir)
                     if self.settings.structured_layout_recovery else None)
