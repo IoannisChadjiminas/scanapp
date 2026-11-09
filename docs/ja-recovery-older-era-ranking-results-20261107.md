@@ -559,3 +559,37 @@ The 1% wrong-first bar is unchanged as the **Phase E completion criterion**.
 1. Retire the 8 wrong-first sealed photos into the development half and inspect each.
 2. Collect replacements, plus 50 more English unnumbered vintage photos for the sealed half.
 3. Build the number-led lookup (M Blastoise) and whatever the English vintage misses show.
+
+## The 8 retired sealed photos: inspection and traces, 2026-11-09
+
+The 8 wrong-first photos from sealed run 3 moved to the development half as `dev-r8-*` (sealed now
+527, dev 681; logged in `sealed/runs.log`). Inspection found **0 label mistakes and 8 genuine
+misses**: each label is confirmed by the photo, and the five slabs by their grading labels too.
+Traces use staging's current flags.
+
+**A. A number-confirmed top card is displaced by its same-artwork twin (3).** Re-ranking puts the
+right card first, but the decision step promotes the twin that local artwork verification
+confirmed. The reasons are `family_verified, local_artwork_used`.
+- Professor Oak: read 88/102, Base Set 88 first, then Base Set 2 116/130 shown.
+- Vaporeon: read 12/64, Jungle 12 first, then the non-holo 28/64 shown.
+- Giratina (Japanese): read 051/096, DPt1-051 first, then English Platinum 10/127 shown.
+
+Fix: verification must not promote a card whose number contradicts a clean full-fraction read.
+
+**B. The fraction's total is used as the collector number (2).**
+- Empoleon V SR: "074/070" is filed as unknown and "070" is used as the number, so S10D-070 is shown.
+- M Blastoise (second development set): "015/060" filed as unknown, "060" used as the number.
+
+**C. Name and number are read but never used to fetch candidates (2).**
+- Flygon: reads "Flygon" and "BW53"; `bwp-BW53` is not shortlisted.
+- Pikachu DPP-048: reads "048"; the promo is not shortlisted.
+
+This is the number-led lookup.
+
+**D. Misreads (2).**
+- Mew, English Southern Islands: "1/18" read as 18 and 6; shown as the Japanese twin.
+- Hitmonchan, PMCG1: the damage "40" is read as the card number; shown as the 20th Anniversary
+  reprint.
+
+Also seen: a `base1-88` row without a language prefix appears next to `en:base1-88` in the
+shortlist. To check.
