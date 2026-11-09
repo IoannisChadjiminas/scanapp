@@ -401,3 +401,35 @@ JAREC6b and seven flags on staging. Details, replays and rollback are in
 JAREC6b:
 - `b28fa245` Drifblim is now right (`OCR_PROMO_S5_GUARD`);
 - `e6c4043e` shows served's answer again (the jumbo Charizard is held).
+
+## Proof panel (Phase T) baseline and the first scanner fix, 2026-11-09
+
+The eBay proof panel (`data/catalogue-gaps/proof-panel-20261109`, seed 20261109) has a
+development half of 673 photos and a sealed half of 535. Labels are re-checked for same-name
+printings: 2 development and 1 sealed corrections, all holo against non-holo. Sealed runs are
+logged in `sealed/runs.log`.
+
+**Staging today (JAREC8, seven flags):**
+
+| Half | Right first | Wrong first (95% Wilson) |
+|---|---|---|
+| Development | 92.3% | 0.7% [0.3, 1.7] |
+| Sealed, run 1 | 94.2% | **2.6% [1.6, 4.3]** |
+
+The sealed wrong rate misses the pass bar (≤1% with an upper bound under 3%). Worst cells:
+- modern Japanese, 7.8%;
+- English vintage, 4.2%;
+- Japanese promos, 3.6%.
+
+**Consequence:** no vector release can pass until the scanner's existing wrong answers come down.
+JAREC9 (39 older-era vectors, inactive) changes nothing on any panel, so it is held, and its sealed
+run is not spent.
+
+**Development-half wrong answers (5) and their causes:**
+1. A bogus name read penalises a Japanese-named original but not its English-named reprint.
+   Fixed by PR 110, `RANK_UNMATCHED_NAME`:
+   - development half: right first 621 → 625, wrong first 5 → 4, 0 right-to-wrong;
+   - matched on a wrong card unchanged everywhere.
+2. A twin-held original (no vector) is not offered when its number is read but truncated (Umbreon V
+   `S6a-047` behind `S8b-100`; probably Pikachu `DPP-048`). Next fix.
+3. Two hard photos: a slab with no name read, and a name strip that read "LV.24".
