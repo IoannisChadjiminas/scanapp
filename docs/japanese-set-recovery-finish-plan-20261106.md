@@ -315,3 +315,21 @@ Whatever is left ships without an image, with its reason in the coverage queue.
 - Replays against JAREC7: 0 changes on every panel. Check: `ja:DPP-033` returns its page-only
   image.
 - Rollback: `/etc/scanapp-staging/catalogue-rollback/ja-rec8-20261109/catalogue-release.env.before`.
+
+## 2026-11-09: JAREC10 Cardmarket image batch switched on staging
+
+- `pokesingle_completion_20261109_jarec10` / `PS-CATALOGUE-EN-JA-REC10-20261109` on top of JAREC8
+  (Phase B step 2, the Chrome sitting).
+  - 230 of 235 Cardmarket product pages read. 5 English Yellow A Alternate pages were still
+    rate-limited and are left for a later retry.
+  - 224 images were accepted after eye-checking on contact sheets. Rejected: two Latias
+    placeholders, two sha clashes with existing images, and one Traditional Chinese printing.
+  - Of the 224: 9 are scannable (modern, no twin). 215 are older-era printing alternatives
+    whose vectors are held, like JAREC2, until the sealed proof panel passes.
+  - Features `20261109-ja-recovery-img5`, artwork `/data/artwork/20261109-ja-recovery-img5`.
+- Replays against JAREC8 showed 0 changes on every panel: 98 with flags on and off, 203 uploads,
+  135 vintage, and pmcg4.
+- Rollback: `/etc/scanapp-staging/catalogue-rollback/ja-rec10-20261109/catalogue-release.env.before`.
+- Shops: Yuyu-tei showed no coverage, so they were dropped. Bulbapedia gives identity only.
+  About 421 Japanese cards are left without an image. They go to listing photos as the last
+  resort (Phase B step 5), or ship with a reason.
