@@ -90,3 +90,35 @@ def test_other_title_is_not_a_member(tmp_path):
     blank = {**other, "name": "Umbreon V", "view_title": None}
     assert not assess_printings([untitled], family=[untitled, blank], hits=[], reference_incomplete=False,
                                 min_visual=.78, min_gap=.04, retake=False, title_family=True).ambiguous
+
+
+def test_title_member_is_marked_so_it_never_orders_the_shown_card(tmp_path):
+    # Charizard upload 379234db: a recovered row named "Charizard" (CLL-003) joined the family
+    # and the verified-sibling ordering showed it first instead of M6a-137. Title members are
+    # marked and the pipeline leaves them out of every ordering rule.
+    conn = _catalog(tmp_path, ROWS)
+    try:
+        members, _ = ReferencePrintingIndex(tmp_path, by_title=True).family(conn, TOP)
+        decision = assess_printings([TOP], family=members, hits=[], reference_incomplete=False,
+                                    min_visual=.78, min_gap=.04, retake=False, title_family=True)
+        marks = {m["card_id"]: bool(m.get("title_member")) for m in decision.members}
+        assert marks == {"ja:S8b-100": False, "ja:S6a-047": True}
+    finally:
+        conn.close()
+
+
+def test_title_row_without_an_image_does_not_make_the_group_incomplete(tmp_path):
+    # Moltres PMCG3-009 went from matched to uncertain: imageless "Moltres" rows found by title
+    # marked its family incomplete.
+    conn = _catalog(tmp_path, ROWS)
+    try:
+        conn.execute("INSERT INTO cards (id,provider_id,name,set_id,set_name,collector_number,language,image_path,has_image,view_title) "
+                     "VALUES ('ja:jr-x-u01','x','Umbreon V','jr','jr','u01','ja','',0,'Umbreon V')")
+        _, incomplete = ReferencePrintingIndex(tmp_path, by_title=True).family(conn, TOP)
+        assert not incomplete
+        conn.execute("INSERT INTO cards (id,provider_id,name,set_id,set_name,collector_number,language,image_path,has_image,view_title) "
+                     "VALUES ('ja:jr-y-u02','y','ブラッキーV','jr','jr','u02','ja','',0,'Umbreon V')")
+        _, incomplete = ReferencePrintingIndex(tmp_path, by_title=True).family(conn, TOP)
+        assert incomplete      # a same-name row without an image still counts, as before
+    finally:
+        conn.close()

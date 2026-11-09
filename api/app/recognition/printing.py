@@ -117,7 +117,9 @@ class ReferencePrintingIndex:
                     self._groups.popitem(last=False)
             self._groups.move_to_end(key)
             anchor = next((p for r, p in cached if r["id"] == top["card_id"]), None)
-            incomplete = any(p is None for _, p in cached)
+            # Coverage is judged on the same-name group only: a row found by its English title
+            # without a reference image can add nothing, so it cannot make the group incomplete.
+            incomplete = any(p is None for r, p in cached if not title or r.get("name") == name or r["id"] == "uninspected")
             if anchor is None:
                 return [], True
             members = [r for r, p in cached if p is not None and
@@ -179,6 +181,8 @@ def assess_printings(
         item = dict(row)
         if not same_card_title(item) or item.get("language") != top.get("language"):
             continue
+        if normalize_text(item["name"]) != normalize_text(top["name"]):
+            item["title_member"] = True
         item.setdefault("card_id", item.get("id"))
         k = printing_key(item)
         old = members.get(k)

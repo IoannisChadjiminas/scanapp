@@ -1195,13 +1195,16 @@ def _recognize_bytes_once(
             guidance='Likely card identified. Confirm the exact set, collector number and finish, or retake with the full card visible.')
     if printing.ambiguous:
         status = "printing_ambiguous"
+        # PRINTING_TITLE_FAMILY: prints that joined only by their English title are offered,
+        # never used to choose the card shown first.
+        order_members = tuple(m for m in printing.members if not m.get('title_member'))
         status_reasons.append(f'printing:{printing.reason}')
         # Geometry verifies shared artwork, not the winning reprint. Once
         # siblings are explicitly retained as ambiguous, use their existing
         # OCR/global scores for display order rather than keypoint survival.
         if local_matches and not .62<=ratio<=.80 and not any(h.region=='collector' and h.confidence is not None
                 and h.confidence>=.85 and ('/' in h.text or any(c.isalpha() for c in h.text)) for h in numbers):
-            sibling_ids={r['card_id'] for r in printing.members}
+            sibling_ids={r['card_id'] for r in order_members}
             eligible=[r for r in combined if r['card_id'] in sibling_ids
                 and artwork_evidence_compatible(r,ocr_name=ocr.name_text,
                     name_confidence=name_confidence,numbers=numbers,languages=rank_languages)]
@@ -1210,7 +1213,7 @@ def _recognize_bytes_once(
                 combined.sort(key=lambda r:r['card_id']==preferred['card_id'],reverse=True)
                 reference_identity=dict(combined[0])
         try:
-            stamp_hint = stamp_printing_hint(combined, printing.members, image,
+            stamp_hint = stamp_printing_hint(combined, order_members, image,
                 ocr_name=ocr.name_text, name_confidence=name_confidence,
                 numbers=numbers, languages=rank_languages)
             if stamp_hint:
@@ -1218,10 +1221,10 @@ def _recognize_bytes_once(
                 reference_identity = dict(combined[0])
         except (OSError, ValueError, KeyError, cv2.error):
             logging.getLogger(__name__).exception('Optional stamp ordering failed')
-        named = fraction_named_printing(combined, printing.members, numbers)
+        named = fraction_named_printing(combined, order_members, numbers)
         damaged_order = bool(getattr(settings, 'ocr_damaged_footer_order', False))
         if not named and damaged_order and not stamp_hint:
-            named = damaged_footer_named_printing(combined, printing.members, ocr.hits)
+            named = damaged_footer_named_printing(combined, order_members, ocr.hits)
         if not named and getattr(settings, 'ocr_printing_from_text', False) and not stamp_hint:
             text_card = _text_named_card(runtime, catalog, client_text, settings)
             if text_card and any(row.get('card_id') == text_card for row in combined):
@@ -1230,15 +1233,15 @@ def _recognize_bytes_once(
             # named no single catalogue card): the Evolutions Charmander read as 9/108 by
             # the phone and as "3" by the server, shown as Base Set 46 (6 November 2026).
             if not named:
-                named = _hint_number_named_printing(combined, printing.members, client_text)
+                named = _hint_number_named_printing(combined, order_members, client_text)
         if named:
             combined.sort(key=lambda row: row.get('card_id') == named, reverse=True)
             if combined:
                 reference_identity = dict(combined[0])
         elif not stamp_hint and not printing.collector_evidence:
-            prefer_unproven_visual_match(combined, printing.members,
+            prefer_unproven_visual_match(combined, order_members,
                                           min_gap=settings.threshold_min_gap)
-            settle_unproven_twins(combined, printing.members,
+            settle_unproven_twins(combined, order_members,
                                   min_gap=settings.threshold_min_gap)
             if combined:
                 reference_identity = dict(combined[0])
