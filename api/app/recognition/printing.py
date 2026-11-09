@@ -63,12 +63,16 @@ class ReferencePrintingIndex:
     outside retrieval top-K and unindexed references; missing files are reported
     as incomplete evidence. Never downloads images during a scan.
     """
-    def __init__(self, data_dir: Path, max_groups: int = 32, feature_store=None) -> None:
+    def __init__(self, data_dir: Path, max_groups: int = 32, feature_store=None, by_title: bool = False) -> None:
         self.root = (data_dir / "reference-images").resolve()
         self.max_groups = max_groups
-        self._groups: OrderedDict[tuple[str, str], list[tuple[dict, np.ndarray | None]]] = OrderedDict()
+        self._groups: OrderedDict[tuple, list[tuple[dict, np.ndarray | None]]] = OrderedDict()
         self._lock = RLock()
         self.feature_store = feature_store
+        # PRINTING_TITLE_FAMILY: also gather same-language rows that share the English title
+        # (ブラッキーV S8b-100 and its recovered twin "Umbreon V" S6a-047). The artwork
+        # correlation floor below still decides membership.
+        self.by_title = by_title
 
     def probe(self, card_id: str, raw_path: str) -> np.ndarray | None:
         """The reference's artwork thumbnail, from the feature store or a local file."""
@@ -85,14 +89,21 @@ class ReferencePrintingIndex:
 
     def family(self, catalog: Any, top: dict[str, Any]) -> tuple[list[dict], bool]:
         name, language = str(top["name"]), str(top.get("language") or "")
-        key = (name, language)
+        title = str(top.get("view_title") or "") if self.by_title else ""
+        key = (name, language, title) if title else (name, language)
         with self._lock:
             cached = self._groups.get(key)
             if cached is None:
-                rows = catalog.execute(
-                    "SELECT * FROM cards WHERE name = ? AND language = ? ORDER BY id LIMIT 513",
-                    (name, language),
-                ).fetchall()
+                if title:
+                    rows = catalog.execute(
+                        "SELECT * FROM cards WHERE language = ? AND (name = ? OR view_title = ?) ORDER BY id LIMIT 513",
+                        (language, name, title),
+                    ).fetchall()
+                else:
+                    rows = catalog.execute(
+                        "SELECT * FROM cards WHERE name = ? AND language = ? ORDER BY id LIMIT 513",
+                        (name, language),
+                    ).fetchall()
                 cached = []
                 for row in rows[:512]:
                     card = dict(row)
@@ -106,7 +117,9 @@ class ReferencePrintingIndex:
                     self._groups.popitem(last=False)
             self._groups.move_to_end(key)
             anchor = next((p for r, p in cached if r["id"] == top["card_id"]), None)
-            incomplete = any(p is None for _, p in cached)
+            # Coverage is judged on the same-name group only: a row found by its English title
+            # without a reference image can add nothing, so it cannot make the group incomplete.
+            incomplete = any(p is None for r, p in cached if not title or r.get("name") == name or r["id"] == "uninspected")
             if anchor is None:
                 return [], True
             members = [r for r, p in cached if p is not None and
@@ -141,6 +154,7 @@ def assess_printings(
     retake: bool,
     wider_gap: float = 0.0,
     max_choices: int = 6,
+    title_family: bool = False,
 ) -> PrintingDecision:
     if retake or not ranked or (float(ranked[0]["visual_score"]) < min_visual
         and not ranked[0].get("local_artwork_verified") and not ranked[0].get('ocr_identity_verified')
@@ -154,11 +168,21 @@ def assess_printings(
               and ((r.get("local_artwork_verified") and top.get("local_artwork_verified")) or
                    (float(r["visual_score"]) >= min_visual and
                     abs(float(r["visual_score"]) - float(top["visual_score"])) < min_gap))]
+    top_title = normalize_text(top.get("view_title") or "") if title_family else ""
+
+    def same_card_title(item: dict[str, Any]) -> bool:
+        if normalize_text(item["name"]) == normalize_text(top["name"]):
+            return True
+        # PRINTING_TITLE_FAMILY: a family member found by the shared English title.
+        return bool(top_title) and normalize_text(item.get("view_title") or "") == top_title
+
     members: dict[tuple, dict] = {}
     for row in [*family, *nearby, top]:
         item = dict(row)
-        if normalize_text(item["name"]) != normalize_text(top["name"]) or item.get("language") != top.get("language"):
+        if not same_card_title(item) or item.get("language") != top.get("language"):
             continue
+        if normalize_text(item["name"]) != normalize_text(top["name"]):
+            item["title_member"] = True
         item.setdefault("card_id", item.get("id"))
         k = printing_key(item)
         old = members.get(k)
