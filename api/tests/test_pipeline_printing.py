@@ -211,7 +211,7 @@ def test_artwork_retrieval_rescues_outside_full_top_k_without_automatic_printing
             threshold_config=lambda: {})
         data = io.BytesIO()
         image.save(data,format='JPEG')
-        response = recognize_bytes(data.getvalue(),settings=Settings(_env_file=None,data_dir=tmp_path,
+        response = recognize_bytes(data.getvalue(),settings=Settings(_env_file=None,data_dir=tmp_path,rank_family_verify=False,
             use_ocr=bool(ocr_result),store_captures=False),runtime=runtime,catalog=catalog,results=results,
             session_id='test',skip_detect=skip_detect,language='en')
         assert response.status != 'matched'

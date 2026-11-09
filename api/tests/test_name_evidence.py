@@ -46,6 +46,6 @@ def test_out_of_scope_reads_are_kept():
     assert verification_name(BOGUS, .995, [], languages=("ja",), numbers=NO_FRACTION)[2] is False
 
 
-def test_flag_is_off_by_default():
+def test_flag_is_on_by_default():
     from app.config import Settings
-    assert Settings().verify_unmatched_name is False
+    assert Settings().verify_unmatched_name is True
