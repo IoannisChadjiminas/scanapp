@@ -669,8 +669,13 @@ def _recognize_bytes_once(
                           if h.text == ocr.name_text and h.region == 'name'), default=0.0)
     mark = time.perf_counter()
     metadata_index = getattr(runtime, 'metadata_index', None)
+    number_led = bool(getattr(settings, 'number_led_lookup', False))
     metadata_ids = metadata_index.candidates(ocr_name=ocr.name_text,
-        name_confidence=name_confidence, numbers=numbers, languages=rank_languages) if metadata_index else []
+        name_confidence=name_confidence, numbers=numbers, languages=rank_languages,
+        **({'promo_codes': True} if number_led else {})) if metadata_index else []
+    if number_led and metadata_index and not metadata_ids and hasattr(metadata_index, 'bare_number_candidates'):
+        metadata_ids = metadata_index.bare_number_candidates(ocr_name=ocr.name_text,
+            name_confidence=name_confidence, numbers=numbers, languages=rank_languages)
     title_ids = metadata_index.title_candidates(ocr_name=ocr.name_text,
         name_confidence=name_confidence, numbers=numbers, languages=rank_languages
     ) if metadata_index and not metadata_ids else []
