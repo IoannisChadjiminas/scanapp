@@ -464,3 +464,57 @@ information. The next step is to learn the remaining causes without opening the 
 collect a second development set in the three worst sealed cells (modern Japanese, English vintage,
 Japanese promos), with labels eye-checked the same way. Then fix what it shows, and spend one sealed
 run on the combined candidate.
+
+## Set totals in replays, two more fixes, and sealed runs 2 and 3, 2026-11-09
+
+**Replay fidelity.** Staging's `/data/catalog.sqlite` holds a `set_totals` table (577 sets). Local
+replay datadirs had none, so earlier replays, including sealed run 1, skipped the printed-total
+check that staging applies. Every replay below loads staging's table. On the development half this
+made staging 5 wrong first (0.7%), not 4.
+
+**Two more flags, both off by default:**
+- `OCR_TRAINERS_BANNER` (PR 113): the Sun & Moon "TRAINER'S" banner is not read as a name. It fixed
+  Judge SR `SM7a-066`, which had been shown as Gym Trainer.
+- `SET_TOTAL_ALIASES` (PR 114): 22 Japanese half-set ids (`XY1-By` and others) find their TCGdex
+  total under TCGdex's id (`XY1b`), and SM7a is corrected to /060 (TCGdex lists 50; cards 51–60 are
+  commons and uncommons).
+
+**Replays with all four candidate flags (JAREC13, set totals loaded):**
+
+| Panel | Staging wrong first | Candidate wrong first | Right → wrong |
+|---|---|---|---|
+| Development half (673) | 5 (0.7%) | 3 (0.4%) | 0 |
+| Second development set (238) | 3 (1.3%) | 1 (0.4%) | 0 |
+
+The gate panels (98 photos, uploads and vintage) show 41 changes, all allowed by the change table.
+They are identical to the PR 112 run, so the two new flags change nothing there.
+
+M Blastoise `XY1-By-015` is still wrong. The photo's full "015/060" is read but not used to look up
+cards: only "060" is used as the number. On the picture alone, M Glalie-EX `XY8-Bb-015` comes out on
+top, and the right card is not in the top eight.
+
+**Sealed half (535 photos).** Run 2 is the staging baseline with set totals; run 3 is the
+candidate. Both are logged in `sealed/runs.log`. Only per-cell counts were read.
+
+| | Right first | Wrong first (95% Wilson) |
+|---|---|---|
+| Staging (run 2) | 504 (94.2%) | 14 (2.6%) [1.6, 4.3] |
+| Candidate (run 3) | 508 (95.0%) | 8 (1.5%) [0.8, 2.9] |
+
+Wrong first per cell, staging → candidate:
+
+| Cell | Staging | Candidate |
+|---|---|---|
+| Modern, Japanese | 4 | 1 |
+| Promo, Japanese | 2 | 1 |
+| Unnumbered vintage, Japanese | 3 | 1 |
+| Unnumbered vintage, English | 3 | 3 |
+| Promo, English | 1 | 1 |
+| Numbered older, Japanese | 1 | 1 |
+| All other cells | 0 | 0 |
+
+Right first is not lower than staging in any cell, and nothing goes from right to wrong. The upper
+bound (2.9%) is under 3%, but wrong first (1.5%) is above the 1% bar, so the candidate **fails**. It
+is not merged and not switched on. Set totals do not explain the sealed gap: staging is 2.6% with
+them, the same as run 1 without them. The largest cell left is English unnumbered vintage (3), which
+none of the fixes touches.
