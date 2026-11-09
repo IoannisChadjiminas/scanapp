@@ -29,10 +29,16 @@ def test_neo1_072_footer_keeps_only_the_other_number(guard_on):
     assert "249" not in numbers(["No.249", "30"])
 
 
-def test_flag_off_keeps_todays_reading():
+@pytest.fixture
+def flag_off(monkeypatch):
+    settings = rank.get_settings().model_copy(update={"ocr_dex_number_guard": False})
+    monkeypatch.setattr(rank, "get_settings", lambda: settings)
+
+
+def test_flag_off_keeps_todays_reading(flag_off):
     assert numbers(["No.025"]) == ["025"]
 
 
-def test_flag_is_off_by_default():
+def test_flag_is_on_by_default():
     from app.config import Settings
-    assert Settings().ocr_dex_number_guard is False
+    assert Settings().ocr_dex_number_guard is True

@@ -140,10 +140,10 @@ def test_query_features_are_extracted_once_per_scan(tmp_path, monkeypatch):
     assert len(calls) == 4            # without a cache nothing is shared
 
 
-def test_flag_and_depth_are_off_by_default():
+def test_flag_is_on_and_depth_unchanged_by_default():
     from app.config import Settings
     settings = Settings()
-    assert settings.rank_family_verify is False
+    assert settings.rank_family_verify is True
     assert (settings.family_verify_full_k, settings.family_verify_artwork_k) == (20, 15)
 
 
