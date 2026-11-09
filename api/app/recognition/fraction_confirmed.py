@@ -14,10 +14,20 @@ MIN_FRACTION_CONFIDENCE = 0.80
 
 
 def clean_fractions(numbers) -> list:
-    """Collector-region reads with a slash (N/T) at confidence 0.80 or more."""
-    return [h for h in numbers or [] if getattr(h, 'region', None) == 'collector'
-            and getattr(h, 'confidence', None) is not None and h.confidence >= MIN_FRACTION_CONFIDENCE
-            and '/' in str(getattr(h, 'text', ''))]
+    """Collector-region reads with a slash (N/T) at confidence 0.80 or more.
+
+    A one-digit total is a truncated read ("4/1" for 4/102), never a printed set total.
+    """
+    from app.recognition.rank import parse_collector
+    out = []
+    for h in numbers or []:
+        if (getattr(h, 'region', None) != 'collector' or getattr(h, 'confidence', None) is None
+                or h.confidence < MIN_FRACTION_CONFIDENCE or '/' not in str(getattr(h, 'text', ''))):
+            continue
+        parts = parse_collector(h.text)
+        if parts and parts.denominator and len(parts.denominator) >= 2:
+            out.append(h)
+    return out
 
 
 def _same_name(a: dict[str, Any], b: dict[str, Any]) -> bool:

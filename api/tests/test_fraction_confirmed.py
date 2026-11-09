@@ -84,3 +84,10 @@ def test_two_different_fractions_with_that_total_are_ambiguous():
 def test_promo_and_non_collector_reads_are_left_alone():
     hits = [OcrHit('060', 0.9, 'holder_name'), OcrHit('015/060', None, 'unknown'), OcrHit('SM60', 0.9, 'collector')]
     assert _texts(guard_fraction_total(hits)) == _texts(hits)
+
+
+def test_truncated_fraction_never_promotes_a_reprint_without_a_total():
+    # Base Set Charizard read as "4/1": the 30th-anniversary reprint (no stored total) must not win.
+    reprint = card('en:30th-c-001', 'Charizard', '001', None, printed_collector_number='4')
+    base = card('en:base1-4', 'Charizard', '4', 102)
+    assert fraction_confirmed_twin([reprint, base], 'en:base1-4', hit('4/1', 0.95)) is None
