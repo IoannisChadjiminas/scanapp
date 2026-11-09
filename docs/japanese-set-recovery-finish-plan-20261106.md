@@ -261,3 +261,40 @@ Steps 4–7 cannot be finished from this session without the owner:
   | Page-only image (eye-checked, sub-180 px), next fixes batch | 22 |
   | Cardmarket product images (Chrome) | 227 |
   | Bulbapedia identity, then Japanese shops (Chrome) | 396 |
+
+## Chrome sitting (deferred; owner's Chrome needed)
+
+Cardmarket product pages, Bulbapedia (Cloudflare 403 to scripts) and the Japanese shop
+catalogues can only be read in the owner's Chrome. Every other phase runs first. Worklists, in
+`data/catalogue-gaps/ja-set-recovery-20261029-v3/phase-b-20261109/`:
+
+| Worklist | Size | What is read | Time at 15 s a page |
+|---|---|---|---|
+| `chrome-cardmarket.json` | 235 product pages: 229 Japanese cards without an image + the 6 English "Yellow A Alternate" | the product image and title, checked against name and number | ~1 h |
+| `chrome-bulbapedia-sets.json` | 72 set/deck pages covering 396 cards | each deck list: the row's identity and official Japanese name | ~20 min |
+| `chrome-shops.json` | 396 cards (after Bulbapedia) | CardRush, Hareruya2, Yuyu-tei, Toretoku, Mandarake: a product photo by set, number and name | ~2–3 h |
+
+**The command.** Tell me "start the Chrome sitting" with Chrome open and signed in to nothing
+special. I drive Claude in Chrome over the three lists in order: one page at a time, read only,
+nothing bought or posted, no cookies beyond what each site needs to show a page. Results go to
+`phase-b-20261109/chrome-*-results.jsonl`.
+
+**Done already:**
+- JAREC7: 104 images;
+- JAREC8: 22 page-only images, and a reason for every card not scannable;
+- this worklist.
+
+**Waits on the sitting:**
+- each image eye-checked on contact sheets;
+- one image batch per source on top of the served release (same scripts as JAREC3/4/7);
+- the replay gate before each switch.
+
+**After it:** listing photos (eBay, Mercari, Snkrdunk) as the last resort, marked photo-sourced.
+Whatever is left ships without an image, with its reason in the coverage queue.
+
+**Not waiting on Chrome:**
+- Phase T (the proof panel, in its own session);
+- Phase C vector releases, once the sealed half exists;
+- Phase D English image upgrades (186 references under 500 px, via `pokemontcg.io` where it has
+  them);
+- the next fixes batch: the `exu` Unown rows are TCGdex duplicates of `ex10-unown-*`.
