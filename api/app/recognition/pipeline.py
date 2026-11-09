@@ -62,6 +62,7 @@ from app.recognition.printing import PRINTING_CHOICES_WIDER_GAP, PrintingDecisio
 from app.recognition.rank import artwork_evidence_compatible, decide_status_with_reason, damaged_footer_named_printing, extract_collector_candidates, fraction_named_printing, rerank
 from app.recognition.rank import name_match, normalize_text
 from app.recognition.fraction_confirmed import fraction_confirmed_twin, guard_fraction_total
+from app.recognition.misread_rules import damage_number_guard, latin_name_twin
 from app.recognition.runtime import Runtime
 from app.recognition.title_retry import read_conflicting_title, title_retry_allowed
 from app.recognition.vintage_name import (GUIDANCE as VINTAGE_NAME_GUIDANCE,
@@ -663,6 +664,8 @@ def _recognize_bytes_once(
         numbers = guard_fraction_total(numbers)
     leader_id = str(snapshot.card_ids[indices[0]]) if len(indices) else None
     leader = _lookup_cards(catalog, [leader_id]).get(leader_id) if leader_id else None
+    if getattr(settings, 'ocr_damage_number_guard', False) and leader is not None:
+        numbers = damage_number_guard(numbers, str(leader['language'] or ''))
     rank_languages = ranking_languages(decision, language_texts,
                                        str(leader['language'] or '') if leader is not None else None)
     name_confidence = max((h.confidence or 0.0 for h in ocr.hits
@@ -682,6 +685,12 @@ def _recognize_bytes_once(
     geometry_ids=metadata_index.geometry_candidates(ocr_name=ocr.name_text,
         name_confidence=name_confidence,numbers=numbers,languages=rank_languages
     ) if metadata_index and not metadata_ids and not title_ids and hasattr(metadata_index,'geometry_candidates') else []
+    latin_twin_id = None
+    if getattr(settings, 'latin_name_twin', False) and metadata_index is not None:
+        latin_twin_id = latin_name_twin(getattr(metadata_index, 'by_name', {}), leader, ocr.name_text,
+                                        fetch=lambda ids: _lookup_cards(catalog, ids))
+        if latin_twin_id and latin_twin_id not in metadata_ids:
+            metadata_ids = [*metadata_ids, latin_twin_id]
     timings['metadata_retrieve_ms'] = (time.perf_counter() - mark) * 1000
     text_ids: list[str] = []
     text_reason = None
@@ -1042,6 +1051,12 @@ def _recognize_bytes_once(
             if (verified_family and not fraction_kept
                     and combined[0]['card_id'] not in {r['card_id'] for r in verified_family}):
                 promote_family(combined, verified_family, family_order)
+    if latin_twin_id and combined and combined[0]['card_id'] != latin_twin_id:
+        twin_row = next((r for r in combined if r['card_id'] == latin_twin_id), None)
+        if twin_row is not None:
+            combined.remove(twin_row)
+            combined.insert(0, twin_row)
+            twin_row['latin_name_twin'] = True
     twin_incumbent = None
     if combined and getattr(settings, 'rank_twin_incumbency', False):
         start = new_release_start(getattr(snapshot, 'retrieval_segments', None), len(snapshot.card_ids),
@@ -1097,6 +1112,10 @@ def _recognize_bytes_once(
         status_reasons.append('family_verified')
     if combined and combined[0].get('fraction_confirmed'):
         status_reasons.append('fraction_confirmed_top')
+    if combined and combined[0].get('latin_name_twin'):
+        status_reasons.append('latin_name_twin')
+        if status == 'matched':
+            status = 'uncertain'
     if twin_incumbent:
         status_reasons.append('twin_incumbent')
     if name_set_aside:

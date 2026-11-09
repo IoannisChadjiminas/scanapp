@@ -146,6 +146,11 @@ class Settings(BaseSettings):
     # Look cards up by a confident promo code (BW53) or a confident bare number, each with a name
     # that agrees, so the right card reaches the shortlist when the picture misses it. Replay first.
     number_led_lookup: bool = False
+    # An unpadded bare 40 on a Japanese card is damage or HP, not the collector number. Replay first.
+    ocr_damage_number_guard: bool = False
+    # A Latin name read on a Japanese visual leader proposes and leads with the one English card of
+    # that name in the same-named set (English Southern Islands Mew). Replay first.
+    latin_name_twin: bool = False
     twin_incumbency_new_segments: int = 1
     # When the printing is already unsure, also offer same-name prints up to 0.08 below the shown
     # card in the list to choose from (e.g. Evolutions 9/108 under Base Set 46/102). The shown card
