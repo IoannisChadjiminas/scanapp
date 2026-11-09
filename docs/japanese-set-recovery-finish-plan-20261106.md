@@ -333,3 +333,20 @@ Whatever is left ships without an image, with its reason in the coverage queue.
 - Shops: Yuyu-tei showed no coverage, so they were dropped. Bulbapedia gives identity only.
   About 421 Japanese cards are left without an image. They go to listing photos as the last
   resort (Phase B step 5), or ship with a reason.
+
+## 2026-11-09: JAREC11 coverage-queue refresh switched on staging
+
+- `pokesingle_completion_20261109_jarec11` / `PS-CATALOGUE-EN-JA-REC11-20261109` on top of JAREC10
+  (`prepare_sql_fixes.py`, no card changes). The queue now has 629 entries:
+  - 596 cards with no image:
+    - 401 Japanese cards, each with what was tried and its next source: an eBay listing photo,
+      marked photo-sourced, or otherwise it ships without an image;
+    - 161 TCG Pocket cards (digital only);
+    - 28 `exu` Unown rows recorded as TCGdex duplicates of their `ex10-unown-*` twin;
+    - 6 Yellow A Alternate prints, waiting on the rate-limited Cardmarket pages.
+  - 20 display-only images.
+  - 10 imaged cards without a vector.
+  - 3 English-printed holds, with their reason.
+  - The 5 Cardmarket rejects carry their rejection reason.
+- Replays against JAREC10 showed 0 changes on every panel. Rollback:
+  `/etc/scanapp-staging/catalogue-rollback/ja-rec11-20261109/catalogue-release.env.before`.
