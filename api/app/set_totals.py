@@ -74,16 +74,53 @@ def refresh_set_totals(
     return stored
 
 
+# Japanese sets sold as two halves: the catalogue keeps one set id per half, TCGdex lists the
+# printed total under its own id. Both halves of every pair print the same total.
+JA_TOTAL_ALIASES = {
+    "BW1-Bb": "BW1a", "BW1-Bw": "BW1b",      # Black / White Collection, /053
+    "BW3-Bh": "BW3a", "BW3-Bp": "BW3a",      # Hail Blizzard / Psycho Drive, /052
+    "BW5-Brn": "BW5a", "BW5-Brz": "BW5b",    # Dragon Blade / Dragon Blast, /050
+    "BW6-Bc": "BW6a", "BW6-Bf": "BW6b",      # Cold Flare / Freeze Bolt, /059
+    "BW8-Brf": "BW8a", "BW8-Brn": "BW8a",    # Spiral Force / Thunder Knuckle, /051
+    "L1HG": "L1a", "L1SS": "L1b",            # HeartGold / SoulSilver Collection, /070
+    "XY1-Bx": "XY1a", "XY1-By": "XY1b",      # Collection X / Y, /060
+    "XY5-Bg": "XY5a", "XY5-Bt": "XY5b",      # Gaia Volcano / Tidal Storm, /070
+    "XY8-Br": "XY8a", "XY8-Bb": "XY8b",      # Red Flash / Blue Shock, /059
+    "XY11-Bb": "XY11a", "XY11-Br": "XY11b",  # Fever-Burst Fighter / Cruel Traitor, /054
+}
+# Totals TCGdex has wrong. Thunderclap Spark prints /060 (its cards 51-60 are commons and
+# uncommons); TCGdex lists 50.
+TOTAL_CORRECTIONS = {("ja", "SM7a"): 60}
+
+
+def _aliases_enabled() -> bool:
+    try:
+        from app.config import get_settings
+        return bool(getattr(get_settings(), "set_total_aliases", False))
+    except Exception:
+        return False
+
+
+def _stored_total(conn: sqlite3.Connection, language: str, set_id: str) -> int | None:
+    row = conn.execute(
+        "SELECT official_total FROM set_totals WHERE language = ? AND set_id = ?", (language, set_id)
+    ).fetchone()
+    return int(row[0]) if row else None
+
+
 def set_total(conn: sqlite3.Connection, language: Any, set_id: Any) -> int | None:
     """Printed total of a set, or None when it is not known. Never raises."""
+    language, set_id = str(language or "en").lower(), str(set_id or "")
+    aliases = _aliases_enabled()
+    if aliases and (language, set_id) in TOTAL_CORRECTIONS:
+        return TOTAL_CORRECTIONS[(language, set_id)]
     try:
-        row = conn.execute(
-            "SELECT official_total FROM set_totals WHERE language = ? AND set_id = ?",
-            (str(language or "en").lower(), str(set_id or "")),
-        ).fetchone()
+        total = _stored_total(conn, language, set_id)
+        if total is None and aliases and language == "ja" and set_id in JA_TOTAL_ALIASES:
+            total = _stored_total(conn, language, JA_TOTAL_ALIASES[set_id])
     except sqlite3.Error:
         return None
-    return int(row[0]) if row else None
+    return total
 
 
 _DATE = re.compile(r"\d{4}-\d{2}-\d{2}")

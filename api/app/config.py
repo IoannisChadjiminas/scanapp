@@ -134,6 +134,9 @@ class Settings(BaseSettings):
     printing_title_family: bool = False
     # The Sun & Moon "TRAINER'S" banner is never a name read. Replay first.
     ocr_trainers_banner: bool = False
+    # Japanese two-half sets whose TCGdex total is stored under another set id (XY1a for
+    # Collection X), and TCGdex totals known to be wrong (SM7a prints /060). Replay first.
+    set_total_aliases: bool = False
     twin_incumbency_new_segments: int = 1
     # When the printing is already unsure, also offer same-name prints up to 0.08 below the shown
     # card in the list to choose from (e.g. Evolutions 9/108 under Base Set 46/102). The shown card
