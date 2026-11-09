@@ -105,6 +105,16 @@ def _compact_latin(text: str) -> str:
     return re.sub(r"[^a-z0-9]+", "", decomposed)
 
 
+def _trainers_banner_enabled() -> bool:
+    # OCR_TRAINERS_BANNER: the Sun & Moon "TRAINER'S" banner is a layout badge, not a card name
+    # (Judge SR SM7a-066 read its name as "TRAINER'S" at 0.99 and ranked Gym Trainer S4a-192 first).
+    try:
+        from app.config import get_settings
+        return bool(getattr(get_settings(), 'ocr_trainers_banner', False))
+    except Exception:
+        return False
+
+
 def _is_layout_badge(line: str) -> bool:
     normalized = unicodedata.normalize('NFKC', line).strip().casefold()
     compact = _compact_latin(line)
@@ -113,6 +123,7 @@ def _is_layout_badge(line: str) -> bool:
     clipped_basic = (abs(len(compact)-len('basicpokemon')) <= 1 and
                      SequenceMatcher(None, compact, 'basicpokemon').ratio() >= .90)
     return bool(compact in {'basic','basicpokemon','stage1','stage2','stage','stag','trainer'}
+                or (compact == 'trainers' and _trainers_banner_enabled())
                 or clipped_basic or normalized in {'たね','トレーナー','トレーナーズ'}
                 or re.fullmatch(r'[12]\s*進化', normalized))
 
@@ -157,7 +168,7 @@ def _pick_name_line(lines: list[str]) -> str | None:
             or re.search(r"(?:\b\d{4}\s+POK[EÉ]MON\b|\bGEM\s*MT\b|\bPSA\b|\bGAME\s*FREAK\b|Nintendo|©|copyright)", text, re.I)
         ):
             continue
-        if compact in NAME_BOILERPLATE:
+        if compact in NAME_BOILERPLATE or (compact == 'trainers' and _trainers_banner_enabled()):
             continue
         if compact in STAGE_ONLY and not _has_cjk(text):
             continue
