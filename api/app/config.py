@@ -137,6 +137,9 @@ class Settings(BaseSettings):
     # Japanese two-half sets whose TCGdex total is stored under another set id (XY1a for
     # Collection X), and TCGdex totals known to be wrong (SM7a prints /060). Replay first.
     set_total_aliases: bool = False
+    # A clean printed fraction keeps its card ahead of a same-name twin that local artwork
+    # verification confirmed (Base Set 88/102 over Base Set 2 116/130). Replay first.
+    rank_fraction_confirmed: bool = False
     twin_incumbency_new_segments: int = 1
     # When the printing is already unsure, also offer same-name prints up to 0.08 below the shown
     # card in the list to choose from (e.g. Evolutions 9/108 under Base Set 46/102). The shown card

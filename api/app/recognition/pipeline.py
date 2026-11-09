@@ -61,6 +61,7 @@ from app.recognition.orientation import retrieve_oriented
 from app.recognition.printing import PRINTING_CHOICES_WIDER_GAP, PrintingDecision, assess_printings
 from app.recognition.rank import artwork_evidence_compatible, decide_status_with_reason, damaged_footer_named_printing, extract_collector_candidates, fraction_named_printing, rerank
 from app.recognition.rank import name_match, normalize_text
+from app.recognition.fraction_confirmed import fraction_confirmed_twin
 from app.recognition.runtime import Runtime
 from app.recognition.title_retry import read_conflicting_title, title_retry_allowed
 from app.recognition.vintage_name import (GUIDANCE as VINTAGE_NAME_GUIDANCE,
@@ -1019,12 +1020,20 @@ def _recognize_bytes_once(
             # candidates instead of using descriptor count as printing proof.
             preferred_ids = {m.card_id for m in eligible or local_matches}
             chosen_id = next(r['card_id'] for r in combined if r['card_id'] in preferred_ids)
+            fraction_kept = None
+            if getattr(settings, 'rank_fraction_confirmed', False):
+                fraction_kept = fraction_confirmed_twin(combined, chosen_id, numbers)
+                if fraction_kept:
+                    chosen_id = fraction_kept
             for item in combined:
                 item["local_artwork_verified"] = item["card_id"] in verified_ids
             combined.sort(key=lambda r: (r["card_id"] == chosen_id,
                                         r["card_id"] in verified_ids), reverse=True)
+            if fraction_kept:
+                combined[0]['fraction_confirmed'] = True
             # A leader already in the family keeps today's order; only another artwork moves.
-            if verified_family and combined[0]['card_id'] not in {r['card_id'] for r in verified_family}:
+            if (verified_family and not fraction_kept
+                    and combined[0]['card_id'] not in {r['card_id'] for r in verified_family}):
                 promote_family(combined, verified_family, family_order)
     twin_incumbent = None
     if combined and getattr(settings, 'rank_twin_incumbency', False):
@@ -1079,6 +1088,8 @@ def _recognize_bytes_once(
         status_reasons.append('local_artwork_used')
     if verified_family:
         status_reasons.append('family_verified')
+    if combined and combined[0].get('fraction_confirmed'):
+        status_reasons.append('fraction_confirmed_top')
     if twin_incumbent:
         status_reasons.append('twin_incumbent')
     if name_set_aside:
