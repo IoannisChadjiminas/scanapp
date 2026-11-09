@@ -350,3 +350,30 @@ Whatever is left ships without an image, with its reason in the coverage queue.
   - The 5 Cardmarket rejects carry their rejection reason.
 - Replays against JAREC10 showed 0 changes on every panel. Rollback:
   `/etc/scanapp-staging/catalogue-rollback/ja-rec11-20261109/catalogue-release.env.before`.
+
+## 2026-11-09: JAREC12 listing-photo batch switched on staging (Phase B step 5)
+
+- `pokesingle_completion_20261109_jarec12` / `PS-CATALOGUE-EN-JA-REC12-20261109` on top of JAREC11.
+  - The 401 Japanese cards still without an image were searched on eBay (Browse API) for up to two
+    main photos each. Numbered cards were matched by name, number and a Japanese marker. Unnumbered
+    cards and the DP4 halves (Dawn Dash, Moonlit Pursuit, which print no set number) were matched by
+    name and set words instead.
+  - Each photo was cropped to its card frame and eye-checked on contact sheets:
+    - 297 candidate photos were checked and 107 accepted;
+    - 105 passed the image gate (Quick Starter Red u05 too small, u15 too blurry).
+  - Rejected:
+    - every 1998–99 gym-deck card, because listings disagree on LV/HP and the deck printing can't be
+      verified;
+    - wrong set or number;
+    - the other half of a deck kit, told apart by the deck mark;
+    - Nidoran of the wrong sex;
+    - watermarked, cut-off and slab-only crops.
+  - All 105 are older era, so they are printing alternatives with no vectors, and scanning is
+    unchanged.
+  - Marked `source_kind=listing_photo` with a photo-sourced permission note. They are stored as local
+    reference images and are never mirrored to the card-image CDN.
+- Features `20261109-ja-recovery-img6` (`96a81264…`), artwork `/data/artwork/20261109-ja-recovery-img6`.
+- Replays against JAREC11 showed 0 changes on every panel. Rollback:
+  `/etc/scanapp-staging/catalogue-rollback/ja-rec12-20261109/catalogue-release.env.before`.
+- After this batch, 296 Japanese cards have no image. Each ships with its reason in the JAREC13
+  coverage queue.
