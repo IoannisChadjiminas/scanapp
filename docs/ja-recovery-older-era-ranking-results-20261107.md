@@ -518,3 +518,44 @@ bound (2.9%) is under 3%, but wrong first (1.5%) is above the 1% bar, so the can
 is not merged and not switched on. Set totals do not explain the sealed gap: staging is 2.6% with
 them, the same as run 1 without them. The largest cell left is English unnumbered vintage (3), which
 none of the fixes touches.
+
+## Owner decision and switch, 2026-11-09 20:04Z
+
+**Decision (owner).** Ship the candidate. It beats staging in every cell, is worse in none, and has
+no right → wrong changes. 1.5% wrong first is accepted for this release.
+
+**Spot check first.** Before shipping, 30 random sealed photos (seed `sealed-spotcheck-20261109`)
+were shown with their labels and references, and no scan results. The owner and Claude both found
+all 30 labels correct, so no relabel or rerun was needed.
+
+**New per-release gate** (replaces the 1% bar as a release gate):
+- zero right → wrong;
+- no cell lower than staging;
+- wrong-first upper bound under 3%.
+
+The 1% wrong-first bar is unchanged as the **Phase E completion criterion**.
+
+**Sealed-panel rules, amended:**
+- one sealed run per candidate;
+- at most three sealed runs on a panel in total, then refresh the sealed half with new photos before
+  any further run;
+- before the final Phase E run, grow the sealed half to about 1,000 photos so that 1% can be
+  measured.
+
+**Shipped:**
+- PRs 109, 110, 112, 113 and 114 merged; main is at `2b0c103` and passes the API suite (1,296;
+  the one failure is the existing webp test).
+- Staging auto-deployed `2b0c103`. The release env then turned on `RANK_UNMATCHED_NAME`,
+  `PRINTING_TITLE_FAMILY`, `OCR_TRAINERS_BANNER` and `SET_TOTAL_ALIASES`, on JAREC13.
+- Live check:
+  - the flags resolve on;
+  - `set_total` on staging's database gives XY1-By 60, XY8-Bb 59, SM7a 60;
+  - health ok, no restarts, no OOM kills.
+- Rollback: `/etc/scanapp-staging/catalogue-rollback/flags14-20261109/catalogue-release.env.before`,
+  archived to `data/catalogue-completion/20261004-01/rollback-archive/flags14-20261109/`.
+- Logged as `scanner-flags14-switched` in `data/catalogue-completion/20261004-01/events.jsonl`.
+
+**Next:**
+1. Retire the 8 wrong-first sealed photos into the development half and inspect each.
+2. Collect replacements, plus 50 more English unnumbered vintage photos for the sealed half.
+3. Build the number-led lookup (M Blastoise) and whatever the English vintage misses show.
