@@ -16,6 +16,9 @@ scan index since JAREC2 get pad vectors and two artwork regions, on top of the s
   The release rule applies as before: a card whose pad cosine to an indexed Japanese card, or to
   another card added here, is >= 0.95 stays a printing alternative.
 
+ALL_ERAS_PACKAGE and JAREC2_PACKAGE may both be "-" (Phase C): the served package already holds the
+first release's vectors, so only the later batches' older-era cards are added.
+
 With HOLD_FILE set (a JSON list of {"id", "reason"}, step 5a), those cards keep no vectors and stay
 printing alternatives with that reason.
 
@@ -68,26 +71,31 @@ def main(run_dir, served_dir, all_eras_dir, jarec2_dir, model_path, name, *batch
     out.mkdir(exist_ok=False)
     cards = {c["id"]: c for c in json.loads((run / "cards.json").read_text())}
     pman, p_ids, p_pad, aman, p_art, p_recs = load_package(Path(served_dir).resolve())
-    _, a_ids, a_pad, _, a_art, a_recs = load_package(Path(all_eras_dir).resolve())
-    j2_ids = set(np.load(Path(jarec2_dir).resolve() / "vectors/pad/embedding_card_ids.npy").astype(str))
     served = set(p_ids)
+    if all_eras_dir == "-":
+        a_ids, a_pad, a_art, a_recs, j2_ids = np.asarray([], dtype=str), np.zeros((0, 384), np.float32), np.zeros((0, 384), np.float32), [], set()
+    else:
+        _, a_ids, a_pad, _, a_art, a_recs = load_package(Path(all_eras_dir).resolve())
+        j2_ids = set(np.load(Path(jarec2_dir).resolve() / "vectors/pad/embedding_card_ids.npy").astype(str))
 
     # held cards from the first release: vectors exactly as replayed
     hold = {h["id"]: h["reason"] for h in json.loads(Path(os.environ["HOLD_FILE"]).read_text())} if os.environ.get("HOLD_FILE") else {}
     held_all = [cid for cid in a_ids if cid not in j2_ids]
-    assert held_all and all(c.startswith("ja:") for c in held_all) and not set(held_all) & served
+    assert (held_all or all_eras_dir == "-") and all(c.startswith("ja:") for c in held_all) and not set(held_all) & served
     held_a = [cid for cid in held_all if cid not in hold]
     a_pos = {cid: i for i, cid in enumerate(a_ids)}
     pads = {cid: a_pad[a_pos[cid]].astype(np.float32) for cid in held_a}
     held_a_set = set(held_a)
     arts = [(r, a_art[i].astype(np.float32)) for i, r in enumerate(a_recs) if r["card_id"] in held_a_set]
     assert {r["card_id"] for r, _ in arts} == held_a_set and len(arts) == 2 * len(held_a)
+    a_recs = a_recs or []
     held = [{"id": cid, "source": "all-eras package (replayed)", "nearest_indexed": None} for cid in held_a]
 
     # held cards from later image batches: new vectors, same rule as every wave
     model = DinoEmbedder(model_path, 4, 1)
     index_ids = [c for c in p_ids if c.startswith("ja:")] + held_a
-    index = np.concatenate([p_pad[[i for i, c in enumerate(p_ids) if c.startswith("ja:")]], np.asarray([pads[c] for c in held_a])])
+    index = np.concatenate([p_pad[[i for i, c in enumerate(p_ids) if c.startswith("ja:")]],
+                            np.asarray([pads[c] for c in held_a], np.float32).reshape(-1, p_pad.shape[1])])
     batch = []
     for bdir in batch_dirs:
         bdir = Path(bdir).resolve()
