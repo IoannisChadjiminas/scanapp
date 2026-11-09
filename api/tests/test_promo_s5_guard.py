@@ -30,10 +30,16 @@ def test_real_fractions_stay(guard_on):
     assert numbers(["025/048"]) == ["025/048"]
 
 
-def test_flag_off_keeps_todays_reading():
+@pytest.fixture
+def flag_off(monkeypatch):
+    settings = rank.get_settings().model_copy(update={"ocr_promo_s5_guard": False})
+    monkeypatch.setattr(rank, "get_settings", lambda: settings)
+
+
+def test_flag_off_keeps_todays_reading(flag_off):
     assert "5V" in numbers(["235/5V-P"])
 
 
-def test_flag_is_off_by_default():
+def test_flag_is_on_by_default():
     from app.config import Settings
-    assert Settings().ocr_promo_s5_guard is False
+    assert Settings().ocr_promo_s5_guard is True

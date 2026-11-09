@@ -40,6 +40,6 @@ def test_negative_a_served_leader_or_another_language_is_left_alone():
     assert incumbent_first(other_language, pos, emb, 2, ()) is None
 
 
-def test_flag_is_off_by_default():
+def test_flag_is_on_by_default():
     from app.config import Settings
-    assert Settings().rank_twin_incumbency is False
+    assert Settings().rank_twin_incumbency is True

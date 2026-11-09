@@ -35,10 +35,16 @@ def test_neo1_072_footer_yields_no_collector(guards_on):
     assert numbers(["ルギア", "HP90", "规力-30", "No.249", "ダメージ-30"]) == []
 
 
-def test_flag_off_keeps_todays_reading():
+@pytest.fixture
+def flag_off(monkeypatch):
+    settings = rank.get_settings().model_copy(update={"ocr_cjk_minus_guard": False})
+    monkeypatch.setattr(rank, "get_settings", lambda: settings)
+
+
+def test_flag_off_keeps_todays_reading(flag_off):
     assert "30" in numbers(["ダメージ-30"])
 
 
-def test_flag_is_off_by_default():
+def test_flag_is_on_by_default():
     from app.config import Settings
-    assert Settings().ocr_cjk_minus_guard is False
+    assert Settings().ocr_cjk_minus_guard is True

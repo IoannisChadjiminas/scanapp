@@ -54,7 +54,9 @@ def test_verdict_needs_both_sides():
     assert species_verdict(LUGIA_READ, LUGIA) is None  # Japanese-named rows keep today's rule
 
 
-def test_flag_off_keeps_the_new_row_first():
+def test_flag_off_keeps_the_new_row_first(monkeypatch):
+    settings = rank.get_settings().model_copy(update={"rank_species_names": False})
+    monkeypatch.setattr(rank, "get_settings", lambda: settings)
     ranked = rerank([HO_OH, LUGIA], LUGIA_READ, NUMBERS, False, detected_languages=("ja",),
                     name_confidence=.99, require_confident_ocr=True)
     assert ranked[0]["card_id"] == HO_OH["card_id"]
@@ -72,6 +74,6 @@ def test_species_names_put_lugia_first_and_rule_out_ho_oh(species_on):
                                        numbers=[], languages=("ja",))
 
 
-def test_flag_is_off_by_default():
+def test_flag_is_on_by_default():
     from app.config import Settings
-    assert Settings().rank_species_names is False
+    assert Settings().rank_species_names is True
