@@ -298,3 +298,20 @@ Whatever is left ships without an image, with its reason in the coverage queue.
 - Phase D English image upgrades (186 references under 500 px, via `pokemontcg.io` where it has
   them);
 - the next fixes batch: the `exu` Unown rows are TCGdex duplicates of `ex10-unown-*`.
+
+## 2026-11-09: JAREC8 fixes batch switched on staging
+
+- `pokesingle_completion_20261109_jarec8` / `PS-CATALOGUE-EN-JA-REC8-20261109` on top of JAREC7
+  (`prepare_sql_fixes.py`).
+  - 22 eye-checked TCG Collector images under 180 px are page-only (`remote_image_url`,
+    `has_image` 0): no features and no vectors.
+  - The import manifest's `coverage_queue` records the reason for all 850 cards that are neither
+    scannable nor a printing alternative:
+    - 623 Japanese cards with no image, each with its next source;
+    - 22 display-only;
+    - 161 TCG Pocket (digital only);
+    - 34 English physical cards;
+    - 10 imaged cards without a vector.
+- Replays against JAREC7: 0 changes on every panel. Check: `ja:DPP-033` returns its page-only
+  image.
+- Rollback: `/etc/scanapp-staging/catalogue-rollback/ja-rec8-20261109/catalogue-release.env.before`.
