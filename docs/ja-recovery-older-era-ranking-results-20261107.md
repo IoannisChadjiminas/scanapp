@@ -433,3 +433,34 @@ run is not spent.
 2. A twin-held original (no vector) is not offered when its number is read but truncated (Umbreon V
    `S6a-047` behind `S8b-100`; probably Pikachu `DPP-048`). Next fix.
 3. Two hard photos: a slab with no name read, and a name strip that read "LV.24".
+
+## Second scanner fix: PRINTING_TITLE_FAMILY (PR 112), 2026-11-09
+
+**Cause.** Umbreon V `S6a-047` (development photo `dev-ja-modern-009`, footer read "047/06") is a
+vectorless same-art twin of ブラッキーV `S8b-100`, but it is named "Umbreon V". The printing
+review matched by exact name, so the twin was never offered. Pikachu `DPP-048` is not this case: it
+has its own vector, different artwork, and loses on the picture. It stays a hard photo.
+
+**Fix (flag, off).** The printing family also gathers same-language rows that share the English
+title, still gated by the artwork correlation. Members found only by title are offered and never
+choose the card shown first. Coverage is judged on the same-name group.
+
+**Replays on JAREC8 + seven flags + `RANK_UNMATCHED_NAME`:**
+- Development half: wrong first 4 → 3 (0.6% → 0.4%), right first 625 unchanged, 0 right → wrong.
+- Main panel (98): 0 changes.
+- Uploads:
+  - 9 wrong → right card offered;
+  - 2 right first with a printing choice added;
+  - 1 wrong → wrong (logged).
+- Vintage: 3 right first with a printing choice added.
+- The first build showed two disallowed changes (CLL-003 displacing M6a-137; PMCG3-009 matched →
+  uncertain). Both were traced, fixed and re-traced.
+
+**Sealed run held.** Sealed run 1 (staging) was 2.6% wrong first [1.6, 4.3]. The development half is
+now 0.4%, with 3 wrong answers left: two hard photos and DPP-048. The two fixes together remove 2 of
+the development half's 5 wrong answers. Nothing on the development half points at the rest of the
+sealed failures, so a sealed run now would fail the ≤1% bar and only spend the sealed half's
+information. The next step is to learn the remaining causes without opening the sealed half:
+collect a second development set in the three worst sealed cells (modern Japanese, English vintage,
+Japanese promos), with labels eye-checked the same way. Then fix what it shows, and spend one sealed
+run on the combined candidate.
