@@ -109,6 +109,22 @@ def scan_language_members(members: list[dict], languages: Iterable[str], leader_
     return [r for r in members if str(r.get("language") or "") in allowed] if allowed else list(members)
 
 
+def verify_shared(verifier, image, references, limit=None, prepared=None):
+    """Call verifier.verify, passing the limit and the photo's shared query features only to a
+    verifier that takes them (the local verifier does; simpler verifiers check what they get)."""
+    import inspect
+    try:
+        params = inspect.signature(verifier.verify).parameters
+    except (TypeError, ValueError):
+        params = {}
+    kwargs = {}
+    if limit is not None and "limit" in params:
+        kwargs["limit"] = limit
+    if prepared is not None and "prepared" in params:
+        kwargs["prepared"] = prepared
+    return verifier.verify(image, references, **kwargs)
+
+
 def verify_families(verifier, image, candidates: list[dict], cards: dict, vector: Lookup,
                     thumbnail: Lookup, limit: int, prepared: dict | None = None):
     """Check one reference per family. Returns (decided family or None, its matches, diagnostics).
@@ -123,7 +139,7 @@ def verify_families(verifier, image, candidates: list[dict], cards: dict, vector
             if card is not None and card["image_path"]:
                 references.append((row["card_id"], str(card["image_path"])))
                 break
-    found = verifier.verify(image, references, len(references), prepared=prepared) if references else []
+    found = verify_shared(verifier, image, references, len(references), prepared) if references else []
     inliers = {m.card_id: m.artwork_inliers for m in found}
     families = merge_verified(families, inliers)
     lead = decisive_family(families, inliers)
