@@ -641,3 +641,34 @@ and the Dawn Dash / Moonlit Pursuit reprints.
 | SQL sha256 | `a465199e…` |
 
 The SQL is applied as an inactive candidate. Its gate replay is running.
+
+## JAREC15 on staging, 2026-11-10
+
+Staging switched to `pokesingle_completion_20261110_jarec15` (artwork `20261110-ja-recovery-vec15`) at
+about 04:07Z, code unchanged (main `71302d0`), same 11 flags. Health ok, 0 restarts. Rollback files:
+`/etc/scanapp-staging/catalogue-rollback/jarec15-20261110` (archived locally); rollback is
+`staging_switch_jarec15.sh rollback`.
+
+Gate, replayed against staging JAREC13 with the same code and flags:
+
+| Set | Photos | Changes | Right first | Wrong first |
+|---|---|---|---|---|
+| Main panel | 98 | 0 | same | same |
+| Uploads | 203 | 0 | same | same |
+| Vintage | 135 | 0 | same | same |
+| Dev | 673 | 59 | 92.7% → 93.3% | 5 → 3 |
+| Dev 2 | 238 | 12 | 93.7% → 94.5% | 3 → 1 |
+
+No right → wrong. Every change was wrong → right, uncertain → matched on the right card, a same-art
+printing choice, or wrong → wrong. The 8 wrong → wrong (logged): dev-ja-modern-019, -vintage-054,
+-vintage-075, -modern-020, -vintage-043, -modern-009, dev2-ja-modern-004, -modern-038. Most now list
+the right card as a same-art printing.
+
+### Five-flag candidate: Emolga regression found and fixed
+
+On the dev set the candidate moved `dev-ja-promo-044` (slabbed Emolga BW-P 236) from right first to
+PokéPark's Pikachu 004 first. Not covered by the change table, so never accepted. Bisect:
+`OCR_DAMAGE_NUMBER_GUARD`. The footer read "60" and "4"; dropping "60" as damage left "4", which named
+Pikachu 004. Fix (`e4b9b27`, PR 116): damage-shaped reads are dropped only when they are the footer's
+only bare numbers. Emolga is right first again; the 8 retired photos are unchanged (Hitmonchan still
+fixed). The candidate is re-gated on every set against staging JAREC15.
