@@ -672,3 +672,35 @@ PokéPark's Pikachu 004 first. Not covered by the change table, so never accepte
 Pikachu 004. Fix (`e4b9b27`, PR 116): damage-shaped reads are dropped only when they are the footer's
 only bare numbers. Emolga is right first again; the 8 retired photos are unchanged (Hitmonchan still
 fixed). The candidate is re-gated on every set against staging JAREC15.
+
+## Sealed run 4 and the five-flag staging switch, 2026-11-10
+
+**Candidate re-gate** (JAREC15 + 16 flags on `e4b9b27`, against staging JAREC15 + 11 flags):
+- Gate panels (98 + 203 + 135): 8 changes, all accepted.
+- Development set, 673 photos: right first 93.3% → 93.5%, wrong first 3 → 3, no cell lower.
+- Development set 2, 238 photos: right first 94.5% → 97.5%, wrong first 1 → 0.
+- Across both development sets, 33 changes: 25 uncertain → matched on the right card, 8 uncertain
+  photos now lead with the right card instead of a wrong one. 0 right → wrong.
+
+**Sealed run 4** (the last run on the 585 composition; staging and candidate each ran once):
+
+| Part | Photos | Right first, staging | Right first, candidate | Wrong first (95% upper bound) |
+|---|---|---|---|---|
+| Carried over | 527 | 508 (96.4% [94.4, 97.7]) | 509 (96.6% [94.7, 97.8]) | 0 → 0 (0.7%) |
+| Never run | 58 | 55 (94.8% [85.9, 98.2]) | 55 (94.8% [85.9, 98.2]) | 0 → 0 (6.2%) |
+| All | 585 | 563 (96.2% [94.4, 97.5]) | 564 (96.4% [94.6, 97.6]) | 0 → 0 (0.7%) |
+
+- 13 changes, all accepted: 12 uncertain → matched on the right card (modern JA), 1 uncertain photo
+  now leading with the right card. 0 right → wrong; no cell lower than staging. **Gate passed.**
+- Carried vs new: 96.6% vs 94.8%, intervals overlap. Not a clear tuning signal; 53 of the 58 new
+  photos are unnumbered vintage EN, so the new part is not a like-for-like sample.
+
+**Shipped:**
+- PR 116 merged (`2ff2597`) after merging main (shipped-flag defaults); API suite: same 7 existing
+  failures as main, 30 more tests passing.
+- Staging auto-deployed `2ff2597`; the release env then turned on `RANK_FRACTION_CONFIRMED`,
+  `OCR_FRACTION_TOTAL_GUARD`, `NUMBER_LED_LOOKUP`, `OCR_DAMAGE_NUMBER_GUARD` and `LATIN_NAME_TWIN`.
+  Health ok, 0 restarts, no OOM kill, 16 flags resolve on.
+- Rollback: `/etc/scanapp-staging/catalogue-rollback/flags16-20261110/catalogue-release.env.before`,
+  archived to `data/catalogue-completion/20261004-01/rollback-archive/flags16-20261110/`.
+- Logged as `scanner-flags16-switched` in `data/catalogue-completion/20261004-01/events.jsonl`.
