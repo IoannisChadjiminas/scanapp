@@ -618,7 +618,7 @@ and the Dawn Dash / Moonlit Pursuit reprints.
 - Every vectored card was checked by eye against:
   - its nearest indexed card (cosine ≥ 0.80);
   - every indexed card with the same name (cosine ≥ 0.70, up to three per card).
-- Total: 488 pairs, 11 of them using staging's reference images.
+- Total: 484 pairs (144 + 57 nearest-card pairs, 272 same-name pairs, 11 using staging's reference images).
 - 145 cards share artwork with an indexed card. Two Nidoran♀ prints twin only each other: one keeps
   vectors.
 - Holding those freed 29 more cards that had been alternatives only through a held batch twin. All
