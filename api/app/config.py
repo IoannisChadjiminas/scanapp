@@ -138,20 +138,20 @@ class Settings(BaseSettings):
     # Collection X), and TCGdex totals known to be wrong (SM7a prints /060). Replay first.
     set_total_aliases: bool = True
     # A clean printed fraction keeps its card ahead of a same-name twin that local artwork
-    # verification confirmed (Base Set 88/102 over Base Set 2 116/130). Replay first.
-    rank_fraction_confirmed: bool = False
+    # verification confirmed (Base Set 88/102 over Base Set 2 116/130). On in staging since 2026-11-10.
+    rank_fraction_confirmed: bool = True
     # A bare footer number equal to the total of a fraction read on the card (070 beside 074/070)
-    # is that total, not the card number. Replay first.
-    ocr_fraction_total_guard: bool = False
+    # is that total, not the card number. On in staging since 2026-11-10.
+    ocr_fraction_total_guard: bool = True
     # Look cards up by a confident promo code (BW53) or a confident bare number, each with a name
-    # that agrees, so the right card reaches the shortlist when the picture misses it. Replay first.
-    number_led_lookup: bool = False
+    # that agrees, so the right card reaches the shortlist when the picture misses it. On in staging since 2026-11-10.
+    number_led_lookup: bool = True
     # On a Japanese card, unpadded bare 40-style reads are damage or HP, not the collector number,
-    # but only when they are the only bare footer reads. Replay first.
-    ocr_damage_number_guard: bool = False
+    # but only when they are the only bare footer reads. On in staging since 2026-11-10.
+    ocr_damage_number_guard: bool = True
     # A Latin name read on a Japanese visual leader proposes and leads with the one English card of
-    # that name in the same-named set (English Southern Islands Mew). Replay first.
-    latin_name_twin: bool = False
+    # that name in the same-named set (English Southern Islands Mew). On in staging since 2026-11-10.
+    latin_name_twin: bool = True
     twin_incumbency_new_segments: int = 1
     # When the printing is already unsure, also offer same-name prints up to 0.08 below the shown
     # card in the list to choose from (e.g. Evolutions 9/108 under Base Set 46/102). The shown card
