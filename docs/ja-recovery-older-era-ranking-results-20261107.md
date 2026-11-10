@@ -593,3 +593,51 @@ This is the number-led lookup.
 
 Also seen: a `base1-88` row without a language prefix appears next to `en:base1-88` in the
 shortlist. To check.
+
+## Phase C correction: JAREC14 failed the twin rule, rebuilt as JAREC15, 2026-11-10
+
+**Owner's correction.** Every newly imaged card gets vectors through the JAREC6b gates, and stays a
+printing alternative only when its artwork is already indexed. So every card that Phase B imaged and
+held back by era was checked again.
+
+**JAREC14 (first build).**
+- 383 held cards: 312 got vectors and 71 stayed alternatives under the existing rule (pad cosine ≥ 0.95
+  to an indexed card).
+- Gate replay against staging (same flags): 0 changes on the main panel (98) and uploads (203).
+- Vintage (135, run as 95 + the 40 a stopped container missed): **one change the table does not
+  cover.** A Neo Genesis Feraligatr photo (label checked by eye) went from matched to
+  `printing_ambiguous`, still first, grouped with two HP 120 Feraligatr cards with different artwork.
+  Treated as never accepted.
+
+**Cause.** The new intro-pack Feraligatr (u05) shares its artwork with an indexed premium-file card at
+pad cosine 0.922, under the 0.95 cut, so it got vectors. A cosine cut cannot decide "artwork already
+indexed": same-art reprints sit as low as 0.80, mostly Energy and Trainer cards reused across deck kits
+and the Dawn Dash / Moonlit Pursuit reprints.
+
+**Fix: the twin rule decided by eye.**
+- Every vectored card was checked by eye against:
+  - its nearest indexed card (cosine ≥ 0.80);
+  - every indexed card with the same name (cosine ≥ 0.70, up to three per card).
+- Total: 488 pairs, 11 of them using staging's reference images.
+- 145 cards share artwork with an indexed card. Two Nidoran♀ prints twin only each other: one keeps
+  vectors.
+- Holding those freed 29 more cards that had been alternatives only through a held batch twin. All
+  were checked by eye and are the same art.
+- Result: a hold list of 174 cards, `docs/ja-recovery-jarec15-twin-holds-20261110.json`, used through
+  `HOLD_FILE`.
+
+**JAREC15.**
+
+| | |
+|---|---|
+| Schema | `pokesingle_completion_20261110_jarec15` |
+| Import | `PS-CATALOGUE-EN-JA-REC15-20261110` |
+| Cards that get vectors | 168 |
+| Pad vectors | 51,431 |
+| New artwork rows | 336 |
+| Printing alternatives left | 3,970 |
+| Feature manifest | img6 (`96a81264…`) |
+| Artwork bundle | `20261110-ja-recovery-vec15` (hashes match on staging) |
+| SQL sha256 | `a465199e…` |
+
+The SQL is applied as an inactive candidate. Its gate replay is running.
