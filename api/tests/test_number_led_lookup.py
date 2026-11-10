@@ -63,3 +63,17 @@ def test_two_bare_numbers_that_both_name_cards_are_ambiguous():
     numbers = [OcrHit('002', 0.9999, 'collector'), OcrHit('048', 0.9998, 'collector')]
     assert INDEX.bare_number_candidates(ocr_name='ピカチュウ', name_confidence=0.94, numbers=numbers,
                                         languages=('ja',)) == []
+
+
+def test_bare_number_never_displaces_title_candidates():
+    # Base Set Charizard: its "100" damage read as a bare footer number named three other
+    # Charizards numbered 100. The title lookup's cards (with Base Set #4) must stay.
+    from app.recognition.metadata import bare_number_fallback
+    title = ["base1-4", "en:base4-4"]
+    assert bare_number_fallback(["en:ex15-100", "en:ex3-100", "en:xy2-100"], title) == title
+
+
+def test_bare_number_is_used_when_the_title_lookup_is_empty():
+    from app.recognition.metadata import bare_number_fallback
+    assert bare_number_fallback(["en:dpp-DP48"], []) == ["en:dpp-DP48"]
+    assert bare_number_fallback([], []) == []

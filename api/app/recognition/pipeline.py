@@ -41,6 +41,7 @@ from app.recognition.images import apply_crop, blur_variance, decode_image
 from app.recognition.embed import top_k
 from app.recognition.family_verify import promote_family, scan_language_members, verify_families, verify_shared
 from app.recognition.twin_incumbency import incumbent_first, new_release_start
+from app.recognition.metadata import bare_number_fallback
 from app.recognition.name_evidence import verification_name
 from app.recognition.identity import layout_identity_agrees, likely_identity_agrees, structured_identity_agrees
 from app.recognition.confidence import confidence_payload
@@ -676,8 +677,11 @@ def _recognize_bytes_once(
     metadata_ids = metadata_index.candidates(ocr_name=ocr.name_text,
         name_confidence=name_confidence, numbers=numbers, languages=rank_languages,
         **({'promo_codes': True} if number_led else {})) if metadata_index else []
+    # A bare number is weak evidence (attack damage and HP are bare numbers too): its
+    # candidates are title-level evidence and are used only when the title lookup is empty.
+    bare_ids: list[str] = []
     if number_led and metadata_index and not metadata_ids and hasattr(metadata_index, 'bare_number_candidates'):
-        metadata_ids = metadata_index.bare_number_candidates(ocr_name=ocr.name_text,
+        bare_ids = metadata_index.bare_number_candidates(ocr_name=ocr.name_text,
             name_confidence=name_confidence, numbers=numbers, languages=rank_languages)
     title_ids = metadata_index.title_candidates(ocr_name=ocr.name_text,
         name_confidence=name_confidence, numbers=numbers, languages=rank_languages
@@ -685,6 +689,7 @@ def _recognize_bytes_once(
     geometry_ids=metadata_index.geometry_candidates(ocr_name=ocr.name_text,
         name_confidence=name_confidence,numbers=numbers,languages=rank_languages
     ) if metadata_index and not metadata_ids and not title_ids and hasattr(metadata_index,'geometry_candidates') else []
+    title_ids = bare_number_fallback(bare_ids, title_ids)
     latin_twin_id = None
     if getattr(settings, 'latin_name_twin', False) and metadata_index is not None:
         latin_twin_id = latin_name_twin(getattr(metadata_index, 'by_name', {}), leader, ocr.name_text,

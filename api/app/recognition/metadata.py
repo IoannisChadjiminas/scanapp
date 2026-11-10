@@ -136,3 +136,12 @@ class MetadataCandidateIndex:
         if len(families) != 1 or len(families[0]) > limit:
             return []
         return sorted(families[0])
+
+def bare_number_fallback(bare_ids: list[str], title_ids: list[str]) -> list[str]:
+    """Title candidates once a bare-number lookup has run (NUMBER_LED_LOOKUP).
+
+    A bare footer number is weak evidence: attack damage and HP are bare numbers too. Its cards are
+    used only when the name alone finds nothing; they never displace the cards the title lookup
+    offers (Base Set Charizard's "100" damage named three other Charizards numbered 100).
+    """
+    return list(title_ids) if title_ids else list(bare_ids)
