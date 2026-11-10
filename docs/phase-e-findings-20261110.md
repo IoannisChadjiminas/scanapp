@@ -9,10 +9,13 @@ production.
 - **Catalogue:** JAREC15 is the final catalogue. 99.2% of English and 98.9% of Japanese cards have an
   image; the rest are display-only.
 - **Scanner:** all 16 scanner flags are on in staging and are the code defaults (PRs 115, 116, 117).
-- **Final sealed run (972 photos):** 93.8% right card first, **1.5% wrong card first**. The 1%
-  wrong-first bar (the Phase E completion criterion) is **not met**. All 15 wrong-first photos are in
-  the 486 photos that had never been run before.
-- **Per-release gate:** passed (upper bound on wrong-first 2.5%, under 3%; no right → wrong).
+- **Final sealed run (972 photos), corrected score:** 95.3% right card first, **0.2% wrong card
+  first** (2 photos; upper bound 0.7%). On the 486 never-run photos alone: 0.4% (upper bound 1.5%).
+  The 1% wrong-first bar is **met on the corrected score**.
+- **Correction:** the first version of this document reported 15 wrong-first (1.5%). After the
+  photos were opened, 13 of those 15 turned out to be **my labelling mistakes**: the scanner had
+  returned the card that is actually in the photo. See section 2.
+- **Per-release gate:** passed (upper bound on wrong-first 0.7%, under 3%; no right → wrong).
 - **Production:** not provisioned. The production host has no ScanApp service, credentials,
   release file or data volume, so the switch cannot yet be a single command.
 
@@ -52,34 +55,71 @@ production.
 Setup: JAREC15 + 16 flags, main `fb7316c`, 972 photos (486 never run, 486 run in earlier rounds).
 Logged in `sealed/runs.log` before any result was read. The photos were not looked at.
 
+### As first reported (before the labels were checked)
+
+912 right first (93.8%), 15 wrong first (1.5%), all 15 in the never-run half (3.1% there).
+
+### What the 15 were
+
+After the run the half was retired to the development set, so the photos could be opened. All 60
+photos that were not right-first were checked against the photo itself (number, set mark, slab
+label):
+
+- **13 of the 15 wrong-first were label mistakes.** The scanner returned the card in the photo; the
+  label was wrong. Examples: a card reading 16/64 with the Jungle mark labelled as Base Set 2; POP
+  Series 5 cards labelled POP Series 1; Japanese secret rares 070/066 and 070/069 labelled as
+  number 009; four old Japanese promos labelled with the Pokédex number ("No. 150", PSA "#025")
+  instead of the promo.
+- **2 are real scanner errors**, both Modern JA: Blastoise EX XY1 014/060 returned as the stamped
+  promo of the same art (status uncertain), and Meloetta SM10a 027/054 returned as an unrelated
+  promo.
+- 2 more labels were wrong among the other rows (one offered, one retake); they do not change the
+  wrong-first count.
+
+**Cause (mine):** labels come from eBay listing titles. The title parser read some numbers wrongly,
+and my eye check of the 486 new labels passed them. The next sealed set uses a stricter check: the
+number strip and set mark are read at full size for every photo, and a promo number is never taken
+from a dex number.
+
+**How far to trust the correction:** it was made after the results were read, and only the misses
+were all checked. As a balance, 48 right-first never-run photos were drawn at random (6 per cell)
+and checked the same way: 48 of 48 labels were right. Labels and scanner are independent (titles
+versus image), so a wrong label on a right-first photo would need both to make the same mistake.
+The corrections are recorded in `sealed/runs.log`.
+
+### Corrected score
+
 | Part | Photos | Right card first (95% interval) | Wrong card first (95% interval) |
 |---|---|---|---|
-| Never run before | 486 | 91.4% [88.5, 93.5] | 15, 3.1% [1.9, 5.0] |
+| Never run before | 486 | 94.2% [91.8, 96.0] | 2, 0.4% [0.1, 1.5] |
 | Run in earlier rounds | 486 | 96.3% [94.2, 97.6] | 0, 0.0% [0, 0.8] |
-| **All** | **972** | **93.8% [92.1, 95.2]** | **15, 1.5% [0.9, 2.5]** |
+| **All** | **972** | **95.3% [93.7, 96.4]** | **2, 0.2% [0.1, 0.7]** |
 
 Per cell, all 972:
 
 | Cell | Photos | Right card first | Wrong card first |
 |---|---|---|---|
 | Modern EN | 141 | 97.2% | 0 |
-| Modern JA | 117 | 84.6% | 4 (3.4%) |
-| Numbered older EN | 135 | 98.5% | 1 (0.7%) |
+| Modern JA | 117 | 86.3% | 2 (1.7%) |
+| Numbered older EN | 135 | 99.3% | 0 |
 | Numbered older JA | 126 | 98.4% | 0 |
-| Promo EN | 137 | 92.7% | 5 (3.6%) |
-| Promo JA | 121 | 90.9% | 4 (3.3%) |
-| Unnumbered vintage EN | 100 | 96.0% | 1 (1.0%) |
+| Promo EN | 137 | 96.4% | 0 |
+| Promo JA | 121 | 95.0% | 0 |
+| Unnumbered vintage EN | 100 | 97.0% | 0 |
 | Unnumbered vintage JA | 95 | 90.5% | 0 |
 
-On the never-run photos alone, Modern JA is 78.8% right first and Promo JA 84.6%.
+**The 1% bar:** 2 wrong-first out of 972 is 0.2%, upper bound 0.7%. On the never-run half alone it
+is 0.4%, upper bound 1.5% (486 photos are too few to put the upper bound under 1%).
 
-**The 1% bar:** 15 wrong-first out of 972 is 1.5%. Bringing the measured rate under 1% needs 9 or
-fewer, so the shortfall is 6 photos. An upper bound under 1% would need 3 or fewer.
+**Weakest cell:** Modern JA, 81.8% right first on never-run photos. Of its 12 other misses, 9 show
+the same thing: the number and set mark are legible, the right card is offered, but a reprint with
+the same art is listed first. That is a printing-order problem, not a wrong card, and it is what
+the tuning round is working on. Unnumbered vintage JA (84.6% on 26 never-run photos) is the known
+vending / quick-starter same-art choice.
 
-**Tuning signal:** every error is in the never-run half. The photos run before have been through
-four sealed runs, and work was tuned against what those runs showed. Expect about 3% wrong-first on
-real users' photos, not the 0% the reused photos suggest. Earlier sealed results overstated
-accuracy for the same reason.
+**Tuning signal:** the never-run half is 2 points lower on right-first than the reused half
+(94.2% against 96.3%). The reused photos still flatter the scanner a little, but far less than the
+first score suggested.
 
 ## 3. What happened today
 
@@ -162,14 +202,13 @@ time. The sealed runs measure the server path, which is the same in both.
 
 ## 5. Proposed next steps (for decision)
 
-1. **The 1% bar.** Two options:
-   - **(a) Ship at ~1.5–3% wrong-first.** Record the miss as a known limit, and keep improving after
-     launch.
-   - **(b) Tune before launch.** Work on Promo EN, Promo JA and Modern JA. That needs a fresh sealed
-     set to measure against, because the 486 photos are now spent. About 500 new photos, collected
-     the same way.
-   - **Recommendation:** (b) if launch can wait, (a) otherwise. Either way, the development half
-     should gain new photos in the weak cells, so tuning stops leaning on reused photos.
+1. **The 1% bar** is met on the corrected score. Remaining work, in progress:
+   - one tuning round on Modern JA printing order (number-led choice inside a same-art group), and
+     the two real errors;
+   - a fresh, never-run sealed set of about 500 photos with the stricter label check, run once on
+     the tuned candidate. This gives a figure that no correction has touched.
+   - If launch cannot wait, shipping the current staging configuration is defensible on the
+     corrected score; the fresh sealed run then becomes the first post-launch check.
 2. **Production provisioning** (section 4, items 1–4). These are owner actions; after them, the
    switch is one scripted step.
 3. **Browser worklist:** the 6 Yellow A images, and replacement scans for the 31 eBay-imaged cards.
