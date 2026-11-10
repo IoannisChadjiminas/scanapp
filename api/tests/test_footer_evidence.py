@@ -34,12 +34,12 @@ def total_of(row):
     return TOTALS.get(row['id'])
 
 
-def test_all_four_flags_are_off_by_default():
+def test_the_four_flags_shipped_on_staging_2026_11_10_are_on_by_default():
     s = Settings()
-    assert s.printing_exact_fraction is False
-    assert s.printing_bare_number is False
-    assert s.ocr_set_code_read is False
-    assert s.retry_own_language is False
+    assert s.printing_exact_fraction is True
+    assert s.printing_bare_number is True
+    assert s.ocr_set_code_read is True
+    assert s.retry_own_language is True
 
 
 def test_clean_fraction_needs_one_agreed_reliable_fraction():

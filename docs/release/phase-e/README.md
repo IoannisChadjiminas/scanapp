@@ -16,7 +16,7 @@ under "Switch".
 | Import id | `PS-CATALOGUE-EN-JA-REC15-20261110` |
 | Reference features | `/data/reference-features/20261109-ja-recovery-img6` |
 | Artwork vectors | `/data/artwork/20261110-ja-recovery-vec15` |
-| Recognition flags | the 16 flags that are code defaults since PR 117, plus the four footer-evidence flags of this change |
+| Recognition flags | 20, all code defaults: 16 since PR 117, and the four footer-evidence flags of PR 119 |
 | Phone index version | `63a3707111add1d751949858766dd479d60d7f248367a389173f110d3842bbdf` (en 25,430, ja 23,741, zh-tw 2,260 rows) |
 
 The artifact manifest (sha256 of every file under the two artifact directories and `models`,
@@ -54,8 +54,8 @@ file.
 `scripts/catalogue-release-switch.sh preflight` checks the items marked (script). The others are
 the owner's.
 
-1. The deployment's code is at the released commit, and that commit's defaults include the 16
-   flags (PR 117).
+1. The deployment's code is at the released commit, and that commit's defaults include all 20
+   flags (`api/tests/test_five_flag_defaults.py`, `api/tests/test_footer_evidence.py`).
 2. (script) `<CONFIG_DIR>/planetscale.env` exists: a read role on `pokesingle-db` for the schema
    above. The role must not expire; staging's replay roles do.
 3. (script) The compose file is present in the code directory.

@@ -154,18 +154,18 @@ class Settings(BaseSettings):
     latin_name_twin: bool = True
     # One clean footer fraction that contradicts the shown card shows the single same-title card
     # with that number in a set of that printed total (a recovered twin with no vector of its own).
-    # The photo stays a printing review. Replay first.
-    printing_exact_fraction: bool = False
+    # The photo stays a printing review. On in staging since 2026-11-10.
+    printing_exact_fraction: bool = True
     # Inside an existing printing group, one very confident bare footer number of three or more
-    # digits that is exactly one member's number shows that member first. Replay first.
-    printing_bare_number: bool = False
+    # digits that is exactly one member's number shows that member first. On in staging since 2026-11-10.
+    printing_bare_number: bool = True
     # A lettered collector read that spells a set whose printed total the fraction confirms
-    # (SM10a beside 027/054) is the set code, not a collector number. Replay first.
-    ocr_set_code_read: bool = False
+    # (SM10a beside 027/054) is the set code, not a collector number. On in staging since 2026-11-10.
+    ocr_set_code_read: bool = True
     # Keep a boundary retry that was rejected only over the first pass's languages when its own
     # languages include the card and a clean fraction with the set's total confirms it. The result
-    # stays a review. Replay first.
-    retry_own_language: bool = False
+    # stays a review. On in staging since 2026-11-10.
+    retry_own_language: bool = True
     twin_incumbency_new_segments: int = 1
     # When the printing is already unsure, also offer same-name prints up to 0.08 below the shown
     # card in the list to choose from (e.g. Evolutions 9/108 under Base Set 46/102). The shown card
