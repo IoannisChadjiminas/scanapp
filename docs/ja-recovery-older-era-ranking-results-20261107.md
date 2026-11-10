@@ -781,3 +781,19 @@ healthy, 0 restarts, no OOM kill, import id `PS-CATALOGUE-EN-JA-REC15-20261110`,
 unchanged (sha256 `6079a6ab…814bba`), the four settings read `True` inside the container. No
 release switch was made, so there is no new rollback file; `flags20-20261110` remains the rollback
 for the flags.
+
+## JAREC16 schema dropped, 2026-11-10
+
+On the owner's instruction the unused schema `pokesingle_completion_20261110_jarec16` (import id
+`PS-CATALOGUE-EN-JA-REC16-20261110`, 9 tables, 408 MB) was dropped at 15:03Z.
+
+- Checked first: staging's release file and API container use `…_jarec15`; no foreign key or view
+  outside the schema pointed into it; no session or role setting named it.
+- The schema was owned by the import role `jarec16-admin-1014`, which expired at 09:14Z and owned
+  nothing else. Its objects were reassigned to the default `postgres` role
+  (`pscale role reassign`), then `DROP SCHEMA … CASCADE` was run.
+- After: only `…_jarec14` and `…_jarec15` remain for 2026-11-10; staging health ok on
+  `PS-CATALOGUE-EN-JA-REC15-20261110`.
+- Not removed: the two JAREC16 artifact folders on staging's data volume
+  (`artwork/20261110-jarec16-display-only`, 65 MB; `reference-features/20261110-jarec16-display-only`,
+  4.7 GB). Nothing references them.
