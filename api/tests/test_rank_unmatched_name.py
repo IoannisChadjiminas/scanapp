@@ -30,6 +30,6 @@ def test_negative_a_read_naming_a_candidate_is_kept():
     assert verification_name("カイリキー", .99, [ORIGINAL, REPRINT], languages=("ja",), numbers=NUMBERS)[2] is False
 
 
-def test_flag_is_off_by_default():
+def test_flag_is_on_by_default():
     from app.config import Settings
-    assert Settings().rank_unmatched_name is False
+    assert Settings().rank_unmatched_name is True

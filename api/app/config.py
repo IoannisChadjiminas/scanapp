@@ -128,15 +128,15 @@ class Settings(BaseSettings):
     ocr_cjk_minus_guard: bool = True
     ocr_promo_s5_guard: bool = True
     rank_twin_incumbency: bool = True
-    rank_unmatched_name: bool = False
+    rank_unmatched_name: bool = True
     # A printing review also offers same-language prints that share the English title and the
     # artwork (a recovered row named "Umbreon V" beside ブラッキーV). Replay first.
-    printing_title_family: bool = False
+    printing_title_family: bool = True
     # The Sun & Moon "TRAINER'S" banner is never a name read. Replay first.
-    ocr_trainers_banner: bool = False
+    ocr_trainers_banner: bool = True
     # Japanese two-half sets whose TCGdex total is stored under another set id (XY1a for
     # Collection X), and TCGdex totals known to be wrong (SM7a prints /060). Replay first.
-    set_total_aliases: bool = False
+    set_total_aliases: bool = True
     # A clean printed fraction keeps its card ahead of a same-name twin that local artwork
     # verification confirmed (Base Set 88/102 over Base Set 2 116/130). Replay first.
     rank_fraction_confirmed: bool = False
@@ -146,7 +146,8 @@ class Settings(BaseSettings):
     # Look cards up by a confident promo code (BW53) or a confident bare number, each with a name
     # that agrees, so the right card reaches the shortlist when the picture misses it. Replay first.
     number_led_lookup: bool = False
-    # An unpadded bare 40 on a Japanese card is damage or HP, not the collector number. Replay first.
+    # On a Japanese card, unpadded bare 40-style reads are damage or HP, not the collector number,
+    # but only when they are the only bare footer reads. Replay first.
     ocr_damage_number_guard: bool = False
     # A Latin name read on a Japanese visual leader proposes and leads with the one English card of
     # that name in the same-named set (English Southern Islands Mew). Replay first.
