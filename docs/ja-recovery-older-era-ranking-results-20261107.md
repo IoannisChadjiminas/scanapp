@@ -740,3 +740,44 @@ fixed). The candidate is re-gated on every set against staging JAREC15.
 - Archived to `data/catalogue-completion/20261004-01/rollback-archive/flags20-20261110/`; logged as
   `scanner-flags20-switched` in `data/catalogue-completion/20261004-01/events.jsonl`.
 - Roll back with: `RELEASE_NAME=flags20-20261110 PROJECT=scanapp-scanapp-z1mwj4 CONFIG_DIR=/etc/scanapp-staging COMPOSE_FILE=compose.dokploy.yaml scripts/catalogue-release-switch.sh rollback`
+
+## The fresh sealed run and the four flags as code defaults, 2026-11-10
+
+**Sealed run** (the never-run 496-photo half, one run, logged in the panel's `sealed/runs.log`
+before reading; staging side against staging + the four flags):
+
+| Cell | Photos | Right first, staging side | Right first, tuned | Wrong first (both sides) |
+|---|---|---|---|---|
+| Modern English | 73 | 67 | 68, 93.2% [84.9, 97.0] | 0 |
+| Modern Japanese | 81 | 77 | 78, 96.3% [89.7, 98.7] | 0 |
+| Numbered older English | 65 | 65 | 65, 100% [94.4, 100] | 0 |
+| Numbered older Japanese | 60 | 59 | 59, 98.3% [91.1, 99.7] | 0 |
+| Promo English | 50 | 50 | 50, 100% [92.9, 100] | 0 |
+| Promo Japanese | 62 | 57 | 58, 93.5% [84.6, 97.5] | 1, 1.6% [0.3, 8.6] |
+| Unnumbered vintage English | 35 | 35 | 35, 100% [90.1, 100] | 0 |
+| Unnumbered vintage Japanese | 70 | 58 | 58, 82.9% [72.4, 89.9] | 2, 2.9% [0.8, 9.8] |
+| All | 496 | 468, 94.4% [92.0, 96.1] | 471, 95.0% [92.7, 96.6] | 3, 0.6% [0.2, 1.8] |
+
+- **Gate passed:** 0 right → wrong, no cell lower, wrong-first upper bound 1.8%. 3 photos changed,
+  all to the right card first (`sealedT-en-modern-032`, `sealedT-ja-modern-064`,
+  `sealedT-ja-promo-043`).
+- **1% bar:** measured 0.6%, upper bound 1.8%: not met on the upper bound. Shortfall: 429 more
+  photos at 3 wrong (925 in all), or the two catalogue gaps below fixed and a new sealed set (0
+  wrong in 493 gives 0.8%).
+- The 3 wrong-first photos carry over unchanged (same wrong card on both sides; accepted and
+  logged): `sealedT-ja-promo-041` expects `ja:XYP-050`, whose reference image is a card back;
+  `sealedT-ja-vintage-002` and `-054` expect `ja:jr-vending-machine-series-3-green-u21`, which has
+  no reference image. Identified from the expected ids; no sealed photo was opened.
+- Short of plan: unnumbered vintage English 35 of 44 photos, promo Japanese 62 of 70.
+- The run started at 13:29Z, one minute before the staging switch. The switch was made on the
+  gate above, not on this run. This half is spent for this candidate.
+
+**Code defaults.** PR 120 (merged as `e06982b`) makes the four flags `True` in
+`api/app/config.py` and adds the sealed run to `docs/release/phase-e/RESULTS.md`. Tests: 1,345
+passed, 13 skipped.
+
+**Staging after the deploy** (checked 14:44Z): code `e06982b`, container started 14:42:01Z,
+healthy, 0 restarts, no OOM kill, import id `PS-CATALOGUE-EN-JA-REC15-20261110`, release file
+unchanged (sha256 `6079a6ab…814bba`), the four settings read `True` inside the container. No
+release switch was made, so there is no new rollback file; `flags20-20261110` remains the rollback
+for the flags.
