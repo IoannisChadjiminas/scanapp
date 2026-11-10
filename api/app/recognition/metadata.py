@@ -29,10 +29,13 @@ class MetadataCandidateIndex:
 
     def candidates(self, *, ocr_name: str | None, name_confidence: float,
                    numbers: list[OcrHit], languages: tuple[str, ...],
-                   limit: int = 32) -> list[str]:
+                   limit: int = 32, promo_codes: bool = False) -> list[str]:
+        # With promo_codes (NUMBER_LED_LOOKUP) a lettered collector read such as BW53 or
+        # SWSH204 is looked up the same way a fraction is; both still need the name to agree.
         reliable = [h for h in numbers if h.region == 'collector'
                     and h.confidence is not None and h.confidence >= .85
-                    and '/' in h.text]
+                    and ('/' in h.text or (promo_codes and any(c.isalpha() for c in h.text)
+                                           and any(c.isdigit() for c in h.text)))]
         if name_confidence < .85 or not reliable:
             return []
         pool: dict[str, dict] = {}
@@ -99,3 +102,46 @@ class MetadataCandidateIndex:
                              name_confidence=name_confidence, numbers=numbers,
                              languages=languages))
         return matches if len(matches) <= limit else []
+
+    def bare_number_candidates(self, *, ocr_name: str | None, name_confidence: float,
+                               numbers: list[OcrHit], languages: tuple[str, ...],
+                               limit: int = 3) -> list[str]:
+        """A confident bare footer number plus a confident name that agrees (NUMBER_LED_LOOKUP).
+
+        Only proposes: the cards still meet the artwork checks and the status rules. A bare number
+        alone is weak, so the read must be very confident, the name must agree with the title,
+        the language must match, and the family must be small.
+        """
+        from app.recognition.identity import review_title_agrees
+        name = normalize_text(ocr_name)
+        minimum = 2 if any(ord(c) > 0x2E80 for c in name) else 4
+        if name_confidence < .85 or len(name) < minimum or not languages:
+            return []
+        if any(h.region == 'collector' and h.confidence is not None and h.confidence >= .85
+               and ('/' in h.text or any(c.isalpha() for c in h.text)) for h in numbers):
+            return []
+        bare = [h for h in numbers if h.region == 'collector' and h.confidence is not None
+                and h.confidence >= .95 and h.text.isdigit()]
+        # Each bare read is judged on its own (damage values are bare numbers too). Exactly one
+        # read may name a small family; two reads that both do are ambiguous.
+        families = []
+        for hit in bare:
+            parts = parse_collector(hit.text)
+            if parts is None:
+                continue
+            ids = {row['id'] for row in self.by_number.get(('', parts.number), ())
+                   if row.get('language') in languages and review_title_agrees(ocr_name, row['name'])}
+            if ids:
+                families.append(ids)
+        if len(families) != 1 or len(families[0]) > limit:
+            return []
+        return sorted(families[0])
+
+def bare_number_fallback(bare_ids: list[str], title_ids: list[str]) -> list[str]:
+    """Title candidates once a bare-number lookup has run (NUMBER_LED_LOOKUP).
+
+    A bare footer number is weak evidence: attack damage and HP are bare numbers too. Its cards are
+    used only when the name alone finds nothing; they never displace the cards the title lookup
+    offers (Base Set Charizard's "100" damage named three other Charizards numbered 100).
+    """
+    return list(title_ids) if title_ids else list(bare_ids)
