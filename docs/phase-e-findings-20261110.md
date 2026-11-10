@@ -8,7 +8,13 @@ production.
 
 - **Catalogue:** JAREC15 is the final catalogue. 99.2% of English and 98.9% of Japanese cards have an
   image; the rest are display-only.
-- **Scanner:** all 16 scanner flags are on in staging and are the code defaults (PRs 115, 116, 117).
+- **Scanner:** 20 scanner flags are on in staging and are the code defaults: 16 from PRs 115, 116
+  and 117, and four footer-evidence rules from the tuning round (PRs 119 and 120). See section 6.
+- **Fresh sealed run after tuning (496 photos never run before):** 95.0% right card first
+  [92.7, 96.6], **0.6% wrong card first** (3 photos; upper bound 1.8%). The measured rate is under
+  the 1% bar; its upper bound is not. No label in this run has been corrected. By their expected
+  cards, all 3 wrong-first photos are of two cards whose catalogue reference image is wrong or
+  missing. See section 6.
 - **Final sealed run (972 photos), corrected score:** 95.3% right card first, **0.2% wrong card
   first** (2 photos; upper bound 0.7%). On the 486 never-run photos alone: 0.4% (upper bound 1.5%).
   The 1% wrong-first bar is **met on the corrected score**.
@@ -17,7 +23,8 @@ production.
   returned the card that is actually in the photo. See section 2.
 - **Per-release gate:** passed (upper bound on wrong-first 0.7%, under 3%; no right → wrong).
 - **Production:** not provisioned. The production host has no ScanApp service, credentials,
-  release file or data volume, so the switch cannot yet be a single command.
+  release file or data volume. The release package is on main (`docs/release/phase-e/`): once the
+  host is provisioned, the switch is one command and the rollback is one command (section 6).
 
 ## 1. Coverage (JAREC15, `pokesingle_completion_20261110_jarec15`)
 
@@ -142,7 +149,8 @@ first score suggested.
 
 ### Ready
 
-- The final catalogue (JAREC15), its 16 flags, and the release file (identical to staging's
+- The final catalogue (JAREC15), its flags (20 since the tuning round, section 6), and the release
+  file (identical to staging's
   `/etc/scanapp-staging/catalogue-release.env`).
 - A rollback file pattern that sets every flag explicitly, rehearsed on staging.
 - Phone index version `63a3707111add1d751949858766dd479d60d7f248367a389173f110d3842bbdf` for
@@ -174,7 +182,7 @@ Once those exist, the remaining steps are mechanical and can be scripted:
 
 ### Staging and production config differences (effective values)
 
-Both use the same release file (catalogue and 16 flags). The compose files differ on 24 effective
+Both use the same release file (catalogue and flags; 20 flags since section 6). The compose files differ on 24 effective
 settings. Most of the difference is the phone stage-1 fast path and client features, which staging
 has on and production's compose leaves off. That was an earlier rollout choice: turn them on one at a
 time. The sealed runs measure the server path, which is the same in both.
@@ -202,15 +210,140 @@ time. The sealed runs measure the server path, which is the same in both.
 
 ## 5. Proposed next steps (for decision)
 
-1. **The 1% bar** is met on the corrected score. Remaining work, in progress:
-   - one tuning round on Modern JA printing order (number-led choice inside a same-art group), and
-     the two real errors;
-   - a fresh, never-run sealed set of about 500 photos with the stricter label check, run once on
-     the tuned candidate. This gives a figure that no correction has touched.
-   - If launch cannot wait, shipping the current staging configuration is defensible on the
-     corrected score; the fresh sealed run then becomes the first post-launch check.
+1. **The 1% bar.** The tuning round and the fresh sealed run are done (section 6). The measured
+   wrong-first rate is 0.6% on photos no correction has touched; the upper bound is 1.8%. To bring
+   the upper bound under 1%:
+   - fix the two catalogue image gaps behind the 3 wrong-first photos (`ja:XYP-050`, whose
+     reference is a card back, and `ja:jr-vending-machine-series-3-green-u21`, which has no
+     reference), as one Japanese image batch with the usual replay gate;
+   - then one more never-run sealed set of about 500 photos. With none wrong, 493 photos give an
+     upper bound of 0.8%. The 496-photo set is spent for this release and cannot be reused.
+   - If launch cannot wait, shipping the current staging configuration is defensible: every
+     per-release gate passed and the measured rate is under 1%.
 2. **Production provisioning** (section 4, items 1–4). These are owner actions; after them, the
-   switch is one scripted step.
+   switch is the one `apply` command in `docs/release/phase-e/README.md`.
 3. **Browser worklist:** the 6 Yellow A images, and replacement scans for the 31 eBay-imaged cards.
    These go into one English image batch, with the usual replay gate.
-4. **Clean-up:** drop the unused JAREC16 schema and its staged artifacts on staging.
+4. **Clean-up:** drop the unused JAREC16 schema and its staged artifacts on staging. Dropping the
+   schema deletes a database schema and waits for the owner's yes.
+5. **Phone fast matching for Japanese cards** (section 7): review pokesingle PR 284, then collect a
+   Japanese phone panel so its two switches can be gated.
+
+## 6. Tuning round, the fresh sealed run and the release package (added later on 2026-11-10)
+
+### The four rules
+
+All four read the collector line at the foot of the card (`api/app/recognition/footer_evidence.py`,
+PR 119). Each has its own flag.
+
+| Flag | What it does |
+|---|---|
+| `PRINTING_EXACT_FRACTION` | One clean fraction that contradicts the shown card shows the single same-title card with that number and printed total. The photo stays a printing review. |
+| `PRINTING_BARE_NUMBER` | Inside a same-art group, one very confident bare number of three or more digits that is exactly one member's number shows that member first. |
+| `OCR_SET_CODE_READ` | A set code read beside a fraction that confirms the set's total (`SM10a` beside `027/054`) is not taken as a collector number. |
+| `RETRY_OWN_LANGUAGE` | A second read that was rejected only over language is kept when its own language and a clean fraction confirm the card. The result stays a review. |
+
+### Gate before staging (1,891 photos, candidate against staging)
+
+| Panel | Photos | Right first | Wrong first (95% upper bound) | Right → wrong |
+|---|---|---|---|---|
+| Development set | 681 | 636 → 637 (93.5% [91.4, 95.2]) | 4 → 4 (1.5%) | 0 |
+| Development set 2 | 238 | 232 → 232 (97.5% [94.6, 98.8]) | 0 → 0 (1.6%) | 0 |
+| Retired sealed half | 972 | 926 → 938 (96.5% [95.2, 97.5]) | 2 → 0 (0.4%) | 0 |
+
+13 photos changed, all to the right card first. No cell lower. The rules were written from the
+retired sealed half, so its figures are in-sample.
+
+### The fresh sealed run (496 photos, run once, logged before reading)
+
+These photos were collected and labelled after the labelling mistakes of section 2, with the
+stricter label check, and had never been run. Nobody has looked at them since.
+
+| Cell | Photos | Right first, staging side | Right first, tuned | Wrong first (both sides) |
+|---|---|---|---|---|
+| Modern English | 73 | 67, 91.8% [83.2, 96.2] | 68, 93.2% [84.9, 97.0] | 0 [0.0, 5.0] |
+| Modern Japanese | 81 | 77, 95.1% [88.0, 98.1] | 78, 96.3% [89.7, 98.7] | 0 [0.0, 4.5] |
+| Numbered older English | 65 | 65, 100% [94.4, 100] | 65, 100% [94.4, 100] | 0 [0.0, 5.6] |
+| Numbered older Japanese | 60 | 59, 98.3% [91.1, 99.7] | 59, 98.3% [91.1, 99.7] | 0 [0.0, 6.0] |
+| Promo English | 50 | 50, 100% [92.9, 100] | 50, 100% [92.9, 100] | 0 [0.0, 7.1] |
+| Promo Japanese | 62 | 57, 91.9% [82.5, 96.5] | 58, 93.5% [84.6, 97.5] | 1, 1.6% [0.3, 8.6] |
+| Unnumbered vintage English | 35 | 35, 100% [90.1, 100] | 35, 100% [90.1, 100] | 0 [0.0, 9.9] |
+| Unnumbered vintage Japanese | 70 | 58, 82.9% [72.4, 89.9] | 58, 82.9% [72.4, 89.9] | 2, 2.9% [0.8, 9.8] |
+| All | 496 | 468, 94.4% [92.0, 96.1] | 471, 95.0% [92.7, 96.6] | 3, 0.6% [0.2, 1.8] |
+
+- **Per-release gate: passed.** No right → wrong, no cell lower, wrong-first upper bound 1.8%.
+- 3 photos changed, all to the right card first. Tuned, the right card is first or offered on 490
+  of 496; 3 photos get no answer.
+- **1% bar:** measured rate 0.6%, under the bar; upper bound 1.8%, over it. The shortfall is one
+  of: 429 more photos at 3 wrong (925 in all), or the two catalogue gaps fixed and a new set.
+- The 3 wrong-first photos are identical on both sides. By their expected cards: 1 on `ja:XYP-050`
+  (reference image is a card back) and 2 on `ja:jr-vending-machine-series-3-green-u21` (no
+  reference image). Identified from the labels; the photos were not opened.
+- The gain is smaller here than on the retired half (+0.6 points against +1.2), as expected for
+  rules written from the retired half.
+- Weakest cell: unnumbered vintage Japanese, 82.9% right first, with the right card offered on 9
+  more of its 70 photos.
+- Short of plan in two cells: unnumbered vintage English 35 of 44 photos, promo Japanese 62 of 70.
+
+### Staging
+
+- Switch `flags20-20261110`, 13:30Z to 13:33Z, made with `scripts/catalogue-release-switch.sh`
+  (its first real run): preflight including the checksums of 112,478 artifact files, health ok,
+  0 restarts, all 20 flags match. Rollback file
+  `/etc/scanapp-staging/catalogue-rollback/flags20-20261110/catalogue-release.env.rollback`.
+- The four flags became code defaults in PR 120 (`e06982b`). Staging runs that commit (checked
+  14:44Z): healthy, 0 restarts, same import id, release file unchanged.
+
+### Release package (on main, `docs/release/phase-e/`)
+
+- `catalogue-release.env`: the release (schema, import id, artifact directories, 20 flags). No
+  secrets.
+- `README.md`: the one `apply` command, the one `rollback` command, the preflight checklist, the
+  staging and production configuration table (verified against both compose files; it replaces
+  the table in section 4, which was less exact), the phone index version and the artifact
+  manifest's location and checksum.
+- `RESULTS.md`: the gate and the sealed run per cell.
+- `scripts/catalogue-release-switch.sh`: writes the rollback file before changing anything and
+  rolls back by itself if health or any flag does not match.
+
+## 7. Phone fast matching (the app, not this repository)
+
+The phone shows a provisional card before the server answers. A read-only review of the app found
+why Japanese cards rarely get one:
+
+- 10,277 of the 23,741 Japanese rows in the phone index carry an English-only name, and the phone
+  compares the Japanese name it reads as plain text. The server's full pipeline bridges this with
+  its species table; the phone did not.
+- The phone took some Japanese set codes as promo numbers (`SM8b 027/150` read as `SM88`).
+- Not addressed: the phone does not read `NNN/DP-P`-style or bare promo numbers, and the 4,283
+  Japanese same-art printings without a vector of their own are not in the phone index.
+
+pokesingle PR 284 adds both fixes behind switches that are off by default
+(`PHONE_JA_SPECIES_NAMES`, `CARD_SET_CODE_GUARD`). Its unit tests pass. **The phone panel replay
+was not run:** the frozen 157-photo panel's phone inputs are not on the development machine, and
+that panel has no Japanese text reads, so it cannot test the names change. The switches stay off
+until a panel with Japanese cards read on a real phone shows zero wrong phone answers. A phone
+miss costs speed only: the server's answer always replaces the phone's.
+
+## 8. Open catalogue issues found while labelling
+
+None blocks the release; each is a wrong or missing reference, a count, or a card not in the
+catalogue.
+
+- **Wrong or missing reference image:** `ja:XYP-050` (card back); `ja:jr-miscellaneous-promos-068`
+  (an English Pikachu); `ja:M-P-168` (none); `ja:DP3-062` Corsola (different art); `ja:L1HG-41`
+  (the holo version); vending series 1 `u19` and `u20`, series 3 `u21` and `u14`, and
+  `ja:jr-yamabuki-city-gym-deck-u15` (none); `en:pop4-2`, `en:pop4-9`, `en:pop5-2`, `en:basep-36`
+  (none).
+- **Cards not in the catalogue (Japanese):** neo1 Meganium LV.54; Shibuya's Pikachu 002/S-P;
+  Pikachu 291/SV-P; Rescue Team DX's Pikachu 036/S-P; Hama-chan's Slowking; Southern Islands Onix;
+  Venusaur LV.64 (GB); the Mewtwo LV.67 contest card; the e-Card starter deck (Moo-Moo Milk
+  029/029); World Champions Pack (Pichu 030/108); ADV Wigglytuff ex 058/083; a DP half-deck
+  stadium 014/014; PCG deck Tyranitar ex δ 004/024; SMP2 (Detective Pikachu 014/024); the svHK
+  deck (Switch Cart 018/053).
+- **Cards not in the catalogue (English):** the 30th-anniversary Shining Celebi reprint (106/105).
+- **Numbers and totals:** L2 and L3 recorded as 70 while the cards print /080; SM7a 50 against
+  /060; SM10b 56 against /054; DP1–DP3 numbers are roster numbers while the cards print
+  `DPBP#NNN`; Zekrom prints `BW005` while the id is `en:bwp-BW05`.
+- **Data shape:** mixed id styles in L1HG and L1SS; text notes in `twins` fields; SV4a's set name
+  shown as レイジングサーフ; the "pop1" candidate pool mixes POP Series 1, 2, 4 and 5.
