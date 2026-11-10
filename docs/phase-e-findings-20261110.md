@@ -224,8 +224,8 @@ time. The sealed runs measure the server path, which is the same in both.
    switch is the one `apply` command in `docs/release/phase-e/README.md`.
 3. **Browser worklist:** the 6 Yellow A images, and replacement scans for the 31 eBay-imaged cards.
    These go into one English image batch, with the usual replay gate.
-4. **Clean-up:** drop the unused JAREC16 schema and its staged artifacts on staging. Dropping the
-   schema deletes a database schema and waits for the owner's yes.
+4. **Clean-up:** the unused JAREC16 schema was dropped on the owner's instruction (15:03Z; staging
+   unaffected). Its two artifact folders on staging's data volume (4.7 GB) are still there.
 5. **Phone fast matching for Japanese cards** (section 7): review pokesingle PR 284, then collect a
    Japanese phone panel so its two switches can be gated.
 
