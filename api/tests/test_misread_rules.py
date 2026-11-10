@@ -13,6 +13,19 @@ def test_unpadded_damage_number_is_dropped_on_a_japanese_card():
     assert texts(damage_number_guard(hits, 'ja')) == []
 
 
+def test_damage_guard_keeps_everything_when_another_bare_read_would_be_left_alone():
+    # Emolga BW-P 236: dropping "60" would leave "4" naming PokéPark's Pikachu 004.
+    hits = [OcrHit('60', 0.955, 'collector'), OcrHit('4', 0.908, 'collector'), OcrHit('70', None, 'unknown')]
+    assert texts(damage_number_guard(hits, 'ja')) == ['60', '4', '70']
+
+
+def test_damage_guard_drops_every_damage_read_when_they_are_the_only_bare_reads():
+    hits = [OcrHit('40', 0.99, 'collector'), OcrHit('120', 0.9, 'collector'), OcrHit('058/102', 0.9, 'collector')]
+    assert texts(damage_number_guard(hits, 'ja')) == ['40', '120', '058/102']   # 120 is not damage-shaped: keep all
+    hits = [OcrHit('40', 0.99, 'collector'), OcrHit('20', 0.9, 'collector'), OcrHit('058/102', 0.9, 'collector')]
+    assert texts(damage_number_guard(hits, 'ja')) == ['058/102']
+
+
 def test_damage_guard_keeps_padded_numbers_fractions_other_languages_and_non_tens():
     hits = [OcrHit('040', 0.99, 'collector'), OcrHit('058/102', 0.9, 'collector'), OcrHit('48', 0.99, 'collector'),
             OcrHit('40', 0.99, 'unknown')]
