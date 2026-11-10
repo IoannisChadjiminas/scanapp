@@ -704,3 +704,39 @@ fixed). The candidate is re-gated on every set against staging JAREC15.
 - Rollback: `/etc/scanapp-staging/catalogue-rollback/flags16-20261110/catalogue-release.env.before`,
   archived to `data/catalogue-completion/20261004-01/rollback-archive/flags16-20261110/`.
 - Logged as `scanner-flags16-switched` in `data/catalogue-completion/20261004-01/events.jsonl`.
+
+## Footer-evidence tuning and the 20-flag staging switch, 2026-11-10
+
+**What changed.** Four rules in `api/app/recognition/footer_evidence.py` (PR 119, merged as
+`76964bc`), each behind its own flag: `PRINTING_EXACT_FRACTION`, `PRINTING_BARE_NUMBER`,
+`OCR_SET_CODE_READ`, `RETRY_OWN_LANGUAGE`. Same catalogue (JAREC15), same artifacts.
+
+**Gate** (candidate = staging + the four flags, replayed against staging on 1,891 photos):
+
+| Panel | Photos | Right first | Wrong first (95% upper bound) | Right → wrong |
+|---|---|---|---|---|
+| Development set | 681 | 636 → 637 (93.5% [91.4, 95.2]) | 4 → 4 (1.5%) | 0 |
+| Development set 2 | 238 | 232 → 232 (97.5%) | 0 → 0 (1.6%) | 0 |
+| Retired sealed half | 972 | 926 → 938 (96.5% [95.2, 97.5]) | 2 → 0 (0.4%) | 0 |
+
+- 13 photos changed, all to the right card first. No cell lower on any panel. **Gate passed with
+  all four flags; nothing excluded.**
+- The four wrong-first photos on the development set are the same photos with the same wrong cards
+  as before (carried over, logged).
+- The rules were written from the retired sealed half, so its figures are in-sample. The
+  never-run 496-photo half is the out-of-sample test; it was started before this switch and is
+  evaluated once.
+- Two gate containers were lost silently (six 4 GB containers on a 16.7 GB Docker VM); the 157
+  photos they did not reach were replayed, totals checked at 681.
+
+**Switch** `flags20-20261110`, 13:30:29Z to 13:32:51Z, with `scripts/catalogue-release-switch.sh`
+(`prepare`, then `forward`), the first real run of the script that production will use:
+- Preflight passed, including the checksums of all 112,478 artifact files.
+- `FORWARD OK`: health ok, import id `PS-CATALOGUE-EN-JA-REC15-20261110`, 0 restarts, no OOM kill,
+  all 20 flags in the release file match inside the container. Code `76964bc`.
+- Rollback file: `/etc/scanapp-staging/catalogue-rollback/flags20-20261110/catalogue-release.env.rollback`
+  (the release before, plus the four flags set to `false`), sha256 `0d1507aa…0e4f24`. Installed
+  release sha256 `6079a6ab…814bba`; release before `2125e78d…4532f3`.
+- Archived to `data/catalogue-completion/20261004-01/rollback-archive/flags20-20261110/`; logged as
+  `scanner-flags20-switched` in `data/catalogue-completion/20261004-01/events.jsonl`.
+- Roll back with: `RELEASE_NAME=flags20-20261110 PROJECT=scanapp-scanapp-z1mwj4 CONFIG_DIR=/etc/scanapp-staging COMPOSE_FILE=compose.dokploy.yaml scripts/catalogue-release-switch.sh rollback`
