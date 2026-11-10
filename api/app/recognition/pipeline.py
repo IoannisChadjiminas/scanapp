@@ -10,7 +10,7 @@ import time
 import uuid
 from copy import deepcopy
 from contextlib import nullcontext
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, replace as dataclass_replace
 from datetime import datetime, timezone
 from typing import Any, Callable
 
@@ -64,6 +64,9 @@ from app.recognition.rank import artwork_evidence_compatible, decide_status_with
 from app.recognition.rank import name_match, normalize_text
 from app.recognition.fraction_confirmed import fraction_confirmed_twin, guard_fraction_total
 from app.recognition.misread_rules import damage_number_guard, latin_name_twin
+from app.recognition.footer_evidence import (bare_number_printing, drop_set_code_reads,
+                                             exact_fraction_printing, retry_language_supported,
+                                             set_code_index)
 from app.recognition.runtime import Runtime
 from app.recognition.title_retry import read_conflicting_title, title_retry_allowed
 from app.recognition.vintage_name import (GUIDANCE as VINTAGE_NAME_GUIDANCE,
@@ -673,6 +676,17 @@ def _recognize_bytes_once(
                           if h.text == ocr.name_text and h.region == 'name'), default=0.0)
     mark = time.perf_counter()
     metadata_index = getattr(runtime, 'metadata_index', None)
+    set_code_reads: list[str] = []
+    if getattr(settings, 'ocr_set_code_read', False) and metadata_index is not None:
+        codes = getattr(metadata_index, 'set_codes', None)
+        if codes is None:
+            codes = set_code_index(row for rows in getattr(metadata_index, 'by_name', {}).values() for row in rows)
+            try:
+                metadata_index.set_codes = codes
+            except AttributeError:
+                pass
+        numbers, set_code_reads = drop_set_code_reads(
+            numbers, codes, lambda lang, set_id: set_total(catalog, lang, set_id), tuple(rank_languages))
     number_led = bool(getattr(settings, 'number_led_lookup', False))
     metadata_ids = metadata_index.candidates(ocr_name=ocr.name_text,
         name_confidence=name_confidence, numbers=numbers, languages=rank_languages,
@@ -1123,6 +1137,8 @@ def _recognize_bytes_once(
             status = 'uncertain'
     if twin_incumbent:
         status_reasons.append('twin_incumbent')
+    if set_code_reads:
+        status_reasons.append('set_code_read')
     if name_set_aside:
         status_reasons.append('unmatched_name_set_aside')
     if any(h.region=='holder_name' for h in ocr.hits) and status=='matched':
@@ -1235,6 +1251,56 @@ def _recognize_bytes_once(
             members=(combined[0],), candidate_group_id='likely:' + combined[0]['card_id'],
             reference_coverage_complete=False,
             guidance='Likely card identified. Confirm the exact set, collector number and finish, or retake with the full card visible.')
+    def footer_named_row(card_id: str) -> dict[str, Any] | None:
+        """The candidate row of a card the footer named; built when retrieval did not shortlist it."""
+        found = next((r for r in combined if r['card_id'] == card_id), None)
+        if found is not None:
+            return found
+        source = _lookup_cards(catalog, [card_id]).get(card_id)
+        if source is None or is_tcg_pocket_card(source["language"], source["set_id"]):
+            return None
+        position = positions.get(card_id)
+        vector = query_vectors.get(id(image))
+        # A card with no vector of its own (a recovered twin) has no picture score: 0, never a guess.
+        score = float(snapshot.embeddings[position] @ vector) if position is not None and vector is not None else 0.
+        built = rerank([visual_row(card_id, source, score, ['footer_number'])], ocr.name_text, numbers,
+                       ocr.failed, detected_languages=rank_languages, name_confidence=name_confidence,
+                       require_confident_ocr=True)[0]
+        built['local_artwork_verified'] = False
+        apply_variants_to_candidate(catalog, built, groups=sku_groups)
+        built["cardmarket_prices"] = scan_prices(catalog, built["card_id"], built.get("cardmarket_url"))
+        built.update(scan_finishes(catalog, built["card_id"]))
+        combined.append(built)
+        return built
+
+    exact_named = None
+    if (getattr(settings, 'printing_exact_fraction', False) and combined and not retake
+            and status in {'matched', 'uncertain'}
+            and (printing.ambiguous or float(combined[0]['visual_score']) >= settings.threshold_min_visual
+                 or combined[0].get('local_artwork_verified'))):
+        def same_number_rows(language: str, spellings: list[str]):
+            marks = ",".join("?" for _ in spellings)
+            return catalog.execute(
+                f"SELECT * FROM cards WHERE language = ? AND collector_number IN ({marks}) ORDER BY id LIMIT 513",
+                (language, *spellings)).fetchall()
+        exact_id = exact_fraction_printing(
+            combined[0], numbers, same_number_rows,
+            lambda row: set_total(catalog, row["language"], row["set_id"]))
+        exact_row = footer_named_row(exact_id) if exact_id else None
+        if exact_row is not None:
+            exact_named = exact_id
+            leader_row = combined[0]
+            if not printing.ambiguous:
+                ids = sorted([str(leader_row['card_id']), exact_id])
+                printing = PrintingDecision(
+                    True, 'printing_not_proven', (leader_row, exact_row),
+                    "reference-group:" + hashlib.sha256("\n".join(ids).encode()).hexdigest()[:16],
+                    False, tuple(h.text for h in numbers if h.region == 'collector' and h.confidence is not None
+                                 and h.confidence >= .85 and '/' in h.text),
+                    "These printings may share artwork or printed numbers. Choose the exact set manually, "
+                    "or retake with all four corners, the collector number and any printing stamps visible.")
+            elif not any(m.get('card_id') == exact_id for m in printing.members):
+                printing = dataclass_replace(printing, members=(*printing.members, exact_row))
     if printing.ambiguous:
         status = "printing_ambiguous"
         # PRINTING_TITLE_FAMILY: prints that joined only by their English title are offered,
@@ -1263,7 +1329,9 @@ def _recognize_bytes_once(
                 reference_identity = dict(combined[0])
         except (OSError, ValueError, KeyError, cv2.error):
             logging.getLogger(__name__).exception('Optional stamp ordering failed')
-        named = fraction_named_printing(combined, order_members, numbers)
+        named = exact_named or fraction_named_printing(combined, order_members, numbers)
+        if exact_named:
+            status_reasons.append('exact_fraction_printing')
         damaged_order = bool(getattr(settings, 'ocr_damaged_footer_order', False))
         if not named and damaged_order and not stamp_hint:
             named = damaged_footer_named_printing(combined, order_members, ocr.hits)
@@ -1276,6 +1344,11 @@ def _recognize_bytes_once(
             # the phone and as "3" by the server, shown as Base Set 46 (6 November 2026).
             if not named:
                 named = _hint_number_named_printing(combined, order_members, client_text)
+        if not named and not stamp_hint and getattr(settings, 'printing_bare_number', False) and combined:
+            bare_id = bare_number_printing(combined[0], printing.members, numbers)
+            if bare_id and footer_named_row(bare_id) is not None:
+                named = bare_id
+                status_reasons.append('bare_number_printing')
         if named:
             combined.sort(key=lambda row: row.get('card_id') == named, reverse=True)
             if combined:
@@ -1850,6 +1923,14 @@ def recognize_bytes(
                     retry.lead,ocr_name=first.ocr.name_text,
                     name_confidence=first.name_confidence,numbers=first.numbers,
                     languages=first.languages))
+                if (not compatible and getattr(settings, 'retry_own_language', False)
+                        and retry_language_supported(retry.lead,
+                            first_name=first.ocr.name_text, first_name_confidence=first.name_confidence,
+                            first_numbers=first.numbers, retry_name=retry.ocr.name_text,
+                            retry_name_confidence=retry.name_confidence, retry_numbers=retry.numbers,
+                            retry_languages=tuple(retry.languages or ()))):
+                    compatible = True
+                    recovery['retry_own_language'] = True
                 recovery.update(retry_status=retry.response.status.value,
                                 retry_top_id=retry.lead.get('card_id') if retry.lead else None,
                                 identity_compatible=compatible)
