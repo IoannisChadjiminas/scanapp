@@ -13,7 +13,9 @@ services:
         format: raw
       # Catalogue selectors and matching artifact paths live outside the checkout.
       # Missing release selection must fail deployment instead of loading an old import.
-      - path: /etc/scanapp-staging/catalogue-release.env
+      # The default is the staging file; scripts/local_candidate.py points a
+      # local copy at a candidate's release file instead.
+      - path: ${CATALOGUE_RELEASE_ENV_FILE:-/etc/scanapp-staging/catalogue-release.env}
         required: true
         format: raw
     environment:
