@@ -39,7 +39,9 @@ FIX_KEY = os.environ.get("FIX_KEY", "ja_recovery_fixes")
 FIX_STATE = os.environ.get("FIX_STATE", "candidate_ja_recovery_fixes_inactive")
 PROVENANCE = os.environ.get("FIX_PROVENANCE", "ja-recovery-name-link-fix-20261107")
 VERIFIED_AT = os.environ.get("FIX_VERIFIED_AT", "2026-11-07T16:00:00Z")
-SET_COLUMNS = ("name", "view_title", "set_name", "category", "rarity", "printed_collector_number")
+# rarity and image_path are not here: the reference-feature bundle is signed over them
+# (reference_features.catalogue_signature), so changing one needs a new bundle, not a label fix.
+SET_COLUMNS = ("name", "view_title", "set_name", "category", "printed_collector_number")
 # The columns visual_aliases.identity_sha256 covers.
 IDENTITY_COLUMNS = {"name", "set_name", "category"}
 

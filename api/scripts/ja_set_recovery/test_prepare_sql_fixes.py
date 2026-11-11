@@ -21,6 +21,9 @@ def test_label_columns_need_a_reason_and_stay_inside_the_list():
         row_change("ja:x-1", _row(), {"set": {"name": "B"}}, set(), set())
     with pytest.raises(AssertionError):
         row_change("ja:x-1", _row(), {"set": {"image_path": "/x"}, "reason": "r"}, set(), set())
+    # The reference-feature bundle is signed over rarity; a label fix may not change it.
+    with pytest.raises(AssertionError):
+        row_change("ja:x-1", _row(), {"set": {"rarity": "Secret Rare"}, "reason": "r"}, set(), set())
 
 
 def test_a_relink_keeps_the_product_id_and_takes_only_the_page_matched_to_this_card():
