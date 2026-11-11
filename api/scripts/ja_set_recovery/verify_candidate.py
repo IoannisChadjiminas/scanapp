@@ -1,6 +1,7 @@
 """Japanese recovery candidate check, adapted from the neo2-057 release verifier.
 
 Run in an isolated API-image container after creating the inactive schema.
+Pass the candidate's catalogue and artifact selectors through the environment.
 
 Read-only candidate readiness check; does not open the live results database.
 Never prints credentials or raw driver errors.
@@ -16,10 +17,6 @@ from app.recognition.artwork import ArtworkIndex
 from app.card_images import display_image_url
 
 settings=Settings().model_copy(update=dict(
-    planetscale_schema='pokesingle_completion_20261107_jarec',
-    planetscale_import_id='PS-CATALOGUE-EN-JA-REC-20261107',
-    reference_features_dir=Path('/data/reference-features/20261107-ja-recovery'),
-    artwork_bundle_dir=Path('/data/artwork/20261107-ja-recovery'),
     use_grading=False,parallel_grading=False,grading_at_card_deadline=False,
     store_captures=False,scan_lanes=1,
 ))
@@ -36,7 +33,7 @@ artwork=ArtworkIndex.load(settings.artwork_bundle_dir,snapshot=snapshot,
 release=json.loads(Path('/work/release.json').read_text())
 new=json.loads(Path('/work/new-ids.json').read_text())
 assert snapshot.indexed_count==release['pad_vectors']
-assert catalog.execute('SELECT count(*) FROM cards').fetchone()[0]==61975
+assert catalog.execute('SELECT count(*) FROM cards').fetchone()[0]==release['cards_total']
 missing=0
 for cid in new:
     r=catalog.execute('SELECT * FROM cards WHERE id=?',(cid,)).fetchone()

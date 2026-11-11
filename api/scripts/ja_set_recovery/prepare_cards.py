@@ -73,6 +73,9 @@ def main(run_dir, catalogue_path):
         else:
             unnumbered[set_id] += 1
             number = f"u{unnumbered[set_id]:02d}"
+            while f"ja:{set_id}-{number}" in taken_ids:
+                unnumbered[set_id] += 1
+                number = f"u{unnumbered[set_id]:02d}"
         card_id = f"ja:{set_id}-{number}"
         image = images[key].pop(0)
         link = links[key].pop(0)
@@ -90,6 +93,7 @@ def main(run_dir, catalogue_path):
             "cardmarket_url": link.get("url") if link["status"] == "linked" else None,
             "cardmarket_id": link.get("product_id") if link["status"] == "linked" else None,
             "cardmarket_status": link["status"] if link["status"] == "linked" else link.get("reason"),
+            **{k: row[k] for k in ("source_row_url", "source_image_url") if row.get(k)},
         }
         card["problem"] = ("id_taken_in_catalogue" if card_id in taken_ids
                            else "id_repeated_in_batch" if card_id in seen else None)

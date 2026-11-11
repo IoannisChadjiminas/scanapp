@@ -17,13 +17,14 @@ Scannable/alternative split comes from RUN_DIR/index-decision.json (decide_looka
 """
 import hashlib
 import json
+import os
 import shutil
 import sys
 from pathlib import Path
 
 import numpy as np
 
-IMAGE_DIR = "/data/reference-images/ja-20261107-recovery"
+IMAGE_DIR = os.environ.get("JAREC_IMAGE_DIR", "/data/reference-images/ja-20261107-recovery")
 PROFILES = ("conventional_window", "broad_center_hypothesis")
 
 
@@ -143,6 +144,7 @@ def main(run_dir, parent_dir, name):
         "release": name, "image_dir": IMAGE_DIR, "new_cards": len(cards), "with_image": with_image,
         "scannable": len(scannable), "printing_alternatives": with_image - len(scannable),
         "no_image": len(cards) - with_image, "pad_vectors": len(ids), "artwork_regions": len(all_recs),
+        "cards_total": new_pman["card_count"],
         "files": {str(p.relative_to(out)): sha_file(p) for p in sorted(out.rglob("*"))
                   if p.is_file() and not p.is_relative_to(img_dir)},
         "images_bytes": sum(p.stat().st_size for p in img_dir.iterdir()),
