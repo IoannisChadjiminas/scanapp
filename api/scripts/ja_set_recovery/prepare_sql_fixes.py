@@ -162,6 +162,8 @@ END $acl$;""")
                      "display_only": ({"remote_image_url": fix["display_image_url"], "reason": fix["display_reason"]}
                                       if fix.get("display_image_url") else None),
                      "fix_batch": IMPORT}
+            # An empty entry would wipe what an earlier batch recorded under the same key.
+            patch = {k: v for k, v in patch.items() if v}
             s.append(f"UPDATE {TARGET}.reference_metadata SET metadata = metadata || {jlit(patch)}::jsonb WHERE source_key={lit(prov_keys[cid])};")
     summary = {"names": sum(1 for f in fixes.values() if f.get("name_en")),
                "links_added": sum(1 for f in fixes.values() if f.get("url") and not f.get("clear_link")),
@@ -183,9 +185,9 @@ END $acl$;""")
              f"WHERE import_id={lit(PARENT_IMPORT)};")
     checks = [f"(SELECT count(*) FROM {TARGET}.{t})={counts[t]}" for t in TABLES]
     checks += [f"(SELECT count(*) FROM {TARGET}.import_manifest WHERE import_id={lit(IMPORT)} AND status='validated')=1",
-               # no new shared Cardmarket pages (the parent already has a few deliberate ones)
-               f"(SELECT count(*) FROM (SELECT cardmarket_url FROM {TARGET}.cards WHERE cardmarket_url IS NOT NULL GROUP BY 1 HAVING count(*)>1) d)"
-               f"=(SELECT count(*) FROM (SELECT cardmarket_url FROM {PARENT}.cards WHERE cardmarket_url IS NOT NULL GROUP BY 1 HAVING count(*)>1) d)",
+               # no new shared Cardmarket pages (the parent already has a few deliberate ones; a relink may end one)
+               f"NOT EXISTS (SELECT cardmarket_url FROM {TARGET}.cards WHERE cardmarket_url IS NOT NULL GROUP BY 1 HAVING count(*)>1"
+               f" EXCEPT SELECT cardmarket_url FROM {PARENT}.cards WHERE cardmarket_url IS NOT NULL GROUP BY 1 HAVING count(*)>1)",
                f"(SELECT md5(metadata::text) FROM {PARENT}.import_manifest WHERE import_id={lit(PARENT_IMPORT)})={lit(meta_md5)}"]
     s.append("DO $$ BEGIN IF NOT (" + " AND ".join(checks) + ") THEN RAISE EXCEPTION 'fix batch checks failed'; END IF; END $$;")
     s.append("COMMIT;")
