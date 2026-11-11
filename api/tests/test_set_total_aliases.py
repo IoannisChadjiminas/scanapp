@@ -10,7 +10,8 @@ def _conn(tmp_path):
     init_catalog(conn)
     conn.executemany(
         "INSERT INTO set_totals (language, set_id, official_total, fetched_at) VALUES (?, ?, ?, 'x')",
-        [("ja", "XY1b", 60), ("ja", "XY8b", 59), ("ja", "SM7a", 50), ("en", "XY1b", 999)],
+        [("ja", "XY1b", 60), ("ja", "XY8b", 59), ("ja", "SM7a", 50), ("en", "XY1b", 999),
+         ("ja", "L2", 70), ("ja", "L3", 70), ("ja", "L1a", 70)],
     )
     conn.commit()
     return conn
@@ -26,6 +27,7 @@ def test_flag_off_keeps_todays_answers(tmp_path, monkeypatch):
     conn = _conn(tmp_path)
     assert set_total(conn, "ja", "XY1-By") is None
     assert set_total(conn, "ja", "SM7a") == 50
+    assert set_total(conn, "ja", "L2") == 70
     get_settings.cache_clear()
 
 
@@ -35,6 +37,10 @@ def test_flag_on_finds_the_half_set_total_and_corrects_sm7a(tmp_path, monkeypatc
     assert set_total(conn, "ja", "XY1-By") == 60
     assert set_total(conn, "ja", "XY8-Bb") == 59
     assert set_total(conn, "ja", "SM7a") == 60
+    # Reviving Legends and Clash at the Summit print /080; the HeartGold half keeps its /070.
+    assert set_total(conn, "ja", "L2") == 80
+    assert set_total(conn, "ja", "L3") == 80
+    assert set_total(conn, "ja", "L1HG") == 70
     assert set_total(conn, "ja", "XY1b") == 60
     # Only Japanese ids are aliased, and an unknown set stays unknown.
     assert set_total(conn, "en", "XY1-By") is None

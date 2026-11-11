@@ -89,8 +89,9 @@ JA_TOTAL_ALIASES = {
     "XY11-Bb": "XY11a", "XY11-Br": "XY11b",  # Fever-Burst Fighter / Cruel Traitor, /054
 }
 # Totals TCGdex has wrong. Thunderclap Spark prints /060 (its cards 51-60 are commons and
-# uncommons); TCGdex lists 50.
-TOTAL_CORRECTIONS = {("ja", "SM7a"): 60}
+# uncommons); TCGdex lists 50. Reviving Legends (L2) and Clash at the Summit (L3) print /080
+# on every card; TCGdex lists 70.
+TOTAL_CORRECTIONS = {("ja", "SM7a"): 60, ("ja", "L2"): 80, ("ja", "L3"): 80}
 
 
 def _aliases_enabled() -> bool:
