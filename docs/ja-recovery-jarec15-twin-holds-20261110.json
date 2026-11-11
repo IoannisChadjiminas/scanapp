@@ -1,0 +1,694 @@
+[
+ {
+  "id": "ja:DPP-043",
+  "reason": "same artwork as ja:DP2-026 (eye-checked 2026-11-10, twin rule)"
+ },
+ {
+  "id": "ja:DPt4-Slp-011",
+  "reason": "same artwork as ja:DPt4-Sgf-011 (eye-checked 2026-11-10, twin rule)"
+ },
+ {
+  "id": "ja:DPtM-001",
+  "reason": "same artwork as ja:DPP-080 (eye-checked 2026-11-10, twin rule)"
+ },
+ {
+  "id": "ja:DPtR-004",
+  "reason": "same artwork as ja:DPP-084 (eye-checked 2026-11-10, twin rule)"
+ },
+ {
+  "id": "ja:HSp-030",
+  "reason": "same artwork as ja:WAK-041 (eye-checked 2026-11-10, twin rule)"
+ },
+ {
+  "id": "ja:WCP-011",
+  "reason": "same artwork as ja:jr-play-promos-024 (eye-checked 2026-11-10, twin rule)"
+ },
+ {
+  "id": "ja:WCP-015",
+  "reason": "same artwork as ja:jr-play-promos-022 (eye-checked 2026-11-10, twin rule)"
+ },
+ {
+  "id": "ja:WCP-027",
+  "reason": "same artwork as ja:jr-play-promos-023 (eye-checked 2026-11-10, twin rule)"
+ },
+ {
+  "id": "ja:jr-battle-starter-deck-raichu-010",
+  "reason": "same artwork as ja:jr-leafeon-vs-metagross-expert-deck-metagross-012 (eye-checked 2026-11-10, twin rule)"
+ },
+ {
+  "id": "ja:jr-black-deck-kit-015",
+  "reason": "same artwork as ja:jr-movie-commemoration-vs-pack-sky-splitting-deoxys-014 (eye-checked 2026-11-10, twin rule)"
+ },
+ {
+  "id": "ja:jr-black-deck-kit-016",
+  "reason": "same artwork as ja:jr-movie-commemoration-vs-pack-015 (eye-checked 2026-11-10, twin rule)"
+ },
+ {
+  "id": "ja:jr-black-deck-kit-019",
+  "reason": "same artwork as ja:jr-silver-deck-kit-019 (eye-checked 2026-11-10, twin rule)"
+ },
+ {
+  "id": "ja:jr-black-deck-kit-020",
+  "reason": "same artwork as ja:jr-silver-deck-kit-020 (eye-checked 2026-11-10, twin rule)"
+ },
+ {
+  "id": "ja:jr-dawn-dash-006",
+  "reason": "same artwork as ja:jr-moonlit-pursuit-dawn-dash-u115 (eye-checked 2026-11-10, twin rule)"
+ },
+ {
+  "id": "ja:jr-dawn-dash-007",
+  "reason": "same artwork as ja:jr-moonlit-pursuit-dawn-dash-u39 (eye-checked 2026-11-10, twin rule)"
+ },
+ {
+  "id": "ja:jr-dawn-dash-009",
+  "reason": "same artwork as ja:jr-moonlit-pursuit-dawn-dash-u49 (eye-checked 2026-11-10, twin rule)"
+ },
+ {
+  "id": "ja:jr-dawn-dash-010",
+  "reason": "same artwork as ja:jr-moonlit-pursuit-dawn-dash-u10 (eye-checked 2026-11-10, twin rule)"
+ },
+ {
+  "id": "ja:jr-dawn-dash-011",
+  "reason": "same artwork as ja:jr-moonlit-pursuit-dawn-dash-u31 (eye-checked 2026-11-10, twin rule)"
+ },
+ {
+  "id": "ja:jr-dawn-dash-012",
+  "reason": "same artwork as ja:jr-moonlit-pursuit-dawn-dash-u77 (eye-checked 2026-11-10, twin rule)"
+ },
+ {
+  "id": "ja:jr-dawn-dash-013",
+  "reason": "same artwork as ja:jr-moonlit-pursuit-dawn-dash-u103 (eye-checked 2026-11-10, twin rule)"
+ },
+ {
+  "id": "ja:jr-dawn-dash-015",
+  "reason": "same artwork as ja:jr-moonlit-pursuit-dawn-dash-u58 (eye-checked 2026-11-10, twin rule)"
+ },
+ {
+  "id": "ja:jr-dawn-dash-016",
+  "reason": "same artwork as ja:jr-moonlit-pursuit-dawn-dash-u56 (eye-checked 2026-11-10, twin rule)"
+ },
+ {
+  "id": "ja:jr-dawn-dash-017",
+  "reason": "same artwork as ja:jr-moonlit-pursuit-dawn-dash-u59 (eye-checked 2026-11-10, twin rule)"
+ },
+ {
+  "id": "ja:jr-dawn-dash-020",
+  "reason": "same artwork as ja:jr-moonlit-pursuit-dawn-dash-u05 (eye-checked 2026-11-10, twin rule)"
+ },
+ {
+  "id": "ja:jr-dawn-dash-021",
+  "reason": "same artwork as ja:jr-moonlit-pursuit-dawn-dash-u21 (eye-checked 2026-11-10, twin rule)"
+ },
+ {
+  "id": "ja:jr-dawn-dash-022",
+  "reason": "same artwork as ja:jr-moonlit-pursuit-dawn-dash-u132 (eye-checked 2026-11-10, twin rule)"
+ },
+ {
+  "id": "ja:jr-dawn-dash-023",
+  "reason": "same artwork as ja:jr-moonlit-pursuit-dawn-dash-u84 (eye-checked 2026-11-10, twin rule)"
+ },
+ {
+  "id": "ja:jr-dawn-dash-025",
+  "reason": "same artwork as ja:jr-moonlit-pursuit-dawn-dash-u46 (eye-checked 2026-11-10, twin rule)"
+ },
+ {
+  "id": "ja:jr-dawn-dash-026",
+  "reason": "same artwork as ja:jr-moonlit-pursuit-dawn-dash-u37 (eye-checked 2026-11-10, twin rule)"
+ },
+ {
+  "id": "ja:jr-dawn-dash-027",
+  "reason": "same artwork as ja:jr-moonlit-pursuit-dawn-dash-u68 (eye-checked 2026-11-10, twin rule)"
+ },
+ {
+  "id": "ja:jr-dawn-dash-031",
+  "reason": "same artwork as ja:jr-moonlit-pursuit-dawn-dash-u25 (eye-checked 2026-11-10, twin rule)"
+ },
+ {
+  "id": "ja:jr-dawn-dash-032",
+  "reason": "same artwork as ja:jr-moonlit-pursuit-dawn-dash-u04 (eye-checked 2026-11-10, twin rule)"
+ },
+ {
+  "id": "ja:jr-dawn-dash-033",
+  "reason": "same artwork as ja:jr-moonlit-pursuit-dawn-dash-u26 (eye-checked 2026-11-10, twin rule)"
+ },
+ {
+  "id": "ja:jr-dawn-dash-039",
+  "reason": "same artwork as ja:jr-moonlit-pursuit-dawn-dash-u71 (eye-checked 2026-11-10, twin rule)"
+ },
+ {
+  "id": "ja:jr-dawn-dash-040",
+  "reason": "same artwork as ja:jr-moonlit-pursuit-dawn-dash-u90 (eye-checked 2026-11-10, twin rule)"
+ },
+ {
+  "id": "ja:jr-dawn-dash-041",
+  "reason": "same artwork as ja:jr-moonlit-pursuit-dawn-dash-u52 (eye-checked 2026-11-10, twin rule)"
+ },
+ {
+  "id": "ja:jr-dawn-dash-042",
+  "reason": "same artwork as ja:jr-moonlit-pursuit-dawn-dash-u53 (eye-checked 2026-11-10, twin rule)"
+ },
+ {
+  "id": "ja:jr-dawn-dash-043",
+  "reason": "same artwork as ja:jr-moonlit-pursuit-dawn-dash-u105 (eye-checked 2026-11-10, twin rule)"
+ },
+ {
+  "id": "ja:jr-dawn-dash-044",
+  "reason": "same artwork as ja:jr-moonlit-pursuit-dawn-dash-u06 (eye-checked 2026-11-10, twin rule)"
+ },
+ {
+  "id": "ja:jr-dawn-dash-045",
+  "reason": "same artwork as ja:jr-moonlit-pursuit-dawn-dash-u15 (eye-checked 2026-11-10, twin rule)"
+ },
+ {
+  "id": "ja:jr-dawn-dash-046",
+  "reason": "same artwork as ja:jr-moonlit-pursuit-dawn-dash-u11 (eye-checked 2026-11-10, twin rule)"
+ },
+ {
+  "id": "ja:jr-dawn-dash-047",
+  "reason": "same artwork as ja:jr-moonlit-pursuit-dawn-dash-u73 (eye-checked 2026-11-10, twin rule)"
+ },
+ {
+  "id": "ja:jr-dawn-dash-048",
+  "reason": "same artwork as ja:jr-moonlit-pursuit-dawn-dash-u48 (eye-checked 2026-11-10, twin rule)"
+ },
+ {
+  "id": "ja:jr-dawn-dash-049",
+  "reason": "same artwork as ja:jr-moonlit-pursuit-dawn-dash-u50 (eye-checked 2026-11-10, twin rule)"
+ },
+ {
+  "id": "ja:jr-dawn-dash-050",
+  "reason": "same artwork as ja:jr-moonlit-pursuit-dawn-dash-u131 (eye-checked 2026-11-10, twin rule)"
+ },
+ {
+  "id": "ja:jr-dawn-dash-052",
+  "reason": "same artwork as ja:jr-moonlit-pursuit-dawn-dash-u01 (eye-checked 2026-11-10, twin rule)"
+ },
+ {
+  "id": "ja:jr-dawn-dash-054",
+  "reason": "same artwork as ja:jr-moonlit-pursuit-dawn-dash-u113 (eye-checked 2026-11-10, twin rule)"
+ },
+ {
+  "id": "ja:jr-dawn-dash-055",
+  "reason": "same artwork as ja:jr-moonlit-pursuit-dawn-dash-u111 (eye-checked 2026-11-10, twin rule)"
+ },
+ {
+  "id": "ja:jr-dawn-dash-056",
+  "reason": "same artwork as ja:jr-moonlit-pursuit-dawn-dash-u135 (eye-checked 2026-11-10, twin rule)"
+ },
+ {
+  "id": "ja:jr-dawn-dash-057",
+  "reason": "same artwork as ja:jr-moonlit-pursuit-dawn-dash-u65 (eye-checked 2026-11-10, twin rule)"
+ },
+ {
+  "id": "ja:jr-dawn-dash-058",
+  "reason": "same artwork as ja:jr-moonlit-pursuit-dawn-dash-u107 (eye-checked 2026-11-10, twin rule)"
+ },
+ {
+  "id": "ja:jr-dawn-dash-059",
+  "reason": "same artwork as ja:jr-moonlit-pursuit-dawn-dash-u02 (eye-checked 2026-11-10, twin rule)"
+ },
+ {
+  "id": "ja:jr-dawn-dash-060",
+  "reason": "same artwork as ja:jr-moonlit-pursuit-dawn-dash-u133 (eye-checked 2026-11-10, twin rule)"
+ },
+ {
+  "id": "ja:jr-dawn-dash-061",
+  "reason": "same artwork as ja:jr-moonlit-pursuit-dawn-dash-u60 (eye-checked 2026-11-10, twin rule)"
+ },
+ {
+  "id": "ja:jr-dawn-dash-062",
+  "reason": "same artwork as ja:jr-moonlit-pursuit-dawn-dash-u22 (eye-checked 2026-11-10, twin rule)"
+ },
+ {
+  "id": "ja:jr-dawn-dash-066",
+  "reason": "same artwork as ja:jr-moonlit-pursuit-dawn-dash-u64 (eye-checked 2026-11-10, twin rule)"
+ },
+ {
+  "id": "ja:jr-dialga-lv-x-constructed-standard-deck-011",
+  "reason": "same artwork as ja:jr-giratina-vs-dialga-deck-kit-dialga-011 (eye-checked 2026-11-10, twin rule)"
+ },
+ {
+  "id": "ja:jr-dialga-palkia-lv-x-constructed-standard-decks-u07",
+  "reason": "same artwork as ja:jr-dialga-lv-x-constructed-standard-deck-007 (eye-checked 2026-11-10, twin rule)"
+ },
+ {
+  "id": "ja:jr-dpt-entry-pack-giratina-010",
+  "reason": "same artwork as ja:DP1-114 (eye-checked 2026-11-10, twin rule)"
+ },
+ {
+  "id": "ja:jr-dpt-entry-pack-giratina-013",
+  "reason": "same artwork as ja:jr-magmortar-vs-electivire-deck-kit-021 (eye-checked 2026-11-10, twin rule)"
+ },
+ {
+  "id": "ja:jr-emerald-gift-box-deoxys-011",
+  "reason": "same artwork as ja:jr-silver-deck-kit-015 (eye-checked 2026-11-10, twin rule)"
+ },
+ {
+  "id": "ja:jr-emerald-gift-box-deoxys-012",
+  "reason": "same artwork as ja:jr-undone-seal-073 (eye-checked 2026-11-10, twin rule)"
+ },
+ {
+  "id": "ja:jr-entry-pack-033",
+  "reason": "same artwork as ja:DP1-033 (eye-checked 2026-11-10, twin rule)"
+ },
+ {
+  "id": "ja:jr-fighting-quick-construction-pack-011",
+  "reason": "same artwork as ja:jr-fighting-quick-construction-pack-012 (eye-checked 2026-11-10, twin rule)"
+ },
+ {
+  "id": "ja:jr-fighting-quick-construction-pack-012",
+  "reason": "same artwork as ja:jr-fighting-quick-construction-pack-011 (eye-checked 2026-11-10, twin rule)"
+ },
+ {
+  "id": "ja:jr-fire-quick-construction-pack-012",
+  "reason": "same artwork as ja:jr-mew-lucario-gift-box-mightyena-012 (eye-checked 2026-11-10, twin rule)"
+ },
+ {
+  "id": "ja:jr-garchomp-vs-charizard-sp-deck-kit-garchomp-007",
+  "reason": "same artwork as ja:S8a-P-018 (eye-checked 2026-11-10, twin rule)"
+ },
+ {
+  "id": "ja:jr-garchomp-vs-charizard-sp-deck-kit-garchomp-010",
+  "reason": "same artwork as ja:jr-magmortar-vs-electivire-deck-kit-019 (eye-checked 2026-11-10, twin rule)"
+ },
+ {
+  "id": "ja:jr-gift-box-latias-015",
+  "reason": "same artwork as ja:jr-miracle-of-the-desert-049 (eye-checked 2026-11-10, twin rule)"
+ },
+ {
+  "id": "ja:jr-gift-box-latias-018",
+  "reason": "same artwork as ja:jr-treecko-constructed-starter-deck-018 (eye-checked 2026-11-10, twin rule)"
+ },
+ {
+  "id": "ja:jr-gift-box-latios-014",
+  "reason": "same artwork as ja:jr-movie-commemoration-vs-pack-015 (eye-checked 2026-11-10, twin rule)"
+ },
+ {
+  "id": "ja:jr-gift-box-latios-016",
+  "reason": "same artwork as ja:jr-rayquaza-constructed-starter-deck-012 (eye-checked 2026-11-10, twin rule)"
+ },
+ {
+  "id": "ja:jr-gift-box-latios-018",
+  "reason": "same artwork as ja:jr-treecko-constructed-starter-deck-018 (eye-checked 2026-11-10, twin rule)"
+ },
+ {
+  "id": "ja:jr-grass-quick-construction-pack-015",
+  "reason": "same artwork as ja:jr-grass-quick-construction-pack-012 (eye-checked 2026-11-10, twin rule)"
+ },
+ {
+  "id": "ja:jr-hanada-city-gym-deck-u03",
+  "reason": "same artwork as ja:jr-guren-town-gym-deck-u16 (eye-checked 2026-11-10, twin rule)"
+ },
+ {
+  "id": "ja:jr-heatran-vs-regigigas-deck-kit-regigigas-u14",
+  "reason": "same artwork as ja:jr-heatran-vs-regigigas-deck-kit-u20 (eye-checked 2026-11-10, twin rule)"
+ },
+ {
+  "id": "ja:jr-heatran-vs-regigigas-deck-kit-u10",
+  "reason": "same artwork as ja:jr-heatran-vs-regigigas-deck-kit-heatran-u07 (eye-checked 2026-11-10, twin rule)"
+ },
+ {
+  "id": "ja:jr-heatran-vs-regigigas-deck-kit-u16",
+  "reason": "same artwork as ja:DPtP-049 (eye-checked 2026-11-10, twin rule)"
+ },
+ {
+  "id": "ja:jr-intro-pack-bulbasaur-04",
+  "reason": "same artwork as ja:jr-tamamushi-city-gym-deck-u23 (eye-checked 2026-11-10, twin rule)"
+ },
+ {
+  "id": "ja:jr-intro-pack-bulbasaur-06",
+  "reason": "same artwork as ja:PMCG1-100 (eye-checked 2026-11-10, twin rule)"
+ },
+ {
+  "id": "ja:jr-intro-pack-bulbasaur-08",
+  "reason": "same artwork as ja:jr-tamamushi-city-gym-deck-u23 (eye-checked 2026-11-10, twin rule)"
+ },
+ {
+  "id": "ja:jr-intro-pack-bulbasaur-10",
+  "reason": "same artwork as ja:jr-intro-pack-neo-totodile-06 (eye-checked 2026-11-10, twin rule)"
+ },
+ {
+  "id": "ja:jr-intro-pack-bulbasaur-23",
+  "reason": "same artwork as ja:jr-guren-town-gym-deck-u16 (eye-checked 2026-11-10, twin rule)"
+ },
+ {
+  "id": "ja:jr-intro-pack-bulbasaur-24",
+  "reason": "same artwork as ja:jr-intro-pack-neo-totodile-07 (eye-checked 2026-11-10, twin rule)"
+ },
+ {
+  "id": "ja:jr-intro-pack-bulbasaur-27",
+  "reason": "same artwork as ja:jr-intro-pack-neo-totodile-07 (eye-checked 2026-11-10, twin rule)"
+ },
+ {
+  "id": "ja:jr-intro-pack-neo-chikorita-u04",
+  "reason": "same artwork as ja:PMCG4-040 (eye-checked 2026-11-10, twin rule)"
+ },
+ {
+  "id": "ja:jr-intro-pack-neo-chikorita-u06",
+  "reason": "same artwork as ja:jr-neo-premium-file-1-u06 (eye-checked 2026-11-10, twin rule)"
+ },
+ {
+  "id": "ja:jr-intro-pack-neo-totodile-u05",
+  "reason": "same artwork as ja:jr-neo-premium-file-1-u05 (eye-checked 2026-11-10, twin rule)"
+ },
+ {
+  "id": "ja:jr-intro-pack-neo-totodile-u07",
+  "reason": "same artwork as ja:neo2-039 (eye-checked 2026-11-10, twin rule)"
+ },
+ {
+  "id": "ja:jr-intro-pack-squirtle-04",
+  "reason": "same artwork as ja:jr-intro-pack-neo-chikorita-05 (eye-checked 2026-11-10, twin rule)"
+ },
+ {
+  "id": "ja:jr-intro-pack-squirtle-05",
+  "reason": "same artwork as ja:jr-intro-pack-neo-totodile-05 (eye-checked 2026-11-10, twin rule)"
+ },
+ {
+  "id": "ja:jr-intro-pack-squirtle-06",
+  "reason": "same artwork as ja:PMCG1-099 (eye-checked 2026-11-10, twin rule)"
+ },
+ {
+  "id": "ja:jr-intro-pack-squirtle-12",
+  "reason": "same artwork as ja:jr-intro-pack-squirtle-34 (eye-checked 2026-11-10, twin rule)"
+ },
+ {
+  "id": "ja:jr-intro-pack-squirtle-17",
+  "reason": "same artwork as ja:jr-intro-pack-neo-chikorita-06 (eye-checked 2026-11-10, twin rule)"
+ },
+ {
+  "id": "ja:jr-intro-pack-squirtle-20",
+  "reason": "same artwork as ja:PMCG1-099 (eye-checked 2026-11-10, twin rule)"
+ },
+ {
+  "id": "ja:jr-intro-pack-squirtle-23",
+  "reason": "same artwork as ja:PMCG1-099 (eye-checked 2026-11-10, twin rule)"
+ },
+ {
+  "id": "ja:jr-intro-pack-squirtle-25",
+  "reason": "same artwork as ja:jr-guren-town-gym-deck-u16 (eye-checked 2026-11-10, twin rule)"
+ },
+ {
+  "id": "ja:jr-intro-pack-squirtle-27",
+  "reason": "same artwork as ja:PMCG1-099 (eye-checked 2026-11-10, twin rule)"
+ },
+ {
+  "id": "ja:jr-lightning-quick-construction-pack-013",
+  "reason": "same artwork as ja:jr-holon-research-tower-lightning-quarter-deck-011 (eye-checked 2026-11-10, twin rule)"
+ },
+ {
+  "id": "ja:jr-magmortar-vs-electivire-deck-kit-electivire-u05",
+  "reason": "same artwork as ja:jr-magmortar-vs-electivire-deck-kit-004 (eye-checked 2026-11-10, twin rule)"
+ },
+ {
+  "id": "ja:jr-magmortar-vs-electivire-deck-kit-magmortar-u04",
+  "reason": "same artwork as ja:jr-giratina-vs-dialga-deck-kit-giratina-009 (eye-checked 2026-11-10, twin rule)"
+ },
+ {
+  "id": "ja:jr-master-kit-side-deck-010",
+  "reason": "same artwork as ja:E2-088 (eye-checked 2026-11-10, twin rule)"
+ },
+ {
+  "id": "ja:jr-mew-lucario-gift-box-mightyena-015",
+  "reason": "same artwork as ja:jr-leafeon-vs-metagross-expert-deck-leafeon-015 (eye-checked 2026-11-10, twin rule)"
+ },
+ {
+  "id": "ja:jr-miscellaneous-decks-063",
+  "reason": "same artwork as ja:jr-kuchiba-city-gym-deck-u07 (eye-checked 2026-11-10, twin rule)"
+ },
+ {
+  "id": "ja:jr-moonlit-pursuit-039",
+  "reason": "same artwork as ja:jr-moonlit-pursuit-dawn-dash-u17 (eye-checked 2026-11-10, twin rule)"
+ },
+ {
+  "id": "ja:jr-moonlit-pursuit-056",
+  "reason": "same artwork as ja:jr-moonlit-pursuit-dawn-dash-u32 (eye-checked 2026-11-10, twin rule)"
+ },
+ {
+  "id": "ja:jr-moonlit-pursuit-060",
+  "reason": "same artwork as ja:jr-moonlit-pursuit-dawn-dash-u43 (eye-checked 2026-11-10, twin rule)"
+ },
+ {
+  "id": "ja:jr-moonlit-pursuit-063",
+  "reason": "same artwork as ja:jr-moonlit-pursuit-dawn-dash-u91 (eye-checked 2026-11-10, twin rule)"
+ },
+ {
+  "id": "ja:jr-moonlit-pursuit-064",
+  "reason": "same artwork as ja:jr-dawn-dash-065 (eye-checked 2026-11-10, twin rule)"
+ },
+ {
+  "id": "ja:jr-moonlit-pursuit-065",
+  "reason": "same artwork as ja:jr-moonlit-pursuit-dawn-dash-u03 (eye-checked 2026-11-10, twin rule)"
+ },
+ {
+  "id": "ja:jr-moonlit-pursuit-066",
+  "reason": "same artwork as ja:jr-moonlit-pursuit-dawn-dash-u30 (eye-checked 2026-11-10, twin rule)"
+ },
+ {
+  "id": "ja:jr-moonlit-pursuit-067",
+  "reason": "same artwork as ja:jr-moonlit-pursuit-dawn-dash-u78 (eye-checked 2026-11-10, twin rule)"
+ },
+ {
+  "id": "ja:jr-moonlit-pursuit-069",
+  "reason": "same artwork as ja:jr-dawn-dash-069 (eye-checked 2026-11-10, twin rule)"
+ },
+ {
+  "id": "ja:jr-moonlit-pursuit-070",
+  "reason": "same artwork as ja:jr-moonlit-pursuit-dawn-dash-u92 (eye-checked 2026-11-10, twin rule)"
+ },
+ {
+  "id": "ja:jr-moonlit-pursuit-dawn-dash-u118",
+  "reason": "same artwork as ja:jr-moonlit-pursuit-035 (eye-checked 2026-11-10, twin rule)"
+ },
+ {
+  "id": "ja:jr-moonlit-pursuit-dawn-dash-u119",
+  "reason": "same artwork as ja:jr-moonlit-pursuit-036 (eye-checked 2026-11-10, twin rule)"
+ },
+ {
+  "id": "ja:jr-moonlit-pursuit-dawn-dash-u121",
+  "reason": "same artwork as ja:jr-dawn-dash-035 (eye-checked 2026-11-10, twin rule)"
+ },
+ {
+  "id": "ja:jr-moonlit-pursuit-dawn-dash-u24",
+  "reason": "same artwork as ja:jr-moonlit-pursuit-046 (eye-checked 2026-11-10, twin rule)"
+ },
+ {
+  "id": "ja:jr-moonlit-pursuit-dawn-dash-u34",
+  "reason": "same artwork as ja:jr-dawn-dash-037 (eye-checked 2026-11-10, twin rule)"
+ },
+ {
+  "id": "ja:jr-moonlit-pursuit-dawn-dash-u63",
+  "reason": "same artwork as ja:jr-dawn-dash-004 (eye-checked 2026-11-10, twin rule)"
+ },
+ {
+  "id": "ja:jr-moonlit-pursuit-dawn-dash-u69",
+  "reason": "same artwork as ja:jr-dawn-dash-014 (eye-checked 2026-11-10, twin rule)"
+ },
+ {
+  "id": "ja:jr-movie-commemoration-vs-pack-aura-s-lucario-u03",
+  "reason": "same artwork as ja:PCG3-084 (eye-checked 2026-11-10, twin rule)"
+ },
+ {
+  "id": "ja:jr-nivi-city-gym-deck-u14",
+  "reason": "same artwork as ja:jr-guren-town-gym-deck-u16 (eye-checked 2026-11-10, twin rule)"
+ },
+ {
+  "id": "ja:jr-nivi-city-gym-deck-u15",
+  "reason": "same artwork as ja:jr-yamabuki-city-gym-deck-u03 (eye-checked 2026-11-10, twin rule)"
+ },
+ {
+  "id": "ja:jr-nivi-city-gym-deck-u18",
+  "reason": "same artwork as ja:jr-guren-town-gym-deck-u19 (eye-checked 2026-11-10, twin rule)"
+ },
+ {
+  "id": "ja:jr-nivi-city-gym-deck-u21",
+  "reason": "same artwork as ja:PMCG1-083 (eye-checked 2026-11-10, twin rule)"
+ },
+ {
+  "id": "ja:jr-nivi-city-gym-deck-u22",
+  "reason": "same artwork as ja:jr-intro-pack-squirtle-24 (eye-checked 2026-11-10, twin rule)"
+ },
+ {
+  "id": "ja:jr-nivi-city-gym-deck-u25",
+  "reason": "same artwork as ja:jr-intro-pack-bulbasaur-19 (eye-checked 2026-11-10, twin rule)"
+ },
+ {
+  "id": "ja:jr-palkia-lv-x-constructed-standard-deck-011",
+  "reason": "same artwork as ja:jr-giratina-vs-dialga-deck-kit-dialga-011 (eye-checked 2026-11-10, twin rule)"
+ },
+ {
+  "id": "ja:jr-pcg-promos-059",
+  "reason": "same artwork as ja:jr-mew-lucario-gift-box-mew-013 (eye-checked 2026-11-10, twin rule)"
+ },
+ {
+  "id": "ja:jr-pcg-promos-060",
+  "reason": "same artwork as ja:jr-mew-lucario-gift-box-lucario-010 (eye-checked 2026-11-10, twin rule)"
+ },
+ {
+  "id": "ja:jr-psychic-quick-construction-pack-008",
+  "reason": "same artwork as ja:jr-movie-commemoration-vs-pack-sky-splitting-deoxys-016 (eye-checked 2026-11-10, twin rule)"
+ },
+ {
+  "id": "ja:jr-quick-starter-gift-set-green-u08",
+  "reason": "same artwork as ja:PMCG3-044 (eye-checked 2026-11-10, twin rule)"
+ },
+ {
+  "id": "ja:jr-quick-starter-gift-set-green-u17",
+  "reason": "same artwork as ja:jr-intro-pack-neo-totodile-22 (eye-checked 2026-11-10, twin rule)"
+ },
+ {
+  "id": "ja:jr-quick-starter-gift-set-green-u22",
+  "reason": "same artwork as ja:jr-vending-machine-series-1-blue-u19 (eye-checked 2026-11-10, twin rule)"
+ },
+ {
+  "id": "ja:jr-quick-starter-gift-set-red-u04",
+  "reason": "same artwork as ja:jr-yamabuki-city-gym-deck-u03 (eye-checked 2026-11-10, twin rule)"
+ },
+ {
+  "id": "ja:jr-quick-starter-gift-set-red-u06",
+  "reason": "same artwork as ja:PMCG1-072 (eye-checked 2026-11-10, twin rule)"
+ },
+ {
+  "id": "ja:jr-quick-starter-gift-set-red-u17",
+  "reason": "same artwork as ja:jr-vending-machine-series-1-blue-u24 (eye-checked 2026-11-10, twin rule)"
+ },
+ {
+  "id": "ja:jr-rampardos-the-attacker-constructed-half-deck-u03",
+  "reason": "same artwork as ja:jr-movie-commemoration-vs-pack-aura-s-lucario-013 (eye-checked 2026-11-10, twin rule)"
+ },
+ {
+  "id": "ja:jr-rampardos-the-attacker-constructed-half-deck-u04",
+  "reason": "same artwork as ja:DP2-120 (eye-checked 2026-11-10, twin rule)"
+ },
+ {
+  "id": "ja:jr-rampardos-the-attacker-constructed-half-deck-u14",
+  "reason": "same artwork as ja:DP2-119 (eye-checked 2026-11-10, twin rule)"
+ },
+ {
+  "id": "ja:jr-tamamushi-city-gym-deck-u24",
+  "reason": "same artwork as ja:PMCG1-081 (eye-checked 2026-11-10, twin rule)"
+ },
+ {
+  "id": "ja:jr-vending-machine-series-1-blue-u20",
+  "reason": "same artwork as ja:web1-002 (eye-checked 2026-11-10, twin rule)"
+ },
+ {
+  "id": "ja:jr-water-quick-construction-pack-014",
+  "reason": "same artwork as ja:jr-pcg-promos-057 (eye-checked 2026-11-10, twin rule)"
+ },
+ {
+  "id": "ja:jr-dpt-gift-box-chimchar-013",
+  "reason": "same artwork as ja:jr-dpt-entry-pack-giratina-013 (eye-checked 2026-11-10, twin rule)"
+ },
+ {
+  "id": "ja:jr-emerald-gift-box-rayquaza-010",
+  "reason": "same artwork as ja:jr-emerald-gift-box-deoxys-011 (eye-checked 2026-11-10, twin rule)"
+ },
+ {
+  "id": "ja:jr-emerald-gift-box-rayquaza-011",
+  "reason": "same artwork as ja:jr-emerald-gift-box-deoxys-012 (eye-checked 2026-11-10, twin rule)"
+ },
+ {
+  "id": "ja:jr-fire-quick-construction-pack-013",
+  "reason": "same artwork as ja:jr-fire-quick-construction-pack-012 (eye-checked 2026-11-10, twin rule)"
+ },
+ {
+  "id": "ja:jr-gift-box-latios-015",
+  "reason": "same artwork as ja:jr-gift-box-latias-015 (eye-checked 2026-11-10, twin rule)"
+ },
+ {
+  "id": "ja:jr-intro-pack-bulbasaur-05",
+  "reason": "same artwork as ja:jr-intro-pack-bulbasaur-04 (eye-checked 2026-11-10, twin rule)"
+ },
+ {
+  "id": "ja:jr-intro-pack-bulbasaur-12",
+  "reason": "same artwork as ja:jr-intro-pack-bulbasaur-10 (eye-checked 2026-11-10, twin rule)"
+ },
+ {
+  "id": "ja:jr-intro-pack-bulbasaur-31",
+  "reason": "same artwork as ja:jr-intro-pack-bulbasaur-27 (eye-checked 2026-11-10, twin rule)"
+ },
+ {
+  "id": "ja:jr-intro-pack-squirtle-08",
+  "reason": "same artwork as ja:jr-intro-pack-squirtle-04 (eye-checked 2026-11-10, twin rule)"
+ },
+ {
+  "id": "ja:jr-intro-pack-squirtle-11",
+  "reason": "same artwork as ja:jr-intro-pack-squirtle-04 (eye-checked 2026-11-10, twin rule)"
+ },
+ {
+  "id": "ja:jr-intro-pack-squirtle-22",
+  "reason": "same artwork as ja:jr-intro-pack-squirtle-05 (eye-checked 2026-11-10, twin rule)"
+ },
+ {
+  "id": "ja:jr-intro-pack-squirtle-28",
+  "reason": "same artwork as ja:jr-intro-pack-squirtle-04 (eye-checked 2026-11-10, twin rule)"
+ },
+ {
+  "id": "ja:jr-intro-pack-squirtle-30",
+  "reason": "same artwork as ja:jr-intro-pack-squirtle-05 (eye-checked 2026-11-10, twin rule)"
+ },
+ {
+  "id": "ja:jr-intro-pack-squirtle-36",
+  "reason": "same artwork as ja:jr-intro-pack-squirtle-20 (eye-checked 2026-11-10, twin rule)"
+ },
+ {
+  "id": "ja:jr-water-quick-construction-pack-015",
+  "reason": "same artwork as ja:jr-water-quick-construction-pack-014 (eye-checked 2026-11-10, twin rule)"
+ },
+ {
+  "id": "ja:jr-fire-quick-construction-pack-014",
+  "reason": "same artwork as ja:jr-fire-quick-construction-pack-012 (eye-checked 2026-11-10, twin rule)"
+ },
+ {
+  "id": "ja:jr-garchomp-vs-charizard-sp-deck-kit-charizard-013",
+  "reason": "same artwork as ja:jr-dpt-entry-pack-giratina-013 (eye-checked 2026-11-10, twin rule)"
+ },
+ {
+  "id": "ja:jr-intro-pack-bulbasaur-14",
+  "reason": "same artwork as ja:jr-intro-pack-bulbasaur-10 (eye-checked 2026-11-10, twin rule)"
+ },
+ {
+  "id": "ja:jr-intro-pack-bulbasaur-15",
+  "reason": "same artwork as ja:jr-intro-pack-bulbasaur-04 (eye-checked 2026-11-10, twin rule)"
+ },
+ {
+  "id": "ja:jr-intro-pack-bulbasaur-25",
+  "reason": "same artwork as ja:jr-intro-pack-bulbasaur-08 (eye-checked 2026-11-10, twin rule)"
+ },
+ {
+  "id": "ja:jr-intro-pack-bulbasaur-38",
+  "reason": "same artwork as ja:jr-intro-pack-bulbasaur-27 (eye-checked 2026-11-10, twin rule)"
+ },
+ {
+  "id": "ja:jr-intro-pack-neo-totodile-29",
+  "reason": "same artwork as ja:jr-intro-pack-bulbasaur-06 (eye-checked 2026-11-10, twin rule)"
+ },
+ {
+  "id": "ja:jr-intro-pack-squirtle-33",
+  "reason": "same artwork as ja:jr-intro-pack-squirtle-04 (eye-checked 2026-11-10, twin rule)"
+ },
+ {
+  "id": "ja:jr-intro-pack-squirtle-38",
+  "reason": "same artwork as ja:jr-intro-pack-squirtle-05 (eye-checked 2026-11-10, twin rule)"
+ },
+ {
+  "id": "ja:jr-fire-quick-construction-pack-015",
+  "reason": "same artwork as ja:jr-fire-quick-construction-pack-012 (eye-checked 2026-11-10, twin rule)"
+ },
+ {
+  "id": "ja:jr-garchomp-vs-charizard-sp-deck-kit-garchomp-013",
+  "reason": "same artwork as ja:jr-dpt-entry-pack-giratina-013 (eye-checked 2026-11-10, twin rule)"
+ },
+ {
+  "id": "ja:jr-intro-pack-bulbasaur-17",
+  "reason": "same artwork as ja:jr-intro-pack-bulbasaur-06 (eye-checked 2026-11-10, twin rule)"
+ },
+ {
+  "id": "ja:jr-magmortar-vs-electivire-deck-kit-magmortar-u12",
+  "reason": "same artwork as ja:jr-dpt-entry-pack-giratina-013 (eye-checked 2026-11-10, twin rule)"
+ },
+ {
+  "id": "ja:jr-intro-pack-bulbasaur-33",
+  "reason": "same artwork as ja:jr-intro-pack-bulbasaur-06 (eye-checked 2026-11-10, twin rule)"
+ }
+]

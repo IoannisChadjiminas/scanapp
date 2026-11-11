@@ -25,6 +25,12 @@ PARENT = os.environ["PARENT"]
 PARENT_IMPORT = os.environ["PARENT_IMPORT"]
 TARGET = os.environ["TARGET"]
 IMPORT = os.environ["IMPORT"]
+# Provenance of the batch's images. The default is the official-site batch (JAREC3). JAREC4's
+# TCG Collector images were recorded with that default by mistake; FIX_SOURCE_BATCH names an
+# earlier batch whose rows get SOURCE_KIND / SOURCE_PERMISSION too.
+SOURCE_KIND = os.environ.get("SOURCE_KIND", "official_pokemon_card_site")
+SOURCE_PERMISSION = os.environ.get("SOURCE_PERMISSION", "pokemon-card.com is an owner-approved Japanese image source.")
+FIX_SOURCE_BATCH = os.environ.get("FIX_SOURCE_BATCH")
 
 
 def main(batch_dir, role_file, feature_sha):
@@ -109,11 +115,15 @@ END $acl$;""")
                             f"{jlit({k: r[k] for k in ('card_id','profile','language','name','set_name','collector_number','reference_sha256')})}::jsonb)"
                             for i, r in enumerate(art_added)) + ";")
     for u in updates:
-        patch = {"image_path": u["image_path"], "sha256": u["image_sha256"], "source_kind": "official_pokemon_card_site",
+        patch = {"image_path": u["image_path"], "sha256": u["image_sha256"], "source_kind": SOURCE_KIND,
                  "source": u["source"], "name_official_ja": u["name_ja"], "treatment": u["treatment"],
-                 "treatment_reason": u["reason"], "source_use_permission": "pokemon-card.com is an owner-approved Japanese image source.",
+                 "treatment_reason": u["reason"], "source_use_permission": SOURCE_PERMISSION,
                  "image_batch": IMPORT}
         s.append(f"UPDATE {TARGET}.reference_metadata SET metadata = metadata || {jlit(patch)}::jsonb WHERE source_key={lit(prov_keys[u['id']])};")
+    if FIX_SOURCE_BATCH:
+        fix = {"source_kind": SOURCE_KIND, "source_use_permission": SOURCE_PERMISSION, "source_kind_corrected_in": IMPORT}
+        s.append(f"UPDATE {TARGET}.reference_metadata SET metadata = metadata || {jlit(fix)}::jsonb "
+                 f"WHERE source_key LIKE 'catalogue-completion-source:%' AND metadata->>'image_batch' = {lit(FIX_SOURCE_BATCH)};")
     delta = {k: v for k, v in pman.items() if k != "indexed_ids" and rm["vector-manifest:pad"][0].get(k) != v}
     s.append(f"UPDATE {TARGET}.reference_metadata SET metadata = metadata || {jlit(delta)}::jsonb || "
              f"jsonb_build_object('indexed_ids', (metadata->'indexed_ids') || {jlit(scannable)}::jsonb) "
@@ -133,7 +143,7 @@ END $acl$;""")
                          "manifest_sha256": hashlib.sha256((rel / "artwork/manifest.json").read_bytes()).hexdigest()},
              "feature_only_printing_alternatives": list(meta.get("feature_only_printing_alternatives") or []) + alternatives,
              "ja_recovery_images": {"cards": len(updates), "scannable": len(scannable), "printing_alternatives": len(alternatives),
-                                    "source": "pokemon-card.com official card search", "batch": rel.name}}
+                                    "source": SOURCE_KIND, "batch": rel.name}}
     vectors_pad = {**meta["vectors"]["pad"], "count": len(ids), "aggregate_md5": agg_md5(vh)}
     s.append(f"UPDATE {TARGET}.import_manifest SET metadata = jsonb_set(jsonb_set(jsonb_set(metadata,'{{digests,cards,md5}}',{jlit(cards_md5)}::jsonb),"
              f"'{{vectors,pad}}',{jlit(vectors_pad)}::jsonb),'{{target,schema}}',{jlit(TARGET)}::jsonb) || {jlit(patch)}::jsonb, "

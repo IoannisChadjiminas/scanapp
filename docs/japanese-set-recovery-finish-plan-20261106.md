@@ -201,3 +201,193 @@ Steps 4–7 cannot be finished from this session without the owner:
 - `pokesingle_completion_20261107_jarec4` / `PS-CATALOGUE-EN-JA-REC4-20261107` on top of JAREC3: 613 cards get images; 18 scannable, 595 printing alternatives (older eras are held from vectors as in JAREC2). Replay: 0 changes on all 98 photos.
 - Staging serves it: **Japanese cards with an image 27,275 of 28,024**; vectors 45,258. Rollback to JAREC3: `/etc/scanapp-staging/catalogue-rollback/ja-rec4-20261107/catalogue-release.env.before`.
 - Still without an image: 749 new cards (listed with reasons in `review/tcgcollector-fill-held-20261107.jsonl`).
+
+## 2026-11-07: JAREC5 names and links kept on staging
+
+- The 44 nameless cards now have names: Shiny Treasure ex 127–167 (official Japanese name, English in `view_title`, image-checked against the official image), LEGEND Promos No. 500–511 and Pokémon VS 077/142 (TCG Collector labels).
+- 31 new Cardmarket links with prices (30 Shiny Treasure ex, Will's Slowking). 25 name-only links from shared pools were cleared (Neo Premium File 1–3 → Unnumbered Promos; unnumbered energies of Leaders' Pokémon: Movie Limited Edition). The other route-name mismatches were checked and are correct (vending Expansion Sheet, MSM movie pack, EC1 starter deck, Cardweb, 20th Anniversary Starter Pack = BREAK Starter Pack).
+- `pokesingle_completion_20261107_jarec5` / `PS-CATALOGUE-EN-JA-REC5-20261107` (`prepare_sql_fixes.py`). Replay: 0 changes on 98 photos. Staging serves it. Rollback to JAREC4: `/etc/scanapp-staging/catalogue-rollback/ja-rec5-20261107/catalogue-release.env.before`.
+
+## 2026-11-08: JAREC6b switched on staging (older-era vectors released)
+
+- `pokesingle_completion_20261108_jarec6b` / `PS-CATALOGUE-EN-JA-REC6B-20261108` on top of JAREC5
+  (`build_held_release.py`, `prepare_sql_held.py`).
+  - 5,992 held older-era cards get vectors: 51,250 pad vectors and 36,662 artwork regions,
+    bundle `/data/artwork/20261108-ja-recovery-held-b`.
+  - Three English-printed Japanese releases (`jr-miscellaneous-promos-123`, `-068`, `-069`) stay
+    printing alternatives. They were found by an OCR sweep of all 5,995 references and checked
+    by eye.
+- Code: `main` `6a5a16f` (PR 108), seven ranking flags set in
+  `/etc/scanapp-staging/catalogue-release.env` in the same step as the catalogue:
+  `RANK_FAMILY_VERIFY`, `VERIFY_UNMATCHED_NAME`, `RANK_SPECIES_NAMES`, `OCR_DEX_NUMBER_GUARD`,
+  `OCR_CJK_MINUS_GUARD`, `OCR_PROMO_S5_GUARD`, `RANK_TWIN_INCUMBENCY`. The vectors must never be
+  served without them.
+- Replays against what staging served, on the served image: every change is of an accepted kind.
+
+  | Vintage panel (135) | Right first | Right offered | Wrong | Retake | No match |
+  |---|---|---|---|---|---|
+  | Served before | 82 | 6 | 17 | 29 | 1 |
+  | JAREC6b | 118 | 12 | 0 | 4 | 1 |
+
+- Health: ready, restarts 0, no OOM, 1.6 GB available. Family check on the staging CPU: +0.44 s
+  median, +2.1 s p95 on scans that trigger it.
+- Rollback: `/etc/scanapp-staging/catalogue-rollback/ja-rec6b-20261108/catalogue-release.env.before`.
+  Install it as the release env and recreate only the API. Rehearsed at 22:59Z: 71 s, healthy,
+  JAREC5 with the flags off, then forward again. The rollback state's photos: the merged code
+  with the flags off on JAREC5 gives 0 changes on the 98-photo panel.
+- Not yet covered: the sealed eBay proof panel (Phase T) does not exist yet.
+
+## 2026-11-09: JAREC7 image batch switched on staging (Phase B step 1)
+
+- `pokesingle_completion_20261109_jarec7` / `PS-CATALOGUE-EN-JA-REC7-20261109` on top of JAREC6b
+  (`build_image_batch.py`, `prepare_sql_images.py`).
+  - 104 TCG Collector images that were held as "looks different", each eye-checked against its
+    row on contact sheets. Most rows' earlier image was a card back or a weak scan.
+  - The earlier weak images of PCG-P 059 (Psychic Energy) and 060 (Fighting Energy) were on each
+    other's rows.
+  - 4 cards are scannable and 100 are printing alternatives.
+  - Five gym-deck Double Colorless Energy rows shared one image file with
+    `jr-hanada-city-gym-deck-u03`, so they stay without an image (one file, one card).
+- Provenance fix: JAREC4's 613 TCG Collector images had been recorded as official pokemon-card.com
+  images (hard-coded source). They are now `tcgcollector_scan`.
+- Replays against JAREC6b with the seven flags: 0 changes on the 98 photos (flags on and off), the
+  203 stored uploads and the 135 vintage photos. Health: ready, restarts 0, no OOM.
+- Rollback: `/etc/scanapp-staging/catalogue-rollback/ja-rec7-20261109/catalogue-release.env.before`.
+- Still without an image: 645 Japanese cards, each with its next source in
+  `data/catalogue-gaps/ja-set-recovery-20261029-v3/phase-b-20261109/no-image-worklist.csv`:
+
+  | Next source | Cards |
+  |---|---|
+  | Page-only image (eye-checked, sub-180 px), next fixes batch | 22 |
+  | Cardmarket product images (Chrome) | 227 |
+  | Bulbapedia identity, then Japanese shops (Chrome) | 396 |
+
+## Chrome sitting (deferred; owner's Chrome needed)
+
+Cardmarket product pages, Bulbapedia (Cloudflare 403 to scripts) and the Japanese shop
+catalogues can only be read in the owner's Chrome. Every other phase runs first. Worklists, in
+`data/catalogue-gaps/ja-set-recovery-20261029-v3/phase-b-20261109/`:
+
+| Worklist | Size | What is read | Time at 15 s a page |
+|---|---|---|---|
+| `chrome-cardmarket.json` | 235 product pages: 229 Japanese cards without an image + the 6 English "Yellow A Alternate" | the product image and title, checked against name and number | ~1 h |
+| `chrome-bulbapedia-sets.json` | 72 set/deck pages covering 396 cards | each deck list: the row's identity and official Japanese name | ~20 min |
+| `chrome-shops.json` | 396 cards (after Bulbapedia) | CardRush, Hareruya2, Yuyu-tei, Toretoku, Mandarake: a product photo by set, number and name | ~2–3 h |
+
+**The command.** Tell me "start the Chrome sitting" with Chrome open and signed in to nothing
+special. I drive Claude in Chrome over the three lists in order: one page at a time, read only,
+nothing bought or posted, no cookies beyond what each site needs to show a page. Results go to
+`phase-b-20261109/chrome-*-results.jsonl`.
+
+**Done already:**
+- JAREC7: 104 images;
+- JAREC8: 22 page-only images, and a reason for every card not scannable;
+- this worklist.
+
+**Waits on the sitting:**
+- each image eye-checked on contact sheets;
+- one image batch per source on top of the served release (same scripts as JAREC3/4/7);
+- the replay gate before each switch.
+
+**After it:** listing photos (eBay, Mercari, Snkrdunk) as the last resort, marked photo-sourced.
+Whatever is left ships without an image, with its reason in the coverage queue.
+
+**Not waiting on Chrome:**
+- Phase T (the proof panel, in its own session);
+- Phase C vector releases, once the sealed half exists;
+- Phase D English image upgrades (186 references under 500 px, via `pokemontcg.io` where it has
+  them);
+- the next fixes batch: the `exu` Unown rows are TCGdex duplicates of `ex10-unown-*`.
+
+## 2026-11-09: JAREC8 fixes batch switched on staging
+
+- `pokesingle_completion_20261109_jarec8` / `PS-CATALOGUE-EN-JA-REC8-20261109` on top of JAREC7
+  (`prepare_sql_fixes.py`).
+  - 22 eye-checked TCG Collector images under 180 px are page-only (`remote_image_url`,
+    `has_image` 0): no features and no vectors.
+  - The import manifest's `coverage_queue` records the reason for all 850 cards that are neither
+    scannable nor a printing alternative:
+    - 623 Japanese cards with no image, each with its next source;
+    - 22 display-only;
+    - 161 TCG Pocket (digital only);
+    - 34 English physical cards;
+    - 10 imaged cards without a vector.
+- Replays against JAREC7: 0 changes on every panel. Check: `ja:DPP-033` returns its page-only
+  image.
+- Rollback: `/etc/scanapp-staging/catalogue-rollback/ja-rec8-20261109/catalogue-release.env.before`.
+
+## 2026-11-09: JAREC10 Cardmarket image batch switched on staging
+
+- `pokesingle_completion_20261109_jarec10` / `PS-CATALOGUE-EN-JA-REC10-20261109` on top of JAREC8
+  (Phase B step 2, the Chrome sitting).
+  - 230 of 235 Cardmarket product pages read. 5 English Yellow A Alternate pages were still
+    rate-limited and are left for a later retry.
+  - 224 images were accepted after eye-checking on contact sheets. Rejected: two Latias
+    placeholders, two sha clashes with existing images, and one Traditional Chinese printing.
+  - Of the 224: 9 are scannable (modern, no twin). 215 are older-era printing alternatives
+    whose vectors are held, like JAREC2, until the sealed proof panel passes.
+  - Features `20261109-ja-recovery-img5`, artwork `/data/artwork/20261109-ja-recovery-img5`.
+- Replays against JAREC8 showed 0 changes on every panel: 98 with flags on and off, 203 uploads,
+  135 vintage, and pmcg4.
+- Rollback: `/etc/scanapp-staging/catalogue-rollback/ja-rec10-20261109/catalogue-release.env.before`.
+- Shops: Yuyu-tei showed no coverage, so they were dropped. Bulbapedia gives identity only.
+  About 421 Japanese cards are left without an image. They go to listing photos as the last
+  resort (Phase B step 5), or ship with a reason.
+
+## 2026-11-09: JAREC11 coverage-queue refresh switched on staging
+
+- `pokesingle_completion_20261109_jarec11` / `PS-CATALOGUE-EN-JA-REC11-20261109` on top of JAREC10
+  (`prepare_sql_fixes.py`, no card changes). The queue now has 629 entries:
+  - 596 cards with no image:
+    - 401 Japanese cards, each with what was tried and its next source: an eBay listing photo,
+      marked photo-sourced, or otherwise it ships without an image;
+    - 161 TCG Pocket cards (digital only);
+    - 28 `exu` Unown rows recorded as TCGdex duplicates of their `ex10-unown-*` twin;
+    - 6 Yellow A Alternate prints, waiting on the rate-limited Cardmarket pages.
+  - 20 display-only images.
+  - 10 imaged cards without a vector.
+  - 3 English-printed holds, with their reason.
+  - The 5 Cardmarket rejects carry their rejection reason.
+- Replays against JAREC10 showed 0 changes on every panel. Rollback:
+  `/etc/scanapp-staging/catalogue-rollback/ja-rec11-20261109/catalogue-release.env.before`.
+
+## 2026-11-09: JAREC12 listing-photo batch switched on staging (Phase B step 5)
+
+- `pokesingle_completion_20261109_jarec12` / `PS-CATALOGUE-EN-JA-REC12-20261109` on top of JAREC11.
+  - The 401 Japanese cards still without an image were searched on eBay (Browse API) for up to two
+    main photos each. Numbered cards were matched by name, number and a Japanese marker. Unnumbered
+    cards and the DP4 halves (Dawn Dash, Moonlit Pursuit, which print no set number) were matched by
+    name and set words instead.
+  - Each photo was cropped to its card frame and eye-checked on contact sheets:
+    - 297 candidate photos were checked and 107 accepted;
+    - 105 passed the image gate (Quick Starter Red u05 too small, u15 too blurry).
+  - Rejected:
+    - every 1998–99 gym-deck card, because listings disagree on LV/HP and the deck printing can't be
+      verified;
+    - wrong set or number;
+    - the other half of a deck kit, told apart by the deck mark;
+    - Nidoran of the wrong sex;
+    - watermarked, cut-off and slab-only crops.
+  - All 105 are older era, so they are printing alternatives with no vectors, and scanning is
+    unchanged.
+  - Marked `source_kind=listing_photo` with a photo-sourced permission note. They are stored as local
+    reference images and are never mirrored to the card-image CDN.
+- Features `20261109-ja-recovery-img6` (`96a81264…`), artwork `/data/artwork/20261109-ja-recovery-img6`.
+- Replays against JAREC11 showed 0 changes on every panel. Rollback:
+  `/etc/scanapp-staging/catalogue-rollback/ja-rec12-20261109/catalogue-release.env.before`.
+- After this batch, 296 Japanese cards have no image. Each ships with its reason in the JAREC13
+  coverage queue.
+
+## 2026-11-09: JAREC13 final coverage queue switched on staging (Phase B closed)
+
+- `pokesingle_completion_20261109_jarec13` / `PS-CATALOGUE-EN-JA-REC13-20261109` on top of JAREC12.
+  No card changes. The queue has 524 entries:
+  - 491 with no image;
+  - 20 display-only;
+  - 10 imaged cards without a vector;
+  - 3 English-printed holds.
+- 296 Japanese cards ship without an image (749 at the start of Phase B). Each records what was
+  tried (TCG Collector, Cardmarket, Japanese shops, Bulbapedia identity, eBay listings) and why
+  nothing was usable.
+- Replays against JAREC12 showed 0 changes on every panel. Rollback:
+  `/etc/scanapp-staging/catalogue-rollback/ja-rec13-20261109/catalogue-release.env.before`.
