@@ -85,7 +85,7 @@ def main(release_dir, role_file, feature_sha):
     scannable = [c["id"] for c in cards if c["treatment"] == "scannable"]
     n_parent = len(ids) - len(scannable)
     assert list(ids[n_parent:]) == scannable
-    art_vecs = np.load(rel / "artwork/embeddings.npy")[-len(art_added):]
+    art_vecs = np.load(rel / "artwork/embeddings.npy")[len(np.load(rel / "artwork/embeddings.npy")) - len(art_added):]
     for rec, vec in zip(art_added, art_vecs):
         assert vhash(vec) == rec["source_vector_sha256"]
 

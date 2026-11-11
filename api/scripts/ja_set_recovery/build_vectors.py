@@ -103,9 +103,10 @@ def main(run_dir: str, model_path: str, share: str | None = None) -> None:
         return
 
     parts = [np.load(chunks / f"{s:05d}.npz") for s in range(0, len(cards), CHUNK)]
-    pad = np.concatenate([p["pad"] for p in parts])
-    square = np.concatenate([p["square"] for p in parts])
-    arts = np.concatenate([p["art"] for p in parts])
+    empty = np.zeros((0, 384), np.float32)  # a batch with no usable image (display-only rows) has no chunks
+    pad = np.concatenate([p["pad"] for p in parts]) if parts else empty
+    square = np.concatenate([p["square"] for p in parts]) if parts else empty
+    arts = np.concatenate([p["art"] for p in parts]) if parts else empty
     records = [json.loads(r) for p in parts for r in p["records"]]
     ids = np.asarray([card["id"] for card in cards], dtype=str)
     assert len(pad) == len(square) == len(ids) and len(arts) == len(records) == len(ids) * len(PROFILES)

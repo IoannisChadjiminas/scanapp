@@ -30,6 +30,8 @@ def row_key(row):
     if row["number"] is not None:
         return str(row["number"])
     stem = urlparse(row["image_url"]).path.rsplit("/", 1)[-1].rsplit(".", 1)[0]
+    if urlparse(row["image_url"]).netloc == "www.pokemon-card.com":
+        return stem
     return stem.split("_")[1] if stem.count("_") >= 2 else stem
 
 
@@ -72,7 +74,7 @@ def main():
             raise ValueError("unexpected source host")
         if parsed.netloc == "www.pokemon-card.com":  # official card search: the file name is the key
             suffix = parsed.path.rsplit("/", 1)[-1].rsplit(".", 1)[0]
-            extension = "jpg"
+            extension = urlparse(url).path.rsplit(".", 1)[-1].lower()  # jpg, png or gif
         else:
             number = row_key(row)
             suffix = f"{int(number):03d}" if number.isdigit() else number
@@ -95,7 +97,7 @@ def main():
         with Image.open(io.BytesIO(data)) as image:
             image.verify()
         with Image.open(io.BytesIO(data)) as image:
-            if image.format != ("PNG" if extension == "png" else "JPEG"):
+            if image.format != {"png": "PNG", "jpg": "JPEG", "gif": "GIF"}.get(extension):
                 raise ValueError("unexpected image format")
             width, height = image.size
         filename.write_bytes(data)

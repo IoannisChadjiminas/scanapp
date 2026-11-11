@@ -80,7 +80,7 @@ def main(run_dir, parent_dir, name):
     # pad vectors: parent order, then scannable ids
     ids = list(p_ids) + scannable
     assert len(ids) == len(set(ids))
-    pad = np.concatenate([p_pad.astype(np.float32), np.asarray([n_pad[pos[c]] for c in scannable], np.float32)])
+    pad = np.concatenate([p_pad.astype(np.float32), np.asarray([n_pad[pos[c]] for c in scannable], np.float32).reshape(-1, 384)])
     vdir = out / "vectors/pad"
     vdir.mkdir(parents=True)
     np.save(vdir / "embedding_card_ids.npy", np.asarray(ids, dtype=str))
@@ -113,7 +113,7 @@ def main(run_dir, parent_dir, name):
             add_vecs.append(vec)
     adir = out / "artwork"
     adir.mkdir()
-    np.save(adir / "embeddings.npy", np.concatenate([p_art.astype(np.float32), np.asarray(add_vecs, np.float32)]))
+    np.save(adir / "embeddings.npy", np.concatenate([p_art.astype(np.float32), np.asarray(add_vecs, np.float32).reshape(-1, 384)]))
     all_recs = p_recs + add_recs
     (adir / "records.json").write_text(json.dumps(all_recs, ensure_ascii=False, separators=(",", ":")))
     new_aman = dict(aman)

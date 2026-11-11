@@ -16,6 +16,11 @@ verified-mappings.jsonl (empty), review/image-coverage-reconciliation-20261030.c
 `limitless_source_files`, only when the file exists and the eye check accepted it) and
 already-present.json. Names are the Japanese names of the rows file.
 
+Spec extras: "extra_rows" (rows the rows file does not give, e.g. a `check` row resolved by hand),
+"require_image", "without_image" (only rows that have no image URL: they are added display-only),
+"exclude_keys", "catalogue_set" (our set id when it differs from source_set), and
+"accept_all_viewed" at the top level (the caller has looked at every image of the run, see below).
+
 The eye check is separate: ACCEPTED_JSON (RUN_DIR/eye-check.json, written by hand after looking at
 every image) maps `<source_set>:<number>` to "accepted" or to a rejection reason; a row without an
 entry is not given an image. CATALOGUE_SETS_JSON is {set_id: [{"id": ..., "collector_number": ...}]}.
@@ -26,6 +31,23 @@ import sys
 from pathlib import Path
 
 ROWS = Path(__file__).resolve().parents[3] / "docs/outside-list-missing-rows-20261111.json"
+
+
+def row_key(row):
+    """Same key as acquire_limitless_batch.py: the number, else the token in the image file name."""
+    if row["number"] is not None:
+        return str(row["number"])
+    if not row.get("image_url"):
+        return row["name"]
+    stem = row["image_url"].rsplit("/", 1)[-1].rsplit(".", 1)[0]
+    return stem if "pokemon-card.com" in row["image_url"] else stem.split("_")[1]
+
+
+def image_file(row, entry, key):
+    if "pokemon-card.com" in (row.get("image_url") or ""):
+        return Path(entry["image_dir"]) / (entry["source_set"] + "_" + row["image_url"].rsplit("/", 1)[-1])
+    suffix = f"{int(key):03d}" if key.isdigit() else key
+    return Path(entry["image_dir"]) / f"{entry['source_set']}_{suffix}.png"
 
 
 def main(run_dir, catalogue_path, spec_path):
@@ -41,6 +63,13 @@ def main(run_dir, catalogue_path, spec_path):
         selected = [r for r in rows if r["language"] == "ja" and r["source_set"] == code
                     and r["row_source"] == entry.get("row_source", "limitless")
                     and r["status"] in entry.get("include_status", ["missing"])]
+        selected = selected + list(entry.get("extra_rows", []))
+        if entry.get("require_image"):
+            selected = [r for r in selected if r.get("image_url")]
+        if entry.get("without_image"):
+            selected = [r for r in selected if not r.get("image_url")]
+        if entry.get("exclude_keys"):
+            selected = [r for r in selected if row_key(r) not in entry["exclude_keys"]]
         if entry.get("numbers"):
             selected = [r for r in selected if r["number"] in entry["numbers"]]
         have = catalogue.get(entry.get("catalogue_set", code), [])
@@ -53,11 +82,11 @@ def main(run_dir, catalogue_path, spec_path):
                          "catalogue_rows": len(have), "checklist_source": spec["checklist_source"]})
         total = entry.get("printed_total")
         for row in selected:
-            number = row["number"]
-            if number.isdigit() and number.lstrip("0") in have_numbers:
+            number = row_key(row)
+            if row["number"] is not None and number.isdigit() and number.lstrip("0") in have_numbers:
                 present.append(row)
                 continue
-            if number.isdigit():
+            if row["number"] is not None and number.isdigit():
                 printed = f"{int(number):03d}/{total:03d}" if total else f"{int(number):03d}"
             else:
                 printed = f"unnumbered ({number})"
@@ -69,9 +98,8 @@ def main(run_dir, catalogue_path, spec_path):
             new_rows.append(card)
             held.append({"group_id": group_id, "printed_number": printed, "card_name": row["name"],
                          "status": "held", "reason": "not_verified_on_cardmarket_browser_worklist"})
-            suffix = f"{int(number):03d}" if number.isdigit() else number
-            image = Path(entry["image_dir"]) / f"{code}_{suffix}.png"
-            ok = eye.get(f"{code}:{number}") == "accepted" and image.is_file()
+            image = image_file(row, entry, number) if row.get("image_url") else Path("/nonexistent")
+            ok = (eye.get(f"{code}:{number}") == "accepted" or spec.get("accept_all_viewed")) and image.is_file()
             recon.append({"group_id": group_id, "printed_number": printed, "card_name": row["name"],
                           "limitless_source_files": str(image) if ok else ""})
     (run / "review").mkdir(exist_ok=True)
