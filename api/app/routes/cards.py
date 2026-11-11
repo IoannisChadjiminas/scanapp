@@ -35,6 +35,11 @@ _PHYSICAL = (
     "NOT (cards.language = 'en'"
     " AND (cards.set_id = 'P-A' OR cards.set_id GLOB '[AB][0-9]*'))"
 )
+# Unseen Forces Unown Collection (exu) lists the 28 Unown of Unseen Forces a second time. The
+# ex10 rows are the same cards and hold the image, the vectors and the Cardmarket page, so a
+# search and the set list show each Unown once. A card asked for by its id, or one the user
+# owns, is still returned.
+_LISTED_ONCE = "NOT (cards.language = 'en' AND cards.set_id = 'exu')"
 
 
 def _summary(row, catalog=None) -> CardSummary:  # noqa: ANN001
@@ -145,7 +150,7 @@ def search_sets(request: Request, language: str = "") -> list[dict]:
     if cached is None or cached[0] != signature:
         rows = catalog.execute(f"""SELECT cards.language, cards.set_id, MAX(cards.set_name) AS set_name,
             set_releases.release_date, COUNT(*) AS cards FROM cards{_RELEASES}
-            WHERE {_PHYSICAL}
+            WHERE {_PHYSICAL} AND {_LISTED_ONCE}
             GROUP BY cards.language, cards.set_id
             ORDER BY release_date IS NULL, release_date DESC, set_name, cards.language, cards.set_id""").fetchall()
         cached = (signature, [dict(row) for row in rows])
@@ -194,7 +199,9 @@ def search_cards(
         raise HTTPException(422, "Invalid release date range")
     catalog = request.app.state.dbs.catalog
     clauses, params = [_PHYSICAL], []
-    chase_scope, chase_params = [_PHYSICAL, "m_trend>0"], []
+    chase_scope, chase_params = [_PHYSICAL, _LISTED_ONCE, "m_trend>0"], []
+    if card_ids is None and ownership != 'only_owned':
+        clauses.append(_LISTED_ONCE)
     explicit_set = bool(sets)
     if ownership not in ('any', 'hide_owned', 'only_owned'):
         raise HTTPException(422, "Unknown ownership filter")

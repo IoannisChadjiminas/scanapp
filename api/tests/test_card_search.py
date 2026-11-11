@@ -4,7 +4,7 @@ from pathlib import Path
 from types import SimpleNamespace
 
 from app.db import connect, init_catalog
-from app.routes.cards import search_cards
+from app.routes.cards import search_cards, search_sets
 
 
 def _request(catalog):  # noqa: ANN001, ANN202
@@ -182,6 +182,39 @@ def test_japanese_set_codes_and_names_combine_with_printed_numbers(tmp_path: Pat
     # An import invalidates the metadata cache rather than requiring a restart.
     conn.execute("INSERT INTO cards (id, provider_id, name, set_id, set_name, collector_number, language) VALUES ('ja:new-1', 'ja:new-1', 'New', 'XYZ9', 'New', '1', 'ja')")
     assert find('xyz9') == ['ja:new-1']
+
+
+def test_search_shows_each_unown_once_and_still_returns_the_duplicate_by_id(tmp_path: Path) -> None:
+    conn = _catalog(tmp_path)
+    for card_id, name, set_id, set_name in (
+        ("en:ex10-unown-A", "Unown [A]", "ex10", "Unseen Forces"),
+        ("en:exu-A", "Unown", "exu", "Unseen Forces Unown Collection"),
+        ("en:xya-24a", "Unown", "xya", "Yellow A Alternate"),
+    ):
+        conn.execute(
+            "INSERT INTO cards (id, provider_id, name, set_id, set_name, collector_number, language) "
+            "VALUES (?, ?, ?, ?, ?, 'A', 'en')",
+            (card_id, card_id, name, set_id, set_name),
+        )
+        conn.execute(
+            "INSERT INTO cards_fts (name, set_name, collector_number, id) VALUES (?, ?, 'A', ?)",
+            (name, set_name, card_id),
+        )
+    conn.commit()
+    request = _request(conn)
+
+    found = search_cards(request, q="Unown", language="", limit=20, offset=0)
+    assert sorted(_ids(found)) == ["en:ex10-unown-A", "en:xya-24a"]
+    assert found.total == 2
+    assert search_cards(request, q="", sets=["en:exu"]).total == 0
+    assert "exu" not in {item["set_id"] for item in search_sets(request)}
+    assert {"ex10", "xya"} <= {item["set_id"] for item in search_sets(request)}
+    # A portfolio row keeps resolving: by id, and through the owned filter.
+    assert _ids(search_cards(request, q="", card_ids=["en:exu-A"])) == ["en:exu-A"]
+    owned = search_cards(request, q="", ownership="only_owned", owned_ids=["en:exu-A", "en:ex10-unown-A"])
+    assert sorted(_ids(owned)) == ["en:ex10-unown-A", "en:exu-A"]
+    hidden = search_cards(request, q="Unown", ownership="hide_owned", owned_ids=["en:ex10-unown-A"])
+    assert _ids(hidden) == ["en:xya-24a"]
 
 
 def test_card_ids_lookup_carries_the_cardmarket_id_of_a_verified_url(tmp_path: Path) -> None:
