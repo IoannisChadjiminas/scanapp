@@ -63,13 +63,13 @@ def main(run_dir, catalogue_path, spec_path):
         selected = [r for r in rows if r["language"] == entry.get("language", "ja") and r["source_set"] == code
                     and r["row_source"] == entry.get("row_source", "limitless")
                     and r["status"] in entry.get("include_status", ["missing"])]
-        selected = selected + list(entry.get("extra_rows", []))
         if entry.get("require_image"):
             selected = [r for r in selected if r.get("image_url")]
         if entry.get("without_image"):
             selected = [r for r in selected if not r.get("image_url")]
         if entry.get("exclude_keys"):
             selected = [r for r in selected if row_key(r) not in entry["exclude_keys"]]
+        selected = selected + list(entry.get("extra_rows", []))  # after the filters: extra rows replace excluded ones
         if entry.get("numbers"):
             selected = [r for r in selected if r["number"] in entry["numbers"]]
         have = catalogue.get(entry.get("catalogue_set", code), [])
