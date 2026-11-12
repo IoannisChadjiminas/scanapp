@@ -20,20 +20,19 @@ Code: main `a916be4`, 20 flags unchanged.
 Every switch passed: right -> wrong 0, right card always offered, no cell lower, wrong-first upper bound 1.5% / 1.6% / 0.4%.
 Rows file: 556 `done`, 261 `left_out`, each with its reason.
 
-## Left out (277 rows)
-- **B, 125 rows:** the gate showed that image-less rows sharing a name with held cards lower stored answers (matched -> uncertain).
-  45 `M6a` rows without art, 40 LEGEND-era deck rows (thumbnails under the size gate), 38 `MG` rows (product not established), 2 Vending rows.
+## Left out (261 rows)
+- **`M6a` without a usable image, 36 rows** (104-135, 151, Mew B/G/R): the official folder has only the regular prints; as image-less rows they lowered stored answers (batch B).
+- **LEGEND-era decks, 40 rows** (`L2-Sb`, `L2-Sh`): only 162 x 226 thumbnails exist where found; same effect as image-less rows.
+- **Folder `MG`, 38 rows:** product name not established.
+- **Vending Series 3 Kadabra, Haunter (2):** Bulbagarden image needs the owner's Chrome.
 - **A4, 4 rows:** SP promos whose held print is not known.
-- **English, 148 rows:** D4 Delta Reign (141): TCGdex still has no art (checked 2026-11-12), wait as the plan says.
-  D1 30th Mew B/G/R (3) and D2 `mep` 099/100/120, `det1` 25 (4): not built. The release scripts here are written for Japanese rows
-  (`prepare_cards.py`, `prepare_sql.py` write `language: ja`); the English route needs a port, and D2's rows have no art, so after
-  batch B they are expected to fail the same gate. D1 needs the normal CDN mirror job.
+- **Delta Reign, 141 rows:** TCGdex still has no art (checked 2026-11-12).
 - **D3** (McDonald's 2013, count-only sets): on the browser worklist.
 
 ## What the work learned
 - A gate replay must not run on a loaded machine: at load 19 (five containers plus builds) answers flip. Four containers at 3 CPUs each is stable.
 - New Pikachu art can move promo Pikachu photos: the 15 `M6a` Pikachu cards are printing alternatives, not scannable.
-- Display-only rows are not neutral: their names enter the name ranking.
+- Display-only rows are not always neutral: Japanese image-less rows sharing names with held cards lowered stored answers (B); the seven English ones (D) changed nothing.
 - A release with no new vectors must not append an empty retrieval segment (fixed in `build_release.py`).
 
 ## Clean-up for later
