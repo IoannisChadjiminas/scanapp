@@ -17,12 +17,14 @@ against the catalogue snapshot and the batch.
 Writes cards.json and cards-summary.json in RUN_DIR.
 """
 import json
+import os
 import re
 import sys
 import unicodedata
 from collections import Counter, defaultdict
 from pathlib import Path
 
+LANG = os.environ.get("JAREC_LANGUAGE", "ja")  # "en" for English rows (second batch D); default keeps the Japanese recovery
 HELPER = ("pooka-", "pc-", "ra-")
 
 
@@ -68,22 +70,24 @@ def main(run_dir, catalogue_path):
         printed = row["printed_number"].strip()
         head = printed.split("/")[0].strip()
         match = None if "unnum" in head.lower() else re.search(r"([A-Za-z]{0,3}\d+[a-z]?)\s*$", head)
+        if not match and "unnum" not in head.lower() and re.fullmatch(r"[A-Z]{1,3}", head):
+            match = re.search(r"([A-Z]{1,3})$", head)  # letter numbers, e.g. 30th Celebration Mew B, G, R
         if match:
             number = match.group(1)
         else:
             unnumbered[set_id] += 1
             number = f"u{unnumbered[set_id]:02d}"
-            while f"ja:{set_id}-{number}" in taken_ids:
+            while f"{LANG}:{set_id}-{number}" in taken_ids:
                 unnumbered[set_id] += 1
                 number = f"u{unnumbered[set_id]:02d}"
-        card_id = f"ja:{set_id}-{number}"
+        card_id = f"{LANG}:{set_id}-{number}"
         image = images[key].pop(0)
         link = links[key].pop(0)
         total = re.match(r"\s*\d+", printed.split("/")[1]) if "/" in printed else None
         card = {
             "id": card_id, "provider_id": f"{set_id}-{number}", "name": row["card_name"],
             "set_id": set_id, "set_name": group["name"], "collector_number": number,
-            "printed_number": printed, "language": "ja", "rarity": "",
+            "printed_number": printed, "language": LANG, "rarity": "",
             "group_id": row["group_id"],
             "local_file": image.get("file") if image["status"] == "chosen" else None,
             "image_status": image["status"], "image_source": image.get("source"),
@@ -93,7 +97,7 @@ def main(run_dir, catalogue_path):
             "cardmarket_url": link.get("url") if link["status"] == "linked" else None,
             "cardmarket_id": link.get("product_id") if link["status"] == "linked" else None,
             "cardmarket_status": link["status"] if link["status"] == "linked" else link.get("reason"),
-            **{k: row[k] for k in ("source_row_url", "source_image_url") if row.get(k)},
+            **{k: row[k] for k in ("source_row_url", "source_image_url", "remote_image_url") if row.get(k)},
         }
         card["problem"] = ("id_taken_in_catalogue" if card_id in taken_ids
                            else "id_repeated_in_batch" if card_id in seen else None)

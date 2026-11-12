@@ -60,7 +60,7 @@ def main(run_dir, catalogue_path, spec_path):
     registry, new_rows, held, recon, present = [], [], [], [], []
     for entry in spec["sets"]:
         code = entry["source_set"]
-        selected = [r for r in rows if r["language"] == "ja" and r["source_set"] == code
+        selected = [r for r in rows if r["language"] == entry.get("language", "ja") and r["source_set"] == code
                     and r["row_source"] == entry.get("row_source", "limitless")
                     and r["status"] in entry.get("include_status", ["missing"])]
         selected = selected + list(entry.get("extra_rows", []))
@@ -87,7 +87,10 @@ def main(run_dir, catalogue_path, spec_path):
                 present.append(row)
                 continue
             if row["number"] is not None and number.isdigit():
-                printed = f"{int(number):03d}/{total:03d}" if total else f"{int(number):03d}"
+                num = number if entry.get("no_pad") else f"{int(number):03d}"
+                printed = f"{num}/{total:03d}" if total else num
+            elif entry.get("letter_numbers") and number.isalpha():
+                printed = number
             else:
                 printed = f"unnumbered ({number})"
             card = {"group_id": group_id, "printed_number": printed, "card_name": row["name"],
@@ -95,6 +98,8 @@ def main(run_dir, catalogue_path, spec_path):
                     "source_row_url": row["row_url"]}
             if row.get("image_url"):
                 card["source_image_url"] = row["image_url"]
+            if entry.get("remote_image_url_from_source") and row.get("image_url"):
+                card["remote_image_url"] = row["image_url"]
             new_rows.append(card)
             held.append({"group_id": group_id, "printed_number": printed, "card_name": row["name"],
                          "status": "held", "reason": "not_verified_on_cardmarket_browser_worklist"})

@@ -20,6 +20,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import os
 import shutil
 import sys
 from pathlib import Path
@@ -38,6 +39,7 @@ sys.path.insert(0, str(REPO))
 from catalogue.bootstrap.checks import BLUR_LIMIT, MIN_SIDE, load_facts  # noqa: E402
 
 CHUNK = 500
+LANG = os.environ.get("JAREC_LANGUAGE", "ja")
 
 
 def vh(vector: np.ndarray) -> str:
@@ -83,7 +85,7 @@ def main(run_dir: str, model_path: str, share: str | None = None) -> None:
                     assert vector.shape == (384,) and np.isfinite(vector).all()
                     arts.append(vector)
                     records.append({
-                        "card_id": card["id"], "profile": profile, "language": "ja",
+                        "card_id": card["id"], "profile": profile, "language": LANG,
                         "name": card["name"], "set_name": card["set_name"],
                         "collector_number": card["collector_number"],
                         "source_vector_sha256": vh(vector), "source_file": card["local_file"],

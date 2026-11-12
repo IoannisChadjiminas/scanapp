@@ -40,6 +40,7 @@ if not all(re.fullmatch(r"[a-z][a-z0-9_]*", value) for value in (PARENT, TARGET)
 if PARENT == TARGET:
     raise ValueError("candidate must use a new schema")
 BATCH = 200
+LANG = os.environ.get("JAREC_LANGUAGE", "ja")
 
 
 def lit(value):
@@ -112,14 +113,14 @@ def main(release_dir, role_file, feature_sha):
         linked = c["cardmarket_url"] is not None
         new_rows.append({
             "id": c["id"], "provider_id": c["provider_id"], "name": c["name"], "set_id": c["set_id"],
-            "set_name": c["set_name"], "collector_number": c["collector_number"], "language": "ja",
+            "set_name": c["set_name"], "collector_number": c["collector_number"], "language": LANG,
             "category": None, "rarity": None, "illustrator": None, "variants_json": "{}",
             "image_path": c["image_path"], "has_image": 1 if c["image_path"] else 0,
             "cardmarket_id": int(c["cardmarket_id"]) if c["cardmarket_id"] else None,
             "cardmarket_url": c["cardmarket_url"], "cardmarket_verified": 1 if linked else 0,
             "cardmarket_provenance": PROVENANCE if linked else None,
             "cardmarket_verified_at": VERIFIED_AT if linked else None,
-            "remote_image_url": None, "printed_collector_number": None, "view_title": c["name"],
+            "remote_image_url": c.get("remote_image_url"), "printed_collector_number": None, "view_title": c["name"],
         })
     assert set(cols) <= set(new_rows[0])
     all_rows = sorted(parent_rows + new_rows, key=lambda r: r["id"].encode())
@@ -182,7 +183,7 @@ END $acl$;""")
         s.append(f"INSERT INTO {TARGET}.artwork_embeddings(card_id,profile,row_index,embedding,source_vector_sha256,metadata) VALUES {','.join(values)};")
     by_id = {c["id"]: c for c in cards}
     prov = [{"source_key": f"catalogue-completion-source:{IMPORT}:{c['id']}", "metadata": {
-        "id": c["id"], "name": c["name"], "language": "ja", "set_id": c["set_id"], "set_name": c["set_name"],
+        "id": c["id"], "name": c["name"], "language": LANG, "set_id": c["set_id"], "set_name": c["set_name"],
         "collector_number": c["collector_number"], "printed_number": c["printed_number"], "group_id": c["group_id"],
         "image_path": c["image_path"], "sha256": c["image_sha256_stored"], "source_file_sha256": c["image_sha256"],
         "source_kind": c["image_source"], "source_use_permission": RIGHTS if c["image_path"] else None,

@@ -25,6 +25,7 @@ from pathlib import Path
 import numpy as np
 
 IMAGE_DIR = os.environ.get("JAREC_IMAGE_DIR", "/data/reference-images/ja-20261107-recovery")
+LANG = os.environ.get("JAREC_LANGUAGE", "ja")
 PROFILES = ("conventional_window", "broad_center_hypothesis")
 
 
@@ -107,7 +108,7 @@ def main(run_dir, parent_dir, name):
         for profile in PROFILES:
             rec, vec = art_by[(cid, profile)]
             assert rec["reference_sha256"] == image_sha[cid]
-            add_recs.append({"card_id": cid, "profile": profile, "language": "ja", "name": card["name"],
+            add_recs.append({"card_id": cid, "profile": profile, "language": LANG, "name": card["name"],
                              "set_name": card["set_name"], "collector_number": card["collector_number"],
                              "reference_sha256": image_sha[cid]})
             add_vecs.append(vec)
