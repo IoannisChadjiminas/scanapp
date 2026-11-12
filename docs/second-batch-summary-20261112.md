@@ -3,7 +3,7 @@
 Work order: `docs/second-batch-agent-plan-20261111.md`. Staging only; production was not switched.
 
 ## Staging now
-Catalogue `PS-CATALOGUE-EN-JA-REC34-C-20261111` (schema `pokesingle_completion_20261111_jarec34`), 62,515 cards (was 61,975 on JAREC18).
+Catalogue `PS-CATALOGUE-EN-JA-REC37-E-20261112` (schema `pokesingle_completion_20261111_jarec37`), 62,531 cards (was 61,975 on JAREC18).
 Code: main `a916be4`, 20 flags unchanged.
 
 | Batch | Release | Added | Scannable / alternatives / display-only | Rollback folder | Record |
@@ -14,9 +14,11 @@ Code: main `a916be4`, 20 flags unchanged.
 | A4 promos and decks | REC26-A4 | 103 | 38 / 65 / 0 | `.../second-batch-a4-20261111` | `second-batch-a4-20261111.md` |
 | B official-list only | none | 0 | | | `second-batch-b-20261111.md` |
 | C product energies | REC34-C | 76 | 6 / 52 / 18 | `.../second-batch-c-20261111` | `second-batch-c-20261111.md` |
+| D English rows | REC36-D | 7 | 2 / 0 / 5 | `.../second-batch-d-20261112` | `second-batch-d-e-20261112.md` |
+| E `M6a` secret rares with official images | REC37-E | 9 | 9 / 0 / 0 | `.../second-batch-e-20261112` | `second-batch-d-e-20261112.md` |
 
 Every switch passed: right -> wrong 0, right card always offered, no cell lower, wrong-first upper bound 1.5% / 1.6% / 0.4%.
-Rows file: 540 `done`, 277 `left_out`, each with its reason.
+Rows file: 556 `done`, 261 `left_out`, each with its reason.
 
 ## Left out (277 rows)
 - **B, 125 rows:** the gate showed that image-less rows sharing a name with held cards lower stored answers (matched -> uncertain).
