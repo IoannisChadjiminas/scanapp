@@ -93,7 +93,7 @@ def main(run_dir, parent_dir, name):
         missing_images=pman["missing_images"] + len(cards) - with_image,
         embeddings_sha256=sha_file(vdir / "embeddings.npy"), ids_sha256=sha_file(vdir / "embedding_card_ids.npy"),
         parent_embeddings_sha256=pman["embeddings_sha256"], parent_ids_sha256=pman["ids_sha256"],
-        retrieval_segments=list(pman["retrieval_segments"]) + [len(scannable)],
+        retrieval_segments=list(pman["retrieval_segments"]) + ([len(scannable)] if scannable else []),  # an empty segment is not a valid lineage
         catalogue_version=pman["catalogue_version"] + "-ja-recovery-" + name,
     )
     (vdir / "manifest.json").write_text(json.dumps(new_pman, ensure_ascii=False) + "\n")
