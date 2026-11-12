@@ -5802,7 +5802,8 @@
    "row_source": "tcgdex",
    "row_url": "https://api.tcgdex.net/v2/ja/cards/M6a-003",
    "image_url": "https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/tpc/M6a/M6a_3_R_JP.png",
-   "status": "missing"
+   "status": "done",
+   "note": "added in PS-CATALOGUE-EN-JA-REC25-A3-20261111"
   },
   {
    "language": "ja",
@@ -5815,7 +5816,8 @@
    "row_source": "tcgdex",
    "row_url": "https://api.tcgdex.net/v2/ja/cards/M6a-004",
    "image_url": "https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/tpc/M6a/M6a_4_R_JP.png",
-   "status": "missing"
+   "status": "done",
+   "note": "added in PS-CATALOGUE-EN-JA-REC25-A3-20261111"
   },
   {
    "language": "ja",
@@ -5828,7 +5830,8 @@
    "row_source": "tcgdex",
    "row_url": "https://api.tcgdex.net/v2/ja/cards/M6a-007",
    "image_url": "https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/tpc/M6a/M6a_7_R_JP.png",
-   "status": "missing"
+   "status": "done",
+   "note": "added in PS-CATALOGUE-EN-JA-REC25-A3-20261111"
   },
   {
    "language": "ja",
@@ -5841,7 +5844,8 @@
    "row_source": "tcgdex",
    "row_url": "https://api.tcgdex.net/v2/ja/cards/M6a-011",
    "image_url": "https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/tpc/M6a/M6a_11_R_JP.png",
-   "status": "missing"
+   "status": "done",
+   "note": "added in PS-CATALOGUE-EN-JA-REC25-A3-20261111"
   },
   {
    "language": "ja",
@@ -5854,7 +5858,8 @@
    "row_source": "tcgdex",
    "row_url": "https://api.tcgdex.net/v2/ja/cards/M6a-013",
    "image_url": "https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/tpc/M6a/M6a_13_R_JP.png",
-   "status": "missing"
+   "status": "done",
+   "note": "added in PS-CATALOGUE-EN-JA-REC25-A3-20261111"
   },
   {
    "language": "ja",
@@ -5867,7 +5872,8 @@
    "row_source": "tcgdex",
    "row_url": "https://api.tcgdex.net/v2/ja/cards/M6a-019",
    "image_url": "https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/tpc/M6a/M6a_19_R_JP.png",
-   "status": "missing"
+   "status": "done",
+   "note": "added in PS-CATALOGUE-EN-JA-REC25-A3-20261111"
   },
   {
    "language": "ja",
@@ -5880,7 +5886,8 @@
    "row_source": "tcgdex",
    "row_url": "https://api.tcgdex.net/v2/ja/cards/M6a-020",
    "image_url": "https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/tpc/M6a/M6a_20_R_JP.png",
-   "status": "missing"
+   "status": "done",
+   "note": "added in PS-CATALOGUE-EN-JA-REC25-A3-20261111"
   },
   {
    "language": "ja",
@@ -5893,7 +5900,8 @@
    "row_source": "tcgdex",
    "row_url": "https://api.tcgdex.net/v2/ja/cards/M6a-023",
    "image_url": "https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/tpc/M6a/M6a_23_R_JP.png",
-   "status": "missing"
+   "status": "done",
+   "note": "added in PS-CATALOGUE-EN-JA-REC25-A3-20261111"
   },
   {
    "language": "ja",
@@ -5906,7 +5914,8 @@
    "row_source": "tcgdex",
    "row_url": "https://api.tcgdex.net/v2/ja/cards/M6a-024",
    "image_url": "https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/tpc/M6a/M6a_24_R_JP.png",
-   "status": "missing"
+   "status": "done",
+   "note": "added in PS-CATALOGUE-EN-JA-REC25-A3-20261111"
   },
   {
    "language": "ja",
@@ -5919,7 +5928,8 @@
    "row_source": "tcgdex",
    "row_url": "https://api.tcgdex.net/v2/ja/cards/M6a-030",
    "image_url": "https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/tpc/M6a/M6a_30_R_JP.png",
-   "status": "missing"
+   "status": "done",
+   "note": "added in PS-CATALOGUE-EN-JA-REC25-A3-20261111"
   },
   {
    "language": "ja",
@@ -5932,7 +5942,8 @@
    "row_source": "tcgdex",
    "row_url": "https://api.tcgdex.net/v2/ja/cards/M6a-031",
    "image_url": "https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/tpc/M6a/M6a_31_R_JP.png",
-   "status": "missing"
+   "status": "done",
+   "note": "added in PS-CATALOGUE-EN-JA-REC25-A3-20261111"
   },
   {
    "language": "ja",
@@ -5945,7 +5956,8 @@
    "row_source": "tcgdex",
    "row_url": "https://api.tcgdex.net/v2/ja/cards/M6a-032",
    "image_url": "https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/tpc/M6a/M6a_32_R_JP.png",
-   "status": "missing"
+   "status": "done",
+   "note": "added in PS-CATALOGUE-EN-JA-REC25-A3-20261111"
   },
   {
    "language": "ja",
@@ -5958,7 +5970,8 @@
    "row_source": "tcgdex",
    "row_url": "https://api.tcgdex.net/v2/ja/cards/M6a-034",
    "image_url": "https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/tpc/M6a/M6a_34_R_JP.png",
-   "status": "missing"
+   "status": "done",
+   "note": "added in PS-CATALOGUE-EN-JA-REC25-A3-20261111"
   },
   {
    "language": "ja",
@@ -5971,7 +5984,8 @@
    "row_source": "tcgdex",
    "row_url": "https://api.tcgdex.net/v2/ja/cards/M6a-036",
    "image_url": "https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/tpc/M6a/M6a_36_R_JP.png",
-   "status": "missing"
+   "status": "done",
+   "note": "added in PS-CATALOGUE-EN-JA-REC25-A3-20261111"
   },
   {
    "language": "ja",
@@ -5984,7 +5998,8 @@
    "row_source": "tcgdex",
    "row_url": "https://api.tcgdex.net/v2/ja/cards/M6a-037",
    "image_url": "https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/tpc/M6a/M6a_37_R_JP.png",
-   "status": "missing"
+   "status": "done",
+   "note": "added in PS-CATALOGUE-EN-JA-REC25-A3-20261111"
   },
   {
    "language": "ja",
@@ -5997,7 +6012,8 @@
    "row_source": "tcgdex",
    "row_url": "https://api.tcgdex.net/v2/ja/cards/M6a-038",
    "image_url": "https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/tpc/M6a/M6a_38_R_JP.png",
-   "status": "missing"
+   "status": "done",
+   "note": "added in PS-CATALOGUE-EN-JA-REC25-A3-20261111"
   },
   {
    "language": "ja",
@@ -6010,7 +6026,8 @@
    "row_source": "tcgdex",
    "row_url": "https://api.tcgdex.net/v2/ja/cards/M6a-041",
    "image_url": "https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/tpc/M6a/M6a_41_R_JP.png",
-   "status": "missing"
+   "status": "done",
+   "note": "added in PS-CATALOGUE-EN-JA-REC25-A3-20261111"
   },
   {
    "language": "ja",
@@ -6023,7 +6040,8 @@
    "row_source": "tcgdex",
    "row_url": "https://api.tcgdex.net/v2/ja/cards/M6a-042",
    "image_url": "https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/tpc/M6a/M6a_42_R_JP.png",
-   "status": "missing"
+   "status": "done",
+   "note": "added in PS-CATALOGUE-EN-JA-REC25-A3-20261111"
   },
   {
    "language": "ja",
@@ -6036,7 +6054,8 @@
    "row_source": "tcgdex",
    "row_url": "https://api.tcgdex.net/v2/ja/cards/M6a-045",
    "image_url": "https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/tpc/M6a/M6a_45_R_JP.png",
-   "status": "missing"
+   "status": "done",
+   "note": "added in PS-CATALOGUE-EN-JA-REC25-A3-20261111"
   },
   {
    "language": "ja",
@@ -6049,7 +6068,8 @@
    "row_source": "tcgdex",
    "row_url": "https://api.tcgdex.net/v2/ja/cards/M6a-046",
    "image_url": "https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/tpc/M6a/M6a_46_R_JP.png",
-   "status": "missing"
+   "status": "done",
+   "note": "added in PS-CATALOGUE-EN-JA-REC25-A3-20261111"
   },
   {
    "language": "ja",
@@ -6062,7 +6082,8 @@
    "row_source": "tcgdex",
    "row_url": "https://api.tcgdex.net/v2/ja/cards/M6a-051",
    "image_url": "https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/tpc/M6a/M6a_51_R_JP.png",
-   "status": "missing"
+   "status": "done",
+   "note": "added in PS-CATALOGUE-EN-JA-REC25-A3-20261111"
   },
   {
    "language": "ja",
@@ -6075,7 +6096,8 @@
    "row_source": "tcgdex",
    "row_url": "https://api.tcgdex.net/v2/ja/cards/M6a-060",
    "image_url": "https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/tpc/M6a/M6a_60_R_JP.png",
-   "status": "missing"
+   "status": "done",
+   "note": "added in PS-CATALOGUE-EN-JA-REC25-A3-20261111"
   },
   {
    "language": "ja",
@@ -6088,7 +6110,8 @@
    "row_source": "tcgdex",
    "row_url": "https://api.tcgdex.net/v2/ja/cards/M6a-066",
    "image_url": "https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/tpc/M6a/M6a_66_R_JP.png",
-   "status": "missing"
+   "status": "done",
+   "note": "added in PS-CATALOGUE-EN-JA-REC25-A3-20261111"
   },
   {
    "language": "ja",
@@ -6101,7 +6124,8 @@
    "row_source": "tcgdex",
    "row_url": "https://api.tcgdex.net/v2/ja/cards/M6a-067",
    "image_url": "https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/tpc/M6a/M6a_67_R_JP.png",
-   "status": "missing"
+   "status": "done",
+   "note": "added in PS-CATALOGUE-EN-JA-REC25-A3-20261111"
   },
   {
    "language": "ja",
@@ -6114,7 +6138,8 @@
    "row_source": "tcgdex",
    "row_url": "https://api.tcgdex.net/v2/ja/cards/M6a-069",
    "image_url": "https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/tpc/M6a/M6a_69_R_JP.png",
-   "status": "missing"
+   "status": "done",
+   "note": "added in PS-CATALOGUE-EN-JA-REC25-A3-20261111"
   },
   {
    "language": "ja",
@@ -6127,7 +6152,8 @@
    "row_source": "tcgdex",
    "row_url": "https://api.tcgdex.net/v2/ja/cards/M6a-070",
    "image_url": "https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/tpc/M6a/M6a_70_R_JP.png",
-   "status": "missing"
+   "status": "done",
+   "note": "added in PS-CATALOGUE-EN-JA-REC25-A3-20261111"
   },
   {
    "language": "ja",
@@ -6140,7 +6166,8 @@
    "row_source": "tcgdex",
    "row_url": "https://api.tcgdex.net/v2/ja/cards/M6a-072",
    "image_url": "https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/tpc/M6a/M6a_72_R_JP.png",
-   "status": "missing"
+   "status": "done",
+   "note": "added in PS-CATALOGUE-EN-JA-REC25-A3-20261111"
   },
   {
    "language": "ja",
@@ -6153,7 +6180,8 @@
    "row_source": "tcgdex",
    "row_url": "https://api.tcgdex.net/v2/ja/cards/M6a-078",
    "image_url": "https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/tpc/M6a/M6a_78_R_JP.png",
-   "status": "missing"
+   "status": "done",
+   "note": "added in PS-CATALOGUE-EN-JA-REC25-A3-20261111"
   },
   {
    "language": "ja",
@@ -6166,7 +6194,8 @@
    "row_source": "tcgdex",
    "row_url": "https://api.tcgdex.net/v2/ja/cards/M6a-081",
    "image_url": "https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/tpc/M6a/M6a_81_R_JP.png",
-   "status": "missing"
+   "status": "done",
+   "note": "added in PS-CATALOGUE-EN-JA-REC25-A3-20261111"
   },
   {
    "language": "ja",
@@ -6179,7 +6208,8 @@
    "row_source": "tcgdex",
    "row_url": "https://api.tcgdex.net/v2/ja/cards/M6a-084",
    "image_url": "https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/tpc/M6a/M6a_84_R_JP.png",
-   "status": "missing"
+   "status": "done",
+   "note": "added in PS-CATALOGUE-EN-JA-REC25-A3-20261111"
   },
   {
    "language": "ja",
@@ -6192,7 +6222,8 @@
    "row_source": "tcgdex",
    "row_url": "https://api.tcgdex.net/v2/ja/cards/M6a-088",
    "image_url": "https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/tpc/M6a/M6a_88_R_JP.png",
-   "status": "missing"
+   "status": "done",
+   "note": "added in PS-CATALOGUE-EN-JA-REC25-A3-20261111"
   },
   {
    "language": "ja",
@@ -6205,7 +6236,8 @@
    "row_source": "tcgdex",
    "row_url": "https://api.tcgdex.net/v2/ja/cards/M6a-089",
    "image_url": "https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/tpc/M6a/M6a_89_R_JP.png",
-   "status": "missing"
+   "status": "done",
+   "note": "added in PS-CATALOGUE-EN-JA-REC25-A3-20261111"
   },
   {
    "language": "ja",
@@ -6218,7 +6250,8 @@
    "row_source": "tcgdex",
    "row_url": "https://api.tcgdex.net/v2/ja/cards/M6a-090",
    "image_url": "https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/tpc/M6a/M6a_90_R_JP.png",
-   "status": "missing"
+   "status": "done",
+   "note": "added in PS-CATALOGUE-EN-JA-REC25-A3-20261111"
   },
   {
    "language": "ja",
@@ -6231,7 +6264,8 @@
    "row_source": "tcgdex",
    "row_url": "https://api.tcgdex.net/v2/ja/cards/M6a-091",
    "image_url": "https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/tpc/M6a/M6a_91_R_JP.png",
-   "status": "missing"
+   "status": "done",
+   "note": "added in PS-CATALOGUE-EN-JA-REC25-A3-20261111"
   },
   {
    "language": "ja",
@@ -6244,7 +6278,8 @@
    "row_source": "tcgdex",
    "row_url": "https://api.tcgdex.net/v2/ja/cards/M6a-092",
    "image_url": "https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/tpc/M6a/M6a_92_R_JP.png",
-   "status": "missing"
+   "status": "done",
+   "note": "added in PS-CATALOGUE-EN-JA-REC25-A3-20261111"
   },
   {
    "language": "ja",
@@ -6257,7 +6292,8 @@
    "row_source": "tcgdex",
    "row_url": "https://api.tcgdex.net/v2/ja/cards/M6a-095",
    "image_url": "https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/tpc/M6a/M6a_95_R_JP.png",
-   "status": "missing"
+   "status": "done",
+   "note": "added in PS-CATALOGUE-EN-JA-REC25-A3-20261111"
   },
   {
    "language": "ja",
@@ -6270,7 +6306,8 @@
    "row_source": "tcgdex",
    "row_url": "https://api.tcgdex.net/v2/ja/cards/M6a-096",
    "image_url": "https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/tpc/M6a/M6a_96_R_JP.png",
-   "status": "missing"
+   "status": "done",
+   "note": "added in PS-CATALOGUE-EN-JA-REC25-A3-20261111"
   },
   {
    "language": "ja",
@@ -6283,7 +6320,8 @@
    "row_source": "tcgdex",
    "row_url": "https://api.tcgdex.net/v2/ja/cards/M6a-099",
    "image_url": "https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/tpc/M6a/M6a_99_R_JP.png",
-   "status": "missing"
+   "status": "done",
+   "note": "added in PS-CATALOGUE-EN-JA-REC25-A3-20261111"
   },
   {
    "language": "ja",
@@ -6296,7 +6334,8 @@
    "row_source": "tcgdex",
    "row_url": "https://api.tcgdex.net/v2/ja/cards/M6a-100",
    "image_url": "https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/tpc/M6a/M6a_100_R_JP.png",
-   "status": "missing"
+   "status": "done",
+   "note": "added in PS-CATALOGUE-EN-JA-REC25-A3-20261111"
   },
   {
    "language": "ja",
@@ -6911,7 +6950,8 @@
    "row_source": "tcgdex",
    "row_url": "https://api.tcgdex.net/v2/ja/cards/M6a-DAR",
    "image_url": "https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/tpc/M6a/M6a_D_R_JP.png",
-   "status": "missing"
+   "status": "done",
+   "note": "added in PS-CATALOGUE-EN-JA-REC25-A3-20261111"
   },
   {
    "language": "ja",
@@ -6924,7 +6964,8 @@
    "row_source": "tcgdex",
    "row_url": "https://api.tcgdex.net/v2/ja/cards/M6a-FIG",
    "image_url": "https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/tpc/M6a/M6a_F_R_JP.png",
-   "status": "missing"
+   "status": "done",
+   "note": "added in PS-CATALOGUE-EN-JA-REC25-A3-20261111"
   },
   {
    "language": "ja",
@@ -6937,7 +6978,8 @@
    "row_source": "tcgdex",
    "row_url": "https://api.tcgdex.net/v2/ja/cards/M6a-FIR",
    "image_url": "https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/tpc/M6a/M6a_R_R_JP.png",
-   "status": "missing"
+   "status": "done",
+   "note": "added in PS-CATALOGUE-EN-JA-REC25-A3-20261111"
   },
   {
    "language": "ja",
@@ -6964,7 +7006,8 @@
    "row_source": "tcgdex",
    "row_url": "https://api.tcgdex.net/v2/ja/cards/M6a-GRA",
    "image_url": "https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/tpc/M6a/M6a_G_R_JP.png",
-   "status": "missing"
+   "status": "done",
+   "note": "added in PS-CATALOGUE-EN-JA-REC25-A3-20261111"
   },
   {
    "language": "ja",
@@ -6977,7 +7020,8 @@
    "row_source": "tcgdex",
    "row_url": "https://api.tcgdex.net/v2/ja/cards/M6a-LIG",
    "image_url": "https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/tpc/M6a/M6a_L_R_JP.png",
-   "status": "missing"
+   "status": "done",
+   "note": "added in PS-CATALOGUE-EN-JA-REC25-A3-20261111"
   },
   {
    "language": "ja",
@@ -6990,7 +7034,8 @@
    "row_source": "tcgdex",
    "row_url": "https://api.tcgdex.net/v2/ja/cards/M6a-MET",
    "image_url": "https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/tpc/M6a/M6a_M_R_JP.png",
-   "status": "missing"
+   "status": "done",
+   "note": "added in PS-CATALOGUE-EN-JA-REC25-A3-20261111"
   },
   {
    "language": "ja",
@@ -7003,7 +7048,8 @@
    "row_source": "tcgdex",
    "row_url": "https://api.tcgdex.net/v2/ja/cards/M6a-PSY",
    "image_url": "https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/tpc/M6a/M6a_P_R_JP.png",
-   "status": "missing"
+   "status": "done",
+   "note": "added in PS-CATALOGUE-EN-JA-REC25-A3-20261111"
   },
   {
    "language": "ja",
@@ -7030,7 +7076,8 @@
    "row_source": "tcgdex",
    "row_url": "https://api.tcgdex.net/v2/ja/cards/M6a-WAT",
    "image_url": "https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/tpc/M6a/M6a_W_R_JP.png",
-   "status": "missing"
+   "status": "done",
+   "note": "added in PS-CATALOGUE-EN-JA-REC25-A3-20261111"
   },
   {
    "language": "ja",
@@ -7043,7 +7090,8 @@
    "row_source": "tcgdex",
    "row_url": "https://api.tcgdex.net/v2/ja/cards/M6a-102",
    "image_url": "https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/tpc/M6a/M6a_102_R_JP.png",
-   "status": "missing"
+   "status": "done",
+   "note": "added in PS-CATALOGUE-EN-JA-REC25-A3-20261111"
   },
   {
    "language": "ja",
@@ -7056,7 +7104,8 @@
    "row_source": "tcgdex",
    "row_url": "https://api.tcgdex.net/v2/ja/cards/M6a-103",
    "image_url": "https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/tpc/M6a/M6a_103_R_JP.png",
-   "status": "missing"
+   "status": "done",
+   "note": "added in PS-CATALOGUE-EN-JA-REC25-A3-20261111"
   },
   {
    "language": "ja",
@@ -8861,7 +8910,8 @@
    "row_source": "limitless",
    "row_url": "https://limitlesstcg.com/cards/jp/SP/34",
    "image_url": "https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/tpc/SP/SP_34_R_JP.png",
-   "status": "missing"
+   "status": "done",
+   "note": "added in PS-CATALOGUE-EN-JA-REC26-A4-20261111"
   },
   {
    "language": "ja",
@@ -8874,7 +8924,8 @@
    "row_source": "limitless",
    "row_url": "https://limitlesstcg.com/cards/jp/SP/35",
    "image_url": "https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/tpc/SP/SP_35_R_JP.png",
-   "status": "missing"
+   "status": "done",
+   "note": "added in PS-CATALOGUE-EN-JA-REC26-A4-20261111"
   },
   {
    "language": "ja",
@@ -8887,7 +8938,8 @@
    "row_source": "limitless",
    "row_url": "https://limitlesstcg.com/cards/jp/SP/50",
    "image_url": "https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/tpc/SP/SP_50_R_JP.png",
-   "status": "missing"
+   "status": "done",
+   "note": "added in PS-CATALOGUE-EN-JA-REC26-A4-20261111"
   },
   {
    "language": "ja",
@@ -8900,7 +8952,8 @@
    "row_source": "limitless",
    "row_url": "https://limitlesstcg.com/cards/jp/SP/68",
    "image_url": "https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/tpc/SP/SP_68_R_JP.png",
-   "status": "missing"
+   "status": "done",
+   "note": "added in PS-CATALOGUE-EN-JA-REC26-A4-20261111"
   },
   {
    "language": "ja",
@@ -8913,7 +8966,8 @@
    "row_source": "limitless",
    "row_url": "https://limitlesstcg.com/cards/jp/SP/75",
    "image_url": "https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/tpc/SP/SP_75_R_JP.png",
-   "status": "missing"
+   "status": "done",
+   "note": "added in PS-CATALOGUE-EN-JA-REC26-A4-20261111"
   },
   {
    "language": "ja",
@@ -8926,7 +8980,8 @@
    "row_source": "limitless",
    "row_url": "https://limitlesstcg.com/cards/jp/SP/83",
    "image_url": "https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/tpc/SP/SP_83_R_JP.png",
-   "status": "missing"
+   "status": "done",
+   "note": "added in PS-CATALOGUE-EN-JA-REC26-A4-20261111"
   },
   {
    "language": "ja",
@@ -8939,7 +8994,8 @@
    "row_source": "limitless",
    "row_url": "https://limitlesstcg.com/cards/jp/SP/90",
    "image_url": "https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/tpc/SP/SP_90_R_JP.png",
-   "status": "missing"
+   "status": "done",
+   "note": "added in PS-CATALOGUE-EN-JA-REC26-A4-20261111"
   },
   {
    "language": "ja",
@@ -8952,7 +9008,8 @@
    "row_source": "limitless",
    "row_url": "https://limitlesstcg.com/cards/jp/SP/91",
    "image_url": "https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/tpc/SP/SP_91_R_JP.png",
-   "status": "missing"
+   "status": "done",
+   "note": "added in PS-CATALOGUE-EN-JA-REC26-A4-20261111"
   },
   {
    "language": "ja",
@@ -8965,7 +9022,8 @@
    "row_source": "limitless",
    "row_url": "https://limitlesstcg.com/cards/jp/SP/92",
    "image_url": "https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/tpc/SP/SP_92_R_JP.png",
-   "status": "missing"
+   "status": "done",
+   "note": "added in PS-CATALOGUE-EN-JA-REC26-A4-20261111"
   },
   {
    "language": "ja",
@@ -8978,7 +9036,8 @@
    "row_source": "limitless",
    "row_url": "https://limitlesstcg.com/cards/jp/SP/93",
    "image_url": "https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/tpc/SP/SP_93_R_JP.png",
-   "status": "missing"
+   "status": "done",
+   "note": "added in PS-CATALOGUE-EN-JA-REC26-A4-20261111"
   },
   {
    "language": "ja",
@@ -8991,7 +9050,8 @@
    "row_source": "limitless",
    "row_url": "https://limitlesstcg.com/cards/jp/SP/94",
    "image_url": "https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/tpc/SP/SP_94_R_JP.png",
-   "status": "missing"
+   "status": "done",
+   "note": "added in PS-CATALOGUE-EN-JA-REC26-A4-20261111"
   },
   {
    "language": "ja",
@@ -9004,7 +9064,8 @@
    "row_source": "limitless",
    "row_url": "https://limitlesstcg.com/cards/jp/SP/95",
    "image_url": "https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/tpc/SP/SP_95_R_JP.png",
-   "status": "missing"
+   "status": "done",
+   "note": "added in PS-CATALOGUE-EN-JA-REC26-A4-20261111"
   },
   {
    "language": "ja",
@@ -9017,7 +9078,8 @@
    "row_source": "limitless",
    "row_url": "https://limitlesstcg.com/cards/jp/SP/96",
    "image_url": "https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/tpc/SP/SP_96_R_JP.png",
-   "status": "missing"
+   "status": "done",
+   "note": "added in PS-CATALOGUE-EN-JA-REC26-A4-20261111"
   },
   {
    "language": "ja",
@@ -9030,7 +9092,8 @@
    "row_source": "limitless",
    "row_url": "https://limitlesstcg.com/cards/jp/SP/97",
    "image_url": "https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/tpc/SP/SP_97_R_JP.png",
-   "status": "missing"
+   "status": "done",
+   "note": "added in PS-CATALOGUE-EN-JA-REC26-A4-20261111"
   },
   {
    "language": "ja",
@@ -9043,7 +9106,8 @@
    "row_source": "limitless",
    "row_url": "https://limitlesstcg.com/cards/jp/SP/131",
    "image_url": "https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/tpc/SP/SP_131_R_JP.png",
-   "status": "missing"
+   "status": "done",
+   "note": "added in PS-CATALOGUE-EN-JA-REC26-A4-20261111"
   },
   {
    "language": "ja",
@@ -9056,7 +9120,8 @@
    "row_source": "limitless",
    "row_url": "https://limitlesstcg.com/cards/jp/SP/160",
    "image_url": "https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/tpc/SP/SP_160_R_JP.png",
-   "status": "missing"
+   "status": "done",
+   "note": "added in PS-CATALOGUE-EN-JA-REC26-A4-20261111"
   },
   {
    "language": "ja",
@@ -9069,7 +9134,8 @@
    "row_source": "limitless",
    "row_url": "https://limitlesstcg.com/cards/jp/SP/176",
    "image_url": "https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/tpc/SP/SP_176_R_JP.png",
-   "status": "missing"
+   "status": "done",
+   "note": "added in PS-CATALOGUE-EN-JA-REC26-A4-20261111"
   },
   {
    "language": "ja",
@@ -9082,7 +9148,8 @@
    "row_source": "limitless",
    "row_url": "https://limitlesstcg.com/cards/jp/SP/186",
    "image_url": "https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/tpc/SP/SP_186_R_JP.png",
-   "status": "missing"
+   "status": "done",
+   "note": "added in PS-CATALOGUE-EN-JA-REC26-A4-20261111"
   },
   {
    "language": "ja",
@@ -9095,7 +9162,8 @@
    "row_source": "limitless",
    "row_url": "https://limitlesstcg.com/cards/jp/SP/187",
    "image_url": "https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/tpc/SP/SP_187_R_JP.png",
-   "status": "missing"
+   "status": "done",
+   "note": "added in PS-CATALOGUE-EN-JA-REC26-A4-20261111"
   },
   {
    "language": "ja",
@@ -9108,7 +9176,8 @@
    "row_source": "limitless",
    "row_url": "https://limitlesstcg.com/cards/jp/SP/188",
    "image_url": "https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/tpc/SP/SP_188_R_JP.png",
-   "status": "missing"
+   "status": "done",
+   "note": "added in PS-CATALOGUE-EN-JA-REC26-A4-20261111"
   },
   {
    "language": "ja",
@@ -9121,7 +9190,8 @@
    "row_source": "limitless",
    "row_url": "https://limitlesstcg.com/cards/jp/SP/243",
    "image_url": "https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/tpc/SP/SP_243_R_JP.png",
-   "status": "missing"
+   "status": "done",
+   "note": "added in PS-CATALOGUE-EN-JA-REC26-A4-20261111"
   },
   {
    "language": "ja",
@@ -9134,7 +9204,8 @@
    "row_source": "limitless",
    "row_url": "https://limitlesstcg.com/cards/jp/SP/246",
    "image_url": "https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/tpc/SP/SP_246_R_JP.png",
-   "status": "missing"
+   "status": "done",
+   "note": "added in PS-CATALOGUE-EN-JA-REC26-A4-20261111"
   },
   {
    "language": "ja",
@@ -9147,7 +9218,8 @@
    "row_source": "limitless",
    "row_url": "https://limitlesstcg.com/cards/jp/SP/247",
    "image_url": "https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/tpc/SP/SP_247_R_JP.png",
-   "status": "missing"
+   "status": "done",
+   "note": "added in PS-CATALOGUE-EN-JA-REC26-A4-20261111"
   },
   {
    "language": "ja",
@@ -9160,7 +9232,8 @@
    "row_source": "limitless",
    "row_url": "https://limitlesstcg.com/cards/jp/SP/248",
    "image_url": "https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/tpc/SP/SP_248_R_JP.png",
-   "status": "missing"
+   "status": "done",
+   "note": "added in PS-CATALOGUE-EN-JA-REC26-A4-20261111"
   },
   {
    "language": "ja",
@@ -9173,7 +9246,8 @@
    "row_source": "limitless",
    "row_url": "https://limitlesstcg.com/cards/jp/SP/249",
    "image_url": "https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/tpc/SP/SP_249_R_JP.png",
-   "status": "missing"
+   "status": "done",
+   "note": "added in PS-CATALOGUE-EN-JA-REC26-A4-20261111"
   },
   {
    "language": "ja",
@@ -9186,7 +9260,8 @@
    "row_source": "limitless",
    "row_url": "https://limitlesstcg.com/cards/jp/SP/250",
    "image_url": "https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/tpc/SP/SP_250_R_JP.png",
-   "status": "missing"
+   "status": "done",
+   "note": "added in PS-CATALOGUE-EN-JA-REC26-A4-20261111"
   },
   {
    "language": "ja",
@@ -9199,7 +9274,8 @@
    "row_source": "limitless",
    "row_url": "https://limitlesstcg.com/cards/jp/SP/251",
    "image_url": "https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/tpc/SP/SP_251_R_JP.png",
-   "status": "missing"
+   "status": "done",
+   "note": "added in PS-CATALOGUE-EN-JA-REC26-A4-20261111"
   },
   {
    "language": "ja",
@@ -9212,7 +9288,8 @@
    "row_source": "limitless",
    "row_url": "https://limitlesstcg.com/cards/jp/SP/252",
    "image_url": "https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/tpc/SP/SP_252_R_JP.png",
-   "status": "missing"
+   "status": "done",
+   "note": "added in PS-CATALOGUE-EN-JA-REC26-A4-20261111"
   },
   {
    "language": "ja",
@@ -9225,7 +9302,8 @@
    "row_source": "limitless",
    "row_url": "https://limitlesstcg.com/cards/jp/SP/253",
    "image_url": "https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/tpc/SP/SP_253_R_JP.png",
-   "status": "missing"
+   "status": "done",
+   "note": "added in PS-CATALOGUE-EN-JA-REC26-A4-20261111"
   },
   {
    "language": "ja",
@@ -9238,7 +9316,8 @@
    "row_source": "limitless",
    "row_url": "https://limitlesstcg.com/cards/jp/SP/324",
    "image_url": "https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/tpc/SP/SP_324_R_JP.png",
-   "status": "missing"
+   "status": "done",
+   "note": "added in PS-CATALOGUE-EN-JA-REC26-A4-20261111"
   },
   {
    "language": "ja",
@@ -9251,7 +9330,8 @@
    "row_source": "limitless",
    "row_url": "https://limitlesstcg.com/cards/jp/SP/326",
    "image_url": "https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/tpc/SP/SP_326_R_JP.png",
-   "status": "missing"
+   "status": "done",
+   "note": "added in PS-CATALOGUE-EN-JA-REC26-A4-20261111"
   },
   {
    "language": "ja",
@@ -9264,7 +9344,8 @@
    "row_source": "limitless",
    "row_url": "https://limitlesstcg.com/cards/jp/SP/327",
    "image_url": "https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/tpc/SP/SP_327_R_JP.png",
-   "status": "missing"
+   "status": "done",
+   "note": "added in PS-CATALOGUE-EN-JA-REC26-A4-20261111"
   },
   {
    "language": "ja",
@@ -9277,7 +9358,8 @@
    "row_source": "limitless",
    "row_url": "https://limitlesstcg.com/cards/jp/SP/102",
    "image_url": "https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/tpc/SP/SP_102_R_JP.png",
-   "status": "missing"
+   "status": "done",
+   "note": "added in PS-CATALOGUE-EN-JA-REC26-A4-20261111"
   },
   {
    "language": "ja",
@@ -9290,7 +9372,8 @@
    "row_source": "limitless",
    "row_url": "https://limitlesstcg.com/cards/jp/SP/120",
    "image_url": "https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/tpc/SP/SP_120_R_JP.png",
-   "status": "missing"
+   "status": "done",
+   "note": "added in PS-CATALOGUE-EN-JA-REC26-A4-20261111"
   },
   {
    "language": "ja",
@@ -9303,7 +9386,8 @@
    "row_source": "limitless",
    "row_url": "https://limitlesstcg.com/cards/jp/SP/127",
    "image_url": "https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/tpc/SP/SP_127_R_JP.png",
-   "status": "missing"
+   "status": "done",
+   "note": "added in PS-CATALOGUE-EN-JA-REC26-A4-20261111"
   },
   {
    "language": "ja",
@@ -9316,7 +9400,8 @@
    "row_source": "limitless",
    "row_url": "https://limitlesstcg.com/cards/jp/SP/183",
    "image_url": "https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/tpc/SP/SP_183_R_JP.png",
-   "status": "missing"
+   "status": "done",
+   "note": "added in PS-CATALOGUE-EN-JA-REC26-A4-20261111"
   },
   {
    "language": "ja",
@@ -9329,7 +9414,8 @@
    "row_source": "limitless",
    "row_url": "https://limitlesstcg.com/cards/jp/SP/223",
    "image_url": "https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/tpc/SP/SP_223_R_JP.png",
-   "status": "missing"
+   "status": "done",
+   "note": "added in PS-CATALOGUE-EN-JA-REC26-A4-20261111"
   },
   {
    "language": "ja",
@@ -9342,7 +9428,8 @@
    "row_source": "limitless",
    "row_url": "https://limitlesstcg.com/cards/jp/SP/241",
    "image_url": "https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/tpc/SP/SP_241_R_JP.png",
-   "status": "missing"
+   "status": "done",
+   "note": "added in PS-CATALOGUE-EN-JA-REC26-A4-20261111"
   },
   {
    "language": "ja",
@@ -9355,7 +9442,8 @@
    "row_source": "limitless",
    "row_url": "https://limitlesstcg.com/cards/jp/SP/245",
    "image_url": "https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/tpc/SP/SP_245_R_JP.png",
-   "status": "missing"
+   "status": "done",
+   "note": "added in PS-CATALOGUE-EN-JA-REC26-A4-20261111"
   },
   {
    "language": "ja",
@@ -9368,7 +9456,8 @@
    "row_source": "limitless",
    "row_url": "https://limitlesstcg.com/cards/jp/SP/264",
    "image_url": "https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/tpc/SP/SP_264_R_JP.png",
-   "status": "missing"
+   "status": "done",
+   "note": "added in PS-CATALOGUE-EN-JA-REC26-A4-20261111"
   },
   {
    "language": "ja",
@@ -9381,7 +9470,8 @@
    "row_source": "limitless",
    "row_url": "https://limitlesstcg.com/cards/jp/SP/285",
    "image_url": "https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/tpc/SP/SP_285_R_JP.png",
-   "status": "missing"
+   "status": "done",
+   "note": "added in PS-CATALOGUE-EN-JA-REC26-A4-20261111"
   },
   {
    "language": "ja",
@@ -9394,7 +9484,8 @@
    "row_source": "limitless",
    "row_url": "https://limitlesstcg.com/cards/jp/SP/301",
    "image_url": "https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/tpc/SP/SP_301_R_JP.png",
-   "status": "missing"
+   "status": "done",
+   "note": "added in PS-CATALOGUE-EN-JA-REC26-A4-20261111"
   },
   {
    "language": "ja",
@@ -9407,7 +9498,8 @@
    "row_source": "limitless",
    "row_url": "https://limitlesstcg.com/cards/jp/SP/317",
    "image_url": "https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/tpc/SP/SP_317_R_JP.png",
-   "status": "missing"
+   "status": "done",
+   "note": "added in PS-CATALOGUE-EN-JA-REC26-A4-20261111"
   },
   {
    "language": "ja",
@@ -9420,7 +9512,8 @@
    "row_source": "limitless",
    "row_url": "https://limitlesstcg.com/cards/jp/SP/328",
    "image_url": "https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/tpc/SP/SP_328_R_JP.png",
-   "status": "missing"
+   "status": "done",
+   "note": "added in PS-CATALOGUE-EN-JA-REC26-A4-20261111"
   },
   {
    "language": "ja",
@@ -9434,7 +9527,7 @@
    "row_url": "https://limitlesstcg.com/cards/jp/SP/5",
    "image_url": "https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/tpc/SP/SP_5_R_JP.png",
    "status": "check",
-   "note": "we hold one unnumbered row for these two prints; find which one, then add the other (second image: https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/tpc/SP/SP_58_R_JP.png)"
+   "note": "left out: our unnumbered row has no image or number; browser worklist"
   },
   {
    "language": "ja",
@@ -9448,7 +9541,7 @@
    "row_url": "https://limitlesstcg.com/cards/jp/SP/17",
    "image_url": "https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/tpc/SP/SP_17_R_JP.png",
    "status": "check",
-   "note": "we hold one unnumbered row for these two prints; find which one, then add the other (second image: https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/tpc/SP/SP_51_R_JP.png)"
+   "note": "left out: our unnumbered row has no image or number; browser worklist"
   },
   {
    "language": "ja",
@@ -9462,7 +9555,7 @@
    "row_url": "https://limitlesstcg.com/cards/jp/SP/19",
    "image_url": "https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/tpc/SP/SP_19_R_JP.png",
    "status": "check",
-   "note": "we hold one unnumbered row for these two prints; find which one, then add the other (second image: https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/tpc/SP/SP_54_R_JP.png)"
+   "note": "left out: our unnumbered row has no image or number; browser worklist"
   },
   {
    "language": "ja",
@@ -9476,7 +9569,7 @@
    "row_url": "https://limitlesstcg.com/cards/jp/SP/27",
    "image_url": "https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/tpc/SP/SP_27_R_JP.png",
    "status": "check",
-   "note": "we hold one unnumbered row for these two prints; find which one, then add the other (second image: https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/tpc/SP/SP_56_R_JP.png)"
+   "note": "left out: our unnumbered row has no image or number; browser worklist"
   },
   {
    "language": "ja",
@@ -9489,8 +9582,8 @@
    "row_source": "limitless",
    "row_url": "https://limitlesstcg.com/cards/jp/SP/55",
    "image_url": "https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/tpc/SP/SP_55_R_JP.png",
-   "status": "check",
-   "note": "we hold one unnumbered row for these two prints; find which one, then add the other (second image: https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/tpc/SP/SP_136_R_JP.png)"
+   "status": "done",
+   "note": "added in PS-CATALOGUE-EN-JA-REC26-A4-20261111"
   },
   {
    "language": "ja",
@@ -9503,8 +9596,8 @@
    "row_source": "limitless",
    "row_url": "https://limitlesstcg.com/cards/jp/SP/89",
    "image_url": "https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/tpc/SP/SP_89_R_JP.png",
-   "status": "check",
-   "note": "we hold one unnumbered row for these two prints; find which one, then add the other (second image: https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/tpc/SP/SP_256_R_JP.png)"
+   "status": "done",
+   "note": "added in PS-CATALOGUE-EN-JA-REC26-A4-20261111"
   },
   {
    "language": "ja",
@@ -9517,8 +9610,8 @@
    "row_source": "limitless",
    "row_url": "https://limitlesstcg.com/cards/jp/SP/NaN1",
    "image_url": "https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/tpc/SP/SP_NaN1_R_JP.png",
-   "status": "check",
-   "note": "three unnumbered prints exist and we hold one; two are missing, which two is not known"
+   "status": "done",
+   "note": "added in PS-CATALOGUE-EN-JA-REC26-A4-20261111"
   },
   {
    "language": "ja",
@@ -9531,8 +9624,8 @@
    "row_source": "limitless",
    "row_url": "https://limitlesstcg.com/cards/jp/SP/NaN2",
    "image_url": "https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/tpc/SP/SP_NaN2_R_JP.png",
-   "status": "check",
-   "note": "three unnumbered prints exist and we hold one; two are missing, which two is not known"
+   "status": "done",
+   "note": "added in PS-CATALOGUE-EN-JA-REC26-A4-20261111"
   },
   {
    "language": "ja",
@@ -9545,8 +9638,8 @@
    "row_source": "limitless",
    "row_url": "https://limitlesstcg.com/cards/jp/BWP/NAN1",
    "image_url": "https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/tpc/BWP/BWP_NAN1_R_JP.png",
-   "status": "missing",
-   "note": "unnumbered"
+   "status": "done",
+   "note": "added in PS-CATALOGUE-EN-JA-REC26-A4-20261111"
   },
   {
    "language": "ja",
@@ -9559,8 +9652,8 @@
    "row_source": "limitless",
    "row_url": "https://limitlesstcg.com/cards/jp/BWP/NAN2",
    "image_url": "https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/tpc/BWP/BWP_NAN2_R_JP.png",
-   "status": "missing",
-   "note": "unnumbered"
+   "status": "done",
+   "note": "added in PS-CATALOGUE-EN-JA-REC26-A4-20261111"
   },
   {
    "language": "ja",
@@ -9573,8 +9666,8 @@
    "row_source": "limitless",
    "row_url": "https://limitlesstcg.com/cards/jp/BWP/NAN3",
    "image_url": "https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/tpc/BWP/BWP_NAN3_R_JP.png",
-   "status": "missing",
-   "note": "unnumbered"
+   "status": "done",
+   "note": "added in PS-CATALOGUE-EN-JA-REC26-A4-20261111"
   },
   {
    "language": "ja",
@@ -9587,8 +9680,8 @@
    "row_source": "limitless",
    "row_url": "https://limitlesstcg.com/cards/jp/BWP/NAN4",
    "image_url": "https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/tpc/BWP/BWP_NAN4_R_JP.png",
-   "status": "check",
-   "note": "unnumbered; we hold a row with this name elsewhere, look first"
+   "status": "done",
+   "note": "added in PS-CATALOGUE-EN-JA-REC26-A4-20261111"
   },
   {
    "language": "ja",
@@ -9601,8 +9694,8 @@
    "row_source": "limitless",
    "row_url": "https://limitlesstcg.com/cards/jp/BWP/NAN5",
    "image_url": "https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/tpc/BWP/BWP_NAN5_R_JP.png",
-   "status": "missing",
-   "note": "unnumbered"
+   "status": "done",
+   "note": "added in PS-CATALOGUE-EN-JA-REC26-A4-20261111"
   },
   {
    "language": "ja",
@@ -9615,8 +9708,8 @@
    "row_source": "limitless",
    "row_url": "https://limitlesstcg.com/cards/jp/BWP/NAN6",
    "image_url": "https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/tpc/BWP/BWP_NAN6_R_JP.png",
-   "status": "missing",
-   "note": "unnumbered"
+   "status": "done",
+   "note": "added in PS-CATALOGUE-EN-JA-REC26-A4-20261111"
   },
   {
    "language": "ja",
@@ -9629,8 +9722,8 @@
    "row_source": "limitless",
    "row_url": "https://limitlesstcg.com/cards/jp/BWP/NAN7",
    "image_url": "https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/tpc/BWP/BWP_NAN7_R_JP.png",
-   "status": "missing",
-   "note": "unnumbered"
+   "status": "done",
+   "note": "added in PS-CATALOGUE-EN-JA-REC26-A4-20261111"
   },
   {
    "language": "ja",
@@ -9643,8 +9736,8 @@
    "row_source": "limitless",
    "row_url": "https://limitlesstcg.com/cards/jp/BWP/NAN8",
    "image_url": "https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/tpc/BWP/BWP_NAN8_R_JP.png",
-   "status": "missing",
-   "note": "unnumbered"
+   "status": "done",
+   "note": "added in PS-CATALOGUE-EN-JA-REC26-A4-20261111"
   },
   {
    "language": "ja",
@@ -9657,8 +9750,8 @@
    "row_source": "limitless",
    "row_url": "https://limitlesstcg.com/cards/jp/BWP/NAN9",
    "image_url": "https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/tpc/BWP/BWP_NAN9_R_JP.png",
-   "status": "missing",
-   "note": "unnumbered"
+   "status": "done",
+   "note": "added in PS-CATALOGUE-EN-JA-REC26-A4-20261111"
   },
   {
    "language": "ja",
@@ -9671,8 +9764,8 @@
    "row_source": "limitless",
    "row_url": "https://limitlesstcg.com/cards/jp/BWP/NAN10",
    "image_url": "https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/tpc/BWP/BWP_NAN10_R_JP.png",
-   "status": "missing",
-   "note": "unnumbered"
+   "status": "done",
+   "note": "added in PS-CATALOGUE-EN-JA-REC26-A4-20261111"
   },
   {
    "language": "ja",
@@ -9685,8 +9778,8 @@
    "row_source": "limitless",
    "row_url": "https://limitlesstcg.com/cards/jp/BWP/NAN11",
    "image_url": "https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/tpc/BWP/BWP_NAN11_R_JP.png",
-   "status": "missing",
-   "note": "unnumbered"
+   "status": "done",
+   "note": "added in PS-CATALOGUE-EN-JA-REC26-A4-20261111"
   },
   {
    "language": "ja",
@@ -9699,8 +9792,8 @@
    "row_source": "limitless",
    "row_url": "https://limitlesstcg.com/cards/jp/BWP/NAN12",
    "image_url": "https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/tpc/BWP/BWP_NAN12_R_JP.png",
-   "status": "check",
-   "note": "unnumbered; we hold a row with this name elsewhere, look first"
+   "status": "done",
+   "note": "added in PS-CATALOGUE-EN-JA-REC26-A4-20261111"
   },
   {
    "language": "ja",
@@ -9713,8 +9806,8 @@
    "row_source": "limitless",
    "row_url": "https://limitlesstcg.com/cards/jp/BWP/NAN13",
    "image_url": "https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/tpc/BWP/BWP_NAN13_R_JP.png",
-   "status": "missing",
-   "note": "unnumbered"
+   "status": "done",
+   "note": "added in PS-CATALOGUE-EN-JA-REC26-A4-20261111"
   },
   {
    "language": "ja",
@@ -9727,8 +9820,8 @@
    "row_source": "limitless",
    "row_url": "https://limitlesstcg.com/cards/jp/BWP/NAN14",
    "image_url": "https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/tpc/BWP/BWP_NAN14_R_JP.png",
-   "status": "missing",
-   "note": "unnumbered"
+   "status": "done",
+   "note": "added in PS-CATALOGUE-EN-JA-REC26-A4-20261111"
   },
   {
    "language": "ja",
@@ -9741,8 +9834,8 @@
    "row_source": "limitless",
    "row_url": "https://limitlesstcg.com/cards/jp/BWP/NAN15",
    "image_url": "https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/tpc/BWP/BWP_NAN15_R_JP.png",
-   "status": "missing",
-   "note": "unnumbered"
+   "status": "done",
+   "note": "added in PS-CATALOGUE-EN-JA-REC26-A4-20261111"
   },
   {
    "language": "ja",
@@ -9755,8 +9848,8 @@
    "row_source": "limitless",
    "row_url": "https://limitlesstcg.com/cards/jp/BWP/NAN16",
    "image_url": "https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/tpc/BWP/BWP_NAN16_R_JP.png",
-   "status": "missing",
-   "note": "unnumbered"
+   "status": "done",
+   "note": "added in PS-CATALOGUE-EN-JA-REC26-A4-20261111"
   },
   {
    "language": "ja",
@@ -9769,8 +9862,8 @@
    "row_source": "limitless",
    "row_url": "https://limitlesstcg.com/cards/jp/SVP/NAN1",
    "image_url": "https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/tpc/SVP/SVP_NAN1_R_JP.png",
-   "status": "missing",
-   "note": "unnumbered"
+   "status": "done",
+   "note": "added in PS-CATALOGUE-EN-JA-REC26-A4-20261111"
   },
   {
    "language": "ja",
@@ -9783,8 +9876,8 @@
    "row_source": "limitless",
    "row_url": "https://limitlesstcg.com/cards/jp/SVP/NAN2",
    "image_url": "https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/tpc/SVP/SVP_NAN2_R_JP.png",
-   "status": "missing",
-   "note": "unnumbered"
+   "status": "done",
+   "note": "added in PS-CATALOGUE-EN-JA-REC26-A4-20261111"
   },
   {
    "language": "ja",
@@ -9797,8 +9890,8 @@
    "row_source": "limitless",
    "row_url": "https://limitlesstcg.com/cards/jp/SVP/NAN3",
    "image_url": "https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/tpc/SVP/SVP_NAN3_R_JP.png",
-   "status": "missing",
-   "note": "unnumbered"
+   "status": "done",
+   "note": "added in PS-CATALOGUE-EN-JA-REC26-A4-20261111"
   },
   {
    "language": "ja",
@@ -9811,8 +9904,8 @@
    "row_source": "limitless",
    "row_url": "https://limitlesstcg.com/cards/jp/SVP/NAN4",
    "image_url": "https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/tpc/SVP/SVP_NAN4_R_JP.png",
-   "status": "missing",
-   "note": "unnumbered"
+   "status": "done",
+   "note": "added in PS-CATALOGUE-EN-JA-REC26-A4-20261111"
   },
   {
    "language": "ja",
@@ -9825,8 +9918,8 @@
    "row_source": "limitless",
    "row_url": "https://limitlesstcg.com/cards/jp/SVP/NAN5",
    "image_url": "https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/tpc/SVP/SVP_NAN5_R_JP.png",
-   "status": "missing",
-   "note": "unnumbered"
+   "status": "done",
+   "note": "added in PS-CATALOGUE-EN-JA-REC26-A4-20261111"
   },
   {
    "language": "ja",
@@ -9839,8 +9932,8 @@
    "row_source": "limitless",
    "row_url": "https://limitlesstcg.com/cards/jp/SVP/NAN6",
    "image_url": "https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/tpc/SVP/SVP_NAN6_R_JP.png",
-   "status": "missing",
-   "note": "unnumbered"
+   "status": "done",
+   "note": "added in PS-CATALOGUE-EN-JA-REC26-A4-20261111"
   },
   {
    "language": "ja",
@@ -9853,8 +9946,8 @@
    "row_source": "limitless",
    "row_url": "https://limitlesstcg.com/cards/jp/SVP/NAN7",
    "image_url": "https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/tpc/SVP/SVP_NAN7_R_JP.png",
-   "status": "missing",
-   "note": "unnumbered"
+   "status": "done",
+   "note": "added in PS-CATALOGUE-EN-JA-REC26-A4-20261111"
   },
   {
    "language": "ja",
@@ -9867,8 +9960,8 @@
    "row_source": "limitless",
    "row_url": "https://limitlesstcg.com/cards/jp/SVP/NAN8",
    "image_url": "https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/tpc/SVP/SVP_NAN8_R_JP.png",
-   "status": "missing",
-   "note": "unnumbered"
+   "status": "done",
+   "note": "added in PS-CATALOGUE-EN-JA-REC26-A4-20261111"
   },
   {
    "language": "ja",
@@ -9881,8 +9974,8 @@
    "row_source": "limitless",
    "row_url": "https://limitlesstcg.com/cards/jp/SVP/NAN9",
    "image_url": "https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/tpc/SVP/SVP_NAN9_R_JP.png",
-   "status": "missing",
-   "note": "unnumbered"
+   "status": "done",
+   "note": "added in PS-CATALOGUE-EN-JA-REC26-A4-20261111"
   },
   {
    "language": "ja",
@@ -9895,8 +9988,8 @@
    "row_source": "limitless",
    "row_url": "https://limitlesstcg.com/cards/jp/SVP/NAN10",
    "image_url": "https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/tpc/SVP/SVP_NAN10_R_JP.png",
-   "status": "missing",
-   "note": "unnumbered"
+   "status": "done",
+   "note": "added in PS-CATALOGUE-EN-JA-REC26-A4-20261111"
   },
   {
    "language": "ja",
@@ -9909,8 +10002,8 @@
    "row_source": "limitless",
    "row_url": "https://limitlesstcg.com/cards/jp/SVP/NAN11",
    "image_url": "https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/tpc/SVP/SVP_NAN11_R_JP.png",
-   "status": "missing",
-   "note": "unnumbered"
+   "status": "done",
+   "note": "added in PS-CATALOGUE-EN-JA-REC26-A4-20261111"
   },
   {
    "language": "ja",
@@ -9923,8 +10016,8 @@
    "row_source": "limitless",
    "row_url": "https://limitlesstcg.com/cards/jp/SVP/NAN12",
    "image_url": "https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/tpc/SVP/SVP_NAN12_R_JP.png",
-   "status": "missing",
-   "note": "unnumbered"
+   "status": "done",
+   "note": "added in PS-CATALOGUE-EN-JA-REC26-A4-20261111"
   },
   {
    "language": "ja",
@@ -9937,8 +10030,8 @@
    "row_source": "limitless",
    "row_url": "https://limitlesstcg.com/cards/jp/MP/NAN1",
    "image_url": "https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/tpc/MP/MP_NAN1_R_JP.png",
-   "status": "missing",
-   "note": "unnumbered"
+   "status": "done",
+   "note": "added in PS-CATALOGUE-EN-JA-REC26-A4-20261111"
   },
   {
    "language": "ja",
@@ -9951,8 +10044,8 @@
    "row_source": "limitless",
    "row_url": "https://limitlesstcg.com/cards/jp/MP/NAN2",
    "image_url": "https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/tpc/MP/MP_NAN2_R_JP.png",
-   "status": "missing",
-   "note": "unnumbered"
+   "status": "done",
+   "note": "added in PS-CATALOGUE-EN-JA-REC26-A4-20261111"
   },
   {
    "language": "ja",
@@ -9965,8 +10058,8 @@
    "row_source": "limitless",
    "row_url": "https://limitlesstcg.com/cards/jp/MP/NAN3",
    "image_url": "https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/tpc/MP/MP_NAN3_R_JP.png",
-   "status": "missing",
-   "note": "unnumbered"
+   "status": "done",
+   "note": "added in PS-CATALOGUE-EN-JA-REC26-A4-20261111"
   },
   {
    "language": "ja",
@@ -9979,8 +10072,8 @@
    "row_source": "limitless",
    "row_url": "https://limitlesstcg.com/cards/jp/MP/NAN4",
    "image_url": "https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/tpc/MP/MP_NAN4_R_JP.png",
-   "status": "missing",
-   "note": "unnumbered"
+   "status": "done",
+   "note": "added in PS-CATALOGUE-EN-JA-REC26-A4-20261111"
   },
   {
    "language": "ja",
@@ -9993,8 +10086,8 @@
    "row_source": "limitless",
    "row_url": "https://limitlesstcg.com/cards/jp/MP/NAN5",
    "image_url": "https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/tpc/MP/MP_NAN5_R_JP.png",
-   "status": "missing",
-   "note": "unnumbered"
+   "status": "done",
+   "note": "added in PS-CATALOGUE-EN-JA-REC26-A4-20261111"
   },
   {
    "language": "ja",
@@ -10007,8 +10100,8 @@
    "row_source": "limitless",
    "row_url": "https://limitlesstcg.com/cards/jp/MP/NAN6",
    "image_url": "https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/tpc/MP/MP_NAN6_R_JP.png",
-   "status": "missing",
-   "note": "unnumbered"
+   "status": "done",
+   "note": "added in PS-CATALOGUE-EN-JA-REC26-A4-20261111"
   },
   {
    "language": "ja",
@@ -10021,8 +10114,8 @@
    "row_source": "official",
    "row_url": "https://www.pokemon-card.com/card-search/details.php/card/49587/regu/all",
    "image_url": "https://www.pokemon-card.com/assets/images/card_images/large/M-P/049587_P_AIANTO.jpg",
-   "status": "missing",
-   "note": "official list has no collector number"
+   "status": "done",
+   "note": "added in PS-CATALOGUE-EN-JA-REC26-A4-20261111"
   },
   {
    "language": "ja",
@@ -10035,8 +10128,8 @@
    "row_source": "official",
    "row_url": "https://www.pokemon-card.com/card-search/details.php/card/49588/regu/all",
    "image_url": "https://www.pokemon-card.com/assets/images/card_images/large/M-P/049588_P_BIRIJION.jpg",
-   "status": "missing",
-   "note": "official list has no collector number"
+   "status": "done",
+   "note": "added in PS-CATALOGUE-EN-JA-REC26-A4-20261111"
   },
   {
    "language": "ja",
@@ -10049,8 +10142,8 @@
    "row_source": "official",
    "row_url": "https://www.pokemon-card.com/card-search/details.php/card/49590/regu/all",
    "image_url": "https://www.pokemon-card.com/assets/images/card_images/large/M-P/049590_P_NIXYAROTE.jpg",
-   "status": "missing",
-   "note": "official list has no collector number"
+   "status": "done",
+   "note": "added in PS-CATALOGUE-EN-JA-REC26-A4-20261111"
   },
   {
    "language": "ja",
@@ -10063,8 +10156,8 @@
    "row_source": "official",
    "row_url": "https://www.pokemon-card.com/card-search/details.php/card/49591/regu/all",
    "image_url": "https://www.pokemon-card.com/assets/images/card_images/large/M-P/049591_P_MASUKANIXYA.jpg",
-   "status": "missing",
-   "note": "official list has no collector number"
+   "status": "done",
+   "note": "added in PS-CATALOGUE-EN-JA-REC26-A4-20261111"
   },
   {
    "language": "ja",
@@ -10077,8 +10170,8 @@
    "row_source": "official",
    "row_url": "https://www.pokemon-card.com/card-search/details.php/card/49593/regu/all",
    "image_url": "https://www.pokemon-card.com/assets/images/card_images/large/M-P/049593_P_EMONGA.jpg",
-   "status": "missing",
-   "note": "official list has no collector number"
+   "status": "done",
+   "note": "added in PS-CATALOGUE-EN-JA-REC26-A4-20261111"
   },
   {
    "language": "ja",
@@ -10091,8 +10184,8 @@
    "row_source": "official",
    "row_url": "https://www.pokemon-card.com/card-search/details.php/card/49594/regu/all",
    "image_url": "https://www.pokemon-card.com/assets/images/card_images/large/M-P/049594_P_WANPACHI.jpg",
-   "status": "missing",
-   "note": "official list has no collector number"
+   "status": "done",
+   "note": "added in PS-CATALOGUE-EN-JA-REC26-A4-20261111"
   },
   {
    "language": "ja",
@@ -10105,8 +10198,8 @@
    "row_source": "official",
    "row_url": "https://www.pokemon-card.com/card-search/details.php/card/49595/regu/all",
    "image_url": "https://www.pokemon-card.com/assets/images/card_images/large/M-P/049595_P_PARUSUWAN.jpg",
-   "status": "missing",
-   "note": "official list has no collector number"
+   "status": "done",
+   "note": "added in PS-CATALOGUE-EN-JA-REC26-A4-20261111"
   },
   {
    "language": "ja",
@@ -10119,8 +10212,8 @@
    "row_source": "official",
    "row_url": "https://www.pokemon-card.com/card-search/details.php/card/49596/regu/all",
    "image_url": "https://www.pokemon-card.com/assets/images/card_images/large/M-P/049596_P_ZUPIKA.jpg",
-   "status": "missing",
-   "note": "official list has no collector number"
+   "status": "done",
+   "note": "added in PS-CATALOGUE-EN-JA-REC26-A4-20261111"
   },
   {
    "language": "ja",
@@ -10133,8 +10226,8 @@
    "row_source": "official",
    "row_url": "https://www.pokemon-card.com/card-search/details.php/card/49597/regu/all",
    "image_url": "https://www.pokemon-card.com/assets/images/card_images/large/M-P/049597_P_HARABARI.jpg",
-   "status": "missing",
-   "note": "official list has no collector number"
+   "status": "done",
+   "note": "added in PS-CATALOGUE-EN-JA-REC26-A4-20261111"
   },
   {
    "language": "ja",
@@ -10147,8 +10240,8 @@
    "row_source": "official",
    "row_url": "https://www.pokemon-card.com/card-search/details.php/card/49598/regu/all",
    "image_url": "https://www.pokemon-card.com/assets/images/card_images/large/M-P/049598_P_KABIGON.jpg",
-   "status": "missing",
-   "note": "official list has no collector number"
+   "status": "done",
+   "note": "added in PS-CATALOGUE-EN-JA-REC26-A4-20261111"
   },
   {
    "language": "ja",
@@ -10161,8 +10254,8 @@
    "row_source": "limitless",
    "row_url": "https://limitlesstcg.com/cards/jp/XYP/NAN141",
    "image_url": "https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/tpc/XYP/XYP_NAN141_R_JP.png",
-   "status": "missing",
-   "note": "unnumbered"
+   "status": "done",
+   "note": "added in PS-CATALOGUE-EN-JA-REC26-A4-20261111"
   },
   {
    "language": "ja",
@@ -10175,8 +10268,8 @@
    "row_source": "limitless",
    "row_url": "https://limitlesstcg.com/cards/jp/XYP/NAN142",
    "image_url": "https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/tpc/XYP/XYP_NAN142_R_JP.png",
-   "status": "missing",
-   "note": "unnumbered"
+   "status": "done",
+   "note": "added in PS-CATALOGUE-EN-JA-REC26-A4-20261111"
   },
   {
    "language": "ja",
@@ -10189,8 +10282,8 @@
    "row_source": "limitless",
    "row_url": "https://limitlesstcg.com/cards/jp/XYP/NAN143",
    "image_url": "https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/tpc/XYP/XYP_NAN143_R_JP.png",
-   "status": "missing",
-   "note": "unnumbered"
+   "status": "done",
+   "note": "added in PS-CATALOGUE-EN-JA-REC26-A4-20261111"
   },
   {
    "language": "ja",
@@ -10203,7 +10296,8 @@
    "row_source": "limitless",
    "row_url": "https://limitlesstcg.com/cards/jp/BKv/1",
    "image_url": "https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/tpc/BKv/BKv_1_R_JP.png",
-   "status": "missing"
+   "status": "done",
+   "note": "added in PS-CATALOGUE-EN-JA-REC26-A4-20261111"
   },
   {
    "language": "ja",
@@ -10216,7 +10310,8 @@
    "row_source": "limitless",
    "row_url": "https://limitlesstcg.com/cards/jp/BKv/2",
    "image_url": "https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/tpc/BKv/BKv_2_R_JP.png",
-   "status": "missing"
+   "status": "done",
+   "note": "added in PS-CATALOGUE-EN-JA-REC26-A4-20261111"
   },
   {
    "language": "ja",
@@ -10229,7 +10324,8 @@
    "row_source": "limitless",
    "row_url": "https://limitlesstcg.com/cards/jp/BKv/13",
    "image_url": "https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/tpc/BKv/BKv_13_R_JP.png",
-   "status": "missing"
+   "status": "done",
+   "note": "added in PS-CATALOGUE-EN-JA-REC26-A4-20261111"
   },
   {
    "language": "ja",
@@ -10242,7 +10338,8 @@
    "row_source": "limitless",
    "row_url": "https://limitlesstcg.com/cards/jp/BKv/8",
    "image_url": "https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/tpc/BKv/BKv_8_R_JP.png",
-   "status": "missing"
+   "status": "done",
+   "note": "added in PS-CATALOGUE-EN-JA-REC26-A4-20261111"
   },
   {
    "language": "ja",
@@ -10255,7 +10352,8 @@
    "row_source": "limitless",
    "row_url": "https://limitlesstcg.com/cards/jp/BKt/1",
    "image_url": "https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/tpc/BKt/BKt_1_R_JP.png",
-   "status": "missing"
+   "status": "done",
+   "note": "added in PS-CATALOGUE-EN-JA-REC26-A4-20261111"
   },
   {
    "language": "ja",
@@ -10268,7 +10366,8 @@
    "row_source": "limitless",
    "row_url": "https://limitlesstcg.com/cards/jp/BKt/2",
    "image_url": "https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/tpc/BKt/BKt_2_R_JP.png",
-   "status": "missing"
+   "status": "done",
+   "note": "added in PS-CATALOGUE-EN-JA-REC26-A4-20261111"
   },
   {
    "language": "ja",
@@ -10281,7 +10380,8 @@
    "row_source": "limitless",
    "row_url": "https://limitlesstcg.com/cards/jp/BKt/8",
    "image_url": "https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/tpc/BKt/BKt_8_R_JP.png",
-   "status": "missing"
+   "status": "done",
+   "note": "added in PS-CATALOGUE-EN-JA-REC26-A4-20261111"
   },
   {
    "language": "ja",
@@ -10294,7 +10394,8 @@
    "row_source": "limitless",
    "row_url": "https://limitlesstcg.com/cards/jp/BKc/8",
    "image_url": "https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/tpc/BKc/BKc_8_R_JP.png",
-   "status": "missing"
+   "status": "done",
+   "note": "added in PS-CATALOGUE-EN-JA-REC26-A4-20261111"
   },
   {
    "language": "ja",
