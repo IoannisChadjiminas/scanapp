@@ -1,6 +1,6 @@
 # Second batch B: official-list-only rows (2026-11-12): not added
 
-**Nothing was switched for batch B.** Staging was not changed. All 129 rows stay out, for the reasons below.
+**Nothing was switched for batch B.** Staging was not changed. All 125 rows stay out, for the reasons below.
 
 ## What was built and measured
 
