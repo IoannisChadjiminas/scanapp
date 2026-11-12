@@ -24,8 +24,8 @@ looked at by eye. Catalogue 62,439 cards (was 62,336). 38 scannable, 65 printing
 
 ### The `check` rows
 - **Victory Proof (勝利の証), `SP`:** three unnumbered prints (優勝, 2位, 3位). Our `ja:SP-u77` image is the 2位 print. Added the other two
-  (`SP-u81`-type ids, from Limitless `NaN1` and `NaN3`).
-- **げんきのハチマキ (55 and 136), マオ&スイレン (89 and 256):** our row shows number 055 and 089 (CSS 2021 / Gym stamps). Added 136 and 256.
+  (`ja:SP-u81`, `ja:SP-u82`, from Limitless `NaN1` and `NaN3`).
+- **げんきのハチマキ (55 and 136), マオ&スイレン (89 and 256):** our row is the 055 / 089 print. Added 136 and 256.
 - **Heavy Ball and Team Plasma Badge, `BWP`:** our `BWP-122` Heavy Ball and `PBG-011` Team Plasma Badge carry no Battle Carnival
   stamp; the Limitless prints do (different art). Added both as new prints.
 
