@@ -69,8 +69,8 @@
    "row_source": "tcgdex",
    "row_url": "https://api.tcgdex.net/v2/en/cards/me06-001",
    "image_url": null,
-   "status": "missing",
-   "note": "no art on TCGdex yet"
+   "status": "left_out",
+   "note": "D4: TCGdex has no art yet (checked 2026-11-12)"
   },
   {
    "language": "en",
@@ -83,8 +83,8 @@
    "row_source": "tcgdex",
    "row_url": "https://api.tcgdex.net/v2/en/cards/me06-002",
    "image_url": null,
-   "status": "missing",
-   "note": "no art on TCGdex yet"
+   "status": "left_out",
+   "note": "D4: TCGdex has no art yet (checked 2026-11-12)"
   },
   {
    "language": "en",
@@ -97,8 +97,8 @@
    "row_source": "tcgdex",
    "row_url": "https://api.tcgdex.net/v2/en/cards/me06-003",
    "image_url": null,
-   "status": "missing",
-   "note": "no art on TCGdex yet"
+   "status": "left_out",
+   "note": "D4: TCGdex has no art yet (checked 2026-11-12)"
   },
   {
    "language": "en",
@@ -111,8 +111,8 @@
    "row_source": "tcgdex",
    "row_url": "https://api.tcgdex.net/v2/en/cards/me06-004",
    "image_url": null,
-   "status": "missing",
-   "note": "no art on TCGdex yet"
+   "status": "left_out",
+   "note": "D4: TCGdex has no art yet (checked 2026-11-12)"
   },
   {
    "language": "en",
@@ -125,8 +125,8 @@
    "row_source": "tcgdex",
    "row_url": "https://api.tcgdex.net/v2/en/cards/me06-005",
    "image_url": null,
-   "status": "missing",
-   "note": "no art on TCGdex yet"
+   "status": "left_out",
+   "note": "D4: TCGdex has no art yet (checked 2026-11-12)"
   },
   {
    "language": "en",
@@ -139,8 +139,8 @@
    "row_source": "tcgdex",
    "row_url": "https://api.tcgdex.net/v2/en/cards/me06-006",
    "image_url": null,
-   "status": "missing",
-   "note": "no art on TCGdex yet"
+   "status": "left_out",
+   "note": "D4: TCGdex has no art yet (checked 2026-11-12)"
   },
   {
    "language": "en",
@@ -153,8 +153,8 @@
    "row_source": "tcgdex",
    "row_url": "https://api.tcgdex.net/v2/en/cards/me06-007",
    "image_url": null,
-   "status": "missing",
-   "note": "no art on TCGdex yet"
+   "status": "left_out",
+   "note": "D4: TCGdex has no art yet (checked 2026-11-12)"
   },
   {
    "language": "en",
@@ -167,8 +167,8 @@
    "row_source": "tcgdex",
    "row_url": "https://api.tcgdex.net/v2/en/cards/me06-008",
    "image_url": null,
-   "status": "missing",
-   "note": "no art on TCGdex yet"
+   "status": "left_out",
+   "note": "D4: TCGdex has no art yet (checked 2026-11-12)"
   },
   {
    "language": "en",
@@ -181,8 +181,8 @@
    "row_source": "tcgdex",
    "row_url": "https://api.tcgdex.net/v2/en/cards/me06-009",
    "image_url": null,
-   "status": "missing",
-   "note": "no art on TCGdex yet"
+   "status": "left_out",
+   "note": "D4: TCGdex has no art yet (checked 2026-11-12)"
   },
   {
    "language": "en",
@@ -195,8 +195,8 @@
    "row_source": "tcgdex",
    "row_url": "https://api.tcgdex.net/v2/en/cards/me06-010",
    "image_url": null,
-   "status": "missing",
-   "note": "no art on TCGdex yet"
+   "status": "left_out",
+   "note": "D4: TCGdex has no art yet (checked 2026-11-12)"
   },
   {
    "language": "en",
@@ -209,8 +209,8 @@
    "row_source": "tcgdex",
    "row_url": "https://api.tcgdex.net/v2/en/cards/me06-011",
    "image_url": null,
-   "status": "missing",
-   "note": "no art on TCGdex yet"
+   "status": "left_out",
+   "note": "D4: TCGdex has no art yet (checked 2026-11-12)"
   },
   {
    "language": "en",
@@ -223,8 +223,8 @@
    "row_source": "tcgdex",
    "row_url": "https://api.tcgdex.net/v2/en/cards/me06-012",
    "image_url": null,
-   "status": "missing",
-   "note": "no art on TCGdex yet"
+   "status": "left_out",
+   "note": "D4: TCGdex has no art yet (checked 2026-11-12)"
   },
   {
    "language": "en",
@@ -237,8 +237,8 @@
    "row_source": "tcgdex",
    "row_url": "https://api.tcgdex.net/v2/en/cards/me06-013",
    "image_url": null,
-   "status": "missing",
-   "note": "no art on TCGdex yet"
+   "status": "left_out",
+   "note": "D4: TCGdex has no art yet (checked 2026-11-12)"
   },
   {
    "language": "en",
@@ -251,8 +251,8 @@
    "row_source": "tcgdex",
    "row_url": "https://api.tcgdex.net/v2/en/cards/me06-014",
    "image_url": null,
-   "status": "missing",
-   "note": "no art on TCGdex yet"
+   "status": "left_out",
+   "note": "D4: TCGdex has no art yet (checked 2026-11-12)"
   },
   {
    "language": "en",
@@ -265,8 +265,8 @@
    "row_source": "tcgdex",
    "row_url": "https://api.tcgdex.net/v2/en/cards/me06-015",
    "image_url": null,
-   "status": "missing",
-   "note": "no art on TCGdex yet"
+   "status": "left_out",
+   "note": "D4: TCGdex has no art yet (checked 2026-11-12)"
   },
   {
    "language": "en",
@@ -279,8 +279,8 @@
    "row_source": "tcgdex",
    "row_url": "https://api.tcgdex.net/v2/en/cards/me06-016",
    "image_url": null,
-   "status": "missing",
-   "note": "no art on TCGdex yet"
+   "status": "left_out",
+   "note": "D4: TCGdex has no art yet (checked 2026-11-12)"
   },
   {
    "language": "en",
@@ -293,8 +293,8 @@
    "row_source": "tcgdex",
    "row_url": "https://api.tcgdex.net/v2/en/cards/me06-017",
    "image_url": null,
-   "status": "missing",
-   "note": "no art on TCGdex yet"
+   "status": "left_out",
+   "note": "D4: TCGdex has no art yet (checked 2026-11-12)"
   },
   {
    "language": "en",
@@ -307,8 +307,8 @@
    "row_source": "tcgdex",
    "row_url": "https://api.tcgdex.net/v2/en/cards/me06-018",
    "image_url": null,
-   "status": "missing",
-   "note": "no art on TCGdex yet"
+   "status": "left_out",
+   "note": "D4: TCGdex has no art yet (checked 2026-11-12)"
   },
   {
    "language": "en",
@@ -321,8 +321,8 @@
    "row_source": "tcgdex",
    "row_url": "https://api.tcgdex.net/v2/en/cards/me06-019",
    "image_url": null,
-   "status": "missing",
-   "note": "no art on TCGdex yet"
+   "status": "left_out",
+   "note": "D4: TCGdex has no art yet (checked 2026-11-12)"
   },
   {
    "language": "en",
@@ -335,8 +335,8 @@
    "row_source": "tcgdex",
    "row_url": "https://api.tcgdex.net/v2/en/cards/me06-020",
    "image_url": null,
-   "status": "missing",
-   "note": "no art on TCGdex yet"
+   "status": "left_out",
+   "note": "D4: TCGdex has no art yet (checked 2026-11-12)"
   },
   {
    "language": "en",
@@ -349,8 +349,8 @@
    "row_source": "tcgdex",
    "row_url": "https://api.tcgdex.net/v2/en/cards/me06-021",
    "image_url": null,
-   "status": "missing",
-   "note": "no art on TCGdex yet"
+   "status": "left_out",
+   "note": "D4: TCGdex has no art yet (checked 2026-11-12)"
   },
   {
    "language": "en",
@@ -363,8 +363,8 @@
    "row_source": "tcgdex",
    "row_url": "https://api.tcgdex.net/v2/en/cards/me06-022",
    "image_url": null,
-   "status": "missing",
-   "note": "no art on TCGdex yet"
+   "status": "left_out",
+   "note": "D4: TCGdex has no art yet (checked 2026-11-12)"
   },
   {
    "language": "en",
@@ -377,8 +377,8 @@
    "row_source": "tcgdex",
    "row_url": "https://api.tcgdex.net/v2/en/cards/me06-023",
    "image_url": null,
-   "status": "missing",
-   "note": "no art on TCGdex yet"
+   "status": "left_out",
+   "note": "D4: TCGdex has no art yet (checked 2026-11-12)"
   },
   {
    "language": "en",
@@ -391,8 +391,8 @@
    "row_source": "tcgdex",
    "row_url": "https://api.tcgdex.net/v2/en/cards/me06-024",
    "image_url": null,
-   "status": "missing",
-   "note": "no art on TCGdex yet"
+   "status": "left_out",
+   "note": "D4: TCGdex has no art yet (checked 2026-11-12)"
   },
   {
    "language": "en",
@@ -405,8 +405,8 @@
    "row_source": "tcgdex",
    "row_url": "https://api.tcgdex.net/v2/en/cards/me06-025",
    "image_url": null,
-   "status": "missing",
-   "note": "no art on TCGdex yet"
+   "status": "left_out",
+   "note": "D4: TCGdex has no art yet (checked 2026-11-12)"
   },
   {
    "language": "en",
@@ -419,8 +419,8 @@
    "row_source": "tcgdex",
    "row_url": "https://api.tcgdex.net/v2/en/cards/me06-026",
    "image_url": null,
-   "status": "missing",
-   "note": "no art on TCGdex yet"
+   "status": "left_out",
+   "note": "D4: TCGdex has no art yet (checked 2026-11-12)"
   },
   {
    "language": "en",
@@ -433,8 +433,8 @@
    "row_source": "tcgdex",
    "row_url": "https://api.tcgdex.net/v2/en/cards/me06-027",
    "image_url": null,
-   "status": "missing",
-   "note": "no art on TCGdex yet"
+   "status": "left_out",
+   "note": "D4: TCGdex has no art yet (checked 2026-11-12)"
   },
   {
    "language": "en",
@@ -447,8 +447,8 @@
    "row_source": "tcgdex",
    "row_url": "https://api.tcgdex.net/v2/en/cards/me06-028",
    "image_url": null,
-   "status": "missing",
-   "note": "no art on TCGdex yet"
+   "status": "left_out",
+   "note": "D4: TCGdex has no art yet (checked 2026-11-12)"
   },
   {
    "language": "en",
@@ -461,8 +461,8 @@
    "row_source": "tcgdex",
    "row_url": "https://api.tcgdex.net/v2/en/cards/me06-029",
    "image_url": null,
-   "status": "missing",
-   "note": "no art on TCGdex yet"
+   "status": "left_out",
+   "note": "D4: TCGdex has no art yet (checked 2026-11-12)"
   },
   {
    "language": "en",
@@ -475,8 +475,8 @@
    "row_source": "tcgdex",
    "row_url": "https://api.tcgdex.net/v2/en/cards/me06-030",
    "image_url": null,
-   "status": "missing",
-   "note": "no art on TCGdex yet"
+   "status": "left_out",
+   "note": "D4: TCGdex has no art yet (checked 2026-11-12)"
   },
   {
    "language": "en",
@@ -489,8 +489,8 @@
    "row_source": "tcgdex",
    "row_url": "https://api.tcgdex.net/v2/en/cards/me06-031",
    "image_url": null,
-   "status": "missing",
-   "note": "no art on TCGdex yet"
+   "status": "left_out",
+   "note": "D4: TCGdex has no art yet (checked 2026-11-12)"
   },
   {
    "language": "en",
@@ -503,8 +503,8 @@
    "row_source": "tcgdex",
    "row_url": "https://api.tcgdex.net/v2/en/cards/me06-032",
    "image_url": null,
-   "status": "missing",
-   "note": "no art on TCGdex yet"
+   "status": "left_out",
+   "note": "D4: TCGdex has no art yet (checked 2026-11-12)"
   },
   {
    "language": "en",
@@ -517,8 +517,8 @@
    "row_source": "tcgdex",
    "row_url": "https://api.tcgdex.net/v2/en/cards/me06-033",
    "image_url": null,
-   "status": "missing",
-   "note": "no art on TCGdex yet"
+   "status": "left_out",
+   "note": "D4: TCGdex has no art yet (checked 2026-11-12)"
   },
   {
    "language": "en",
@@ -531,8 +531,8 @@
    "row_source": "tcgdex",
    "row_url": "https://api.tcgdex.net/v2/en/cards/me06-034",
    "image_url": null,
-   "status": "missing",
-   "note": "no art on TCGdex yet"
+   "status": "left_out",
+   "note": "D4: TCGdex has no art yet (checked 2026-11-12)"
   },
   {
    "language": "en",
@@ -545,8 +545,8 @@
    "row_source": "tcgdex",
    "row_url": "https://api.tcgdex.net/v2/en/cards/me06-035",
    "image_url": null,
-   "status": "missing",
-   "note": "no art on TCGdex yet"
+   "status": "left_out",
+   "note": "D4: TCGdex has no art yet (checked 2026-11-12)"
   },
   {
    "language": "en",
@@ -559,8 +559,8 @@
    "row_source": "tcgdex",
    "row_url": "https://api.tcgdex.net/v2/en/cards/me06-036",
    "image_url": null,
-   "status": "missing",
-   "note": "no art on TCGdex yet"
+   "status": "left_out",
+   "note": "D4: TCGdex has no art yet (checked 2026-11-12)"
   },
   {
    "language": "en",
@@ -573,8 +573,8 @@
    "row_source": "tcgdex",
    "row_url": "https://api.tcgdex.net/v2/en/cards/me06-037",
    "image_url": null,
-   "status": "missing",
-   "note": "no art on TCGdex yet"
+   "status": "left_out",
+   "note": "D4: TCGdex has no art yet (checked 2026-11-12)"
   },
   {
    "language": "en",
@@ -587,8 +587,8 @@
    "row_source": "tcgdex",
    "row_url": "https://api.tcgdex.net/v2/en/cards/me06-038",
    "image_url": null,
-   "status": "missing",
-   "note": "no art on TCGdex yet"
+   "status": "left_out",
+   "note": "D4: TCGdex has no art yet (checked 2026-11-12)"
   },
   {
    "language": "en",
@@ -601,8 +601,8 @@
    "row_source": "tcgdex",
    "row_url": "https://api.tcgdex.net/v2/en/cards/me06-039",
    "image_url": null,
-   "status": "missing",
-   "note": "no art on TCGdex yet"
+   "status": "left_out",
+   "note": "D4: TCGdex has no art yet (checked 2026-11-12)"
   },
   {
    "language": "en",
@@ -615,8 +615,8 @@
    "row_source": "tcgdex",
    "row_url": "https://api.tcgdex.net/v2/en/cards/me06-040",
    "image_url": null,
-   "status": "missing",
-   "note": "no art on TCGdex yet"
+   "status": "left_out",
+   "note": "D4: TCGdex has no art yet (checked 2026-11-12)"
   },
   {
    "language": "en",
@@ -629,8 +629,8 @@
    "row_source": "tcgdex",
    "row_url": "https://api.tcgdex.net/v2/en/cards/me06-041",
    "image_url": null,
-   "status": "missing",
-   "note": "no art on TCGdex yet"
+   "status": "left_out",
+   "note": "D4: TCGdex has no art yet (checked 2026-11-12)"
   },
   {
    "language": "en",
@@ -643,8 +643,8 @@
    "row_source": "tcgdex",
    "row_url": "https://api.tcgdex.net/v2/en/cards/me06-042",
    "image_url": null,
-   "status": "missing",
-   "note": "no art on TCGdex yet"
+   "status": "left_out",
+   "note": "D4: TCGdex has no art yet (checked 2026-11-12)"
   },
   {
    "language": "en",
@@ -657,8 +657,8 @@
    "row_source": "tcgdex",
    "row_url": "https://api.tcgdex.net/v2/en/cards/me06-043",
    "image_url": null,
-   "status": "missing",
-   "note": "no art on TCGdex yet"
+   "status": "left_out",
+   "note": "D4: TCGdex has no art yet (checked 2026-11-12)"
   },
   {
    "language": "en",
@@ -671,8 +671,8 @@
    "row_source": "tcgdex",
    "row_url": "https://api.tcgdex.net/v2/en/cards/me06-044",
    "image_url": null,
-   "status": "missing",
-   "note": "no art on TCGdex yet"
+   "status": "left_out",
+   "note": "D4: TCGdex has no art yet (checked 2026-11-12)"
   },
   {
    "language": "en",
@@ -685,8 +685,8 @@
    "row_source": "tcgdex",
    "row_url": "https://api.tcgdex.net/v2/en/cards/me06-045",
    "image_url": null,
-   "status": "missing",
-   "note": "no art on TCGdex yet"
+   "status": "left_out",
+   "note": "D4: TCGdex has no art yet (checked 2026-11-12)"
   },
   {
    "language": "en",
@@ -699,8 +699,8 @@
    "row_source": "tcgdex",
    "row_url": "https://api.tcgdex.net/v2/en/cards/me06-046",
    "image_url": null,
-   "status": "missing",
-   "note": "no art on TCGdex yet"
+   "status": "left_out",
+   "note": "D4: TCGdex has no art yet (checked 2026-11-12)"
   },
   {
    "language": "en",
@@ -713,8 +713,8 @@
    "row_source": "tcgdex",
    "row_url": "https://api.tcgdex.net/v2/en/cards/me06-047",
    "image_url": null,
-   "status": "missing",
-   "note": "no art on TCGdex yet"
+   "status": "left_out",
+   "note": "D4: TCGdex has no art yet (checked 2026-11-12)"
   },
   {
    "language": "en",
@@ -727,8 +727,8 @@
    "row_source": "tcgdex",
    "row_url": "https://api.tcgdex.net/v2/en/cards/me06-048",
    "image_url": null,
-   "status": "missing",
-   "note": "no art on TCGdex yet"
+   "status": "left_out",
+   "note": "D4: TCGdex has no art yet (checked 2026-11-12)"
   },
   {
    "language": "en",
@@ -741,8 +741,8 @@
    "row_source": "tcgdex",
    "row_url": "https://api.tcgdex.net/v2/en/cards/me06-049",
    "image_url": null,
-   "status": "missing",
-   "note": "no art on TCGdex yet"
+   "status": "left_out",
+   "note": "D4: TCGdex has no art yet (checked 2026-11-12)"
   },
   {
    "language": "en",
@@ -755,8 +755,8 @@
    "row_source": "tcgdex",
    "row_url": "https://api.tcgdex.net/v2/en/cards/me06-050",
    "image_url": null,
-   "status": "missing",
-   "note": "no art on TCGdex yet"
+   "status": "left_out",
+   "note": "D4: TCGdex has no art yet (checked 2026-11-12)"
   },
   {
    "language": "en",
@@ -769,8 +769,8 @@
    "row_source": "tcgdex",
    "row_url": "https://api.tcgdex.net/v2/en/cards/me06-051",
    "image_url": null,
-   "status": "missing",
-   "note": "no art on TCGdex yet"
+   "status": "left_out",
+   "note": "D4: TCGdex has no art yet (checked 2026-11-12)"
   },
   {
    "language": "en",
@@ -783,8 +783,8 @@
    "row_source": "tcgdex",
    "row_url": "https://api.tcgdex.net/v2/en/cards/me06-052",
    "image_url": null,
-   "status": "missing",
-   "note": "no art on TCGdex yet"
+   "status": "left_out",
+   "note": "D4: TCGdex has no art yet (checked 2026-11-12)"
   },
   {
    "language": "en",
@@ -797,8 +797,8 @@
    "row_source": "tcgdex",
    "row_url": "https://api.tcgdex.net/v2/en/cards/me06-053",
    "image_url": null,
-   "status": "missing",
-   "note": "no art on TCGdex yet"
+   "status": "left_out",
+   "note": "D4: TCGdex has no art yet (checked 2026-11-12)"
   },
   {
    "language": "en",
@@ -811,8 +811,8 @@
    "row_source": "tcgdex",
    "row_url": "https://api.tcgdex.net/v2/en/cards/me06-054",
    "image_url": null,
-   "status": "missing",
-   "note": "no art on TCGdex yet"
+   "status": "left_out",
+   "note": "D4: TCGdex has no art yet (checked 2026-11-12)"
   },
   {
    "language": "en",
@@ -825,8 +825,8 @@
    "row_source": "tcgdex",
    "row_url": "https://api.tcgdex.net/v2/en/cards/me06-055",
    "image_url": null,
-   "status": "missing",
-   "note": "no art on TCGdex yet"
+   "status": "left_out",
+   "note": "D4: TCGdex has no art yet (checked 2026-11-12)"
   },
   {
    "language": "en",
@@ -839,8 +839,8 @@
    "row_source": "tcgdex",
    "row_url": "https://api.tcgdex.net/v2/en/cards/me06-056",
    "image_url": null,
-   "status": "missing",
-   "note": "no art on TCGdex yet"
+   "status": "left_out",
+   "note": "D4: TCGdex has no art yet (checked 2026-11-12)"
   },
   {
    "language": "en",
@@ -853,8 +853,8 @@
    "row_source": "tcgdex",
    "row_url": "https://api.tcgdex.net/v2/en/cards/me06-057",
    "image_url": null,
-   "status": "missing",
-   "note": "no art on TCGdex yet"
+   "status": "left_out",
+   "note": "D4: TCGdex has no art yet (checked 2026-11-12)"
   },
   {
    "language": "en",
@@ -867,8 +867,8 @@
    "row_source": "tcgdex",
    "row_url": "https://api.tcgdex.net/v2/en/cards/me06-058",
    "image_url": null,
-   "status": "missing",
-   "note": "no art on TCGdex yet"
+   "status": "left_out",
+   "note": "D4: TCGdex has no art yet (checked 2026-11-12)"
   },
   {
    "language": "en",
@@ -881,8 +881,8 @@
    "row_source": "tcgdex",
    "row_url": "https://api.tcgdex.net/v2/en/cards/me06-059",
    "image_url": null,
-   "status": "missing",
-   "note": "no art on TCGdex yet"
+   "status": "left_out",
+   "note": "D4: TCGdex has no art yet (checked 2026-11-12)"
   },
   {
    "language": "en",
@@ -895,8 +895,8 @@
    "row_source": "tcgdex",
    "row_url": "https://api.tcgdex.net/v2/en/cards/me06-060",
    "image_url": null,
-   "status": "missing",
-   "note": "no art on TCGdex yet"
+   "status": "left_out",
+   "note": "D4: TCGdex has no art yet (checked 2026-11-12)"
   },
   {
    "language": "en",
@@ -909,8 +909,8 @@
    "row_source": "tcgdex",
    "row_url": "https://api.tcgdex.net/v2/en/cards/me06-061",
    "image_url": null,
-   "status": "missing",
-   "note": "no art on TCGdex yet"
+   "status": "left_out",
+   "note": "D4: TCGdex has no art yet (checked 2026-11-12)"
   },
   {
    "language": "en",
@@ -923,8 +923,8 @@
    "row_source": "tcgdex",
    "row_url": "https://api.tcgdex.net/v2/en/cards/me06-062",
    "image_url": null,
-   "status": "missing",
-   "note": "no art on TCGdex yet"
+   "status": "left_out",
+   "note": "D4: TCGdex has no art yet (checked 2026-11-12)"
   },
   {
    "language": "en",
@@ -937,8 +937,8 @@
    "row_source": "tcgdex",
    "row_url": "https://api.tcgdex.net/v2/en/cards/me06-063",
    "image_url": null,
-   "status": "missing",
-   "note": "no art on TCGdex yet"
+   "status": "left_out",
+   "note": "D4: TCGdex has no art yet (checked 2026-11-12)"
   },
   {
    "language": "en",
@@ -951,8 +951,8 @@
    "row_source": "tcgdex",
    "row_url": "https://api.tcgdex.net/v2/en/cards/me06-064",
    "image_url": null,
-   "status": "missing",
-   "note": "no art on TCGdex yet"
+   "status": "left_out",
+   "note": "D4: TCGdex has no art yet (checked 2026-11-12)"
   },
   {
    "language": "en",
@@ -965,8 +965,8 @@
    "row_source": "tcgdex",
    "row_url": "https://api.tcgdex.net/v2/en/cards/me06-065",
    "image_url": null,
-   "status": "missing",
-   "note": "no art on TCGdex yet"
+   "status": "left_out",
+   "note": "D4: TCGdex has no art yet (checked 2026-11-12)"
   },
   {
    "language": "en",
@@ -979,8 +979,8 @@
    "row_source": "tcgdex",
    "row_url": "https://api.tcgdex.net/v2/en/cards/me06-066",
    "image_url": null,
-   "status": "missing",
-   "note": "no art on TCGdex yet"
+   "status": "left_out",
+   "note": "D4: TCGdex has no art yet (checked 2026-11-12)"
   },
   {
    "language": "en",
@@ -993,8 +993,8 @@
    "row_source": "tcgdex",
    "row_url": "https://api.tcgdex.net/v2/en/cards/me06-067",
    "image_url": null,
-   "status": "missing",
-   "note": "no art on TCGdex yet"
+   "status": "left_out",
+   "note": "D4: TCGdex has no art yet (checked 2026-11-12)"
   },
   {
    "language": "en",
@@ -1007,8 +1007,8 @@
    "row_source": "tcgdex",
    "row_url": "https://api.tcgdex.net/v2/en/cards/me06-068",
    "image_url": null,
-   "status": "missing",
-   "note": "no art on TCGdex yet"
+   "status": "left_out",
+   "note": "D4: TCGdex has no art yet (checked 2026-11-12)"
   },
   {
    "language": "en",
@@ -1021,8 +1021,8 @@
    "row_source": "tcgdex",
    "row_url": "https://api.tcgdex.net/v2/en/cards/me06-069",
    "image_url": null,
-   "status": "missing",
-   "note": "no art on TCGdex yet"
+   "status": "left_out",
+   "note": "D4: TCGdex has no art yet (checked 2026-11-12)"
   },
   {
    "language": "en",
@@ -1035,8 +1035,8 @@
    "row_source": "tcgdex",
    "row_url": "https://api.tcgdex.net/v2/en/cards/me06-070",
    "image_url": null,
-   "status": "missing",
-   "note": "no art on TCGdex yet"
+   "status": "left_out",
+   "note": "D4: TCGdex has no art yet (checked 2026-11-12)"
   },
   {
    "language": "en",
@@ -1049,8 +1049,8 @@
    "row_source": "tcgdex",
    "row_url": "https://api.tcgdex.net/v2/en/cards/me06-071",
    "image_url": null,
-   "status": "missing",
-   "note": "no art on TCGdex yet"
+   "status": "left_out",
+   "note": "D4: TCGdex has no art yet (checked 2026-11-12)"
   },
   {
    "language": "en",
@@ -1063,8 +1063,8 @@
    "row_source": "tcgdex",
    "row_url": "https://api.tcgdex.net/v2/en/cards/me06-072",
    "image_url": null,
-   "status": "missing",
-   "note": "no art on TCGdex yet"
+   "status": "left_out",
+   "note": "D4: TCGdex has no art yet (checked 2026-11-12)"
   },
   {
    "language": "en",
@@ -1077,8 +1077,8 @@
    "row_source": "tcgdex",
    "row_url": "https://api.tcgdex.net/v2/en/cards/me06-073",
    "image_url": null,
-   "status": "missing",
-   "note": "no art on TCGdex yet"
+   "status": "left_out",
+   "note": "D4: TCGdex has no art yet (checked 2026-11-12)"
   },
   {
    "language": "en",
@@ -1091,8 +1091,8 @@
    "row_source": "tcgdex",
    "row_url": "https://api.tcgdex.net/v2/en/cards/me06-074",
    "image_url": null,
-   "status": "missing",
-   "note": "no art on TCGdex yet"
+   "status": "left_out",
+   "note": "D4: TCGdex has no art yet (checked 2026-11-12)"
   },
   {
    "language": "en",
@@ -1105,8 +1105,8 @@
    "row_source": "tcgdex",
    "row_url": "https://api.tcgdex.net/v2/en/cards/me06-075",
    "image_url": null,
-   "status": "missing",
-   "note": "no art on TCGdex yet"
+   "status": "left_out",
+   "note": "D4: TCGdex has no art yet (checked 2026-11-12)"
   },
   {
    "language": "en",
@@ -1119,8 +1119,8 @@
    "row_source": "tcgdex",
    "row_url": "https://api.tcgdex.net/v2/en/cards/me06-076",
    "image_url": null,
-   "status": "missing",
-   "note": "no art on TCGdex yet"
+   "status": "left_out",
+   "note": "D4: TCGdex has no art yet (checked 2026-11-12)"
   },
   {
    "language": "en",
@@ -1133,8 +1133,8 @@
    "row_source": "tcgdex",
    "row_url": "https://api.tcgdex.net/v2/en/cards/me06-077",
    "image_url": null,
-   "status": "missing",
-   "note": "no art on TCGdex yet"
+   "status": "left_out",
+   "note": "D4: TCGdex has no art yet (checked 2026-11-12)"
   },
   {
    "language": "en",
@@ -1147,8 +1147,8 @@
    "row_source": "tcgdex",
    "row_url": "https://api.tcgdex.net/v2/en/cards/me06-078",
    "image_url": null,
-   "status": "missing",
-   "note": "no art on TCGdex yet"
+   "status": "left_out",
+   "note": "D4: TCGdex has no art yet (checked 2026-11-12)"
   },
   {
    "language": "en",
@@ -1161,8 +1161,8 @@
    "row_source": "tcgdex",
    "row_url": "https://api.tcgdex.net/v2/en/cards/me06-079",
    "image_url": null,
-   "status": "missing",
-   "note": "no art on TCGdex yet"
+   "status": "left_out",
+   "note": "D4: TCGdex has no art yet (checked 2026-11-12)"
   },
   {
    "language": "en",
@@ -1175,8 +1175,8 @@
    "row_source": "tcgdex",
    "row_url": "https://api.tcgdex.net/v2/en/cards/me06-080",
    "image_url": null,
-   "status": "missing",
-   "note": "no art on TCGdex yet"
+   "status": "left_out",
+   "note": "D4: TCGdex has no art yet (checked 2026-11-12)"
   },
   {
    "language": "en",
@@ -1189,8 +1189,8 @@
    "row_source": "tcgdex",
    "row_url": "https://api.tcgdex.net/v2/en/cards/me06-081",
    "image_url": null,
-   "status": "missing",
-   "note": "no art on TCGdex yet"
+   "status": "left_out",
+   "note": "D4: TCGdex has no art yet (checked 2026-11-12)"
   },
   {
    "language": "en",
@@ -1203,8 +1203,8 @@
    "row_source": "tcgdex",
    "row_url": "https://api.tcgdex.net/v2/en/cards/me06-082",
    "image_url": null,
-   "status": "missing",
-   "note": "no art on TCGdex yet"
+   "status": "left_out",
+   "note": "D4: TCGdex has no art yet (checked 2026-11-12)"
   },
   {
    "language": "en",
@@ -1217,8 +1217,8 @@
    "row_source": "tcgdex",
    "row_url": "https://api.tcgdex.net/v2/en/cards/me06-083",
    "image_url": null,
-   "status": "missing",
-   "note": "no art on TCGdex yet"
+   "status": "left_out",
+   "note": "D4: TCGdex has no art yet (checked 2026-11-12)"
   },
   {
    "language": "en",
@@ -1231,8 +1231,8 @@
    "row_source": "tcgdex",
    "row_url": "https://api.tcgdex.net/v2/en/cards/me06-084",
    "image_url": null,
-   "status": "missing",
-   "note": "no art on TCGdex yet"
+   "status": "left_out",
+   "note": "D4: TCGdex has no art yet (checked 2026-11-12)"
   },
   {
    "language": "en",
@@ -1245,8 +1245,8 @@
    "row_source": "tcgdex",
    "row_url": "https://api.tcgdex.net/v2/en/cards/me06-085",
    "image_url": null,
-   "status": "missing",
-   "note": "no art on TCGdex yet"
+   "status": "left_out",
+   "note": "D4: TCGdex has no art yet (checked 2026-11-12)"
   },
   {
    "language": "en",
@@ -1259,8 +1259,8 @@
    "row_source": "tcgdex",
    "row_url": "https://api.tcgdex.net/v2/en/cards/me06-086",
    "image_url": null,
-   "status": "missing",
-   "note": "no art on TCGdex yet"
+   "status": "left_out",
+   "note": "D4: TCGdex has no art yet (checked 2026-11-12)"
   },
   {
    "language": "en",
@@ -1273,8 +1273,8 @@
    "row_source": "tcgdex",
    "row_url": "https://api.tcgdex.net/v2/en/cards/me06-087",
    "image_url": null,
-   "status": "missing",
-   "note": "no art on TCGdex yet"
+   "status": "left_out",
+   "note": "D4: TCGdex has no art yet (checked 2026-11-12)"
   },
   {
    "language": "en",
@@ -1287,8 +1287,8 @@
    "row_source": "tcgdex",
    "row_url": "https://api.tcgdex.net/v2/en/cards/me06-088",
    "image_url": null,
-   "status": "missing",
-   "note": "no art on TCGdex yet"
+   "status": "left_out",
+   "note": "D4: TCGdex has no art yet (checked 2026-11-12)"
   },
   {
    "language": "en",
@@ -1301,8 +1301,8 @@
    "row_source": "tcgdex",
    "row_url": "https://api.tcgdex.net/v2/en/cards/me06-089",
    "image_url": null,
-   "status": "missing",
-   "note": "no art on TCGdex yet"
+   "status": "left_out",
+   "note": "D4: TCGdex has no art yet (checked 2026-11-12)"
   },
   {
    "language": "en",
@@ -1315,8 +1315,8 @@
    "row_source": "tcgdex",
    "row_url": "https://api.tcgdex.net/v2/en/cards/me06-090",
    "image_url": null,
-   "status": "missing",
-   "note": "no art on TCGdex yet"
+   "status": "left_out",
+   "note": "D4: TCGdex has no art yet (checked 2026-11-12)"
   },
   {
    "language": "en",
@@ -1329,8 +1329,8 @@
    "row_source": "tcgdex",
    "row_url": "https://api.tcgdex.net/v2/en/cards/me06-091",
    "image_url": null,
-   "status": "missing",
-   "note": "no art on TCGdex yet"
+   "status": "left_out",
+   "note": "D4: TCGdex has no art yet (checked 2026-11-12)"
   },
   {
    "language": "en",
@@ -1343,8 +1343,8 @@
    "row_source": "tcgdex",
    "row_url": "https://api.tcgdex.net/v2/en/cards/me06-092",
    "image_url": null,
-   "status": "missing",
-   "note": "no art on TCGdex yet"
+   "status": "left_out",
+   "note": "D4: TCGdex has no art yet (checked 2026-11-12)"
   },
   {
    "language": "en",
@@ -1357,8 +1357,8 @@
    "row_source": "tcgdex",
    "row_url": "https://api.tcgdex.net/v2/en/cards/me06-093",
    "image_url": null,
-   "status": "missing",
-   "note": "no art on TCGdex yet"
+   "status": "left_out",
+   "note": "D4: TCGdex has no art yet (checked 2026-11-12)"
   },
   {
    "language": "en",
@@ -1371,8 +1371,8 @@
    "row_source": "tcgdex",
    "row_url": "https://api.tcgdex.net/v2/en/cards/me06-094",
    "image_url": null,
-   "status": "missing",
-   "note": "no art on TCGdex yet"
+   "status": "left_out",
+   "note": "D4: TCGdex has no art yet (checked 2026-11-12)"
   },
   {
    "language": "en",
@@ -1385,8 +1385,8 @@
    "row_source": "tcgdex",
    "row_url": "https://api.tcgdex.net/v2/en/cards/me06-095",
    "image_url": null,
-   "status": "missing",
-   "note": "no art on TCGdex yet"
+   "status": "left_out",
+   "note": "D4: TCGdex has no art yet (checked 2026-11-12)"
   },
   {
    "language": "en",
@@ -1399,8 +1399,8 @@
    "row_source": "tcgdex",
    "row_url": "https://api.tcgdex.net/v2/en/cards/me06-096",
    "image_url": null,
-   "status": "missing",
-   "note": "no art on TCGdex yet"
+   "status": "left_out",
+   "note": "D4: TCGdex has no art yet (checked 2026-11-12)"
   },
   {
    "language": "en",
@@ -1413,8 +1413,8 @@
    "row_source": "tcgdex",
    "row_url": "https://api.tcgdex.net/v2/en/cards/me06-097",
    "image_url": null,
-   "status": "missing",
-   "note": "no art on TCGdex yet"
+   "status": "left_out",
+   "note": "D4: TCGdex has no art yet (checked 2026-11-12)"
   },
   {
    "language": "en",
@@ -1427,8 +1427,8 @@
    "row_source": "tcgdex",
    "row_url": "https://api.tcgdex.net/v2/en/cards/me06-098",
    "image_url": null,
-   "status": "missing",
-   "note": "no art on TCGdex yet"
+   "status": "left_out",
+   "note": "D4: TCGdex has no art yet (checked 2026-11-12)"
   },
   {
    "language": "en",
@@ -1441,8 +1441,8 @@
    "row_source": "tcgdex",
    "row_url": "https://api.tcgdex.net/v2/en/cards/me06-099",
    "image_url": null,
-   "status": "missing",
-   "note": "no art on TCGdex yet"
+   "status": "left_out",
+   "note": "D4: TCGdex has no art yet (checked 2026-11-12)"
   },
   {
    "language": "en",
@@ -1455,8 +1455,8 @@
    "row_source": "tcgdex",
    "row_url": "https://api.tcgdex.net/v2/en/cards/me06-100",
    "image_url": null,
-   "status": "missing",
-   "note": "no art on TCGdex yet"
+   "status": "left_out",
+   "note": "D4: TCGdex has no art yet (checked 2026-11-12)"
   },
   {
    "language": "en",
@@ -1469,8 +1469,8 @@
    "row_source": "tcgdex",
    "row_url": "https://api.tcgdex.net/v2/en/cards/me06-101",
    "image_url": null,
-   "status": "missing",
-   "note": "no art on TCGdex yet"
+   "status": "left_out",
+   "note": "D4: TCGdex has no art yet (checked 2026-11-12)"
   },
   {
    "language": "en",
@@ -1483,8 +1483,8 @@
    "row_source": "tcgdex",
    "row_url": "https://api.tcgdex.net/v2/en/cards/me06-102",
    "image_url": null,
-   "status": "missing",
-   "note": "no art on TCGdex yet"
+   "status": "left_out",
+   "note": "D4: TCGdex has no art yet (checked 2026-11-12)"
   },
   {
    "language": "en",
@@ -1497,8 +1497,8 @@
    "row_source": "tcgdex",
    "row_url": "https://api.tcgdex.net/v2/en/cards/me06-103",
    "image_url": null,
-   "status": "missing",
-   "note": "no art on TCGdex yet"
+   "status": "left_out",
+   "note": "D4: TCGdex has no art yet (checked 2026-11-12)"
   },
   {
    "language": "en",
@@ -1511,8 +1511,8 @@
    "row_source": "tcgdex",
    "row_url": "https://api.tcgdex.net/v2/en/cards/me06-104",
    "image_url": null,
-   "status": "missing",
-   "note": "no art on TCGdex yet"
+   "status": "left_out",
+   "note": "D4: TCGdex has no art yet (checked 2026-11-12)"
   },
   {
    "language": "en",
@@ -1525,8 +1525,8 @@
    "row_source": "tcgdex",
    "row_url": "https://api.tcgdex.net/v2/en/cards/me06-105",
    "image_url": null,
-   "status": "missing",
-   "note": "no art on TCGdex yet"
+   "status": "left_out",
+   "note": "D4: TCGdex has no art yet (checked 2026-11-12)"
   },
   {
    "language": "en",
@@ -1539,8 +1539,8 @@
    "row_source": "tcgdex",
    "row_url": "https://api.tcgdex.net/v2/en/cards/me06-106",
    "image_url": null,
-   "status": "missing",
-   "note": "no art on TCGdex yet"
+   "status": "left_out",
+   "note": "D4: TCGdex has no art yet (checked 2026-11-12)"
   },
   {
    "language": "en",
@@ -1553,8 +1553,8 @@
    "row_source": "tcgdex",
    "row_url": "https://api.tcgdex.net/v2/en/cards/me06-107",
    "image_url": null,
-   "status": "missing",
-   "note": "no art on TCGdex yet"
+   "status": "left_out",
+   "note": "D4: TCGdex has no art yet (checked 2026-11-12)"
   },
   {
    "language": "en",
@@ -1567,8 +1567,8 @@
    "row_source": "tcgdex",
    "row_url": "https://api.tcgdex.net/v2/en/cards/me06-108",
    "image_url": null,
-   "status": "missing",
-   "note": "no art on TCGdex yet"
+   "status": "left_out",
+   "note": "D4: TCGdex has no art yet (checked 2026-11-12)"
   },
   {
    "language": "en",
@@ -1581,8 +1581,8 @@
    "row_source": "tcgdex",
    "row_url": "https://api.tcgdex.net/v2/en/cards/me06-109",
    "image_url": null,
-   "status": "missing",
-   "note": "no art on TCGdex yet"
+   "status": "left_out",
+   "note": "D4: TCGdex has no art yet (checked 2026-11-12)"
   },
   {
    "language": "en",
@@ -1595,8 +1595,8 @@
    "row_source": "tcgdex",
    "row_url": "https://api.tcgdex.net/v2/en/cards/me06-110",
    "image_url": null,
-   "status": "missing",
-   "note": "no art on TCGdex yet"
+   "status": "left_out",
+   "note": "D4: TCGdex has no art yet (checked 2026-11-12)"
   },
   {
    "language": "en",
@@ -1609,8 +1609,8 @@
    "row_source": "tcgdex",
    "row_url": "https://api.tcgdex.net/v2/en/cards/me06-111",
    "image_url": null,
-   "status": "missing",
-   "note": "no art on TCGdex yet"
+   "status": "left_out",
+   "note": "D4: TCGdex has no art yet (checked 2026-11-12)"
   },
   {
    "language": "en",
@@ -1623,8 +1623,8 @@
    "row_source": "tcgdex",
    "row_url": "https://api.tcgdex.net/v2/en/cards/me06-112",
    "image_url": null,
-   "status": "missing",
-   "note": "no art on TCGdex yet"
+   "status": "left_out",
+   "note": "D4: TCGdex has no art yet (checked 2026-11-12)"
   },
   {
    "language": "en",
@@ -1637,8 +1637,8 @@
    "row_source": "tcgdex",
    "row_url": "https://api.tcgdex.net/v2/en/cards/me06-113",
    "image_url": null,
-   "status": "missing",
-   "note": "no art on TCGdex yet"
+   "status": "left_out",
+   "note": "D4: TCGdex has no art yet (checked 2026-11-12)"
   },
   {
    "language": "en",
@@ -1651,8 +1651,8 @@
    "row_source": "tcgdex",
    "row_url": "https://api.tcgdex.net/v2/en/cards/me06-114",
    "image_url": null,
-   "status": "missing",
-   "note": "no art on TCGdex yet"
+   "status": "left_out",
+   "note": "D4: TCGdex has no art yet (checked 2026-11-12)"
   },
   {
    "language": "en",
@@ -1665,8 +1665,8 @@
    "row_source": "tcgdex",
    "row_url": "https://api.tcgdex.net/v2/en/cards/me06-115",
    "image_url": null,
-   "status": "missing",
-   "note": "no art on TCGdex yet"
+   "status": "left_out",
+   "note": "D4: TCGdex has no art yet (checked 2026-11-12)"
   },
   {
    "language": "en",
@@ -1679,8 +1679,8 @@
    "row_source": "tcgdex",
    "row_url": "https://api.tcgdex.net/v2/en/cards/me06-116",
    "image_url": null,
-   "status": "missing",
-   "note": "no art on TCGdex yet"
+   "status": "left_out",
+   "note": "D4: TCGdex has no art yet (checked 2026-11-12)"
   },
   {
    "language": "en",
@@ -1693,8 +1693,8 @@
    "row_source": "tcgdex",
    "row_url": "https://api.tcgdex.net/v2/en/cards/me06-117",
    "image_url": null,
-   "status": "missing",
-   "note": "no art on TCGdex yet"
+   "status": "left_out",
+   "note": "D4: TCGdex has no art yet (checked 2026-11-12)"
   },
   {
    "language": "en",
@@ -1707,8 +1707,8 @@
    "row_source": "tcgdex",
    "row_url": "https://api.tcgdex.net/v2/en/cards/me06-118",
    "image_url": null,
-   "status": "missing",
-   "note": "no art on TCGdex yet"
+   "status": "left_out",
+   "note": "D4: TCGdex has no art yet (checked 2026-11-12)"
   },
   {
    "language": "en",
@@ -1721,8 +1721,8 @@
    "row_source": "tcgdex",
    "row_url": "https://api.tcgdex.net/v2/en/cards/me06-119",
    "image_url": null,
-   "status": "missing",
-   "note": "no art on TCGdex yet"
+   "status": "left_out",
+   "note": "D4: TCGdex has no art yet (checked 2026-11-12)"
   },
   {
    "language": "en",
@@ -1735,8 +1735,8 @@
    "row_source": "tcgdex",
    "row_url": "https://api.tcgdex.net/v2/en/cards/me06-120",
    "image_url": null,
-   "status": "missing",
-   "note": "no art on TCGdex yet"
+   "status": "left_out",
+   "note": "D4: TCGdex has no art yet (checked 2026-11-12)"
   },
   {
    "language": "en",
@@ -1749,8 +1749,8 @@
    "row_source": "tcgdex",
    "row_url": "https://api.tcgdex.net/v2/en/cards/me06-121",
    "image_url": null,
-   "status": "missing",
-   "note": "no art on TCGdex yet"
+   "status": "left_out",
+   "note": "D4: TCGdex has no art yet (checked 2026-11-12)"
   },
   {
    "language": "en",
@@ -1763,8 +1763,8 @@
    "row_source": "tcgdex",
    "row_url": "https://api.tcgdex.net/v2/en/cards/me06-122",
    "image_url": null,
-   "status": "missing",
-   "note": "no art on TCGdex yet"
+   "status": "left_out",
+   "note": "D4: TCGdex has no art yet (checked 2026-11-12)"
   },
   {
    "language": "en",
@@ -1777,8 +1777,8 @@
    "row_source": "tcgdex",
    "row_url": "https://api.tcgdex.net/v2/en/cards/me06-123",
    "image_url": null,
-   "status": "missing",
-   "note": "no art on TCGdex yet"
+   "status": "left_out",
+   "note": "D4: TCGdex has no art yet (checked 2026-11-12)"
   },
   {
    "language": "en",
@@ -1791,8 +1791,8 @@
    "row_source": "tcgdex",
    "row_url": "https://api.tcgdex.net/v2/en/cards/me06-124",
    "image_url": null,
-   "status": "missing",
-   "note": "no art on TCGdex yet"
+   "status": "left_out",
+   "note": "D4: TCGdex has no art yet (checked 2026-11-12)"
   },
   {
    "language": "en",
@@ -1805,8 +1805,8 @@
    "row_source": "tcgdex",
    "row_url": "https://api.tcgdex.net/v2/en/cards/me06-125",
    "image_url": null,
-   "status": "missing",
-   "note": "no art on TCGdex yet"
+   "status": "left_out",
+   "note": "D4: TCGdex has no art yet (checked 2026-11-12)"
   },
   {
    "language": "en",
@@ -1819,8 +1819,8 @@
    "row_source": "tcgdex",
    "row_url": "https://api.tcgdex.net/v2/en/cards/me06-126",
    "image_url": null,
-   "status": "missing",
-   "note": "no art on TCGdex yet"
+   "status": "left_out",
+   "note": "D4: TCGdex has no art yet (checked 2026-11-12)"
   },
   {
    "language": "en",
@@ -1833,8 +1833,8 @@
    "row_source": "tcgdex",
    "row_url": "https://api.tcgdex.net/v2/en/cards/me06-127",
    "image_url": null,
-   "status": "missing",
-   "note": "no art on TCGdex yet"
+   "status": "left_out",
+   "note": "D4: TCGdex has no art yet (checked 2026-11-12)"
   },
   {
    "language": "en",
@@ -1847,8 +1847,8 @@
    "row_source": "tcgdex",
    "row_url": "https://api.tcgdex.net/v2/en/cards/me06-128",
    "image_url": null,
-   "status": "missing",
-   "note": "no art on TCGdex yet"
+   "status": "left_out",
+   "note": "D4: TCGdex has no art yet (checked 2026-11-12)"
   },
   {
    "language": "en",
@@ -1861,8 +1861,8 @@
    "row_source": "tcgdex",
    "row_url": "https://api.tcgdex.net/v2/en/cards/me06-129",
    "image_url": null,
-   "status": "missing",
-   "note": "no art on TCGdex yet"
+   "status": "left_out",
+   "note": "D4: TCGdex has no art yet (checked 2026-11-12)"
   },
   {
    "language": "en",
@@ -1875,8 +1875,8 @@
    "row_source": "tcgdex",
    "row_url": "https://api.tcgdex.net/v2/en/cards/me06-130",
    "image_url": null,
-   "status": "missing",
-   "note": "no art on TCGdex yet"
+   "status": "left_out",
+   "note": "D4: TCGdex has no art yet (checked 2026-11-12)"
   },
   {
    "language": "en",
@@ -1889,8 +1889,8 @@
    "row_source": "tcgdex",
    "row_url": "https://api.tcgdex.net/v2/en/cards/me06-131",
    "image_url": null,
-   "status": "missing",
-   "note": "no art on TCGdex yet"
+   "status": "left_out",
+   "note": "D4: TCGdex has no art yet (checked 2026-11-12)"
   },
   {
    "language": "en",
@@ -1903,8 +1903,8 @@
    "row_source": "tcgdex",
    "row_url": "https://api.tcgdex.net/v2/en/cards/me06-132",
    "image_url": null,
-   "status": "missing",
-   "note": "no art on TCGdex yet"
+   "status": "left_out",
+   "note": "D4: TCGdex has no art yet (checked 2026-11-12)"
   },
   {
    "language": "en",
@@ -1917,8 +1917,8 @@
    "row_source": "tcgdex",
    "row_url": "https://api.tcgdex.net/v2/en/cards/me06-133",
    "image_url": null,
-   "status": "missing",
-   "note": "no art on TCGdex yet"
+   "status": "left_out",
+   "note": "D4: TCGdex has no art yet (checked 2026-11-12)"
   },
   {
    "language": "en",
@@ -1931,8 +1931,8 @@
    "row_source": "tcgdex",
    "row_url": "https://api.tcgdex.net/v2/en/cards/me06-134",
    "image_url": null,
-   "status": "missing",
-   "note": "no art on TCGdex yet"
+   "status": "left_out",
+   "note": "D4: TCGdex has no art yet (checked 2026-11-12)"
   },
   {
    "language": "en",
@@ -1945,8 +1945,8 @@
    "row_source": "tcgdex",
    "row_url": "https://api.tcgdex.net/v2/en/cards/me06-135",
    "image_url": null,
-   "status": "missing",
-   "note": "no art on TCGdex yet"
+   "status": "left_out",
+   "note": "D4: TCGdex has no art yet (checked 2026-11-12)"
   },
   {
    "language": "en",
@@ -1959,8 +1959,8 @@
    "row_source": "tcgdex",
    "row_url": "https://api.tcgdex.net/v2/en/cards/me06-136",
    "image_url": null,
-   "status": "missing",
-   "note": "no art on TCGdex yet"
+   "status": "left_out",
+   "note": "D4: TCGdex has no art yet (checked 2026-11-12)"
   },
   {
    "language": "en",
@@ -1973,8 +1973,8 @@
    "row_source": "tcgdex",
    "row_url": "https://api.tcgdex.net/v2/en/cards/me06-137",
    "image_url": null,
-   "status": "missing",
-   "note": "no art on TCGdex yet"
+   "status": "left_out",
+   "note": "D4: TCGdex has no art yet (checked 2026-11-12)"
   },
   {
    "language": "en",
@@ -1987,8 +1987,8 @@
    "row_source": "tcgdex",
    "row_url": "https://api.tcgdex.net/v2/en/cards/me06-138",
    "image_url": null,
-   "status": "missing",
-   "note": "no art on TCGdex yet"
+   "status": "left_out",
+   "note": "D4: TCGdex has no art yet (checked 2026-11-12)"
   },
   {
    "language": "en",
@@ -2001,8 +2001,8 @@
    "row_source": "tcgdex",
    "row_url": "https://api.tcgdex.net/v2/en/cards/me06-139",
    "image_url": null,
-   "status": "missing",
-   "note": "no art on TCGdex yet"
+   "status": "left_out",
+   "note": "D4: TCGdex has no art yet (checked 2026-11-12)"
   },
   {
    "language": "en",
@@ -2015,8 +2015,8 @@
    "row_source": "tcgdex",
    "row_url": "https://api.tcgdex.net/v2/en/cards/me06-140",
    "image_url": null,
-   "status": "missing",
-   "note": "no art on TCGdex yet"
+   "status": "left_out",
+   "note": "D4: TCGdex has no art yet (checked 2026-11-12)"
   },
   {
    "language": "en",
@@ -2029,8 +2029,8 @@
    "row_source": "tcgdex",
    "row_url": "https://api.tcgdex.net/v2/en/cards/me06-141",
    "image_url": null,
-   "status": "missing",
-   "note": "no art on TCGdex yet"
+   "status": "left_out",
+   "note": "D4: TCGdex has no art yet (checked 2026-11-12)"
   },
   {
    "language": "en",
@@ -2043,7 +2043,8 @@
    "row_source": "tcgdex",
    "row_url": "https://api.tcgdex.net/v2/en/cards/30th-B",
    "image_url": "https://assets.tcgdex.net/en/me/30th/B/high.webp",
-   "status": "missing"
+   "status": "left_out",
+   "note": "D1/D2: English route not run in this batch; see docs/second-batch-summary-20261112.md"
   },
   {
    "language": "en",
@@ -2056,7 +2057,8 @@
    "row_source": "tcgdex",
    "row_url": "https://api.tcgdex.net/v2/en/cards/30th-G",
    "image_url": "https://assets.tcgdex.net/en/me/30th/G/high.webp",
-   "status": "missing"
+   "status": "left_out",
+   "note": "D1/D2: English route not run in this batch; see docs/second-batch-summary-20261112.md"
   },
   {
    "language": "en",
@@ -2069,7 +2071,8 @@
    "row_source": "tcgdex",
    "row_url": "https://api.tcgdex.net/v2/en/cards/30th-R",
    "image_url": "https://assets.tcgdex.net/en/me/30th/R/high.webp",
-   "status": "missing"
+   "status": "left_out",
+   "note": "D1/D2: English route not run in this batch; see docs/second-batch-summary-20261112.md"
   },
   {
    "language": "en",
@@ -2082,7 +2085,8 @@
    "row_source": "tcgdex",
    "row_url": "https://api.tcgdex.net/v2/en/cards/mep-099",
    "image_url": null,
-   "status": "missing"
+   "status": "left_out",
+   "note": "D1/D2: English route not run in this batch; see docs/second-batch-summary-20261112.md"
   },
   {
    "language": "en",
@@ -2095,7 +2099,8 @@
    "row_source": "tcgdex",
    "row_url": "https://api.tcgdex.net/v2/en/cards/mep-100",
    "image_url": null,
-   "status": "missing"
+   "status": "left_out",
+   "note": "D1/D2: English route not run in this batch; see docs/second-batch-summary-20261112.md"
   },
   {
    "language": "en",
@@ -2108,7 +2113,8 @@
    "row_source": "tcgdex",
    "row_url": "https://api.tcgdex.net/v2/en/cards/mep-120",
    "image_url": null,
-   "status": "missing"
+   "status": "left_out",
+   "note": "D1/D2: English route not run in this batch; see docs/second-batch-summary-20261112.md"
   },
   {
    "language": "en",
@@ -2121,7 +2127,8 @@
    "row_source": "tcgdex",
    "row_url": "https://api.tcgdex.net/v2/en/cards/det1-25",
    "image_url": null,
-   "status": "missing"
+   "status": "left_out",
+   "note": "D1/D2: English route not run in this batch; see docs/second-batch-summary-20261112.md"
   },
   {
    "language": "ja",
@@ -4710,8 +4717,8 @@
    "row_source": "official",
    "row_url": "https://www.pokemon-card.com/card-search/details.php/card/50813/regu/all",
    "image_url": "https://www.pokemon-card.com/assets/images/card_images/large/MG/050813_P_WANINOKO.jpg",
-   "status": "missing",
-   "note": "official list has no collector number; the image is the search thumbnail size"
+   "status": "left_out",
+   "note": "batch B: not added, see docs/second-batch-b-20261111.md"
   },
   {
    "language": "ja",
@@ -4724,8 +4731,8 @@
    "row_source": "official",
    "row_url": "https://www.pokemon-card.com/card-search/details.php/card/50815/regu/all",
    "image_url": "https://www.pokemon-card.com/assets/images/card_images/large/MG/050815_P_ARIGEITSU.jpg",
-   "status": "missing",
-   "note": "official list has no collector number; the image is the search thumbnail size"
+   "status": "left_out",
+   "note": "batch B: not added, see docs/second-batch-b-20261111.md"
   },
   {
    "language": "ja",
@@ -4738,8 +4745,8 @@
    "row_source": "official",
    "row_url": "https://www.pokemon-card.com/card-search/details.php/card/50816/regu/all",
    "image_url": "https://www.pokemon-card.com/assets/images/card_images/large/MG/050816_P_MODAIRUIEKKUSU.jpg",
-   "status": "missing",
-   "note": "official list has no collector number; the image is the search thumbnail size"
+   "status": "left_out",
+   "note": "batch B: not added, see docs/second-batch-b-20261111.md"
   },
   {
    "language": "ja",
@@ -4752,8 +4759,8 @@
    "row_source": "official",
    "row_url": "https://www.pokemon-card.com/card-search/details.php/card/50817/regu/all",
    "image_url": "https://www.pokemon-card.com/assets/images/card_images/large/MG/050817_P_MANTAIN.jpg",
-   "status": "missing",
-   "note": "official list has no collector number; the image is the search thumbnail size"
+   "status": "left_out",
+   "note": "batch B: not added, see docs/second-batch-b-20261111.md"
   },
   {
    "language": "ja",
@@ -4766,8 +4773,8 @@
    "row_source": "official",
    "row_url": "https://www.pokemon-card.com/card-search/details.php/card/50818/regu/all",
    "image_url": "https://www.pokemon-card.com/assets/images/card_images/large/MG/050818_P_SASHIKAMASU.jpg",
-   "status": "missing",
-   "note": "official list has no collector number; the image is the search thumbnail size"
+   "status": "left_out",
+   "note": "batch B: not added, see docs/second-batch-b-20261111.md"
   },
   {
    "language": "ja",
@@ -4780,8 +4787,8 @@
    "row_source": "official",
    "row_url": "https://www.pokemon-card.com/card-search/details.php/card/50819/regu/all",
    "image_url": "https://www.pokemon-card.com/assets/images/card_images/large/MG/050819_P_KAMASUJIXYO.jpg",
-   "status": "missing",
-   "note": "official list has no collector number; the image is the search thumbnail size"
+   "status": "left_out",
+   "note": "batch B: not added, see docs/second-batch-b-20261111.md"
   },
   {
    "language": "ja",
@@ -4794,8 +4801,8 @@
    "row_source": "official",
    "row_url": "https://www.pokemon-card.com/card-search/details.php/card/50820/regu/all",
    "image_url": "https://www.pokemon-card.com/assets/images/card_images/large/MG/050820_P_BURIZAPOSU.jpg",
-   "status": "missing",
-   "note": "official list has no collector number; the image is the search thumbnail size"
+   "status": "left_out",
+   "note": "batch B: not added, see docs/second-batch-b-20261111.md"
   },
   {
    "language": "ja",
@@ -4808,8 +4815,8 @@
    "row_source": "official",
    "row_url": "https://www.pokemon-card.com/card-search/details.php/card/50821/regu/all",
    "image_url": "https://www.pokemon-card.com/assets/images/card_images/large/MG/050821_P_OGAPONIDONOMEN.jpg",
-   "status": "missing",
-   "note": "official list has no collector number; the image is the search thumbnail size"
+   "status": "left_out",
+   "note": "batch B: not added, see docs/second-batch-b-20261111.md"
   },
   {
    "language": "ja",
@@ -4822,8 +4829,8 @@
    "row_source": "official",
    "row_url": "https://www.pokemon-card.com/card-search/details.php/card/50822/regu/all",
    "image_url": "https://www.pokemon-card.com/assets/images/card_images/large/MG/050822_P_EMONGA.jpg",
-   "status": "missing",
-   "note": "official list has no collector number; the image is the search thumbnail size"
+   "status": "left_out",
+   "note": "batch B: not added, see docs/second-batch-b-20261111.md"
   },
   {
    "language": "ja",
@@ -4836,8 +4843,8 @@
    "row_source": "official",
    "row_url": "https://www.pokemon-card.com/card-search/details.php/card/50823/regu/all",
    "image_url": "https://www.pokemon-card.com/assets/images/card_images/large/MG/050823_P_WANPACHI.jpg",
-   "status": "missing",
-   "note": "official list has no collector number; the image is the search thumbnail size"
+   "status": "left_out",
+   "note": "batch B: not added, see docs/second-batch-b-20261111.md"
   },
   {
    "language": "ja",
@@ -4850,8 +4857,8 @@
    "row_source": "official",
    "row_url": "https://www.pokemon-card.com/card-search/details.php/card/50824/regu/all",
    "image_url": "https://www.pokemon-card.com/assets/images/card_images/large/MG/050824_P_PARUSUWAN.jpg",
-   "status": "missing",
-   "note": "official list has no collector number; the image is the search thumbnail size"
+   "status": "left_out",
+   "note": "batch B: not added, see docs/second-batch-b-20261111.md"
   },
   {
    "language": "ja",
@@ -4864,8 +4871,8 @@
    "row_source": "official",
    "row_url": "https://www.pokemon-card.com/card-search/details.php/card/50826/regu/all",
    "image_url": "https://www.pokemon-card.com/assets/images/card_images/large/MG/050826_P_GOSU.jpg",
-   "status": "missing",
-   "note": "official list has no collector number; the image is the search thumbnail size"
+   "status": "left_out",
+   "note": "batch B: not added, see docs/second-batch-b-20261111.md"
   },
   {
    "language": "ja",
@@ -4878,8 +4885,8 @@
    "row_source": "official",
    "row_url": "https://www.pokemon-card.com/card-search/details.php/card/50828/regu/all",
    "image_url": "https://www.pokemon-card.com/assets/images/card_images/large/MG/050828_P_GOSUTO.jpg",
-   "status": "missing",
-   "note": "official list has no collector number; the image is the search thumbnail size"
+   "status": "left_out",
+   "note": "batch B: not added, see docs/second-batch-b-20261111.md"
   },
   {
    "language": "ja",
@@ -4892,8 +4899,8 @@
    "row_source": "official",
    "row_url": "https://www.pokemon-card.com/card-search/details.php/card/50829/regu/all",
    "image_url": "https://www.pokemon-card.com/assets/images/card_images/large/MG/050829_P_MGENGAIEKKUSU.jpg",
-   "status": "missing",
-   "note": "official list has no collector number; the image is the search thumbnail size"
+   "status": "left_out",
+   "note": "batch B: not added, see docs/second-batch-b-20261111.md"
   },
   {
    "language": "ja",
@@ -4906,8 +4913,8 @@
    "row_source": "official",
    "row_url": "https://www.pokemon-card.com/card-search/details.php/card/50830/regu/all",
    "image_url": "https://www.pokemon-card.com/assets/images/card_images/large/MG/050830_P_YAMIRAMI.jpg",
-   "status": "missing",
-   "note": "official list has no collector number; the image is the search thumbnail size"
+   "status": "left_out",
+   "note": "batch B: not added, see docs/second-batch-b-20261111.md"
   },
   {
    "language": "ja",
@@ -4920,8 +4927,8 @@
    "row_source": "official",
    "row_url": "https://www.pokemon-card.com/card-search/details.php/card/50831/regu/all",
    "image_url": "https://www.pokemon-card.com/assets/images/card_images/large/MG/050831_P_HABUNEKU.jpg",
-   "status": "missing",
-   "note": "official list has no collector number; the image is the search thumbnail size"
+   "status": "left_out",
+   "note": "batch B: not added, see docs/second-batch-b-20261111.md"
   },
   {
    "language": "ja",
@@ -4934,8 +4941,8 @@
    "row_source": "official",
    "row_url": "https://www.pokemon-card.com/card-search/details.php/card/50832/regu/all",
    "image_url": "https://www.pokemon-card.com/assets/images/card_images/large/MG/050832_P_YABUKURON.jpg",
-   "status": "missing",
-   "note": "official list has no collector number; the image is the search thumbnail size"
+   "status": "left_out",
+   "note": "batch B: not added, see docs/second-batch-b-20261111.md"
   },
   {
    "language": "ja",
@@ -4948,8 +4955,8 @@
    "row_source": "official",
    "row_url": "https://www.pokemon-card.com/card-search/details.php/card/50833/regu/all",
    "image_url": "https://www.pokemon-card.com/assets/images/card_images/large/MG/050833_P_DASUTODASU.jpg",
-   "status": "missing",
-   "note": "official list has no collector number; the image is the search thumbnail size"
+   "status": "left_out",
+   "note": "batch B: not added, see docs/second-batch-b-20261111.md"
   },
   {
    "language": "ja",
@@ -4962,8 +4969,8 @@
    "row_source": "official",
    "row_url": "https://www.pokemon-card.com/card-search/details.php/card/50834/regu/all",
    "image_url": "https://www.pokemon-card.com/assets/images/card_images/large/MG/050834_P_MORUPEKO.jpg",
-   "status": "missing",
-   "note": "official list has no collector number; the image is the search thumbnail size"
+   "status": "left_out",
+   "note": "batch B: not added, see docs/second-batch-b-20261111.md"
   },
   {
    "language": "ja",
@@ -4976,8 +4983,8 @@
    "row_source": "official",
    "row_url": "https://www.pokemon-card.com/card-search/details.php/card/50836/regu/all",
    "image_url": "https://www.pokemon-card.com/assets/images/card_images/large/MG/050836_P_MINIRIXYUU.jpg",
-   "status": "missing",
-   "note": "official list has no collector number; the image is the search thumbnail size"
+   "status": "left_out",
+   "note": "batch B: not added, see docs/second-batch-b-20261111.md"
   },
   {
    "language": "ja",
@@ -4990,8 +4997,8 @@
    "row_source": "official",
    "row_url": "https://www.pokemon-card.com/card-search/details.php/card/50838/regu/all",
    "image_url": "https://www.pokemon-card.com/assets/images/card_images/large/MG/050838_P_HAKURIXYU.jpg",
-   "status": "missing",
-   "note": "official list has no collector number; the image is the search thumbnail size"
+   "status": "left_out",
+   "note": "batch B: not added, see docs/second-batch-b-20261111.md"
   },
   {
    "language": "ja",
@@ -5004,8 +5011,8 @@
    "row_source": "official",
    "row_url": "https://www.pokemon-card.com/card-search/details.php/card/50839/regu/all",
    "image_url": "https://www.pokemon-card.com/assets/images/card_images/large/MG/050839_P_MKAIRIXYUIEKKUSU.jpg",
-   "status": "missing",
-   "note": "official list has no collector number; the image is the search thumbnail size"
+   "status": "left_out",
+   "note": "batch B: not added, see docs/second-batch-b-20261111.md"
   },
   {
    "language": "ja",
@@ -5018,8 +5025,8 @@
    "row_source": "official",
    "row_url": "https://www.pokemon-card.com/card-search/details.php/card/50840/regu/all",
    "image_url": "https://www.pokemon-card.com/assets/images/card_images/large/MG/050840_P_CHIRAMII.jpg",
-   "status": "missing",
-   "note": "official list has no collector number; the image is the search thumbnail size"
+   "status": "left_out",
+   "note": "batch B: not added, see docs/second-batch-b-20261111.md"
   },
   {
    "language": "ja",
@@ -5032,8 +5039,8 @@
    "row_source": "official",
    "row_url": "https://www.pokemon-card.com/card-search/details.php/card/50841/regu/all",
    "image_url": "https://www.pokemon-card.com/assets/images/card_images/large/MG/050841_P_CHIRACHINO.jpg",
-   "status": "missing",
-   "note": "official list has no collector number; the image is the search thumbnail size"
+   "status": "left_out",
+   "note": "batch B: not added, see docs/second-batch-b-20261111.md"
   },
   {
    "language": "ja",
@@ -5046,8 +5053,8 @@
    "row_source": "official",
    "row_url": "https://www.pokemon-card.com/card-search/details.php/card/50842/regu/all",
    "image_url": "https://www.pokemon-card.com/assets/images/card_images/large/MG/050842_P_TORUNEROSU.jpg",
-   "status": "missing",
-   "note": "official list has no collector number; the image is the search thumbnail size"
+   "status": "left_out",
+   "note": "batch B: not added, see docs/second-batch-b-20261111.md"
   },
   {
    "language": "ja",
@@ -5060,8 +5067,8 @@
    "row_source": "official",
    "row_url": "https://www.pokemon-card.com/card-search/details.php/card/50843/regu/all",
    "image_url": "https://www.pokemon-card.com/assets/images/card_images/large/MG/050843_T_HAIPABORU.jpg",
-   "status": "missing",
-   "note": "official list has no collector number; the image is the search thumbnail size"
+   "status": "left_out",
+   "note": "batch B: not added, see docs/second-batch-b-20261111.md"
   },
   {
    "language": "ja",
@@ -5074,8 +5081,8 @@
    "row_source": "official",
    "row_url": "https://www.pokemon-card.com/card-search/details.php/card/50844/regu/all",
    "image_url": "https://www.pokemon-card.com/assets/images/card_images/large/MG/050844_T_FUSHIGINAAME.jpg",
-   "status": "missing",
-   "note": "official list has no collector number; the image is the search thumbnail size"
+   "status": "left_out",
+   "note": "batch B: not added, see docs/second-batch-b-20261111.md"
   },
   {
    "language": "ja",
@@ -5088,8 +5095,8 @@
    "row_source": "official",
    "row_url": "https://www.pokemon-card.com/card-search/details.php/card/50845/regu/all",
    "image_url": "https://www.pokemon-card.com/assets/images/card_images/large/MG/050845_T_POKEGIA30.jpg",
-   "status": "missing",
-   "note": "official list has no collector number; the image is the search thumbnail size"
+   "status": "left_out",
+   "note": "batch B: not added, see docs/second-batch-b-20261111.md"
   },
   {
    "language": "ja",
@@ -5102,8 +5109,8 @@
    "row_source": "official",
    "row_url": "https://www.pokemon-card.com/card-search/details.php/card/50846/regu/all",
    "image_url": "https://www.pokemon-card.com/assets/images/card_images/large/MG/050846_T_POKEPADDO.jpg",
-   "status": "missing",
-   "note": "official list has no collector number; the image is the search thumbnail size"
+   "status": "left_out",
+   "note": "batch B: not added, see docs/second-batch-b-20261111.md"
   },
   {
    "language": "ja",
@@ -5116,8 +5123,8 @@
    "row_source": "official",
    "row_url": "https://www.pokemon-card.com/card-search/details.php/card/50847/regu/all",
    "image_url": "https://www.pokemon-card.com/assets/images/card_images/large/MG/050847_T_POKEMONIREKAE.jpg",
-   "status": "missing",
-   "note": "official list has no collector number; the image is the search thumbnail size"
+   "status": "left_out",
+   "note": "batch B: not added, see docs/second-batch-b-20261111.md"
   },
   {
    "language": "ja",
@@ -5130,8 +5137,8 @@
    "row_source": "official",
    "row_url": "https://www.pokemon-card.com/card-search/details.php/card/50848/regu/all",
    "image_url": "https://www.pokemon-card.com/assets/images/card_images/large/MG/050848_T_FUUSEN.jpg",
-   "status": "missing",
-   "note": "official list has no collector number; the image is the search thumbnail size"
+   "status": "left_out",
+   "note": "batch B: not added, see docs/second-batch-b-20261111.md"
   },
   {
    "language": "ja",
@@ -5144,8 +5151,8 @@
    "row_source": "official",
    "row_url": "https://www.pokemon-card.com/card-search/details.php/card/50849/regu/all",
    "image_url": "https://www.pokemon-card.com/assets/images/card_images/large/MG/050849_T_UETORESU.jpg",
-   "status": "missing",
-   "note": "official list has no collector number; the image is the search thumbnail size"
+   "status": "left_out",
+   "note": "batch B: not added, see docs/second-batch-b-20261111.md"
   },
   {
    "language": "ja",
@@ -5158,8 +5165,8 @@
    "row_source": "official",
    "row_url": "https://www.pokemon-card.com/card-search/details.php/card/50850/regu/all",
    "image_url": "https://www.pokemon-card.com/assets/images/card_images/large/MG/050850_T_GAI.jpg",
-   "status": "missing",
-   "note": "official list has no collector number; the image is the search thumbnail size"
+   "status": "left_out",
+   "note": "batch B: not added, see docs/second-batch-b-20261111.md"
   },
   {
    "language": "ja",
@@ -5172,8 +5179,8 @@
    "row_source": "official",
    "row_url": "https://www.pokemon-card.com/card-search/details.php/card/50851/regu/all",
    "image_url": "https://www.pokemon-card.com/assets/images/card_images/large/MG/050851_T_JIXYAJJIMAN.jpg",
-   "status": "missing",
-   "note": "official list has no collector number; the image is the search thumbnail size"
+   "status": "left_out",
+   "note": "batch B: not added, see docs/second-batch-b-20261111.md"
   },
   {
    "language": "ja",
@@ -5186,8 +5193,8 @@
    "row_source": "official",
    "row_url": "https://www.pokemon-card.com/card-search/details.php/card/50852/regu/all",
    "image_url": "https://www.pokemon-card.com/assets/images/card_images/large/MG/050852_T_HIKARI.jpg",
-   "status": "missing",
-   "note": "official list has no collector number; the image is the search thumbnail size"
+   "status": "left_out",
+   "note": "batch B: not added, see docs/second-batch-b-20261111.md"
   },
   {
    "language": "ja",
@@ -5200,8 +5207,8 @@
    "row_source": "official",
    "row_url": "https://www.pokemon-card.com/card-search/details.php/card/50853/regu/all",
    "image_url": "https://www.pokemon-card.com/assets/images/card_images/large/MG/050853_T_BOSUNOSHIREI.jpg",
-   "status": "missing",
-   "note": "official list has no collector number; the image is the search thumbnail size"
+   "status": "left_out",
+   "note": "batch B: not added, see docs/second-batch-b-20261111.md"
   },
   {
    "language": "ja",
@@ -5214,8 +5221,8 @@
    "row_source": "official",
    "row_url": "https://www.pokemon-card.com/card-search/details.php/card/50854/regu/all",
    "image_url": "https://www.pokemon-card.com/assets/images/card_images/large/MG/050854_T_MEINOHAGEMASHI.jpg",
-   "status": "missing",
-   "note": "official list has no collector number; the image is the search thumbnail size"
+   "status": "left_out",
+   "note": "batch B: not added, see docs/second-batch-b-20261111.md"
   },
   {
    "language": "ja",
@@ -5228,8 +5235,8 @@
    "row_source": "official",
    "row_url": "https://www.pokemon-card.com/card-search/details.php/card/50855/regu/all",
    "image_url": "https://www.pokemon-card.com/assets/images/card_images/large/MG/050855_T_RIRIENOKESSHIN.jpg",
-   "status": "missing",
-   "note": "official list has no collector number; the image is the search thumbnail size"
+   "status": "left_out",
+   "note": "batch B: not added, see docs/second-batch-b-20261111.md"
   },
   {
    "language": "ja",
@@ -5242,8 +5249,8 @@
    "row_source": "official",
    "row_url": "https://www.pokemon-card.com/card-search/details.php/card/25501/regu/all",
    "image_url": "https://www.pokemon-card.com/assets/images/card_images/large/L2-Sb/025501_P_SAWAMURA.jpg",
-   "status": "missing",
-   "note": "official list has no collector number; the image is the search thumbnail size"
+   "status": "left_out",
+   "note": "batch B: not added, see docs/second-batch-b-20261111.md"
   },
   {
    "language": "ja",
@@ -5256,8 +5263,8 @@
    "row_source": "official",
    "row_url": "https://www.pokemon-card.com/card-search/details.php/card/25503/regu/all",
    "image_url": "https://www.pokemon-card.com/assets/images/card_images/large/L2-Sb/025503_P_EBIWARA.jpg",
-   "status": "missing",
-   "note": "official list has no collector number; the image is the search thumbnail size"
+   "status": "left_out",
+   "note": "batch B: not added, see docs/second-batch-b-20261111.md"
   },
   {
    "language": "ja",
@@ -5270,8 +5277,8 @@
    "row_source": "official",
    "row_url": "https://www.pokemon-card.com/card-search/details.php/card/25505/regu/all",
    "image_url": "https://www.pokemon-card.com/assets/images/card_images/large/L2-Sb/025505_P_YOGIRASU.jpg",
-   "status": "missing",
-   "note": "official list has no collector number; the image is the search thumbnail size"
+   "status": "left_out",
+   "note": "batch B: not added, see docs/second-batch-b-20261111.md"
   },
   {
    "language": "ja",
@@ -5284,8 +5291,8 @@
    "row_source": "official",
    "row_url": "https://www.pokemon-card.com/card-search/details.php/card/25507/regu/all",
    "image_url": "https://www.pokemon-card.com/assets/images/card_images/large/L2-Sb/025507_P_SANAGIRASU.jpg",
-   "status": "missing",
-   "note": "official list has no collector number; the image is the search thumbnail size"
+   "status": "left_out",
+   "note": "batch B: not added, see docs/second-batch-b-20261111.md"
   },
   {
    "language": "ja",
@@ -5298,8 +5305,8 @@
    "row_source": "official",
    "row_url": "https://www.pokemon-card.com/card-search/details.php/card/25509/regu/all",
    "image_url": "https://www.pokemon-card.com/assets/images/card_images/large/L2-Sb/025509_P_YAMIKARASU.jpg",
-   "status": "missing",
-   "note": "official list has no collector number; the image is the search thumbnail size"
+   "status": "left_out",
+   "note": "batch B: not added, see docs/second-batch-b-20261111.md"
   },
   {
    "language": "ja",
@@ -5312,8 +5319,8 @@
    "row_source": "official",
    "row_url": "https://www.pokemon-card.com/card-search/details.php/card/25510/regu/all",
    "image_url": "https://www.pokemon-card.com/assets/images/card_images/large/L2-Sb/025510_P_DONKARASU.jpg",
-   "status": "missing",
-   "note": "official list has no collector number; the image is the search thumbnail size"
+   "status": "left_out",
+   "note": "batch B: not added, see docs/second-batch-b-20261111.md"
   },
   {
    "language": "ja",
@@ -5326,8 +5333,8 @@
    "row_source": "official",
    "row_url": "https://www.pokemon-card.com/card-search/details.php/card/25512/regu/all",
    "image_url": "https://www.pokemon-card.com/assets/images/card_images/large/L2-Sb/025512_P_DERUBIRU.jpg",
-   "status": "missing",
-   "note": "official list has no collector number; the image is the search thumbnail size"
+   "status": "left_out",
+   "note": "batch B: not added, see docs/second-batch-b-20261111.md"
   },
   {
    "language": "ja",
@@ -5340,8 +5347,8 @@
    "row_source": "official",
    "row_url": "https://www.pokemon-card.com/card-search/details.php/card/25513/regu/all",
    "image_url": "https://www.pokemon-card.com/assets/images/card_images/large/L2-Sb/025513_P_HERUGA.gif",
-   "status": "missing",
-   "note": "official list has no collector number; the image is the search thumbnail size"
+   "status": "left_out",
+   "note": "batch B: not added, see docs/second-batch-b-20261111.md"
   },
   {
    "language": "ja",
@@ -5354,8 +5361,8 @@
    "row_source": "official",
    "row_url": "https://www.pokemon-card.com/card-search/details.php/card/25515/regu/all",
    "image_url": "https://www.pokemon-card.com/assets/images/card_images/large/L2-Sb/025515_P_BANGIRASU.gif",
-   "status": "missing",
-   "note": "official list has no collector number; the image is the search thumbnail size"
+   "status": "left_out",
+   "note": "batch B: not added, see docs/second-batch-b-20261111.md"
   },
   {
    "language": "ja",
@@ -5368,8 +5375,8 @@
    "row_source": "official",
    "row_url": "https://www.pokemon-card.com/card-search/details.php/card/25517/regu/all",
    "image_url": "https://www.pokemon-card.com/assets/images/card_images/large/L2-Sb/025517_P_BANGIRASU.jpg",
-   "status": "missing",
-   "note": "official list has no collector number; the image is the search thumbnail size"
+   "status": "left_out",
+   "note": "batch B: not added, see docs/second-batch-b-20261111.md"
   },
   {
    "language": "ja",
@@ -5382,8 +5389,8 @@
    "row_source": "official",
    "row_url": "https://www.pokemon-card.com/card-search/details.php/card/25519/regu/all",
    "image_url": "https://www.pokemon-card.com/assets/images/card_images/large/L2-Sb/025519_P_SUKANPU.jpg",
-   "status": "missing",
-   "note": "official list has no collector number; the image is the search thumbnail size"
+   "status": "left_out",
+   "note": "batch B: not added, see docs/second-batch-b-20261111.md"
   },
   {
    "language": "ja",
@@ -5396,8 +5403,8 @@
    "row_source": "official",
    "row_url": "https://www.pokemon-card.com/card-search/details.php/card/25520/regu/all",
    "image_url": "https://www.pokemon-card.com/assets/images/card_images/large/L2-Sb/025520_P_SUKATANKU.jpg",
-   "status": "missing",
-   "note": "official list has no collector number; the image is the search thumbnail size"
+   "status": "left_out",
+   "note": "batch B: not added, see docs/second-batch-b-20261111.md"
   },
   {
    "language": "ja",
@@ -5410,8 +5417,8 @@
    "row_source": "official",
    "row_url": "https://www.pokemon-card.com/card-search/details.php/card/25522/regu/all",
    "image_url": "https://www.pokemon-card.com/assets/images/card_images/large/L2-Sb/025522_T_ENERUGIKOUKANSOUCHI.jpg",
-   "status": "missing",
-   "note": "official list has no collector number; the image is the search thumbnail size"
+   "status": "left_out",
+   "note": "batch B: not added, see docs/second-batch-b-20261111.md"
   },
   {
    "language": "ja",
@@ -5424,8 +5431,8 @@
    "row_source": "official",
    "row_url": "https://www.pokemon-card.com/card-search/details.php/card/25524/regu/all",
    "image_url": "https://www.pokemon-card.com/assets/images/card_images/large/L2-Sb/025524_T_POKEMONRIBASU.jpg",
-   "status": "missing",
-   "note": "official list has no collector number; the image is the search thumbnail size"
+   "status": "left_out",
+   "note": "batch B: not added, see docs/second-batch-b-20261111.md"
   },
   {
    "language": "ja",
@@ -5438,8 +5445,8 @@
    "row_source": "official",
    "row_url": "https://www.pokemon-card.com/card-search/details.php/card/25526/regu/all",
    "image_url": "https://www.pokemon-card.com/assets/images/card_images/large/L2-Sb/025526_T_UTSUGIHAKASENOSODATEKATA.jpg",
-   "status": "missing",
-   "note": "official list has no collector number; the image is the search thumbnail size"
+   "status": "left_out",
+   "note": "batch B: not added, see docs/second-batch-b-20261111.md"
   },
   {
    "language": "ja",
@@ -5452,8 +5459,8 @@
    "row_source": "official",
    "row_url": "https://www.pokemon-card.com/card-search/details.php/card/25528/regu/all",
    "image_url": "https://www.pokemon-card.com/assets/images/card_images/large/L2-Sb/025528_T_OKIDOHAKASENOSHINRIRON.jpg",
-   "status": "missing",
-   "note": "official list has no collector number; the image is the search thumbnail size"
+   "status": "left_out",
+   "note": "batch B: not added, see docs/second-batch-b-20261111.md"
   },
   {
    "language": "ja",
@@ -5466,8 +5473,8 @@
    "row_source": "official",
    "row_url": "https://www.pokemon-card.com/card-search/details.php/card/25530/regu/all",
    "image_url": "https://www.pokemon-card.com/assets/images/card_images/large/L2-Sb/025530_T_POKEMONKOREKUTA.jpg",
-   "status": "missing",
-   "note": "official list has no collector number; the image is the search thumbnail size"
+   "status": "left_out",
+   "note": "batch B: not added, see docs/second-batch-b-20261111.md"
   },
   {
    "language": "ja",
@@ -5480,8 +5487,8 @@
    "row_source": "official",
    "row_url": "https://www.pokemon-card.com/card-search/details.php/card/25532/regu/all",
    "image_url": "https://www.pokemon-card.com/assets/images/card_images/large/L2-Sb/025532_T_MASAKI.jpg",
-   "status": "missing",
-   "note": "official list has no collector number; the image is the search thumbnail size"
+   "status": "left_out",
+   "note": "batch B: not added, see docs/second-batch-b-20261111.md"
   },
   {
    "language": "ja",
@@ -5494,8 +5501,8 @@
    "row_source": "official",
    "row_url": "https://www.pokemon-card.com/card-search/details.php/card/25534/regu/all",
    "image_url": "https://www.pokemon-card.com/assets/images/card_images/large/L2-Sb/025534_T_ROKETTODANNOTEGUCHI.jpg",
-   "status": "missing",
-   "note": "official list has no collector number; the image is the search thumbnail size"
+   "status": "left_out",
+   "note": "batch B: not added, see docs/second-batch-b-20261111.md"
   },
   {
    "language": "ja",
@@ -5508,8 +5515,8 @@
    "row_source": "official",
    "row_url": "https://www.pokemon-card.com/card-search/details.php/card/25536/regu/all",
    "image_url": "https://www.pokemon-card.com/assets/images/card_images/large/L2-Sb/025536_E_TOKUSHUAKUENERUGI.jpg",
-   "status": "missing",
-   "note": "official list has no collector number; the image is the search thumbnail size"
+   "status": "left_out",
+   "note": "batch B: not added, see docs/second-batch-b-20261111.md"
   },
   {
    "language": "ja",
@@ -5522,8 +5529,8 @@
    "row_source": "official",
    "row_url": "https://www.pokemon-card.com/card-search/details.php/card/25537/regu/all",
    "image_url": "https://www.pokemon-card.com/assets/images/card_images/large/L2-Sh/025537_P_SUTORAIKU.jpg",
-   "status": "missing",
-   "note": "official list has no collector number; the image is the search thumbnail size"
+   "status": "left_out",
+   "note": "batch B: not added, see docs/second-batch-b-20261111.md"
   },
   {
    "language": "ja",
@@ -5536,8 +5543,8 @@
    "row_source": "official",
    "row_url": "https://www.pokemon-card.com/card-search/details.php/card/25539/regu/all",
    "image_url": "https://www.pokemon-card.com/assets/images/card_images/large/L2-Sh/025539_P_KAIROSU.jpg",
-   "status": "missing",
-   "note": "official list has no collector number; the image is the search thumbnail size"
+   "status": "left_out",
+   "note": "batch B: not added, see docs/second-batch-b-20261111.md"
   },
   {
    "language": "ja",
@@ -5550,8 +5557,8 @@
    "row_source": "official",
    "row_url": "https://www.pokemon-card.com/card-search/details.php/card/25541/regu/all",
    "image_url": "https://www.pokemon-card.com/assets/images/card_images/large/L2-Sh/025541_P_KUNUGIDAMA.jpg",
-   "status": "missing",
-   "note": "official list has no collector number; the image is the search thumbnail size"
+   "status": "left_out",
+   "note": "batch B: not added, see docs/second-batch-b-20261111.md"
   },
   {
    "language": "ja",
@@ -5564,8 +5571,8 @@
    "row_source": "official",
    "row_url": "https://www.pokemon-card.com/card-search/details.php/card/25542/regu/all",
    "image_url": "https://www.pokemon-card.com/assets/images/card_images/large/L2-Sh/025542_P_TOROPIUSU.jpg",
-   "status": "missing",
-   "note": "official list has no collector number; the image is the search thumbnail size"
+   "status": "left_out",
+   "note": "batch B: not added, see docs/second-batch-b-20261111.md"
   },
   {
    "language": "ja",
@@ -5578,8 +5585,8 @@
    "row_source": "official",
    "row_url": "https://www.pokemon-card.com/card-search/details.php/card/25544/regu/all",
    "image_url": "https://www.pokemon-card.com/assets/images/card_images/large/L2-Sh/025544_P_IWAKU.jpg",
-   "status": "missing",
-   "note": "official list has no collector number; the image is the search thumbnail size"
+   "status": "left_out",
+   "note": "batch B: not added, see docs/second-batch-b-20261111.md"
   },
   {
    "language": "ja",
@@ -5592,8 +5599,8 @@
    "row_source": "official",
    "row_url": "https://www.pokemon-card.com/card-search/details.php/card/25545/regu/all",
    "image_url": "https://www.pokemon-card.com/assets/images/card_images/large/L2-Sh/025545_P_FORETOSU.jpg",
-   "status": "missing",
-   "note": "official list has no collector number; the image is the search thumbnail size"
+   "status": "left_out",
+   "note": "batch B: not added, see docs/second-batch-b-20261111.md"
   },
   {
    "language": "ja",
@@ -5606,8 +5613,8 @@
    "row_source": "official",
    "row_url": "https://www.pokemon-card.com/card-search/details.php/card/25547/regu/all",
    "image_url": "https://www.pokemon-card.com/assets/images/card_images/large/L2-Sh/025547_P_HAGANERU.gif",
-   "status": "missing",
-   "note": "official list has no collector number; the image is the search thumbnail size"
+   "status": "left_out",
+   "note": "batch B: not added, see docs/second-batch-b-20261111.md"
   },
   {
    "language": "ja",
@@ -5620,8 +5627,8 @@
    "row_source": "official",
    "row_url": "https://www.pokemon-card.com/card-search/details.php/card/25549/regu/all",
    "image_url": "https://www.pokemon-card.com/assets/images/card_images/large/L2-Sh/025549_P_HAGANERU.jpg",
-   "status": "missing",
-   "note": "official list has no collector number; the image is the search thumbnail size"
+   "status": "left_out",
+   "note": "batch B: not added, see docs/second-batch-b-20261111.md"
   },
   {
    "language": "ja",
@@ -5634,8 +5641,8 @@
    "row_source": "official",
    "row_url": "https://www.pokemon-card.com/card-search/details.php/card/25551/regu/all",
    "image_url": "https://www.pokemon-card.com/assets/images/card_images/large/L2-Sh/025551_P_HASSAMU.gif",
-   "status": "missing",
-   "note": "official list has no collector number; the image is the search thumbnail size"
+   "status": "left_out",
+   "note": "batch B: not added, see docs/second-batch-b-20261111.md"
   },
   {
    "language": "ja",
@@ -5648,8 +5655,8 @@
    "row_source": "official",
    "row_url": "https://www.pokemon-card.com/card-search/details.php/card/25553/regu/all",
    "image_url": "https://www.pokemon-card.com/assets/images/card_images/large/L2-Sh/025553_P_KOKODORA.jpg",
-   "status": "missing",
-   "note": "official list has no collector number; the image is the search thumbnail size"
+   "status": "left_out",
+   "note": "batch B: not added, see docs/second-batch-b-20261111.md"
   },
   {
    "language": "ja",
@@ -5662,8 +5669,8 @@
    "row_source": "official",
    "row_url": "https://www.pokemon-card.com/card-search/details.php/card/25555/regu/all",
    "image_url": "https://www.pokemon-card.com/assets/images/card_images/large/L2-Sh/025555_P_KODORA.jpg",
-   "status": "missing",
-   "note": "official list has no collector number; the image is the search thumbnail size"
+   "status": "left_out",
+   "note": "batch B: not added, see docs/second-batch-b-20261111.md"
   },
   {
    "language": "ja",
@@ -5676,8 +5683,8 @@
    "row_source": "official",
    "row_url": "https://www.pokemon-card.com/card-search/details.php/card/25557/regu/all",
    "image_url": "https://www.pokemon-card.com/assets/images/card_images/large/L2-Sh/025557_T_ENERUGIKOUKANSOUCHI.jpg",
-   "status": "missing",
-   "note": "official list has no collector number; the image is the search thumbnail size"
+   "status": "left_out",
+   "note": "batch B: not added, see docs/second-batch-b-20261111.md"
   },
   {
    "language": "ja",
@@ -5690,8 +5697,8 @@
    "row_source": "official",
    "row_url": "https://www.pokemon-card.com/card-search/details.php/card/25559/regu/all",
    "image_url": "https://www.pokemon-card.com/assets/images/card_images/large/L2-Sh/025559_T_POKEMONIREKAE.jpg",
-   "status": "missing",
-   "note": "official list has no collector number; the image is the search thumbnail size"
+   "status": "left_out",
+   "note": "batch B: not added, see docs/second-batch-b-20261111.md"
   },
   {
    "language": "ja",
@@ -5704,8 +5711,8 @@
    "row_source": "official",
    "row_url": "https://www.pokemon-card.com/card-search/details.php/card/25561/regu/all",
    "image_url": "https://www.pokemon-card.com/assets/images/card_images/large/L2-Sh/025561_T_MOMOMIRUKU.jpg",
-   "status": "missing",
-   "note": "official list has no collector number; the image is the search thumbnail size"
+   "status": "left_out",
+   "note": "batch B: not added, see docs/second-batch-b-20261111.md"
   },
   {
    "language": "ja",
@@ -5718,8 +5725,8 @@
    "row_source": "official",
    "row_url": "https://www.pokemon-card.com/card-search/details.php/card/25563/regu/all",
    "image_url": "https://www.pokemon-card.com/assets/images/card_images/large/L2-Sh/025563_T_UTSUGIHAKASENOSODATEKATA.jpg",
-   "status": "missing",
-   "note": "official list has no collector number; the image is the search thumbnail size"
+   "status": "left_out",
+   "note": "batch B: not added, see docs/second-batch-b-20261111.md"
   },
   {
    "language": "ja",
@@ -5732,8 +5739,8 @@
    "row_source": "official",
    "row_url": "https://www.pokemon-card.com/card-search/details.php/card/25565/regu/all",
    "image_url": "https://www.pokemon-card.com/assets/images/card_images/large/L2-Sh/025565_T_OKIDOHAKASENOSHINRIRON.jpg",
-   "status": "missing",
-   "note": "official list has no collector number; the image is the search thumbnail size"
+   "status": "left_out",
+   "note": "batch B: not added, see docs/second-batch-b-20261111.md"
   },
   {
    "language": "ja",
@@ -5746,8 +5753,8 @@
    "row_source": "official",
    "row_url": "https://www.pokemon-card.com/card-search/details.php/card/25567/regu/all",
    "image_url": "https://www.pokemon-card.com/assets/images/card_images/large/L2-Sh/025567_T_BOUZUNOSHUGYOU.jpg",
-   "status": "missing",
-   "note": "official list has no collector number; the image is the search thumbnail size"
+   "status": "left_out",
+   "note": "batch B: not added, see docs/second-batch-b-20261111.md"
   },
   {
    "language": "ja",
@@ -5760,8 +5767,8 @@
    "row_source": "official",
    "row_url": "https://www.pokemon-card.com/card-search/details.php/card/25569/regu/all",
    "image_url": "https://www.pokemon-card.com/assets/images/card_images/large/L2-Sh/025569_T_POKEMONKOREKUTA.jpg",
-   "status": "missing",
-   "note": "official list has no collector number; the image is the search thumbnail size"
+   "status": "left_out",
+   "note": "batch B: not added, see docs/second-batch-b-20261111.md"
   },
   {
    "language": "ja",
@@ -5774,8 +5781,8 @@
    "row_source": "official",
    "row_url": "https://www.pokemon-card.com/card-search/details.php/card/25571/regu/all",
    "image_url": "https://www.pokemon-card.com/assets/images/card_images/large/L2-Sh/025571_T_MASAKI.jpg",
-   "status": "missing",
-   "note": "official list has no collector number; the image is the search thumbnail size"
+   "status": "left_out",
+   "note": "batch B: not added, see docs/second-batch-b-20261111.md"
   },
   {
    "language": "ja",
@@ -5788,8 +5795,8 @@
    "row_source": "official",
    "row_url": "https://www.pokemon-card.com/card-search/details.php/card/25573/regu/all",
    "image_url": "https://www.pokemon-card.com/assets/images/card_images/large/L2-Sh/025573_E_TOKUSHUKOUENERUGI.jpg",
-   "status": "missing",
-   "note": "official list has no collector number; the image is the search thumbnail size"
+   "status": "left_out",
+   "note": "batch B: not added, see docs/second-batch-b-20261111.md"
   },
   {
    "language": "ja",
@@ -6348,8 +6355,8 @@
    "row_source": "tcgdex",
    "row_url": "https://api.tcgdex.net/v2/ja/cards/M6a-104",
    "image_url": null,
-   "status": "missing",
-   "note": "no full-size image found; official folder M6a has a thumbnail"
+   "status": "left_out",
+   "note": "batch B: not added, see docs/second-batch-b-20261111.md"
   },
   {
    "language": "ja",
@@ -6362,8 +6369,8 @@
    "row_source": "tcgdex",
    "row_url": "https://api.tcgdex.net/v2/ja/cards/M6a-105",
    "image_url": null,
-   "status": "missing",
-   "note": "no full-size image found; official folder M6a has a thumbnail"
+   "status": "left_out",
+   "note": "batch B: not added, see docs/second-batch-b-20261111.md"
   },
   {
    "language": "ja",
@@ -6376,8 +6383,8 @@
    "row_source": "tcgdex",
    "row_url": "https://api.tcgdex.net/v2/ja/cards/M6a-106",
    "image_url": null,
-   "status": "missing",
-   "note": "no full-size image found; official folder M6a has a thumbnail"
+   "status": "left_out",
+   "note": "batch B: not added, see docs/second-batch-b-20261111.md"
   },
   {
    "language": "ja",
@@ -6390,8 +6397,8 @@
    "row_source": "tcgdex",
    "row_url": "https://api.tcgdex.net/v2/ja/cards/M6a-107",
    "image_url": null,
-   "status": "missing",
-   "note": "no full-size image found; official folder M6a has a thumbnail"
+   "status": "left_out",
+   "note": "batch B: not added, see docs/second-batch-b-20261111.md"
   },
   {
    "language": "ja",
@@ -6404,8 +6411,8 @@
    "row_source": "tcgdex",
    "row_url": "https://api.tcgdex.net/v2/ja/cards/M6a-108",
    "image_url": null,
-   "status": "missing",
-   "note": "no full-size image found; official folder M6a has a thumbnail"
+   "status": "left_out",
+   "note": "batch B: not added, see docs/second-batch-b-20261111.md"
   },
   {
    "language": "ja",
@@ -6418,8 +6425,8 @@
    "row_source": "tcgdex",
    "row_url": "https://api.tcgdex.net/v2/ja/cards/M6a-109",
    "image_url": null,
-   "status": "missing",
-   "note": "no full-size image found; official folder M6a has a thumbnail"
+   "status": "left_out",
+   "note": "batch B: not added, see docs/second-batch-b-20261111.md"
   },
   {
    "language": "ja",
@@ -6432,8 +6439,8 @@
    "row_source": "tcgdex",
    "row_url": "https://api.tcgdex.net/v2/ja/cards/M6a-110",
    "image_url": null,
-   "status": "missing",
-   "note": "no full-size image found; official folder M6a has a thumbnail"
+   "status": "left_out",
+   "note": "batch B: not added, see docs/second-batch-b-20261111.md"
   },
   {
    "language": "ja",
@@ -6446,8 +6453,8 @@
    "row_source": "tcgdex",
    "row_url": "https://api.tcgdex.net/v2/ja/cards/M6a-111",
    "image_url": null,
-   "status": "missing",
-   "note": "no full-size image found; official folder M6a has a thumbnail"
+   "status": "left_out",
+   "note": "batch B: not added, see docs/second-batch-b-20261111.md"
   },
   {
    "language": "ja",
@@ -6460,8 +6467,8 @@
    "row_source": "tcgdex",
    "row_url": "https://api.tcgdex.net/v2/ja/cards/M6a-112",
    "image_url": null,
-   "status": "missing",
-   "note": "no full-size image found; official folder M6a has a thumbnail"
+   "status": "left_out",
+   "note": "batch B: not added, see docs/second-batch-b-20261111.md"
   },
   {
    "language": "ja",
@@ -6474,8 +6481,8 @@
    "row_source": "tcgdex",
    "row_url": "https://api.tcgdex.net/v2/ja/cards/M6a-113",
    "image_url": null,
-   "status": "missing",
-   "note": "no full-size image found; official folder M6a has a thumbnail"
+   "status": "left_out",
+   "note": "batch B: not added, see docs/second-batch-b-20261111.md"
   },
   {
    "language": "ja",
@@ -6488,8 +6495,8 @@
    "row_source": "tcgdex",
    "row_url": "https://api.tcgdex.net/v2/ja/cards/M6a-114",
    "image_url": null,
-   "status": "missing",
-   "note": "no full-size image found; official folder M6a has a thumbnail"
+   "status": "left_out",
+   "note": "batch B: not added, see docs/second-batch-b-20261111.md"
   },
   {
    "language": "ja",
@@ -6502,8 +6509,8 @@
    "row_source": "tcgdex",
    "row_url": "https://api.tcgdex.net/v2/ja/cards/M6a-115",
    "image_url": null,
-   "status": "missing",
-   "note": "no full-size image found; official folder M6a has a thumbnail"
+   "status": "left_out",
+   "note": "batch B: not added, see docs/second-batch-b-20261111.md"
   },
   {
    "language": "ja",
@@ -6516,8 +6523,8 @@
    "row_source": "tcgdex",
    "row_url": "https://api.tcgdex.net/v2/ja/cards/M6a-116",
    "image_url": null,
-   "status": "missing",
-   "note": "no full-size image found; official folder M6a has a thumbnail"
+   "status": "left_out",
+   "note": "batch B: not added, see docs/second-batch-b-20261111.md"
   },
   {
    "language": "ja",
@@ -6530,8 +6537,8 @@
    "row_source": "tcgdex",
    "row_url": "https://api.tcgdex.net/v2/ja/cards/M6a-117",
    "image_url": null,
-   "status": "missing",
-   "note": "no full-size image found; official folder M6a has a thumbnail"
+   "status": "left_out",
+   "note": "batch B: not added, see docs/second-batch-b-20261111.md"
   },
   {
    "language": "ja",
@@ -6544,8 +6551,8 @@
    "row_source": "tcgdex",
    "row_url": "https://api.tcgdex.net/v2/ja/cards/M6a-118",
    "image_url": null,
-   "status": "missing",
-   "note": "no full-size image found; official folder M6a has a thumbnail"
+   "status": "left_out",
+   "note": "batch B: not added, see docs/second-batch-b-20261111.md"
   },
   {
    "language": "ja",
@@ -6558,8 +6565,8 @@
    "row_source": "tcgdex",
    "row_url": "https://api.tcgdex.net/v2/ja/cards/M6a-119",
    "image_url": null,
-   "status": "missing",
-   "note": "no full-size image found; official folder M6a has a thumbnail"
+   "status": "left_out",
+   "note": "batch B: not added, see docs/second-batch-b-20261111.md"
   },
   {
    "language": "ja",
@@ -6572,8 +6579,8 @@
    "row_source": "tcgdex",
    "row_url": "https://api.tcgdex.net/v2/ja/cards/M6a-120",
    "image_url": null,
-   "status": "missing",
-   "note": "no full-size image found; official folder M6a has a thumbnail"
+   "status": "left_out",
+   "note": "batch B: not added, see docs/second-batch-b-20261111.md"
   },
   {
    "language": "ja",
@@ -6586,8 +6593,8 @@
    "row_source": "tcgdex",
    "row_url": "https://api.tcgdex.net/v2/ja/cards/M6a-121",
    "image_url": null,
-   "status": "missing",
-   "note": "no full-size image found; official folder M6a has a thumbnail"
+   "status": "left_out",
+   "note": "batch B: not added, see docs/second-batch-b-20261111.md"
   },
   {
    "language": "ja",
@@ -6600,8 +6607,8 @@
    "row_source": "tcgdex",
    "row_url": "https://api.tcgdex.net/v2/ja/cards/M6a-122",
    "image_url": null,
-   "status": "missing",
-   "note": "no full-size image found; official folder M6a has a thumbnail"
+   "status": "left_out",
+   "note": "batch B: not added, see docs/second-batch-b-20261111.md"
   },
   {
    "language": "ja",
@@ -6614,8 +6621,8 @@
    "row_source": "tcgdex",
    "row_url": "https://api.tcgdex.net/v2/ja/cards/M6a-123",
    "image_url": null,
-   "status": "missing",
-   "note": "no full-size image found; official folder M6a has a thumbnail"
+   "status": "left_out",
+   "note": "batch B: not added, see docs/second-batch-b-20261111.md"
   },
   {
    "language": "ja",
@@ -6628,8 +6635,8 @@
    "row_source": "tcgdex",
    "row_url": "https://api.tcgdex.net/v2/ja/cards/M6a-124",
    "image_url": null,
-   "status": "missing",
-   "note": "no full-size image found; official folder M6a has a thumbnail"
+   "status": "left_out",
+   "note": "batch B: not added, see docs/second-batch-b-20261111.md"
   },
   {
    "language": "ja",
@@ -6642,8 +6649,8 @@
    "row_source": "tcgdex",
    "row_url": "https://api.tcgdex.net/v2/ja/cards/M6a-125",
    "image_url": null,
-   "status": "missing",
-   "note": "no full-size image found; official folder M6a has a thumbnail"
+   "status": "left_out",
+   "note": "batch B: not added, see docs/second-batch-b-20261111.md"
   },
   {
    "language": "ja",
@@ -6656,8 +6663,8 @@
    "row_source": "tcgdex",
    "row_url": "https://api.tcgdex.net/v2/ja/cards/M6a-126",
    "image_url": null,
-   "status": "missing",
-   "note": "no full-size image found; official folder M6a has a thumbnail"
+   "status": "left_out",
+   "note": "batch B: not added, see docs/second-batch-b-20261111.md"
   },
   {
    "language": "ja",
@@ -6670,8 +6677,8 @@
    "row_source": "tcgdex",
    "row_url": "https://api.tcgdex.net/v2/ja/cards/M6a-127",
    "image_url": null,
-   "status": "missing",
-   "note": "no full-size image found; official folder M6a has a thumbnail"
+   "status": "left_out",
+   "note": "batch B: not added, see docs/second-batch-b-20261111.md"
   },
   {
    "language": "ja",
@@ -6684,8 +6691,8 @@
    "row_source": "tcgdex",
    "row_url": "https://api.tcgdex.net/v2/ja/cards/M6a-128",
    "image_url": null,
-   "status": "missing",
-   "note": "no full-size image found; official folder M6a has a thumbnail"
+   "status": "left_out",
+   "note": "batch B: not added, see docs/second-batch-b-20261111.md"
   },
   {
    "language": "ja",
@@ -6698,8 +6705,8 @@
    "row_source": "tcgdex",
    "row_url": "https://api.tcgdex.net/v2/ja/cards/M6a-129",
    "image_url": null,
-   "status": "missing",
-   "note": "no full-size image found; official folder M6a has a thumbnail"
+   "status": "left_out",
+   "note": "batch B: not added, see docs/second-batch-b-20261111.md"
   },
   {
    "language": "ja",
@@ -6712,8 +6719,8 @@
    "row_source": "tcgdex",
    "row_url": "https://api.tcgdex.net/v2/ja/cards/M6a-130",
    "image_url": null,
-   "status": "missing",
-   "note": "no full-size image found; official folder M6a has a thumbnail"
+   "status": "left_out",
+   "note": "batch B: not added, see docs/second-batch-b-20261111.md"
   },
   {
    "language": "ja",
@@ -6726,8 +6733,8 @@
    "row_source": "tcgdex",
    "row_url": "https://api.tcgdex.net/v2/ja/cards/M6a-131",
    "image_url": null,
-   "status": "missing",
-   "note": "no full-size image found; official folder M6a has a thumbnail"
+   "status": "left_out",
+   "note": "batch B: not added, see docs/second-batch-b-20261111.md"
   },
   {
    "language": "ja",
@@ -6740,8 +6747,8 @@
    "row_source": "tcgdex",
    "row_url": "https://api.tcgdex.net/v2/ja/cards/M6a-132",
    "image_url": null,
-   "status": "missing",
-   "note": "no full-size image found; official folder M6a has a thumbnail"
+   "status": "left_out",
+   "note": "batch B: not added, see docs/second-batch-b-20261111.md"
   },
   {
    "language": "ja",
@@ -6754,8 +6761,8 @@
    "row_source": "tcgdex",
    "row_url": "https://api.tcgdex.net/v2/ja/cards/M6a-133",
    "image_url": null,
-   "status": "missing",
-   "note": "no full-size image found; official folder M6a has a thumbnail"
+   "status": "left_out",
+   "note": "batch B: not added, see docs/second-batch-b-20261111.md"
   },
   {
    "language": "ja",
@@ -6768,8 +6775,8 @@
    "row_source": "tcgdex",
    "row_url": "https://api.tcgdex.net/v2/ja/cards/M6a-134",
    "image_url": null,
-   "status": "missing",
-   "note": "no full-size image found; official folder M6a has a thumbnail"
+   "status": "left_out",
+   "note": "batch B: not added, see docs/second-batch-b-20261111.md"
   },
   {
    "language": "ja",
@@ -6782,8 +6789,8 @@
    "row_source": "tcgdex",
    "row_url": "https://api.tcgdex.net/v2/ja/cards/M6a-135",
    "image_url": null,
-   "status": "missing",
-   "note": "no full-size image found; official folder M6a has a thumbnail"
+   "status": "left_out",
+   "note": "batch B: not added, see docs/second-batch-b-20261111.md"
   },
   {
    "language": "ja",
@@ -6796,8 +6803,8 @@
    "row_source": "tcgdex",
    "row_url": "https://api.tcgdex.net/v2/ja/cards/M6a-140",
    "image_url": null,
-   "status": "missing",
-   "note": "no full-size image found; official folder M6a has a thumbnail"
+   "status": "left_out",
+   "note": "batch B: not added, see docs/second-batch-b-20261111.md"
   },
   {
    "language": "ja",
@@ -6810,8 +6817,8 @@
    "row_source": "tcgdex",
    "row_url": "https://api.tcgdex.net/v2/ja/cards/M6a-141",
    "image_url": null,
-   "status": "missing",
-   "note": "no full-size image found; official folder M6a has a thumbnail"
+   "status": "left_out",
+   "note": "batch B: not added, see docs/second-batch-b-20261111.md"
   },
   {
    "language": "ja",
@@ -6824,8 +6831,8 @@
    "row_source": "tcgdex",
    "row_url": "https://api.tcgdex.net/v2/ja/cards/M6a-142",
    "image_url": null,
-   "status": "missing",
-   "note": "no full-size image found; official folder M6a has a thumbnail"
+   "status": "left_out",
+   "note": "batch B: not added, see docs/second-batch-b-20261111.md"
   },
   {
    "language": "ja",
@@ -6838,8 +6845,8 @@
    "row_source": "tcgdex",
    "row_url": "https://api.tcgdex.net/v2/ja/cards/M6a-146",
    "image_url": null,
-   "status": "missing",
-   "note": "no full-size image found; official folder M6a has a thumbnail"
+   "status": "left_out",
+   "note": "batch B: not added, see docs/second-batch-b-20261111.md"
   },
   {
    "language": "ja",
@@ -6852,8 +6859,8 @@
    "row_source": "tcgdex",
    "row_url": "https://api.tcgdex.net/v2/ja/cards/M6a-150",
    "image_url": null,
-   "status": "missing",
-   "note": "no full-size image found; official folder M6a has a thumbnail"
+   "status": "left_out",
+   "note": "batch B: not added, see docs/second-batch-b-20261111.md"
   },
   {
    "language": "ja",
@@ -6866,8 +6873,8 @@
    "row_source": "tcgdex",
    "row_url": "https://api.tcgdex.net/v2/ja/cards/M6a-151",
    "image_url": null,
-   "status": "missing",
-   "note": "no full-size image found; official folder M6a has a thumbnail"
+   "status": "left_out",
+   "note": "batch B: not added, see docs/second-batch-b-20261111.md"
   },
   {
    "language": "ja",
@@ -6880,8 +6887,8 @@
    "row_source": "tcgdex",
    "row_url": "https://api.tcgdex.net/v2/ja/cards/M6a-152",
    "image_url": null,
-   "status": "missing",
-   "note": "no full-size image found; official folder M6a has a thumbnail"
+   "status": "left_out",
+   "note": "batch B: not added, see docs/second-batch-b-20261111.md"
   },
   {
    "language": "ja",
@@ -6894,8 +6901,8 @@
    "row_source": "tcgdex",
    "row_url": "https://api.tcgdex.net/v2/ja/cards/M6a-154",
    "image_url": null,
-   "status": "missing",
-   "note": "no full-size image found; official folder M6a has a thumbnail"
+   "status": "left_out",
+   "note": "batch B: not added, see docs/second-batch-b-20261111.md"
   },
   {
    "language": "ja",
@@ -6908,8 +6915,8 @@
    "row_source": "tcgdex",
    "row_url": "https://api.tcgdex.net/v2/ja/cards/M6a-155",
    "image_url": null,
-   "status": "missing",
-   "note": "no full-size image found; official folder M6a has a thumbnail"
+   "status": "left_out",
+   "note": "batch B: not added, see docs/second-batch-b-20261111.md"
   },
   {
    "language": "ja",
@@ -6922,8 +6929,8 @@
    "row_source": "tcgdex",
    "row_url": "https://api.tcgdex.net/v2/ja/cards/M6a-158",
    "image_url": null,
-   "status": "missing",
-   "note": "no full-size image found; official folder M6a has a thumbnail"
+   "status": "left_out",
+   "note": "batch B: not added, see docs/second-batch-b-20261111.md"
   },
   {
    "language": "ja",
@@ -6936,8 +6943,8 @@
    "row_source": "tcgdex",
    "row_url": "https://api.tcgdex.net/v2/ja/cards/M6a-B",
    "image_url": null,
-   "status": "missing",
-   "note": "no full-size image found; official folder M6a has a thumbnail"
+   "status": "left_out",
+   "note": "batch B: not added, see docs/second-batch-b-20261111.md"
   },
   {
    "language": "ja",
@@ -6992,8 +6999,8 @@
    "row_source": "tcgdex",
    "row_url": "https://api.tcgdex.net/v2/ja/cards/M6a-G",
    "image_url": null,
-   "status": "missing",
-   "note": "no full-size image found; official folder M6a has a thumbnail"
+   "status": "left_out",
+   "note": "batch B: not added, see docs/second-batch-b-20261111.md"
   },
   {
    "language": "ja",
@@ -7062,8 +7069,8 @@
    "row_source": "tcgdex",
    "row_url": "https://api.tcgdex.net/v2/ja/cards/M6a-R",
    "image_url": null,
-   "status": "missing",
-   "note": "no full-size image found; official folder M6a has a thumbnail"
+   "status": "left_out",
+   "note": "batch B: not added, see docs/second-batch-b-20261111.md"
   },
   {
    "language": "ja",
@@ -9526,8 +9533,8 @@
    "row_source": "limitless",
    "row_url": "https://limitlesstcg.com/cards/jp/SP/5",
    "image_url": "https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/tpc/SP/SP_5_R_JP.png",
-   "status": "check",
-   "note": "left out: our unnumbered row has no image or number; browser worklist"
+   "status": "left_out",
+   "note": "print we hold not known; browser worklist"
   },
   {
    "language": "ja",
@@ -9540,8 +9547,8 @@
    "row_source": "limitless",
    "row_url": "https://limitlesstcg.com/cards/jp/SP/17",
    "image_url": "https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/tpc/SP/SP_17_R_JP.png",
-   "status": "check",
-   "note": "left out: our unnumbered row has no image or number; browser worklist"
+   "status": "left_out",
+   "note": "print we hold not known; browser worklist"
   },
   {
    "language": "ja",
@@ -9554,8 +9561,8 @@
    "row_source": "limitless",
    "row_url": "https://limitlesstcg.com/cards/jp/SP/19",
    "image_url": "https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/tpc/SP/SP_19_R_JP.png",
-   "status": "check",
-   "note": "left out: our unnumbered row has no image or number; browser worklist"
+   "status": "left_out",
+   "note": "print we hold not known; browser worklist"
   },
   {
    "language": "ja",
@@ -9568,8 +9575,8 @@
    "row_source": "limitless",
    "row_url": "https://limitlesstcg.com/cards/jp/SP/27",
    "image_url": "https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/tpc/SP/SP_27_R_JP.png",
-   "status": "check",
-   "note": "left out: our unnumbered row has no image or number; browser worklist"
+   "status": "left_out",
+   "note": "print we hold not known; browser worklist"
   },
   {
    "language": "ja",
@@ -10408,8 +10415,8 @@
    "row_source": "bulbapedia",
    "row_url": "https://bulbapedia.bulbagarden.net/wiki/Vending_Machine_cards_(TCG)",
    "image_url": null,
-   "status": "missing",
-   "note": "unnumbered; find our set id by name (ours holds 51 of 53)"
+   "status": "left_out",
+   "note": "batch B: not added, see docs/second-batch-b-20261111.md"
   },
   {
    "language": "ja",
@@ -10422,8 +10429,8 @@
    "row_source": "bulbapedia",
    "row_url": "https://bulbapedia.bulbagarden.net/wiki/Vending_Machine_cards_(TCG)",
    "image_url": null,
-   "status": "missing",
-   "note": "unnumbered; find our set id by name (ours holds 51 of 53)"
+   "status": "left_out",
+   "note": "batch B: not added, see docs/second-batch-b-20261111.md"
   },
   {
    "language": "ja",
@@ -10436,8 +10443,8 @@
    "row_source": "limitless",
    "row_url": "https://limitlesstcg.com/cards/jp/MMBp/NAN1",
    "image_url": "https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/tpc/MMBp/MMBp_NAN1_R_JP.png",
-   "status": "missing",
-   "note": "unnumbered basic energy; low priority"
+   "status": "done",
+   "note": "added in PS-CATALOGUE-EN-JA-REC34-C-20261111"
   },
   {
    "language": "ja",
@@ -10450,8 +10457,8 @@
    "row_source": "limitless",
    "row_url": "https://limitlesstcg.com/cards/jp/MMBp/NAN2",
    "image_url": "https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/tpc/MMBp/MMBp_NAN2_R_JP.png",
-   "status": "missing",
-   "note": "unnumbered basic energy; low priority"
+   "status": "done",
+   "note": "added in PS-CATALOGUE-EN-JA-REC34-C-20261111"
   },
   {
    "language": "ja",
@@ -10464,8 +10471,8 @@
    "row_source": "limitless",
    "row_url": "https://limitlesstcg.com/cards/jp/MMBp/NAN3",
    "image_url": "https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/tpc/MMBp/MMBp_NAN3_R_JP.png",
-   "status": "missing",
-   "note": "unnumbered basic energy; low priority"
+   "status": "done",
+   "note": "added in PS-CATALOGUE-EN-JA-REC34-C-20261111"
   },
   {
    "language": "ja",
@@ -10478,8 +10485,8 @@
    "row_source": "limitless",
    "row_url": "https://limitlesstcg.com/cards/jp/MMBp/NAN4",
    "image_url": "https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/tpc/MMBp/MMBp_NAN4_R_JP.png",
-   "status": "missing",
-   "note": "unnumbered basic energy; low priority"
+   "status": "done",
+   "note": "added in PS-CATALOGUE-EN-JA-REC34-C-20261111"
   },
   {
    "language": "ja",
@@ -10492,8 +10499,8 @@
    "row_source": "limitless",
    "row_url": "https://limitlesstcg.com/cards/jp/MMBp/NAN5",
    "image_url": "https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/tpc/MMBp/MMBp_NAN5_R_JP.png",
-   "status": "missing",
-   "note": "unnumbered basic energy; low priority"
+   "status": "done",
+   "note": "added in PS-CATALOGUE-EN-JA-REC34-C-20261111"
   },
   {
    "language": "ja",
@@ -10506,8 +10513,8 @@
    "row_source": "limitless",
    "row_url": "https://limitlesstcg.com/cards/jp/MMBp/NAN6",
    "image_url": "https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/tpc/MMBp/MMBp_NAN6_R_JP.png",
-   "status": "missing",
-   "note": "unnumbered basic energy; low priority"
+   "status": "done",
+   "note": "added in PS-CATALOGUE-EN-JA-REC34-C-20261111"
   },
   {
    "language": "ja",
@@ -10520,8 +10527,8 @@
    "row_source": "limitless",
    "row_url": "https://limitlesstcg.com/cards/jp/MMBp/NAN7",
    "image_url": "https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/tpc/MMBp/MMBp_NAN7_R_JP.png",
-   "status": "missing",
-   "note": "unnumbered basic energy; low priority"
+   "status": "done",
+   "note": "added in PS-CATALOGUE-EN-JA-REC34-C-20261111"
   },
   {
    "language": "ja",
@@ -10534,8 +10541,8 @@
    "row_source": "limitless",
    "row_url": "https://limitlesstcg.com/cards/jp/MMBp/NAN8",
    "image_url": "https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/tpc/MMBp/MMBp_NAN8_R_JP.png",
-   "status": "missing",
-   "note": "unnumbered basic energy; low priority"
+   "status": "done",
+   "note": "added in PS-CATALOGUE-EN-JA-REC34-C-20261111"
   },
   {
    "language": "ja",
@@ -10548,8 +10555,8 @@
    "row_source": "limitless",
    "row_url": "https://limitlesstcg.com/cards/jp/MMBp/NAN9",
    "image_url": "https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/tpc/MMBp/MMBp_NAN9_R_JP.png",
-   "status": "missing",
-   "note": "unnumbered basic energy; low priority"
+   "status": "done",
+   "note": "added in PS-CATALOGUE-EN-JA-REC34-C-20261111"
   },
   {
    "language": "ja",
@@ -10562,8 +10569,8 @@
    "row_source": "limitless",
    "row_url": "https://limitlesstcg.com/cards/jp/MMBs/NAN1",
    "image_url": "https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/tpc/MMBs/MMBs_NAN1_R_JP.png",
-   "status": "missing",
-   "note": "unnumbered basic energy; low priority"
+   "status": "done",
+   "note": "added in PS-CATALOGUE-EN-JA-REC34-C-20261111"
   },
   {
    "language": "ja",
@@ -10576,8 +10583,8 @@
    "row_source": "limitless",
    "row_url": "https://limitlesstcg.com/cards/jp/MMBs/NAN2",
    "image_url": "https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/tpc/MMBs/MMBs_NAN2_R_JP.png",
-   "status": "missing",
-   "note": "unnumbered basic energy; low priority"
+   "status": "done",
+   "note": "added in PS-CATALOGUE-EN-JA-REC34-C-20261111"
   },
   {
    "language": "ja",
@@ -10590,8 +10597,8 @@
    "row_source": "limitless",
    "row_url": "https://limitlesstcg.com/cards/jp/MMBs/NAN3",
    "image_url": "https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/tpc/MMBs/MMBs_NAN3_R_JP.png",
-   "status": "missing",
-   "note": "unnumbered basic energy; low priority"
+   "status": "done",
+   "note": "added in PS-CATALOGUE-EN-JA-REC34-C-20261111"
   },
   {
    "language": "ja",
@@ -10604,8 +10611,8 @@
    "row_source": "limitless",
    "row_url": "https://limitlesstcg.com/cards/jp/MMBs/NAN4",
    "image_url": "https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/tpc/MMBs/MMBs_NAN4_R_JP.png",
-   "status": "missing",
-   "note": "unnumbered basic energy; low priority"
+   "status": "done",
+   "note": "added in PS-CATALOGUE-EN-JA-REC34-C-20261111"
   },
   {
    "language": "ja",
@@ -10618,8 +10625,8 @@
    "row_source": "limitless",
    "row_url": "https://limitlesstcg.com/cards/jp/MMBs/NAN5",
    "image_url": "https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/tpc/MMBs/MMBs_NAN5_R_JP.png",
-   "status": "missing",
-   "note": "unnumbered basic energy; low priority"
+   "status": "done",
+   "note": "added in PS-CATALOGUE-EN-JA-REC34-C-20261111"
   },
   {
    "language": "ja",
@@ -10632,8 +10639,8 @@
    "row_source": "limitless",
    "row_url": "https://limitlesstcg.com/cards/jp/MMBs/NAN6",
    "image_url": "https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/tpc/MMBs/MMBs_NAN6_R_JP.png",
-   "status": "missing",
-   "note": "unnumbered basic energy; low priority"
+   "status": "done",
+   "note": "added in PS-CATALOGUE-EN-JA-REC34-C-20261111"
   },
   {
    "language": "ja",
@@ -10646,8 +10653,8 @@
    "row_source": "limitless",
    "row_url": "https://limitlesstcg.com/cards/jp/MMBs/NAN7",
    "image_url": "https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/tpc/MMBs/MMBs_NAN7_R_JP.png",
-   "status": "missing",
-   "note": "unnumbered basic energy; low priority"
+   "status": "done",
+   "note": "added in PS-CATALOGUE-EN-JA-REC34-C-20261111"
   },
   {
    "language": "ja",
@@ -10660,8 +10667,8 @@
    "row_source": "limitless",
    "row_url": "https://limitlesstcg.com/cards/jp/MMBs/NAN8",
    "image_url": "https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/tpc/MMBs/MMBs_NAN8_R_JP.png",
-   "status": "missing",
-   "note": "unnumbered basic energy; low priority"
+   "status": "done",
+   "note": "added in PS-CATALOGUE-EN-JA-REC34-C-20261111"
   },
   {
    "language": "ja",
@@ -10674,8 +10681,8 @@
    "row_source": "limitless",
    "row_url": "https://limitlesstcg.com/cards/jp/MMBs/NAN9",
    "image_url": "https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/tpc/MMBs/MMBs_NAN9_R_JP.png",
-   "status": "missing",
-   "note": "unnumbered basic energy; low priority"
+   "status": "done",
+   "note": "added in PS-CATALOGUE-EN-JA-REC34-C-20261111"
   },
   {
    "language": "ja",
@@ -10688,8 +10695,8 @@
    "row_source": "limitless",
    "row_url": "https://limitlesstcg.com/cards/jp/SMA/NAN1",
    "image_url": "https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/tpc/SMA/SMA_NAN1_R_JP.png",
-   "status": "missing",
-   "note": "unnumbered basic energy; low priority"
+   "status": "done",
+   "note": "added in PS-CATALOGUE-EN-JA-REC34-C-20261111"
   },
   {
    "language": "ja",
@@ -10702,8 +10709,8 @@
    "row_source": "limitless",
    "row_url": "https://limitlesstcg.com/cards/jp/SMA/NAN2",
    "image_url": "https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/tpc/SMA/SMA_NAN2_R_JP.png",
-   "status": "missing",
-   "note": "unnumbered basic energy; low priority"
+   "status": "done",
+   "note": "added in PS-CATALOGUE-EN-JA-REC34-C-20261111"
   },
   {
    "language": "ja",
@@ -10716,8 +10723,8 @@
    "row_source": "limitless",
    "row_url": "https://limitlesstcg.com/cards/jp/SMA/NAN3",
    "image_url": "https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/tpc/SMA/SMA_NAN3_R_JP.png",
-   "status": "missing",
-   "note": "unnumbered basic energy; low priority"
+   "status": "done",
+   "note": "added in PS-CATALOGUE-EN-JA-REC34-C-20261111"
   },
   {
    "language": "ja",
@@ -10730,8 +10737,8 @@
    "row_source": "limitless",
    "row_url": "https://limitlesstcg.com/cards/jp/SMA/NAN4",
    "image_url": "https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/tpc/SMA/SMA_NAN4_R_JP.png",
-   "status": "missing",
-   "note": "unnumbered basic energy; low priority"
+   "status": "done",
+   "note": "added in PS-CATALOGUE-EN-JA-REC34-C-20261111"
   },
   {
    "language": "ja",
@@ -10744,8 +10751,8 @@
    "row_source": "limitless",
    "row_url": "https://limitlesstcg.com/cards/jp/SMA/NAN5",
    "image_url": "https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/tpc/SMA/SMA_NAN5_R_JP.png",
-   "status": "missing",
-   "note": "unnumbered basic energy; low priority"
+   "status": "done",
+   "note": "added in PS-CATALOGUE-EN-JA-REC34-C-20261111"
   },
   {
    "language": "ja",
@@ -10758,8 +10765,8 @@
    "row_source": "limitless",
    "row_url": "https://limitlesstcg.com/cards/jp/SMA/NAN6",
    "image_url": "https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/tpc/SMA/SMA_NAN6_R_JP.png",
-   "status": "missing",
-   "note": "unnumbered basic energy; low priority"
+   "status": "done",
+   "note": "added in PS-CATALOGUE-EN-JA-REC34-C-20261111"
   },
   {
    "language": "ja",
@@ -10772,8 +10779,8 @@
    "row_source": "limitless",
    "row_url": "https://limitlesstcg.com/cards/jp/SMA/NAN7",
    "image_url": "https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/tpc/SMA/SMA_NAN7_R_JP.png",
-   "status": "missing",
-   "note": "unnumbered basic energy; low priority"
+   "status": "done",
+   "note": "added in PS-CATALOGUE-EN-JA-REC34-C-20261111"
   },
   {
    "language": "ja",
@@ -10786,8 +10793,8 @@
    "row_source": "limitless",
    "row_url": "https://limitlesstcg.com/cards/jp/SMA/NAN8",
    "image_url": "https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/tpc/SMA/SMA_NAN8_R_JP.png",
-   "status": "missing",
-   "note": "unnumbered basic energy; low priority"
+   "status": "done",
+   "note": "added in PS-CATALOGUE-EN-JA-REC34-C-20261111"
   },
   {
    "language": "ja",
@@ -10800,8 +10807,8 @@
    "row_source": "limitless",
    "row_url": "https://limitlesstcg.com/cards/jp/SMA/NAN9",
    "image_url": "https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/tpc/SMA/SMA_NAN9_R_JP.png",
-   "status": "missing",
-   "note": "unnumbered basic energy; low priority"
+   "status": "done",
+   "note": "added in PS-CATALOGUE-EN-JA-REC34-C-20261111"
   },
   {
    "language": "ja",
@@ -10814,8 +10821,8 @@
    "row_source": "limitless",
    "row_url": "https://limitlesstcg.com/cards/jp/SMB/NAN1",
    "image_url": "https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/tpc/SMB/SMB_NAN1_R_JP.png",
-   "status": "missing",
-   "note": "unnumbered basic energy; low priority"
+   "status": "done",
+   "note": "added in PS-CATALOGUE-EN-JA-REC34-C-20261111"
   },
   {
    "language": "ja",
@@ -10828,8 +10835,8 @@
    "row_source": "limitless",
    "row_url": "https://limitlesstcg.com/cards/jp/SMB/NAN2",
    "image_url": "https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/tpc/SMB/SMB_NAN2_R_JP.png",
-   "status": "missing",
-   "note": "unnumbered basic energy; low priority"
+   "status": "done",
+   "note": "added in PS-CATALOGUE-EN-JA-REC34-C-20261111"
   },
   {
    "language": "ja",
@@ -10842,8 +10849,8 @@
    "row_source": "limitless",
    "row_url": "https://limitlesstcg.com/cards/jp/SMB/NAN3",
    "image_url": "https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/tpc/SMB/SMB_NAN3_R_JP.png",
-   "status": "missing",
-   "note": "unnumbered basic energy; low priority"
+   "status": "done",
+   "note": "added in PS-CATALOGUE-EN-JA-REC34-C-20261111"
   },
   {
    "language": "ja",
@@ -10856,8 +10863,8 @@
    "row_source": "limitless",
    "row_url": "https://limitlesstcg.com/cards/jp/SMB/NAN4",
    "image_url": "https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/tpc/SMB/SMB_NAN4_R_JP.png",
-   "status": "missing",
-   "note": "unnumbered basic energy; low priority"
+   "status": "done",
+   "note": "added in PS-CATALOGUE-EN-JA-REC34-C-20261111"
   },
   {
    "language": "ja",
@@ -10870,8 +10877,8 @@
    "row_source": "limitless",
    "row_url": "https://limitlesstcg.com/cards/jp/SMB/NAN5",
    "image_url": "https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/tpc/SMB/SMB_NAN5_R_JP.png",
-   "status": "missing",
-   "note": "unnumbered basic energy; low priority"
+   "status": "done",
+   "note": "added in PS-CATALOGUE-EN-JA-REC34-C-20261111"
   },
   {
    "language": "ja",
@@ -10884,8 +10891,8 @@
    "row_source": "limitless",
    "row_url": "https://limitlesstcg.com/cards/jp/SMB/NAN6",
    "image_url": "https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/tpc/SMB/SMB_NAN6_R_JP.png",
-   "status": "missing",
-   "note": "unnumbered basic energy; low priority"
+   "status": "done",
+   "note": "added in PS-CATALOGUE-EN-JA-REC34-C-20261111"
   },
   {
    "language": "ja",
@@ -10898,8 +10905,8 @@
    "row_source": "limitless",
    "row_url": "https://limitlesstcg.com/cards/jp/SMB/NAN7",
    "image_url": "https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/tpc/SMB/SMB_NAN7_R_JP.png",
-   "status": "missing",
-   "note": "unnumbered basic energy; low priority"
+   "status": "done",
+   "note": "added in PS-CATALOGUE-EN-JA-REC34-C-20261111"
   },
   {
    "language": "ja",
@@ -10912,8 +10919,8 @@
    "row_source": "limitless",
    "row_url": "https://limitlesstcg.com/cards/jp/SMB/NAN8",
    "image_url": "https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/tpc/SMB/SMB_NAN8_R_JP.png",
-   "status": "missing",
-   "note": "unnumbered basic energy; low priority"
+   "status": "done",
+   "note": "added in PS-CATALOGUE-EN-JA-REC34-C-20261111"
   },
   {
    "language": "ja",
@@ -10926,8 +10933,8 @@
    "row_source": "limitless",
    "row_url": "https://limitlesstcg.com/cards/jp/SMB/NAN9",
    "image_url": "https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/tpc/SMB/SMB_NAN9_R_JP.png",
-   "status": "missing",
-   "note": "unnumbered basic energy; low priority"
+   "status": "done",
+   "note": "added in PS-CATALOGUE-EN-JA-REC34-C-20261111"
   },
   {
    "language": "ja",
@@ -10940,8 +10947,8 @@
    "row_source": "limitless",
    "row_url": "https://limitlesstcg.com/cards/jp/SVI/G",
    "image_url": "https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/tpc/SVI/SVI_G_R_JP.png",
-   "status": "missing",
-   "note": "unnumbered basic energy; low priority"
+   "status": "done",
+   "note": "added in PS-CATALOGUE-EN-JA-REC34-C-20261111"
   },
   {
    "language": "ja",
@@ -10954,8 +10961,8 @@
    "row_source": "limitless",
    "row_url": "https://limitlesstcg.com/cards/jp/SVI/R",
    "image_url": "https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/tpc/SVI/SVI_R_R_JP.png",
-   "status": "missing",
-   "note": "unnumbered basic energy; low priority"
+   "status": "done",
+   "note": "added in PS-CATALOGUE-EN-JA-REC34-C-20261111"
   },
   {
    "language": "ja",
@@ -10968,8 +10975,8 @@
    "row_source": "limitless",
    "row_url": "https://limitlesstcg.com/cards/jp/SVI/W",
    "image_url": "https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/tpc/SVI/SVI_W_R_JP.png",
-   "status": "missing",
-   "note": "unnumbered basic energy; low priority"
+   "status": "done",
+   "note": "added in PS-CATALOGUE-EN-JA-REC34-C-20261111"
   },
   {
    "language": "ja",
@@ -10982,8 +10989,8 @@
    "row_source": "limitless",
    "row_url": "https://limitlesstcg.com/cards/jp/SVI/L",
    "image_url": "https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/tpc/SVI/SVI_L_R_JP.png",
-   "status": "missing",
-   "note": "unnumbered basic energy; low priority"
+   "status": "done",
+   "note": "added in PS-CATALOGUE-EN-JA-REC34-C-20261111"
   },
   {
    "language": "ja",
@@ -10996,8 +11003,8 @@
    "row_source": "limitless",
    "row_url": "https://limitlesstcg.com/cards/jp/SVI/P",
    "image_url": "https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/tpc/SVI/SVI_P_R_JP.png",
-   "status": "missing",
-   "note": "unnumbered basic energy; low priority"
+   "status": "done",
+   "note": "added in PS-CATALOGUE-EN-JA-REC34-C-20261111"
   },
   {
    "language": "ja",
@@ -11010,8 +11017,8 @@
    "row_source": "limitless",
    "row_url": "https://limitlesstcg.com/cards/jp/SVI/F",
    "image_url": "https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/tpc/SVI/SVI_F_R_JP.png",
-   "status": "missing",
-   "note": "unnumbered basic energy; low priority"
+   "status": "done",
+   "note": "added in PS-CATALOGUE-EN-JA-REC34-C-20261111"
   },
   {
    "language": "ja",
@@ -11024,8 +11031,8 @@
    "row_source": "limitless",
    "row_url": "https://limitlesstcg.com/cards/jp/SVI/D",
    "image_url": "https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/tpc/SVI/SVI_D_R_JP.png",
-   "status": "missing",
-   "note": "unnumbered basic energy; low priority"
+   "status": "done",
+   "note": "added in PS-CATALOGUE-EN-JA-REC34-C-20261111"
   },
   {
    "language": "ja",
@@ -11038,8 +11045,8 @@
    "row_source": "limitless",
    "row_url": "https://limitlesstcg.com/cards/jp/SVI/M",
    "image_url": "https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/tpc/SVI/SVI_M_R_JP.png",
-   "status": "missing",
-   "note": "unnumbered basic energy; low priority"
+   "status": "done",
+   "note": "added in PS-CATALOGUE-EN-JA-REC34-C-20261111"
   },
   {
    "language": "ja",
@@ -11052,8 +11059,8 @@
    "row_source": "limitless",
    "row_url": "https://limitlesstcg.com/cards/jp/HXY/NAN1",
    "image_url": "https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/tpc/HXY/HXY_NAN1_R_JP.png",
-   "status": "missing",
-   "note": "unnumbered basic energy; low priority"
+   "status": "done",
+   "note": "added in PS-CATALOGUE-EN-JA-REC34-C-20261111"
   },
   {
    "language": "ja",
@@ -11066,8 +11073,8 @@
    "row_source": "limitless",
    "row_url": "https://limitlesstcg.com/cards/jp/HXY/NAN2",
    "image_url": "https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/tpc/HXY/HXY_NAN2_R_JP.png",
-   "status": "missing",
-   "note": "unnumbered basic energy; low priority"
+   "status": "done",
+   "note": "added in PS-CATALOGUE-EN-JA-REC34-C-20261111"
   },
   {
    "language": "ja",
@@ -11080,8 +11087,8 @@
    "row_source": "limitless",
    "row_url": "https://limitlesstcg.com/cards/jp/HXY/NAN3",
    "image_url": "https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/tpc/HXY/HXY_NAN3_R_JP.png",
-   "status": "missing",
-   "note": "unnumbered basic energy; low priority"
+   "status": "done",
+   "note": "added in PS-CATALOGUE-EN-JA-REC34-C-20261111"
   },
   {
    "language": "ja",
@@ -11094,8 +11101,8 @@
    "row_source": "limitless",
    "row_url": "https://limitlesstcg.com/cards/jp/HXY/NAN4",
    "image_url": "https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/tpc/HXY/HXY_NAN4_R_JP.png",
-   "status": "missing",
-   "note": "unnumbered basic energy; low priority"
+   "status": "done",
+   "note": "added in PS-CATALOGUE-EN-JA-REC34-C-20261111"
   },
   {
    "language": "ja",
@@ -11108,8 +11115,8 @@
    "row_source": "limitless",
    "row_url": "https://limitlesstcg.com/cards/jp/HXY/NAN5",
    "image_url": "https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/tpc/HXY/HXY_NAN5_R_JP.png",
-   "status": "missing",
-   "note": "unnumbered basic energy; low priority"
+   "status": "done",
+   "note": "added in PS-CATALOGUE-EN-JA-REC34-C-20261111"
   },
   {
    "language": "ja",
@@ -11122,8 +11129,8 @@
    "row_source": "limitless",
    "row_url": "https://limitlesstcg.com/cards/jp/HXY/NAN6",
    "image_url": "https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/tpc/HXY/HXY_NAN6_R_JP.png",
-   "status": "missing",
-   "note": "unnumbered basic energy; low priority"
+   "status": "done",
+   "note": "added in PS-CATALOGUE-EN-JA-REC34-C-20261111"
   },
   {
    "language": "ja",
@@ -11136,8 +11143,8 @@
    "row_source": "limitless",
    "row_url": "https://limitlesstcg.com/cards/jp/MDB/NAN1",
    "image_url": "https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/tpc/MDB/MDB_NAN1_R_JP.png",
-   "status": "missing",
-   "note": "unnumbered basic energy; low priority"
+   "status": "done",
+   "note": "added in PS-CATALOGUE-EN-JA-REC34-C-20261111"
   },
   {
    "language": "ja",
@@ -11150,8 +11157,8 @@
    "row_source": "limitless",
    "row_url": "https://limitlesstcg.com/cards/jp/MDB/NAN2",
    "image_url": "https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/tpc/MDB/MDB_NAN2_R_JP.png",
-   "status": "missing",
-   "note": "unnumbered basic energy; low priority"
+   "status": "done",
+   "note": "added in PS-CATALOGUE-EN-JA-REC34-C-20261111"
   },
   {
    "language": "ja",
@@ -11164,8 +11171,8 @@
    "row_source": "limitless",
    "row_url": "https://limitlesstcg.com/cards/jp/MDB/NAN3",
    "image_url": "https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/tpc/MDB/MDB_NAN3_R_JP.png",
-   "status": "missing",
-   "note": "unnumbered basic energy; low priority"
+   "status": "done",
+   "note": "added in PS-CATALOGUE-EN-JA-REC34-C-20261111"
   },
   {
    "language": "ja",
@@ -11178,8 +11185,8 @@
    "row_source": "limitless",
    "row_url": "https://limitlesstcg.com/cards/jp/MDB/NAN4",
    "image_url": "https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/tpc/MDB/MDB_NAN4_R_JP.png",
-   "status": "missing",
-   "note": "unnumbered basic energy; low priority"
+   "status": "done",
+   "note": "added in PS-CATALOGUE-EN-JA-REC34-C-20261111"
   },
   {
    "language": "ja",
@@ -11192,8 +11199,8 @@
    "row_source": "limitless",
    "row_url": "https://limitlesstcg.com/cards/jp/MDB/NAN5",
    "image_url": "https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/tpc/MDB/MDB_NAN5_R_JP.png",
-   "status": "missing",
-   "note": "unnumbered basic energy; low priority"
+   "status": "done",
+   "note": "added in PS-CATALOGUE-EN-JA-REC34-C-20261111"
   },
   {
    "language": "ja",
@@ -11206,8 +11213,8 @@
    "row_source": "limitless",
    "row_url": "https://limitlesstcg.com/cards/jp/SM1p/NAN2",
    "image_url": "https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/tpc/SM1p/SM1p_NAN2_R_JP.png",
-   "status": "missing",
-   "note": "unnumbered basic energy; low priority"
+   "status": "done",
+   "note": "added in PS-CATALOGUE-EN-JA-REC34-C-20261111"
   },
   {
    "language": "ja",
@@ -11220,8 +11227,8 @@
    "row_source": "limitless",
    "row_url": "https://limitlesstcg.com/cards/jp/SM1p/NAN3",
    "image_url": "https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/tpc/SM1p/SM1p_NAN3_R_JP.png",
-   "status": "missing",
-   "note": "unnumbered basic energy; low priority"
+   "status": "done",
+   "note": "added in PS-CATALOGUE-EN-JA-REC34-C-20261111"
   },
   {
    "language": "ja",
@@ -11234,8 +11241,8 @@
    "row_source": "limitless",
    "row_url": "https://limitlesstcg.com/cards/jp/SM1p/NAN4",
    "image_url": "https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/tpc/SM1p/SM1p_NAN4_R_JP.png",
-   "status": "missing",
-   "note": "unnumbered basic energy; low priority"
+   "status": "done",
+   "note": "added in PS-CATALOGUE-EN-JA-REC34-C-20261111"
   },
   {
    "language": "ja",
@@ -11248,8 +11255,8 @@
    "row_source": "limitless",
    "row_url": "https://limitlesstcg.com/cards/jp/SM1p/NAN5",
    "image_url": "https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/tpc/SM1p/SM1p_NAN5_R_JP.png",
-   "status": "missing",
-   "note": "unnumbered basic energy; low priority"
+   "status": "done",
+   "note": "added in PS-CATALOGUE-EN-JA-REC34-C-20261111"
   },
   {
    "language": "ja",
@@ -11262,8 +11269,8 @@
    "row_source": "limitless",
    "row_url": "https://limitlesstcg.com/cards/jp/SP4/r",
    "image_url": "https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/tpc/SP4/SP4_r_R_JP.png",
-   "status": "missing",
-   "note": "unnumbered basic energy; low priority"
+   "status": "done",
+   "note": "added in PS-CATALOGUE-EN-JA-REC34-C-20261111"
   },
   {
    "language": "ja",
@@ -11276,8 +11283,8 @@
    "row_source": "limitless",
    "row_url": "https://limitlesstcg.com/cards/jp/SP4/w",
    "image_url": "https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/tpc/SP4/SP4_w_R_JP.png",
-   "status": "missing",
-   "note": "unnumbered basic energy; low priority"
+   "status": "done",
+   "note": "added in PS-CATALOGUE-EN-JA-REC34-C-20261111"
   },
   {
    "language": "ja",
@@ -11290,8 +11297,8 @@
    "row_source": "limitless",
    "row_url": "https://limitlesstcg.com/cards/jp/SP4/l",
    "image_url": "https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/tpc/SP4/SP4_l_R_JP.png",
-   "status": "missing",
-   "note": "unnumbered basic energy; low priority"
+   "status": "done",
+   "note": "added in PS-CATALOGUE-EN-JA-REC34-C-20261111"
   },
   {
    "language": "ja",
@@ -11304,8 +11311,8 @@
    "row_source": "limitless",
    "row_url": "https://limitlesstcg.com/cards/jp/SP4/p",
    "image_url": "https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/tpc/SP4/SP4_p_R_JP.png",
-   "status": "missing",
-   "note": "unnumbered basic energy; low priority"
+   "status": "done",
+   "note": "added in PS-CATALOGUE-EN-JA-REC34-C-20261111"
   },
   {
    "language": "ja",
@@ -11318,8 +11325,8 @@
    "row_source": "limitless",
    "row_url": "https://limitlesstcg.com/cards/jp/WCS23/L",
    "image_url": "https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/tpc/WCS23/WCS23_L_R_JP.png",
-   "status": "missing",
-   "note": "unnumbered basic energy; low priority"
+   "status": "done",
+   "note": "added in PS-CATALOGUE-EN-JA-REC34-C-20261111"
   },
   {
    "language": "ja",
@@ -11332,8 +11339,8 @@
    "row_source": "limitless",
    "row_url": "https://limitlesstcg.com/cards/jp/WCS23/F",
    "image_url": "https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/tpc/WCS23/WCS23_F_R_JP.png",
-   "status": "missing",
-   "note": "unnumbered basic energy; low priority"
+   "status": "done",
+   "note": "added in PS-CATALOGUE-EN-JA-REC34-C-20261111"
   },
   {
    "language": "ja",
@@ -11346,8 +11353,8 @@
    "row_source": "limitless",
    "row_url": "https://limitlesstcg.com/cards/jp/SGG/0",
    "image_url": "https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/tpc/SGG/SGG_0_R_JP.png",
-   "status": "missing",
-   "note": "unnumbered basic energy; low priority"
+   "status": "done",
+   "note": "added in PS-CATALOGUE-EN-JA-REC34-C-20261111"
   },
   {
    "language": "ja",
@@ -11360,8 +11367,8 @@
    "row_source": "official",
    "row_url": "https://www.pokemon-card.com/card-search/details.php/card/36517/regu/all",
    "image_url": "https://www.pokemon-card.com/assets/images/card_images/large/SML/036517_E_KIHONYOUENERUGI.jpg",
-   "status": "missing",
-   "note": "unnumbered basic energy; official list only; low priority"
+   "status": "done",
+   "note": "added in PS-CATALOGUE-EN-JA-REC34-C-20261111"
   },
   {
    "language": "ja",
@@ -11374,8 +11381,8 @@
    "row_source": "official",
    "row_url": "https://www.pokemon-card.com/card-search/details.php/card/36494/regu/all",
    "image_url": "https://www.pokemon-card.com/assets/images/card_images/large/SML/036494_E_KIHONHONOOENERUGI.jpg",
-   "status": "missing",
-   "note": "unnumbered basic energy; official list only; low priority"
+   "status": "done",
+   "note": "added in PS-CATALOGUE-EN-JA-REC34-C-20261111"
   },
   {
    "language": "ja",
@@ -11388,8 +11395,8 @@
    "row_source": "official",
    "row_url": "https://www.pokemon-card.com/card-search/details.php/card/36493/regu/all",
    "image_url": "https://www.pokemon-card.com/assets/images/card_images/large/SML/036493_E_KIHONKUSAENERUGI.jpg",
-   "status": "missing",
-   "note": "unnumbered basic energy; official list only; low priority"
+   "status": "done",
+   "note": "added in PS-CATALOGUE-EN-JA-REC34-C-20261111"
   },
   {
    "language": "ja",
@@ -11402,8 +11409,8 @@
    "row_source": "official",
    "row_url": "https://www.pokemon-card.com/card-search/details.php/card/36516/regu/all",
    "image_url": "https://www.pokemon-card.com/assets/images/card_images/large/SML/036516_E_KIHONKAMINARIENERUGI.jpg",
-   "status": "missing",
-   "note": "unnumbered basic energy; official list only; low priority"
+   "status": "done",
+   "note": "added in PS-CATALOGUE-EN-JA-REC34-C-20261111"
   },
   {
    "language": "ja",
@@ -11416,8 +11423,8 @@
    "row_source": "official",
    "row_url": "https://www.pokemon-card.com/card-search/details.php/card/36540/regu/all",
    "image_url": "https://www.pokemon-card.com/assets/images/card_images/large/SML/036540_E_KIHONCHOUENERUGI.jpg",
-   "status": "missing",
-   "note": "unnumbered basic energy; official list only; low priority"
+   "status": "done",
+   "note": "added in PS-CATALOGUE-EN-JA-REC34-C-20261111"
   },
   {
    "language": "ja",
@@ -11430,8 +11437,8 @@
    "row_source": "official",
    "row_url": "https://www.pokemon-card.com/card-search/details.php/card/36539/regu/all",
    "image_url": "https://www.pokemon-card.com/assets/images/card_images/large/SML/036539_E_KIHONMIZUENERUGI.jpg",
-   "status": "missing",
-   "note": "unnumbered basic energy; official list only; low priority"
+   "status": "done",
+   "note": "added in PS-CATALOGUE-EN-JA-REC34-C-20261111"
   },
   {
    "language": "ja",
@@ -11444,8 +11451,8 @@
    "row_source": "official",
    "row_url": "https://www.pokemon-card.com/card-search/details.php/card/42944/regu/all",
    "image_url": "https://www.pokemon-card.com/assets/images/card_images/large/S12a/042944_E_KIHONKUSAENERUGI.jpg",
-   "status": "check",
-   "note": "ours 258 equals TCGdex; Bulbapedia counts 262; possibly missing"
+   "status": "done",
+   "note": "added in PS-CATALOGUE-EN-JA-REC34-C-20261111"
   },
   {
    "language": "ja",
@@ -11458,8 +11465,8 @@
    "row_source": "official",
    "row_url": "https://www.pokemon-card.com/card-search/details.php/card/42945/regu/all",
    "image_url": "https://www.pokemon-card.com/assets/images/card_images/large/S12a/042945_E_KIHONHONOOENERUGI.jpg",
-   "status": "check",
-   "note": "ours 258 equals TCGdex; Bulbapedia counts 262; possibly missing"
+   "status": "done",
+   "note": "added in PS-CATALOGUE-EN-JA-REC34-C-20261111"
   },
   {
    "language": "ja",
@@ -11472,8 +11479,8 @@
    "row_source": "official",
    "row_url": "https://www.pokemon-card.com/card-search/details.php/card/42946/regu/all",
    "image_url": "https://www.pokemon-card.com/assets/images/card_images/large/S12a/042946_E_KIHONMIZUENERUGI.jpg",
-   "status": "check",
-   "note": "ours 258 equals TCGdex; Bulbapedia counts 262; possibly missing"
+   "status": "done",
+   "note": "added in PS-CATALOGUE-EN-JA-REC34-C-20261111"
   },
   {
    "language": "ja",
@@ -11486,8 +11493,8 @@
    "row_source": "official",
    "row_url": "https://www.pokemon-card.com/card-search/details.php/card/42947/regu/all",
    "image_url": "https://www.pokemon-card.com/assets/images/card_images/large/S12a/042947_E_KIHONKAMINARIENERUGI.jpg",
-   "status": "check",
-   "note": "ours 258 equals TCGdex; Bulbapedia counts 262; possibly missing"
+   "status": "done",
+   "note": "added in PS-CATALOGUE-EN-JA-REC34-C-20261111"
   }
  ]
 }
