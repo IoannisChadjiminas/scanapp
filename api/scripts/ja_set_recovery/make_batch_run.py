@@ -47,7 +47,8 @@ def image_file(row, entry, key):
     if "pokemon-card.com" in (row.get("image_url") or ""):
         return Path(entry["image_dir"]) / (entry["source_set"] + "_" + row["image_url"].rsplit("/", 1)[-1])
     suffix = f"{int(key):03d}" if key.isdigit() else key
-    return Path(entry["image_dir"]) / f"{entry['source_set']}_{suffix}.png"
+    extension = entry.get("image_extension", "png")  # TCG Collector images are .webp
+    return Path(entry["image_dir"]) / f"{entry['source_set']}_{suffix}.{extension}"
 
 
 def main(run_dir, catalogue_path, spec_path):
