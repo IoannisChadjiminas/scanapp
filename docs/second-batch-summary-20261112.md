@@ -3,7 +3,7 @@
 Work order: `docs/second-batch-agent-plan-20261111.md`. Staging only; production was not switched.
 
 ## Staging now
-Catalogue `PS-CATALOGUE-EN-JA-REC37-E-20261112` (schema `pokesingle_completion_20261111_jarec37`), 62,531 cards (was 61,975 on JAREC18).
+Catalogue `PS-CATALOGUE-EN-JA-REC42-J-20261113` (schema `pokesingle_completion_20261111_jarec42`), 62,784 cards (was 61,975 on JAREC18).
 Code: main `a916be4`, 20 flags unchanged.
 
 | Batch | Release | Added | Scannable / alternatives / display-only | Rollback folder | Record |
@@ -16,18 +16,18 @@ Code: main `a916be4`, 20 flags unchanged.
 | C product energies | REC34-C | 76 | 6 / 52 / 18 | `.../second-batch-c-20261111` | `second-batch-c-20261111.md` |
 | D English rows | REC36-D | 7 | 2 / 0 / 5 | `.../second-batch-d-20261112` | `second-batch-d-e-20261112.md` |
 | E `M6a` secret rares with official images | REC37-E | 9 | 9 / 0 / 0 | `.../second-batch-e-20261112` | `second-batch-d-e-20261112.md` |
+| F 30th Celebration rest, LEGEND decks (TCG Collector) | REC38-F | 74 | 55 / 19 / 0 | `.../second-batch-f-20261113` | `second-batch-f-20261113.md` |
+| G+H+I+J, one replay: 4 English images, `MG` deck set 38, Delta Reign 141, 38 images for existing rows | REC42-J | 179 new + 42 images | see record | `.../second-batch-j-20261113` | `second-batch-j-20261113.md` |
 
 Every switch passed: right -> wrong 0, right card always offered, no cell lower, wrong-first upper bound 1.5% / 1.6% / 0.4%.
-Rows file: 556 `done`, 261 `left_out`, each with its reason.
+Rows file: 811 `done`, 6 `left_out`, each with its reason.
 
-## Left out (261 rows)
-- **`M6a` without a usable image, 36 rows** (104-135, 151, Mew B/G/R): the official folder has only the regular prints; as image-less rows they lowered stored answers (batch B).
-- **LEGEND-era decks, 40 rows** (`L2-Sb`, `L2-Sh`): only 162 x 226 thumbnails exist where found; same effect as image-less rows.
-- **Folder `MG`, 38 rows:** product name not established.
-- **Vending Series 3 Kadabra, Haunter (2):** Bulbagarden image needs the owner's Chrome.
-- **A4, 4 rows:** SP promos whose held print is not known.
-- **Delta Reign, 141 rows:** TCGdex still has no art (checked 2026-11-12).
-- **D3** (McDonald's 2013, count-only sets): on the browser worklist.
+## Left out (6 rows)
+- **4 Sword & Shield promos** (ホップ, きずぐすり, モンスターボール, ビート): two prints each; our single row has no image or number, so which print we hold is not known.
+- **Vending Series 3 Kadabra, Haunter:** Bulbagarden has both prints of each; same reason.
+- **D3** (McDonald's 2013, count-only English sets): on the browser worklist; not rows of the rows file.
+
+Delta Reign uses TCG Collector images until TCGdex publishes art; the TCGdex ids are kept so the mirror job can replace them.
 
 ## What the work learned
 - A gate replay must not run on a loaded machine: at load 19 (five containers plus builds) answers flip. Four containers at 3 CPUs each is stable.
