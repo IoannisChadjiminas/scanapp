@@ -17,6 +17,15 @@ content-derived version directory. The version file hashes the other three
 files; a future publication manifest must hash all four, including the version
 file itself.
 
+The meta file has eight columns: the six the app reads (`id, name, number,
+printed_number, set_total, language`) plus `promo_code` and `row_kind`. A fraction
+printed on the card sets `set_total`; Japanese promo rows carry their code
+(`SV-P`) and no total. The build fails on rows the checks cannot account for:
+pass `--allow-exceptions export_exceptions.json` (the known rows of catalogue K)
+and `--report <file>` to see the counts. `--exclude digital,language,duplicate`
+cuts a subset index (`app/phone_index_subset.py`); only a server with the subset
+rule in its manifest route serves one. See `docs/phone-index-review-20261114.md`.
+
 Run `check_compressed_index.py` against the *same* exported vectors, catalogue,
 and model using `--index-dir`, `--catalog`, `--model`, and `--phone-index`, along
 with the required scan corpus arguments. The comparison verifies that the
