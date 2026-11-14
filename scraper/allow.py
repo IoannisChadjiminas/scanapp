@@ -18,7 +18,7 @@ def cardmarket_product(url: str) -> bool:
     )
 
 
-_LISTING_PARAMS = {"page", "site", "perPage", "sortBy", "sortDir", "language", "idExpansion", "idRarity"}
+_LISTING_PARAMS = {"page", "site", "perPage", "perSite", "mode", "sortBy", "sortDir", "language", "idExpansion", "idRarity"}
 
 
 def cardmarket_expansion_listing(url: str) -> bool:
@@ -44,7 +44,11 @@ def cardmarket_expansion_listing(url: str) -> bool:
     if len({key for key, _ in pairs}) != len(pairs):
         return False
     for key, value in pairs:
-        if key in {"page", "site", "perPage", "idExpansion", "idRarity", "language"} and not value.isdecimal():
+        if key in {"page", "site", "perPage", "perSite", "idExpansion", "idRarity", "language"} and not value.isdecimal():
+            return False
+        if key == "mode" and value != "list":  # the list view: 50 rows a page, product id on each row
+            return False
+        if key == "perSite" and int(value) > 50:
             return False
     if len(bits) == 4 and route == ["pokemon", "products", "singles"]:
         return any(key == "idExpansion" for key, _ in pairs)
