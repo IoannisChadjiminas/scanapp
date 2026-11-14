@@ -45,12 +45,26 @@ def test_export_preserves_rows_and_hashes(tmp_path, monkeypatch):
     target = exporter.export(snapshot, catalogue, catalogue, model, tmp_path / 'output')
     assert (target / 'card_index.ids.txt').read_text() == 'en:b\nen:a\n'
     assert (target / 'card_index.meta.tsv').read_text().splitlines() == [
-        exporter.HEADER.rstrip('\n'), 'en:b\tBeta\t2\t02\t100\ten\t\t', 'en:a\tAlpha\t1\t\t100\ten\t\t']
+        exporter.HEADER.rstrip('\n'), 'en:b\tBeta\t2\t02\t100\ten\t\t\t\t', 'en:a\tAlpha\t1\t\t100\ten\t\t\t\t']
     assert np.fromfile(target / 'card_index.f16.bin', dtype='<f2').reshape(2, 384)[1, 1] == 1
     version = json.loads((target / 'card_index.version.json').read_text())
     for name, info in version['files'].items():
         assert info == {'bytes': (target / name).stat().st_size, 'sha256': exporter.digest(target / name)}
     assert exporter.export(snapshot, catalogue, catalogue, model, tmp_path / 'output') == target
+
+
+def test_alt_name_and_printing_family_are_appended(tmp_path, monkeypatch):
+    snapshot, catalogue, model = fixture(tmp_path, monkeypatch)
+    with sqlite3.connect(catalogue) as db:
+        db.execute('ALTER TABLE cards ADD COLUMN view_title TEXT')
+        db.execute("UPDATE cards SET name='ベータ', view_title='Beta' WHERE id='en:b'")
+        db.execute("UPDATE cards SET view_title='Alpha' WHERE id='en:a'")
+    target = exporter.export(snapshot, catalogue, catalogue, model, tmp_path / 'output',
+                             families={'en:a': 'en:a', 'en:b': 'en:a'})
+    lines = (target / 'card_index.meta.tsv').read_text().splitlines()
+    assert lines[1:] == ['en:b\tベータ\t2\t02\t100\ten\t\t\tBeta\ten:a', 'en:a\tAlpha\t1\t\t100\ten\t\t\t\ten:a']
+    assert all(len(line.split('\t')) == 10 for line in lines)
+    assert lines[1].split('\t')[:6] == ['en:b', 'ベータ', '2', '02', '100', 'en']  # what the app reads
 
 
 def test_rejects_changed_snapshot_without_publishing(tmp_path, monkeypatch):

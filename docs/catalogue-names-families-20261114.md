@@ -1,0 +1,129 @@
+# Japanese names, printing families and zh-tw rows (2026-11-14)
+
+The owner approved the three open review items ("ok lets proceed now with these steps"). This release
+builds on the clean-up release (`docs/catalogue-cleanup-20261114.md`):
+- It gives 7,681 Japanese rows their printed Japanese name.
+- It records printing families.
+
+Production is not touched. Vectors, ids, images and links are unchanged.
+
+## Switch
+
+@@SWITCH@@
+
+## 1. Japanese names
+
+**Target:** every `ja:` catalogue row whose name has no kana or kanji. That is 14,438 rows: 10,272 in the phone index plus 4,166 without a vector.
+
+**Sources:**
+
+| Source | What it holds for these rows |
+|---|---|
+| TCGdex ja | Nothing. Its Japanese sets for these rows list no cards (for example `/v2/ja/sets/S3a`: `cards: []`). These are the sets the recovery filled from English checklists. |
+| TCG Collector | English names for Japanese cards; automated requests are refused (403). |
+| Bulbapedia set lists | English card names only. Each card page states the Japanese name; see "Not done". |
+| Limitless JP set lists (`limitlesstcg.com/cards/jp/<set>`) | Set code, printed number and the Japanese name for 264 sets (20,169 cards), BW era onward. Pages were saved on 2026-11-11 for the outside-list check. |
+
+**Rule** (`api/scripts/ja_set_recovery/match_ja_names.py`, deterministic):
+1. **Join** only on set plus printed number, never on a name.
+2. **Choose the set.** Each of our sets maps to the Limitless set where the most rows agree. The mapping is used only when at least 70% of the rows that find their number agree. 173 sets are mapped, including split sets such as `BW5-Brz` → `BW5z` and `XY11-Bb` → `XY11b`.
+3. **Accept a name** only when it agrees with the row's English name:
+   - `pair`: the same English/Japanese pair already exists on another Japanese row of the catalogue.
+   - `species`: the English name's species translates (`ja_species_names.json`) into the Japanese name, with the same suffix (V, VMAX, VSTAR, GX, EX, ex, BREAK, …).
+   - `set-aligned`: a name with no species in it (trainers, energies, species missing from the table), only from a set where at least 85% of numbered rows agree.
+4. **Mega cards.** A Mega card whose source name has no Mega prefix is not accepted. Limitless drops it on XY Mega EX (CP6/91 is listed as `リザードンEX`).
+
+Spelling is kept as the source prints it (`ガラル デスバーン` with a space). `view_title` keeps the English name, so English search still finds these rows.
+
+**Results:**
+
+| Result | Rows | In phone index |
+|---|---:|---:|
+| Name set from the source | 7,681 (pair 6,631, species 646, set-aligned 404) | 5,098 |
+| Source name is already the row's name (`N`, `AZ`: printed in Latin letters) | 5 | 5 |
+| Kept English: the source disagrees with the English name | 247 | 163 |
+| Kept English: number not on the mapped Limitless set (newest promos) | 702 | |
+| Kept English: set has no Limitless list (DP, Platinum, LEGEND, ADV, PCG, e-Card, `jr-*`, …) | 5,803 | |
+
+The two "number not on set" and "no Limitless list" groups together are 6,505 rows, 5,008 of them in the phone index.
+
+Each row that keeps its English name is listed, with its reason and any candidate Japanese name, in `docs/catalogue-names-20261114-kept-english.tsv`. The review rows are mostly Mega EX cards and deck sets whose numbering differs from Limitless. Each changed row's source and check is stored in the release record `catalogue-names-ja:PS-CATALOGUE-EN-JA-NAMES1-20261114`.
+
+Examples, checked by eye on samples of each kind:
+- `ja:S4a-254` Hattrem → テブリム
+- `ja:XY6-088` Winona → ナギ
+- `ja:S1a-016` Cinderace V → エースバーンV
+- `ja:SVOD-003` Steven's Carbink → ダイゴのメレシー
+- `ja:SMP-104` → シロデスナGX. Its English name was scraped text: `L18: 【30†Image: Palossand-GX`.
+
+**Phone and app:**
+- The phone index `name` column now carries the Japanese name for these rows.
+- A new last column, `alt_name`, carries the English title.
+- The app reads the first six columns (`PhoneCardMeta.parse` needs at least six and ignores the rest), so builds already shipped keep working.
+- No column was reordered.
+
+## 2. Printing families
+
+**Rule** (`api/scripts/ja_set_recovery/printing_families.py`, `printing-family-v1`, deterministic):
+- **Members:**
+  - Prize Pack rows `en:PPS<n>-<CODE>-<NUM>`: 983 rows.
+  - Stamped rows whose `variants_json` names a `printed_set` and a `stamp` (Trick or Trade 2022–2024): 89 rows.
+- **Base:** the regular row with the same number in the set that `<CODE>` stands for. A code maps to the English set where the most members find a row of the same name at the same number. It is used only when at least 80% do; 50 of 51 codes map.
+- **Join:** a member joins its base only if the names are equal (case and punctuation ignored) and the art is the same.
+  - Same art means a cosine of at least 0.70 between the two catalogue vectors.
+  - Every pair between 0.70 and 0.88 was checked by eye on contact sheets (39 pairs). All are the same art; the stamp lowers the score.
+  - The next pairs down, 0.38–0.43, are rows whose reference image is a card back.
+- The family id is the base row's id. Any other row is its own family.
+
+**Results:**
+- 991 members joined (Prize Pack 916, stamped 75) into 749 families: 523 of 2 rows, 210 of 3, 16 of 4.
+- Cosine median 0.968, lowest 0.736.
+- 81 members were left out, each with a reason in `docs/printing-families-20261114-left-out.tsv`:
+  - 61 have no base set: the basic energies `SVE`, and the Trick or Trade copies of `SWSH10`, whose names agree with the base set at the same number too rarely.
+  - 16 have no base row with the same name.
+  - 4 have a card-back image: `en:PPS2-BRS-064`, `en:PPS3-LOR-118`, `en:PPS3-LOR-119`, `en:PPS3-SVI-076`. Their reference image and vector are a card back; see "Not done".
+- Japanese rows have no Prize Pack or Trick or Trade copies in the catalogue, so all their families are single rows.
+
+**Storage:**
+- **Catalogue:** the reference_metadata record `printing-families` holds `{card_id: family_id}` for the 1,740 rows in a family, with the rule. Every release builder copies it. The API loader does not read it, so recognition and answers cannot change.
+- **Phone index:** a new last column, `printing_family`, filled from that record (`export_index.py --families`).
+- **API:** exposing the family needs a code change that is not deployed. Staging runs `main`.
+
+## 3. zh-tw rows
+
+- **Recognition:** 7,436 `zh-tw` catalogue rows, 2,260 with a vector.
+  - No `zh-tw` vector equals a `ja:` vector: the highest cosine to any `ja:` row is below 0.999 for every one.
+  - The median is 0.971: same artwork, but the card text is Chinese.
+  - So none is a duplicate in the sense of the 561 unprefixed rows, and all 2,260 stay in recognition. They are distinct images, marked `row_kind=language` in the phone index.
+- **Start Deck 100 links:** 59 `zh-tw:SI-*` rows hold the Cardmarket page of Start Deck 100 (`sI100<NNN>`).
+  - Each matching `ja:SI-<NNN>` row exists and has no link. The recovery held them because the URL was already on a catalogue card.
+  - The request named 4 links, but the catalogue has 59.
+  - **Not moved:** the rule is to move a link only after checking the product photo by eye. Cardmarket showed a "Verify you are human" check in the browser, which the agent does not answer. All 59 go on the owner's browser worklist, `docs/zh-tw-links-worklist-20261114.tsv`.
+- **Other links:** 38 other `zh-tw` rows carry a Cardmarket link from the `helper-expansion` provenance.
+  - 5 point to the same card on a Japanese product (`SK-008` Crobat V, `SLD-008` Darkrai VSTAR, `SLL-005` Lucario VSTAR, `SP6-004` Zacian VSTAR, `SP6-006` Zamazenta VSTAR). These belong with the photo check above.
+  - 33 point to a different card. Examples:
+    - `zh-tw:S10D-032` 怪力V → ADV Donphan
+    - `zh-tw:S4a-124` → Iono SVP124
+
+    These 33 should be removed. Nothing was changed. All 97 links are in `docs/zh-tw-links-worklist-20261114.tsv`.
+
+## Gate
+
+@@GATE@@
+
+## Phone index
+
+@@PHONE@@
+
+## Going back
+
+@@BACK@@
+
+## Not done
+
+- **Japanese names for the 6,505 rows with no Limitless list.** These are the DP, Platinum, LEGEND, ADV, PCG and `jr-*` sets. Bulbapedia's card pages state the Japanese name, and the saved set lists link each set number to its card page. A follow-up can fetch those pages (MediaWiki API, 50 per request) and apply the same check.
+- **The 247 review rows** need a look: XY Mega EX, and deck sets numbered differently on Limitless.
+- **59 Start Deck 100 links:** move them to `ja:SI-*` after the product photos are checked in the owner's browser.
+- **33 wrong `zh-tw` links:** remove them in a links-only release. The 5 same-card Japanese products wait for the same photo check as the 59.
+- **4 Prize Pack rows with a card-back image:** `en:PPS2-BRS-064`, `en:PPS3-LOR-118`, `en:PPS3-LOR-119`, `en:PPS3-SVI-076` need their real image and vector.
+- **API exposure of `printing_family`, and the app using it** to count printings once.

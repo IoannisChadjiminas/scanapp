@@ -6,10 +6,15 @@ The output is an offline candidate; do not publish it until the parity gate and
 device tests in the shipping plan pass.
 
 card_index.meta.tsv columns: id, name, number, printed_number, set_total, language,
-promo_code, row_kind. The app reads the first six and ignores the rest. set_total is the
+promo_code, row_kind, alt_name, printing_family. The app reads the first six and ignores the
+rest, so columns are only ever appended. set_total is the
 total printed on the card when printed_number (or number) carries a fraction, else the
 operational total; Japanese promo rows carry their code ("SV-P") in promo_code and no total.
 row_kind is app.phone_index_subset's kind (digital, language, duplicate, reference or empty).
+alt_name is the catalogue's view_title when it differs from name (the English title of a Japanese
+row), for search. printing_family is the family id from --families (the regular print's id, shared
+with its Prize Pack and stamped copies; see docs/catalogue-names-families-20261114.md), empty for a
+row that is a family of its own.
 
 The build fails when a row breaks a check (CHECKS: an id without a language prefix, a ja row
 without a Japanese name, a printed fraction without a total or code, a digital set) unless the
@@ -32,7 +37,7 @@ import numpy as np
 
 MODEL_ID = '2ddf6ec79e37'
 DIMENSIONS = 384
-HEADER = '#id\tname\tnumber\tprinted_number\tset_total\tlanguage\tpromo_code\trow_kind\n'
+HEADER = '#id\tname\tnumber\tprinted_number\tset_total\tlanguage\tpromo_code\trow_kind\talt_name\tprinting_family\n'
 
 # Loaded by path so the exporter also runs from a copied folder (api/app/phone_index_subset.py).
 _spec = importlib.util.spec_from_file_location(
@@ -93,10 +98,10 @@ def row_identity(number: str, printed: str, language: str, set_id: str,
 
 
 def check_rows(rows: list[tuple[str, ...]]) -> dict[str, list[str]]:
-    """Rows that break a build rule, by rule. A row is (id, name, number, printed_number,
+    """Rows that break a build rule, by rule. A row starts (id, name, number, printed_number,
     set_total, language, promo_code, row_kind)."""
     found = {name: [] for name in CHECKS}
-    for card_id, name, number, printed, total, language, code, kind in rows:
+    for card_id, name, number, printed, total, language, code, kind, *_ in rows:
         if ':' not in card_id:
             found['unprefixed_id'].append(card_id)
         if (language == 'ja' or card_id.startswith('ja:')) and not _JAPANESE.search(name):
@@ -116,7 +121,7 @@ def check_failures(found: dict[str, list[str]], allowed: dict[str, list[str]]) -
 
 def export(snapshot_dir: Path, catalogue: Path, totals_db: Path, model: Path, out: Path,
            *, exclude: tuple[str, ...] = (), allowed: dict[str, list[str]] | None = None,
-           report: Path | None = None) -> Path:
+           report: Path | None = None, families: dict[str, str] | None = None) -> Path:
     manifest = json.loads((snapshot_dir / 'manifest.json').read_text())
     if manifest.get('preprocess_config') != 'pad' or manifest.get('embedding_dim') != DIMENSIONS:
         raise ValueError('Expected a 384-dimensional pad snapshot')
@@ -142,8 +147,9 @@ def export(snapshot_dir: Path, catalogue: Path, totals_db: Path, model: Path, ou
     with sqlite3.connect(f'{catalogue.resolve().as_uri()}?mode=ro', uri=True) as db:
         columns = {row[1] for row in db.execute('PRAGMA table_info(cards)')}
         printed = 'printed_collector_number' if 'printed_collector_number' in columns else "''"
+        title = 'view_title' if 'view_title' in columns else "''"
         cards = {row[0]: row for row in db.execute(
-            f'SELECT id, name, collector_number, {printed}, language, set_id FROM cards')}
+            f'SELECT id, name, collector_number, {printed}, language, set_id, {title} FROM cards')}
     with sqlite3.connect(f'{totals_db.resolve().as_uri()}?mode=ro', uri=True) as db:
         totals = {(str(lang).casefold(), str(set_id).split(':')[-1].casefold()): total
                   for lang, set_id, total in db.execute(
@@ -159,10 +165,12 @@ def export(snapshot_dir: Path, catalogue: Path, totals_db: Path, model: Path, ou
     kinds = dict(zip(ids, subset.row_kinds(ids)))
     rows = []
     for card_id in kept:
-        _, name, number, printed_number, lang, set_id = (clean(v) for v in cards[card_id])
+        _, name, number, printed_number, lang, set_id, view_title = (clean(v) for v in cards[card_id])
+        alt_name = view_title if view_title and view_title != name else ''
         catalogue_total = totals.get((str(lang or 'en').casefold(), set_id.split(':')[-1].casefold()))
         total, code = row_identity(number, printed_number, lang, set_id, catalogue_total)
-        rows.append((clean(card_id), name, number, printed_number, total, lang, code, kinds[card_id]))
+        rows.append((clean(card_id), name, number, printed_number, total, lang, code, kinds[card_id],
+                     alt_name, clean((families or {}).get(card_id, ''))))
     found = check_rows(rows)
     failures = check_failures(found, allowed or {})
     if report is not None:
@@ -224,10 +232,14 @@ def main() -> None:
     p.add_argument('--allow-exceptions', type=Path,
                    help='JSON {check: [ids]} of known rows each check lets through; any other row fails the build')
     p.add_argument('--report', type=Path, help='write the check results (counts and ids) here')
+    p.add_argument('--families', type=Path,
+                   help='JSON with "family": {card_id: family_id} (the catalogue\'s printing-families record)')
     a = p.parse_args()
+    families = json.loads(a.families.read_text())['family'] if a.families else None
     allowed = json.loads(a.allow_exceptions.read_text()) if a.allow_exceptions else {}
     print(export(a.snapshot_dir, a.catalogue, a.totals_db, a.model, a.out,
-                 exclude=tuple(x for x in a.exclude.split(',') if x), allowed=allowed, report=a.report))
+                 exclude=tuple(x for x in a.exclude.split(',') if x), allowed=allowed, report=a.report,
+                 families=families))
 
 
 if __name__ == '__main__':
