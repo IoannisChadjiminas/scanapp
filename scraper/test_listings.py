@@ -199,3 +199,13 @@ def test_master_index_returns_named_expansions_and_excludes_products_and_foreign
         <a href="/en/Pokemon/Expansions/Real-Set">Real Set</a>''')
     assert result['outcome'] == 'listing_links'
     assert result['expansions'] == [{'url': url + '/Real-Set', 'name': 'Real Set'}]
+
+
+def test_list_view_product_id_comes_from_the_row():
+    from listings import parse_expansion_listing
+    html = ('<table><tr id="productRow907869"><td><a href="/en/Pokemon/Products/Singles/30th-Celebration-JP/'
+            'Alolan-Exeggutor-V2-m6a104">Alolan Exeggutor (m6a 104)</a></td></tr>'
+            '<tr id="productRow907870"><td><a href="/en/Pokemon/Products/Singles/30th-Celebration-JP/'
+            'Moltres-V2-m6a105">Moltres</a></td></tr></table>')
+    out = parse_expansion_listing('https://www.cardmarket.com/en/Pokemon/Products/Singles/30th-Celebration-JP?mode=list', html)
+    assert [p.get("product_id") for p in out["products"]] == ["907869", "907870"]

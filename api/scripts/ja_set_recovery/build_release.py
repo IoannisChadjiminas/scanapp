@@ -17,13 +17,15 @@ Scannable/alternative split comes from RUN_DIR/index-decision.json (decide_looka
 """
 import hashlib
 import json
+import os
 import shutil
 import sys
 from pathlib import Path
 
 import numpy as np
 
-IMAGE_DIR = "/data/reference-images/ja-20261107-recovery"
+IMAGE_DIR = os.environ.get("JAREC_IMAGE_DIR", "/data/reference-images/ja-20261107-recovery")
+LANG = os.environ.get("JAREC_LANGUAGE", "ja")
 PROFILES = ("conventional_window", "broad_center_hypothesis")
 
 
@@ -79,7 +81,7 @@ def main(run_dir, parent_dir, name):
     # pad vectors: parent order, then scannable ids
     ids = list(p_ids) + scannable
     assert len(ids) == len(set(ids))
-    pad = np.concatenate([p_pad.astype(np.float32), np.asarray([n_pad[pos[c]] for c in scannable], np.float32)])
+    pad = np.concatenate([p_pad.astype(np.float32), np.asarray([n_pad[pos[c]] for c in scannable], np.float32).reshape(-1, 384)])
     vdir = out / "vectors/pad"
     vdir.mkdir(parents=True)
     np.save(vdir / "embedding_card_ids.npy", np.asarray(ids, dtype=str))
@@ -92,7 +94,7 @@ def main(run_dir, parent_dir, name):
         missing_images=pman["missing_images"] + len(cards) - with_image,
         embeddings_sha256=sha_file(vdir / "embeddings.npy"), ids_sha256=sha_file(vdir / "embedding_card_ids.npy"),
         parent_embeddings_sha256=pman["embeddings_sha256"], parent_ids_sha256=pman["ids_sha256"],
-        retrieval_segments=list(pman["retrieval_segments"]) + [len(scannable)],
+        retrieval_segments=list(pman["retrieval_segments"]) + ([len(scannable)] if scannable else []),  # an empty segment is not a valid lineage
         catalogue_version=pman["catalogue_version"] + "-ja-recovery-" + name,
     )
     (vdir / "manifest.json").write_text(json.dumps(new_pman, ensure_ascii=False) + "\n")
@@ -106,13 +108,13 @@ def main(run_dir, parent_dir, name):
         for profile in PROFILES:
             rec, vec = art_by[(cid, profile)]
             assert rec["reference_sha256"] == image_sha[cid]
-            add_recs.append({"card_id": cid, "profile": profile, "language": "ja", "name": card["name"],
+            add_recs.append({"card_id": cid, "profile": profile, "language": LANG, "name": card["name"],
                              "set_name": card["set_name"], "collector_number": card["collector_number"],
                              "reference_sha256": image_sha[cid]})
             add_vecs.append(vec)
     adir = out / "artwork"
     adir.mkdir()
-    np.save(adir / "embeddings.npy", np.concatenate([p_art.astype(np.float32), np.asarray(add_vecs, np.float32)]))
+    np.save(adir / "embeddings.npy", np.concatenate([p_art.astype(np.float32), np.asarray(add_vecs, np.float32).reshape(-1, 384)]))
     all_recs = p_recs + add_recs
     (adir / "records.json").write_text(json.dumps(all_recs, ensure_ascii=False, separators=(",", ":")))
     new_aman = dict(aman)
@@ -143,6 +145,7 @@ def main(run_dir, parent_dir, name):
         "release": name, "image_dir": IMAGE_DIR, "new_cards": len(cards), "with_image": with_image,
         "scannable": len(scannable), "printing_alternatives": with_image - len(scannable),
         "no_image": len(cards) - with_image, "pad_vectors": len(ids), "artwork_regions": len(all_recs),
+        "cards_total": new_pman["card_count"],
         "files": {str(p.relative_to(out)): sha_file(p) for p in sorted(out.rglob("*"))
                   if p.is_file() and not p.is_relative_to(img_dir)},
         "images_bytes": sum(p.stat().st_size for p in img_dir.iterdir()),

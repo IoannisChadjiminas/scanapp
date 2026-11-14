@@ -20,6 +20,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import os
 import shutil
 import sys
 from pathlib import Path
@@ -38,6 +39,7 @@ sys.path.insert(0, str(REPO))
 from catalogue.bootstrap.checks import BLUR_LIMIT, MIN_SIDE, load_facts  # noqa: E402
 
 CHUNK = 500
+LANG = os.environ.get("JAREC_LANGUAGE", "ja")
 
 
 def vh(vector: np.ndarray) -> str:
@@ -83,7 +85,7 @@ def main(run_dir: str, model_path: str, share: str | None = None) -> None:
                     assert vector.shape == (384,) and np.isfinite(vector).all()
                     arts.append(vector)
                     records.append({
-                        "card_id": card["id"], "profile": profile, "language": "ja",
+                        "card_id": card["id"], "profile": profile, "language": LANG,
                         "name": card["name"], "set_name": card["set_name"],
                         "collector_number": card["collector_number"],
                         "source_vector_sha256": vh(vector), "source_file": card["local_file"],
@@ -103,9 +105,10 @@ def main(run_dir: str, model_path: str, share: str | None = None) -> None:
         return
 
     parts = [np.load(chunks / f"{s:05d}.npz") for s in range(0, len(cards), CHUNK)]
-    pad = np.concatenate([p["pad"] for p in parts])
-    square = np.concatenate([p["square"] for p in parts])
-    arts = np.concatenate([p["art"] for p in parts])
+    empty = np.zeros((0, 384), np.float32)  # a batch with no usable image (display-only rows) has no chunks
+    pad = np.concatenate([p["pad"] for p in parts]) if parts else empty
+    square = np.concatenate([p["square"] for p in parts]) if parts else empty
+    arts = np.concatenate([p["art"] for p in parts]) if parts else empty
     records = [json.loads(r) for p in parts for r in p["records"]]
     ids = np.asarray([card["id"] for card in cards], dtype=str)
     assert len(pad) == len(square) == len(ids) and len(arts) == len(records) == len(ids) * len(PROFILES)

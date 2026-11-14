@@ -27,6 +27,7 @@ SOURCE_RANK = [  # tie-break only; resolution decides first
     "linked_source_files", "alternate_source_files", "binderboss_source_files",
     "supercartas_source_files", "pokemon_tcg_io_source_files", "tcgdex_high_resolution_files",
     "tcgstats_source_files", "pokedatavault_source_files", "local_reference_files",
+    "limitless_source_files",
 ]
 REPO = Path(__file__).resolve().parents[3]
 UPGRADE_BELOW = 500
