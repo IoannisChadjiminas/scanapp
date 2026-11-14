@@ -101,6 +101,11 @@ Two more unprefixed catalogue rows (`s8b`, `sm9`) have no vector. The app alread
 Marked now: `row_kind` `duplicate` (561) and `reference` (6). Dropping the 561 from the phone index is the
 subset rule above (`duplicate`).
 
+**Update, later on 2026-11-14:** done through the clean-up release recorded in
+`docs/catalogue-cleanup-20261114.md`. It removes the 561, the ten `M-P` duplicates of MP1 and four of the extras, and
+it takes the vectors off the Pocket rows. It was switched on staging after the gate, and phone index `d40042cb…` was published.
+The paragraph below is the state before that.
+
 **Not done: dropping the 561 from the server's vectors through a catalogue release.** The release tooling here
 adds rows and fixes labels or links (`prepare_sql.py`, `prepare_sql_fixes.py`); none removes vectors. A removal
 release has to delete the 561 `card_embeddings` rows and rewrite the pad vector manifest (`indexed_ids`,
