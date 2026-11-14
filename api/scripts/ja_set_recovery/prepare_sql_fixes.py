@@ -120,6 +120,12 @@ def main(fixes_file, role_file, out_dir):
         f"SELECT url, card_id FROM {PARENT}.cardmarket_products WHERE matched = 1 AND url = ANY(%s)", (relinks,)).fetchall())
     conn.close()
 
+    # A link cleared in this batch frees its page and product id, so another row of the same batch can
+    # take them (a link moved from one row to another); rows are otherwise processed in id order.
+    for cid, fix in fixes.items():
+        if fix.get("clear_link"):
+            urls_in_use.discard(by_id[cid]["cardmarket_url"])
+            ids_in_use.discard(by_id[cid]["cardmarket_id"])
     updates = []
     for cid, fix in sorted(fixes.items()):
         row = by_id[cid]

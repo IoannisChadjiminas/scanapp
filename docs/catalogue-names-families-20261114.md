@@ -1,11 +1,15 @@
 # Japanese names, printing families and zh-tw rows (2026-11-14)
 
-The owner approved the three open review items ("ok lets proceed now with these steps"). This release
-builds on the clean-up release (`docs/catalogue-cleanup-20261114.md`):
-- It gives 7,681 Japanese rows their printed Japanese name.
-- It records printing families.
+The owner approved the three open review items ("ok lets proceed now with these steps"). Two releases
+build on the clean-up release (`docs/catalogue-cleanup-20261114.md`). They were gated together and
+switched once, on the second:
+- **NAMES1** (`pokesingle_completion_20261114_names1` / `PS-CATALOGUE-EN-JA-NAMES1-20261114`): gives
+  7,681 Japanese rows their printed Japanese name and records printing families.
+- **LINKS1** (`pokesingle_completion_20261114_links1` / `PS-CATALOGUE-EN-JA-LINKS1-20261114`, parent
+  NAMES1): moves 59 Start Deck 100 Cardmarket links from `zh-tw:SI-*` to `ja:SI-*` and clears the other
+  38 `zh-tw` links.
 
-Production is not touched. Vectors, ids, images and links are unchanged.
+Production is not touched. Vectors, ids and images are unchanged.
 
 ## Switch
 
@@ -98,14 +102,21 @@ Examples, checked by eye on samples of each kind:
 - **Start Deck 100 links:** 59 `zh-tw:SI-*` rows hold the Cardmarket page of Start Deck 100 (`sI100<NNN>`).
   - Each matching `ja:SI-<NNN>` row exists and has no link. The recovery held them because the URL was already on a catalogue card.
   - The request named 4 links, but the catalogue has 59.
-  - **Not moved:** the rule is to move a link only after checking the product photo by eye. Cardmarket showed a "Verify you are human" check in the browser, which the agent does not answer. All 59 go on the owner's browser worklist, `docs/zh-tw-links-worklist-20261114.tsv`.
+  - **Checked in the owner's Chrome** (the owner cleared Cardmarket's human check). The Start Deck 100 list view (150 rows) gives product id = 587710 + number with no exception. All 59 product photos were looked at by eye: each is the Japanese print (katakana name) of the same card. Three printed numbers were zoomed on (129, 173, 174 of 414). Decisions: `zh-tw-links-decisions-20261114.json` in the sessions' shared notes.
+  - **Moved in LINKS1:** each `ja:SI-<NNN>` gets the page and product id (`cardmarket_verified=1`, provenance `cardmarket-start-deck-100-photo-check-20261114`), and the `zh-tw` row's link is cleared. This also settles `ja:SI-169`, `-174`, `-301` and `-310`, which were held in batch K.
 - **Other links:** 38 other `zh-tw` rows carry a Cardmarket link from the `helper-expansion` provenance.
-  - 5 point to the same card on a Japanese product (`SK-008` Crobat V, `SLD-008` Darkrai VSTAR, `SLL-005` Lucario VSTAR, `SP6-004` Zacian VSTAR, `SP6-006` Zamazenta VSTAR). These belong with the photo check above.
+  - 5 point to the same card on a Japanese product (`SK-008` Crobat V, `SLD-008` Darkrai VSTAR, `SLL-005` Lucario VSTAR, `SP6-004` Zacian VSTAR, `SP6-006` Zamazenta VSTAR). The catalogue has no `ja:` row for these prints, so the links are cleared.
   - 33 point to a different card. Examples:
     - `zh-tw:S10D-032` 怪力V → ADV Donphan
     - `zh-tw:S4a-124` → Iono SVP124
 
-    These 33 should be removed. Nothing was changed. All 97 links are in `docs/zh-tw-links-worklist-20261114.tsv`.
+    These 33 are cleared.
+- **LINKS1 in numbers:**
+  - 156 card rows updated (59 links added, 97 cleared). No `zh-tw` row keeps a link.
+  - The builder (`prepare_sql_fixes.py`) now frees a cleared link before another row of the same batch takes it.
+  - The guard confirmed no new shared Cardmarket page.
+  - The 97 `cardmarket_url_helpers` rows of these `zh-tw` cards are kept as the history of where the old links came from, as in earlier link batches. The API does not read that table.
+  - All 97 links and their actions are in `docs/zh-tw-links-worklist-20261114.tsv`.
 
 ## Gate
 
@@ -123,7 +134,5 @@ Examples, checked by eye on samples of each kind:
 
 - **Japanese names for the 6,505 rows with no Limitless list.** These are the DP, Platinum, LEGEND, ADV, PCG and `jr-*` sets. Bulbapedia's card pages state the Japanese name, and the saved set lists link each set number to its card page. A follow-up can fetch those pages (MediaWiki API, 50 per request) and apply the same check.
 - **The 247 review rows** need a look: XY Mega EX, and deck sets numbered differently on Limitless.
-- **59 Start Deck 100 links:** move them to `ja:SI-*` after the product photos are checked in the owner's browser.
-- **33 wrong `zh-tw` links:** remove them in a links-only release. The 5 same-card Japanese products wait for the same photo check as the 59.
 - **4 Prize Pack rows with a card-back image:** `en:PPS2-BRS-064`, `en:PPS3-LOR-118`, `en:PPS3-LOR-119`, `en:PPS3-SVI-076` need their real image and vector.
 - **API exposure of `printing_family`, and the app using it** to count printings once.

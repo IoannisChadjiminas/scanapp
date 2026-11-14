@@ -1,0 +1,552 @@
+{
+ "checked_at": "2026-11-14",
+ "method": "Cardmarket Start Deck 100 list view in the owner Chrome (150 rows read: product id = 587710 + number, no exception); every one of the 59 product photos (product-images.s3.cardmarket.com/51/sI100/<id>/<id>.jpg) looked at by eye: Japanese print (katakana name), same Pokemon and card type; numbers zoomed on 129/414, 173/414, 174/414.",
+ "move": [
+  {
+   "from": "zh-tw:SI-018",
+   "to": "ja:SI-018",
+   "url": "https://www.cardmarket.com/en/Pokemon/Products/Singles/Start-Deck-100/Leafeon-VMAX-sI100018",
+   "product_id": 587728
+  },
+  {
+   "from": "zh-tw:SI-029",
+   "to": "ja:SI-029",
+   "url": "https://www.cardmarket.com/en/Pokemon/Products/Singles/Start-Deck-100/Trevenant-VMAX-sI100029",
+   "product_id": 587739
+  },
+  {
+   "from": "zh-tw:SI-045",
+   "to": "ja:SI-045",
+   "url": "https://www.cardmarket.com/en/Pokemon/Products/Singles/Start-Deck-100/Zarude-V-sI100045",
+   "product_id": 587755
+  },
+  {
+   "from": "zh-tw:SI-052",
+   "to": "ja:SI-052",
+   "url": "https://www.cardmarket.com/en/Pokemon/Products/Singles/Start-Deck-100/Flareon-VMAX-sI100052",
+   "product_id": 587762
+  },
+  {
+   "from": "zh-tw:SI-060",
+   "to": "ja:SI-060",
+   "url": "https://www.cardmarket.com/en/Pokemon/Products/Singles/Start-Deck-100/Victini-VMAX-sI100060",
+   "product_id": 587770
+  },
+  {
+   "from": "zh-tw:SI-063",
+   "to": "ja:SI-063",
+   "url": "https://www.cardmarket.com/en/Pokemon/Products/Singles/Start-Deck-100/Simisear-V-sI100063",
+   "product_id": 587773
+  },
+  {
+   "from": "zh-tw:SI-081",
+   "to": "ja:SI-081",
+   "url": "https://www.cardmarket.com/en/Pokemon/Products/Singles/Start-Deck-100/Kingler-VMAX-sI100081",
+   "product_id": 587791
+  },
+  {
+   "from": "zh-tw:SI-092",
+   "to": "ja:SI-092",
+   "url": "https://www.cardmarket.com/en/Pokemon/Products/Singles/Start-Deck-100/Suicune-V-sI100092",
+   "product_id": 587802
+  },
+  {
+   "from": "zh-tw:SI-119",
+   "to": "ja:SI-119",
+   "url": "https://www.cardmarket.com/en/Pokemon/Products/Singles/Start-Deck-100/Inteleon-V-sI100119",
+   "product_id": 587829
+  },
+  {
+   "from": "zh-tw:SI-126",
+   "to": "ja:SI-126",
+   "url": "https://www.cardmarket.com/en/Pokemon/Products/Singles/Start-Deck-100/Ice-Rider-Calyrex-VMAX-sI100126",
+   "product_id": 587836
+  },
+  {
+   "from": "zh-tw:SI-129",
+   "to": "ja:SI-129",
+   "url": "https://www.cardmarket.com/en/Pokemon/Products/Singles/Start-Deck-100/Pikachu-V-V1-sI100129",
+   "product_id": 587839
+  },
+  {
+   "from": "zh-tw:SI-130",
+   "to": "ja:SI-130",
+   "url": "https://www.cardmarket.com/en/Pokemon/Products/Singles/Start-Deck-100/Jolteon-V-sI100130",
+   "product_id": 587840
+  },
+  {
+   "from": "zh-tw:SI-137",
+   "to": "ja:SI-137",
+   "url": "https://www.cardmarket.com/en/Pokemon/Products/Singles/Start-Deck-100/Raikou-V-sI100137",
+   "product_id": 587847
+  },
+  {
+   "from": "zh-tw:SI-149",
+   "to": "ja:SI-149",
+   "url": "https://www.cardmarket.com/en/Pokemon/Products/Singles/Start-Deck-100/Tapu-Koko-V-sI100149",
+   "product_id": 587859
+  },
+  {
+   "from": "zh-tw:SI-150",
+   "to": "ja:SI-150",
+   "url": "https://www.cardmarket.com/en/Pokemon/Products/Singles/Start-Deck-100/Tapu-Koko-VMAX-sI100150",
+   "product_id": 587860
+  },
+  {
+   "from": "zh-tw:SI-155",
+   "to": "ja:SI-155",
+   "url": "https://www.cardmarket.com/en/Pokemon/Products/Singles/Start-Deck-100/Boltund-V-V1-sI100155",
+   "product_id": 587865
+  },
+  {
+   "from": "zh-tw:SI-156",
+   "to": "ja:SI-156",
+   "url": "https://www.cardmarket.com/en/Pokemon/Products/Singles/Start-Deck-100/Boltund-V-V2-sI100156",
+   "product_id": 587866
+  },
+  {
+   "from": "zh-tw:SI-160",
+   "to": "ja:SI-160",
+   "url": "https://www.cardmarket.com/en/Pokemon/Products/Singles/Start-Deck-100/Dracozolt-V-sI100160",
+   "product_id": 587870
+  },
+  {
+   "from": "zh-tw:SI-161",
+   "to": "ja:SI-161",
+   "url": "https://www.cardmarket.com/en/Pokemon/Products/Singles/Start-Deck-100/Dracozolt-VMAX-sI100161",
+   "product_id": 587871
+  },
+  {
+   "from": "zh-tw:SI-163",
+   "to": "ja:SI-163",
+   "url": "https://www.cardmarket.com/en/Pokemon/Products/Singles/Start-Deck-100/Galarian-Rapidash-V-sI100163",
+   "product_id": 587873
+  },
+  {
+   "from": "zh-tw:SI-169",
+   "to": "ja:SI-169",
+   "url": "https://www.cardmarket.com/en/Pokemon/Products/Singles/Start-Deck-100/Galarian-Articuno-V-V1-sI100169",
+   "product_id": 587879
+  },
+  {
+   "from": "zh-tw:SI-172",
+   "to": "ja:SI-172",
+   "url": "https://www.cardmarket.com/en/Pokemon/Products/Singles/Start-Deck-100/Espeon-V-sI100172",
+   "product_id": 587882
+  },
+  {
+   "from": "zh-tw:SI-173",
+   "to": "ja:SI-173",
+   "url": "https://www.cardmarket.com/en/Pokemon/Products/Singles/Start-Deck-100/Espeon-VMAX-sI100173",
+   "product_id": 587883
+  },
+  {
+   "from": "zh-tw:SI-174",
+   "to": "ja:SI-174",
+   "url": "https://www.cardmarket.com/en/Pokemon/Products/Singles/Start-Deck-100/Granbull-V-V1-sI100174",
+   "product_id": 587884
+  },
+  {
+   "from": "zh-tw:SI-188",
+   "to": "ja:SI-188",
+   "url": "https://www.cardmarket.com/en/Pokemon/Products/Singles/Start-Deck-100/Golurk-V-sI100188",
+   "product_id": 587898
+  },
+  {
+   "from": "zh-tw:SI-191",
+   "to": "ja:SI-191",
+   "url": "https://www.cardmarket.com/en/Pokemon/Products/Singles/Start-Deck-100/Sylveon-V-sI100191",
+   "product_id": 587901
+  },
+  {
+   "from": "zh-tw:SI-192",
+   "to": "ja:SI-192",
+   "url": "https://www.cardmarket.com/en/Pokemon/Products/Singles/Start-Deck-100/Sylveon-VMAX-sI100192",
+   "product_id": 587902
+  },
+  {
+   "from": "zh-tw:SI-198",
+   "to": "ja:SI-198",
+   "url": "https://www.cardmarket.com/en/Pokemon/Products/Singles/Start-Deck-100/Necrozma-V-sI100198",
+   "product_id": 587908
+  },
+  {
+   "from": "zh-tw:SI-204",
+   "to": "ja:SI-204",
+   "url": "https://www.cardmarket.com/en/Pokemon/Products/Singles/Start-Deck-100/Shadow-Rider-Calyrex-VMAX-sI100204",
+   "product_id": 587914
+  },
+  {
+   "from": "zh-tw:SI-217",
+   "to": "ja:SI-217",
+   "url": "https://www.cardmarket.com/en/Pokemon/Products/Singles/Start-Deck-100/Galarian-Zapdos-V-V1-sI100217",
+   "product_id": 587927
+  },
+  {
+   "from": "zh-tw:SI-221",
+   "to": "ja:SI-221",
+   "url": "https://www.cardmarket.com/en/Pokemon/Products/Singles/Start-Deck-100/Medicham-V-sI100221",
+   "product_id": 587931
+  },
+  {
+   "from": "zh-tw:SI-225",
+   "to": "ja:SI-225",
+   "url": "https://www.cardmarket.com/en/Pokemon/Products/Singles/Start-Deck-100/Lucario-V-sI100225",
+   "product_id": 587935
+  },
+  {
+   "from": "zh-tw:SI-234",
+   "to": "ja:SI-234",
+   "url": "https://www.cardmarket.com/en/Pokemon/Products/Singles/Start-Deck-100/Lycanroc-V-sI100234",
+   "product_id": 587944
+  },
+  {
+   "from": "zh-tw:SI-235",
+   "to": "ja:SI-235",
+   "url": "https://www.cardmarket.com/en/Pokemon/Products/Singles/Start-Deck-100/Lycanroc-VMAX-sI100235",
+   "product_id": 587945
+  },
+  {
+   "from": "zh-tw:SI-247",
+   "to": "ja:SI-247",
+   "url": "https://www.cardmarket.com/en/Pokemon/Products/Singles/Start-Deck-100/Single-Strike-Urshifu-V-sI100247",
+   "product_id": 587957
+  },
+  {
+   "from": "zh-tw:SI-248",
+   "to": "ja:SI-248",
+   "url": "https://www.cardmarket.com/en/Pokemon/Products/Singles/Start-Deck-100/Rapid-Strike-Urshifu-V-sI100248",
+   "product_id": 587958
+  },
+  {
+   "from": "zh-tw:SI-253",
+   "to": "ja:SI-253",
+   "url": "https://www.cardmarket.com/en/Pokemon/Products/Singles/Start-Deck-100/Gengar-V-sI100253",
+   "product_id": 587963
+  },
+  {
+   "from": "zh-tw:SI-254",
+   "to": "ja:SI-254",
+   "url": "https://www.cardmarket.com/en/Pokemon/Products/Singles/Start-Deck-100/Galarian-Moltres-V-V1-sI100254",
+   "product_id": 587964
+  },
+  {
+   "from": "zh-tw:SI-255",
+   "to": "ja:SI-255",
+   "url": "https://www.cardmarket.com/en/Pokemon/Products/Singles/Start-Deck-100/Umbreon-V-sI100255",
+   "product_id": 587965
+  },
+  {
+   "from": "zh-tw:SI-256",
+   "to": "ja:SI-256",
+   "url": "https://www.cardmarket.com/en/Pokemon/Products/Singles/Start-Deck-100/Umbreon-VMAX-sI100256",
+   "product_id": 587966
+  },
+  {
+   "from": "zh-tw:SI-258",
+   "to": "ja:SI-258",
+   "url": "https://www.cardmarket.com/en/Pokemon/Products/Singles/Start-Deck-100/Galarian-Slowking-V-sI100258",
+   "product_id": 587968
+  },
+  {
+   "from": "zh-tw:SI-259",
+   "to": "ja:SI-259",
+   "url": "https://www.cardmarket.com/en/Pokemon/Products/Singles/Start-Deck-100/Galarian-Slowking-VMAX-sI100259",
+   "product_id": 587969
+  },
+  {
+   "from": "zh-tw:SI-263",
+   "to": "ja:SI-263",
+   "url": "https://www.cardmarket.com/en/Pokemon/Products/Singles/Start-Deck-100/Tyranitar-V-sI100263",
+   "product_id": 587973
+  },
+  {
+   "from": "zh-tw:SI-273",
+   "to": "ja:SI-273",
+   "url": "https://www.cardmarket.com/en/Pokemon/Products/Singles/Start-Deck-100/Liepard-V-sI100273",
+   "product_id": 587983
+  },
+  {
+   "from": "zh-tw:SI-281",
+   "to": "ja:SI-281",
+   "url": "https://www.cardmarket.com/en/Pokemon/Products/Singles/Start-Deck-100/Garbodor-V-sI100281",
+   "product_id": 587991
+  },
+  {
+   "from": "zh-tw:SI-299",
+   "to": "ja:SI-299",
+   "url": "https://www.cardmarket.com/en/Pokemon/Products/Singles/Start-Deck-100/Aggron-V-sI100299",
+   "product_id": 588009
+  },
+  {
+   "from": "zh-tw:SI-301",
+   "to": "ja:SI-301",
+   "url": "https://www.cardmarket.com/en/Pokemon/Products/Singles/Start-Deck-100/Metagross-V-sI100301",
+   "product_id": 588011
+  },
+  {
+   "from": "zh-tw:SI-309",
+   "to": "ja:SI-309",
+   "url": "https://www.cardmarket.com/en/Pokemon/Products/Singles/Start-Deck-100/Corviknight-V-sI100309",
+   "product_id": 588019
+  },
+  {
+   "from": "zh-tw:SI-310",
+   "to": "ja:SI-310",
+   "url": "https://www.cardmarket.com/en/Pokemon/Products/Singles/Start-Deck-100/Corviknight-VMAX-sI100310",
+   "product_id": 588020
+  },
+  {
+   "from": "zh-tw:SI-313",
+   "to": "ja:SI-313",
+   "url": "https://www.cardmarket.com/en/Pokemon/Products/Singles/Start-Deck-100/Zamazenta-V-V1-sI100313",
+   "product_id": 588023
+  },
+  {
+   "from": "zh-tw:SI-315",
+   "to": "ja:SI-315",
+   "url": "https://www.cardmarket.com/en/Pokemon/Products/Singles/Start-Deck-100/Rayquaza-V-sI100315",
+   "product_id": 588025
+  },
+  {
+   "from": "zh-tw:SI-316",
+   "to": "ja:SI-316",
+   "url": "https://www.cardmarket.com/en/Pokemon/Products/Singles/Start-Deck-100/Rayquaza-VMAX-sI100316",
+   "product_id": 588026
+  },
+  {
+   "from": "zh-tw:SI-321",
+   "to": "ja:SI-321",
+   "url": "https://www.cardmarket.com/en/Pokemon/Products/Singles/Start-Deck-100/Noivern-V-sI100321",
+   "product_id": 588031
+  },
+  {
+   "from": "zh-tw:SI-325",
+   "to": "ja:SI-325",
+   "url": "https://www.cardmarket.com/en/Pokemon/Products/Singles/Start-Deck-100/Duraludon-V-sI100325",
+   "product_id": 588035
+  },
+  {
+   "from": "zh-tw:SI-326",
+   "to": "ja:SI-326",
+   "url": "https://www.cardmarket.com/en/Pokemon/Products/Singles/Start-Deck-100/Duraludon-VMAX-sI100326",
+   "product_id": 588036
+  },
+  {
+   "from": "zh-tw:SI-334",
+   "to": "ja:SI-334",
+   "url": "https://www.cardmarket.com/en/Pokemon/Products/Singles/Start-Deck-100/Blissey-V-sI100334",
+   "product_id": 588044
+  },
+  {
+   "from": "zh-tw:SI-340",
+   "to": "ja:SI-340",
+   "url": "https://www.cardmarket.com/en/Pokemon/Products/Singles/Start-Deck-100/Porygon-Z-sI100340",
+   "product_id": 588050
+  },
+  {
+   "from": "zh-tw:SI-359",
+   "to": "ja:SI-359",
+   "url": "https://www.cardmarket.com/en/Pokemon/Products/Singles/Start-Deck-100/Drampa-V-sI100359",
+   "product_id": 588069
+  },
+  {
+   "from": "zh-tw:SI-360",
+   "to": "ja:SI-360",
+   "url": "https://www.cardmarket.com/en/Pokemon/Products/Singles/Start-Deck-100/Greedent-V-V1-sI100360",
+   "product_id": 588070
+  }
+ ],
+ "clear": [
+  {
+   "id": "zh-tw:S10D-032",
+   "old_url": "https://www.cardmarket.com/en/Pokemon/Products/Singles/ADV-Expansion-Pack/Donphan-ADV1032",
+   "reason": "link points to a different card (name on the row and the Cardmarket product differ)"
+  },
+  {
+   "id": "zh-tw:S4-008",
+   "old_url": "https://www.cardmarket.com/en/Pokemon/Products/Singles/Advent-of-Arceus/Burmy-Plant-Cloak-Lv11-Pt4008",
+   "reason": "link points to a different card (name on the row and the Cardmarket product differ)"
+  },
+  {
+   "id": "zh-tw:S4a-124",
+   "old_url": "https://www.cardmarket.com/en/Pokemon/Products/Singles/SV-Black-Star-Promos/Iono-SVP124",
+   "reason": "link points to a different card (name on the row and the Cardmarket product differ)"
+  },
+  {
+   "id": "zh-tw:S4a-137",
+   "old_url": "https://www.cardmarket.com/en/Pokemon/Products/Singles/Mega-Evolution-IDTH/Helioptile-V2-MA1137",
+   "reason": "link points to a different card (name on the row and the Cardmarket product differ)"
+  },
+  {
+   "id": "zh-tw:S4a-139",
+   "old_url": "https://www.cardmarket.com/en/Pokemon/Products/Singles/Mega-Evolution-IDTH/Shedinja-V2-MA1139",
+   "reason": "link points to a different card (name on the row and the Cardmarket product differ)"
+  },
+  {
+   "id": "zh-tw:S4a-140",
+   "old_url": "https://www.cardmarket.com/en/Pokemon/Products/Singles/Mega-Evolution-IDTH/Houndstone-V2-MA1140",
+   "reason": "link points to a different card (name on the row and the Cardmarket product differ)"
+  },
+  {
+   "id": "zh-tw:S4a-154",
+   "old_url": "https://www.cardmarket.com/en/Pokemon/Products/Singles/Mega-Evolution-IDTH/Mega-Manectric-ex-V2-MA1154",
+   "reason": "link points to a different card (name on the row and the Cardmarket product differ)"
+  },
+  {
+   "id": "zh-tw:S4a-155",
+   "old_url": "https://www.cardmarket.com/en/Pokemon/Products/Singles/Mega-Evolution-IDTH/Mega-Gardevoir-ex-V2-MA1155",
+   "reason": "link points to a different card (name on the row and the Cardmarket product differ)"
+  },
+  {
+   "id": "zh-tw:S5R-050",
+   "old_url": "https://www.cardmarket.com/en/Pokemon/Products/Singles/Advent-of-Arceus/Kabutops-Lv59-Pt4050",
+   "reason": "link points to a different card (name on the row and the Cardmarket product differ)"
+  },
+  {
+   "id": "zh-tw:S5a-045",
+   "old_url": "https://www.cardmarket.com/en/Pokemon/Products/Singles/151/Vileplume-V2-MEW045",
+   "reason": "link points to a different card (name on the row and the Cardmarket product differ)"
+  },
+  {
+   "id": "zh-tw:S7R-020",
+   "old_url": "https://www.cardmarket.com/en/Pokemon/Products/Singles/ADV-Expansion-Pack/Sharpedo-ADV1020",
+   "reason": "link points to a different card (name on the row and the Cardmarket product differ)"
+  },
+  {
+   "id": "zh-tw:SC1D-013",
+   "old_url": "https://www.cardmarket.com/en/Pokemon/Products/Singles/30th-Celebration-Simplified-Chinese-Promo/Snivy-30th-P013",
+   "reason": "link points to a different card (name on the row and the Cardmarket product differ)"
+  },
+  {
+   "id": "zh-tw:SC1D-095",
+   "old_url": "https://www.cardmarket.com/en/Pokemon/Products/Singles/Arceus/Arceus-LVX-AR95",
+   "reason": "link points to a different card (name on the row and the Cardmarket product differ)"
+  },
+  {
+   "id": "zh-tw:SC1D-098",
+   "old_url": "https://www.cardmarket.com/en/Pokemon/Products/Singles/Arceus/Salamence-LVX-AR98",
+   "reason": "link points to a different card (name on the row and the Cardmarket product differ)"
+  },
+  {
+   "id": "zh-tw:SC1D-129",
+   "old_url": "https://www.cardmarket.com/en/Pokemon/Products/Singles/Generations-Start-Decks/Delivery-Drone-svM129",
+   "reason": "link points to a different card (name on the row and the Cardmarket product differ)"
+  },
+  {
+   "id": "zh-tw:SC1D-133",
+   "old_url": "https://www.cardmarket.com/en/Pokemon/Products/Singles/151/Eevee-V1-MEW133",
+   "reason": "link points to a different card (name on the row and the Cardmarket product differ)"
+  },
+  {
+   "id": "zh-tw:SC1D-144",
+   "old_url": "https://www.cardmarket.com/en/Pokemon/Products/Singles/BW-Promos/Rayquaza-V1-BW-P144",
+   "reason": "link points to a different card (name on the row and the Cardmarket product differ)"
+  },
+  {
+   "id": "zh-tw:SC1a-019",
+   "old_url": "https://www.cardmarket.com/en/Pokemon/Products/Singles/Starter-Deck-Build-Set-Ancient-Koraidon-ex/Energy-Switch-svHK019",
+   "reason": "link points to a different card (name on the row and the Cardmarket product differ)"
+  },
+  {
+   "id": "zh-tw:SC1a-050",
+   "old_url": "https://www.cardmarket.com/en/Pokemon/Products/Singles/Starter-Deck-Build-Set-Ancient-Koraidon-ex/Magma-Basin-svHK050",
+   "reason": "link points to a different card (name on the row and the Cardmarket product differ)"
+  },
+  {
+   "id": "zh-tw:SC2D-115",
+   "old_url": "https://www.cardmarket.com/en/Pokemon/Products/Singles/30th-Celebration-IDTH/Meowth-V1-MA6115",
+   "reason": "link points to a different card (name on the row and the Cardmarket product differ)"
+  },
+  {
+   "id": "zh-tw:SCA-060",
+   "old_url": "https://www.cardmarket.com/en/Pokemon/Products/Singles/Advent-of-Arceus/Arceus-Lv100-Pt4060",
+   "reason": "link points to a different card (name on the row and the Cardmarket product differ)"
+  },
+  {
+   "id": "zh-tw:SCB-114",
+   "old_url": "https://www.cardmarket.com/en/Pokemon/Products/Singles/Base-Expansion-Pack/Pichu-V2-EC1114",
+   "reason": "link points to a different card (name on the row and the Cardmarket product differ)"
+  },
+  {
+   "id": "zh-tw:SCC-117",
+   "old_url": "https://www.cardmarket.com/en/Pokemon/Products/Singles/30th-Celebration-IDTH/Ditto-V1-MA6117",
+   "reason": "link points to a different card (name on the row and the Cardmarket product differ)"
+  },
+  {
+   "id": "zh-tw:SCC-119",
+   "old_url": "https://www.cardmarket.com/en/Pokemon/Products/Singles/30th-Celebration-IDTH/Eevee-V1-MA6119",
+   "reason": "link points to a different card (name on the row and the Cardmarket product differ)"
+  },
+  {
+   "id": "zh-tw:SCD-067",
+   "old_url": "https://www.cardmarket.com/en/Pokemon/Products/Singles/30th-Celebration-IDTH/Mew-V2-MA6067",
+   "reason": "link points to a different card (name on the row and the Cardmarket product differ)"
+  },
+  {
+   "id": "zh-tw:SCD-090",
+   "old_url": "https://www.cardmarket.com/en/Pokemon/Products/Singles/30th-Celebration-IDTH/Nidorina-V1-MA6090",
+   "reason": "link points to a different card (name on the row and the Cardmarket product differ)"
+  },
+  {
+   "id": "zh-tw:SCD-118",
+   "old_url": "https://www.cardmarket.com/en/Pokemon/Products/Singles/Dragons-Exalted/Blend-Energy-WLFM-V1-DRX118",
+   "reason": "link points to a different card (name on the row and the Cardmarket product differ)"
+  },
+  {
+   "id": "zh-tw:SH-019",
+   "old_url": "https://www.cardmarket.com/en/Pokemon/Products/Singles/ADV-Expansion-Pack/Carvanha-ADV1019",
+   "reason": "link points to a different card (name on the row and the Cardmarket product differ)"
+  },
+  {
+   "id": "zh-tw:SK-008",
+   "old_url": "https://www.cardmarket.com/en/Pokemon/Products/Singles/Premium-Trainer-Box-VSTAR/Crobat-V-sKV008",
+   "reason": "Cardmarket product is the Japanese print of this card; no ja: row in the catalogue for it, so the link is cleared, not moved"
+  },
+  {
+   "id": "zh-tw:SLD-008",
+   "old_url": "https://www.cardmarket.com/en/Pokemon/Products/Singles/Sword-Shield-Starter-Set-Darkrai-VSTAR/Darkrai-VSTAR-sLD008",
+   "reason": "Cardmarket product is the Japanese print of this card; no ja: row in the catalogue for it, so the link is cleared, not moved"
+  },
+  {
+   "id": "zh-tw:SLL-005",
+   "old_url": "https://www.cardmarket.com/en/Pokemon/Products/Singles/Sword-Shield-Starter-Set-Lucario-VSTAR/Lucario-VSTAR-sLL005",
+   "reason": "Cardmarket product is the Japanese print of this card; no ja: row in the catalogue for it, so the link is cleared, not moved"
+  },
+  {
+   "id": "zh-tw:SP6-002",
+   "old_url": "https://www.cardmarket.com/en/Pokemon/Products/Singles/Special-Battle-Set-Charizard-VSTAR-vs-Rayquaza-VMAX/Charizard-VSTAR-sO002",
+   "reason": "link points to a different card (name on the row and the Cardmarket product differ)"
+  },
+  {
+   "id": "zh-tw:SP6-004",
+   "old_url": "https://www.cardmarket.com/en/Pokemon/Products/Singles/VSTAR-Special-Set/Zacian-VSTAR-sp6004",
+   "reason": "Cardmarket product is the Japanese print of this card; no ja: row in the catalogue for it, so the link is cleared, not moved"
+  },
+  {
+   "id": "zh-tw:SP6-006",
+   "old_url": "https://www.cardmarket.com/en/Pokemon/Products/Singles/VSTAR-Special-Set/Zamazenta-VSTAR-sp6006",
+   "reason": "Cardmarket product is the Japanese print of this card; no ja: row in the catalogue for it, so the link is cleared, not moved"
+  },
+  {
+   "id": "zh-tw:SV-P-038",
+   "old_url": "https://www.cardmarket.com/en/Pokemon/Products/Singles/Sword-Shield-Thai-Promos/Charizard-VMAX-S-PTH038",
+   "reason": "link points to a different card (name on the row and the Cardmarket product differ)"
+  },
+  {
+   "id": "zh-tw:SV2P-034",
+   "old_url": "https://www.cardmarket.com/en/Pokemon/Products/Singles/Extra-Regulation-Box/Rayquaza-Spirit-Link-ERB034",
+   "reason": "link points to a different card (name on the row and the Cardmarket product differ)"
+  },
+  {
+   "id": "zh-tw:SVB-008",
+   "old_url": "https://www.cardmarket.com/en/Pokemon/Products/Singles/Battle-Master-Deck-Chien-Pao-ex/Bidoof-svJP008",
+   "reason": "link points to a different card (name on the row and the Cardmarket product differ)"
+  },
+  {
+   "id": "zh-tw:SVP1-002",
+   "old_url": "https://www.cardmarket.com/en/Pokemon/Products/Singles/Extra-Regulation-Box/Ho-Oh-EX-ERB002",
+   "reason": "link points to a different card (name on the row and the Cardmarket product differ)"
+  }
+ ]
+}
