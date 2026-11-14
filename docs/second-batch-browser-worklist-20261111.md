@@ -2,7 +2,9 @@
 
 One list for the browser sitting (step 2 of `docs/remaining-cards-plan-20261111.md`).
 
-1. **Cardmarket links** for every card added in A1-A4 and C (about 520 cards, none has a verified link yet).
+1. **Cardmarket links**: 582 of the 809 new cards got a verified link in K (2026-11-14, `docs/second-batch-k-20261114.md`).
+   227 are left, listed with the reason in `data/catalogue-gaps/second-batch-k-20261113/held-links.json`: open the product page to
+   see which deck or print it is (Starter Set V V1..V5, Charizard VMAX 1/2, trophies and unnumbered promos).
 2. **Sword & Shield promos with two prints** (our single unnumbered row has no image or number): ホップ (5 and 58), きずぐすり (17 and 51),
    モンスターボール (19 and 54), ビート (27 and 56). Find which print we hold, then add the other.
 3. **Done 2026-11-13:** `M6a`, the LEGEND decks, `MG` and Delta Reign now have images (batches E, F, J). Upgrade the 320 px TCG Collector images later.
