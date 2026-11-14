@@ -3,7 +3,7 @@
 One list for the browser sitting (step 2 of `docs/remaining-cards-plan-20261111.md`).
 
 1. **Cardmarket links**: 698 of the 809 new cards have a verified link (K and K3, 2026-11-14, `docs/second-batch-k-20261114.md`).
-   111 are left, mostly cards with no Japanese product on Cardmarket; they were, listed with the reason in `data/catalogue-gaps/second-batch-k-20261113/held-links.json` (the K3 section of the record
+   111 are left, mostly cards with no Japanese product on Cardmarket; they are listed with the reason in `data/catalogue-gaps/second-batch-k-20261113/held-links.json` (the K3 section of the record
    says which were resolved since).
 2. **Sword & Shield promos with two prints** (our single unnumbered row has no image or number): ホップ (5 and 58), きずぐすり (17 and 51),
    モンスターボール (19 and 54), ビート (27 and 56). Find which print we hold, then add the other.
