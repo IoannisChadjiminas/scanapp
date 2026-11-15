@@ -210,8 +210,8 @@ manifest check; `d40042cb` is the one whose names match CLEANUP1.
   depends on the shared name. Each needs its own gate.
 - **The 247 review rows** need a look: XY Mega EX, and deck sets numbered differently on Limitless.
 - **4 Prize Pack rows with a card-back image:** `en:PPS2-BRS-064`, `en:PPS3-LOR-118`, `en:PPS3-LOR-119`, `en:PPS3-SVI-076` need their real image and vector.
-- **`ja:SMP-104`'s `view_title`** is scraped text (`L18: 【30†Image: Palossand-GX`) and so is its phone `alt_name`.
-  Other scraped titles may exist; a check for `【` or `†` in `view_title` would find them.
+- ~~`ja:SMP-104`'s scraped `view_title`~~: done with 127 other scraped titles in TITLES1, switched on staging
+  2026-11-15 with phone index `e19e142e…` (`docs/catalogue-titles-20261115.md`).
 - **Schemas `…_names1`, `…_links1`, `…_names2`, `…_links2`** are inactive and unused. Dropping a schema is permanent;
   it waits for the owner.
 - **API exposure of `printing_family`, and the app using it** to count printings once.

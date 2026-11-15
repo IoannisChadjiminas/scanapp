@@ -103,7 +103,7 @@ subset rule above (`duplicate`).
 
 **Update, later on 2026-11-14:** done through the clean-up release recorded in
 `docs/catalogue-cleanup-20261114.md`. It removes the 561, the ten `M-P` duplicates of MP1 and four of the extras, and
-it takes the vectors off the Pocket rows. It was switched on staging after the gate, and phone index `d40042cb…` was published. Japanese names, printing families and the `zh-tw` links followed in `docs/catalogue-names-families-20261114.md` (phone index `07e3a028…`).
+it takes the vectors off the Pocket rows. It was switched on staging after the gate, and phone index `d40042cb…` was published. Japanese names, printing families and the `zh-tw` links followed in `docs/catalogue-names-families-20261114.md` (phone index `07e3a028…`), then 128 scraped English titles in `docs/catalogue-titles-20261115.md` (phone index `e19e142e…`).
 The paragraph below is the state before that.
 
 **Not done: dropping the 561 from the server's vectors through a catalogue release.** The release tooling here

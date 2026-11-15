@@ -1,5 +1,5 @@
 {
-"_note": "Rows the export checks let through: the state of the names-and-links catalogue (PS-CATALOGUE-EN-JA-LINKS3-20261115) on 2026-11-15. Any other row that breaks a check fails the build. Remove ids as they are fixed; never add new ones without a record in docs/.",
+"_note": "Rows the export checks let through: the state of the titles catalogue (PS-CATALOGUE-EN-JA-TITLES1-20261115) on 2026-11-15. Any other row that breaks a check fails the build. Remove ids as they are fixed; never add new ones without a record in docs/.",
 "digital_set": [],
 "latin_name_ja": [
 "extra-charmander-001-032",
