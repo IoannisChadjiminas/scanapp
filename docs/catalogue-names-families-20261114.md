@@ -17,7 +17,15 @@ Production is not touched. Vectors, ids and images are unchanged.
 
 ## Switch
 
-@@SWITCH@@
+| Item | Value |
+|---|---|
+| Release | `PS-CATALOGUE-EN-JA-LINKS3-20261115`, schema `pokesingle_completion_20261114_links3` |
+| Parent | `PS-CATALOGUE-EN-JA-NAMES3-20261115` (`pokesingle_completion_20261114_names3`), whose parent is CLEANUP1 |
+| SQL | NAMES3: 36 statements, sha256 `69f4ba76c05d0204d4a4922793dfd97bdcb160b1b92d0c57d4fc5d51069fb1be`, cards md5 `9475aa3853660277c8559b2ce0d4ff1c`. LINKS3: 240 statements, sha256 `f2d9fd25dd70f7309205bfa555bb88d9bd92223e4e1a67acc5825a6c2891cac1`, cards md5 `e9524320fbf5616b29a154ac2e60f81c` |
+| Bundles | unchanged: features `/data/reference-features/20261114-cleanup`, artwork `/data/artwork/20261114-cleanup` |
+| How | `scripts/catalogue-release-switch.sh apply`, `RELEASE_NAME=catalogue-names-links-20261115` on 2026-11-15. Only `PLANETSCALE_SCHEMA` and `PLANETSCALE_IMPORT_ID` of the env file changed (checked line by line against the live file before the switch) |
+| After | health ok, ready, import `PS-CATALOGUE-EN-JA-LINKS3-20261115`, restarts 0, no OOM |
+| Rollback | `/etc/scanapp-staging/catalogue-rollback/catalogue-names-links-20261115` (rollback file points to CLEANUP1) |
 
 ## 1. Japanese names
 
@@ -70,14 +78,14 @@ The two "number not on set" and "no Limitless list" groups together are 6,505 ro
 Each row that keeps its English name is listed, with its reason and any candidate Japanese name, in `docs/catalogue-names-20261114-kept-english.tsv`. The review rows are mostly Mega EX cards and deck sets whose numbering differs from Limitless. Each changed row's source and check is stored in the release record `catalogue-names-ja:PS-CATALOGUE-EN-JA-NAMES3-20261115`. The held rows carry their candidate Japanese name in the list, so a later release can apply them together with the rest of their name group.
 
 Examples, checked by eye on samples of each kind:
-- `ja:S4a-254` Hattrem → テブリム
-- `ja:XY6-088` Winona → ナギ
+- `ja:S4-016` Talonflame V → ファイアローV
+- `ja:BW9-070` Reversal Trigger → リバーサルトリガー
 - `ja:S1a-016` Cinderace V → エースバーンV
 - `ja:SVOD-003` Steven's Carbink → ダイゴのメレシー
-- `ja:SMP-104` → シロデスナGX. Its English name was scraped text: `L18: 【30†Image: Palossand-GX`.
+- `ja:SMP-104` → シロデスナGX. Its English name was scraped text: `L18: 【30†Image: Palossand-GX`. That text is still its `view_title`, so it shows in the phone index `alt_name`; see "Not done".
 
 **Phone and app:**
-- The phone index `name` column now carries the Japanese name for these rows.
+- The phone index `name` column now carries the Japanese name for the 2,509 indexed rows that changed.
 - A new last column, `alt_name`, carries the English title.
 - The app reads the first six columns (`PhoneCardMeta.parse` needs at least six and ignores the rest), so builds already shipped keep working.
 - No column was reordered.
@@ -136,15 +144,63 @@ Examples, checked by eye on samples of each kind:
 
 ## Gate
 
-@@GATE@@
+1,891 photos replayed against each candidate (local docker, image `scanapp-api-staging:24856ba9`, 3 lanes), scored
+against K3's accepted run with `score_gate.py`, the same baseline as the clean-up release.
+
+**LINKS1 (7,681 names): failed.** Right first dev 637 → 634, dev3 938 → 936; dev3 wrong first 0 → 1; one right card no
+longer offered (`sealedF-ja-promo-065`); cells lower `dev:unnumbered_vintage:ja`, `dev3:promo:ja`,
+`dev3:unnumbered_vintage:ja`. Nine right-first losses:
+- Seven Base Set photos (`ja:PMCG1-013`, `-020`, `-034`, `-050`, `-057`, `-058`) went to the CP6 reprint, which now
+  shared the original's Japanese name.
+- `sealedF-ja-promo-065` (`ja:SMP-179`) and `sealed-ja-promo-045` (`ja:DPP-113`) went to `ja:DP2-002` and
+  `ja:DPtS-007`: the SMP and XYP Pikachu promos were renamed, the DP-era ones kept `Pikachu`.
+
+The five photos not plainly explained were re-run alone on LINKS1 and on CLEANUP1: the same answers both times, so load
+was not the cause. NAMES2/LINKS2 (CP6 held only) were built but not replayed. Rules 5 and 6 above came from this.
+
+**LINKS3 (3,660 names): passed.**
+
+| Panel | Photos | Right first | Wrong first | Right offered | Wrong-first upper bound |
+|---|---:|---|---|---|---:|
+| dev | 681 | 637 → 637 | 4 → 4 | 663 → 663 | 1.5% |
+| dev2 | 238 | 232 → 232 | 0 → 0 | 238 → 238 | 1.6% |
+| dev3 | 972 | 938 → 938 | 0 → 0 | 963 → 963 | 0.4% |
+
+Right → wrong: 0. Right no longer offered: 0. Cells lower: none. All eleven lanes exited 0 with every row.
+
+96 answers changed against K3, and each was looked at. No card shown first changed:
+- 16 went to `matched` with the same right card (15 from `uncertain`, 1 from `printing_ambiguous`), 9 of them
+  Japanese promos.
+- 14 changed only because an old id became its `en:` twin (the clean-up release).
+- 11 changed only the order of their alternatives.
+- 55 changed which alternatives are offered; in 51 of them a renamed row entered or left. None lost the right card.
 
 ## Phone index
 
-@@PHONE@@
+| Item | Value |
+|---|---|
+| Before | `d40042cbb35dc7f8a8a021ffa67b7bf2af6875ffa499769d52ea6780ebf121f1` (still valid after the switch: same ids and vectors) |
+| Now | `07e3a028571c086d8b3a4fd6d2c7cc4e067065a863bef8a52f1a884cef7e9adb`, 48,934 rows |
+| Same as before | ids file and float16 vectors byte for byte; only `card_index.meta.tsv` and the version file differ |
+| Meta | 2,509 rows have their Japanese `name` (no other of the first eight columns changed); `alt_name` filled on 15,968 rows; `printing_family` on 1,740 rows |
+| Rollback record | `/etc/scanapp-staging/catalogue-rollback/phone-index-names-links-20261115/ACTIVE.before` |
+| Check | manifest 200 inside the container and from `staging-scan.pokesingle.com`; the meta, ids and version files download with the manifest's sha256; a ranged request on the vectors returns 206 and the whole file matches |
+
+Built from a local snapshot export of LINKS3 (read-only role) with this branch's `export_index.py --families`. Its ids
+and vectors files are byte-identical to the CLEANUP1 export. `export_exceptions.json` only shrank: Latin-only Japanese
+names 10,274 → 7,765; unprefixed ids stay 2.
 
 ## Going back
 
-@@BACK@@
+On the staging host, from the code directory:
+
+```
+CONFIG_DIR=/etc/scanapp-staging RELEASE_NAME=catalogue-names-links-20261115 PROJECT=scanapp-scanapp-z1mwj4 COMPOSE_FILE=compose.dokploy.yaml scripts/catalogue-release-switch.sh rollback
+```
+
+Then write `d40042cbb35dc7f8a8a021ffa67b7bf2af6875ffa499769d52ea6780ebf121f1` to `/data/phone-index/ACTIVE.next` and
+rename it to `ACTIVE`. Going back to CLEANUP1 keeps the same ids and vectors, so either phone index would pass the
+manifest check; `d40042cb` is the one whose names match CLEANUP1.
 
 ## Not done
 
@@ -154,4 +210,8 @@ Examples, checked by eye on samples of each kind:
   depends on the shared name. Each needs its own gate.
 - **The 247 review rows** need a look: XY Mega EX, and deck sets numbered differently on Limitless.
 - **4 Prize Pack rows with a card-back image:** `en:PPS2-BRS-064`, `en:PPS3-LOR-118`, `en:PPS3-LOR-119`, `en:PPS3-SVI-076` need their real image and vector.
+- **`ja:SMP-104`'s `view_title`** is scraped text (`L18: 【30†Image: Palossand-GX`) and so is its phone `alt_name`.
+  Other scraped titles may exist; a check for `【` or `†` in `view_title` would find them.
+- **Schemas `…_names1`, `…_links1`, `…_names2`, `…_links2`** are inactive and unused. Dropping a schema is permanent;
+  it waits for the owner.
 - **API exposure of `printing_family`, and the app using it** to count printings once.
