@@ -1,11 +1,13 @@
 """Make the reference-feature bundle of a clean-up release: the parent bundle without the deleted rows.
 
-    python3 cleanup_features.py PARENT_DIR NEW_DIR SIGNATURE_ROWS_JSON DELETED_JSON
+    python3 cleanup_features.py PARENT_DIR NEW_DIR SIGNATURE_ROWS_JSON DELETED_JSON [ADOPTED_JSON]
 
 No feature is computed: NEW_DIR is a hard-linked copy of PARENT_DIR without the deleted rows' .npz
 files, and its manifest drops their records and is re-signed over the remaining catalogue rows
 (app.recognition.reference_features.catalogue_signature). Prints the new manifest's sha256, which
-prepare_sql_cleanup.py stores in the import manifest. Runs on this Mac (local replay data) and on the
+prepare_sql_cleanup.py stores in the import manifest. ADOPTED_JSON ({to_id: from_id}, prepare_sql_cleanup.py's
+feature-adopted.json) gives each adopting row the deleted row's record (same image, same .npz file); the adopting
+row's own file goes unless another record uses it. Runs on this Mac (local replay data) and on the
 staging host (python3 -I, standard library only); both must print the same sha256.
 """
 import hashlib
@@ -22,10 +24,16 @@ def catalogue_signature(rows):
     return hashlib.sha256(json.dumps(values, separators=(",", ":"), ensure_ascii=False).encode()).hexdigest()
 
 
-def new_manifest(parent_manifest, signature_rows, deleted):
+def new_manifest(parent_manifest, signature_rows, deleted, adopted=None):
     manifest = json.loads(json.dumps(parent_manifest))
     records = manifest["records"]
     assert set(deleted) <= set(records)
+    for to, frm in (adopted or {}).items():
+        assert frm in deleted and to not in deleted and to in records, to
+        records[to] = records[frm]
+    paths = {str(r["id"]): str(r.get("image_path") or "") for r in signature_rows}
+    for to in adopted or {}:
+        assert paths[to] == records[to].get("image_path", ""), f"{to} must carry the adopted image_path"
     for card_id in deleted:
         del records[card_id]
     assert set(records) == {str(r["id"]) for r in signature_rows}
@@ -35,14 +43,21 @@ def new_manifest(parent_manifest, signature_rows, deleted):
     return manifest
 
 
-def main(parent_dir, new_dir, signature_path, deleted_path):
+def removed_files(parent_manifest, manifest):
+    """Files of the parent bundle that no record of the new manifest uses."""
+    used = {r["filename"] for r in manifest["records"].values() if r.get("available")}
+    return {r["filename"] for r in parent_manifest["records"].values() if r.get("available")} - used
+
+
+def main(parent_dir, new_dir, signature_path, deleted_path, adopted_path=None):
     parent, new = Path(parent_dir), Path(new_dir)
     if new.exists():
         raise SystemExit("destination exists")
     parent_manifest = json.loads((parent / "manifest.json").read_text())
     deleted = json.loads(Path(deleted_path).read_text())
-    gone = {parent_manifest["records"][c]["filename"] for c in deleted if parent_manifest["records"][c].get("available")}
-    manifest = new_manifest(parent_manifest, json.loads(Path(signature_path).read_text()), deleted)
+    adopted = json.loads(Path(adopted_path).read_text()) if adopted_path else {}
+    manifest = new_manifest(parent_manifest, json.loads(Path(signature_path).read_text()), deleted, adopted)
+    gone = removed_files(parent_manifest, manifest)
     work = new.with_name(new.name + ".preparing")
     shutil.copytree(parent, work, copy_function=os.link, ignore=lambda d, names: [n for n in names if n in gone])
     (work / "manifest.json").unlink()
@@ -54,4 +69,4 @@ def main(parent_dir, new_dir, signature_path, deleted_path):
 
 
 if __name__ == "__main__":
-    main(*sys.argv[1:5])
+    main(*sys.argv[1:6])

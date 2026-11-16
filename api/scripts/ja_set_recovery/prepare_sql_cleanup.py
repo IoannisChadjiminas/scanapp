@@ -14,8 +14,12 @@ Read-only on PlanetScale. PARENT_PACKAGE holds the parent's served vectors/pad a
   move_vector   {from_id: to_id}     the from-row's vectors become the to-row's (to has none); the
                                      from-row must be deleted
   relink        {to_id: from_id}     copy the Cardmarket columns of from (a deleted row) onto to
+  adopt_image   {to_id: from_id}     for a move_vector whose from-row has artwork regions: to takes from's
+                                     image (image_path, has_image, remote_image_url) and artwork regions
+                                     too, so the vector, regions, features and image stay one scan
+                                     (cleanup_features.py moves the feature record; pass it ADOPT_JSON)
 
-Nothing else changes: names, images, the other vectors and the other tables are copied as they are.
+Nothing else changes: names, the other images, the other vectors and the other tables are copied as they are.
 Writes OUT_DIR/vectors/pad (ids, embeddings, manifest), OUT_DIR/artwork (bundle), OUT_DIR/signature-rows.json
 (every remaining catalogue row, for the feature manifest), OUT_DIR/feature-deleted.json, and, when
 FEATURE_MANIFEST_SHA256 is given, OUT_DIR/sql/candidate.sql and prepared.json. Same transaction shape as
@@ -36,8 +40,13 @@ PARENT = os.environ.get("PARENT")
 PARENT_IMPORT = os.environ.get("PARENT_IMPORT")
 TARGET = os.environ.get("TARGET")
 IMPORT = os.environ.get("IMPORT")
+# The import-manifest key and provenance text of this clean-up (defaults: the 2026-11-14 release).
+CLEANUP_KEY = os.environ.get("CLEANUP_KEY", "catalogue_cleanup_20261114")
+CLEANUP_PROVENANCE = os.environ.get(
+    "CLEANUP_PROVENANCE", "catalogue clean-up release, owner approved 2026-11-14 (docs/catalogue-cleanup-20261114.md)")
 CARD_COLS = ("cardmarket_id", "cardmarket_url", "cardmarket_verified", "cardmarket_provenance",
              "cardmarket_verified_at")
+IMAGE_COLS = ("image_path", "has_image", "remote_image_url")
 
 
 def sha_file(path):
@@ -101,11 +110,35 @@ def check_decisions(decisions, card_ids, vector_ids):
         assert new not in delete and new not in unvector, old
     for to, frm in relink.items():
         assert frm in delete and to in card_ids and to not in delete, to
+    for to, frm in decisions.get("adopt_image", {}).items():
+        assert move.get(frm) == to, f"adopt_image {to} needs move_vector {frm} -> {to}"
+
+
+def plan_artwork(records, decisions, rows):
+    """(kept record positions, records) after the clean-up: regions of rows losing their vectors go; regions of
+    an adopted move follow the vector to its new row and take that row's labels."""
+    gone = (set(decisions["delete"]) | set(decisions["unvector"])) - set(decisions.get("adopt_image", {}).values())
+    adopt = {frm: to for to, frm in decisions.get("adopt_image", {}).items()}
+    move = decisions["move_vector"]
+    assert not {r["card_id"] for r in records} & set(adopt.values()), "an adopting row already has artwork regions"
+    keep, out = [], []
+    for i, r in enumerate(records):
+        cid = r["card_id"]
+        assert cid not in move or cid in adopt, f"moved vector of {cid} has artwork regions; adopt its image"
+        if cid in gone:
+            continue
+        keep.append(i)
+        if cid in adopt:
+            to = rows[adopt[cid]]
+            r = {**r, "card_id": to["id"], "name": to["name"], "set_name": to["set_name"],
+                 "collector_number": to["collector_number"]}
+        out.append(r)
+    return keep, out
 
 
 def main(decisions_path, package, role_file, out_dir, feature_sha=None):
     decisions = json.loads(Path(decisions_path).read_text())
-    for key in ("delete", "successor", "unvector", "move_vector", "relink"):
+    for key in ("delete", "successor", "unvector", "move_vector", "relink", "adopt_image"):
         decisions.setdefault(key, {})
     package, out = Path(package).resolve(), Path(out_dir).resolve()
     out.mkdir(parents=True, exist_ok=True)
@@ -155,7 +188,7 @@ def main(decisions_path, package, role_file, out_dir, feature_sha=None):
 
     check_decisions(decisions, set(by_id), set(vecs["pad"]))
     delete, unvector, successor = decisions["delete"], decisions["unvector"], decisions["successor"]
-    move, relink = decisions["move_vector"], decisions["relink"]
+    move, relink, adopt = decisions["move_vector"], decisions["relink"], decisions["adopt_image"]
     gone_vectors = set(delete) | set(unvector)
     for p in products:
         if p["card_id"] in delete:
@@ -183,12 +216,10 @@ def main(decisions_path, package, role_file, out_dir, feature_sha=None):
     # artwork bundle: the regions of every card that loses its vectors go
     p_art = np.load(package / "artwork/embeddings.npy")
     p_recs = json.loads((package / "artwork/records.json").read_text())
-    assert not any(r["card_id"] in move for r in p_recs), "a moved vector's row has artwork regions"
-    keep_art = [i for i, r in enumerate(p_recs) if r["card_id"] not in gone_vectors]
+    keep_art, recs = plan_artwork(p_recs, decisions, by_id)
     adir = out / "artwork"
     adir.mkdir(exist_ok=True)
     np.save(adir / "embeddings.npy", np.asarray(p_art[keep_art], dtype=np.float32))
-    recs = [p_recs[i] for i in keep_art]
     (adir / "records.json").write_text(json.dumps(recs, ensure_ascii=False, separators=(",", ":")))
     new_aman = dict(aman)
     new_aman.update(
@@ -198,9 +229,10 @@ def main(decisions_path, package, role_file, out_dir, feature_sha=None):
         parent_manifest_sha256=sha_file(package / "artwork/manifest.json"),
     )
     (adir / "manifest.json").write_text(json.dumps(new_aman, ensure_ascii=False, sort_keys=True, indent=2) + "\n")
-    db_art_gone = [(ri, cid) for ri, cid, _ in art_rows if cid in gone_vectors]
+    art_gone = gone_vectors - set(adopt.values())
+    db_art_gone = [(ri, cid) for ri, cid, _ in art_rows if cid in art_gone]
     assert len(db_art_gone) == len(p_recs) - len(recs), "database artwork rows differ from the bundle"
-    art_md5 = hashlib.md5("".join(h for _, cid, h in art_rows if cid not in gone_vectors).encode()).hexdigest()
+    art_md5 = hashlib.md5("".join(h for _, cid, h in art_rows if cid not in art_gone).encode()).hexdigest()
 
     # card rows after the change
     new_rows = []
@@ -211,6 +243,9 @@ def main(decisions_path, package, role_file, out_dir, feature_sha=None):
         if r["id"] in relink:
             src = by_id[relink[r["id"]]]
             r.update({k: src[k] for k in CARD_COLS})
+        if r["id"] in adopt:
+            src = by_id[adopt[r["id"]]]
+            r.update({k: src[k] for k in IMAGE_COLS})
         new_rows.append(r)
     cards_md5 = digest(new_rows, cols)
     new_products = [dict(p, card_id=successor.get(p["card_id"], p["card_id"])) for p in products]
@@ -218,6 +253,7 @@ def main(decisions_path, package, role_file, out_dir, feature_sha=None):
     sig = [{"id": r["id"], "image_path": r["image_path"], "rarity": r["rarity"]} for r in new_rows]
     (out / "signature-rows.json").write_text(json.dumps(sig, ensure_ascii=False) + "\n")
     (out / "feature-deleted.json").write_text(json.dumps(sorted(delete)) + "\n")
+    (out / "feature-adopted.json").write_text(json.dumps(adopt, sort_keys=True) + "\n")
 
     new_vecs = {}
     for mode, hashes in vecs.items():
@@ -229,7 +265,7 @@ def main(decisions_path, package, role_file, out_dir, feature_sha=None):
 
     report = {"target": TARGET, "import_id": IMPORT, "parent": PARENT, "parent_metadata_md5": meta_md5,
               "deleted_cards": len(delete), "unvectored_cards": len(unvector), "moved_vectors": len(move),
-              "relinked": len(relink), "products_moved": sum(1 for p in products if p["card_id"] in successor),
+              "relinked": len(relink), "images_adopted": len(adopt), "products_moved": sum(1 for p in products if p["card_id"] in successor),
               "helpers_dropped": len(helper_drop), "helpers_moved": len(helper_move),
               "pad_vectors": f"{len(ids)} -> {len(kept)}", "segments": f"{len(pman['retrieval_segments'])} -> {len(new_pman['retrieval_segments'])}",
               "artwork_regions": f"{len(p_recs)} -> {len(recs)}", "cards": f"{len(rows)} -> {len(new_rows)}",
@@ -265,6 +301,13 @@ END $acl$;""")
         src = by_id[frm]
         s.append(f"UPDATE {TARGET}.cards SET " + ",".join(f"{k}={lit(src[k])}" for k in CARD_COLS)
                  + f" WHERE id={lit(to)};")
+    for to, frm in sorted(adopt.items()):
+        src, dst = by_id[frm], by_id[to]
+        s.append(f"UPDATE {TARGET}.cards SET " + ",".join(f"{k}={lit(src[k])}" for k in IMAGE_COLS)
+                 + f" WHERE id={lit(to)};")
+        labels = {"card_id": to, "name": dst["name"], "set_name": dst["set_name"], "collector_number": dst["collector_number"]}
+        s.append(f"UPDATE {TARGET}.artwork_embeddings SET card_id={lit(to)}, metadata = metadata || {jlit(labels)}::jsonb "
+                 f"WHERE card_id={lit(frm)};")
     for frm, to in move.items():
         s.append(f"UPDATE {TARGET}.card_embeddings SET card_id={lit(to)} WHERE card_id={lit(frm)};")
     gone = sorted(gone_vectors - set(move))
@@ -283,7 +326,7 @@ END $acl$;""")
     for i in range(0, len(dels), 500):
         s.append(f"DELETE FROM {TARGET}.cards WHERE id IN ({q(dels[i:i + 500])});")
     record = {"import_id": IMPORT, "parent_import_id": PARENT_IMPORT, "decisions": decisions,
-              "provenance": "catalogue clean-up release, owner approved 2026-11-14 (docs/catalogue-cleanup-20261114.md)"}
+              "provenance": CLEANUP_PROVENANCE}
     s.append(f"INSERT INTO {TARGET}.reference_metadata(source_key,metadata) VALUES "
              f"({lit('catalogue-cleanup:' + IMPORT)},{jlit(record)}::jsonb);")
     delta = {k: v for k, v in new_pman.items() if stored.get(k) != v}
@@ -310,8 +353,8 @@ END $acl$;""")
                     "embeddings_sha256": new_aman["embeddings_sha256"],
                     "manifest_sha256": sha_file(adir / "manifest.json")},
         "vectors": new_vecs,
-        "catalogue_cleanup_20261114": {k: report[k] for k in (
-            "deleted_cards", "unvectored_cards", "moved_vectors", "relinked", "products_moved",
+        CLEANUP_KEY: {k: report[k] for k in (
+            "deleted_cards", "unvectored_cards", "moved_vectors", "relinked", "images_adopted", "products_moved",
             "helpers_dropped", "helpers_moved", "pad_vectors", "artwork_regions", "cards")},
     }
     s.append(f"UPDATE {TARGET}.import_manifest SET metadata = jsonb_set(jsonb_set(jsonb_set(metadata,"
