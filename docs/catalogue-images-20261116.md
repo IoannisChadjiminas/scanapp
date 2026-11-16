@@ -86,13 +86,13 @@ looked for within that language) and keeps a per-row `source_kind`; `prepare_sql
 
 SQL applied on staging after FIXES1R was switched (sha256 `a602ea03…17f5`, 299 statements, committed). The candidate read back as validated and inactive (`activation_allowed` false), with 62,074 cards, 55,663 of them with images, and 37,358 artwork rows.
 
-Replay of 1,891 photos run under `caffeinate` with a 12h read role: image `scanapp-api-staging:24856ba9`, 3 lanes, every shard exited 0. Scored with `score_gate.py` against `data/catalogue-gaps/fixes1-20261116/out`. Scoring that baseline against itself gives 0 changes.
+Replay of 1,891 photos run under `caffeinate` with a 12h read role: image `scanapp-api-staging:24856ba9`, 3 lanes, every shard exited 0. Scored with `score_gate.py` against `data/catalogue-gaps/fixes1-20261116/out`, with the corrected labels (`LABELS_DIR` holding `panel-dev.json`, `panel-dev2.json` and `panel-dev3.json`). Without them, dev3 scores against stale labels as 924/14/949 on both sides, with the same 2 changes. Scoring that baseline against itself gives 0 changes.
 
 | panel | photos | right first | wrong first | right offered | wrong-first upper bound |
 |---|---|---|---|---|---|
 | dev | 681 | 636 → 636 | 3 → 3 | 663 → 663 | 0.0129 |
 | dev2 | 238 | 232 → 232 | 0 → 0 | 238 → 238 | 0.0159 |
-| dev3 | 972 | 924 → 924 | 14 → 14 | 949 → 949 | 0.024 |
+| dev3 | 972 | 938 → 938 | 0 → 0 | 963 → 963 | 0.0039 |
 
 There were 0 answers going from right first to not right first, 0 expected cards no longer offered and 0 cells lower, and the numerical gates pass. `dev-r8-ja-vintage-104` is already not right first in the baseline and is unchanged.
 
