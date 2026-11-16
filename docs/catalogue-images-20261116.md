@@ -84,7 +84,22 @@ looked for within that language) and keeps a per-row `source_kind`; `prepare_sql
 
 ## Gate
 
-(pending: FIXES1R, the parent, is still gating)
+SQL applied on staging after FIXES1R was switched (sha256 `a602ea03…17f5`, 299 statements, committed). The candidate read back as validated and inactive (`activation_allowed` false), with 62,074 cards, 55,663 of them with images, and 37,358 artwork rows.
+
+Replay of 1,891 photos run under `caffeinate` with a 12h read role: image `scanapp-api-staging:24856ba9`, 3 lanes, every shard exited 0. Scored with `score_gate.py` against `data/catalogue-gaps/fixes1-20261116/out`. Scoring that baseline against itself gives 0 changes.
+
+| panel | photos | right first | wrong first | right offered | wrong-first upper bound |
+|---|---|---|---|---|---|
+| dev | 681 | 636 → 636 | 3 → 3 | 663 → 663 | 0.0129 |
+| dev2 | 238 | 232 → 232 | 0 → 0 | 238 → 238 | 0.0159 |
+| dev3 | 972 | 924 → 924 | 14 → 14 | 949 → 949 | 0.024 |
+
+There were 0 answers going from right first to not right first, 0 expected cards no longer offered and 0 cells lower, and the numerical gates pass. `dev-r8-ja-vintage-104` is already not right first in the baseline and is unchanged.
+
+Every changed answer (2):
+
+- `dev-ja-promo-015` (expected `ja:BWP-235`): the best card is unchanged and right. The new `ja:SP-u12` (Eevee promo, one of the 4 new scannable rows) enters the alternatives in 4th place, and `ja:M6a-100` drops out of the five. Harmless.
+- `sealed-ja-older-001` (expected `ja:PCG4-079`): `printing_ambiguous` became `matched` on the same right card. The baseline's printing list held only the card itself. Harmless.
 
 ## Switch
 
