@@ -49,12 +49,63 @@ schemas and bundle are unused; dropping them waits for the owner.
 
 ## Gate
 
-(pending)
+1,891 photos were replayed against FIXES1R (local docker, image `scanapp-api-staging:24856ba9`, 3 lanes) and
+scored against LINKS4's accepted run with `score_gate.py`.
+
+| Panel | Photos | Right first | Wrong first | Right offered |
+|---|---:|---|---|---|
+| dev | 681 | 637 -> 636 | 4 -> 3 | 663 -> 663 |
+| dev2 | 238 | 232 -> 232 | 0 -> 0 | 238 -> 238 |
+| dev3 | 972 | 938 -> 938 | 0 -> 0 | 963 -> 963 |
+
+**One right -> not-right-first, accepted by the owner** ("yes switch it", 2026-11-16, after the trade-off was
+laid out). `dev-r8-ja-vintage-104`, an angled photo of the Base Set Hitmonchan `ja:PMCG1-058`: before, uncertain
+with the right card and no alternatives; now `printing_ambiguous` with `ja:CP6-060` (the 20th Anniversary
+reprint, same art) first and the right card second. Right still offered; cell `dev:unnumbered_vintage:ja` lower
+by one. A one-photo replay put the change in step B (LINKS4 and step A answer right; B and C answer the same new
+way, every time): removing the duplicate vectors changes this photo's neighbours, and the reprint now competes.
+
+The other 15 changed answers: 13 lost a deleted duplicate from their alternatives or show its original instead,
+1 got richer alternatives with the same right answer, and `dev-ja-vintage-054` went from wrong first
+(`ja:jr-dawn-dash-030`) to no match. No expected card stopped being offered. No panel label refers to a deleted row.
 
 ## Switch
 
-(pending)
+| Item | Value |
+|---|---|
+| Release | `PS-CATALOGUE-EN-JA-FIXES1R-20261116`, schema `pokesingle_completion_20261116_fixes1r` |
+| Parent | `PS-CATALOGUE-EN-JA-LINKS4-20261115` |
+| How | `scripts/catalogue-release-switch.sh apply`, `RELEASE_NAME=catalogue-fixes1-20261116`, 2026-11-16; only the four release lines of the env file changed (checked line by line against the live file) |
+| After | health ok, ready, import `PS-CATALOGUE-EN-JA-FIXES1R-20261116`, cards 62,074, restarts 0, no OOM |
+| Rollback | `/etc/scanapp-staging/catalogue-rollback/catalogue-fixes1-20261116` (rollback file points to LINKS4) |
+
+## Phone index
+
+| Item | Value |
+|---|---|
+| Before | `e19e142e80eac95b620efa1ad3adc67a2c9e9e78f33f830b229a004d410c9a62` (LINKS4) |
+| Now | `c7bdbcae8bb22f6f2683fa10db1deeb498577d8a750296f0c6e1797631f4768f`, 48,870 rows |
+| Rollback record | `/etc/scanapp-staging/catalogue-rollback/phone-index-fixes1-20261116/ACTIVE.before` |
+| Check | manifest 200 inside the container and from `staging-scan.pokesingle.com`; the downloaded ids file matches; a ranged request on the vectors returns 206 |
+
+Built from a local snapshot export of FIXES1R (read-only role) with `export_index.py --families`.
+`export_exceptions.json`: the 123 deleted duplicate ids leave the `latin_name_ja` list and the 59 rows that
+adopted their vectors join it (same cards, same English names as before: 7,765 -> 7,701).
 
 ## Going back
 
-(pending)
+On the staging host, from the code directory:
+
+```
+CONFIG_DIR=/etc/scanapp-staging RELEASE_NAME=catalogue-fixes1-20261116 PROJECT=scanapp-scanapp-z1mwj4 COMPOSE_FILE=compose.dokploy.yaml scripts/catalogue-release-switch.sh rollback
+```
+
+Then write `e19e142e80eac95b620efa1ad3adc67a2c9e9e78f33f830b229a004d410c9a62` to `/data/phone-index/ACTIVE.next`
+and rename it to `ACTIVE`. Both steps are needed: each phone index matches only its own snapshot.
+
+## Not done
+
+- Schemas `pokesingle_completion_20261116_fixes1b` and `_fixes1` and the folder
+  `/data/reference-features/20261116-fixes1` (first build, never served) are unused; dropping them waits for
+  the owner, as do the older `jarec43`-`45`. `_fixes1a` and `_fixes1rb` are FIXES1R's parents.
+- An image batch (IMG1) on top of FIXES1R is being built in its own session.
