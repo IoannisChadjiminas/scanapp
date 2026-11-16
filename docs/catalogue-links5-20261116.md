@@ -1,4 +1,4 @@
-# LINKS5 to 5F: Cardmarket links for Japanese rows, and 12 crossed links fixed (2026-11-16)
+# LINKS5 to 5F: Cardmarket links for Japanese rows, and 12 crossed links fixed (2026-11-16, switched 2026-11-17)
 
 Of the 2,966 Japanese rows without a Cardmarket link on IMG1, 1,245 get one (799 in LINKS5, 127 more in LINKS5B, 267 in LINKS5C, 52 in LINKS5D),
 plus the English `en:mep-120`
@@ -116,11 +116,54 @@ Each link is URL-only, as 142 links already were, with provenance
 | LINKS5C | `pokesingle_completion_20261116_links5c`, `PS-CATALOGUE-EN-JA-LINKS5C-20261116`, parent LINKS5B; 267 cards, SQL sha256 `d1bda60a696ecfd5917867e2a577fab0d8a3ce4db554a159a7dd91a7bc4ef45f`; links 49,236 -> 49,503 |
 | LINKS5D | `pokesingle_completion_20261116_links5d`, `PS-CATALOGUE-EN-JA-LINKS5D-20261116`, parent LINKS5C; 52 cards, SQL sha256 `532b68af5104376140164188c1c60b8fd9fd5a6cf2bc779dc9e5997b0d5771bc`; links 49,503 -> 49,555 |
 | LINKS5E | `pokesingle_completion_20261116_links5e`, parent LINKS5D; 125 cards (12 cleared, 113 linked), SQL sha256 `c4a6a75a60b2a1a999c8351169c9c36577446d7e58875cafb2b1ac4feb0b932a`; links 49,555 -> 49,656 |
-| LINKS5F (served candidate) | `pokesingle_completion_20261116_links5f`, `PS-CATALOGUE-EN-JA-LINKS5F-20261116`, parent LINKS5E; 7 cards, SQL sha256 `6c0bc7da6b5f94c37198d83abf1daa9a2a5e46cd870e28db44cd83b45856a38f`; links 49,656 -> 49,663 |
+| LINKS5F (served) | `pokesingle_completion_20261116_links5f`, `PS-CATALOGUE-EN-JA-LINKS5F-20261116`, parent LINKS5E; 7 cards, SQL sha256 `6c0bc7da6b5f94c37198d83abf1daa9a2a5e46cd870e28db44cd83b45856a38f`; links 49,656 -> 49,663 |
 | Read back | all six validated, inactive |
 | Bundles | features `20261116-img1`, artwork `20261116-img1` (unchanged) |
 
 Work files: `data/catalogue-gaps/ja-links-20261116/` (`matches.json`, `fixes.json`, `sql/`, `run_gate.sh`, `out/`).
+
+## Gate
+
+1,891 photos replayed against LINKS5F (local docker, image `scanapp-api-staging:24856ba9`, 3 lanes, features and
+artwork `20261116-img1`), scored against IMG1's accepted run with `score_gate.py` and the corrected labels.
+
+| Panel | Photos | Right first | Wrong first | Right offered |
+|---|---:|---|---|---|
+| dev | 681 | 636 -> 636 | 3 -> 3 | 663 -> 663 |
+| dev2 | 238 | 232 -> 232 | 0 -> 0 | 238 -> 238 |
+| dev3 | 972 | 938 -> 938 | 0 -> 0 | 963 -> 963 |
+
+0 right -> wrong, 0 expected cards lost, 0 changed answers. Only link columns changed, so this was expected.
+The gates on LINKS5 to 5D were stopped part-way when the next step was added; only LINKS5F, which holds all of
+them, was replayed in full.
+
+## Switch
+
+| Item | Value |
+|---|---|
+| Release | `PS-CATALOGUE-EN-JA-LINKS5F-20261116`, schema `pokesingle_completion_20261116_links5f`, features and artwork `20261116-img1` |
+| Approval | the owner chose "Everything possible", then "one photo check and switch", and asked to "do everything and finalize it" |
+| How | `catalogue-release-switch.sh apply`, `RELEASE_NAME=catalogue-links5-20261116`, release file `/root/catalogue-links5-20261116.env` (a copy of the live file with only `PLANETSCALE_SCHEMA` and `PLANETSCALE_IMPORT_ID` changed, checked by diff) |
+| After | health ok, ready, import LINKS5F, restarts 0, no OOM |
+| Rollback | `/etc/scanapp-staging/catalogue-rollback/catalogue-links5-20261116` (rollback file points to IMG1) |
+
+## Phone index
+
+Unchanged: `32f22e3fa19e49e43c0d2f940ff00c03b2a5201e0ae8d4bd9de57e54ac3bda0b`, 48,874 rows. A local snapshot
+export of LINKS5F (read-only role: 62,074 cards, 49,663 links) has the same pad vectors byte for byte, and
+`export_index.py --families` on it rebuilt the same version with all four files identical. Cardmarket links are
+not in the phone index. Nothing was published: the manifest kept answering 200 across the switch, the public
+ids file matches, and a ranged request on the vectors returns 206.
+
+## Going back
+
+On the staging host, from the code directory:
+
+```
+CONFIG_DIR=/etc/scanapp-staging RELEASE_NAME=catalogue-links5-20261116 PROJECT=scanapp-scanapp-z1mwj4 COMPOSE_FILE=compose.dokploy.yaml scripts/catalogue-release-switch.sh rollback
+```
+
+The phone index stays as it is: IMG1 uses the same one.
 
 ## Still without a link (1,721 Japanese rows after LINKS5D)
 
