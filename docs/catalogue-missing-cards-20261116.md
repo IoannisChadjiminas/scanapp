@@ -23,8 +23,9 @@ Limitless sets map to ours through the names work's set map, then by the same co
 ## English: nothing missing that a list shows
 
 - Every card on TCGdex's 221 English set lists has a catalogue row (Pocket left out).
-- Against pokemontcg.io's 177 sets, the only shortfall is **Team Up (`sm9`) 197 and 198**: pokemontcg.io counts
-  198 cards, TCGdex and the catalogue stop at 196 (+ `152b`). Its API returned 502 today; to check by hand.
+- Against pokemontcg.io's 177 sets, the only shortfall was Team Up (`sm9`): pokemontcg.io counts 198 cards,
+  TCGdex and the catalogue stop at 196. Bulbapedia's Team Up list also ends at 196/181; the two extra are the
+  `152a`/`152b` Pokémon Communication variants (we have `152b`; `152a` is a championship reverse-holo promo).
 - Four TCGdex English sets have no card list: Jumbo cards (160), W Promotional (7), Sample (10), Radiant
   Collection (25). Radiant Collection's 25 cards are inside our `bw*` sets as `RC` numbers; the other three
   are oversize, sample and pre-release products, to check by hand.
@@ -32,13 +33,13 @@ Limitless sets map to ours through the names work's set map, then by the same co
   Prize Pack Series 1-9, Trick or Trade 2022-2024, the Classic decks, Burger King, Professor Program,
   the 151 UPC metal card.
 
-## Japanese, Black & White onward: nothing numbered is missing
+## Japanese, Black & White onward: nothing missing
 
 Against the 264 Limitless sets:
 
 | Kind | Cards | What it is |
 |---|---:|---|
-| Numbered, not in the catalogue | 3 | `SC` 002 ジャノビー, `SGG` 0 and `SGI` 0 (basic energies numbered 0) |
+| Numbered, filed elsewhere | 3 | `SC` 002 ジャノビー is `ja:pc-shiny-collection-2` (a companion set); `SGG` 0 and `SGI` 0 (basic energies numbered 0) are our `SGG-u01` and `SGI-u01` |
 | Numbered, in the catalogue without its number | 77 | Sword & Shield promos `SP` 001-099: our `ja:SP-u01`..`u82` rows (English names, placeholder numbers) are these cards (きずぐすり = Potion, マリィ = Marnie, ...). They need their printed numbers, not new rows |
 | Suffix variants | 210 | Limitless lists mirror and deck-mark prints as `1r`, `1a`, `13b` (`XY` The Best of XY 128, `WAK` 17, `HS` 14, `XYP` 13, ...). The catalogue does not model these as separate cards |
 | Unnumbered basic energies per product | 300 | Limitless lists each deck's basic energies (`NAN1`, `G`, `D`, ...). The catalogue keeps basic energies in the `EN*` and energy sets, not per product |
@@ -104,10 +105,31 @@ Found on the way (not missing cards):
 - 19 L1HG and 18 L1SS rows have unpadded numbers (`13`, not `013`) and a Japanese set name; no number repeats,
   so the sets are complete, only inconsistently written.
 
-## Answer so far
+## Japanese promos, decks and products, read by hand
 
-- **English: 0 cards confirmed missing**; 2 to check (Team Up 197-198), plus 3 small special products without a list.
-- **Japanese, from 2010 on: 3 cards missing**, 77 present without their number; mirror and deck-mark variants
+Bulbapedia, 2026-11-16, same method (numbered products by number; deck pages count each distinct numbered
+card once, so a card in both decks of a two-deck kit appears once there and twice here).
+
+| Matched the checklist | Sets |
+|---|---|
+| Promos | DPP 127, DPtP 51, PPP 7, ADV-P 63, PCG-P 154, P 47, T 24, J 2, PLAY 32, LP 79 (+ our 12 Illusion's Zorua/Zoroark `500`-`511`), WCP 108 (87 + 21 in `pooka-wcp`), S8a-P 25, Pikachu World 9 |
+| Numbered decks and kits | Aqua and Magma Deck Kits 33, Black and Silver Deck Kits 20, the 18 ADV/PCG constructed starter and standard decks, Extra Regulation Box (48 + 9 energies), Master Kit, Leafeon vs Metagross, Garchomp vs Charizard, Giratina vs Dialga, Infernape vs Gallade, Battle Starter Decks, the DPt, Emerald, Latias/Latios and Mew • Lucario gift boxes, Arceus LV.X decks, the three Holon Research Tower quarter decks, the four Movie Commemoration VS packs, Theater Limited VS Pack, 10th and 11th Movie sets, Movie Random Pack, Melee! Pokémon Scramble, Southern Islands, Scarlet & Violet energies, the Classic decks (with their `pooka-` companions), Vending Machine Series 1 and 2 |
+| **Missing** | **Vending Machine Series 3 (Green): 2 cards.** Bulbapedia lists two different Kadabra and two different Haunter; we have one of each (`u21`, `u14`). Neither has a TCGdex image |
+
+Not compared (no comparable list): the unnumbered half decks, Entry Packs, Quick Starter Gift Set and
+Heatran/Magmortar kits (Bulbapedia lists every card in the deck, reprints and energies included), the gym
+decks, Neo Premium Files, PokéPark, Venusaur/Charizard/Blastoise random decks, Intro Packs, McDonald's
+Pokémon-e Minimum Pack (Bulbapedia's page lists a different product), `jr-miscellaneous-promos` and
+`jr-miscellaneous-decks` (TCG Collector groupings), MG, Mega Evolution energies and the `EN*` energy sets:
+about 40 products, 900 rows.
+
+## Answer
+
+- **English: 0 cards missing**, apart from 3 small special products without a list (Jumbo, W Promotional, Sample).
+- **Japanese, from 2010 on: 0 cards missing**; 77 SP promos present without their printed number; mirror and deck-mark variants
   and per-product basic energies are not modelled (510 list entries).
 - **Japanese main expansions before 2010 (23 sets read): 0 cards missing**; 57 are filed under companion set ids.
-- **Japanese promos, decks, gift boxes and energy sets: not yet known** (about 160 sets, 3,700 rows).
+- **Japanese promos, decks and products: 2 cards missing** (Vending Machine Series 3 Kadabra and Haunter);
+  about 40 products (900 rows) have no comparable list.
+- Fixes rather than additions: 77 SP promo numbers, `jr-dawn-dash-014` "Dark Magcargo" title, the duplicate
+  `jr-moonlit-pursuit-dawn-dash` set, and 57 + 1 cards filed under companion set ids.
