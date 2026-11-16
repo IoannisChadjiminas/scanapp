@@ -1,6 +1,6 @@
-# LINKS5 and LINKS5B: 927 Cardmarket links for Japanese rows (2026-11-16)
+# LINKS5, 5B and 5C: 1,194 Cardmarket links for Japanese rows (2026-11-16)
 
-Of the 2,966 Japanese rows without a Cardmarket link on IMG1, 926 get one (799 in LINKS5, 127 more in LINKS5B),
+Of the 2,966 Japanese rows without a Cardmarket link on IMG1, 1,193 get one (799 in LINKS5, 127 more in LINKS5B, 267 in LINKS5C),
 plus the English `en:mep-120`
 held over from EN1 (`docs/catalogue-en1-findings-20261116.md` on `claude/image-batch-20261116-ffd17e`). The
 owner asked for "Japanese links" after IMG1. Staging only. Only link columns change: no vector, image,
@@ -33,6 +33,34 @@ and given to the matcher as its third argument. This added 127 links (95 Sun & M
 It also cleared the LINKS5 link of `ja:XYP-065` Hawlucha: the full list has two Hawlucha (XY-P 065) products
 (`Hawlucha-V1`, `-V2`), so the match was not unique.
 
+**LINKS5C: sets with no link yet, mapped by hand.** 37 sets (1,026 rows) had no linked row, so no expansion to
+search. The owner asked to map them ("ok lets do", 2026-11-16). Cardmarket's own expansion list (794
+expansions, read from the Singles page's expansion menu: `cm-expansions-20261116.json`) gave these pairings
+(`set-map.json`). The full list pages of each were read the same way (`crawl-products-20261116.json`).
+
+| Our sets | Cardmarket expansion | Linked |
+|---|---|---:|
+| `SD` V Starter Decks | V Starter Decks | 115 |
+| `jr-heatran-vs-regigigas-deck-kit` | Heatran vs Regigigas Deck Kit | 20 |
+| `jr-dialga-lv-x-constructed-standard-deck`, `jr-palkia-...` | Dialga / Palkia LV.X Constructed Standard Deck | 15 + 15 |
+| `jr-mew-lucario-gift-box-*` (5 decks) | Gift Box Mew • Lucario | 60 |
+| `jr-master-kit-*` (3 decks) | Master Kit | 42 |
+
+Matched with `api/scripts/ja_set_recovery/match_mapped_sets.py`: same English name (Lv. ignored), exactly one
+product. For the starter decks, gift box and master kit, whose numbers are the printed deck positions, the
+product's number must also agree (Mew and Mightyena share the `M` suffix on Cardmarket; name plus number tells
+them apart). A product two rows would take is dropped.
+
+Not linked, with the reason:
+- `jr-miscellaneous-decks` (73) duplicates the six Kanto gym deck sets (`jr-nivi-city-gym-deck` ...), whose rows
+  already hold those products. Likely duplicate rows, like the moonlit-pursuit set was.
+- Pikachu World Collection, Scarlet & Violet Energies, Mega Evolution Energies: Cardmarket lists several products
+  with the same name and number, so nothing is unique.
+- `jr-miscellaneous-promos` (298) spreads over many promo expansions with our own numbering.
+- The yearly energy sets `EN*`, the Neo Premium Files, the Quick Starter Gift Sets, Tropical Mega Battle and the
+  original Entry Pack: no matching expansion on Cardmarket. The combined half-deck and deck-kit sets duplicate
+  their halves.
+
 Each link is URL-only, as 142 links already were, with provenance
 `verified-cardmarket-firstparty-crawl-exact-expansion-number-name-links5`.
 
@@ -41,23 +69,24 @@ Each link is URL-only, as 142 links already were, with provenance
 | Item | Value |
 |---|---|
 | LINKS5 | `pokesingle_completion_20261116_links5`, `PS-CATALOGUE-EN-JA-LINKS5-20261116`, parent IMG1; `prepare_sql_fixes.py`, 800 cards, SQL sha256 `e89b42170675d6b9b3ab7f7e44f0e4d05e9150345cf5e2f5aba83cbc2ed4b7dc`; links 48,310 -> 49,110 |
-| LINKS5B (served candidate) | `pokesingle_completion_20261116_links5b`, `PS-CATALOGUE-EN-JA-LINKS5B-20261116`, parent LINKS5; 128 cards (127 links, 1 cleared), SQL sha256 `f19e87b2eead99c3562bf8d3c4addb5c6a56b9ed80905faa5a7892da7c2f47f5`; links 49,110 -> 49,236 |
-| Read back | both validated, inactive |
+| LINKS5B | `pokesingle_completion_20261116_links5b`, `PS-CATALOGUE-EN-JA-LINKS5B-20261116`, parent LINKS5; 128 cards (127 links, 1 cleared), SQL sha256 `f19e87b2eead99c3562bf8d3c4addb5c6a56b9ed80905faa5a7892da7c2f47f5`; links 49,110 -> 49,236 |
+| LINKS5C (served candidate) | `pokesingle_completion_20261116_links5c`, `PS-CATALOGUE-EN-JA-LINKS5C-20261116`, parent LINKS5B; 267 cards, SQL sha256 `d1bda60a696ecfd5917867e2a577fab0d8a3ce4db554a159a7dd91a7bc4ef45f`; links 49,236 -> 49,503 |
+| Read back | all three validated, inactive |
 | Bundles | features `20261116-img1`, artwork `20261116-img1` (unchanged) |
 
 Work files: `data/catalogue-gaps/ja-links-20261116/` (`matches.json`, `fixes.json`, `sql/`, `run_gate.sh`, `out/`).
 
-## Still without a link (2,040 Japanese rows after LINKS5B)
+## Still without a link (1,773 Japanese rows after LINKS5C)
 
 Counts from the matcher's run with the full promo lists:
 
 | Why | Rows |
 |---|---:|
-| The set has no linked row, so its expansion is unknown (`jr-miscellaneous-promos`, `SD`, the deck kits, energies, `EN*`) | 1,026 |
+| Sets with no linked row that could not be mapped or matched (see LINKS5C above) | 759 |
 | No product with that number and name in the expansion | 697 |
 | Name-only in an expansion shared by several of our sets (vending machine series, deck-kit halves) | 156 |
 | Several products fit (Cardmarket versions `V1`..`V5` with the same number) | 121 |
 | The set's rows link to several expansions | 41 |
 
-Linking more needs the unmapped sets assigned to their Cardmarket expansions by hand. The rows with several
+The rows with several
 fitting versions need someone to tell the versions apart on Cardmarket.
