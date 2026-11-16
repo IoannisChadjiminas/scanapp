@@ -1,6 +1,6 @@
 import pytest
 
-from cleanup_features import new_manifest, removed_files
+from cleanup_features import adopted_links, feature_filename, new_manifest, removed_files
 from prepare_sql_cleanup import check_decisions, new_segments, plan_artwork, plan_vectors
 
 
@@ -54,7 +54,9 @@ def test_feature_manifest_adopts_record_and_drops_unused_files():
                           "x": {"available": True, "filename": "x.npz", "image_path": "/i/x.jpg"}}}
     sig = [{"id": "orig", "image_path": "/i/dup.jpg", "rarity": None}]
     m = new_manifest(parent, sig, ["dup", "x"], {"orig": "dup"})
-    assert m["records"] == {"orig": parent["records"]["dup"]} and m["available"] == 1
-    assert removed_files(parent, m) == {"o.npz", "x.npz"}
+    assert m["records"] == {"orig": {**parent["records"]["dup"], "filename": feature_filename("orig")}} and m["available"] == 1
+    assert feature_filename("orig") == __import__("hashlib").sha256(b"orig").hexdigest() + ".npz"
+    assert removed_files(parent, m, {"orig": "dup"}) == {"d.npz", "o.npz", "x.npz", feature_filename("orig")}
+    assert adopted_links(parent, {"orig": "dup"}) == [("d.npz", feature_filename("orig"))]
     with pytest.raises(AssertionError):  # the catalogue row must point at the adopted image
         new_manifest(parent, [{"id": "orig", "image_path": "/i/orig.jpg"}], ["dup", "x"], {"orig": "dup"})
