@@ -1,6 +1,6 @@
-# LINKS5, 5B and 5C: 1,194 Cardmarket links for Japanese rows (2026-11-16)
+# LINKS5 to 5D: 1,246 Cardmarket links for Japanese rows (2026-11-16)
 
-Of the 2,966 Japanese rows without a Cardmarket link on IMG1, 1,193 get one (799 in LINKS5, 127 more in LINKS5B, 267 in LINKS5C),
+Of the 2,966 Japanese rows without a Cardmarket link on IMG1, 1,245 get one (799 in LINKS5, 127 more in LINKS5B, 267 in LINKS5C, 52 in LINKS5D),
 plus the English `en:mep-120`
 held over from EN1 (`docs/catalogue-en1-findings-20261116.md` on `claude/image-batch-20261116-ffd17e`). The
 owner asked for "Japanese links" after IMG1. Staging only. Only link columns change: no vector, image,
@@ -61,6 +61,25 @@ Not linked, with the reason:
   original Entry Pack: no matching expansion on Cardmarket. The combined half-deck and deck-kit sets duplicate
   their halves.
 
+**LINKS5D: same number, spelling differs.** The owner asked to add these ("Yes, add them"). With
+`api/scripts/ja_set_recovery/match_spelling_links.py`, the products with the row's printed number are taken, and
+exactly one must have the same name after spelling is evened out: `M Rayquaza-EX` = `MRayquaza EX`,
+`Basic Fire Energy` = `Fire Energy`, `NidoranF` = `Nidoran [F]`, the movie mark `[M]` and `Lv.` ignored, our
+`(Vaporeon artwork)` / `(Normal Forme)` notes ignored. All 57 pairs were read by eye: M-EX cards, the L-P basic
+energies, the Movie Commemoration Random Pack, the DPt-P `[GL]` / `[FB]` cards, the Eevee GX artworks and the
+Sky-Splitting Deoxys formes.
+- 5 were left out: `ja:XY3-012`, `-014` and `ja:XY9-001` to `-003`. Their Japanese products (`Rising-Fist/Torchic`,
+  `Rage-of-the-Broken-Heavens/Chikorita`, ...) are held by the English rows `en:xy3-12`, `en:xy3-14` and
+  `en:xy9-1` to `-3`.
+- Pairs that differ in more than spelling were not taken: `Mewtwo` against `MMewtwo EX`, `Shaymin` against
+  `Shaymin EX`, `Golbat` against `Zubat`, `Professor's Research` against a named professor.
+
+**Found on the way: links crossed between languages.** Six Cardmarket expansions are linked from both English and
+Japanese rows. Eight English rows hold Japanese-set products: `en:xy3-12`, `-14` (Rising Fist), `en:xy9-1` to
+`-3` (Rage of the Broken Heavens), and 3 in Pokémon GO Enhanced Expansion Pack. Four Japanese rows hold
+English-set products: 1 in Roaring Skies, 1 in Flashfire, 2 in MEP Black Star Promos. These are not changed
+here; they need a relink batch with the right products.
+
 Each link is URL-only, as 142 links already were, with provenance
 `verified-cardmarket-firstparty-crawl-exact-expansion-number-name-links5`.
 
@@ -70,20 +89,21 @@ Each link is URL-only, as 142 links already were, with provenance
 |---|---|
 | LINKS5 | `pokesingle_completion_20261116_links5`, `PS-CATALOGUE-EN-JA-LINKS5-20261116`, parent IMG1; `prepare_sql_fixes.py`, 800 cards, SQL sha256 `e89b42170675d6b9b3ab7f7e44f0e4d05e9150345cf5e2f5aba83cbc2ed4b7dc`; links 48,310 -> 49,110 |
 | LINKS5B | `pokesingle_completion_20261116_links5b`, `PS-CATALOGUE-EN-JA-LINKS5B-20261116`, parent LINKS5; 128 cards (127 links, 1 cleared), SQL sha256 `f19e87b2eead99c3562bf8d3c4addb5c6a56b9ed80905faa5a7892da7c2f47f5`; links 49,110 -> 49,236 |
-| LINKS5C (served candidate) | `pokesingle_completion_20261116_links5c`, `PS-CATALOGUE-EN-JA-LINKS5C-20261116`, parent LINKS5B; 267 cards, SQL sha256 `d1bda60a696ecfd5917867e2a577fab0d8a3ce4db554a159a7dd91a7bc4ef45f`; links 49,236 -> 49,503 |
-| Read back | all three validated, inactive |
+| LINKS5C | `pokesingle_completion_20261116_links5c`, `PS-CATALOGUE-EN-JA-LINKS5C-20261116`, parent LINKS5B; 267 cards, SQL sha256 `d1bda60a696ecfd5917867e2a577fab0d8a3ce4db554a159a7dd91a7bc4ef45f`; links 49,236 -> 49,503 |
+| LINKS5D (served candidate) | `pokesingle_completion_20261116_links5d`, `PS-CATALOGUE-EN-JA-LINKS5D-20261116`, parent LINKS5C; 52 cards, SQL sha256 `532b68af5104376140164188c1c60b8fd9fd5a6cf2bc779dc9e5997b0d5771bc`; links 49,503 -> 49,555 |
+| Read back | all four validated, inactive |
 | Bundles | features `20261116-img1`, artwork `20261116-img1` (unchanged) |
 
 Work files: `data/catalogue-gaps/ja-links-20261116/` (`matches.json`, `fixes.json`, `sql/`, `run_gate.sh`, `out/`).
 
-## Still without a link (1,773 Japanese rows after LINKS5C)
+## Still without a link (1,721 Japanese rows after LINKS5D)
 
 Counts from the matcher's run with the full promo lists:
 
 | Why | Rows |
 |---|---:|
 | Sets with no linked row that could not be mapped or matched (see LINKS5C above) | 759 |
-| No product with that number and name in the expansion | 697 |
+| No product with that number and name in the expansion (after LINKS5D: 316 have no product with the number at all; the rest differ in more than spelling) | 645 |
 | Name-only in an expansion shared by several of our sets (vending machine series, deck-kit halves) | 156 |
 | Several products fit (Cardmarket versions `V1`..`V5` with the same number) | 121 |
 | The set's rows link to several expansions | 41 |
