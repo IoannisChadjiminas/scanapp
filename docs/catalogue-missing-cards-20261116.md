@@ -83,15 +83,17 @@ numbers there are our own); LEGEND and ADV sets are numbered and were compared b
 | L1HG HeartGold Collection | 71 (+8 basic energies) | 71 | - |
 | L1SS SoulSilver Collection | 71 | 71 | - |
 | Magma vs Aqua: Two Ambitions | 80 | 80 | - |
-| **L2 Reviving Legends** | 73 | 81 | **8**: 016 Vaporeon, 019 Lanturn, 020 Lanturn, 023 Muk, 025 Misdreavus, 074 Flower Shop Lady, 079 Darkness Energy, 080 Metal Energy |
-| **L3 Clash at the Summit** | 68 | 81 | **13**: 004 Yanma, 007 Celebi, 010 Ponyta, 011 Rapidash, 019 Swinub, 020 Piloswine, 026 Electrode, 027 Electrode, 029 Electabuzz, 030 Electivire, 052 Drapion, 064 Ditto, 067 Porygon-Z |
-| **LL Lost Link** | 38 | 40 | **2**: 010 Magneton, 034 Zangoose |
-| **ADV Expansion Pack** | 43 | 55 | **12**: 006 Beautifly, 008 Dustox, 012 Numel, 013 Camerupt, 024 Electrike, 025 Manectric, 027 Ralts, 028 Kirlia, 029 Gardevoir, 038 Linoone, 044 Skitty, 049 Aron |
-| **Miracle of the Desert** | 48 | 53 | **5**: 006 Cacnea, 007 Cacturne, 020 Ludicolo, 025 Natu, 026 Xatu |
-| **Rulers of the Heavens** | 48 | 54 | **6**: 008 Slugma, 016 Barboach, 017 Whiscash, 030 Grumpig, 040 Vibrava, 045 Shelgon |
-| **Undone Seal** | 72 | 83 | **11**: 003 Oddish, 004 Gloom, 006 Pinsir, 009 Heracross, 010 Seedot, 016 Vulpix, 025 Milotic, 026 Rain Castform, 042 Chinchou, 044 Starmie, 051 Machamp |
+| L2 Reviving Legends | 73 + 8 companion | 81 | - (8 in `pc-reviving-legends`, `pooka-l2`) |
+| L3 Clash at the Summit | 68 + 13 companion | 81 | - (13 in `pc-clash-at-the-summit`) |
+| LL Lost Link | 38 + 2 companion | 40 | - (2 in `pc-lost-link`) |
+| ADV Expansion Pack | 43 + 12 companion | 55 | - (12 in `pooka-adv-expansion-pack`) |
+| Miracle of the Desert | 48 + 5 companion | 53 | - (5 in `pooka-miracle-of-the-desert`) |
+| Rulers of the Heavens | 48 + 6 companion | 54 | - (6 in `pooka-rulers-of-the-heavens`) |
+| Undone Seal | 72 + 11 companion | 83 | - (11 in `pooka-undone-seal`) |
 
-**57 cards missing** across these 23 sets, all in LEGEND (L2, L3, LL) and four ADV sets.
+**Nothing missing** in these 23 sets. 57 of their cards are filed under a companion set id (`pc-*`, `pooka-*`,
+rows added from other sources to complete the set) instead of the main set id; every number on the checklist
+has a row in the main set or its companion.
 
 Found on the way (not missing cards):
 
@@ -107,5 +109,5 @@ Found on the way (not missing cards):
 - **English: 0 cards confirmed missing**; 2 to check (Team Up 197-198), plus 3 small special products without a list.
 - **Japanese, from 2010 on: 3 cards missing**, 77 present without their number; mirror and deck-mark variants
   and per-product basic energies are not modelled (510 list entries).
-- **Japanese main expansions before 2010 (23 sets read): 57 cards missing**, in L2, L3, LL and four ADV sets.
+- **Japanese main expansions before 2010 (23 sets read): 0 cards missing**; 57 are filed under companion set ids.
 - **Japanese promos, decks, gift boxes and energy sets: not yet known** (about 160 sets, 3,700 rows).
