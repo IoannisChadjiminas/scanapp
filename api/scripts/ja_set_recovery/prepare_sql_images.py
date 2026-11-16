@@ -115,11 +115,12 @@ END $acl$;""")
                             f"{jlit({k: r[k] for k in ('card_id','profile','language','name','set_name','collector_number','reference_sha256')})}::jsonb)"
                             for i, r in enumerate(art_added)) + ";")
     for u in updates:
-        patch = {"image_path": u["image_path"], "sha256": u["image_sha256"], "source_kind": SOURCE_KIND,
+        patch = {"image_path": u["image_path"], "sha256": u["image_sha256"], "source_kind": u.get("source_kind", SOURCE_KIND),
                  "source": u["source"], "name_official_ja": u["name_ja"], "treatment": u["treatment"],
-                 "treatment_reason": u["reason"], "source_use_permission": SOURCE_PERMISSION,
+                 "treatment_reason": u["reason"], "source_use_permission": u.get("source_permission", SOURCE_PERMISSION),
                  "image_batch": IMPORT}
-        s.append(f"UPDATE {TARGET}.reference_metadata SET metadata = metadata || {jlit(patch)}::jsonb WHERE source_key={lit(prov_keys[u['id']])};")
+        if u["id"] in prov_keys:  # rows from the base import have no completion-source row
+            s.append(f"UPDATE {TARGET}.reference_metadata SET metadata = metadata || {jlit(patch)}::jsonb WHERE source_key={lit(prov_keys[u['id']])};")
     if FIX_SOURCE_BATCH:
         fix = {"source_kind": SOURCE_KIND, "source_use_permission": SOURCE_PERMISSION, "source_kind_corrected_in": IMPORT}
         s.append(f"UPDATE {TARGET}.reference_metadata SET metadata = metadata || {jlit(fix)}::jsonb "
