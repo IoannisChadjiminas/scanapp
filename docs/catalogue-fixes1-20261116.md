@@ -105,7 +105,12 @@ and rename it to `ACTIVE`. Both steps are needed: each phone index matches only 
 
 ## Not done
 
-- Schemas `pokesingle_completion_20261116_fixes1b` and `_fixes1` and the folder
-  `/data/reference-features/20261116-fixes1` (first build, never served) are unused; dropping them waits for
-  the owner, as do the older `jarec43`-`45`. `_fixes1a` and `_fixes1rb` are FIXES1R's parents.
+- Cleaned up with the owner's OK (2026-11-16): dropped schemas `pokesingle_completion_20261116_fixes1b`,
+  `_fixes1` (first build, never served), `pokesingle_completion_20261111_jarec43` and `_jarec45`, and removed
+  the host folder `/data/reference-features/20261116-fixes1`. Before dropping, no view or foreign key in
+  another schema depended on them and no staging env or rollback file named them. The first-build schemas
+  were owned by an expired role, so its objects were reassigned to `postgres` first (`_fixes1a` with them).
+  Staging stayed healthy on FIXES1R.
+- Kept: `pokesingle_completion_20261111_jarec44`, which the old `second-batch-k3-20261114` rollback file
+  points to. `_fixes1a` and `_fixes1rb` are FIXES1R's parents.
 - An image batch (IMG1) on top of FIXES1R is being built in its own session.
