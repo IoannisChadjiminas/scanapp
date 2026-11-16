@@ -82,7 +82,26 @@ rename it to `ACTIVE`.
 
 ## Not done
 
-- **Seven wrong Cardmarket links.** `ja:M6-048`, `ja:SV-P-155`, `-165`, `-210`, `-254`, `-258` and `ja:SV10-082` link
-  to an Indonesian, Traditional Chinese or 30th Celebration product with the same number but a different card; that is
-  where their wrong titles came from. This release changes titles only; clearing or fixing the links is a links release.
+- ~~Seven wrong Cardmarket links~~: cleared by LINKS4, below. The right Japanese products are not linked yet; each row
+  now has no Cardmarket link until its real product is found and checked.
 - **The 3 held titles** above need a source for the right card.
+
+## LINKS4: the seven wrong-card links cleared (2026-11-16)
+
+`ja:M6-048`, `ja:SV-P-155`, `-165`, `-210`, `-254`, `-258` and `ja:SV10-082` linked to an Indonesian, Traditional
+Chinese or 30th Celebration (IDTH) product with the same number but a different card (Krookodile ex, Pikachu ex,
+Mewtwo ex, Mega Tatsugiri ex, Arboliva ex, Team Rocket's Crobat ex, Lunala). That is where their scraped titles came
+from. The owner approved clearing them ("Yes, clear them"). Each row now has no Cardmarket link; the old URLs and
+reasons are in `docs/catalogue-links4-20261115.json`.
+
+| Item | Value |
+|---|---|
+| Release | `PS-CATALOGUE-EN-JA-LINKS4-20261115`, schema `pokesingle_completion_20261115_links4`, parent TITLES1 |
+| SQL | `prepare_sql_fixes.py` (`clear_link`), `FIX_KEY=wrong_card_links_20261115`: 32 statements, sha256 `b14b10fdad85b0091f6433c1b52aa07032ef99001013efafab01521a60f9bb65`; 7 cards updated, cards md5 `8dbd9c21fb09f5920003bdb87f650068` |
+| Gate | 1,891 photos: every answer identical to TITLES1 (dev 637/4/663, dev2 232/0/238, dev3 938/0/963; right → wrong 0, cells lower none). Eight of the eleven lanes were re-run once: the read role expired while the Mac slept, and they failed at catalogue load with no rows |
+| How | `scripts/catalogue-release-switch.sh apply`, `RELEASE_NAME=catalogue-links4-20261115`; only `PLANETSCALE_SCHEMA` and `PLANETSCALE_IMPORT_ID` changed |
+| After | health ok, ready, import `PS-CATALOGUE-EN-JA-LINKS4-20261115`, restarts 0, no OOM, phone manifest 200 |
+| Rollback | `/etc/scanapp-staging/catalogue-rollback/catalogue-links4-20261115` (rollback file points to TITLES1) |
+| Phone index | unchanged: the export from LINKS4 is byte-identical to `e19e142e…` (the index has no link column) |
+
+Going back: the same rollback command with `RELEASE_NAME=catalogue-links4-20261115`. The phone index needs no change.
