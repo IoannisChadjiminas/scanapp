@@ -1,0 +1,76 @@
+BGS-015 V2 gold Thundurus mark
+BGS-016 V2 gold mark
+BGS-017 V2 gold mark
+BGS-018 V2 gold mark
+BGS-019 V2 gold mark
+BGS-020 V2 gold mark
+HS-001 V2 deck mark 1 (V1 is 15)
+HS-003 V1 non-holo, mark 9 on both
+HS-006 V2 deck mark 10, holo (V1 is 14)
+HS-008 V1 non-holo, mark 18 on both
+HS-011 V2 holo
+HS-013 V1 non-holo
+HS-033 V1 green mark 16
+HS-035 V1 green mark 25
+HS-036 V1 green mark 26
+HS-037 V1 green mark 23
+HSP-32 V1 green mark 25
+HSP-33 V1 green mark 26
+HSZ-031 V1 green mark 16
+HSZ-032 V1 green mark 28
+HSZ-033 V1 green mark 29
+HSZ-034 V1 green mark 17
+HSp-032 V1 green mark
+HXY-036 V1 green mark 28
+HXY-038 V1 green mark 29
+SH-040 V2 yellow Pikachu mark
+SH-042 V2 yellow Pikachu mark
+SH-043 V2 yellow Pikachu mark
+SH-044 V2 yellow Pikachu mark
+SH-045 V2 yellow Pikachu mark
+SH-047 V2 yellow Pikachu mark
+SH-048 V2 yellow Pikachu mark
+SH-050 V2 yellow Pikachu mark
+SH-052 V2 yellow Pikachu mark
+SH-053 V2 yellow Pikachu mark
+SMD-022 V1 yellow-black deck mark (V2 red)
+SMD-024 V1 yellow-black deck mark (V2 red)
+SVAL-002 V1 non-holo (V2 is Cardmarket's Holo Version)
+SVAL-003 V1 non-holo (V2 Holo Version)
+SVAL-004 V1 non-holo (V2 Holo Version)
+SVAM-004 V1 non-holo (V2 Holo Version)
+SVAM-005 V1 non-holo (V2 Holo Version)
+SVAM-006 V1 non-holo (V2 Holo Version)
+SVAW-002 V1 non-holo (V2 Holo Version)
+SVAW-003 V1 non-holo (V2 Holo Version)
+SVAW-004 V1 non-holo (V2 Holo Version)
+SVC-007 V1 non-holo (V2 Holo Version)
+SVC-008 V1 non-holo (V2 Holo Version)
+SVC-009 V1 non-holo (V2 Holo Version)
+SVEL-005 V1 non-holo (V2 foil art)
+SVEL-006 V1 non-holo (V2 foil art)
+SVEM-004 V1 non-holo (V2 foil art)
+SVEM-005 V1 non-holo (V2 foil art)
+SVI-050 V1 green deck mark 16 (V2 orange)
+SVI-052 V1 green deck mark
+SVI-054 V1 green deck mark
+SVI-055 V1 green deck mark
+SVI-056 V1 green deck mark
+SVI-059 V1 green deck mark
+SVI-060 V1 green deck mark
+SVI-065 V1 green deck mark
+WAK-041 V1 green deck silhouette
+WAK-042 V1 red deck silhouette
+WAK-043 V1 orange deck silhouette
+WAK-044 V1 purple deck silhouette
+WAK-045 V1 green deck silhouette (of 8)
+WAK-046 V1 light-blue deck silhouette (of 4)
+WAK-047 V1 green deck silhouette
+XY1-Bx-008 V1 Elegant Pattern (purple wings), V2 is Meadow Pattern
+XYE-019 V1 red Emboar mark (V2 pink)
+XYE-020 V1 red mark
+XYE-021 V2 pink Togekiss mark
+XYE-022 V1 red mark
+XYP-011 V1 XY campaign stamp
+XYP-013 V1 XY campaign stamp
+XYP-065 V1 no stamp (V2 Pokemon Pan stamp)
