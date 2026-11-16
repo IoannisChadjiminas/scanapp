@@ -1,5 +1,5 @@
 {
-"_note": "Rows the export checks let through: the state of the FIXES1R catalogue (PS-CATALOGUE-EN-JA-FIXES1R-20261116) on 2026-11-16. Any other row that breaks a check fails the build. Remove ids as they are fixed; never add new ones without a record in docs/.",
+"_note": "Rows the export checks let through: the state of the IMG1 catalogue (PS-CATALOGUE-EN-JA-IMG1-20261116) on 2026-11-16. Any other row that breaks a check fails the build. Remove ids as they are fixed; never add new ones without a record in docs/. IMG1 (2026-11-16) gave vectors to ja:SP-u12 Eevee, ja:SP-u63 Scorbunny and ja:SP-u65 Sobble, whose names are still English: they join latin_name_ja (7,701 -> 7,704).",
 "digital_set": [],
 "latin_name_ja": [
 "extra-charmander-001-032",
@@ -3710,6 +3710,7 @@
 "ja:SP-u09",
 "ja:SP-u10",
 "ja:SP-u11",
+"ja:SP-u12",
 "ja:SP-u13",
 "ja:SP-u14",
 "ja:SP-u15",
@@ -3742,6 +3743,8 @@
 "ja:SP-u60",
 "ja:SP-u61",
 "ja:SP-u62",
+"ja:SP-u63",
+"ja:SP-u65",
 "ja:SP-u68",
 "ja:SP-u69",
 "ja:SP-u72",

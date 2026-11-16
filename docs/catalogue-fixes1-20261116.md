@@ -114,4 +114,24 @@ and rename it to `ACTIVE`. Both steps are needed: each phone index matches only 
 - `pokesingle_completion_20261111_jarec44` was dropped too, after the owner was told that the old
   `second-batch-k3-20261114` rollback file points to it (that rollback can no longer be used).
   `_fixes1a` and `_fixes1rb` are FIXES1R's parents and stay.
-- An image batch (IMG1) on top of FIXES1R is being built in its own session.
+- IMG1, the image batch on top of FIXES1R, is now served: see "Next release: IMG1" below.
+
+## Next release: IMG1 (switched 2026-11-16)
+
+IMG1 adds images for 135 Japanese rows. Four of them become scannable: `ja:SP-099`, `ja:SP-u12`, `-u63` and
+`-u65`. It was built and gated in its own session (branch `claude/image-batch-20261116-ffd17e`, doc there).
+The gate was rescored against FIXES1R with the corrected labels and every panel is unchanged: dev 636/3/663,
+dev2 232/0/238, dev3 938/0/963. There are 0 right->wrong answers and 2 harmless changed answers. The owner
+approved the switch ("Yes, switch IMG1").
+
+| Item | Value |
+|---|---|
+| Release | `PS-CATALOGUE-EN-JA-IMG1-20261116`, schema `pokesingle_completion_20261116_img1`, features and artwork `20261116-img1` |
+| How | `catalogue-release-switch.sh apply`, `RELEASE_NAME=catalogue-img1-20261116`, release file `/root/catalogue-img1-20261116.env` (a copy of the live file with only the four release lines changed) |
+| After | health ok, ready, import IMG1, restarts 0, no OOM |
+| Rollback | `/etc/scanapp-staging/catalogue-rollback/catalogue-img1-20261116` (back to FIXES1R) |
+| Phone index | `32f22e3fa19e49e43c0d2f940ff00c03b2a5201e0ae8d4bd9de57e54ac3bda0b`, 48,874 rows; `ACTIVE.before` (c7bdbcae) in `/etc/scanapp-staging/catalogue-rollback/phone-index-img1-20261116`. Manifest 200 inside the container and in public; the ids file matches; a ranged request returns 206 |
+
+`export_exceptions.json`: `ja:SP-u12`, `-u63` and `-u65` still have English names and join `latin_name_ja`
+(7,701 -> 7,704). To go back, run the rollback with `RELEASE_NAME=catalogue-img1-20261116`, then make
+`c7bdbcae...` the phone index's `ACTIVE` again.
