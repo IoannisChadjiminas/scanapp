@@ -57,7 +57,7 @@ def test_extend_keeps_rows_and_appends(tmp_path):
     assert lines[0].split('\t')[:6] == ['#id', 'name', 'number', 'printed_number', 'set_total', 'language']
     assert lines[0].split('\t')[10:] == list(extend.NEW_COLUMNS)
     assert lines[1].split('\t') == ['ja:a', 'ヘルガー', '44', '', '57', 'ja', '', '', 'Houndoom', '',
-                                    '2000', '70', 'regular', '', 'Houndoom']
+                                    '2000', '70', 'regular', '', 'Houndoom', '']
     assert lines[2].split('\t')[:10] == ['en:b', 'Beta', '2', '02', '100', 'en', '', '', '', '']
     assert lines[3].split('\t')[:6] == ['ja:c', 'ブラッキーV', '047', '', '69', 'ja']
     assert (target / 'card_index.ids.txt').read_text() == 'ja:a\nen:b\nja:c\n'
@@ -67,6 +67,34 @@ def test_extend_keeps_rows_and_appends(tmp_path):
     version = json.loads((target / 'card_index.version.json').read_text())
     assert version['rows'] == 3 and version['extends']['version'] == 'v1' and target.name == version['version']
     assert version['extends']['names_changed'] == 1 and version['extends']['totals_filled'] == 1
+
+
+def test_extend_fills_empty_promo_code_and_writes_prints(tmp_path):
+    base = base_release(tmp_path)
+    cols = {'rows': {'en:b': {'promo_code': 'SWSH', 'set_code': 'PAL', 'printing': 'promo'}},
+            'prints': {'ja:p': {'reprint_of': 'ja:a', 'printing': 'promo', 'number': '044', 'set_code': 'SP',
+                                'release_year': '2020'}}}
+    target = extend.extend(base, cols, tmp_path / 'out', [], None)
+    row = (target / 'card_index.meta.tsv').read_text().splitlines()[2].split('\t')
+    assert row[6] == 'SWSH' and row[-1] == 'PAL'
+    prints = (target / 'card_index.prints.tsv').read_text().splitlines()
+    assert prints[0].split('\t') == ['#id'] + list(extend.PRINTS_COLUMNS)
+    assert prints[1].split('\t') == ['ja:p', 'ja:a', 'promo', '044', '', '', 'SP', '', '2020']
+    version = json.loads((target / 'card_index.version.json').read_text())
+    assert 'card_index.prints.tsv' in version['files'] and version['extends']['promo_codes_filled'] == 1
+    with pytest.raises(AssertionError):  # a prints row must point at an index row
+        extend.extend(base, {'rows': {}, 'prints': {'ja:q': {'reprint_of': 'ja:zz'}}}, tmp_path / 'o2', [], None)
+    with pytest.raises(AssertionError):  # a promo code already set is not replaced
+        extend.extend(_with_code(base), {'rows': {'ja:a': {'promo_code': 'X'}}}, tmp_path / 'o3', [], None)
+
+
+def _with_code(base):
+    meta = base / 'card_index.meta.tsv'
+    meta.write_text(meta.read_text().replace('ja:a\tHoundoom\t44\t\t\tja\t\t', 'ja:a\tHoundoom\t44\t\t\tja\tS-P\t'))
+    version = json.loads((base / 'card_index.version.json').read_text())
+    version['files']['card_index.meta.tsv'] = {'bytes': meta.stat().st_size, 'sha256': extend.digest(meta)}
+    (base / 'card_index.version.json').write_text(json.dumps(version))
+    return base
 
 
 def test_extend_refuses_changed_base_and_existing_totals(tmp_path):
