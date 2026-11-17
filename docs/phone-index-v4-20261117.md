@@ -1,7 +1,8 @@
 # On-phone card index v4 (2026-11-17): printing alternatives, prints.tsv, set codes
 
-A phone index for the plan to recognise cards on the phone without the server. **Built locally only:
-not published, not deployed; staging is unchanged.** The phone app is not changed.
+A phone index for the plan to recognise cards on the phone without the server. **Published on staging
+on 2026-11-17** (see Publish below), after the manifest change in #124. Production is unchanged, and so
+is the phone app.
 
 | Item | Value |
 |---|---|
@@ -12,7 +13,8 @@ not published, not deployed; staging is unchanged.** The phone app is not change
 | Meta columns | v3's 15 (`id name number printed_number set_total language promo_code row_kind alt_name printing_family release_year hp printing reprint_of name_en`) + `set_code` |
 | Files (sha256) | f16 `cb4f9724...`, ids `2b6d0a3d...`, meta `b2a90ae8...`, prints `63d34641...`, version `ef9f0911...` |
 
-The staging manifest would refuse this folder: it has rows the server snapshot does not.
+The old staging manifest refused this folder because it has rows the server snapshot does not. #124
+(merged as b899a25) serves an index that extends the published one, with `prints.tsv` as a fifth file.
 
 ## Printing alternatives
 
@@ -161,8 +163,28 @@ still without a link after LINKS5J; the phone shows them without a price, as it 
 Linked rows with no price in the reply (198 + 300) are filled by the usual on-demand price read, which
 this check did not trigger. Repeat this check against the catalogue that will be served at publish.
 
+## Publish on staging (2026-11-17)
+
+| Step | Result |
+|---|---|
+| Code | #124 merged to `main` as b899a25; Dokploy redeployed staging at 17:23 UTC. API healthy, catalogue still LINKS5J (`pokesingle_completion_20261116_links5j`) |
+| Manifest before the switch | 200, `32f22e3f...`, 48,874 rows, four files: same as before the redeploy |
+| Product API check on the live catalogue | 1,719 prints-only and 2,751 added ids: all details 200 with the same id and a name, all images 200 (`product-api-check-publish.json`). One image (`ja:M6a-127`) hit the script's 30 s timeout once; three retries answered 200 with the full 105,792 bytes |
+| Rollback saved | `/etc/scanapp-staging/catalogue-rollback/phone-index-v4-20261117/ACTIVE.before` (`32f22e3fa19e49e43c0d2f940ff00c03b2a5201e0ae8d4bd9de57e54ac3bda0b`) |
+| Installed | `/data/phone-index/0a46b0ab.../` (copied to a temporary folder, sha256 checked, renamed), then `ACTIVE.next` renamed to `ACTIVE`. `32f22e3f...` stays in place as the base and for phones still downloading it |
+| Manifest after the switch | 200 inside the container and from outside: `0a46b0abe0f8db7db415ffef544a1249a295965fb0bd848bb06d26c8831478e2`, **51,625 rows**, model `2ddf6ec79e37`, five files |
+| Files | all five download with the manifest's bytes and sha256: f16 39,648,000 (= 51,625 x 768), ids 696,144 (51,625 lines), meta 3,854,235, version 62,800, `card_index.prints.tsv` 86,245 at `card-index/files/<version>/card_index.prints.tsv`. Range request 206; the base's files are still served |
+
+## Going back
+
+On the staging host, write the version in `ACTIVE.before` (`32f22e3f...`) to
+`/data/phone-index/ACTIVE.next` (the volume `scanapp-scanapp-z1mwj4_scanapp-data`) and rename it to
+`ACTIVE`. The manifest then serves `32f22e3f...` with four files, as before. Keep the `0a46b0ab...`
+folder for phones still finishing a download.
+
 ## Not done
 
-- Not published, not deployed, staging unchanged.
+- The phone replay with text, and the device round (download, checksum, swap) on phone build 727bbfb.
+- Production (its compose keeps `CARD_INDEX_PUBLISH` off).
 - The server gate does not run `dev-en-vintage-073` yet: `run_gate.sh` and `score_gate.py` (dev = 681)
   still list the old batches, and the accepted baselines lack it.
