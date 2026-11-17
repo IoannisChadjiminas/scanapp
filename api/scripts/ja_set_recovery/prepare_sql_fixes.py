@@ -57,8 +57,12 @@ def label_groups(labelled):
     return list(groups.values())
 
 
-def row_change(cid, row, fix, urls_in_use, ids_in_use, matched_products=None, alias_ids=frozenset()):
-    """The column changes one fix makes to one cards row; raises AssertionError on a fix that must not ship."""
+def row_change(cid, row, fix, urls_in_use, ids_in_use, matched_products=None, alias_ids=frozenset(), shared_url=None):
+    """The column changes one fix makes to one cards row; raises AssertionError on a fix that must not ship.
+
+    A page is linked from one row only, except that a row of a copy set may share the link of the row it copies
+    (owner, 2026-11-17): the fix names that row in `shares_link_of`, and `shared_url` is that row's current link,
+    which must be exactly the fix's url."""
     change = {}
     if fix.get("name_en"):
         change["name"] = fix.get("name_ja") or fix["name_en"]
@@ -72,7 +76,9 @@ def row_change(cid, row, fix, urls_in_use, ids_in_use, matched_products=None, al
         change.update(cardmarket_url=None, cardmarket_id=None, cardmarket_verified=0,
                       cardmarket_provenance=None, cardmarket_verified_at=None)
     elif fix.get("url"):
-        assert not row["cardmarket_url"] and fix["url"] not in urls_in_use, cid
+        shared = bool(fix.get("shares_link_of")) and shared_url == fix["url"]
+        assert not fix.get("shares_link_of") or shared, cid
+        assert not row["cardmarket_url"] and (fix["url"] not in urls_in_use or shared), cid
         pid = int(fix["product_id"]) if fix.get("product_id") else None
         assert pid is None or pid not in ids_in_use, cid
         change.update(cardmarket_url=fix["url"], cardmarket_id=pid, cardmarket_verified=1,
@@ -127,9 +133,13 @@ def main(fixes_file, role_file, out_dir):
             urls_in_use.discard(by_id[cid]["cardmarket_url"])
             ids_in_use.discard(by_id[cid]["cardmarket_id"])
     updates = []
+    for cid, fix in fixes.items():  # the row a copy shares a link with must keep it in this batch
+        assert not fix.get("shares_link_of") or fix["shares_link_of"] not in fixes, cid
     for cid, fix in sorted(fixes.items()):
         row = by_id[cid]
-        change = row_change(cid, row, fix, urls_in_use, ids_in_use, matched_products, alias_ids)
+        twin = by_id.get(fix.get("shares_link_of")) if fix.get("shares_link_of") else None
+        change = row_change(cid, row, fix, urls_in_use, ids_in_use, matched_products, alias_ids,
+                            shared_url=twin["cardmarket_url"] if twin else None)
         before = {k: row[k] for k in change}
         row.update(change)
         updates.append((cid, change, fix, before))
@@ -191,12 +201,20 @@ END $acl$;""")
     s.append(f"UPDATE {TARGET}.import_manifest SET metadata = jsonb_set(jsonb_set(metadata,'{{digests,cards,md5}}',{jlit(cards_md5)}::jsonb),"
              f"'{{target,schema}}',{jlit(TARGET)}::jsonb) || {jlit(patch)}::jsonb, validated_at = now(), import_id = {lit(IMPORT)} "
              f"WHERE import_id={lit(PARENT_IMPORT)};")
+    shared = {}
+    for fix in fixes.values():
+        if fix.get("shares_link_of"):
+            shared[fix["url"]] = shared.get(fix["url"], 0) + 1
     checks = [f"(SELECT count(*) FROM {TARGET}.{t})={counts[t]}" for t in TABLES]
     checks += [f"(SELECT count(*) FROM {TARGET}.import_manifest WHERE import_id={lit(IMPORT)} AND status='validated')=1",
                # no new shared Cardmarket pages (the parent already has a few deliberate ones; a relink may end one)
                f"NOT EXISTS (SELECT cardmarket_url FROM {TARGET}.cards WHERE cardmarket_url IS NOT NULL GROUP BY 1 HAVING count(*)>1"
-               f" EXCEPT SELECT cardmarket_url FROM {PARENT}.cards WHERE cardmarket_url IS NOT NULL GROUP BY 1 HAVING count(*)>1)",
+               f" EXCEPT SELECT cardmarket_url FROM {PARENT}.cards WHERE cardmarket_url IS NOT NULL GROUP BY 1 HAVING count(*)>1"
+               + "".join(f" EXCEPT SELECT {lit(u)}" for u in sorted(shared)) + ")",
                f"(SELECT md5(metadata::text) FROM {PARENT}.import_manifest WHERE import_id={lit(PARENT_IMPORT)})={lit(meta_md5)}"]
+    # a page shared by a copy row: exactly the rows the parent had on it plus the copies that name its row
+    checks += [f"(SELECT count(*) FROM {TARGET}.cards WHERE cardmarket_url={lit(u)})="
+               f"(SELECT count(*) FROM {PARENT}.cards WHERE cardmarket_url={lit(u)})+{n}" for u, n in sorted(shared.items())]
     s.append("DO $$ BEGIN IF NOT (" + " AND ".join(checks) + ") THEN RAISE EXCEPTION 'fix batch checks failed'; END IF; END $$;")
     s.append("COMMIT;")
     (out / "candidate.sql").write_text("\n".join(s) + "\n")
