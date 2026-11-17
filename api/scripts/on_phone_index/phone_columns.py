@@ -3,7 +3,8 @@
     python3 phone_columns.py --base RELEASE_DIR --catalogue CATALOG_SQLITE --totals-db TOTALS_SQLITE \
         --families FAMILIES_JSON --names NAMES_JSON --tcgdex-sets SETS_JSON --tcgdex-hp HP_JSON \
         --limitless-sets LIM_JSON --set-map NAMES3_JSON --ocr-reads READS_JSONL --add-ids IDS_TXT \
-        [--en-abbrev ABBREV_JSON] [--alternatives BANDS_JSON --prints-ids IDS_TXT] --out COLUMNS_JSON
+        [--en-abbrev ABBREV_JSON] [--alternatives BANDS_JSON --prints-ids IDS_TXT] [--stamped-ja STAMPED_JSON] \
+        --out COLUMNS_JSON
 
 Offline; every source is a file. Column rules:
 
@@ -14,10 +15,12 @@ hp            TCGdex card HP (`/v2/{lang}/cards?hp=eq:N`) for the row's provider
 printing      prize_pack: a Play! Pokemon Prize Pack set (PPS*). stamped: a printing family member of
               kind stamped, or a Trick or Trade set (tot*). promo: a Japanese promo code, or a set
               named as promos (Black Star, Promo, McDonald's, Burger King, Professor Program, POP,
-              Best of game, Futsal). other: trainer kits, the Classic decks, extra reference rows,
+              Best of game, Futsal). Japanese stamped: a promo-set row listed in STAMPED_JSON (its
+              picture at least 0.95 similar to a regular Japanese card). other: trainer kits, the Classic decks, extra reference rows,
               the 151 UPC metal card. regular: everything else.
 reprint_of    For prize_pack and stamped rows: the regular card of its printing family
-              (families.json), or the base the family step named when it left the row out.
+              (families.json), or the base the family step named when it left the row out; for a
+              Japanese stamped row, the regular card STAMPED_JSON names.
               For a printing alternative (BANDS_JSON, its own row or a prints.tsv row): the indexed
               card it reprints, as chosen there (empty where none was found or the match was weak).
 name_en       For ja rows: the catalogue's English title (view_title), without a scraped
@@ -91,13 +94,14 @@ def main() -> None:
     for name in ('base', 'catalogue', 'totals-db', 'families', 'names', 'tcgdex-sets', 'tcgdex-hp',
                  'limitless-sets', 'set-map', 'ocr-reads', 'add-ids', 'out'):
         p.add_argument('--' + name, type=Path, required=True)
-    for name in ('en-abbrev', 'alternatives', 'prints-ids'):
+    for name in ('en-abbrev', 'alternatives', 'prints-ids', 'stamped-ja'):
         p.add_argument('--' + name, type=Path)
     a = p.parse_args()
     abbrev = json.loads(a.en_abbrev.read_text()) if a.en_abbrev else {}
     alt_reprint = ({r['id']: r['reprint_of'] for r in json.loads(a.alternatives.read_text())['rows']}
                    if a.alternatives else {})
     prints_ids = a.prints_ids.read_text().split() if a.prints_ids else []
+    stamped_ja = json.loads(a.stamped_ja.read_text())['rows'] if a.stamped_ja else {}
     meta = {}
     lines = (a.base / 'card_index.meta.tsv').read_text().split('\n')[:-1]
     header = lines[0].lstrip('#').split('\t')
@@ -135,7 +139,7 @@ def main() -> None:
             return 'other'
         if (sid or '').startswith('PPS'):
             return 'prize_pack'
-        if cid in stamped or re.match(r'^tot\d', sid or ''):
+        if cid in stamped or re.match(r'^tot\d', sid or '') or cid in stamped_ja:
             return 'stamped'
         if code or (lang == 'ja' and sid in JA_PROMO_CODES) or PROMO_NAME.search(set_name or ''):
             return 'promo'
@@ -175,10 +179,12 @@ def main() -> None:
         kind = printing(cid, lang, sid, set_name, code_now)
         r['printing'] = kind
         if kind in ('prize_pack', 'stamped'):
-            base = family.get(cid) or left_base.get(cid) or ''
+            base = family.get(cid) or left_base.get(cid) or (stamped_ja.get(cid) or {}).get('reprint_of') or ''
             r['reprint_of'] = base if base != cid else ''
-        if cid in alt_reprint:
+        if cid in alt_reprint and cid not in stamped_ja:
             r['reprint_of'] = alt_reprint[cid]
+        if cid in stamped_ja:
+            counts['ja_stamped'] += 1
         r['set_code'] = set_code(lang, sid)
         if cid in prints_ids:
             prints[cid] = {c: str(r.get(c, '')) for c in PRINTS_COLUMNS}

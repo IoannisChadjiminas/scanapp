@@ -7,7 +7,7 @@ Family: cards joined by reprint_of in the new index (meta and prints.tsv) or by 
 Twin of the right card: same family, or a picture vector at least 0.95 similar to a right card's (the
 server's printing-alternative rule); `cross_language` marks a twin in another language.
 Print sheet: the top two matches are in one family, or 0.95 similar to each other, and their scores
-are within 0.05.
+are within 0.05. `print_sheet_linked` counts only pairs linked in the index data (what the phone sees).
 """
 import json, sys, collections
 from pathlib import Path
@@ -57,7 +57,8 @@ def run(rel):
         res.append({'first': t[0], 'top5': t, 's1': s[0], 's2': s[1], 'right_first': t[0] in exp,
                     'right_top5': bool(set(exp) & set(t)), 'twin_first': (t[0] not in exp) and any(twins(t[0], e) for e in exp),
                     'cross_language': all(lang(t[0]) != lang(e) for e in exp),
-                    'sheet': twins(t[0], t[1]) and s[0] - s[1] <= 0.05})
+                    'sheet': twins(t[0], t[1]) and s[0] - s[1] <= 0.05,
+                    'sheet_linked': bool(same_family(t[0], t[1])) and s[0] - s[1] <= 0.05})
     return res
 
 A, B = run(old), run(new)
@@ -86,6 +87,7 @@ sheet = collections.Counter()
 for m, a, b in zip(meta, A, B):
     sheet[(a['sheet'], b['sheet'])] += 1
 summary = {'photos': len(meta), 'panels': {p: dict(c) for p, c in by.items()}, 'first_changed': dict(changed),
+           'print_sheet_linked': {'old': sum(a['sheet_linked'] for a in A), 'new': sum(b['sheet_linked'] for b in B)},
            'print_sheet': {'old': sum(a['sheet'] for a in A), 'new': sum(b['sheet'] for b in B),
                            'both': sheet[(True, True)], 'new_only': sheet[(False, True)], 'old_only': sheet[(True, False)]},
            'frame_found': sum(m['found'] for m in meta)}

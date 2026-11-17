@@ -5,12 +5,12 @@ not published, not deployed; staging is unchanged.** The phone app is not change
 
 | Item | Value |
 |---|---|
-| Folder | `data/catalogue-gaps/phone-index-v4-20261117/release/cbc610a7533050ec17156352cf87956bd1c1b4238a2682134bf13e967108dcee` |
+| Folder | `data/catalogue-gaps/phone-index-v4-20261117/release/0a46b0abe0f8db7db415ffef544a1249a295965fb0bd848bb06d26c8831478e2` (with Japanese stamped cards; the first build `cbc610a7...` is the same without them) |
 | Base | `32f22e3fa19e49e43c0d2f940ff00c03b2a5201e0ae8d4bd9de57e54ac3bda0b`, the index staging serves (IMG1 to LINKS5J), 48,874 rows, unchanged byte for byte |
 | Rows | **51,625** = 48,874 + 2,751 printing alternatives with their own vector |
 | `card_index.prints.tsv` | 1,719 printing alternatives with no vector (new file, hashed in the version file) |
 | Meta columns | v3's 15 (`id name number printed_number set_total language promo_code row_kind alt_name printing_family release_year hp printing reprint_of name_en`) + `set_code` |
-| Files (sha256) | f16 `cb4f9724...`, ids `2b6d0a3d...`, meta `0241f5c0...`, prints `931410d4...`, version `e287c673...` |
+| Files (sha256) | f16 `cb4f9724...`, ids `2b6d0a3d...`, meta `b2a90ae8...`, prints `63d34641...`, version `ef9f0911...` |
 
 The staging manifest would refuse this folder: it has rows the server snapshot does not.
 
@@ -45,10 +45,26 @@ overlap between them: a stamp barely moves the picture vector.
 Contact sheets of the middle band (134 sheets): `phone-index-v4-20261117/middle-sheets/`. A sampled
 sheet had 21 same-art pairs of 24; the rest are stamps. Band per card: `bands.json`.
 
-Own rows carry `printing` (by the existing rules: 2,427 regular, 304 promo, 20 other) and
-`reprint_of` (2,693 of 2,751; 58 empty as above). The existing rules do not mark Japanese stamped
-cards as `stamped` (only English families do), so a stamped Japanese card shows `regular` with a
-`reprint_of`.
+Own rows carry `printing` and `reprint_of` (2,693 of 2,751; 58 empty as above).
+
+## Japanese stamped cards
+
+The catalogue records no stamp (not in names, titles or variants), so the rule is visual: a Japanese
+promo-set row whose picture is at least 0.95 similar to a regular (non-promo) Japanese card gets
+`printing = stamped` and `reprint_of` = that card (`stamped-ja.json`). Checked by eye on two samples of
+24 (`stamp-sheets/`): about 4 in 5 show a stamp (Gym, TANTO, Pokémon Center, Lawson, Championship
+Series, 25th), the rest are promo reprints with no visible mark. Between 0.90 and 0.95, even with the
+same name, only about half are stamped (the rest are other art), so they stay `promo`.
+
+| Rows changed | Count |
+|---|---:|
+| Index rows `promo` -> `stamped` | 477 (297 base rows, 180 added rows) |
+| ... of which `reprint_of` filled where empty | 297 |
+| ... of which `reprint_of` changed to the regular card | 63 |
+| prints.tsv rows `promo` -> `stamped` | 28 (16 with `reprint_of` changed) |
+
+Vectors and ids are unchanged, and so is every number in the photo test below. English stamped rows
+(89, from the printing families) are unchanged.
 
 `card_index.prints.tsv`: `id reprint_of printing number printed_number set_total set_code promo_code
 release_year`, one row per card; every `reprint_of` is an index row.
@@ -92,9 +108,15 @@ First answer changed on 36 photos; 35 of the new answers are added rows.
 | Right -> another right card | 2 |
 
 Twin: same printing family (`reprint_of`, `prints.tsv`, `families.json`) or a picture at least 0.95
-similar to the right card. Broken: `en:dp1-109` -> `ja:jr-dpt-entry-pack-giratina-010` and `en:neo2-39`
--> `ja:jr-intro-pack-neo-totodile-u07` (English photos answered by a Japanese print), `ja:XY2-064` ->
-`ja:CP4-093`.
+similar to the right card. Broken:
+
+| Photo | Right card | New first answer |
+|---|---|---|
+| `dev-en-older-019` | `en:dp1-109` PlusPower (Diamond & Pearl) | `ja:jr-dpt-entry-pack-giratina-010` PlusPower (DPt Entry Pack) |
+| `dev2-en-vintage-012` | `en:neo2-39` Houndour (Neo Discovery) | `ja:jr-intro-pack-neo-totodile-u07` Houndour (Intro Pack Neo) |
+| `sealedF-ja-modern-015` | `ja:XY2-064` | `ja:CP4-093` |
+
+The first two are English photos answered by a Japanese print of the same card.
 
 Print sheet (top two matches a reprint pair within 0.05):
 
@@ -114,6 +136,13 @@ photo), `queries/` (photo vectors), `middle-sheets/`, and the scripts that made 
 `api/scripts/on_phone_index/phone_columns.py` and `extend_index.py` (set_code, promo fill,
 prints.tsv), `embed_photos.py` and `phone_replay.py` (the test), tests in
 `api/tests/test_phone_index_extend.py`.
+
+## Review (2026-11-17)
+
+The owner accepted the print-sheet rise (the phone will prefer `regular` among twins when no text
+separates them, and the sheet rate will be measured on the phone) and the right-first change for the
+local build; publishing waits for the phone replay with text. Japanese stamped cards were added as
+above.
 
 ## Not done
 
