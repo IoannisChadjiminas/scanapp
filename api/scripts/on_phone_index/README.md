@@ -37,6 +37,16 @@ and dimension. It also checks the candidate's file sizes and hashes. File routes
 support byte ranges, ETags, and immutable caching. Previously published version
 directories must remain present for clients completing an older download.
 
+An index may also extend a published one: its version file has `extends` with the base
+`version` and `rows`. The manifest serves it only if the base version is still in the publish
+directory and matches the loaded snapshot as above, and the index's ids and float16 files begin
+with the base's files byte for byte, followed by the added rows. The manifest's `rows` is the
+index's own row count (the float16 file is `rows * dims * 2` bytes). An index may carry a fifth
+file, `card_index.prints.tsv` (printings with the same picture as an index row, without a
+vector), listed in its version file; the manifest then lists it after the four files at
+`card-index/files/<version>/card_index.prints.tsv`. A version without it has exactly the four
+files, as before. Keep the base version's directory while an extension of it is active.
+
 This route does **not** automatically export or promote snapshots. The offline
 research check and physical-device gates remain required before enabling it.
 
