@@ -144,6 +144,23 @@ separates them, and the sheet rate will be measured on the phone) and the right-
 local build; publishing waits for the phone replay with text. Japanese stamped cards were added as
 above.
 
+## Product API check (before publish)
+
+The phone gets a card's details, image, link and prices from the product API by card id, so every id
+the phone can answer with must resolve there, including ids that exist only in `prints.tsv` (no vector,
+no index row). Checked against the staging product API on 2026-11-17 (`GET /api/v1/cards/{id}` and
+`/api/v1/cards/{id}/image`, read only; `api_check.py`, results in `product-api-check.json`):
+
+| Ids | Count | Details 200, same id, name | Image 200 | Cardmarket link | Prices in the reply |
+|---|---:|---:|---:|---:|---:|
+| prints.tsv only (e.g. `ja:20th-007` Parasect, 20th Anniversary Starter Pack) | 1,719 | 1,719 | 1,719 | 1,589 | 1,391 |
+| Added index rows | 2,751 | 2,751 | 2,751 | 2,356 | 2,056 |
+
+No id failed. The rows without a link are all Japanese (130 + 395) and are among the Japanese rows
+still without a link after LINKS5J; the phone shows them without a price, as it does any unlinked card.
+Linked rows with no price in the reply (198 + 300) are filled by the usual on-demand price read, which
+this check did not trigger. Repeat this check against the catalogue that will be served at publish.
+
 ## Not done
 
 - Not published, not deployed, staging unchanged.
