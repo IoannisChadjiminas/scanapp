@@ -1,4 +1,4 @@
-# LINKS5 to 5J: Cardmarket links for Japanese rows, and 12 crossed links fixed (2026-11-16, switched 2026-11-17)
+# LINKS5 to 5M: Cardmarket links for Japanese rows, and 12 crossed links fixed (2026-11-16, switched 2026-11-17)
 
 Of the 2,966 Japanese rows without a Cardmarket link on IMG1, 1,245 get one (799 in LINKS5, 127 more in LINKS5B, 267 in LINKS5C, 52 in LINKS5D),
 plus the English `en:mep-120`
@@ -131,6 +131,35 @@ as `-367`), `ja:XYP-323` (another Greninja than Cardmarket's), `ja:XYP-300` Inka
 products are oversized cards), and 12 vending cards with two versions each (Mewtwo, Graveler, Machoke, Omanyte, Kadabra,
 Haunter): Cardmarket asked for its check on almost every page and they were not read.
 
+**LINKS5K to 5M (2026-11-17): the 12 two-version vending cards, deck-kit halves and copy sets.** 115 links. Fix files
+in `data/catalogue-gaps/ja-links-20261116/` (`fixes-vending-two-version-20261117.json`, `fixes-decks-20261117.json`,
+`fixes-copies-decks-20261117.json`), each row with its evidence.
+
+- **LINKS5K, the 12 vending cards with two versions** (Mewtwo, Graveler, Machoke, Omanyte, Kadabra, Haunter). Read in the
+  owner's Chrome after they passed Cardmarket's check, one page about every 15-20 seconds. `V1` is the series 1 or 2 card,
+  `V2` the series 3 card (told apart by the picture and the series mark): for example `Mewtwo-V1-EXS` -> `blue-u16`,
+  `Mewtwo-V2` -> `green-u27`.
+- **LINKS5L, 46 deck-kit cards.** Six expansion pages crawled the same slow way (160 products: Magmortar vs Electivire,
+  Mewtwo vs Genesect, Entry Pack 08, Bastiodon the Defender, Rampardos the Attacker, McDonald's Original Minimum Pack).
+  32 Mewtwo vs Genesect cards by number and half, 14 Magmortar vs Electivire half-deck cards whose name is unique in
+  their half.
+- **LINKS5M, 57 copy-set rows sharing a link.** Some of our sets hold the same cards as another set: a combined deck set
+  and its own half decks. The owner approved on 2026-11-17 ("Yes, allow sharing") that such a copy may carry the link of
+  the row it copies. A row takes the link only when its picture is at least 0.95 similar (DINOv2 pad) to an already
+  linked row, the English titles are the same, every such twin carries the same single link, it is not a basic energy,
+  and the pair is a combined set and its half decks: Dialga & Palkia LV.X combined (20), Bastiodon & Rampardos combined
+  (19), Magmortar vs Electivire combined (10), Heatran vs Regigigas halves (7), Palkia LV.X deck (1). 146 rows passed
+  the picture rule; the other 89 are reprints in a different product (Tropical Mega Battle against VS1, MMBP against
+  HXY, `jr-miscellaneous-decks` against the gym decks) and were left out, since the link would show another product's
+  price.
+- `prepare_sql_fixes.py` now takes `shares_link_of`: a fix may reuse a link already in use only when it names the row
+  that holds that same link (and that row is not in the same batch); the SQL then checks that each shared page gains
+  exactly the approved rows. Tests in `api/tests/test_prepare_sql_fixes_shared.py`.
+
+Cardmarket blocked the session twice: once after a few background page fetches ("Access denied"), once after quick
+page loads (rate limit). Loading one page about every 15-20 seconds, in the owner's browser after they passed the
+check, worked. No product photos were saved.
+
 Titles found wrong (link columns only change, so not fixed here): `ja:SVM-042` / `-043` are Voltorb / Electrode (swapped),
 `ja:XY-037` is Zubat (not Golbat), `ja:XY11-Br-030` is Spiritomb (not Lucario).
 
@@ -147,13 +176,20 @@ Titles found wrong (link columns only change, so not fixed here): `ja:SVM-042` /
 | LINKS5G | `pokesingle_completion_20261116_links5g`, `PS-CATALOGUE-EN-JA-LINKS5G-20261116`, parent LINKS5F; 5 cards, SQL sha256 `ad5dbe92322de2c75987b4fd69982b6b5336adac3f8fa3be7ef8361a9c3ee364`; links 49,663 -> 49,668 |
 | LINKS5H | `pokesingle_completion_20261116_links5h`, `PS-CATALOGUE-EN-JA-LINKS5H-20261116`, parent LINKS5G; 118 cards, SQL sha256 `8578c1dc6cd9a2b05ba71558aa9a8f32cb0e342e75ac71cd3e1650e91f993438`; links -> 49,786 |
 | LINKS5I | `pokesingle_completion_20261116_links5i`, `PS-CATALOGUE-EN-JA-LINKS5I-20261116`, parent LINKS5H; 91 cards, SQL sha256 `b308d65dc4a4c6f82fcd06e0461e94610b7b736b3479f9e30979270934b7faa8`; links -> 49,877 |
-| LINKS5J (served) | `pokesingle_completion_20261116_links5j`, `PS-CATALOGUE-EN-JA-LINKS5J-20261116`, parent LINKS5I; 47 cards, SQL sha256 `3238fc047d5209e9524052527189d78c4c2dfb4defca222e6aefc759d09523a4`; links -> 49,924 |
+| LINKS5J | `pokesingle_completion_20261116_links5j`, `PS-CATALOGUE-EN-JA-LINKS5J-20261116`, parent LINKS5I; 47 cards, SQL sha256 `3238fc047d5209e9524052527189d78c4c2dfb4defca222e6aefc759d09523a4`; links -> 49,924 |
+| LINKS5K | `pokesingle_completion_20261117_links5k`, `PS-CATALOGUE-EN-JA-LINKS5K-20261117`, parent LINKS5J; 12 cards, SQL sha256 `5e41508e4f426d053a6d009c71bd07a56b8da332b9e532a38414a320a10afccf`; links -> 49,936 |
+| LINKS5L | `pokesingle_completion_20261117_links5l`, `PS-CATALOGUE-EN-JA-LINKS5L-20261117`, parent LINKS5K; 46 cards, SQL sha256 `827b28bfa7dbb4bac43f7cbc3e336d49b998e809e83e9ab7036c261cfb830c2e`; links -> 49,982 |
+| LINKS5M (served) | `pokesingle_completion_20261117_links5m`, `PS-CATALOGUE-EN-JA-LINKS5M-20261117`, parent LINKS5L; 57 cards (shared links), SQL sha256 `f7bdb7b97e027b254b4d5d640e1403446c543a6dd2911be6c2d3c6f2dc8d577b`; links -> 50,039; pages linked from more than one row 36 -> 93 |
 | Read back | all validated, inactive |
 | Bundles | features `20261116-img1`, artwork `20261116-img1` (unchanged) |
 
 Work files: `data/catalogue-gaps/ja-links-20261116/` (`matches.json`, `fixes.json`, `sql/`, `run_gate.sh`, `out/`).
 
 ## Gate
+
+LINKS5M: 1,891 photos replayed against LINKS5M (same setup), scored against LINKS5F's accepted run: every panel
+unchanged (dev 636/3/663, dev2 232/0/238, dev3 938/0/963), 0 right -> wrong, 0 expected cards lost, 0 changed
+answers; `gate.json` identical to LINKS5J's. The LINKS5K and 5L runs were stopped part-way when the next step was added.
 
 LINKS5J: 1,891 photos replayed against LINKS5J (same setup), scored against LINKS5F's accepted run: every panel
 unchanged (dev 636/3/663, dev2 232/0/238, dev3 938/0/963), 0 right -> wrong, 0 expected cards lost, 0 changed
@@ -174,6 +210,13 @@ them, was replayed in full.
 
 ## Switch
 
+LINKS5M, 2026-11-18: `catalogue-release-switch.sh apply`, `RELEASE_NAME=catalogue-links5m-20261117`, release file
+`/root/catalogue-links5m-20261117.env` (only the schema and import lines changed, checked by diff). After: health ok,
+ready, import LINKS5M, restarts 0, no OOM; all 115 new links read back from `/api/v1/cards/{id}`. Rollback
+`/etc/scanapp-staging/catalogue-rollback/catalogue-links5m-20261117` (rollback file points to LINKS5J). Approval: the
+owner asked for items 1 and 4 ("lets start with 1 ... and then do 4") and approved sharing ("Yes, allow sharing"), on the
+plan to switch if nothing went from right to wrong.
+
 LINKS5J, 2026-11-17: `catalogue-release-switch.sh apply`, `RELEASE_NAME=catalogue-links5j-20261117`, release file
 `/root/catalogue-links5j-20261117.env` (only the schema and import lines changed, checked by diff). After: health ok,
 ready, import LINKS5J, restarts 0, no OOM. Rollback `/etc/scanapp-staging/catalogue-rollback/catalogue-links5j-20261117`
@@ -192,6 +235,9 @@ LINKS5F:
 
 ## Phone index
 
+LINKS5M: unchanged, v4 `0a46b0abe0f8db7db415ffef544a1249a295965fb0bd848bb06d26c8831478e2` (published on 2026-11-17,
+`docs/phone-index-v4-20261117.md`), 51,625 rows, five files. The manifest answers 200 in public after the switch.
+
 LINKS5J: unchanged, `32f22e3f...`. Only link columns changed (no vector, image or row); the server accepted the
 index for the LINKS5J snapshot and the manifest answers 200 inside the container and in public. Not rebuilt
 locally this time.
@@ -204,7 +250,13 @@ ids file matches, and a ranged request on the vectors returns 206.
 
 ## Going back
 
-On the staging host, from the code directory:
+To LINKS5J, on the staging host, from the code directory:
+
+```
+CONFIG_DIR=/etc/scanapp-staging RELEASE_NAME=catalogue-links5m-20261117 PROJECT=scanapp-scanapp-z1mwj4 COMPOSE_FILE=compose.dokploy.yaml scripts/catalogue-release-switch.sh rollback
+```
+
+Before LINKS5M:
 
 ```
 CONFIG_DIR=/etc/scanapp-staging RELEASE_NAME=catalogue-links5-20261116 PROJECT=scanapp-scanapp-z1mwj4 COMPOSE_FILE=compose.dokploy.yaml scripts/catalogue-release-switch.sh rollback
@@ -213,7 +265,12 @@ CONFIG_DIR=/etc/scanapp-staging RELEASE_NAME=catalogue-links5-20261116 PROJECT=s
 That goes back to LINKS5F. To go back further, run it again with `RELEASE_NAME=catalogue-links5-20261116` (to IMG1).
 The phone index stays as it is: IMG1, LINKS5F and LINKS5J use the same one.
 
-## Still without a link (1,353 Japanese rows after LINKS5J)
+## Still without a link (1,238 Japanese rows after LINKS5M)
+
+After LINKS5M: 1,238 Japanese rows without a link. Mostly: copies of cards in another product that were kept apart
+(Tropical Mega Battle, MMBP, `jr-miscellaneous-decks`, `jr-entry-pack` against DP1), `jr-miscellaneous-promos` (298)
+and `jr-miscellaneous-decks` (73), promo versions Cardmarket lists as `V1`.. (XYP 61, SMP 41, BWP 29, M-P 25),
+basic energies, and sets Cardmarket does not list (quick starter gift sets, 64).
 
 Japanese rows without a link: 1,609 on LINKS5F, 1,353 on LINKS5J (of 28,537). What is left after 5J: the 12
 two-version vending cards and 5 XY promos above, `jr-miscellaneous-promos` (a grab-bag set with no matching
