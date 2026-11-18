@@ -25,7 +25,7 @@ from app.cardmarket import (
     listing_choice_message,
     url_for_row,
 )
-from app.price_sources import scan_finishes, scan_prices
+from app.price_sources import scan_finishes, scan_listing_urls, scan_listings, scan_prices
 from app.catalogue_titles import stored_view_title
 from app.physical_cards import is_tcg_pocket_card
 from app.set_totals import set_total
@@ -1748,6 +1748,7 @@ def _recognize_bytes_once(
         confidence=confidence,
         **presentation.model_dump(mode='json'),
     )
+    response.stored_listings = scan_listings(catalog, scan_listing_urls(response))
     return _ScanEvaluation(response, timings, input_image, save,
                            reference_identity, ocr, numbers,
                            tuple(rank_languages), name_confidence, too_small or too_blurry, ocr_payload,

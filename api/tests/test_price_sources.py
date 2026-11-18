@@ -341,3 +341,48 @@ def test_reverse_holo_listing_url_reads_the_reverse_trend(tmp_path):
     assert price_sources.guide_trend_for_url(conn, URL)[0] == 4.2
     assert price_sources.guide_trend_for_url(conn, URL + "?isReverseHolo=Y")[0] == 12.0
     assert price_sources.trend_for_url(conn, URL + "?isReverseHolo=Y&language=1") == 12.0
+
+
+def test_a_scan_carries_the_listing_stored_under_the_phone_filters(tmp_path):
+    from app.price_sources import scan_listings
+
+    conn = _catalog(tmp_path)
+    filters = {"language": "1", "minCondition": "2"}
+    write_snapshot(
+        conn, URL, [{"label": "NM · English", "amount": 2.0, "currency": "EUR"}], filters=filters
+    )
+    # The bare URL a card carries finds no sample of its own.
+    assert best_prices(conn, "none", URL) == []
+    listings = scan_listings(conn, [URL, None, URL + "?language=1"])
+    assert len(listings) == 1
+    assert listings[0]["url"] == URL + "?language=1&minCondition=2"
+    assert listings[0]["prices"][0]["amount"] == 2.0
+    assert listings[0]["freshness"] == "fresh"
+    assert "webview_enabled" in listings[0]
+    json.dumps(listings)
+
+
+def test_a_scan_carries_no_listing_for_another_product_or_none(tmp_path):
+    from app.price_sources import scan_listings
+
+    conn = _catalog(tmp_path)
+    write_snapshot(conn, URL, [{"label": "From", "amount": 2.0, "currency": "EUR"}])
+    assert scan_listings(conn, [URL + "-V2"]) == []
+    assert scan_listings(conn, []) == []
+    assert scan_listings(conn, [None]) == []
+
+
+def test_scan_listing_urls_take_the_shown_cards(tmp_path):
+    from types import SimpleNamespace as NS
+
+    from app.price_sources import scan_listing_urls
+
+    response = NS(
+        printing_review=NS(plausible_printings=[NS(cardmarket_url="a"), NS(cardmarket_url="b")]),
+        suggestions=[
+            NS(cardmarket_url="c", cardmarket_variants=[NS(url="c1"), NS(url="c2")]),
+            NS(cardmarket_url="d"),
+        ],
+    )
+    assert scan_listing_urls(response) == ["a", "b", "c", "c1"]
+    assert scan_listing_urls(NS(printing_review=None, suggestions=[])) == []

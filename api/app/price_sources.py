@@ -406,6 +406,66 @@ def scan_prices(conn: sqlite3.Connection, card_id: str, url: str | None) -> list
         return []
 
 
+_LISTING_FIELDS = (
+    "url", "prices", "status", "observed_at", "sampled_offer_count", "freshness", "fresh_for_s",
+    "guide_trend", "guide_trend_at", "unlisted", "scraper_ready", "webview_enabled",
+    "challenge_fallback_minutes", "helper_online", "helper_ready", "helper_paused",
+)
+
+
+def scan_listings(
+    conn: sqlite3.Connection, urls: list[str | None], *, limit: int = 6
+) -> list[dict[str, Any]]:
+    """The stored listing reads for the products a scan answers with.
+
+    Phones store a listing under the product URL plus its language and
+    condition filters, so the bare URL a card carries finds nothing. Every
+    stored sample of these products is returned, newest first, in the shape
+    of GET /cardmarket/prices; the app keeps the one whose key is the card it
+    shows. This saves the app a second request before it can show a listing
+    price. A scan must never fail because of a price.
+    """
+    from app.cardmarket import normalize_product_url
+    from app.cardmarket_queue import prices_payload
+
+    try:
+        products: list[str] = []
+        for url in urls:
+            product = normalize_product_url(url)
+            if product and product not in products:
+                products.append(product)
+        if not products or limit <= 0:
+            return []
+        marks = ",".join("?" * len(products))
+        rows = conn.execute(
+            f"SELECT sample_key FROM cardmarket_snapshots WHERE url IN ({marks}) "
+            "ORDER BY fetched_at DESC LIMIT ?",
+            (*products, limit),
+        ).fetchall()
+        out: list[dict[str, Any]] = []
+        for row in rows:
+            payload = prices_payload(conn, str(row["sample_key"]))
+            if payload.get("prices") or payload.get("unlisted"):
+                out.append({key: payload.get(key) for key in _LISTING_FIELDS})
+        return out
+    except Exception:
+        log.exception("scan listings failed")
+        return []
+
+
+def scan_listing_urls(response: Any) -> list[str | None]:
+    """The product URLs of the cards a scan response shows first."""
+    urls: list[str | None] = []
+    review = getattr(response, "printing_review", None)
+    cards = [*(getattr(review, "plausible_printings", None) or [])[:3],
+             *(getattr(response, "suggestions", None) or [])[:1]]
+    for card in cards:
+        urls.append(getattr(card, "cardmarket_url", None))
+        for variant in (getattr(card, "cardmarket_variants", None) or [])[:1]:
+            urls.append(getattr(variant, "url", None))
+    return urls
+
+
 def tcgdex_ids(row: sqlite3.Row) -> tuple[str, str]:
     """(language, TCGdex card id) for a catalogue row."""
     language = str(row["language"] or "en").lower()
