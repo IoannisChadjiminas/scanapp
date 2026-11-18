@@ -75,7 +75,12 @@ compose files pass them through):
 | `CARD_IMAGE_CDN_BASE_URL` | API | `https://img.pokesingle.com`; empty keeps TCGdex URLs |
 
 Set the base URL only once a bucket has been mirrored for that environment.
-Never use the production bucket's token against the staging API or vice versa.
+Staging and production share one bucket, `pokesingle-card-art` (owner's decision,
+2026-11-18). The job only adds objects and never deletes, and object names depend
+only on the card and its stored copy, so both environments write the same files.
+Each server keeps its own registry, so run the job on each. Use one token scoped
+to this bucket only. User photos (`pokesingle-captures`) and training frames
+(`pokesingle-frames`) stay in their own private buckets and never go in here.
 
 ## Running the mirror
 
