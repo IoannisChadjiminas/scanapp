@@ -394,6 +394,9 @@ def get_card(card_id: str, request: Request) -> CardSummary:
     return summary
 
 
+IMAGE_ROUTE_CACHE_CONTROL = "public, max-age=86400"
+
+
 @router.get("/cards/{card_id}/image")
 def card_image(card_id: str, request: Request) -> FileResponse:
     row = request.app.state.dbs.catalog.execute(
@@ -407,4 +410,6 @@ def card_image(card_id: str, request: Request) -> FileResponse:
     if not path.is_file():
         raise HTTPException(status_code=404, detail="Card image not found")
     media = "image/webp" if path.suffix.lower() == ".webp" else "image/jpeg"
-    return FileResponse(path, media_type=media)
+    # A day of caching lets Cloudflare and the phone absorb repeat loads; a
+    # catalogue release that replaces a picture shows within that day.
+    return FileResponse(path, media_type=media, headers={"Cache-Control": IMAGE_ROUTE_CACHE_CONTROL})
