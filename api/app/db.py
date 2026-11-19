@@ -298,7 +298,7 @@ def init_catalog(conn: sqlite3.Connection) -> None:
     _add_columns(
         conn,
         "cardmarket_expansion_products",
-        {"listing_image_url": "TEXT"},
+        {"listing_image_url": "TEXT", "product_id": "INTEGER"},
     )
     conn.executescript(
         """
