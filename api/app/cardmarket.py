@@ -1064,6 +1064,35 @@ _CARDMARKET_IMAGE_ID = re.compile(
 )
 
 
+def listing_product_id(src: str | None) -> int | None:
+    """Cardmarket's product number, read from a product photo address.
+
+    The photo of a product is stored at .../<idProduct>/<idProduct>.jpg, so the
+    address of a listing's own photo names the product. Any other address
+    (a placeholder, another host) gives None.
+    """
+    match = _CARDMARKET_IMAGE_ID.search(str(src or "").strip())
+    return int(match.group(1)) if match else None
+
+
+def remember_listing_product(conn: sqlite3.Connection, url: str, image_url: str | None) -> None:
+    """Keep the product number a read page showed, for a listing already known.
+
+    Only the number is kept, in its own column: the listing's shown photo is
+    left alone. A listing the catalogue does not know is not added here.
+    """
+    product_id = listing_product_id(image_url)
+    product = normalize_product_url(url)
+    if not product_id or not product:
+        return
+    with conn:
+        conn.execute(
+            "UPDATE cardmarket_expansion_products SET product_id = ? "
+            "WHERE url = ? AND product_id IS NOT ?",
+            (product_id, product, product_id),
+        )
+
+
 def public_listing_image(src: str) -> str:
     """Serve a cached Cardmarket product photo. The image host refuses other sites."""
     text = str(src or "").strip()

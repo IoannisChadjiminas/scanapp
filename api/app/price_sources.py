@@ -268,31 +268,52 @@ def market_trend(market: dict[str, Any] | None, *, reverse: bool = False) -> flo
     return None
 
 
-def trend_for_url(conn: sqlite3.Connection, url: str | None) -> float | None:
-    """The Cardmarket trend of the product behind a listing URL, if on file."""
-    from app.cardmarket import normalize_product_url
+def product_id_for_url(conn: sqlite3.Connection, url: str | None) -> int | None:
+    """Cardmarket's product number for a listing URL.
+
+    A card row carries the number of its main listing only. Its other
+    listings (V2, V3: separate Cardmarket products, each with its own row in
+    the price file) are known by URL; their number comes from a page a phone
+    read, or from the stored address of the listing's own photo.
+    """
+    from app.cardmarket import listing_product_id, normalize_product_url
 
     if not url:
         return None
+    product = normalize_product_url(url) or url
     row = conn.execute(
         "SELECT cardmarket_id FROM cards WHERE cardmarket_url = ? AND cardmarket_id IS NOT NULL LIMIT 1",
-        (normalize_product_url(url) or url,),
+        (product,),
     ).fetchone()
-    market = guide_market(conn, row["cardmarket_id"]) if row else None
+    if row:
+        return int(row["cardmarket_id"])
+    try:
+        listing = conn.execute(
+            "SELECT product_id, listing_image_url FROM cardmarket_expansion_products WHERE url = ?",
+            (product,),
+        ).fetchone()
+    except sqlite3.OperationalError:
+        return None
+    if listing is None:
+        return None
+    return int(listing["product_id"]) if listing["product_id"] else listing_product_id(
+        listing["listing_image_url"]
+    )
+
+
+def trend_for_url(conn: sqlite3.Connection, url: str | None) -> float | None:
+    """The Cardmarket trend of the product behind a listing URL, if on file."""
+    if not url:
+        return None
+    market = guide_market(conn, product_id_for_url(conn, url))
     return market_trend(market, reverse=is_reverse_holo_url(url))
 
 
 def guide_trend_for_url(conn: sqlite3.Connection, url: str | None) -> tuple[float | None, str | None]:
     """The price file's trend and its date for the product behind a listing URL."""
-    from app.cardmarket import normalize_product_url
-
     if not url:
         return None, None
-    row = conn.execute(
-        "SELECT cardmarket_id FROM cards WHERE cardmarket_url = ? AND cardmarket_id IS NOT NULL LIMIT 1",
-        (normalize_product_url(url) or url,),
-    ).fetchone()
-    market = guide_market(conn, row["cardmarket_id"]) if row else None
+    market = guide_market(conn, product_id_for_url(conn, url))
     trend = market_trend(market, reverse=is_reverse_holo_url(url))
     return (trend, str(market.get("updated") or "") or None) if trend else (None, None)
 
