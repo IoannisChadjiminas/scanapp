@@ -1,4 +1,4 @@
-# LINKS5 to 5M: Cardmarket links for Japanese rows, and 12 crossed links fixed (2026-11-16, switched 2026-11-17)
+# LINKS5 to 5T: Cardmarket links for Japanese rows, and 12 crossed links fixed (2026-11-16, last switched 2026-11-19)
 
 Of the 2,966 Japanese rows without a Cardmarket link on IMG1, 1,245 get one (799 in LINKS5, 127 more in LINKS5B, 267 in LINKS5C, 52 in LINKS5D),
 plus the English `en:mep-120`
@@ -179,13 +179,27 @@ Titles found wrong (link columns only change, so not fixed here): `ja:SVM-042` /
 | LINKS5J | `pokesingle_completion_20261116_links5j`, `PS-CATALOGUE-EN-JA-LINKS5J-20261116`, parent LINKS5I; 47 cards, SQL sha256 `3238fc047d5209e9524052527189d78c4c2dfb4defca222e6aefc759d09523a4`; links -> 49,924 |
 | LINKS5K | `pokesingle_completion_20261117_links5k`, `PS-CATALOGUE-EN-JA-LINKS5K-20261117`, parent LINKS5J; 12 cards, SQL sha256 `5e41508e4f426d053a6d009c71bd07a56b8da332b9e532a38414a320a10afccf`; links -> 49,936 |
 | LINKS5L | `pokesingle_completion_20261117_links5l`, `PS-CATALOGUE-EN-JA-LINKS5L-20261117`, parent LINKS5K; 46 cards, SQL sha256 `827b28bfa7dbb4bac43f7cbc3e336d49b998e809e83e9ab7036c261cfb830c2e`; links -> 49,982 |
-| LINKS5M (served) | `pokesingle_completion_20261117_links5m`, `PS-CATALOGUE-EN-JA-LINKS5M-20261117`, parent LINKS5L; 57 cards (shared links), SQL sha256 `f7bdb7b97e027b254b4d5d640e1403446c543a6dd2911be6c2d3c6f2dc8d577b`; links -> 50,039; pages linked from more than one row 36 -> 93 |
+| LINKS5M | `pokesingle_completion_20261117_links5m`, `PS-CATALOGUE-EN-JA-LINKS5M-20261117`, parent LINKS5L; 57 cards (shared links), SQL sha256 `f7bdb7b97e027b254b4d5d640e1403446c543a6dd2911be6c2d3c6f2dc8d577b`; links -> 50,039; pages linked from more than one row 36 -> 93 |
+| LINKS5N | `pokesingle_completion_20261118_links5n`, `PS-CATALOGUE-EN-JA-LINKS5N-20261118`, parent LINKS5M; 89 cards (Unnumbered Promos, one product each), SQL sha256 `c394a1098ce94d652d214f555328263f3919ef5209957c6853f3447afc70b54e` |
+| LINKS5O | `pokesingle_completion_20261118_links5o`, `PS-CATALOGUE-EN-JA-LINKS5O-20261118`, parent LINKS5N; 68 cards (Unnumbered Promos `V1`.. versions, by picture), SQL sha256 `6bd85cca6f21a11250752e706d155363fe7a91b554965847eeb582a4ef3863e1` |
+| LINKS5P | `pokesingle_completion_20261118_links5p`, `PS-CATALOGUE-EN-JA-LINKS5P-20261118`, parent LINKS5O; 11 cards, SQL sha256 `c047a595c477049350de5e444e6b41b6ac53fac42185d322b1c689bed80f3265` |
+| LINKS5Q | `pokesingle_completion_20261118_links5q`, `PS-CATALOGUE-EN-JA-LINKS5Q-20261118`, parent LINKS5P; 6 cards (eye-checked), SQL sha256 `1b80682cea47fbebe24356f0c318146961bb8bf38c401dd6c0496906993b474a` |
+| LINKS5R | `pokesingle_completion_20261118_links5r`, `PS-CATALOGUE-EN-JA-LINKS5R-20261118`, parent LINKS5Q; 2 cards (duplicate rows `jr-miscellaneous-promos-086`/`052` share the links of `016`/`020`), SQL sha256 `dd375a46b79b770419da3043ba30c60a80249649f847754d4118ee97d0947fcc` |
+| LINKS5S | `pokesingle_completion_20261118_links5s`, `PS-CATALOGUE-EN-JA-LINKS5S-20261118`, parent LINKS5R; 39 cards (M-P, SV-P, XY-P, SM-P and BW-P promo versions, by picture), SQL sha256 `381c91c54a3d9536b511e4dd21281af2b906847b66a83fc68a30ac6d49729396`; links -> 50,254 |
+| LINKS5T (served) | `pokesingle_completion_20261119_links5t`, `PS-CATALOGUE-EN-JA-LINKS5T-20261119`, parent LINKS5S; 3 cards (duplicate rows share a link: XYP-362 with XYP-367, XYP-421 with XYP-028, SMP-444 with SMP-091; same art and printed number, checked side by side), SQL sha256 `8f042b5ad8bcc0a5ebd9020a32b0f84b11b3e9ec10be4ebc53c423aacded20df`; links -> 50,257; LINKS5T differs from LINKS5S in those 3 rows only |
 | Read back | all validated, inactive |
 | Bundles | features `20261116-img1`, artwork `20261116-img1` (unchanged) |
 
 Work files: `data/catalogue-gaps/ja-links-20261116/` (`matches.json`, `fixes.json`, `sql/`, `run_gate.sh`, `out/`).
 
 ## Gate
+
+LINKS5S (covers LINKS5T): 1,891 photos replayed against LINKS5S (same setup), scored against LINKS5F's accepted run:
+every panel unchanged (dev 636/3/663, dev2 232/0/238, dev3 938/0/963), 0 right -> wrong, 0 expected cards lost.
+2 changed answers (`dev2-ja-modern-002`, `-004`): same first card, only the alternatives list differs. Three batches
+(`dev32`, `dev34`, `d2dev20`) failed first because the 8-hour read role expired mid-run; they were rerun with a new
+role. LINKS5T was not replayed: it changes only the link of 3 rows, and recognition reads the link only to attach the
+page and prices to an answer. The LINKS5N to 5R runs were stopped part-way when the next step was added.
 
 LINKS5M: 1,891 photos replayed against LINKS5M (same setup), scored against LINKS5F's accepted run: every panel
 unchanged (dev 636/3/663, dev2 232/0/238, dev3 938/0/963), 0 right -> wrong, 0 expected cards lost, 0 changed
@@ -209,6 +223,13 @@ The gates on LINKS5 to 5D were stopped part-way when the next step was added; on
 them, was replayed in full.
 
 ## Switch
+
+LINKS5T, 2026-11-19: `catalogue-release-switch.sh apply`, `RELEASE_NAME=catalogue-links5t-20261119`, release file
+`/root/catalogue-links5t-20261119.env` (only the schema and import lines changed, checked by diff). After: container
+healthy, restarts 0, no OOM; all 218 new links of LINKS5N to 5T read back from `/api/v1/cards/{id}`. Rollback
+`/etc/scanapp-staging/catalogue-rollback/catalogue-links5t-20261119` (rollback file points to LINKS5M). Approval: the
+owner asked to "finalize with the links", approved sharing for duplicate twins ("ok do") and asked for the three
+promo duplicates ("do the three duplicationes").
 
 LINKS5M, 2026-11-18: `catalogue-release-switch.sh apply`, `RELEASE_NAME=catalogue-links5m-20261117`, release file
 `/root/catalogue-links5m-20261117.env` (only the schema and import lines changed, checked by diff). After: health ok,
@@ -235,6 +256,8 @@ LINKS5F:
 
 ## Phone index
 
+LINKS5T: unchanged, v4 `0a46b0ab...`; `/api/v1/card-index/manifest` answers 200 after the switch.
+
 LINKS5M: unchanged, v4 `0a46b0abe0f8db7db415ffef544a1249a295965fb0bd848bb06d26c8831478e2` (published on 2026-11-17,
 `docs/phone-index-v4-20261117.md`), 51,625 rows, five files. The manifest answers 200 in public after the switch.
 
@@ -249,6 +272,12 @@ not in the phone index. Nothing was published: the manifest kept answering 200 a
 ids file matches, and a ranged request on the vectors returns 206.
 
 ## Going back
+
+To LINKS5M:
+
+```
+CONFIG_DIR=/etc/scanapp-staging RELEASE_NAME=catalogue-links5t-20261119 PROJECT=scanapp-scanapp-z1mwj4 COMPOSE_FILE=compose.dokploy.yaml scripts/catalogue-release-switch.sh rollback
+```
 
 To LINKS5J, on the staging host, from the code directory:
 
@@ -265,7 +294,30 @@ CONFIG_DIR=/etc/scanapp-staging RELEASE_NAME=catalogue-links5-20261116 PROJECT=s
 That goes back to LINKS5F. To go back further, run it again with `RELEASE_NAME=catalogue-links5-20261116` (to IMG1).
 The phone index stays as it is: IMG1, LINKS5F and LINKS5J use the same one.
 
-## Still without a link (1,238 Japanese rows after LINKS5M)
+## Still without a link (1,020 Japanese rows after LINKS5T)
+
+### How LINKS5N to 5T were found
+
+Cardmarket listings were read page by page in the owner's browser (30 items a page, at most 300 a listing, so each
+listing was read sorted both ways). Product ids came from the picture addresses on the page; pictures were compared
+on screen with ours and never saved. Cloudflare's check came back three times at one page a minute; at one page
+every three minutes it did not. The owner passed each check.
+
+Left without a link on purpose:
+
+- Not sold on Cardmarket: Gym Challenge energies, No.1/2/3 Trainer, Arceus contest cards, extra Tropical Wind and
+  silver Darkness Energy cards, 2005 Victory Medals, 21 Victory Rings (3 products, 2 without a picture), Victory
+  Decorations of other cities, Zorua/Zoroark contest cards, Hau (Cardmarket's card has other art), XYP-064 (stamp
+  variants).
+- No picture of our own: 154 of the unlinked Japanese rows (`has_image = 0`). They came from REC2's checklist fill
+  (2026-11-07, `treatment: no_image`): a name and number, no image. Mostly old deck and gift-box cards (gym decks,
+  movie VS packs, Pokémon-e packs), energy sets, Pikachu World Collection, 29 `jr-miscellaneous-promos`. Where
+  Cardmarket has several versions under the name, the row cannot be matched without a picture.
+
+Title errors seen on our side: `ja:XYP-299` is titled Team Flare Grunt but its picture is Double Dragon Energy;
+`ja:jr-miscellaneous-promos-176` is titled Fearow but the card is Dark Fearow (its link is right).
+
+### Before LINKS5N
 
 After LINKS5M: 1,238 Japanese rows without a link. Mostly: copies of cards in another product that were kept apart
 (Tropical Mega Battle, MMBP, `jr-miscellaneous-decks`, `jr-entry-pack` against DP1), `jr-miscellaneous-promos` (298)
