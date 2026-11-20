@@ -9,6 +9,10 @@ prepare_sql.py: parent CAS, clone the nine tables, copy read grants, then for th
 name (English kept in view_title), append pad vectors and artwork regions for the scannable
 ones, update both manifests, the cards' provenance rows and the import manifest, rename the
 import, and end with a guard. Writes BATCH_DIR/sql/candidate.sql and sql/prepared.json.
+
+An update with "new_row_from" is a new catalogue row (one more real card behind a checklist name that
+covered several): it is inserted as a copy of that row with its own id, provider_id, collector_number and
+image, no Cardmarket link, and gets its own catalogue-completion-source provenance row.
 """
 import hashlib
 import json
@@ -64,10 +68,21 @@ def main(batch_dir, role_file, feature_sha):
     cols = meta["digests"]["cards"]["columns"]
     rows = [dict(zip(cols, r)) for r in conn.execute(f'SELECT {",".join(cols)} FROM {PARENT}.cards ORDER BY id COLLATE "C"').fetchall()]
     by_id = {r["id"]: r for r in rows}
-    for u in updates:
+    existing = [u for u in updates if not u.get("new_row_from")]
+    new = [u for u in updates if u.get("new_row_from")]
+    new_rows = []
+    for u in new:
+        assert u["id"] not in by_id and u["id"].startswith(u["id"].split(":", 1)[0] + ":"), u["id"]
+        src = by_id[u["new_row_from"]]
+        new_rows.append({**src, "id": u["id"], "provider_id": u["id"].split(":", 1)[1], "collector_number": u["collector_number"],
+                         "image_path": u["image_path"], "has_image": 1, "name": u["name_ja"], "view_title": u["name_en"],
+                         "cardmarket_id": None, "cardmarket_url": None, "cardmarket_verified": 0, "cardmarket_provenance": None,
+                         "cardmarket_verified_at": None, "remote_image_url": None, "printed_collector_number": None})
+    for u in existing:
         row = by_id[u["id"]]
         assert row["has_image"] == 0 and not row["image_path"], u["id"]
         row.update(image_path=u["image_path"], has_image=1, name=u["name_ja"], view_title=u["name_en"])
+    rows = sorted(rows + new_rows, key=lambda r: r["id"].encode())
     cards_md5 = hashlib.md5("".join(hashlib.md5("|".join(token(r[k]) for k in cols).encode()).hexdigest()
                                     for r in rows).encode()).hexdigest()
     vh = dict(conn.execute(f"SELECT card_id, source_vector_sha256 FROM {PARENT}.card_embeddings WHERE mode='pad'").fetchall())
@@ -81,7 +96,7 @@ def main(batch_dir, role_file, feature_sha):
     art_md5 = hashlib.md5(("".join(h for _, h in art_rows) + "".join(r["source_vector_sha256"] for r in art_added)).encode()).hexdigest()
     prov_keys = dict(conn.execute(
         f"SELECT metadata->>'id', source_key FROM {PARENT}.reference_metadata WHERE source_key LIKE 'catalogue-completion-source:%%' "
-        f"AND metadata->>'id' = ANY(%s)", ([u["id"] for u in updates],)).fetchall())
+        f"AND metadata->>'id' = ANY(%s)", ([u["id"] for u in existing],)).fetchall())
     snapshot = meta["vectors"]["pad"]["snapshot"]
     conn.close()
 
@@ -104,9 +119,12 @@ def main(batch_dir, role_file, feature_sha):
   recipient:=CASE WHEN item.grantee=0 THEN 'PUBLIC' ELSE quote_ident(pg_get_userbyid(item.grantee)) END;
   EXECUTE 'GRANT SELECT ON TABLE {TARGET}.' || quote_ident(item.relname) || ' TO ' || recipient; END LOOP;
 END $acl$;""")
-    for u in updates:
+    for u in existing:
         s.append(f"UPDATE {TARGET}.cards SET image_path={lit(u['image_path'])}, has_image=1, name={lit(u['name_ja'])}, "
                  f"view_title={lit(u['name_en'])} WHERE id={lit(u['id'])} AND has_image=0;")
+    if new_rows:
+        s.append(f"INSERT INTO {TARGET}.cards({','.join(cols)}) VALUES "
+                 + ",".join("(" + ",".join(lit(r[k]) for k in cols) + ")" for r in new_rows) + ";")
     if scannable:
         s.append(f"INSERT INTO {TARGET}.card_embeddings(card_id,mode,snapshot_id,embedding,source_vector_sha256) VALUES "
                  + ",".join(f"({lit(c)},'pad',{lit(snapshot)},{vlit(pad[pos[c]])},{lit(vh[c])})" for c in scannable) + ";")
@@ -114,13 +132,24 @@ END $acl$;""")
                  + ",".join(f"({lit(r['card_id'])},{lit(r['profile'])},{start_row + i},{vlit(art_vecs[i])},{lit(r['source_vector_sha256'])},"
                             f"{jlit({k: r[k] for k in ('card_id','profile','language','name','set_name','collector_number','reference_sha256')})}::jsonb)"
                             for i, r in enumerate(art_added)) + ";")
+    prov = []
     for u in updates:
         patch = {"image_path": u["image_path"], "sha256": u["image_sha256"], "source_kind": u.get("source_kind", SOURCE_KIND),
                  "source": u["source"], "name_official_ja": u["name_ja"], "treatment": u["treatment"],
                  "treatment_reason": u["reason"], "source_use_permission": u.get("source_permission", SOURCE_PERMISSION),
-                 "image_batch": IMPORT}
-        if u["id"] in prov_keys:  # rows from the base import have no completion-source row
+                 "image_batch": IMPORT, **({"source_label": u["tcgc_label"]} if u.get("tcgc_label") else {})}
+        if u.get("new_row_from"):
+            r = next(x for x in new_rows if x["id"] == u["id"])
+            prov.append({"source_key": f"catalogue-completion-source:{IMPORT}:{u['id']}", "metadata": {
+                "id": u["id"], "name": r["name"], "language": r["language"], "set_id": r["set_id"], "set_name": r["set_name"],
+                "collector_number": r["collector_number"], "split_from": u["new_row_from"],
+                "split_reason": "the checklist row's name covers more than one real card; this row is one of them", **patch,
+                "status": "candidate_staging_scan_pending"}})
+        elif u["id"] in prov_keys:  # rows from the base import have no completion-source row
             s.append(f"UPDATE {TARGET}.reference_metadata SET metadata = metadata || {jlit(patch)}::jsonb WHERE source_key={lit(prov_keys[u['id']])};")
+    if prov:
+        s.append(f"INSERT INTO {TARGET}.reference_metadata(source_key,metadata) SELECT x.source_key,x.metadata FROM "
+                 f"jsonb_to_recordset({jlit(prov)}::jsonb) AS x(source_key text, metadata jsonb);")
     if FIX_SOURCE_BATCH:
         fix = {"source_kind": SOURCE_KIND, "source_use_permission": SOURCE_PERMISSION, "source_kind_corrected_in": IMPORT}
         s.append(f"UPDATE {TARGET}.reference_metadata SET metadata = metadata || {jlit(fix)}::jsonb "
@@ -132,6 +161,8 @@ END $acl$;""")
     s.append(f"UPDATE {TARGET}.reference_metadata SET metadata = metadata || {jlit(aman)}::jsonb "
              f"WHERE source_key='artwork-manifest' AND md5(metadata::text)={lit(rm['artwork-manifest'][1])};")
     new_counts = dict(meta["counts"])
+    new_counts["cards"] = counts["cards"] + len(new_rows)
+    new_counts["reference_metadata"] = counts["reference_metadata"] + len(prov)
     new_counts["card_embeddings"] = counts["card_embeddings"] + len(scannable)
     new_counts["artwork_embeddings"] = counts["artwork_embeddings"] + len(art_added)
     alternatives = [{"card_id": u["id"], "image_path": u["image_path"], "source_sha256": u["image_sha256"], "reason": u["reason"]}
@@ -143,7 +174,7 @@ END $acl$;""")
                          "records_sha256": aman["records_sha256"], "embeddings_sha256": aman["embeddings_sha256"],
                          "manifest_sha256": hashlib.sha256((rel / "artwork/manifest.json").read_bytes()).hexdigest()},
              "feature_only_printing_alternatives": list(meta.get("feature_only_printing_alternatives") or []) + alternatives,
-             "ja_recovery_images": {"cards": len(updates), "scannable": len(scannable), "printing_alternatives": len(alternatives),
+             "ja_recovery_images": {"cards": len(updates), "new_rows": [r["id"] for r in new_rows], "scannable": len(scannable), "printing_alternatives": len(alternatives),
                                     "source": SOURCE_KIND, "batch": rel.name}}
     vectors_pad = {**meta["vectors"]["pad"], "count": len(ids), "aggregate_md5": agg_md5(vh)}
     s.append(f"UPDATE {TARGET}.import_manifest SET metadata = jsonb_set(jsonb_set(jsonb_set(metadata,'{{digests,cards,md5}}',{jlit(cards_md5)}::jsonb),"
@@ -162,7 +193,7 @@ END $acl$;""")
     s.append("COMMIT;")
     (rel / "sql").mkdir(exist_ok=True)
     (rel / "sql/candidate.sql").write_text("\n".join(s) + "\n")
-    report = {"target": TARGET, "import_id": IMPORT, "parent": PARENT, "parent_metadata_md5": meta_md5, "updated_cards": len(updates),
+    report = {"target": TARGET, "import_id": IMPORT, "parent": PARENT, "parent_metadata_md5": meta_md5, "updated_cards": len(existing), "new_cards": len(new_rows),
               "pad_vectors": len(ids), "new_artwork_rows": len(art_added), "cards_md5": cards_md5,
               "feature_manifest_sha256": feature_sha, "provenance_rows": len(prov_keys),
               "sql_sha256": hashlib.sha256((rel / "sql/candidate.sql").read_bytes()).hexdigest()}

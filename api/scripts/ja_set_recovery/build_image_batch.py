@@ -118,7 +118,7 @@ def main(run_dir, parent_dir, fill_file, model_path, name, image_dir_name):
     np.save(vdir / "embedding_card_ids.npy", np.asarray(ids, dtype=str))
     np.save(vdir / "embeddings.npy", pad)
     new_pman = dict(pman)
-    new_pman.update(indexed_ids=ids, indexed_count=len(ids), missing_images=pman["missing_images"] - len(batch),
+    new_pman.update(indexed_ids=ids, indexed_count=len(ids), missing_images=pman["missing_images"] - sum(1 for b in batch if not b["fill"].get("new_row_from")),
                     embeddings_sha256=sha_file(vdir / "embeddings.npy"), ids_sha256=sha_file(vdir / "embedding_card_ids.npy"),
                     parent_embeddings_sha256=pman["embeddings_sha256"], parent_ids_sha256=pman["ids_sha256"],
                     retrieval_segments=list(pman["retrieval_segments"]) + ([len(scannable)] if scannable else []),
@@ -133,7 +133,7 @@ def main(run_dir, parent_dir, fill_file, model_path, name, image_dir_name):
         for profile in PROFILES:
             add_recs.append({"card_id": b["fill"]["id"], "profile": profile, "language": lang_of(b["fill"]["id"]),
                              "name": b["fill"]["official_name_ja"], "set_name": b["fill"]["set_name"],
-                             "collector_number": b["fill"]["id"].rsplit("-", 1)[-1], "reference_sha256": b["sha"]})
+                             "collector_number": b["fill"].get("collector_number") or b["fill"]["id"].rsplit("-", 1)[-1], "reference_sha256": b["sha"]})
             add_vecs.append(b["art"][profile])
     adir = out / "artwork"
     adir.mkdir()
@@ -153,7 +153,7 @@ def main(run_dir, parent_dir, fill_file, model_path, name, image_dir_name):
                 "name_ja": b["fill"]["official_name_ja"], "name_en": b["fill"]["name"], "treatment": b["treatment"],
                 "reason": b["reason"], "nearest_indexed": b["nearest_indexed"], "era": b["era"],
                 "source": {k: b["fill"][k] for k in ("detail_url", "image_url", "official_card_id", "official_number", "sha256")},
-                **({"source_kind": b["fill"]["source_kind"]} if b["fill"].get("source_kind") else {})}
+                **{k: b["fill"][k] for k in ("source_kind", "new_row_from", "collector_number", "tcgc_label") if b["fill"].get(k)}}
                for b in sorted(batch, key=lambda b: b["fill"]["id"].encode())]
     (out / "updates.json").write_text(json.dumps(updates, ensure_ascii=False, indent=1) + "\n")
     (out / "feature-rows.json").write_text(json.dumps([{"id": u["id"], "image_path": u["image_path"], "rarity": ""}
