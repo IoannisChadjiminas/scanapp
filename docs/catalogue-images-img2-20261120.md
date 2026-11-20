@@ -89,6 +89,24 @@ The rollback folder is `/etc/scanapp-staging/catalogue-rollback/catalogue-img2-2
 Going back:
 `cd /etc/dokploy/compose/scanapp-scanapp-z1mwj4/code && RELEASE_NAME=catalogue-img2-20261120 PROJECT=scanapp-scanapp-z1mwj4 CONFIG_DIR=/etc/scanapp-staging COMPOSE_FILE=compose.dokploy.yaml bash scripts/catalogue-release-switch.sh rollback`
 
+## Phone index (republished 2026-11-20)
+
+The switch also changed the phone index, though no row or vector changed. `build_image_batch.py` appends the batch name to the pad manifest's `catalogue_version` even when it adds no vectors, so the live `catalogue_version` now ends `...release-img1-20261116-release-img2-20261120`. `routes/card_index.py` `_matches_snapshot` requires the index's `catalogue_version` to equal the snapshot's. ACTIVE v4 `0a46b0ab…` and its base `32f22e3f…` still carried the IMG1 version, so the manifest answered 503 "Phone index unavailable" from the IMG2 switch until this republish. It stayed that way through LINKS5X, which touched links only.
+
+Republished with the same files (ids, vectors, meta and prints copied and checked by sha256); only the version metadata is new. The script is `api/scripts/on_phone_index/restamp_index.py`, run on the staging host from `/root/stage-img2-20261120`. Each version hash is recomputed by the scheme that reproduces the old one: `export_index.py`/`extend_index.py` for the base and v4, and the run-4 variant scheme for the other model.
+
+| | Before (IMG1 `catalogue_version`) | After (IMG2 `catalogue_version`) |
+|---|---|---|
+| Base (48,874 rows) | `32f22e3fa19e49e43c0d2f940ff00c03b2a5201e0ae8d4bd9de57e54ac3bda0b` | `4c7bffc44e28cbf34f1b3b18538b8e33c2bb54a3f5f36a955951c9f84dba7265` |
+| `ACTIVE`: v4 extension (51,625 rows, `extends` the base) | `0a46b0abe0f8db7db415ffef544a1249a295965fb0bd848bb06d26c8831478e2` | `1c75043b3444e8c7cf21348b96280f6156d248973e7194c263b42ceaf7bf2190` |
+| `ACTIVE.38ce95cc1928`: run-4 model variant (`variant_of` v4) | `624cf48c970012ad257c07036c0d5710f1d4e191a8487b97781bb72f20053f9e` | `3a63c5ca187316625fcc28972cda519b6c8e5ab45c5f186ddbafca23cb1f3870` |
+
+**Checks:** both manifests (default model and `?model=38ce95cc1928`) answer 200 inside the container and in public (`staging-scan.pokesingle.com`), with 51,625 rows and the IMG2 `catalogue_version`. The ids file downloads with the listed size and sha256 (`2b6d0a3d…`, 696,144 bytes). A `Range: bytes=0-1023` request on the vectors file returns 206.
+
+**Rollback:** `/etc/scanapp-staging/catalogue-rollback/phone-index-img2-20261120` holds `ACTIVE.before` (`0a46b0ab…`) and `ACTIVE.38ce95cc1928.before` (`624cf48c…`). To go back to LINKS5T, run the catalogue rollback above, then copy both files back to `/data/phone-index/ACTIVE` and `ACTIVE.38ce95cc1928`. The old folders are kept.
+
+**Next time:** any image batch built with `build_image_batch.py` changes `catalogue_version`, so the phone index must be republished at the switch, as for IMG1 and here.
+
 ## Scripts
 
 - `assemble_image_batch.py`: an accepted line with `new_row_from` and `collector_number` becomes a new row. Signature rows include the new rows. TCG Collector's source kind is now `tcgcollector_scan`.
