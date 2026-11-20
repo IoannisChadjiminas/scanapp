@@ -16,6 +16,7 @@ rows for the feature-store signature) and RELEASE_DIR/sql/prepared.json.
 import hashlib
 import json
 import os
+import re
 import sys
 from pathlib import Path
 
@@ -23,17 +24,23 @@ import certifi
 import numpy as np
 import psycopg
 
-PARENT = "pokesingle_completion_20261028_neo2057"
-PARENT_IMPORT = "PS-CATALOGUE-EN-JA-NEO2057-20261028"
+PARENT = os.environ.get("JAREC_PARENT", "pokesingle_completion_20261028_neo2057")
+PARENT_IMPORT = os.environ.get("JAREC_PARENT_IMPORT", "PS-CATALOGUE-EN-JA-NEO2057-20261028")
 TARGET = os.environ.get("JAREC_TARGET", "pokesingle_completion_20261107_jarec")
 IMPORT = os.environ.get("JAREC_IMPORT", "PS-CATALOGUE-EN-JA-REC-20261107")
 TABLES = ["cards", "cardmarket_products", "card_embeddings", "reference_metadata", "import_manifest",
           "artwork_embeddings", "cardmarket_review", "cardmarket_url_helpers", "source_records"]
-PROVENANCE = "ja-recovery-listing-20261106"
-VERIFIED_AT = "2026-11-06T23:59:00Z"
-RIGHTS = "Owner approved the Japanese recovery image sources that pass the catalogue gate (chat, 2026-11-07)."
-NAME_DECISION = "English checklist name; no official Japanese name available for these rows (owner decision 3, 2026-11-06)."
+PROVENANCE = os.environ.get("JAREC_PROVENANCE", "ja-recovery-listing-20261106")
+VERIFIED_AT = os.environ.get("JAREC_VERIFIED_AT", "2026-11-06T23:59:00Z")
+RIGHTS = os.environ.get("JAREC_RIGHTS", "Owner approved the Japanese recovery image sources that pass the catalogue gate (chat, 2026-11-07).")
+NAME_DECISION = os.environ.get("JAREC_NAME_DECISION", "English checklist name; no official Japanese name available for these rows (owner decision 3, 2026-11-06).")
+RUN_DIR = os.environ.get("JAREC_RUN_DIR", "data/catalogue-gaps/ja-set-recovery-20261029-v3")
+if not all(re.fullmatch(r"[a-z][a-z0-9_]*", value) for value in (PARENT, TARGET)):
+    raise ValueError("invalid catalogue schema identifier")
+if PARENT == TARGET:
+    raise ValueError("candidate must use a new schema")
 BATCH = 200
+LANG = os.environ.get("JAREC_LANGUAGE", "ja")
 
 
 def lit(value):
@@ -79,7 +86,7 @@ def main(release_dir, role_file, feature_sha):
     scannable = [c["id"] for c in cards if c["treatment"] == "scannable"]
     n_parent = len(ids) - len(scannable)
     assert list(ids[n_parent:]) == scannable
-    art_vecs = np.load(rel / "artwork/embeddings.npy")[-len(art_added):]
+    art_vecs = np.load(rel / "artwork/embeddings.npy")[len(np.load(rel / "artwork/embeddings.npy")) - len(art_added):]
     for rec, vec in zip(art_added, art_vecs):
         assert vhash(vec) == rec["source_vector_sha256"]
 
@@ -106,14 +113,14 @@ def main(release_dir, role_file, feature_sha):
         linked = c["cardmarket_url"] is not None
         new_rows.append({
             "id": c["id"], "provider_id": c["provider_id"], "name": c["name"], "set_id": c["set_id"],
-            "set_name": c["set_name"], "collector_number": c["collector_number"], "language": "ja",
+            "set_name": c["set_name"], "collector_number": c["collector_number"], "language": LANG,
             "category": None, "rarity": None, "illustrator": None, "variants_json": "{}",
             "image_path": c["image_path"], "has_image": 1 if c["image_path"] else 0,
             "cardmarket_id": int(c["cardmarket_id"]) if c["cardmarket_id"] else None,
             "cardmarket_url": c["cardmarket_url"], "cardmarket_verified": 1 if linked else 0,
             "cardmarket_provenance": PROVENANCE if linked else None,
             "cardmarket_verified_at": VERIFIED_AT if linked else None,
-            "remote_image_url": None, "printed_collector_number": None, "view_title": c["name"],
+            "remote_image_url": c.get("remote_image_url"), "printed_collector_number": None, "view_title": c["name"],
         })
     assert set(cols) <= set(new_rows[0])
     all_rows = sorted(parent_rows + new_rows, key=lambda r: r["id"].encode())
@@ -176,10 +183,11 @@ END $acl$;""")
         s.append(f"INSERT INTO {TARGET}.artwork_embeddings(card_id,profile,row_index,embedding,source_vector_sha256,metadata) VALUES {','.join(values)};")
     by_id = {c["id"]: c for c in cards}
     prov = [{"source_key": f"catalogue-completion-source:{IMPORT}:{c['id']}", "metadata": {
-        "id": c["id"], "name": c["name"], "language": "ja", "set_id": c["set_id"], "set_name": c["set_name"],
+        "id": c["id"], "name": c["name"], "language": LANG, "set_id": c["set_id"], "set_name": c["set_name"],
         "collector_number": c["collector_number"], "printed_number": c["printed_number"], "group_id": c["group_id"],
         "image_path": c["image_path"], "sha256": c["image_sha256_stored"], "source_file_sha256": c["image_sha256"],
         "source_kind": c["image_source"], "source_use_permission": RIGHTS if c["image_path"] else None,
+        **{k: c[k] for k in ("source_row_url", "source_image_url") if c.get(k)},
         "name_decision": NAME_DECISION, "treatment": c["treatment"],
         "cardmarket_status": c["cardmarket_status"], "status": "candidate_staging_scan_pending"}} for c in cards]
     for i in range(0, len(prov), 1000):
@@ -208,7 +216,7 @@ END $acl$;""")
                     "records_sha256": aman["records_sha256"], "embeddings_sha256": aman["embeddings_sha256"],
                     "manifest_sha256": hashlib.sha256((rel / "artwork/manifest.json").read_bytes()).hexdigest()},
         "feature_only_printing_alternatives": list(meta.get("feature_only_printing_alternatives") or []) + alternatives,
-        "ja_recovery": {"run": "data/catalogue-gaps/ja-set-recovery-20261029-v3", "cards": len(new_rows),
+        "ja_recovery": {"run": RUN_DIR, "cards": len(new_rows),
                         "with_image": sum(1 for r in new_rows if r["has_image"]), "scannable": len(scannable),
                         "printing_alternatives": len(alternatives),
                         "cardmarket_linked": sum(1 for r in new_rows if r["cardmarket_url"]),

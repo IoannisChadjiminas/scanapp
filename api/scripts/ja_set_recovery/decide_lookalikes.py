@@ -12,6 +12,7 @@ SERVED_PAD_DIR holds embeddings.npy + embedding_card_ids.npy of the index being 
 Writes RUN_DIR/index-decision.json.
 """
 import json
+import os
 import sys
 from pathlib import Path
 
@@ -29,7 +30,7 @@ def main(run_dir, served_dir):
     pad = np.load(run / "vectors/pad-embeddings.npy")
     base = np.load(served / "embeddings.npy")
     bids = np.load(served / "embedding_card_ids.npy").astype(str)
-    ja = np.char.startswith(bids, "ja:")
+    ja = np.char.startswith(bids, os.environ.get("JAREC_LANGUAGE", "ja") + ":")  # twins within one language only
     base, bids = base[ja], bids[ja]
 
     parent = {}

@@ -16,11 +16,16 @@ class _Anchors(HTMLParser):
         self.items: list[dict[str, str]] = []
         self.page_links: list[str] = []
         self._current: dict[str, str] | None = None
+        self._row_id = ""
 
     def handle_starttag(self, tag: str, attrs) -> None:
+        attr = dict(attrs)
+        # The list view (?mode=list) carries the product id on the row element, not on the link.
+        row = re.fullmatch(r"productRow(\d+)", attr.get("id") or "")
+        if row:
+            self._row_id = row.group(1)
         if tag != "a":
             return
-        attr = dict(attrs)
         href = attr.get("href", "")
         if href:
             self.page_links.append(href)
@@ -28,7 +33,7 @@ class _Anchors(HTMLParser):
         bits = [bit for bit in parts.path.split("/") if bit]
         if href:
             product_id = next((attr[key] for key in ("data-product-id", "data-id-product", "idProduct")
-                               if attr.get(key, "").isdecimal()), "")
+                               if attr.get(key, "").isdecimal()), "") or self._row_id
             self._current = {"href": href, "name": "", "product_id": product_id}
 
     def handle_data(self, data: str) -> None:

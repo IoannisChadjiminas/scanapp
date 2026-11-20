@@ -17,6 +17,7 @@ art-added.json, release.json.
 """
 import hashlib
 import json
+import os
 import shutil
 import sys
 from pathlib import Path
@@ -34,6 +35,7 @@ from catalogue.bootstrap.checks import BLUR_LIMIT, MIN_SIDE, load_facts  # noqa:
 
 MODERN = {"Mega Evolution Era", "Scarlet & Violet Era", "Sword & Shield Era", "Sun & Moon Era"}
 T = 0.95
+LANG = os.environ.get("JAREC_LANGUAGE", "ja")  # "en": English rows; twins are looked for within that language
 
 
 def sha_file(path):
@@ -77,7 +79,7 @@ def main(run_dir, parent_dir, fill_file, model_path, name, image_dir_name):
     p_pad = np.load(parent / "vectors/pad/embeddings.npy")
     pman = json.loads((parent / "vectors/pad/manifest.json").read_text())
     assert sha_file(parent / "vectors/pad/embeddings.npy") == pman["embeddings_sha256"]
-    ja = np.char.startswith(p_ids, "ja:")
+    ja = np.char.startswith(p_ids, LANG + ":")
     ja_ids, ja_pad = p_ids[ja], p_pad[ja]
     assert not {b["fill"]["id"] for b in batch} & set(p_ids)
 
@@ -121,7 +123,7 @@ def main(run_dir, parent_dir, fill_file, model_path, name, image_dir_name):
     add_recs, add_vecs = [], []
     for b in scannable:
         for profile in PROFILES:
-            add_recs.append({"card_id": b["fill"]["id"], "profile": profile, "language": "ja",
+            add_recs.append({"card_id": b["fill"]["id"], "profile": profile, "language": LANG,
                              "name": b["fill"]["official_name_ja"], "set_name": b["fill"]["set_name"],
                              "collector_number": b["fill"]["id"].rsplit("-", 1)[-1], "reference_sha256": b["sha"]})
             add_vecs.append(b["art"][profile])
