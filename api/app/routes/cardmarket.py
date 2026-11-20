@@ -23,6 +23,7 @@ from app.cardmarket import (
     map_card_product,
     mark_expansion_complete,
     normalize_product_url,
+    remember_listing_product,
     store_unmatched_product_image,
 )
 from app.cardmarket_events import notify_product, wait_for_product
@@ -664,6 +665,13 @@ def parse_cardmarket_page(
             header=parsed.get("header"),
             chart=parsed.get("chart"),
         )
+    if not parsed.get("blocked"):
+        # The page names its own product: a listing other than the card's
+        # main one can then be given its row of the price file.
+        try:
+            remember_listing_product(catalog, payload.url, parsed.get("image"))
+        except Exception:  # noqa: BLE001 - never fail a read over this
+            log.exception("listing product not kept")
     return ParseResponse.model_validate(parsed)
 
 

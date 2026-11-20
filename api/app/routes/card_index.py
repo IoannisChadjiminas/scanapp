@@ -1,6 +1,7 @@
 """Read-only distribution of an already validated phone-index candidate."""
 from __future__ import annotations
 
+import hashlib
 import json
 import re
 from collections import OrderedDict
@@ -14,11 +15,18 @@ from app.recognition.artifacts import sha256_file
 
 router = APIRouter()
 _NAMES = ('card_index.f16.bin', 'card_index.ids.txt', 'card_index.meta.tsv', 'card_index.version.json')
+# Optional fifth file: printings with the same picture as an index row, listed without a vector.
+# Served only when the version file lists it; a version without it has exactly the four files.
+_PRINTS = 'card_index.prints.tsv'
 _HEX = re.compile(r'^[0-9a-f]{64}$')
 _CACHE = 'public, max-age=31536000, immutable'
 _MODEL_ID = '2ddf6ec79e37'
+# Another picture model's index of the active rows (`?model=` on the manifest),
+# activated by `ACTIVE.<model>`: run 4 (38ce95cc1928) since 20 November 2026.
+_OTHER_MODEL = re.compile(r'^[0-9a-f]{12}$')
 _candidates = OrderedDict()
 _candidate_lock = RLock()
+_extensions = OrderedDict()
 
 
 def _candidate(root: Path, version: str) -> tuple[Path, dict, dict]:
@@ -35,9 +43,11 @@ def _checked_candidate(root: Path, version: str) -> tuple[Path, dict, dict]:
     folder = (root / version).resolve()
     if folder.parent != root or not folder.is_dir():
         raise ValueError('invalid folder')
+    names = _NAMES + ((_PRINTS,) if (folder / _PRINTS).exists() or (folder / _PRINTS).is_symlink() else ())
+
     def signature():
         values = []
-        for name in _NAMES:
+        for name in names:
             path = folder / name
             if path.is_symlink() or not path.is_file():
                 raise ValueError('missing file')
@@ -55,8 +65,10 @@ def _checked_candidate(root: Path, version: str) -> tuple[Path, dict, dict]:
     meta = json.loads((folder / _NAMES[3]).read_text())
     if not isinstance(meta, dict) or meta.get('version') != version or not isinstance(meta.get('files'), dict):
         raise ValueError('invalid version metadata')
+    if (_PRINTS in names) != (_PRINTS in meta['files']):
+        raise ValueError('prints file not listed in the version metadata')
     files = {}
-    for name in _NAMES:
+    for name in names:
         file = folder / name
         if file.is_symlink() or not file.is_file():
             raise ValueError('missing file')
@@ -73,6 +85,61 @@ def _checked_candidate(root: Path, version: str) -> tuple[Path, dict, dict]:
     return result
 
 
+def _prefix_sha256(path: Path, length: int) -> str:
+    digest = hashlib.sha256()
+    with path.open('rb') as handle:
+        while length > 0:
+            block = handle.read(min(length, 1 << 20))
+            if not block:
+                break
+            digest.update(block)
+            length -= len(block)
+    return digest.hexdigest()
+
+
+def _matches_snapshot(meta: dict, snapshot) -> bool:
+    return (meta.get('catalogue_version') == snapshot.catalogue_version
+            and meta.get('source_ids_sha256') == snapshot.ids_sha256
+            and meta.get('source_embeddings_sha256') == snapshot.embeddings_sha256
+            and meta.get('dims') == snapshot.embedding_dim
+            and meta.get('model_id') == _MODEL_ID
+            and meta.get('model_id') == str(snapshot.manifest.get('dinov2_sha256', ''))[:12])
+
+
+def _extension_ok(root: Path, folder: Path, meta: dict, files: dict, snapshot) -> bool:
+    """An index that extends a published one (version file `extends`) is served only if that base
+    version still matches the loaded snapshot exactly, and this index's ids and vectors files
+    start with the base's files byte for byte (its first rows are the snapshot's rows), followed
+    by the added rows. The manifest's `rows` is this index's own row count."""
+    ext = meta.get('extends')
+    if not isinstance(ext, dict) or not isinstance(ext.get('version'), str) or ext['version'] == meta['version']:
+        return False
+    _, base_meta, base_files = _candidate(root, ext['version'])
+    if ('extends' in base_meta or not _matches_snapshot(base_meta, snapshot)
+            or base_meta.get('rows') != snapshot.indexed_count or ext.get('rows') != base_meta['rows']
+            or base_meta.get('dims') != meta.get('dims') or base_meta.get('model_id') != meta.get('model_id')):
+        return False
+    rows = meta.get('rows')
+    if not isinstance(rows, int) or rows <= base_meta['rows']:
+        return False
+    key = (str(folder), files['card_index.ids.txt']['sha256'], files['card_index.f16.bin']['sha256'],
+           base_files['card_index.ids.txt']['sha256'], base_files['card_index.f16.bin']['sha256'])
+    with _candidate_lock:
+        if key in _extensions:
+            return _extensions[key]
+        ids_path, vectors_path = folder / 'card_index.ids.txt', folder / 'card_index.f16.bin'
+        with ids_path.open('rb') as handle:
+            lines = sum(block.count(b'\n') for block in iter(lambda: handle.read(1 << 20), b''))
+        result = (lines == rows
+                  and files['card_index.f16.bin']['bytes'] == rows * meta['dims'] * 2
+                  and all(_prefix_sha256(folder / name, base_files[name]['bytes']) == base_files[name]['sha256']
+                          for name in ('card_index.ids.txt', 'card_index.f16.bin')))
+        _extensions[key] = result
+        if len(_extensions) > 8:
+            _extensions.popitem(last=False)
+        return result
+
+
 def _enabled(request: Request):
     settings = request.app.state.settings
     if not settings.card_index_publish:
@@ -80,42 +147,71 @@ def _enabled(request: Request):
     return settings
 
 
+def _same_rows(meta: dict, files: dict, other: dict, other_files: dict, model: str, version: str) -> bool:
+    """Another model's vectors for exactly the active index's rows: the same ids,
+    card details and printings, in the same order, made from the same catalogue.
+    Only the vectors file differs."""
+    return (other.get('model_id') == model
+            and other.get('variant_of') == version
+            and other.get('catalogue_version') == meta.get('catalogue_version')
+            and other.get('rows') == meta.get('rows')
+            and other.get('dims') == meta.get('dims')
+            and set(other_files) == set(files)
+            and all(other_files[name] == files[name] for name in files
+                    if name not in ('card_index.f16.bin', 'card_index.version.json'))
+            and other_files['card_index.f16.bin']['bytes'] == files['card_index.f16.bin']['bytes'])
+
+
 @router.get('/card-index/manifest')
-def manifest(request: Request):
+def manifest(request: Request, model: str | None = None):
     settings = _enabled(request)
+    if model is not None and model != _MODEL_ID and not _OTHER_MODEL.fullmatch(model):
+        raise HTTPException(404)
     snapshot = request.app.state.runtime.snapshot
     if snapshot is None:
         raise HTTPException(503, 'Recognition snapshot unavailable')
     try:
         root = settings.card_index_publish_dir
         version = (root / 'ACTIVE').read_text().strip()
-        _, meta, files = _candidate(root, version)
-        if (meta.get('catalogue_version') != snapshot.catalogue_version
-                or meta.get('source_ids_sha256') != snapshot.ids_sha256
-                or meta.get('source_embeddings_sha256') != snapshot.embeddings_sha256
-                or meta.get('rows') != snapshot.indexed_count
-                or meta.get('dims') != snapshot.embedding_dim
-                or meta.get('model_id') != _MODEL_ID
-                or meta.get('model_id') != str(snapshot.manifest.get('dinov2_sha256', ''))[:12]):
+        folder, meta, files = _candidate(root, version)
+        if 'extends' in meta:
+            rows_ok = _extension_ok(root, folder, meta, files, snapshot)
+        else:
+            rows_ok = meta.get('rows') == snapshot.indexed_count
+        if not _matches_snapshot(meta, snapshot) or not rows_ok:
             raise ValueError('candidate does not match the active snapshot')
     except (OSError, ValueError, TypeError, json.JSONDecodeError):
         raise HTTPException(503, 'Phone index unavailable') from None
+    if model is not None and model != _MODEL_ID:
+        pointer = settings.card_index_publish_dir / f'ACTIVE.{model}'
+        if not pointer.is_file():
+            raise HTTPException(404)
+        try:
+            other_version = pointer.read_text().strip()
+            _, other, other_files = _candidate(root, other_version)
+            if not _same_rows(meta, files, other, other_files, model, version):
+                raise ValueError('model index does not match the active rows')
+        except (OSError, ValueError, TypeError, json.JSONDecodeError):
+            raise HTTPException(503, 'Phone index unavailable') from None
+        version, meta, files = other_version, other, other_files
     result = {'version': version, 'model_id': meta['model_id'],
               'catalogue_version': meta['catalogue_version'], 'rows': meta['rows'],
               'files': [{'name': name, **files[name],
-                         'url': f'card-index/files/{version}/{name}'} for name in _NAMES]}
+                         'url': f'card-index/files/{version}/{name}'} for name in files]}
     return JSONResponse(result, headers={'Cache-Control': 'no-cache'})
 
 
 @router.get('/card-index/files/{version}/{name}')
 def file(request: Request, version: str, name: str):
     settings = _enabled(request)
-    if name not in _NAMES:
+    if name not in _NAMES and name != _PRINTS:
         raise HTTPException(404)
     try:
         folder, _, files = _candidate(settings.card_index_publish_dir, version)
     except (OSError, ValueError, TypeError, json.JSONDecodeError):
         raise HTTPException(404) from None
+    if name not in files:
+        raise HTTPException(404)
     etag = '"' + files[name]['sha256'] + '"'
     headers = {'ETag': etag, 'Cache-Control': _CACHE, 'Accept-Ranges': 'bytes'}
     if request.headers.get('if-none-match') == etag and 'range' not in request.headers:

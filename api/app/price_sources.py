@@ -268,31 +268,52 @@ def market_trend(market: dict[str, Any] | None, *, reverse: bool = False) -> flo
     return None
 
 
-def trend_for_url(conn: sqlite3.Connection, url: str | None) -> float | None:
-    """The Cardmarket trend of the product behind a listing URL, if on file."""
-    from app.cardmarket import normalize_product_url
+def product_id_for_url(conn: sqlite3.Connection, url: str | None) -> int | None:
+    """Cardmarket's product number for a listing URL.
+
+    A card row carries the number of its main listing only. Its other
+    listings (V2, V3: separate Cardmarket products, each with its own row in
+    the price file) are known by URL; their number comes from a page a phone
+    read, or from the stored address of the listing's own photo.
+    """
+    from app.cardmarket import listing_product_id, normalize_product_url
 
     if not url:
         return None
+    product = normalize_product_url(url) or url
     row = conn.execute(
         "SELECT cardmarket_id FROM cards WHERE cardmarket_url = ? AND cardmarket_id IS NOT NULL LIMIT 1",
-        (normalize_product_url(url) or url,),
+        (product,),
     ).fetchone()
-    market = guide_market(conn, row["cardmarket_id"]) if row else None
+    if row:
+        return int(row["cardmarket_id"])
+    try:
+        listing = conn.execute(
+            "SELECT product_id, listing_image_url FROM cardmarket_expansion_products WHERE url = ?",
+            (product,),
+        ).fetchone()
+    except sqlite3.OperationalError:
+        return None
+    if listing is None:
+        return None
+    return int(listing["product_id"]) if listing["product_id"] else listing_product_id(
+        listing["listing_image_url"]
+    )
+
+
+def trend_for_url(conn: sqlite3.Connection, url: str | None) -> float | None:
+    """The Cardmarket trend of the product behind a listing URL, if on file."""
+    if not url:
+        return None
+    market = guide_market(conn, product_id_for_url(conn, url))
     return market_trend(market, reverse=is_reverse_holo_url(url))
 
 
 def guide_trend_for_url(conn: sqlite3.Connection, url: str | None) -> tuple[float | None, str | None]:
     """The price file's trend and its date for the product behind a listing URL."""
-    from app.cardmarket import normalize_product_url
-
     if not url:
         return None, None
-    row = conn.execute(
-        "SELECT cardmarket_id FROM cards WHERE cardmarket_url = ? AND cardmarket_id IS NOT NULL LIMIT 1",
-        (normalize_product_url(url) or url,),
-    ).fetchone()
-    market = guide_market(conn, row["cardmarket_id"]) if row else None
+    market = guide_market(conn, product_id_for_url(conn, url))
     trend = market_trend(market, reverse=is_reverse_holo_url(url))
     return (trend, str(market.get("updated") or "") or None) if trend else (None, None)
 
@@ -404,6 +425,66 @@ def scan_prices(conn: sqlite3.Connection, card_id: str, url: str | None) -> list
     except Exception:
         log.exception("scan prices failed card=%s", card_id)
         return []
+
+
+_LISTING_FIELDS = (
+    "url", "prices", "status", "observed_at", "sampled_offer_count", "freshness", "fresh_for_s",
+    "guide_trend", "guide_trend_at", "unlisted", "scraper_ready", "webview_enabled",
+    "challenge_fallback_minutes", "helper_online", "helper_ready", "helper_paused",
+)
+
+
+def scan_listings(
+    conn: sqlite3.Connection, urls: list[str | None], *, limit: int = 6
+) -> list[dict[str, Any]]:
+    """The stored listing reads for the products a scan answers with.
+
+    Phones store a listing under the product URL plus its language and
+    condition filters, so the bare URL a card carries finds nothing. Every
+    stored sample of these products is returned, newest first, in the shape
+    of GET /cardmarket/prices; the app keeps the one whose key is the card it
+    shows. This saves the app a second request before it can show a listing
+    price. A scan must never fail because of a price.
+    """
+    from app.cardmarket import normalize_product_url
+    from app.cardmarket_queue import prices_payload
+
+    try:
+        products: list[str] = []
+        for url in urls:
+            product = normalize_product_url(url)
+            if product and product not in products:
+                products.append(product)
+        if not products or limit <= 0:
+            return []
+        marks = ",".join("?" * len(products))
+        rows = conn.execute(
+            f"SELECT sample_key FROM cardmarket_snapshots WHERE url IN ({marks}) "
+            "ORDER BY fetched_at DESC LIMIT ?",
+            (*products, limit),
+        ).fetchall()
+        out: list[dict[str, Any]] = []
+        for row in rows:
+            payload = prices_payload(conn, str(row["sample_key"]))
+            if payload.get("prices") or payload.get("unlisted"):
+                out.append({key: payload.get(key) for key in _LISTING_FIELDS})
+        return out
+    except Exception:
+        log.exception("scan listings failed")
+        return []
+
+
+def scan_listing_urls(response: Any) -> list[str | None]:
+    """The product URLs of the cards a scan response shows first."""
+    urls: list[str | None] = []
+    review = getattr(response, "printing_review", None)
+    cards = [*(getattr(review, "plausible_printings", None) or [])[:3],
+             *(getattr(response, "suggestions", None) or [])[:1]]
+    for card in cards:
+        urls.append(getattr(card, "cardmarket_url", None))
+        for variant in (getattr(card, "cardmarket_variants", None) or [])[:1]:
+            urls.append(getattr(variant, "url", None))
+    return urls
 
 
 def tcgdex_ids(row: sqlite3.Row) -> tuple[str, str]:
