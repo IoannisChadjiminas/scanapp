@@ -28,7 +28,7 @@ def test_config_reports_the_safe_defaults():
     assert body.scan_prices.warm_reader is True
     assert body.price_fresh_minutes >= 1
     assert body.slab_detection is False
-    assert body.scan_prices.phone_reads.scan_gap_s == 45
+    assert body.scan_prices.phone_reads.scan_gap_s == 20
 
 
 def test_config_keeps_the_phone_scan_gap_within_the_app_bounds():
