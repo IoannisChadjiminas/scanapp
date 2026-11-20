@@ -426,10 +426,12 @@ class Settings(BaseSettings):
     scan_price_server_read_statuses: str = "matched"
     scan_price_server_read_delay_ms: int = 3000
     scan_price_server_read_daily_pages: int = 0
-    # Seconds between two Cardmarket page loads the phone makes for a scan's
-    # cards; a card scanned inside the gap keeps its stored price. 15 s still
-    # drew Cardmarket's 429 on the A55 on 20 November 2026; the owner chose 45.
-    scan_price_phone_scan_gap_s: int = 45
+    # Seconds between two Cardmarket page loads the phone makes. Since 20
+    # November 2026 the app loads a page only when the collector taps "Check
+    # live offers", so this is the wait between two manual checks. 15 s drew
+    # Cardmarket's 429 only when automatic reads ran continuously; the owner
+    # chose 20 for manual checks (it was 45 while scans read automatically).
+    scan_price_phone_scan_gap_s: int = 20
     # No paid read for a card whose Cardmarket trend is below this (EUR). A card
     # with no known trend is still read. 0 reads every card.
     # 0 = no flat floor: the value tiers in CARDMARKET_FRESH_TIERS decide.
