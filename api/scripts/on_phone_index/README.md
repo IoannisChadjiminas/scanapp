@@ -47,6 +47,24 @@ vector), listed in its version file; the manifest then lists it after the four f
 `card-index/files/<version>/card_index.prints.tsv`. A version without it has exactly the four
 files, as before. Keep the base version's directory while an extension of it is active.
 
+### Another picture model's index (20 November 2026)
+
+Apps on run 4, the card-tuned picture model (model ID `38ce95cc1928`), ask
+for `/api/v1/card-index/manifest?model=38ce95cc1928`. A request without
+`model`, or with the snapshot's own model, is served as before. Another
+model's index is served from `ACTIVE.<model>` (the version, as in
+`ACTIVE`) when its version file has that `model_id`, a `variant_of` naming
+the version in `ACTIVE`, and the same catalogue, rows and dimensions. All
+its files except the vectors and the version file must be byte for byte
+the active index's. A model with no `ACTIVE.<model>` gets 404 (no index
+for it). A mismatch gets 503, and phones keep the index they have.
+
+When `ACTIVE` moves to a new catalogue, run 4's index stops being served
+until it is rebuilt for the new rows: run 4's vectors for every row, in
+the new index's order, from the run 4 ONNX model (`dinov2_small_r4.onnx`,
+sha256 `38ce95cc…`), then the four other files copied from the new
+active index.
+
 This route does **not** automatically export or promote snapshots. The offline
 research check and physical-device gates remain required before enabling it.
 

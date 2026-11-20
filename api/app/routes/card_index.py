@@ -21,6 +21,9 @@ _PRINTS = 'card_index.prints.tsv'
 _HEX = re.compile(r'^[0-9a-f]{64}$')
 _CACHE = 'public, max-age=31536000, immutable'
 _MODEL_ID = '2ddf6ec79e37'
+# Another picture model's index of the active rows (`?model=` on the manifest),
+# activated by `ACTIVE.<model>`: run 4 (38ce95cc1928) since 20 November 2026.
+_OTHER_MODEL = re.compile(r'^[0-9a-f]{12}$')
 _candidates = OrderedDict()
 _candidate_lock = RLock()
 _extensions = OrderedDict()
@@ -144,9 +147,26 @@ def _enabled(request: Request):
     return settings
 
 
+def _same_rows(meta: dict, files: dict, other: dict, other_files: dict, model: str, version: str) -> bool:
+    """Another model's vectors for exactly the active index's rows: the same ids,
+    card details and printings, in the same order, made from the same catalogue.
+    Only the vectors file differs."""
+    return (other.get('model_id') == model
+            and other.get('variant_of') == version
+            and other.get('catalogue_version') == meta.get('catalogue_version')
+            and other.get('rows') == meta.get('rows')
+            and other.get('dims') == meta.get('dims')
+            and set(other_files) == set(files)
+            and all(other_files[name] == files[name] for name in files
+                    if name not in ('card_index.f16.bin', 'card_index.version.json'))
+            and other_files['card_index.f16.bin']['bytes'] == files['card_index.f16.bin']['bytes'])
+
+
 @router.get('/card-index/manifest')
-def manifest(request: Request):
+def manifest(request: Request, model: str | None = None):
     settings = _enabled(request)
+    if model is not None and model != _MODEL_ID and not _OTHER_MODEL.fullmatch(model):
+        raise HTTPException(404)
     snapshot = request.app.state.runtime.snapshot
     if snapshot is None:
         raise HTTPException(503, 'Recognition snapshot unavailable')
@@ -162,6 +182,18 @@ def manifest(request: Request):
             raise ValueError('candidate does not match the active snapshot')
     except (OSError, ValueError, TypeError, json.JSONDecodeError):
         raise HTTPException(503, 'Phone index unavailable') from None
+    if model is not None and model != _MODEL_ID:
+        pointer = settings.card_index_publish_dir / f'ACTIVE.{model}'
+        if not pointer.is_file():
+            raise HTTPException(404)
+        try:
+            other_version = pointer.read_text().strip()
+            _, other, other_files = _candidate(root, other_version)
+            if not _same_rows(meta, files, other, other_files, model, version):
+                raise ValueError('model index does not match the active rows')
+        except (OSError, ValueError, TypeError, json.JSONDecodeError):
+            raise HTTPException(503, 'Phone index unavailable') from None
+        version, meta, files = other_version, other, other_files
     result = {'version': version, 'model_id': meta['model_id'],
               'catalogue_version': meta['catalogue_version'], 'rows': meta['rows'],
               'files': [{'name': name, **files[name],
