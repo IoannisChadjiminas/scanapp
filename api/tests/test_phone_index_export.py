@@ -226,3 +226,75 @@ def test_unlisted_prints_file_is_refused(tmp_path, monkeypatch):
     root, base, _, client = _served(tmp_path, monkeypatch)
     _extended(root, base, list_prints=False)
     assert client.get('/api/v1/card-index/manifest').status_code == 503
+
+
+def _other_model(root, active, *, model='38ce95cc1928', vectors=None, ids=None, catalogue=None):
+    """Another picture model's vectors for the active index's rows, as published for run 4."""
+    meta = json.loads((active / 'card_index.version.json').read_text())
+    body = {name: (active / name).read_bytes() for name in meta['files']}
+    if vectors is None:
+        vectors = bytes(len(body['card_index.f16.bin']))
+    body['card_index.f16.bin'] = vectors
+    if ids is not None:
+        body['card_index.ids.txt'] = ids
+    files = {n: {'bytes': len(b), 'sha256': hashlib.sha256(b).hexdigest()} for n, b in body.items()}
+    identity = {k: v for k, v in meta.items() if k not in ('version', 'files', 'extends')}
+    identity.update(model_id=model, variant_of=active.name, files=files)
+    if catalogue is not None:
+        identity['catalogue_version'] = catalogue
+    version = hashlib.sha256(json.dumps(identity, sort_keys=True).encode()).hexdigest()
+    identity['version'] = version
+    folder = root / version
+    folder.mkdir()
+    for name, data in body.items():
+        (folder / name).write_bytes(data)
+    (folder / 'card_index.version.json').write_text(json.dumps(identity))
+    (root / f'ACTIVE.{model}').write_text(version)
+    return folder
+
+
+def test_each_model_gets_its_own_index_of_the_same_rows(tmp_path, monkeypatch):
+    root, base, _, client = _served(tmp_path, monkeypatch)
+    (root / 'ACTIVE').write_text(base.name)
+    other = _other_model(root, base)
+    plain = client.get('/api/v1/card-index/manifest').json()
+    assert plain['version'] == base.name
+    assert client.get(f'/api/v1/card-index/manifest?model={plain["model_id"]}').json() == plain
+    tuned = client.get('/api/v1/card-index/manifest?model=38ce95cc1928').json()
+    assert tuned['version'] == other.name and tuned['model_id'] == '38ce95cc1928'
+    assert tuned['rows'] == plain['rows']
+    vectors = next(f for f in tuned['files'] if f['name'] == 'card_index.f16.bin')
+    assert client.get('/api/v1/' + vectors['url']).content == (other / 'card_index.f16.bin').read_bytes()
+
+
+def test_other_model_index_of_an_extended_active_index(tmp_path, monkeypatch):
+    root, base, _, client = _served(tmp_path, monkeypatch)
+    extended = _extended(root, base)
+    other = _other_model(root, extended)
+    tuned = client.get('/api/v1/card-index/manifest?model=38ce95cc1928').json()
+    assert tuned['version'] == other.name and tuned['rows'] == 3
+    assert 'card_index.prints.tsv' in {f['name'] for f in tuned['files']}
+
+
+def test_unknown_or_malformed_model_has_no_index(tmp_path, monkeypatch):
+    root, base, _, client = _served(tmp_path, monkeypatch)
+    (root / 'ACTIVE').write_text(base.name)
+    assert client.get('/api/v1/card-index/manifest?model=aaaaaaaaaaaa').status_code == 404
+    assert client.get('/api/v1/card-index/manifest?model=../ACTIVE').status_code == 404
+
+
+def test_other_model_index_refused_when_its_rows_differ(tmp_path, monkeypatch):
+    root, base, _, client = _served(tmp_path, monkeypatch)
+    (root / 'ACTIVE').write_text(base.name)
+    _other_model(root, base, ids=b'a\nz\n')
+    assert client.get('/api/v1/card-index/manifest?model=38ce95cc1928').status_code == 503
+    assert client.get('/api/v1/card-index/manifest').status_code == 200
+
+
+def test_other_model_index_refused_once_the_active_index_moves(tmp_path, monkeypatch):
+    root, base, _, client = _served(tmp_path, monkeypatch)
+    (root / 'ACTIVE').write_text(base.name)
+    _other_model(root, base)
+    assert client.get('/api/v1/card-index/manifest?model=38ce95cc1928').status_code == 200
+    _extended(root, base)  # A new active index; run 4's still describes the old rows.
+    assert client.get('/api/v1/card-index/manifest?model=38ce95cc1928').status_code == 503
