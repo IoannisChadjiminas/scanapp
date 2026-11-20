@@ -28,6 +28,16 @@ def test_config_reports_the_safe_defaults():
     assert body.scan_prices.warm_reader is True
     assert body.price_fresh_minutes >= 1
     assert body.slab_detection is False
+    assert body.scan_prices.phone_reads.scan_gap_s == 45
+
+
+def test_config_keeps_the_phone_scan_gap_within_the_app_bounds():
+    gap = lambda value: scan_price_config(  # noqa: E731
+        Settings(scan_price_phone_scan_gap_s=value)
+    ).scan_prices.phone_reads.scan_gap_s
+    assert gap(20) == 20
+    assert gap(600) == 60
+    assert gap(-5) == 0
 
 
 def test_config_lets_the_server_switch_slab_detection_on():
