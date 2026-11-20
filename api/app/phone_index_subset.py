@@ -12,9 +12,10 @@ recognition snapshot, in snapshot order. Each row gets a `row_kind`:
 - empty: an ordinary card.
 
 `subset_ids` is the documented subset rule: the snapshot ids minus the rows whose kind is in
-`excluded`, in snapshot order. The exporter writes it into the version file and the manifest
-route recomputes it from the loaded snapshot, so a subset index is only served for the
-snapshot it was cut from. The rule uses nothing but the ids, so both sides agree by construction.
+`excluded`, in snapshot order. The exporter writes it into the version file. Only the
+exporter uses this module (row_kind, and subset indexes for offline checks); the server's
+manifest route does not serve a subset index. The rows such an index would leave out were
+removed from the catalogue itself instead (docs/catalogue-cleanup-20261114.md).
 """
 from __future__ import annotations
 

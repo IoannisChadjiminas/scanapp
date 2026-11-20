@@ -1,4 +1,7 @@
-"""Mirror TCGdex card art into the public R2 bucket the API hands out as image_url.
+"""Mirror card art into the public R2 bucket the API hands out as image_url.
+
+TCGdex art, plus the catalogue's stored reference copies for allow-listed
+source hosts (LOCAL_SOURCE_HOSTS, converted to high.webp and low.webp).
 
 Run inside the API container, where the catalogue and the data volume are:
 
@@ -30,6 +33,8 @@ def main() -> int:
     parser.add_argument("--limit", type=int, default=None, help="cards to upload this run")
     parser.add_argument("--language", default=None, help="only this catalogue language, e.g. en")
     parser.add_argument("--gap", type=float, default=0.1, help="seconds between cards (TCGdex courtesy)")
+    parser.add_argument("--only", choices=("tcgdex", "local"), default=None,
+                        help="only TCGdex art, or only stored reference copies")
     parser.add_argument("--dry-run", action="store_true", help="download nothing, upload nothing, count only")
     args = parser.parse_args()
 
@@ -56,6 +61,7 @@ def main() -> int:
                 fetch=fetch,
                 limit=args.limit,
                 language=args.language,
+                kinds=(args.only,) if args.only else ("tcgdex", "local"),
                 gap_s=0.0 if args.dry_run else args.gap,
                 record=not args.dry_run,
                 log=print,

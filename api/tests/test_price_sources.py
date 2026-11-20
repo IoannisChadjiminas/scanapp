@@ -341,3 +341,111 @@ def test_reverse_holo_listing_url_reads_the_reverse_trend(tmp_path):
     assert price_sources.guide_trend_for_url(conn, URL)[0] == 4.2
     assert price_sources.guide_trend_for_url(conn, URL + "?isReverseHolo=Y")[0] == 12.0
     assert price_sources.trend_for_url(conn, URL + "?isReverseHolo=Y&language=1") == 12.0
+
+
+def test_a_scan_carries_the_listing_stored_under_the_phone_filters(tmp_path):
+    from app.price_sources import scan_listings
+
+    conn = _catalog(tmp_path)
+    filters = {"language": "1", "minCondition": "2"}
+    write_snapshot(
+        conn, URL, [{"label": "NM · English", "amount": 2.0, "currency": "EUR"}], filters=filters
+    )
+    # The bare URL a card carries finds no sample of its own.
+    assert best_prices(conn, "none", URL) == []
+    listings = scan_listings(conn, [URL, None, URL + "?language=1"])
+    assert len(listings) == 1
+    assert listings[0]["url"] == URL + "?language=1&minCondition=2"
+    assert listings[0]["prices"][0]["amount"] == 2.0
+    assert listings[0]["freshness"] == "fresh"
+    assert "webview_enabled" in listings[0]
+    json.dumps(listings)
+
+
+def test_a_scan_carries_no_listing_for_another_product_or_none(tmp_path):
+    from app.price_sources import scan_listings
+
+    conn = _catalog(tmp_path)
+    write_snapshot(conn, URL, [{"label": "From", "amount": 2.0, "currency": "EUR"}])
+    assert scan_listings(conn, [URL + "-V2"]) == []
+    assert scan_listings(conn, []) == []
+    assert scan_listings(conn, [None]) == []
+
+
+def test_scan_listing_urls_take_the_shown_cards(tmp_path):
+    from types import SimpleNamespace as NS
+
+    from app.price_sources import scan_listing_urls
+
+    response = NS(
+        printing_review=NS(plausible_printings=[NS(cardmarket_url="a"), NS(cardmarket_url="b")]),
+        suggestions=[
+            NS(cardmarket_url="c", cardmarket_variants=[NS(url="c1"), NS(url="c2")]),
+            NS(cardmarket_url="d"),
+        ],
+    )
+    assert scan_listing_urls(response) == ["a", "b", "c", "c1"]
+    assert scan_listing_urls(NS(printing_review=None, suggestions=[])) == []
+
+
+V2 = URL + "-V2"
+PHOTO = "https://product-images.s3.cardmarket.com/51/BS/{0}/{0}.jpg"
+
+
+def _listing(conn, url, *, image=None):
+    conn.execute(
+        "INSERT INTO cardmarket_expansion_products (url, expansion, name, source, imported_at,"
+        " listing_image_url) VALUES (?, 'Base-Set', 'Pikachu', 'test', '2026-11-19', ?)",
+        (url, image),
+    )
+    conn.commit()
+
+
+def test_another_listing_gets_its_own_row_of_the_price_file(tmp_path):
+    from app.cardmarket_queue import prices_payload
+
+    conn = _catalog(tmp_path)
+    _card(conn, "en:a", product=100, url=URL)
+    guide = json.loads(json.dumps(GUIDE))
+    guide["priceGuides"].append(
+        {"idProduct": 777, "avg": 30.0, "low": 20.0, "trend": 25.5, "avg7": 24.0}
+    )
+    import_guide(conn, guide)
+    # Known by URL only: no product number, so no trend.
+    _listing(conn, V2)
+    assert price_sources.product_id_for_url(conn, V2) is None
+    assert prices_payload(conn, V2)["guide_trend"] is None
+    # Its stored photo address names the product.
+    conn.execute(
+        "UPDATE cardmarket_expansion_products SET listing_image_url = ? WHERE url = ?",
+        (PHOTO.format(777), V2),
+    )
+    assert price_sources.product_id_for_url(conn, V2) == 777
+    assert price_sources.trend_for_url(conn, V2 + "?language=1&minCondition=2") == 25.5
+    assert prices_payload(conn, V2)["guide_trend"] == 25.5
+    # The card's main listing keeps its own number and trend.
+    assert price_sources.product_id_for_url(conn, URL) == 100
+    assert price_sources.trend_for_url(conn, URL) == 4.2
+
+
+def test_a_read_page_gives_a_known_listing_its_product_number(tmp_path):
+    from app.cardmarket import listing_product_id, remember_listing_product
+
+    conn = _catalog(tmp_path)
+    _listing(conn, V2)
+    assert listing_product_id("https://static.cardmarket.com/img/placeholder.png") is None
+    assert listing_product_id(PHOTO.format(777)) == 777
+    # A photo of another shape, or of another host, is not a product number.
+    assert listing_product_id("https://product-images.s3.cardmarket.com/51/BS/777/778.jpg") is None
+    remember_listing_product(conn, V2 + "?language=1", "not a photo")
+    assert price_sources.product_id_for_url(conn, V2) is None
+    remember_listing_product(conn, V2 + "?language=1", PHOTO.format(777))
+    assert price_sources.product_id_for_url(conn, V2) == 777
+    # The listing's shown photo is left alone.
+    row = conn.execute(
+        "SELECT listing_image_url FROM cardmarket_expansion_products WHERE url = ?", (V2,)
+    ).fetchone()
+    assert row["listing_image_url"] is None
+    # A listing the catalogue does not know is not added.
+    remember_listing_product(conn, URL + "-V9", PHOTO.format(999))
+    assert conn.execute("SELECT COUNT(*) FROM cardmarket_expansion_products").fetchone()[0] == 1

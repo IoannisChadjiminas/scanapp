@@ -23,8 +23,8 @@ printed on the card sets `set_total`; Japanese promo rows carry their code
 (`SV-P`) and no total. The build fails on rows the checks cannot account for:
 pass `--allow-exceptions export_exceptions.json` (the known rows of catalogue K)
 and `--report <file>` to see the counts. `--exclude digital,language,duplicate`
-cuts a subset index (`app/phone_index_subset.py`); only a server with the subset
-rule in its manifest route serves one. See `docs/phone-index-review-20261114.md`.
+cuts a subset index (`app/phone_index_subset.py`) for offline checks only: the server's
+manifest route does not serve one (rows must equal the snapshot, or extend a published index). See `docs/phone-index-review-20261114.md`.
 
 Run `check_compressed_index.py` against the *same* exported vectors, catalogue,
 and model using `--index-dir`, `--catalog`, `--model`, and `--phone-index`, along
@@ -45,6 +45,34 @@ loaded recognition snapshot's catalogue, model, vector and id hashes, row count,
 and dimension. It also checks the candidate's file sizes and hashes. File routes
 support byte ranges, ETags, and immutable caching. Previously published version
 directories must remain present for clients completing an older download.
+
+An index may also extend a published one: its version file has `extends` with the base
+`version` and `rows`. The manifest serves it only if the base version is still in the publish
+directory and matches the loaded snapshot as above, and the index's ids and float16 files begin
+with the base's files byte for byte, followed by the added rows. The manifest's `rows` is the
+index's own row count (the float16 file is `rows * dims * 2` bytes). An index may carry a fifth
+file, `card_index.prints.tsv` (printings with the same picture as an index row, without a
+vector), listed in its version file; the manifest then lists it after the four files at
+`card-index/files/<version>/card_index.prints.tsv`. A version without it has exactly the four
+files, as before. Keep the base version's directory while an extension of it is active.
+
+### Another picture model's index (20 November 2026)
+
+Apps on run 4, the card-tuned picture model (model ID `38ce95cc1928`), ask
+for `/api/v1/card-index/manifest?model=38ce95cc1928`. A request without
+`model`, or with the snapshot's own model, is served as before. Another
+model's index is served from `ACTIVE.<model>` (the version, as in
+`ACTIVE`) when its version file has that `model_id`, a `variant_of` naming
+the version in `ACTIVE`, and the same catalogue, rows and dimensions. All
+its files except the vectors and the version file must be byte for byte
+the active index's. A model with no `ACTIVE.<model>` gets 404 (no index
+for it). A mismatch gets 503, and phones keep the index they have.
+
+When `ACTIVE` moves to a new catalogue, run 4's index stops being served
+until it is rebuilt for the new rows: run 4's vectors for every row, in
+the new index's order, from the run 4 ONNX model (`dinov2_small_r4.onnx`,
+sha256 `38ce95cc…`), then the four other files copied from the new
+active index.
 
 This route does **not** automatically export or promote snapshots. The offline
 research check and physical-device gates remain required before enabling it.

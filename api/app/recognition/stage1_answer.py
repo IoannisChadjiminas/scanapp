@@ -308,6 +308,8 @@ def answer_stage1(*, decision: Decision, settings, runtime, catalog, results, se
     # Candidate list stays the one card. Presentation may repeat it as the best match.
     from app.schemas import Candidate
     response.suggestions = [Candidate.model_validate(item)]
+    from app.price_sources import scan_listing_urls, scan_listings
+    response.stored_listings = scan_listings(catalog, scan_listing_urls(response))
     if results is not None:
         with _results_write, getattr(results, '_cache_lock', nullcontext()):
             results.execute(

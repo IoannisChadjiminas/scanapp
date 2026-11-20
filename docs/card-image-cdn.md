@@ -17,12 +17,33 @@ which the phone's image cache honours ahead of its 90 day fallback.
   Both `high.webp` and `low.webp` are stored under TCGdex's own path layout,
   `{language}/{serie}/{set}/{number}/{quality}.webp`, so the Flutter thumbnail
   rule (swap `high.webp` for `low.webp`) keeps working on the CDN host.
+- Stored reference copies of cards whose `remote_image_url` host is in
+  `LOCAL_SOURCE_HOSTS` (today only `static.tcgcollector.com`, about 4,200
+  cards, almost all Japanese). The owner approved publishing these on
+  2026-11-18: about half of those hotlinks had started returning 404. The job
+  converts the catalogue's copy (`image_path`) to `high.webp` (at most 800 px
+  wide) and `low.webp` (245 px) under `local/{language}/{card}-{hash}/`; the
+  hash covers the card id and `image_path`, so a card whose copy moves stops
+  using the old CDN file. Other hosts need the owner's approval before they are
+  added to the list.
 - Never Cardmarket product photos (`product-images.s3.cardmarket.com`), which
-  Cardmarket serves only with its own Referer, and never locally supplied
-  reference images that have no TCGdex source. Those keep their current URLs.
+  Cardmarket serves only with its own Referer. They keep their current URLs.
 - The bootstrap's `reference-images/{language}/{provider_id}.webp` is TCGdex's
   `high.webp`, so the job uploads it from disk and downloads only `low.webp`.
   Anything that is not a WebP file (an HTML error page, say) is rejected.
+
+## Which URL a card gets
+
+`display_image_url` in `api/app/card_images.py`:
+
+1. TCGdex art: the CDN copy once mirrored, else the TCGdex file.
+2. Cardmarket product photo: its own URL.
+3. Any other remote address, when the catalogue holds its own copy: the CDN
+   copy once mirrored, else the API's `/api/v1/cards/{id}/image` route (sent
+   with `Cache-Control: public, max-age=86400`). Third-party hotlinks such as
+   tcgcollector, pokemon-card.com or serebii are no longer handed out, since
+   they can disappear.
+4. No own copy: the remote address as before, or none.
 
 Ownership: the catalogue API (this repository) owns `image_url`, so the mirror
 lives here. The PokeSingle product API keeps its separate, private R2 bucket
@@ -54,7 +75,12 @@ compose files pass them through):
 | `CARD_IMAGE_CDN_BASE_URL` | API | `https://img.pokesingle.com`; empty keeps TCGdex URLs |
 
 Set the base URL only once a bucket has been mirrored for that environment.
-Never use the production bucket's token against the staging API or vice versa.
+Staging and production share one bucket, `pokesingle-card-art` (owner's decision,
+2026-11-18). The job only adds objects and never deletes, and object names depend
+only on the card and its stored copy, so both environments write the same files.
+Each server keeps its own registry, so run the job on each. Use one token scoped
+to this bucket only. User photos (`pokesingle-captures`) and training frames
+(`pokesingle-frames`) stay in their own private buckets and never go in here.
 
 ## Running the mirror
 
@@ -70,7 +96,8 @@ docker compose -f compose.dokploy.yaml exec api python scripts/mirror_card_image
   after both files are stored; a rerun skips recorded cards whose art has not
   moved and prints `candidates`, `uploaded`, `already_mirrored`, `failed`.
 - `--language en` limits a run to one catalogue language; `--gap` (default
-  0.1 s) spaces the TCGdex downloads.
+  0.1 s) spaces the TCGdex downloads; `--only tcgdex` or `--only local` limits
+  a run to TCGdex art or to stored reference copies.
 - The running API re-reads the registry when the file changes, checked at most
   once a minute, so mirrored URLs appear without a restart.
 - A card whose catalogue `remote_image_url` later moves to a different TCGdex
@@ -83,7 +110,7 @@ returns an `image_url` on the CDN host, and the file loads there with
 ## Rollback
 
 Unset `CARD_IMAGE_CDN_BASE_URL` and restart the API: every card returns to its
-TCGdex URL. The bucket and registry can stay for a later retry.
+TCGdex URL, and cards with a stored copy to the API's image route. The bucket and registry can stay for a later retry.
 
 ## Cost (order of magnitude)
 

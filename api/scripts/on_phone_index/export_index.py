@@ -228,7 +228,7 @@ def main() -> None:
     p.add_argument('--model', type=Path, required=True)
     p.add_argument('--out', type=Path, required=True)
     p.add_argument('--exclude', default='', help=f'row kinds to leave out, comma-separated, of {subset.EXCLUDABLE}; '
-                   'a subset index is served only by a server that knows the subset rule')
+                   'a subset index is for offline checks; the server does not serve one')
     p.add_argument('--allow-exceptions', type=Path,
                    help='JSON {check: [ids]} of known rows each check lets through; any other row fails the build')
     p.add_argument('--report', type=Path, help='write the check results (counts and ids) here')

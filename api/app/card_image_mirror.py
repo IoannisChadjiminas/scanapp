@@ -2,13 +2,19 @@
 
 The catalogue keeps handing out TCGdex URLs until a card's art has been
 uploaded; a mirrored card gets the same path on the CDN host, so clients that
-swap ``high.webp`` for ``low.webp`` keep working. Only TCGdex art is mirrored:
-Cardmarket product photos and locally supplied reference images stay where
-they are. See docs/card-image-cdn.md.
+swap ``high.webp`` for ``low.webp`` keep working.
+
+Besides TCGdex art, the catalogue's stored reference copy is mirrored for cards
+whose original host is in ``LOCAL_SOURCE_HOSTS`` (owner's decision,
+2026-11-18): it is converted to ``high.webp`` and ``low.webp`` under
+``local/``. Cardmarket product photos are never mirrored. See
+docs/card-image-cdn.md.
 """
 from __future__ import annotations
 
 import hashlib
+import io
+import re
 import sqlite3
 import time
 from dataclasses import dataclass
@@ -24,6 +30,15 @@ QUALITIES = ("high", "low")
 CACHE_CONTROL = "public, max-age=31536000, immutable"
 CONTENT_TYPE = "image/webp"
 REGISTRY_RELOAD_SECONDS = 60.0
+# Hosts whose cards' stored reference copy may be published on the CDN. Their
+# hotlinks die (half of a sample of static.tcgcollector.com returned 404), and
+# the catalogue holds a copy of every one of these images.
+LOCAL_SOURCE_HOSTS = frozenset({"static.tcgcollector.com"})
+CARDMARKET_IMAGE_HOST = "product-images.s3.cardmarket.com"
+LOCAL_PREFIX = "local"
+# TCGdex's own sizes: high is about 600 px wide, low 245 px.
+LOCAL_LOW_WIDTH = 245
+LOCAL_HIGH_MAX_WIDTH = 800
 
 _QUALITY_FILES = frozenset(f"{quality}.webp" for quality in QUALITIES)
 
@@ -39,6 +54,35 @@ def mirror_object_base(remote_image_url: Any) -> str | None:
     if any(segment in {".", ".."} for segment in segments):
         return None
     return "/".join(segments[:-1])
+
+
+def image_host(url: Any) -> str:
+    return (urlsplit(str(url or "").strip()).hostname or "").lower()
+
+
+def is_local_source(remote_image_url: Any) -> bool:
+    """True when this card's stored reference copy may be mirrored (its host is allow-listed)."""
+    url = str(remote_image_url or "").strip()
+    return url.startswith("https://") and image_host(url) in LOCAL_SOURCE_HOSTS
+
+
+def local_object_base(card_id: Any, image_path: Any) -> str | None:
+    """``local/ja/web1-047-<hash>`` for a stored reference copy, else None.
+
+    The hash covers the card id and the stored path, so a card whose reference
+    copy moves gets a new key and the old CDN copy is no longer handed out.
+    """
+    card = str(card_id or "").strip()
+    path = str(image_path or "").strip()
+    if not card or not path:
+        return None
+    language, _, rest = card.partition(":")
+    if not rest:
+        language, rest = "xx", card
+    language = re.sub(r"[^a-z0-9-]", "", language.lower()) or "xx"
+    slug = re.sub(r"[^A-Za-z0-9._-]+", "_", rest).strip("._") or "card"
+    digest = hashlib.sha256(f"{card}\n{path}".encode()).hexdigest()[:12]
+    return f"{LOCAL_PREFIX}/{language}/{slug[:80]}-{digest}"
 
 
 def tcgdex_source_url(object_base: str, quality: str) -> str:
@@ -127,12 +171,17 @@ class CardImageCdn:
         self._mtime = mtime
         self._mirrored = load_mirrored(self._path)
 
-    def url_for(self, card_id: Any, remote_image_url: Any) -> str | None:
+    def url_for(self, card_id: Any, remote_image_url: Any, image_path: Any = None) -> str | None:
         if not self.enabled:
             return None
         self.refresh()
         base = self._mirrored.get(str(card_id))
         if base is None:
+            return None
+        if mirror_object_base(remote_image_url) is None:
+            # A mirrored reference copy: valid while the card still stores that copy.
+            if image_path is not None and base == local_object_base(card_id, image_path):
+                return cdn_image_url(self.base_url, base, "high")
             return None
         # The catalogue moved this card's art since it was mirrored: the copy
         # is stale, so the live TCGdex file wins until the next mirror run.
@@ -221,12 +270,15 @@ def mirror_card_images(
     fetch: Callable[[str], bytes],
     limit: int | None = None,
     language: str | None = None,
+    kinds: tuple[str, ...] = ("tcgdex", "local"),
     gap_s: float = 0.0,
     record: bool = True,
     sleep: Callable[[float], None] = time.sleep,
     log: Callable[[str], None] = print,
 ) -> MirrorReport:
-    """Upload high and low art for every TCGdex card not yet in the registry.
+    """Upload high and low art for every TCGdex card not yet in the registry,
+    and for every card whose stored reference copy may be published
+    (``is_local_source``). ``kinds`` limits a run to one of the two.
 
     Resumable: a card is recorded only after both files are stored, and a
     second run skips recorded cards whose art has not moved. With
@@ -240,9 +292,17 @@ def mirror_card_images(
             str(row["card_id"]): str(row["object_base"])
             for row in registry.execute("SELECT card_id, object_base FROM mirrored_images")
         }
+        hosts = []
+        if "tcgdex" in kinds:
+            hosts.append(TCGDEX_ASSETS_HOST)
+        if "local" in kinds:
+            hosts.extend(sorted(LOCAL_SOURCE_HOSTS))
+        if not hosts:
+            return report
         query = (
-            "SELECT id, language, remote_image_url, image_path, has_image FROM cards"
-            f" WHERE remote_image_url LIKE 'https://{TCGDEX_ASSETS_HOST}/%'"
+            "SELECT id, language, remote_image_url, image_path, has_image FROM cards WHERE ("
+            + " OR ".join(f"remote_image_url LIKE 'https://{host}/%'" for host in hosts)
+            + ")"
         )
         params: tuple[Any, ...] = ()
         if language:
@@ -252,8 +312,13 @@ def mirror_card_images(
         done = 0
         for row in rows:
             base = mirror_object_base(row["remote_image_url"])
-            if base is None:
-                continue
+            local = base is None
+            if local:
+                if not is_local_source(row["remote_image_url"]) or not int(row["has_image"] or 0):
+                    continue
+                base = local_object_base(row["id"], row["image_path"])
+                if base is None:
+                    continue
             card_id = str(row["id"])
             if mirrored.get(card_id) == base:
                 report.already_mirrored += 1
@@ -263,7 +328,10 @@ def mirror_card_images(
             done += 1
             report.candidates += 1
             try:
-                uploaded_sha = _mirror_one(row, base, store=store, bucket=bucket, fetch=fetch)
+                if local:
+                    uploaded_sha = _mirror_local(row, base, store=store, bucket=bucket)
+                else:
+                    uploaded_sha = _mirror_one(row, base, store=store, bucket=bucket, fetch=fetch)
             except Exception as exc:  # noqa: BLE001  one bad card must not end the run
                 report.failed += 1
                 log(f"skip {card_id}: {type(exc).__name__}")
@@ -305,3 +373,45 @@ def _mirror_one(row: Any, base: str, *, store: ObjectStore, bucket: str, fetch: 
             CacheControl=CACHE_CONTROL,
         )
     return hashlib.sha256(high).hexdigest()
+
+
+def local_webp_pair(data: bytes) -> tuple[bytes, bytes]:
+    """``high.webp`` and ``low.webp`` bytes made from a stored reference copy (any format Pillow reads)."""
+    from PIL import Image  # noqa: PLC0415  (only the mirror job needs it)
+
+    with Image.open(io.BytesIO(data)) as source:
+        source.load()
+        image = source.convert("RGB")
+    if image.width < 100 or image.height < 100:
+        raise ValueError("reference copy is too small")
+
+    def encode(width: int, quality: int) -> bytes:
+        sized = image if image.width <= width else image.resize(
+            (width, max(1, round(image.height * width / image.width))), Image.LANCZOS)
+        out = io.BytesIO()
+        sized.save(out, "WEBP", quality=quality, method=6)
+        return out.getvalue()
+
+    return encode(LOCAL_HIGH_MAX_WIDTH, 90), encode(LOCAL_LOW_WIDTH, 80)
+
+
+def _mirror_local(row: Any, base: str, *, store: ObjectStore, bucket: str) -> str:
+    """Publish a card's stored reference copy; never a Cardmarket product photo."""
+    if image_host(row["remote_image_url"]) == CARDMARKET_IMAGE_HOST:
+        raise ValueError("Cardmarket product photos are never mirrored")
+    path = Path(str(row["image_path"] or ""))
+    if not path.is_file():
+        raise FileNotFoundError("reference copy missing")
+    data = path.read_bytes()
+    high, low = local_webp_pair(data)
+    if not (is_webp(high) and is_webp(low)):
+        raise ValueError("conversion did not produce WebP")
+    for quality, body in (("high", high), ("low", low)):
+        store.put_object(
+            Bucket=bucket,
+            Key=f"{base}/{quality}.webp",
+            Body=body,
+            ContentType=CONTENT_TYPE,
+            CacheControl=CACHE_CONTROL,
+        )
+    return hashlib.sha256(data).hexdigest()

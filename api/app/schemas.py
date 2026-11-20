@@ -224,6 +224,9 @@ class ScanResponse(MatchPresentation):
     printing_review: PrintingReview | None = None
     confidence: RecognitionConfidence | None = None
     grading: GradingEvidence = Field(default_factory=GradingEvidence)
+    # Stored listing reads for the shown cards, each in the shape of
+    # GET /cardmarket/prices. Older clients ignore it and ask for them.
+    stored_listings: list[dict[str, Any]] = Field(default_factory=list)
 
 
 class FeedbackRequest(BaseModel):
