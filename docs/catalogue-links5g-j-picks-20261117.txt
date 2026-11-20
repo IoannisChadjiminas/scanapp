@@ -1,0 +1,262 @@
+# id	Cardmarket product	step and reason
+en:xy3-12	Furious-Fists/Torchic-V1-FFI12	g regular set card; the other version is a League/Championship/Staff-stamped promo
+en:xy3-14	Furious-Fists/Blaziken-V1-FFI14	g regular set card; the other version is a League/Championship/Staff-stamped promo
+en:xy9-1	BREAKpoint/Chikorita-V1-BKP1	g regular set card; the other version is a League/Championship/Staff-stamped promo
+en:xy9-2	BREAKpoint/Bayleef-V1-BKP2	g regular set card; the other version is a League/Championship/Staff-stamped promo
+en:xy9-3	BREAKpoint/Meganium-V1-BKP3	g regular set card; the other version is a League/Championship/Staff-stamped promo
+ja:20th-002	BREAK-Starter-Pack/MVenusaur-EX	h the only free product at this number in the set's expansion; checked against our reference image
+ja:20th-011	BREAK-Starter-Pack/MCharizard-EX	h the only free product at this number in the set's expansion; checked against our reference image
+ja:20th-074	BREAK-Starter-Pack/MBlastoise-EX	h the only free product at this number in the set's expansion; checked against our reference image
+ja:BW5-Brz-050	Dragon-Blast/Blend-Energy-GFPD	h the only free product at this number in the set's expansion; checked against our reference image
+ja:BW8-Brf-020	Spiral-Force/Nidoran	h the only free product at this number in the set's expansion; checked against our reference image
+ja:BW8-Brn-021	Thunder-Knuckle/Nidoran	h the only free product at this number in the set's expansion; checked against our reference image
+ja:CLF-029	Pokemon-Card-Game-Classic-Venusaur-Lugia-ex-Deck/Bosss-Orders-Giovanni-CLF029	h the only free product at this number in the set's expansion; checked against our reference image
+ja:CLK-029	Pokemon-Card-Game-Classic-Blastoise-Suicune-ex-Deck/Bosss-Orders-Giovanni-CLK029	h the only free product at this number in the set's expansion; checked against our reference image
+ja:CLL-029	Pokemon-Card-Game-Classic-Charizard-Ho-Oh-ex-Deck/Bosss-Orders-Giovanni-CLL029	h the only free product at this number in the set's expansion; checked against our reference image
+ja:CP4-002	Premium-Champion-Pack/MBeedrill-EX	h the only free product at this number in the set's expansion; checked against our reference image
+ja:CP4-007	Premium-Champion-Pack/MSceptile-EX	h the only free product at this number in the set's expansion; checked against our reference image
+ja:CP4-043	Premium-Champion-Pack/MManectric-EX	h the only free product at this number in the set's expansion; checked against our reference image
+ja:CP4-049	Premium-Champion-Pack/MGengar-EX	h the only free product at this number in the set's expansion; checked against our reference image
+ja:CP4-051	Premium-Champion-Pack/MMewtwo-EX-V1	h the only free product at this number in the set's expansion; checked against our reference image
+ja:CP4-052	Premium-Champion-Pack/MMewtwo-EX-V2	h the only free product at this number in the set's expansion; checked against our reference image
+ja:CP4-075	Premium-Champion-Pack/MLucario-EX	h the only free product at this number in the set's expansion; checked against our reference image
+ja:CP4-094	Premium-Champion-Pack/MKangaskhan-EX	h the only free product at this number in the set's expansion; checked against our reference image
+ja:CP4-097	Premium-Champion-Pack/MRayquaza-EX	h the only free product at this number in the set's expansion; checked against our reference image
+ja:CP4-104	Premium-Champion-Pack/Battle-Compressor-Team-Flare-Gear-CP4104	h the only free product at this number in the set's expansion; checked against our reference image
+ja:DPP-109	DP-Promos/Real-Worlds-Giratina-Lv62	h the only free product at this number in the set's expansion; checked against our reference image
+ja:DPt2-021	Bonds-to-the-End-of-Time/Shellos-West-Sea-Lv27-Pt2021	h the only free product at this number in the set's expansion; checked against our reference image
+ja:DPt2-022	Bonds-to-the-End-of-Time/Shellos-East-Sea-Lv21-Pt2022	h the only free product at this number in the set's expansion; checked against our reference image
+ja:DPt2-023	Bonds-to-the-End-of-Time/Gastrodon-East-Sea-Lv40-Pt2023	h the only free product at this number in the set's expansion; checked against our reference image
+ja:DPt2-052	Bonds-to-the-End-of-Time/Gastrodon-West-Sea-Lv50-Pt2052	h the only free product at this number in the set's expansion; checked against our reference image
+ja:DPt4-008	Advent-of-Arceus/Burmy-Plant-Cloak-Lv11-Pt4008	h the only free product at this number in the set's expansion; checked against our reference image
+ja:DPt4-009	Advent-of-Arceus/Burmy-Sandy-Cloak-Lv11-Pt4009	h the only free product at this number in the set's expansion; checked against our reference image
+ja:DPt4-010	Advent-of-Arceus/Burmy-Trash-Cloak-Lv11-Pt4010	h the only free product at this number in the set's expansion; checked against our reference image
+ja:DPt4-011	Advent-of-Arceus/Wormadam-Plant-Cloak-Lv46-Pt4011	h the only free product at this number in the set's expansion; checked against our reference image
+ja:DPt4-055	Advent-of-Arceus/Wormadam-Sandy-Cloak-Lv45-Pt4055	h the only free product at this number in the set's expansion; checked against our reference image
+ja:DPt4-061	Advent-of-Arceus/Wormadam-Trash-Cloak-Lv44-Pt4061	h the only free product at this number in the set's expansion; checked against our reference image
+ja:DPt4-Slp-016	Arceus-LVX-Deck-Lightning-Psychic/Professor-Rowan-ALP016	h the only free product at this number in the set's expansion; checked against our reference image
+ja:DPtM-001	Mewtwo-LVX-Collection-Pack/Burmy-Sandy-Cloak-Lv12-PtM001	h the only free product at this number in the set's expansion; checked against our reference image
+ja:DPtR-004	Regigigas-LVX-Collection-Pack/Shellos-East-Sea-Lv19-PtR004	h the only free product at this number in the set's expansion; checked against our reference image
+ja:M6-048	Storm-Emeralda/Mega-Malamar-ex-V1-m6048	h the only free product at this number in the set's expansion; checked against our reference image
+ja:MA-037	Premium-Trainer-Box-MEGA/Professors-Research-Professor-Sada-mAA037	h the only free product at this number in the set's expansion; checked against our reference image
+ja:MA-039	Premium-Trainer-Box-MEGA/Bosss-Orders-Ghetsis-mAA039	h the only free product at this number in the set's expansion; checked against our reference image
+ja:MBD-019	MEGA-Starter-Set-Mega-Diancie-ex/Bosss-Orders-Ghetsis-mBD019	h the only free product at this number in the set's expansion; checked against our reference image
+ja:MBG-020	MEGA-Starter-Set-Mega-Gengar-ex/Bosss-Orders-Ghetsis-mBG020	h the only free product at this number in the set's expansion; checked against our reference image
+ja:MEE-018	MEGA-Starter-Set-Eevee-ex/Bosss-Orders-Corbeau-mEEv018	h the only free product at this number in the set's expansion; checked against our reference image
+ja:SB-009	Premium-Trainer-Box-Sword-Shield/Professors-Research-Professor-Magnolia-sB9	h the only free product at this number in the set's expansion; checked against our reference image
+ja:SD-001	V-Starter-Decks/Venusaur-V-sD1	h the only free product at this number in the set's expansion; checked against our reference image
+ja:SD-009	V-Starter-Decks/Eldegoss-V-sD9	h the only free product at this number in the set's expansion; checked against our reference image
+ja:SD-015	V-Starter-Decks/Incineroar-V-sD15	h the only free product at this number in the set's expansion; checked against our reference image
+ja:SD-024	V-Starter-Decks/Wailord-V-sD24	h the only free product at this number in the set's expansion; checked against our reference image
+ja:SD-028	V-Starter-Decks/Pikachu-V-sD28	h the only free product at this number in the set's expansion; checked against our reference image
+ja:SD-038	V-Starter-Decks/Mew-V-sD38	h the only free product at this number in the set's expansion; checked against our reference image
+ja:SD-050	V-Starter-Decks/Lucario-V-sD50	h the only free product at this number in the set's expansion; checked against our reference image
+ja:SD-059	V-Starter-Decks/Galarian-Slowbro-V-sD59	h the only free product at this number in the set's expansion; checked against our reference image
+ja:SD-073	V-Starter-Decks/Duraludon-V-sD73	h the only free product at this number in the set's expansion; checked against our reference image
+ja:SD-075	V-Starter-Decks/Eevee-V-sD75	h the only free product at this number in the set's expansion; checked against our reference image
+ja:SD-113	V-Starter-Decks/Professors-Research-Professor-Magnolia-sD113	h the only free product at this number in the set's expansion; checked against our reference image
+ja:SMP-147	Sun-Moon-Promos/Vulpix-SM-P147	h the only free product at this number in the set's expansion; checked against our reference image
+ja:SMP-210	Sun-Moon-Promos/Gentleman-Pikachu-SM-P210	h the only free product at this number in the set's expansion; checked against our reference image
+ja:SMP-401	Sun-Moon-Promos/Friends-in-Alola-SM-P401	h the only free product at this number in the set's expansion; checked against our reference image
+ja:SNPo-007	Noivern-BREAK-Evolution-Pack/Reserved-Ticket	h the only free product at this number in the set's expansion; checked against our reference image
+ja:SNPr-006	Raichu-BREAK-Evolution-Pack/Buddy-Buddy-Rescue-SNPr006	h the only free product at this number in the set's expansion; checked against our reference image
+ja:SVD-135	ex-Start-Decks/Professors-Research-Professor-Sada-V1-svD135	h the only free product at this number in the set's expansion; checked against our reference image
+ja:SVD-136	ex-Start-Decks/Professors-Research-Professor-Turo-V1-svD136	h the only free product at this number in the set's expansion; checked against our reference image
+ja:SVD-138	ex-Start-Decks/Bosss-Orders-Ghetsis-svD138	h the only free product at this number in the set's expansion; checked against our reference image
+ja:SVG-044	Venusaur-Charizard-Blastoise-Special-Deck-Set-ex/Professors-Research-Professor-Sada-V1-svG044	h the only free product at this number in the set's expansion; checked against our reference image
+ja:SVG-045	Venusaur-Charizard-Blastoise-Special-Deck-Set-ex/Professors-Research-Professor-Turo-V1-svG045	h the only free product at this number in the set's expansion; checked against our reference image
+ja:SVG-046	Venusaur-Charizard-Blastoise-Special-Deck-Set-ex/Bosss-Orders-Ghetsis-svG046	h the only free product at this number in the set's expansion; checked against our reference image
+ja:SVHK-012	Starter-Deck-Build-Set-Ancient-Koraidon-ex/Koraidon-ex-svHK012	h the only free product at this number in the set's expansion; checked against our reference image
+ja:SVHK-015	Starter-Deck-Build-Set-Ancient-Koraidon-ex/Pidgeot-ex-svHK015	h the only free product at this number in the set's expansion; checked against our reference image
+ja:SVHM-011	Starter-Deck-Build-Set-Future-Miraidon-ex/Miraidon-ex-svHM011	h the only free product at this number in the set's expansion; checked against our reference image
+ja:SVHM-014	Starter-Deck-Build-Set-Future-Miraidon-ex/Pidgeot-ex-svHM014	h the only free product at this number in the set's expansion; checked against our reference image
+ja:SVI-066	Scarlet-Violet-Battle-Academy/Bosss-Orders-Ghetsis-svIba066	h the only free product at this number in the set's expansion; checked against our reference image
+ja:SVJL-018	Battle-Master-Deck-Tera-Charizard-ex/Professors-Research-Professor-Sada-svJL018	h the only free product at this number in the set's expansion; checked against our reference image
+ja:SVJL-019	Battle-Master-Deck-Tera-Charizard-ex/Bosss-Orders-Ghetsis-svJL019	h the only free product at this number in the set's expansion; checked against our reference image
+ja:SVM-042	Generations-Start-Decks/Voltorb-svM042	h the only free product at this number in the set's expansion; checked against our reference image
+ja:SVM-043	Generations-Start-Decks/Electrode-svM043	h the only free product at this number in the set's expansion; checked against our reference image
+ja:SVM-162	Generations-Start-Decks/Professors-Research-Professor-Oak-svM162	h the only free product at this number in the set's expansion; checked against our reference image
+ja:SVM-163	Generations-Start-Decks/Professors-Research-Professor-Elm-svM163	h the only free product at this number in the set's expansion; checked against our reference image
+ja:SVM-164	Generations-Start-Decks/Professors-Research-Professor-Birch-V3-svM164	h the only free product at this number in the set's expansion; checked against our reference image
+ja:SVM-165	Generations-Start-Decks/Professors-Research-Professor-Rowan-svM165	h the only free product at this number in the set's expansion; checked against our reference image
+ja:SVM-166	Generations-Start-Decks/Professors-Research-Professor-Juniper-svM166	h the only free product at this number in the set's expansion; checked against our reference image
+ja:SVM-167	Generations-Start-Decks/Professors-Research-Professor-Sycamore-svM167	h the only free product at this number in the set's expansion; checked against our reference image
+ja:SVM-168	Generations-Start-Decks/Professors-Research-Professor-Kukui-svM168	h the only free product at this number in the set's expansion; checked against our reference image
+ja:SVM-169	Generations-Start-Decks/Professors-Research-Professor-Magnolia-svM169	h the only free product at this number in the set's expansion; checked against our reference image
+ja:SVM-170	Generations-Start-Decks/Professors-Research-Professor-Sada-svM170	h the only free product at this number in the set's expansion; checked against our reference image
+ja:SVM-172	Generations-Start-Decks/Bosss-Orders-Ghetsis-svM172	h the only free product at this number in the set's expansion; checked against our reference image
+ja:SVOD-016	Starter-Set-ex-Stevens-Beldum-Metagross-ex/Professors-Research-Professor-Birch-svOD016	h the only free product at this number in the set's expansion; checked against our reference image
+ja:SVOD-017	Starter-Set-ex-Stevens-Beldum-Metagross-ex/Bosss-Orders-Ghetsis-svOD017	h the only free product at this number in the set's expansion; checked against our reference image
+ja:SVOM-017	Starter-Set-ex-Marnies-Morpeko-Grimmsnarl-ex/Professors-Research-Professor-Magnolia-svOM017	h the only free product at this number in the set's expansion; checked against our reference image
+ja:SVOM-018	Starter-Set-ex-Marnies-Morpeko-Grimmsnarl-ex/Bosss-Orders-Ghetsis-svOM018	h the only free product at this number in the set's expansion; checked against our reference image
+ja:SZD-015	Hydreigon-Half-Deck/Blend-Energy-GFPD	h the only free product at this number in the set's expansion; checked against our reference image
+ja:XY-037	The-Best-of-XY/Zubat	h the only free product at this number in the set's expansion; checked against our reference image
+ja:XY-109	The-Best-of-XY/Target-Whistle-Team-Flare-Gear-BXY109	h the only free product at this number in the set's expansion; checked against our reference image
+ja:XY-114	The-Best-of-XY/Battle-Compressor-Team-Flare-Gear-BXY114	h the only free product at this number in the set's expansion; checked against our reference image
+ja:XY-119	The-Best-of-XY/Robo-Substitute-Team-Flare-Gear-BXY119	h the only free product at this number in the set's expansion; checked against our reference image
+ja:XY11-Bb-049	Fever-Burst-Fighter/Armor-Fossil-Shieldon	h the only free product at this number in the set's expansion; checked against our reference image
+ja:XY11-Br-030	Cruel-Traitor/Spiritomb	h the only free product at this number in the set's expansion; checked against our reference image
+ja:XY5-Bg-046	Gaia-Volcano/MAggron-EX-V1	h the only free product at this number in the set's expansion; checked against our reference image
+ja:XY5-Bg-076	Gaia-Volcano/MAggron-EX-V2	h the only free product at this number in the set's expansion; checked against our reference image
+ja:XY8-Br-058	Red-Flash/Giovannis-Scheme-V1	h the only free product at this number in the set's expansion; checked against our reference image
+ja:XY8-Br-064	Red-Flash/Giovannis-Scheme-V2	h the only free product at this number in the set's expansion; checked against our reference image
+ja:XYH-12	MAudino-EX-Mega-Battle-Deck/MAudino-EX	h the only free product at this number in the set's expansion; checked against our reference image
+ja:jr-extra-regulation-box-002	Extra-Regulation-Box/Ho-Oh-EX-ERB002	h the only free product at this number in the set's expansion; checked against our reference image
+ja:jr-extra-regulation-box-003	Extra-Regulation-Box/Volcanion-EX-ERB003	h the only free product at this number in the set's expansion; checked against our reference image
+ja:jr-extra-regulation-box-010	Extra-Regulation-Box/Hoopa-EX-ERB010	h the only free product at this number in the set's expansion; checked against our reference image
+ja:jr-extra-regulation-box-011	Extra-Regulation-Box/Regirock-EX-ERB011	h the only free product at this number in the set's expansion; checked against our reference image
+ja:jr-extra-regulation-box-012	Extra-Regulation-Box/Darkrai-EX-ERB012	h the only free product at this number in the set's expansion; checked against our reference image
+ja:jr-extra-regulation-box-015	Extra-Regulation-Box/Gardevoir-EX-ERB015	h the only free product at this number in the set's expansion; checked against our reference image
+ja:jr-extra-regulation-box-016	Extra-Regulation-Box/MGardevoir-EX-ERB016	h the only free product at this number in the set's expansion; checked against our reference image
+ja:jr-extra-regulation-box-019	Extra-Regulation-Box/Rayquaza-EX-ERB019	h the only free product at this number in the set's expansion; checked against our reference image
+ja:jr-extra-regulation-box-020	Extra-Regulation-Box/MRayquaza-EX-ERB020	h the only free product at this number in the set's expansion; checked against our reference image
+ja:jr-extra-regulation-box-021	Extra-Regulation-Box/Shaymin-EX-ERB021	h the only free product at this number in the set's expansion; checked against our reference image
+ja:jr-extra-regulation-box-025	Extra-Regulation-Box/Battle-Compressor-Team-Flare-Gear-ERB025	h the only free product at this number in the set's expansion; checked against our reference image
+ja:jr-feraligatr-constructed-starter-deck-006	Feraligatr-Constructed-Starter-Deck/Unown-R-pcgJ006	h the only free product at this number in the set's expansion; checked against our reference image
+ja:jr-garchomp-vs-charizard-sp-deck-kit-charizard-014	Charizard-SP-Half-Deck/Team-Galactics-Invention-G-107-Technical-Machine-G-PtS014	h the only free product at this number in the set's expansion; checked against our reference image
+ja:jr-grimmsnarl-vmax-starter-set-010	VMAX-Starter-Decks/Evolution-Incense-V1-sC10	h the only free product at this number in the set's expansion; checked against our reference image
+ja:jr-holon-research-tower-fire-quarter-deck-003	Holon-Research-Tower-Fire-Quarter-Deck/Ditto-pcgM003	h the only free product at this number in the set's expansion; checked against our reference image
+ja:jr-holon-research-tower-water-quarter-deck-002	Holon-Research-Tower-Water-Quarter-Deck/Ditto-pcgN002	h the only free product at this number in the set's expansion; checked against our reference image
+ja:jr-play-promos-022	PLAY-Promos/Vaporeon-Gold-Star-PLAY022	h the only free product at this number in the set's expansion; checked against our reference image
+ja:jr-play-promos-023	PLAY-Promos/Jolteon-Gold-Star-PLAY023	h the only free product at this number in the set's expansion; checked against our reference image
+ja:jr-play-promos-024	PLAY-Promos/Flareon-Gold-Star-PLAY024	h the only free product at this number in the set's expansion; checked against our reference image
+ja:jr-play-promos-025	PLAY-Promos/Espeon-Gold-Star-PLAY025	h the only free product at this number in the set's expansion; checked against our reference image
+ja:jr-play-promos-026	PLAY-Promos/Umbreon-Gold-Star-PLAY026	h the only free product at this number in the set's expansion; checked against our reference image
+ja:XYP-301	XY-Promos/Grass-Energy-V1-XY-P	i unnumbered XY promo; version chosen by eye against our reference image
+ja:XYP-302	XY-Promos/Fire-Energy-V1-XY-P	i unnumbered XY promo; version chosen by eye against our reference image
+ja:XYP-303	XY-Promos/Water-Energy-V1-XY-P	i unnumbered XY promo; version chosen by eye against our reference image
+ja:XYP-304	XY-Promos/Lightning-Energy-V1-XY-P	i unnumbered XY promo; version chosen by eye against our reference image
+ja:XYP-305	XY-Promos/Psychic-Energy-V1-XY-P	i unnumbered XY promo; version chosen by eye against our reference image
+ja:XYP-306	XY-Promos/Fighting-Energy-V1-XY-P	i unnumbered XY promo; version chosen by eye against our reference image
+ja:XYP-307	XY-Promos/Darkness-Energy-V1-XY-P	i unnumbered XY promo; version chosen by eye against our reference image
+ja:XYP-308	XY-Promos/Metal-Energy-V1-XY-P	i unnumbered XY promo; version chosen by eye against our reference image
+ja:XYP-309	XY-Promos/Fairy-Energy-V1-XY-P	i unnumbered XY promo; version chosen by eye against our reference image
+ja:XYP-311	XY-Promos/Victory-Ring-V3	i unnumbered XY promo; version chosen by eye against our reference image
+ja:XYP-312	XY-Promos/Victory-Ring-V2	i unnumbered XY promo; version chosen by eye against our reference image
+ja:XYP-313	XY-Promos/Victory-Ring-V1	i unnumbered XY promo; version chosen by eye against our reference image
+ja:XYP-315	XY-Promos/Lightning-Energy-V2-XY-P	i unnumbered XY promo; version chosen by eye against our reference image
+ja:XYP-316	XY-Promos/Psychic-Energy-V2-XY-P	i unnumbered XY promo; version chosen by eye against our reference image
+ja:XYP-317	XY-Promos/Fighting-Energy-V2-XY-P	i unnumbered XY promo; version chosen by eye against our reference image
+ja:XYP-318	XY-Promos/Pitchs-Pikachu-V1	i unnumbered XY promo; version chosen by eye against our reference image
+ja:XYP-319	XY-Promos/Pitchs-Pikachu-V2	i unnumbered XY promo; version chosen by eye against our reference image
+ja:XYP-320	XY-Promos/Grass-Energy-V2-XY-P	i unnumbered XY promo; version chosen by eye against our reference image
+ja:XYP-321	XY-Promos/Fire-Energy-V2-XY-P	i unnumbered XY promo; version chosen by eye against our reference image
+ja:XYP-322	XY-Promos/Darkness-Energy-V2-XY-P	i unnumbered XY promo; version chosen by eye against our reference image
+ja:XYP-324	XY-Promos/Fire-Energy-V6-XY-P	i unnumbered XY promo; version chosen by eye against our reference image
+ja:XYP-330	XY-Promos/Pokemon-Card-Gym-Medal	i unnumbered XY promo; version chosen by eye against our reference image
+ja:XYP-331	XY-Promos/Champions-Festival-V1-XY-P	i unnumbered XY promo; version chosen by eye against our reference image
+ja:XYP-332	XY-Promos/Palace-Book	i unnumbered XY promo; version chosen by eye against our reference image
+ja:XYP-333	XY-Promos/Water-Energy-V2-XY-P	i unnumbered XY promo; version chosen by eye against our reference image
+ja:XYP-334	XY-Promos/Metal-Energy-V2-XY-P	i unnumbered XY promo; version chosen by eye against our reference image
+ja:XYP-335	XY-Promos/Fairy-Energy-V2-XY-P	i unnumbered XY promo; version chosen by eye against our reference image
+ja:XYP-348	XY-Promos/Pikachu-V23	i unnumbered XY promo; version chosen by eye against our reference image
+ja:XYP-349	XY-Promos/Grass-Energy-V3-XY-P	i unnumbered XY promo; version chosen by eye against our reference image
+ja:XYP-350	XY-Promos/Water-Energy-V3-XY-P	i unnumbered XY promo; version chosen by eye against our reference image
+ja:XYP-351	XY-Promos/Fighting-Energy-V3-XY-P	i unnumbered XY promo; version chosen by eye against our reference image
+ja:XYP-361	XY-Promos/Gym-Badge-V1	i unnumbered XY promo; version chosen by eye against our reference image
+ja:XYP-363	XY-Promos/Gym-Badge-V3	i unnumbered XY promo; version chosen by eye against our reference image
+ja:XYP-364	XY-Promos/Gym-Badge-V4	i unnumbered XY promo; version chosen by eye against our reference image
+ja:XYP-365	XY-Promos/Gym-Badge-V5	i unnumbered XY promo; version chosen by eye against our reference image
+ja:XYP-366	XY-Promos/Gym-Badge-V6	i unnumbered XY promo; version chosen by eye against our reference image
+ja:XYP-367	XY-Promos/Gym-Badge-V7	i unnumbered XY promo; version chosen by eye against our reference image
+ja:XYP-368	XY-Promos/Gym-Badge-V8	i unnumbered XY promo; version chosen by eye against our reference image
+ja:XYP-369	XY-Promos/Fire-Energy-V3-XY-P	i unnumbered XY promo; version chosen by eye against our reference image
+ja:XYP-370	XY-Promos/Lightning-Energy-V3-XY-P	i unnumbered XY promo; version chosen by eye against our reference image
+ja:XYP-371	XY-Promos/Metal-Energy-V3-XY-P	i unnumbered XY promo; version chosen by eye against our reference image
+ja:XYP-372	XY-Promos/Mega-Turbo-XY-P	i unnumbered XY promo; version chosen by eye against our reference image
+ja:XYP-382	XY-Promos/Pikachu-V22	i unnumbered XY promo; version chosen by eye against our reference image
+ja:XYP-383	XY-Promos/Pikachu-V17	i unnumbered XY promo; version chosen by eye against our reference image
+ja:XYP-384	XY-Promos/Pikachu-V18	i unnumbered XY promo; version chosen by eye against our reference image
+ja:XYP-385	XY-Promos/Pikachu-V19	i unnumbered XY promo; version chosen by eye against our reference image
+ja:XYP-386	XY-Promos/Pikachu-V20	i unnumbered XY promo; version chosen by eye against our reference image
+ja:XYP-387	XY-Promos/Pikachu-V21	i unnumbered XY promo; version chosen by eye against our reference image
+ja:XYP-388	XY-Promos/Champions-Festival-V2-XY-P	i unnumbered XY promo; version chosen by eye against our reference image
+ja:XYP-389	XY-Promos/Psychic-Energy-V3-XY-P	i unnumbered XY promo; version chosen by eye against our reference image
+ja:XYP-390	XY-Promos/Darkness-Energy-V3-XY-P	i unnumbered XY promo; version chosen by eye against our reference image
+ja:XYP-391	XY-Promos/Fairy-Energy-V3-XY-P	i unnumbered XY promo; version chosen by eye against our reference image
+ja:XYP-402	XY-Promos/Grass-Energy-V6-XY-P	i unnumbered XY promo; version chosen by eye against our reference image
+ja:XYP-403	XY-Promos/Darkness-Energy-V6-XY-P	i unnumbered XY promo; version chosen by eye against our reference image
+ja:XYP-406	XY-Promos/Pikachu-V24	i unnumbered XY promo; version chosen by eye against our reference image
+ja:XYP-407	XY-Promos/Fighting-Fury-Belt-XY-P	i unnumbered XY promo; version chosen by eye against our reference image
+ja:XYP-410	XY-Promos/Garchomp-Spirit-Link-XY-P	i unnumbered XY promo; version chosen by eye against our reference image
+ja:XYP-411	XY-Promos/MGarchomp-EX-XY-P	i unnumbered XY promo; version chosen by eye against our reference image
+ja:XYP-415	XY-Promos/Psyduck-XY-P	i unnumbered XY promo; version chosen by eye against our reference image
+ja:XYP-425	XY-Promos/Absol-XY-P	i unnumbered XY promo; version chosen by eye against our reference image
+ja:XYP-428	XY-Promos/Grass-Energy-V4-XY-P	i unnumbered XY promo; version chosen by eye against our reference image
+ja:XYP-429	XY-Promos/Fire-Energy-V4-XY-P	i unnumbered XY promo; version chosen by eye against our reference image
+ja:XYP-430	XY-Promos/Water-Energy-V4-XY-P	i unnumbered XY promo; version chosen by eye against our reference image
+ja:XYP-431	XY-Promos/Lightning-Energy-V4-XY-P	i unnumbered XY promo; version chosen by eye against our reference image
+ja:XYP-432	XY-Promos/Psychic-Energy-V4-XY-P	i unnumbered XY promo; version chosen by eye against our reference image
+ja:XYP-433	XY-Promos/Fighting-Energy-V4-XY-P	i unnumbered XY promo; version chosen by eye against our reference image
+ja:XYP-434	XY-Promos/Darkness-Energy-V4-XY-P	i unnumbered XY promo; version chosen by eye against our reference image
+ja:XYP-435	XY-Promos/Metal-Energy-V4-XY-P	i unnumbered XY promo; version chosen by eye against our reference image
+ja:XYP-436	XY-Promos/Fairy-Energy-V4-XY-P	i unnumbered XY promo; version chosen by eye against our reference image
+ja:XYP-437	XY-Promos/Champions-Festival-V3-XY-P	i unnumbered XY promo; version chosen by eye against our reference image
+ja:XYP-438	XY-Promos/Grass-Energy-V5-XY-P	i unnumbered XY promo; version chosen by eye against our reference image
+ja:XYP-439	XY-Promos/Fire-Energy-V5-XY-P	i unnumbered XY promo; version chosen by eye against our reference image
+ja:XYP-440	XY-Promos/Water-Energy-V5-XY-P	i unnumbered XY promo; version chosen by eye against our reference image
+ja:XYP-441	XY-Promos/Lightning-Energy-V5-XY-P	i unnumbered XY promo; version chosen by eye against our reference image
+ja:XYP-442	XY-Promos/Psychic-Energy-V5-XY-P	i unnumbered XY promo; version chosen by eye against our reference image
+ja:XYP-443	XY-Promos/Fighting-Energy-V5-XY-P	i unnumbered XY promo; version chosen by eye against our reference image
+ja:XYP-444	XY-Promos/Darkness-Energy-V5-XY-P	i unnumbered XY promo; version chosen by eye against our reference image
+ja:XYP-445	XY-Promos/Metal-Energy-V5-XY-P	i unnumbered XY promo; version chosen by eye against our reference image
+ja:XYP-446	XY-Promos/Fairy-Energy-V5-XY-P	i unnumbered XY promo; version chosen by eye against our reference image
+ja:XYP-447	XY-Promos/Gym-Badge-V9	i unnumbered XY promo; version chosen by eye against our reference image
+ja:XYP-448	XY-Promos/Gym-Badge-V10	i unnumbered XY promo; version chosen by eye against our reference image
+ja:XYP-449	XY-Promos/Gym-Badge-V11	i unnumbered XY promo; version chosen by eye against our reference image
+ja:XYP-450	XY-Promos/Gym-Badge-V12	i unnumbered XY promo; version chosen by eye against our reference image
+ja:XYP-451	XY-Promos/Gym-Badge-V13	i unnumbered XY promo; version chosen by eye against our reference image
+ja:XYP-452	XY-Promos/Gym-Badge-V14	i unnumbered XY promo; version chosen by eye against our reference image
+ja:XYP-453	XY-Promos/Gym-Badge-V15	i unnumbered XY promo; version chosen by eye against our reference image
+ja:XYP-454	XY-Promos/Gym-Badge-V16	i unnumbered XY promo; version chosen by eye against our reference image
+ja:XYP-456	XY-Promos/Magikarp-XY-P	i unnumbered XY promo; version chosen by eye against our reference image
+ja:XYP-457	XY-Promos/Mewtwo-EX-XY-P	i unnumbered XY promo; version chosen by eye against our reference image
+ja:XYP-458	XY-Promos/Pikachu-V25	i unnumbered XY promo; version chosen by eye against our reference image
+ja:XYP-459	XY-Promos/Mew	i unnumbered XY promo; version chosen by eye against our reference image
+ja:XYP-342	XY-Promos/Absol-EX-XY-P	j vending machine card unique by name on both sides, or XY promo chosen by eye
+ja:XYP-343	XY-Promos/MAbsol-EX-XY-P	j vending machine card unique by name on both sides, or XY promo chosen by eye
+ja:XYP-373	XY-Promos/MSwampert-EX-XY-P	j vending machine card unique by name on both sides, or XY promo chosen by eye
+ja:XYP-397	XY-Promos/Bronzong-XY-P	j vending machine card unique by name on both sides, or XY promo chosen by eye
+ja:XYP-398	XY-Promos/Empoleon-BREAK-XY-P	j vending machine card unique by name on both sides, or XY promo chosen by eye
+ja:XYP-408	XY-Promos/Crobat-BREAK-V1-XY-P	j vending machine card unique by name on both sides, or XY promo chosen by eye
+ja:XYP-409	XY-Promos/Crobat-BREAK-V2-XY-P	j vending machine card unique by name on both sides, or XY promo chosen by eye
+ja:jr-vending-machine-series-1-blue-u01	Expansion-Sheet/Abra	j vending machine card unique by name on both sides, or XY promo chosen by eye
+ja:jr-vending-machine-series-1-blue-u02	Expansion-Sheet/Bulbasaur	j vending machine card unique by name on both sides, or XY promo chosen by eye
+ja:jr-vending-machine-series-1-blue-u03	Expansion-Sheet/Caterpie	j vending machine card unique by name on both sides, or XY promo chosen by eye
+ja:jr-vending-machine-series-1-blue-u04	Expansion-Sheet/Chansey	j vending machine card unique by name on both sides, or XY promo chosen by eye
+ja:jr-vending-machine-series-1-blue-u05	Expansion-Sheet/Charmander	j vending machine card unique by name on both sides, or XY promo chosen by eye
+ja:jr-vending-machine-series-1-blue-u06	Expansion-Sheet/Clefairy	j vending machine card unique by name on both sides, or XY promo chosen by eye
+ja:jr-vending-machine-series-1-blue-u08	Expansion-Sheet/Doduo	j vending machine card unique by name on both sides, or XY promo chosen by eye
+ja:jr-vending-machine-series-1-blue-u14	Expansion-Sheet/Lickitung	j vending machine card unique by name on both sides, or XY promo chosen by eye
+ja:jr-vending-machine-series-1-blue-u15	Expansion-Sheet/Metapod	j vending machine card unique by name on both sides, or XY promo chosen by eye
+ja:jr-vending-machine-series-1-blue-u18	Expansion-Sheet/Mr-Mime-EXS	j vending machine card unique by name on both sides, or XY promo chosen by eye
+ja:jr-vending-machine-series-1-blue-u19	Expansion-Sheet/Nidoran-F-EXS	j vending machine card unique by name on both sides, or XY promo chosen by eye
+ja:jr-vending-machine-series-1-blue-u20	Expansion-Sheet/Nidoran-M-V2-EXS	j vending machine card unique by name on both sides, or XY promo chosen by eye
+ja:jr-vending-machine-series-1-blue-u25	Expansion-Sheet/Pinsir	j vending machine card unique by name on both sides, or XY promo chosen by eye
+ja:jr-vending-machine-series-1-blue-u26	Expansion-Sheet/Poliwag	j vending machine card unique by name on both sides, or XY promo chosen by eye
+ja:jr-vending-machine-series-1-blue-u27	Expansion-Sheet/Poliwhirl	j vending machine card unique by name on both sides, or XY promo chosen by eye
+ja:jr-vending-machine-series-1-blue-u28	Expansion-Sheet/Poliwrath	j vending machine card unique by name on both sides, or XY promo chosen by eye
+ja:jr-vending-machine-series-1-blue-u30	Expansion-Sheet/Rapidash	j vending machine card unique by name on both sides, or XY promo chosen by eye
+ja:jr-vending-machine-series-1-blue-u31	Expansion-Sheet/Rattata	j vending machine card unique by name on both sides, or XY promo chosen by eye
+ja:jr-vending-machine-series-1-blue-u32	Expansion-Sheet/Snorlax-EXS	j vending machine card unique by name on both sides, or XY promo chosen by eye
+ja:jr-vending-machine-series-1-blue-u33	Expansion-Sheet/Squirtle	j vending machine card unique by name on both sides, or XY promo chosen by eye
+ja:jr-vending-machine-series-2-red-u03	Expansion-Sheet/Dewgong	j vending machine card unique by name on both sides, or XY promo chosen by eye
+ja:jr-vending-machine-series-2-red-u11	Expansion-Sheet/Hitmonchan	j vending machine card unique by name on both sides, or XY promo chosen by eye
+ja:jr-vending-machine-series-2-red-u17	Expansion-Sheet/Lapras	j vending machine card unique by name on both sides, or XY promo chosen by eye
+ja:jr-vending-machine-series-2-red-u19	Expansion-Sheet/Machop	j vending machine card unique by name on both sides, or XY promo chosen by eye
+ja:jr-vending-machine-series-2-red-u20	Expansion-Sheet/Magnemite	j vending machine card unique by name on both sides, or XY promo chosen by eye
+ja:jr-vending-machine-series-2-red-u21	Expansion-Sheet/Magneton	j vending machine card unique by name on both sides, or XY promo chosen by eye
+ja:jr-vending-machine-series-2-red-u23	Expansion-Sheet/Master-Ball	j vending machine card unique by name on both sides, or XY promo chosen by eye
+ja:jr-vending-machine-series-2-red-u27	Expansion-Sheet/Onix	j vending machine card unique by name on both sides, or XY promo chosen by eye
+ja:jr-vending-machine-series-2-red-u28	Expansion-Sheet/Raichu	j vending machine card unique by name on both sides, or XY promo chosen by eye
+ja:jr-vending-machine-series-2-red-u29	Expansion-Sheet/Sandshrew	j vending machine card unique by name on both sides, or XY promo chosen by eye
+ja:jr-vending-machine-series-2-red-u30	Expansion-Sheet/Seel	j vending machine card unique by name on both sides, or XY promo chosen by eye
+ja:jr-vending-machine-series-2-red-u35	Expansion-Sheet/Voltorb-EXS	j vending machine card unique by name on both sides, or XY promo chosen by eye
+ja:jr-vending-machine-series-3-green-u10	Expansion-Sheet/Gastly	j vending machine card unique by name on both sides, or XY promo chosen by eye
+ja:jr-vending-machine-series-3-green-u13	Expansion-Sheet/Growlithe	j vending machine card unique by name on both sides, or XY promo chosen by eye
+ja:jr-vending-machine-series-3-green-u22	Expansion-Sheet/Kangaskhan	j vending machine card unique by name on both sides, or XY promo chosen by eye
+ja:jr-vending-machine-series-3-green-u26	Expansion-Sheet/Magmar	j vending machine card unique by name on both sides, or XY promo chosen by eye
+ja:jr-vending-machine-series-3-green-u37	Expansion-Sheet/Ponyta	j vending machine card unique by name on both sides, or XY promo chosen by eye
+ja:jr-vending-machine-series-3-green-u39	Expansion-Sheet/Sandslash	j vending machine card unique by name on both sides, or XY promo chosen by eye
+ja:jr-vending-machine-series-3-green-u40	Expansion-Sheet/Scyther	j vending machine card unique by name on both sides, or XY promo chosen by eye
+ja:jr-vending-machine-series-3-green-u49	Expansion-Sheet/Vulpix	j vending machine card unique by name on both sides, or XY promo chosen by eye

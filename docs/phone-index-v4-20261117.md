@@ -1,0 +1,190 @@
+# On-phone card index v4 (2026-11-17): printing alternatives, prints.tsv, set codes
+
+A phone index for the plan to recognise cards on the phone without the server. **Published on staging
+on 2026-11-17** (see Publish below), after the manifest change in #124. Production is unchanged, and so
+is the phone app.
+
+| Item | Value |
+|---|---|
+| Folder | `data/catalogue-gaps/phone-index-v4-20261117/release/0a46b0abe0f8db7db415ffef544a1249a295965fb0bd848bb06d26c8831478e2` (with Japanese stamped cards; the first build `cbc610a7...` is the same without them) |
+| Base | `32f22e3fa19e49e43c0d2f940ff00c03b2a5201e0ae8d4bd9de57e54ac3bda0b`, the index staging serves (IMG1 to LINKS5J), 48,874 rows, unchanged byte for byte |
+| Rows | **51,625** = 48,874 + 2,751 printing alternatives with their own vector |
+| `card_index.prints.tsv` | 1,719 printing alternatives with no vector (new file, hashed in the version file) |
+| Meta columns | v3's 15 (`id name number printed_number set_total language promo_code row_kind alt_name printing_family release_year hp printing reprint_of name_en`) + `set_code` |
+| Files (sha256) | f16 `cb4f9724...`, ids `2b6d0a3d...`, meta `b2a90ae8...`, prints `63d34641...`, version `ef9f0911...` |
+
+The old staging manifest refused this folder because it has rows the server snapshot does not. #124
+(merged as b899a25) serves an index that extends the published one, with `prints.tsv` as a fifth file.
+
+## Printing alternatives
+
+4,470 catalogue cards have an image but no vector: the server keeps them out of its index because
+their picture is at least 0.95 similar to an indexed card, and uses their features to choose the
+printing. 4,455 are Japanese, 15 English; all have a reference image.
+
+Each was embedded from its reference image with the catalogue's model (re-embedding three indexed
+cards gives cosine 1.000). `reprint_of` is the nearest indexed card of the same language when that is
+at least 0.95 similar (4,090), otherwise the most similar indexed card with the same title (355), or
+none (25). Same-title matches below 0.8 similarity (33) are left without `reprint_of`.
+
+Cut-offs on the similarity to `reprint_of`, chosen from the cards classified with confidence:
+
+| Confident group | Cards | Similarity |
+|---|---:|---|
+| Same image (pixel test: mean difference < 0.01, no 16-px block > 0.05) | 1,621 | 0.9504 to 1.0, median 0.993 |
+| Visibly different, by eye (stamps, other art, changed promo text) | 36 | up to 0.9933 (34 with a reprint) |
+
+So 0.994 (above every eye-checked difference) and 0.95 (below every identical image). The two groups
+overlap between them: a stamp barely moves the picture vector.
+
+| Band | Cards | Result |
+|---|---:|---|
+| 0.994 and above | 882 | prints.tsv |
+| 0.95 to 0.994, image identical to the reprint's (pixel test) | 837 | prints.tsv (owner, 2026-11-17) |
+| 0.95 to 0.994, other | 2,371 | own row and vector |
+| Below 0.95, or no reprint found | 380 | own row and vector |
+
+Contact sheets of the middle band (134 sheets): `phone-index-v4-20261117/middle-sheets/`. A sampled
+sheet had 21 same-art pairs of 24; the rest are stamps. Band per card: `bands.json`.
+
+Own rows carry `printing` and `reprint_of` (2,693 of 2,751; 58 empty as above).
+
+## Japanese stamped cards
+
+The catalogue records no stamp (not in names, titles or variants), so the rule is visual: a Japanese
+promo-set row whose picture is at least 0.95 similar to a regular (non-promo) Japanese card gets
+`printing = stamped` and `reprint_of` = that card (`stamped-ja.json`). Checked by eye on two samples of
+24 (`stamp-sheets/`): about 4 in 5 show a stamp (Gym, TANTO, Pokémon Center, Lawson, Championship
+Series, 25th), the rest are promo reprints with no visible mark. Between 0.90 and 0.95, even with the
+same name, only about half are stamped (the rest are other art), so they stay `promo`.
+
+| Rows changed | Count |
+|---|---:|
+| Index rows `promo` -> `stamped` | 477 (297 base rows, 180 added rows) |
+| ... of which `reprint_of` filled where empty | 297 |
+| ... of which `reprint_of` changed to the regular card | 63 |
+| prints.tsv rows `promo` -> `stamped` | 28 (16 with `reprint_of` changed) |
+
+Vectors and ids are unchanged, and so is every number in the photo test below. English stamped rows
+(89, from the printing families) are unchanged.
+
+`card_index.prints.tsv`: `id reprint_of printing number printed_number set_total set_code promo_code
+release_year`, one row per card; every `reprint_of` is an index row.
+
+## New column and fills
+
+| Column | English | Japanese | Source |
+|---|---:|---:|---|
+| `set_code` (new) | 92.0% | 71.1% | English: TCGdex `abbreviation.official` (`PAL`), fetched 2026-11-17 (`tcgdex/en-abbrev.json`, 191 of 240 sets). Japanese: the Limitless code through NAMES3's set map, or the same code. Older Japanese sets print a symbol, not a code, and stay empty |
+| `promo_code` (existing, filled where empty) | 5.7% | 8.1% | 1,292 English Black Star promos: SWSH, SM, XY, BW, DP, HGSS, SVP, MEP. Wizards and Nintendo promos print no prefix |
+
+Names, set totals, years, HP and `name_en` are v3's rules on the new base (`names.json` rebuilt for the
+added rows; identical to v3 on every row both cover).
+
+## Picture-only test on the gate photos
+
+1,892 photos: the 1,891 the gate replays plus `dev-en-vintage-073`. That photo was added to the dev
+panel on 2026-11-09, after the replay batches were cut, so no batch held it; it is now in
+`proof-panel-20261109/work/shards/dev9`. (The labels hold 1,991 dev/dev2/dev3 photos: the other 99 are
+the sealed vintage half retired on 2026-11-10, kept out of the gate.)
+
+Each photo was squared with the server's `detect_and_rectify` (card found in 1,360) and embedded as the
+index was; the first answer is the top picture match. There is no text step, so right-first is far
+below the server's; the comparison between the two indexes is what this measures.
+
+| Panel | Photos | Right first | Wrong first | Right in top 5 | Twin first |
+|---|---:|---|---|---|---|
+| dev | 682 | 447 -> 442 | 235 -> 240 | 562 -> 561 | 9 -> 13 |
+| dev2 | 238 | 160 -> 160 | 78 -> 78 | 206 -> 206 | 6 -> 7 |
+| dev3 | 972 | 621 -> 620 | 351 -> 352 | 791 -> 793 | 36 -> 37 |
+
+First answer changed on 36 photos; 35 of the new answers are added rows.
+
+| Change | Photos |
+|---|---:|
+| Fixed (wrong -> right) | 4 |
+| Right -> twin of the right card | 7 |
+| Right -> another card that is not a twin (broken) | 3 |
+| Wrong -> twin of the right card | 4 |
+| Wrong -> another wrong card | 16 |
+| Right -> another right card | 2 |
+
+Twin: same printing family (`reprint_of`, `prints.tsv`, `families.json`) or a picture at least 0.95
+similar to the right card. Broken:
+
+| Photo | Right card | New first answer |
+|---|---|---|
+| `dev-en-older-019` | `en:dp1-109` PlusPower (Diamond & Pearl) | `ja:jr-dpt-entry-pack-giratina-010` PlusPower (DPt Entry Pack) |
+| `dev2-en-vintage-012` | `en:neo2-39` Houndour (Neo Discovery) | `ja:jr-intro-pack-neo-totodile-u07` Houndour (Intro Pack Neo) |
+| `sealedF-ja-modern-015` | `ja:XY2-064` | `ja:CP4-093` |
+
+The first two are English photos answered by a Japanese print of the same card.
+
+Print sheet (top two matches a reprint pair within 0.05):
+
+| Reprint pair means | Before | After |
+|---|---:|---:|
+| Linked in the index data (`reprint_of`, `printing_family`, prints.tsv), what the phone can see | 5 | 29 |
+| Linked, or pictures at least 0.95 similar | 143 | 161 (20 new, 2 gone) |
+
+`dev-en-vintage-073` (`en:base2-5`) ranks third by picture in both indexes.
+
+## Files
+
+Work folder `data/catalogue-gaps/phone-index-v4-20261117/`: `bands.json`, `add-ids.txt`,
+`add-vectors.npy`, `prints-ids.txt`, `names.json`, `columns.json`, `phone-replay.json` (every changed
+photo), `queries/` (photo vectors), `middle-sheets/`, and the scripts that made them
+(`embed_alts.py`, `reprint.py`, `bands.py`, `fetch_abbrev.py`). In the repository:
+`api/scripts/on_phone_index/phone_columns.py` and `extend_index.py` (set_code, promo fill,
+prints.tsv), `embed_photos.py` and `phone_replay.py` (the test), tests in
+`api/tests/test_phone_index_extend.py`.
+
+## Review (2026-11-17)
+
+The owner accepted the print-sheet rise (the phone will prefer `regular` among twins when no text
+separates them, and the sheet rate will be measured on the phone) and the right-first change for the
+local build; publishing waits for the phone replay with text. Japanese stamped cards were added as
+above.
+
+## Product API check (before publish)
+
+The phone gets a card's details, image, link and prices from the product API by card id, so every id
+the phone can answer with must resolve there, including ids that exist only in `prints.tsv` (no vector,
+no index row). Checked against the staging product API on 2026-11-17 (`GET /api/v1/cards/{id}` and
+`/api/v1/cards/{id}/image`, read only; `api_check.py`, results in `product-api-check.json`):
+
+| Ids | Count | Details 200, same id, name | Image 200 | Cardmarket link | Prices in the reply |
+|---|---:|---:|---:|---:|---:|
+| prints.tsv only (e.g. `ja:20th-007` Parasect, 20th Anniversary Starter Pack) | 1,719 | 1,719 | 1,719 | 1,589 | 1,391 |
+| Added index rows | 2,751 | 2,751 | 2,751 | 2,356 | 2,056 |
+
+No id failed. The rows without a link are all Japanese (130 + 395) and are among the Japanese rows
+still without a link after LINKS5J; the phone shows them without a price, as it does any unlinked card.
+Linked rows with no price in the reply (198 + 300) are filled by the usual on-demand price read, which
+this check did not trigger. Repeat this check against the catalogue that will be served at publish.
+
+## Publish on staging (2026-11-17)
+
+| Step | Result |
+|---|---|
+| Code | #124 merged to `main` as b899a25; Dokploy redeployed staging at 17:23 UTC. API healthy, catalogue still LINKS5J (`pokesingle_completion_20261116_links5j`) |
+| Manifest before the switch | 200, `32f22e3f...`, 48,874 rows, four files: same as before the redeploy |
+| Product API check on the live catalogue | 1,719 prints-only and 2,751 added ids: all details 200 with the same id and a name, all images 200 (`product-api-check-publish.json`). One image (`ja:M6a-127`) hit the script's 30 s timeout once; three retries answered 200 with the full 105,792 bytes |
+| Rollback saved | `/etc/scanapp-staging/catalogue-rollback/phone-index-v4-20261117/ACTIVE.before` (`32f22e3fa19e49e43c0d2f940ff00c03b2a5201e0ae8d4bd9de57e54ac3bda0b`) |
+| Installed | `/data/phone-index/0a46b0ab.../` (copied to a temporary folder, sha256 checked, renamed), then `ACTIVE.next` renamed to `ACTIVE`. `32f22e3f...` stays in place as the base and for phones still downloading it |
+| Manifest after the switch | 200 inside the container and from outside: `0a46b0abe0f8db7db415ffef544a1249a295965fb0bd848bb06d26c8831478e2`, **51,625 rows**, model `2ddf6ec79e37`, five files |
+| Files | all five download with the manifest's bytes and sha256: f16 39,648,000 (= 51,625 x 768), ids 696,144 (51,625 lines), meta 3,854,235, version 62,800, `card_index.prints.tsv` 86,245 at `card-index/files/<version>/card_index.prints.tsv`. Range request 206; the base's files are still served |
+
+## Going back
+
+On the staging host, write the version in `ACTIVE.before` (`32f22e3f...`) to
+`/data/phone-index/ACTIVE.next` (the volume `scanapp-scanapp-z1mwj4_scanapp-data`) and rename it to
+`ACTIVE`. The manifest then serves `32f22e3f...` with four files, as before. Keep the `0a46b0ab...`
+folder for phones still finishing a download.
+
+## Not done
+
+- The phone replay with text, and the device round (download, checksum, swap) on phone build 727bbfb.
+- Production (its compose keeps `CARD_INDEX_PUBLISH` off).
+- The server gate does not run `dev-en-vintage-073` yet: `run_gate.sh` and `score_gate.py` (dev = 681)
+  still list the old batches, and the accepted baselines lack it.

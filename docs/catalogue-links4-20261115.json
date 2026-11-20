@@ -1,0 +1,37 @@
+{
+ "ja:M6-048": {
+  "clear_link": true,
+  "old_url": "https://www.cardmarket.com/en/Pokemon/Products/Singles/M-P-Indonesian-Promos/Krookodile-ex-M-PID048",
+  "reason": "link is another card's product: Krookodile ex (M-P Indonesian promo 048), not メガカラマネロex; same number, different card (docs/catalogue-titles-20261115.md)"
+ },
+ "ja:SV-P-155": {
+  "clear_link": true,
+  "old_url": "https://www.cardmarket.com/en/Pokemon/Products/Singles/30th-Celebration-IDTH/Pikachu-ex-V2-MA6155",
+  "reason": "link is another card's product: Pikachu ex (30th Celebration IDTH MA6 155), not タイカイデンex; same number, different card (docs/catalogue-titles-20261115.md)"
+ },
+ "ja:SV-P-165": {
+  "clear_link": true,
+  "old_url": "https://www.cardmarket.com/en/Pokemon/Products/Singles/30th-Celebration-IDTH/Mewtwo-ex-V2-MA6165",
+  "reason": "link is another card's product: Mewtwo ex (30th Celebration IDTH MA6 165), not ミガルーサex; same number, different card (docs/catalogue-titles-20261115.md)"
+ },
+ "ja:SV-P-210": {
+  "clear_link": true,
+  "old_url": "https://www.cardmarket.com/en/Pokemon/Products/Singles/M-P-Traditional-Chinese-Promos/Mega-Tatsugiri-ex-M-PCT210",
+  "reason": "link is another card's product: Mega Tatsugiri ex (M-P Traditional Chinese promo 210), not ハッサムex; same number, different card (docs/catalogue-titles-20261115.md)"
+ },
+ "ja:SV-P-254": {
+  "clear_link": true,
+  "old_url": "https://www.cardmarket.com/en/Pokemon/Products/Singles/Scarlet-Violet-Indonesian-Promos/Arboliva-ex-SV-PID254",
+  "reason": "link is another card's product: Arboliva ex (SV-P Indonesian promo 254), not ヒビキのホウオウex; same number, different card (docs/catalogue-titles-20261115.md)"
+ },
+ "ja:SV-P-258": {
+  "clear_link": true,
+  "old_url": "https://www.cardmarket.com/en/Pokemon/Products/Singles/Scarlet-Violet-Indonesian-Promos/Team-Rockets-Crobat-ex-SV-PID258",
+  "reason": "link is another card's product: Team Rocket's Crobat ex (SV-P Indonesian promo 258), not ガチグマ アカツキex; same number, different card (docs/catalogue-titles-20261115.md)"
+ },
+ "ja:SV10-082": {
+  "clear_link": true,
+  "old_url": "https://www.cardmarket.com/en/Pokemon/Products/Singles/30th-Celebration-IDTH/Lunala-MA6082",
+  "reason": "link is another card's product: Lunala (30th Celebration IDTH MA6 082), not ロケット団のポリゴン2; same number, different card (docs/catalogue-titles-20261115.md)"
+ }
+}
