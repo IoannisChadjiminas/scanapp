@@ -15,6 +15,11 @@ class ServerReadConfig(BaseModel):
     daily_pages: int
 
 
+class PhoneReadsConfig(BaseModel):
+    # The phone's other limits keep its own defaults.
+    scan_gap_s: int
+
+
 class ScanPriceConfig(BaseModel):
     start_on_provisional: bool
     candidate_reads: int
@@ -22,6 +27,7 @@ class ScanPriceConfig(BaseModel):
     show_stale_price: bool
     stale_max_days: int
     server_read: ServerReadConfig
+    phone_reads: PhoneReadsConfig
 
 
 CAPTURE_PRESETS = ('max', 'ultraHigh', 'veryHigh', 'high')
@@ -140,6 +146,10 @@ def scan_price_config(settings) -> AppConfigResponse:
                 statuses=sorted(settings.scan_server_read_statuses()),
                 delay_ms=max(0, min(delay, 60_000)),
                 daily_pages=max(0, min(pages, 100_000)),
+            ),
+            # The phone accepts 0 to 60.
+            phone_reads=PhoneReadsConfig(
+                scan_gap_s=max(0, min(int(settings.scan_price_phone_scan_gap_s), 60)),
             ),
         ),
     )
