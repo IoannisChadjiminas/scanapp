@@ -436,6 +436,16 @@ class Settings(BaseSettings):
     # Cardmarket's 429 only when automatic reads ran continuously; the owner
     # chose 20 for manual checks (it was 45 while scans read automatically).
     scan_price_phone_scan_gap_s: int = 20
+    # The phone also counts its pages: at most this many inside the window,
+    # the ones the collector opens on the Cardmarket sheet included. On 21
+    # November 2026 Cardmarket let seven pages 21 s apart through and refused
+    # the eighth, so a burst is fine and a steady stream is not. 0 pages
+    # turns the count off.
+    scan_price_phone_budget_pages: int = 4
+    scan_price_phone_budget_window_s: int = 600
+    # How long a card's live read stands, whichever phone made it: inside it
+    # the card page shows the stored offers with no refresh button.
+    live_offer_reuse_minutes: int = 1440
     # No paid read for a card whose Cardmarket trend is below this (EUR). A card
     # with no known trend is still read. 0 reads every card.
     # 0 = no flat floor: the value tiers in CARDMARKET_FRESH_TIERS decide.
