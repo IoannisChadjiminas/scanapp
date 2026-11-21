@@ -105,3 +105,15 @@ candidate is selected. Phones retain their compatible index and retry failed
 manifest checks at most hourly, while valid 200/404 answers are checked daily.
 Candidate hash verification is cached in the server process and invalidated by
 file size, modification time, change time or inode changes.
+
+### The phone's daily price file (21 November 2026)
+
+After each import of Cardmarket's price file, the nightly price pass
+(`refresh_all`) rebuilds `card_prices.tsv.gz` for the active index's ids and
+printings (`app/phone_prices.py`): each card's Cardmarket trend in euro cents
+(the `cardmarket_file` trend `best_prices` shows, empty when there is none),
+its set name and image address. Phones download it to finish a scan with no
+connection. It is served at `/api/v1/card-prices/manifest` and
+`card-prices/files/<sha256>/card_prices.tsv.gz` from `CARD_PRICES_DIR`
+(default `/data/phone-prices`) when `CARD_PRICES_PUBLISH` is on. A failed
+build keeps the previous version active; the two versions before it are kept.

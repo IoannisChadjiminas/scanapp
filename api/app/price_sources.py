@@ -578,6 +578,10 @@ def refresh_all(
             refresh_guide(conn, settings, history)
         except Exception as exc:
             log.info("price guide failed error=%s", type(exc).__name__)
+        # The phone's offline price file, from whichever guide is now stored.
+        from app.phone_prices import refresh as refresh_phone_prices
+
+        refresh_phone_prices(catalog if catalog is not None else conn, settings)
     if settings.tcgdex_prices_enabled:
         try:
             refresh_tcgdex(conn, settings, catalog=catalog)

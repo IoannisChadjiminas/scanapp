@@ -13,6 +13,10 @@ class Settings(BaseSettings):
     data_dir: Path = Path("/data")
     card_index_publish: bool = True
     card_index_publish_dir: Path = Path('/data/phone-index')
+    # The phone's daily price file (app/phone_prices.py), rebuilt after each
+    # import of Cardmarket's price file and served at /api/v1/card-prices.
+    card_prices_publish: bool = True
+    card_prices_dir: Path = Path('/data/phone-prices')
     health_vector_coverage: bool = False
     catalogue_backend: str = "sqlite"
     planetscale_database_url: SecretStr = SecretStr("")
