@@ -65,7 +65,8 @@ _BAIT = re.compile(
 # Another printing of the same card, worth something else.
 _VARIANT = re.compile(
     r"\b(pok[eé]\s*ball|master\s*ball|stamp(?:ed)?|staff|pre-?release|jumbo|"
-    r"oversized|cosmos|costco|league|winner|promo|shadowless|metal|sequential)\b",
+    r"oversized|cosmos|costco|league|winner|promo|shadowless|metal|sequential|"
+    r"exclusive|best\s+buy|gamestop|walmart|target|pok[eé]mon\s+cent(?:er|re))\b",
     re.IGNORECASE,
 )
 # A later reprint that keeps the old number.
@@ -123,7 +124,7 @@ def names_grade(title: str, grader: str, grade: str) -> bool:
     """Whether a title says this grader and exact grade, and no other slab:
     "PSA 10", "PSA10", "PSA GEM MT 10", "[PSA: 9]"; never "PSA 10" for a
     wanted "PSA 1", "9.5" for "9", or a title that also names "BGS"."""
-    wanted = rf"(?<![A-Za-z]){re.escape(grader)}{_FILLER}\s*[:\-\]]?\s*{re.escape(grade)}(?![\d]|\.\d)"
+    wanted = rf"(?<![A-Za-z]){re.escape(grader)}{_FILLER}\s*[:\-\]]?\s*{re.escape(grade)}(?![\d+]|\.\d)"
     if re.search(wanted, title, re.IGNORECASE) is None:
         return False
     for other in _ALL_GRADERS:
@@ -131,7 +132,7 @@ def names_grade(title: str, grader: str, grade: str) -> bool:
             return False
     # The same grader with another number: "PSA 9 ... PSA 10".
     for found in re.finditer(
-        rf"(?<![A-Za-z]){re.escape(grader)}{_FILLER}\s*[:\-\]]?\s*(10|\d(?:\.5)?)(?![\d]|\.\d)",
+        rf"(?<![A-Za-z]){re.escape(grader)}{_FILLER}\s*[:\-\]]?\s*(10|\d(?:\.5)?)(?![\d+]|\.\d)",
         title,
         re.IGNORECASE,
     ):

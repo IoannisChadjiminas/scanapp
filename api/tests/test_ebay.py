@@ -40,6 +40,7 @@ def test_a_title_must_name_the_grader_and_the_exact_grade():
     assert not names_grade("Charizard PSA 9", "PSA", "9.5")
     assert not names_grade("Charizard CGC 10", "PSA", "10")
     assert not names_grade("Charizard 10 HP", "PSA", "10")
+    assert not names_grade("Venusaur 15/102 Light Play PSA 7+", "PSA", "7")
     # Another slab in the same title.
     assert not names_grade("[BGS 9.5] PIKACHU BASE SET PSA 10", "PSA", "10")
     assert not names_grade("Eevee 51/64 Jungle Regular CGC 9 Mint Psa 9", "PSA", "9")
@@ -102,6 +103,10 @@ def test_the_printing_follows_the_copy():
     reverse = GradedCard("Pikachu", "025", "CGC", "10", total=165, year=2023, reverse=True)
     assert listing_is("Pikachu Pokemon 151 25/165 Reverse Holo CGC Gem Mint 10", reverse)
     assert not listing_is("Pikachu Pokemon 151 25/165 Holo CGC Gem Mint 10", reverse)
+    # A shop's stamped copy is another printing.
+    bulbasaur = GradedCard("Bulbasaur", "001", "PSA", "10", total=165, year=2023, set_name="151")
+    assert listing_is("Bulbasaur 001/165 Pokemon 151 PSA 10 GEM MINT", bulbasaur)
+    assert not listing_is("Bulbasaur 001/165 Best Buy Exclusive 151 Pokemon PSA 10", bulbasaur)
     # CGC's Pristine 10 is a dearer slab than its Gem Mint 10.
     plain = GradedCard("Pikachu", "025", "CGC", "10", total=165, year=2023)
     assert not listing_is("Pikachu 2023 Pokemon 151 CGC PRISTINE 10 #25/165", plain)
