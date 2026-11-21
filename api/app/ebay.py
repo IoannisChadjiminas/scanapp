@@ -1,18 +1,27 @@
 """What graded copies of a card are offered for on eBay, from its Browse API.
 
 Only graded copies, and only asking prices: eBay gives sold prices to approved
-partners alone, so this is the average of the cheapest Buy It Now listings
-whose title names the grade ("PSA 10"). Auctions are left out: a current bid
-says nothing until the auction ends. The server asks, never the phone; an
-answer is reused for six hours.
+partners alone, so this is the average of the cheapest Buy It Now listings for
+the card in the copy's grade. Auctions are left out: a current bid says
+nothing until the auction ends. The server asks, never the phone; an answer is
+reused for six hours.
+
+eBay titles are free text, so a listing counts only when its title passes
+every rule in `listing_is` (the card's name, number, year and language; the
+exact grade; no other card, variant or grader). The rules were set against
+real listings on 21 November 2026: a first version let through a reprint with
+the same number (Celebrations "4/102"), raw cards titled "NOT PSA 10" and
+"PSA 10 worthy", and Japanese copies of English cards.
 """
 from __future__ import annotations
 
 import base64
 import logging
 import re
+import statistics
 import threading
 import time
+from dataclasses import dataclass
 from datetime import datetime, timezone
 from typing import Any
 
@@ -28,28 +37,158 @@ SCOPE = "https://api.ebay.com/oauth/api_scope"
 # eBay's category for single trading cards: no boxes, packs or lots.
 SINGLE_CARDS = "183454"
 GRADERS = ("PSA", "BGS", "CGC", "TAG", "AGS")
+# Graders the app does not offer still mark a listing as another slab.
+_ALL_GRADERS = (*GRADERS, "SGC", "ACE", "PCA", "MNT", "GMA", "HGA", "CGA", "ARS", "BECKETT")
 GRADE = re.compile(r"^(10|[1-9](\.5)?)$")
 USER_AGENT = "scanapp-prices/1.0"
 
-# Titles that are not one real card.
+# Words sellers put between the grader and the number: "PSA GEM MT 10".
+_FILLER = r"(?:\s*[:\[\]\(\)\-#]?\s*(?:gem|mint|mt|nm|nm-mt|grade|graded)\b)*"
+# A cheaper listing than this share of the middle price is left out of the
+# average: a mislisted card or a bait title that passed the other rules.
+OUTLIER_SHARE = 0.5
+
+# Not one real graded card of the usual kind.
 _NOT_A_CARD = re.compile(
-    r"\b(lot|lots|bundle|proxy|custom|reprint|replica|fake|digital|"
-    r"choose|pick|read\s+description|empty|case\s+only|display)\b",
+    r"\b(lots?|bundle|proxy|custom|reprint|replica|fake|digital|choose|pick|"
+    r"read\s+desc\w*|empty|case\s+only|display|sealed|booster|box|pack|"
+    r"signed|autograph\w*|auto|error|misprint|miscut|damaged|"
+    r"pristine|perfect|black\s+label)\b",
     re.IGNORECASE,
 )
+# A raw card dressed as a slab: "NOT PSA 10", "PSA 10 worthy", "PSA ready".
+_BAIT = re.compile(
+    r"\b(not|no|non|worthy|candidate|potential|possible|contender|ready|"
+    r"regrade|crack|quality|like|ungraded|raw)\b|\?",
+    re.IGNORECASE,
+)
+# Another printing of the same card, worth something else.
+_VARIANT = re.compile(
+    r"\b(pok[eé]\s*ball|master\s*ball|stamp(?:ed)?|staff|pre-?release|jumbo|"
+    r"oversized|cosmos|costco|league|winner|promo|shadowless|metal|sequential)\b",
+    re.IGNORECASE,
+)
+# A later reprint that keeps the old number.
+_REPRINT = re.compile(
+    r"\b(celebrations?|classic\s+collection|anniversary|25th|30th)\b", re.IGNORECASE
+)
+_JAPANESE = re.compile(r"\b(japanese|japan|jpn|jp)\b", re.IGNORECASE)
+_OTHER_LANGUAGE = re.compile(
+    r"\b(korean|kor|chinese|chn|thai|indonesian|german|french|italian|spanish|"
+    r"portuguese|dutch|russian|ita|deu|ger|fra|fre|esp|spa|por)\b",
+    re.IGNORECASE,
+)
+_YEAR = re.compile(r"(?<!\d)(19[89]\d|20[0-4]\d)(?!\d)")
+_FRACTION = re.compile(r"(?<![\d.])(\d{1,3})\s*/\s*(\d{1,3})(?![\d.])")
+
+
+@dataclass(frozen=True)
+class GradedCard:
+    """What a listing must be: the card, and the copy's grade."""
+
+    name: str
+    number: str
+    grader: str
+    grade: str
+    total: int | None = None
+    year: int | None = None
+    japanese: bool = False
+    reverse: bool = False
+    first_edition: bool | None = None
+    set_name: str = ""
+
+    @property
+    def search(self) -> str:
+        """What eBay is asked for, as sellers title their listings."""
+        number = f"{self.number}/{self.total}" if self.total else self.number
+        return " ".join(
+            part for part in (
+                self.name, number, "Japanese" if self.japanese else "", self.grader, self.grade
+            ) if part
+        )
+
+
+def _words(text: str) -> list[str]:
+    """"Misty's Psyduck" -> ["mistys", "psyduck"]."""
+    plain = text.lower().replace("'", "").replace("’", "")
+    return re.findall(r"[a-z0-9]+", plain)
+
+
+def _plain_number(text: str) -> str:
+    head = text.split("/")[0].strip().lower()
+    return head.lstrip("0") or ("0" if head else "")
 
 
 def names_grade(title: str, grader: str, grade: str) -> bool:
-    """Whether a listing's title says this grader and grade: "PSA 10", "PSA10",
-    "PSA-10", and never "PSA 10" for a wanted "PSA 1" or "9.5" for "9"."""
-    pattern = rf"(?<![A-Za-z]){re.escape(grader)}\s*-?\s*{re.escape(grade)}(?![\d.]\d|\d)"
-    return re.search(pattern, title, re.IGNORECASE) is not None
+    """Whether a title says this grader and exact grade, and no other slab:
+    "PSA 10", "PSA10", "PSA GEM MT 10", "[PSA: 9]"; never "PSA 10" for a
+    wanted "PSA 1", "9.5" for "9", or a title that also names "BGS"."""
+    wanted = rf"(?<![A-Za-z]){re.escape(grader)}{_FILLER}\s*[:\-\]]?\s*{re.escape(grade)}(?![\d]|\.\d)"
+    if re.search(wanted, title, re.IGNORECASE) is None:
+        return False
+    for other in _ALL_GRADERS:
+        if other != grader and re.search(rf"(?<![A-Za-z]){other}(?![A-Za-z])", title, re.IGNORECASE):
+            return False
+    # The same grader with another number: "PSA 9 ... PSA 10".
+    for found in re.finditer(
+        rf"(?<![A-Za-z]){re.escape(grader)}{_FILLER}\s*[:\-\]]?\s*(10|\d(?:\.5)?)(?![\d]|\.\d)",
+        title,
+        re.IGNORECASE,
+    ):
+        if found.group(1) != grade:
+            return False
+    return True
+
+
+def listing_is(title: str, card: GradedCard) -> bool:
+    """Whether a listing's title is this card in this grade and nothing else."""
+    if not names_grade(title, card.grader, card.grade):
+        return False
+    if _NOT_A_CARD.search(title) or _BAIT.search(title):
+        return False
+    # Every word of the card's name.
+    present = set(_words(title))
+    if not all(word in present for word in _words(card.name)):
+        return False
+    # Its number, and no other card's: "4/102", "#4", "004".
+    wanted = _plain_number(card.number)
+    fractions = _FRACTION.findall(title)
+    if fractions:
+        if any(_plain_number(number) != wanted for number, _ in fractions):
+            return False
+        if card.total and not any(int(total) == card.total for _, total in fractions):
+            return False
+    elif wanted not in {_plain_number(word) for word in _words(title)}:
+        return False
+    # The language.
+    if card.japanese != bool(_JAPANESE.search(title)) or _OTHER_LANGUAGE.search(title):
+        return False
+    # The printing.
+    if card.reverse != bool(re.search(r"\breverse\b", title, re.IGNORECASE)):
+        return False
+    # A copy not marked first edition is an unlimited one: a "1st Edition"
+    # listing is another, dearer card.
+    first = bool(re.search(r"\b1st\b|\bfirst\s+ed", title, re.IGNORECASE))
+    if bool(card.first_edition) != first:
+        return False
+    for rule in (_VARIANT, _REPRINT):
+        found = rule.search(title)
+        if found and found.group(0).lower() not in card.set_name.lower():
+            # "shadowless" belongs to a first edition copy.
+            if not (card.first_edition and found.group(0).lower() == "shadowless"):
+                return False
+    # The year, where the title gives one: a reprint is years later.
+    if card.year is not None:
+        years = [int(year) for year in _YEAR.findall(title)]
+        if any(abs(year - card.year) > 1 for year in years):
+            return False
+    return True
 
 
 def graded_listings(
-    items: list[dict[str, Any]], *, grader: str, grade: str, currency: str
+    items: list[dict[str, Any]], card: GradedCard, *, currency: str
 ) -> list[dict[str, Any]]:
-    """Buy It Now listings of one card in this grade, cheapest first."""
+    """Buy It Now listings of the card in its grade, cheapest first."""
     found = []
     for item in items:
         title = str(item.get("title") or "")
@@ -62,7 +201,7 @@ def graded_listings(
             continue
         if "FIXED_PRICE" not in (item.get("buyingOptions") or []):
             continue
-        if not names_grade(title, grader, grade) or _NOT_A_CARD.search(title):
+        if not listing_is(title, card):
             continue
         found.append({
             "title": title[:120],
@@ -72,6 +211,9 @@ def graded_listings(
             "url": str(item.get("itemWebUrl") or ""),
         })
     found.sort(key=lambda listing: listing["amount"])
+    if len(found) >= 5:
+        floor = OUTLIER_SHARE * statistics.median(item["amount"] for item in found)
+        found = [item for item in found if item["amount"] >= floor]
     return found
 
 
@@ -102,7 +244,7 @@ class Ebay:
         )
         self._lock = threading.Lock()
         self._token: tuple[float, str] | None = None
-        self._kept: dict[tuple[str, str, str], tuple[float, dict[str, Any]]] = {}
+        self._kept: dict[GradedCard, tuple[float, dict[str, Any]]] = {}
 
     def close(self) -> None:
         self._client.close()
@@ -127,13 +269,8 @@ class Ebay:
             self._token = (time.time() + max(60, int(body.get("expires_in", 7200)) - 60), token)
         return token
 
-    def graded(self, query: str, grader: str, grade: str) -> dict[str, Any]:
-        """The app's payload: the average of the cheapest listings, how many
-        matched, the listings averaged, and when eBay was asked."""
-        key = (" ".join(query.lower().split()), grader, grade)
-        kept = self._kept.get(key)
-        if kept is not None and time.time() - kept[0] < self.reuse_s:
-            return kept[1]
+    def search(self, card: GradedCard) -> list[dict[str, Any]]:
+        """eBay's Buy It Now single-card listings for the card, cheapest first."""
         reply = self._client.get(
             "/buy/browse/v1/item_summary/search",
             headers={
@@ -141,20 +278,23 @@ class Ebay:
                 "X-EBAY-C-MARKETPLACE-ID": self.marketplace,
             },
             params={
-                "q": query,
+                "q": card.search,
                 "category_ids": SINGLE_CARDS,
                 "filter": "buyingOptions:{FIXED_PRICE}",
                 "sort": "price",
-                "limit": 50,
+                "limit": 200,
             },
         )
         reply.raise_for_status()
-        listings = graded_listings(
-            reply.json().get("itemSummaries") or [],
-            grader=grader,
-            grade=grade,
-            currency=self.currency,
-        )
+        return reply.json().get("itemSummaries") or []
+
+    def graded(self, card: GradedCard) -> dict[str, Any]:
+        """The app's payload: the average of the cheapest listings, how many
+        matched, the listings averaged, and when eBay was asked."""
+        kept = self._kept.get(card)
+        if kept is not None and time.time() - kept[0] < self.reuse_s:
+            return kept[1]
+        listings = graded_listings(self.search(card), card, currency=self.currency)
         cheapest = listings[: self.take]
         enough = len(listings) >= self.least
         answer = {
@@ -167,11 +307,25 @@ class Ebay:
             "listings": cheapest if enough else [],
             "observed_at": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
         }
-        self._kept[key] = (time.time(), answer)
+        self._kept[card] = (time.time(), answer)
         if len(self._kept) > 5000:
             cutoff = time.time() - self.reuse_s
             self._kept = {k: v for k, v in self._kept.items() if v[0] >= cutoff}
         return answer
+
+
+def name_from_listing(cardmarket_url: object) -> str:
+    """A card's English name from its Cardmarket address, for a card whose own
+    name is not in Latin letters: ".../Mew-ex-V1-sv2a205" -> "Mew ex"."""
+    tail = str(cardmarket_url or "").split("?")[0].rstrip("/").rsplit("/", 1)[-1]
+    words: list[str] = []
+    for word in tail.split("-"):
+        # The name ends where the version or the set code starts.
+        if words and (re.fullmatch(r"[Vv]\d+", word) or any(ch.isdigit() for ch in word)):
+            break
+        if word:
+            words.append(word)
+    return " ".join(words)
 
 
 def from_settings(settings) -> Ebay | None:
