@@ -97,6 +97,7 @@ from app.recognition.runtime import Runtime
 from app.routes.card_index import router as card_index_router
 from app.routes.card_prices import router as card_prices_router
 from app.routes.cardmarket import router as cardmarket_router
+from app.routes.cardtrader import router as cardtrader_router
 from app.routes.cards import router as cards_router
 from app.routes.health import router as health_router
 from app.routes.images import router as images_router
@@ -134,6 +135,11 @@ async def lifespan(app: FastAPI):
 
     price_history.bind(dbs.portfolio)
     app.state.runtime = runtime
+    from app.cardtrader import from_settings as cardtrader_from_settings
+
+    app.state.cardtrader = cardtrader_from_settings(settings)
+    if app.state.cardtrader is not None:
+        app.state.cardtrader.refresh_map_if_stale()
     lanes = max(1, settings.scan_lanes)
     app.state.scan_limiter = ScanLimiter(settings.scan_wait_limit, slots=lanes)
     from app.recognition.stage1_check import Stage1Checker
@@ -184,6 +190,8 @@ async def lifespan(app: FastAPI):
         await drain_grading_updates()
         app.state.executor.shutdown(wait=False, cancel_futures=True)
         app.state.image_executor.shutdown(wait=False, cancel_futures=True)
+        if app.state.cardtrader is not None:
+            app.state.cardtrader.close()
         price_history.bind(None)
         runtime.close()
         dbs.close()
@@ -243,4 +251,5 @@ app.include_router(review_router, prefix="/api/v1", tags=["review"])
 app.include_router(scans_router, prefix="/api/v1", tags=["scans"])
 app.include_router(cards_router, prefix="/api/v1", tags=["cards"])
 app.include_router(cardmarket_router, prefix="/api/v1", tags=["cardmarket"])
+app.include_router(cardtrader_router, prefix="/api/v1", tags=["cardtrader"])
 app.include_router(internal_router, prefix="/api/v1", tags=["internal"])

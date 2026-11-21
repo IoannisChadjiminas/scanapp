@@ -446,6 +446,12 @@ class Settings(BaseSettings):
     # How long a card's live read stands, whichever phone made it: inside it
     # the card page shows the stored offers with no refresh button.
     live_offer_reuse_minutes: int = 1440
+    # CardTrader's API token. Empty: no CardTrader box in the app. Listings
+    # are reused for the minutes below; the list that ties a Cardmarket
+    # product to a CardTrader card is imported again after the hours below.
+    cardtrader_api_token: str = ""
+    cardtrader_reuse_minutes: int = 60
+    cardtrader_map_max_age_h: int = 168
     # No paid read for a card whose Cardmarket trend is below this (EUR). A card
     # with no known trend is still read. 0 reads every card.
     # 0 = no flat floor: the value tiers in CARDMARKET_FRESH_TIERS decide.
