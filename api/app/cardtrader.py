@@ -24,6 +24,8 @@ POKEMON_GAME_ID = 5
 MAX_ROWS = 20
 MAX_BLUEPRINTS = 3
 USER_AGENT = "scanapp-cardtrader/1.0"
+# Raised when the stored list gains something: an older list is imported again.
+MAP_VERSION = "2"
 
 # CardTrader's condition names, best first, with the short codes the app and
 # Cardmarket use.
@@ -148,6 +150,10 @@ class CardTrader:
                 blueprint_id INTEGER NOT NULL,
                 PRIMARY KEY (cardmarket_id, blueprint_id)
             );
+            CREATE TABLE IF NOT EXISTS tcgplayer_ids (
+                cardmarket_id INTEGER PRIMARY KEY,
+                product_id INTEGER NOT NULL
+            );
             CREATE TABLE IF NOT EXISTS meta (key TEXT PRIMARY KEY, value TEXT);
             """
         )
@@ -166,7 +172,13 @@ class CardTrader:
             row = self._conn.execute(
                 "SELECT value FROM meta WHERE key = 'imported_at'"
             ).fetchone()
-        return None if row is None else time.time() - float(row[0])
+            # A list from before TCGplayer ids were kept is imported again.
+            version = self._conn.execute(
+                "SELECT value FROM meta WHERE key = 'version'"
+            ).fetchone()
+        if row is None or version is None or version[0] != MAP_VERSION:
+            return None
+        return time.time() - float(row[0])
 
     def refresh_map_if_stale(self) -> None:
         """Starts the import in the background; lookups meanwhile use the old list."""
@@ -194,6 +206,7 @@ class CardTrader:
         response = self._client.get("/expansions")
         response.raise_for_status()
         pairs: set[tuple[int, int]] = set()
+        tcgplayer: dict[int, int] = {}
         for expansion in response.json():
             if expansion.get("game_id") != POKEMON_GAME_ID:
                 continue
@@ -205,6 +218,8 @@ class CardTrader:
                 for market_id in blueprint.get("card_market_ids") or []:
                     if isinstance(market_id, int):
                         pairs.add((market_id, int(blueprint["id"])))
+                        if isinstance(blueprint.get("tcg_player_id"), int):
+                            tcgplayer.setdefault(market_id, blueprint["tcg_player_id"])
             time.sleep(pause_s)
         if not pairs:
             raise ValueError("no blueprints")
@@ -212,9 +227,13 @@ class CardTrader:
             with self._conn:
                 self._conn.execute("DELETE FROM blueprints")
                 self._conn.executemany("INSERT INTO blueprints VALUES (?, ?)", pairs)
-                self._conn.execute(
-                    "INSERT OR REPLACE INTO meta VALUES ('imported_at', ?)",
-                    (str(time.time()),),
+                self._conn.execute("DELETE FROM tcgplayer_ids")
+                self._conn.executemany(
+                    "INSERT INTO tcgplayer_ids VALUES (?, ?)", tcgplayer.items()
+                )
+                self._conn.executemany(
+                    "INSERT OR REPLACE INTO meta VALUES (?, ?)",
+                    [("imported_at", str(time.time())), ("version", MAP_VERSION)],
                 )
         return len(pairs)
 
@@ -226,6 +245,16 @@ class CardTrader:
                 (cardmarket_id, MAX_BLUEPRINTS),
             ).fetchall()
         return [int(row[0]) for row in rows]
+
+    def tcgplayer_id(self, cardmarket_id: int) -> int | None:
+        """TCGplayer's product for a Cardmarket one, where CardTrader knows it."""
+        self.refresh_map_if_stale()
+        with self._lock:
+            row = self._conn.execute(
+                "SELECT product_id FROM tcgplayer_ids WHERE cardmarket_id = ?",
+                (cardmarket_id,),
+            ).fetchone()
+        return None if row is None else int(row[0])
 
     # -- listings ----------------------------------------------------------
 
