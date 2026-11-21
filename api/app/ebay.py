@@ -53,6 +53,7 @@ _NOT_A_CARD = re.compile(
     r"\b(lots?|bundle|proxy|custom|reprint|replica|fake|digital|choose|pick|"
     r"read\s+desc\w*|empty|case\s+only|display|sealed|booster|box|pack|"
     r"signed|autograph\w*|auto|error|misprint|miscut|damaged|"
+    r"big\s+three|trio|duo|pair|both|all\s+three|set\s+of|complete|"
     r"pristine|perfect|black\s+label)\b",
     re.IGNORECASE,
 )
@@ -79,6 +80,8 @@ _OTHER_LANGUAGE = re.compile(
     r"portuguese|dutch|russian|ita|deu|ger|fra|fre|esp|spa|por)\b",
     re.IGNORECASE,
 )
+# Words of a set's name that do not tell sets apart.
+_SET_NOISE = {"pokemon", "pokémon", "the", "and", "of", "set", "tcg", "card", "cards", "game"}
 _YEAR = re.compile(r"(?<!\d)(19[89]\d|20[0-4]\d)(?!\d)")
 _FRACTION = re.compile(r"(?<![\d.])(\d{1,3})\s*/\s*(\d{1,3})(?![\d.])")
 
@@ -97,6 +100,11 @@ class GradedCard:
     reverse: bool = False
     first_edition: bool | None = None
     set_name: str = ""
+    # The set's code ("sv2a"), which sellers of Japanese cards put in titles.
+    set_code: str = ""
+    # No other card in the set has this name, so the set and the name are
+    # the card even where the title's number differs from the catalogue's.
+    unique_name: bool = False
 
     @property
     def search(self) -> str:
@@ -105,6 +113,25 @@ class GradedCard:
         return " ".join(
             part for part in (
                 self.name, number, "Japanese" if self.japanese else "", self.grader, self.grade
+            ) if part
+        )
+
+    @property
+    def set_words(self) -> list[str]:
+        """The words that name the set, without ones every title has."""
+        return [word for word in _words(self.set_name) if word not in _SET_NOISE]
+
+    @property
+    def set_search(self) -> str:
+        """The second search, by set instead of number: slab labels read
+        "2026 POKEMON 30TH CELEBRATION CLASSIC COLLECTION #4 CHARIZARD", with
+        no "4/102" for the first search to find. Empty with no set to name."""
+        named = " ".join(self.set_words) if self.set_name.isascii() else self.set_code
+        if not named:
+            return ""
+        return " ".join(
+            part for part in (
+                self.name, named, "Japanese" if self.japanese else "", self.grader, self.grade
             ) if part
         )
 
@@ -141,6 +168,26 @@ def names_grade(title: str, grader: str, grade: str) -> bool:
     return True
 
 
+def _names_set(title: str, card: GradedCard) -> bool:
+    """Whether a title names the card's set: every word of its name, or its
+    code; and not a later set that only adds a number ("Base Set 2")."""
+    present = _words(title)
+    words = card.set_words
+    by_name = bool(words) and all(word in present for word in words)
+    by_code = bool(card.set_code) and card.set_code.lower() in present
+    if not (by_name or by_code):
+        return False
+    if by_name and not by_code:
+        last = words[-1]
+        # "Base Set 2": past words like "set", which every title has.
+        told = [word for word in present if word not in _SET_NOISE]
+        for index, word in enumerate(told[:-1]):
+            follows = told[index + 1]
+            if word == last and follows in {"2", "ii"} and follows not in words:
+                return False
+    return True
+
+
 def listing_is(title: str, card: GradedCard) -> bool:
     """Whether a listing's title is this card in this grade and nothing else."""
     if not names_grade(title, card.grader, card.grade):
@@ -151,16 +198,28 @@ def listing_is(title: str, card: GradedCard) -> bool:
     present = set(_words(title))
     if not all(word in present for word in _words(card.name)):
         return False
-    # Its number, and no other card's: "4/102", "#4", "004".
+    # Its number, and no other card's. "4/102" names the card by itself;
+    # a title without one ("#4", as on a slab's label) must name the set too.
     wanted = _plain_number(card.number)
     fractions = _FRACTION.findall(title)
     if fractions:
         if any(_plain_number(number) != wanted for number, _ in fractions):
             return False
-        if card.total and not any(int(total) == card.total for _, total in fractions):
+        if card.total:
+            if not any(int(total) == card.total for _, total in fractions):
+                return False
+        elif not _names_set(title, card):
             return False
-    elif wanted not in {_plain_number(word) for word in _words(title)}:
-        return False
+    else:
+        if not _names_set(title, card):
+            return False
+        if wanted not in {_plain_number(word) for word in present}:
+            # The catalogue's number is not always the printed one (a reprint
+            # numbered 001 of 30 that sellers list as "#4"). Then the set and
+            # a name no other card in it has are the card, on a title that
+            # gives one "#number" like a single slab's label.
+            if not (card.unique_name and len(re.findall(r"#\s*\d+", title)) == 1):
+                return False
     # The language.
     if card.japanese != bool(_JAPANESE.search(title)) or _OTHER_LANGUAGE.search(title):
         return False
@@ -271,23 +330,30 @@ class Ebay:
         return token
 
     def search(self, card: GradedCard) -> list[dict[str, Any]]:
-        """eBay's Buy It Now single-card listings for the card, cheapest first."""
-        reply = self._client.get(
-            "/buy/browse/v1/item_summary/search",
-            headers={
-                "Authorization": f"Bearer {self._bearer()}",
-                "X-EBAY-C-MARKETPLACE-ID": self.marketplace,
-            },
-            params={
-                "q": card.search,
-                "category_ids": SINGLE_CARDS,
-                "filter": "buyingOptions:{FIXED_PRICE}",
-                "sort": "price",
-                "limit": 200,
-            },
-        )
-        reply.raise_for_status()
-        return reply.json().get("itemSummaries") or []
+        """eBay's Buy It Now single-card listings for the card, from both
+        searches (by number, and by set), each cheapest first."""
+        found: dict[str, dict[str, Any]] = {}
+        for query in dict.fromkeys(q for q in (card.search, card.set_search) if q):
+            reply = self._client.get(
+                "/buy/browse/v1/item_summary/search",
+                headers={
+                    "Authorization": f"Bearer {self._bearer()}",
+                    "X-EBAY-C-MARKETPLACE-ID": self.marketplace,
+                },
+                params={
+                    "q": query,
+                    "category_ids": SINGLE_CARDS,
+                    "filter": "buyingOptions:{FIXED_PRICE}",
+                    "sort": "price",
+                    "limit": 200,
+                },
+            )
+            reply.raise_for_status()
+            for item in reply.json().get("itemSummaries") or []:
+                # One listing found by both searches counts once.
+                key = str(item.get("itemId") or item.get("itemWebUrl") or item.get("title"))
+                found.setdefault(key, item)
+        return list(found.values())
 
     def graded(self, card: GradedCard) -> dict[str, Any]:
         """The app's payload: the average of the cheapest listings, how many
