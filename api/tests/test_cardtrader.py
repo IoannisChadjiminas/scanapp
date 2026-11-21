@@ -81,7 +81,10 @@ def _reader(tmp_path, calls):
             return httpx.Response(200, json=[
                 {"id": 70, "card_market_ids": [271823], "tcg_player_id": 42346},
                 {"id": 71, "card_market_ids": []},
+                {"id": 72, "card_market_ids": [555001], "tcg_player_id": 42999},
             ])
+        if request.url.params.get("blueprint_id") == "72":
+            return httpx.Response(200, json={"72": [_product(900)]})
         return httpx.Response(200, json={"70": [_product(250), _product(400, language="jp")]})
 
     client = httpx.Client(base_url="https://ct.test", transport=httpx.MockTransport(handle))
@@ -91,7 +94,7 @@ def _reader(tmp_path, calls):
 def test_a_card_is_found_by_its_cardmarket_id_and_read_once_an_hour(tmp_path):
     calls: list[str] = []
     reader = _reader(tmp_path, calls)
-    assert reader.import_map(pause_s=0) == 1
+    assert reader.import_map(pause_s=0) == 2
     assert reader.blueprints(271823) == [70]
     assert reader.tcgplayer_id(271823) == 42346
     assert reader.tcgplayer_id(1) is None
@@ -148,3 +151,73 @@ def test_the_route_answers_for_a_catalogue_card(tmp_path):
     off = client.get("/api/v1/cardtrader/prices", params={"card_id": "base1-58"}).json()
     assert off == {"enabled": False, "matched": False, "count": 0, "prices": [], "observed_at": None}
     reader.close()
+
+
+def test_a_picked_listing_is_priced_as_its_own_product(tmp_path):
+    """V1 and V2 are separate Cardmarket products of one catalogue card."""
+    from app.tcgplayer import TcgplayerPrices
+
+    reader = _reader(tmp_path, [])
+    reader.import_map(pause_s=0)
+    main = "https://www.cardmarket.com/en/Pokemon/Products/Singles/Base-Set/Pikachu-V1"
+    second = "https://www.cardmarket.com/en/Pokemon/Products/Singles/Base-Set/Pikachu-V2"
+    unknown = "https://www.cardmarket.com/en/Pokemon/Products/Singles/Base-Set/Pikachu-V3"
+    catalog = connect(tmp_path / "catalog.sqlite")
+    init_catalog(catalog)
+    values = {"id": "base1-58", "name": "Pikachu", "language": "en",
+              "cardmarket_id": 271823, "cardmarket_url": main}
+    values.update({
+        row[1]: "" for row in catalog.execute("PRAGMA table_info(cards)")
+        if row[3] and row[4] is None and row[1] not in values
+    })
+    catalog.execute(
+        f"INSERT INTO cards ({', '.join(values)}) VALUES ({', '.join('?' for _ in values)})",
+        list(values.values()),
+    )
+    for url, product in ((second, 555001), (unknown, None)):
+        catalog.execute(
+            "INSERT INTO cardmarket_expansion_products "
+            "(url, source, card_id, matched, imported_at, product_id) VALUES (?, 'test', ?, 1, '', ?)",
+            (url, "base1-58", product),
+        )
+    catalog.commit()
+
+    store = TcgplayerPrices(tmp_path / "tcgplayer.sqlite", client=httpx.Client(
+        base_url="https://tcg.test",
+        transport=httpx.MockTransport(lambda request: httpx.Response(500)),
+    ))
+    store._conn.executemany(
+        "INSERT INTO prices VALUES (?, 'Normal', ?, ?, ?)",
+        [(42346, 4.5, 2.0, 5.0), (42999, 60.0, 45.0, 70.0)],
+    )
+    store._conn.executemany(
+        "INSERT INTO meta VALUES (?, ?)",
+        [("imported_at", "99999999999"), ("priced_at", "2026-11-20T20:06:21+0000")],
+    )
+    store._conn.commit()
+
+    app = FastAPI()
+    app.include_router(router, prefix="/api/v1")
+    app.state.cardtrader = reader
+    app.state.tcgplayer = store
+    app.state.dbs = type("Dbs", (), {"catalog": catalog})()
+    client = TestClient(app)
+
+    def amounts(path, url=None):
+        params = {"card_id": "base1-58"} | ({"url": url} if url else {})
+        return [p["amount"] for p in client.get(f"/api/v1/{path}/prices", params=params).json()["prices"]]
+
+    # No listing, or the main one (with or without its filters): the card's own product.
+    for url in (None, main, main + "?language=1&minCondition=2"):
+        assert amounts("cardtrader", url) == [2.5]
+        assert amounts("tcgplayer", url)[0] == 4.5
+    # An address that is not one of the card's stored listings means the card.
+    assert amounts("cardtrader", main.replace("/en/", "/de/")) == [2.5]
+    # The second listing has its own product, so its own prices.
+    assert amounts("cardtrader", second + "?isFirstEd=N") == [9.0]
+    assert amounts("tcgplayer", second)[0] == 60.0
+    # A listing whose product is not known shows nothing, never another version's price.
+    assert amounts("cardtrader", unknown) == []
+    assert amounts("tcgplayer", unknown) == []
+    reader.close()
+    store.close()
