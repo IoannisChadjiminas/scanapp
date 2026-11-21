@@ -221,3 +221,211 @@ def test_a_picked_listing_is_priced_as_its_own_product(tmp_path):
     assert amounts("tcgplayer", unknown) == []
     reader.close()
     store.close()
+
+
+def test_base_set_first_editions_come_from_the_shadowless_set(tmp_path):
+    """Both marketplaces keep Base Set first editions as cards of another set."""
+    def handle(request: httpx.Request) -> httpx.Response:
+        if request.url.path.endswith("/expansions"):
+            return httpx.Response(200, json=[{"id": 1472, "game_id": 5}, {"id": 1969, "game_id": 5}])
+        if request.url.path.endswith("/blueprints/export"):
+            shadowless = request.url.params["expansion_id"] == "1969"
+            return httpx.Response(200, json=[{
+                "id": 134213 if shadowless else 111198,
+                "name": "Koffing",
+                "fixed_properties": {"collector_number": "051"},
+                "card_market_ids": [660177 if shadowless else 273746],
+                "tcg_player_id": 107048 if shadowless else 42395,
+            }, {
+                "id": 1 if shadowless else 2,
+                "name": "Only here" if shadowless else "Only there",
+                "fixed_properties": {"collector_number": "099"},
+                "card_market_ids": [5 if shadowless else 6],
+            }])
+        blueprint = request.url.params["blueprint_id"]
+        listings = (
+            [_product(1500, first_edition=True), _product(300)]
+            if blueprint == "134213"
+            else [_product(130)]
+        )
+        return httpx.Response(200, json={blueprint: listings})
+
+    reader = CardTrader(
+        "token", tmp_path / "cardtrader.sqlite",
+        client=httpx.Client(base_url="https://ct.test", transport=httpx.MockTransport(handle)),
+    )
+    reader.import_map(pause_s=0)
+    assert reader.first_edition_product(273746) == 660177
+    assert reader.first_edition_product(6) is None
+    assert reader.first_edition_product(660177) is None
+
+    catalog = connect(tmp_path / "catalog.sqlite")
+    init_catalog(catalog)
+    values = {"id": "base1-51", "name": "Koffing", "language": "en", "cardmarket_id": 273746}
+    values.update({
+        row[1]: "" for row in catalog.execute("PRAGMA table_info(cards)")
+        if row[3] and row[4] is None and row[1] not in values
+    })
+    catalog.execute(
+        f"INSERT INTO cards ({', '.join(values)}) VALUES ({', '.join('?' for _ in values)})",
+        list(values.values()),
+    )
+    catalog.commit()
+    app = FastAPI()
+    app.include_router(router, prefix="/api/v1")
+    app.state.cardtrader = reader
+    app.state.dbs = type("Dbs", (), {"catalog": catalog})()
+    client = TestClient(app)
+
+    def amounts(**params):
+        body = client.get("/api/v1/cardtrader/prices", params={"card_id": "base1-51", **params}).json()
+        return [price["amount"] for price in body["prices"]]
+
+    # First edition: the other set's first edition listings only.
+    assert amounts(first_edition="true") == [15.0]
+    # Unlimited, or no choice: the card's own listings, as before.
+    assert amounts(first_edition="false") == [1.3]
+    assert amounts() == [1.3]
+    reader.close()
+
+
+def _numbered_reader(tmp_path):
+    def blueprint(bid, name, number, languages, ids=(), tcg=None):
+        return {
+            "id": bid, "name": name, "card_market_ids": list(ids), "tcg_player_id": tcg,
+            "fixed_properties": {"collector_number": number},
+            "editable_properties": [{"name": "pokemon_language", "possible_values": languages}],
+        }
+
+    def handle(request: httpx.Request) -> httpx.Response:
+        if request.url.path.endswith("/expansions"):
+            return httpx.Response(200, json=[
+                {"id": 2077, "game_id": 5, "name": "Infinity Zone", "code": "s3"},
+                {"id": 9, "game_id": 5, "name": "Old Set Sheet", "code": "zz"},
+                {"id": 10, "game_id": 5, "name": "Holon Phantoms", "code": "hp"},
+            ])
+        if request.url.path.endswith("/blueprints/export"):
+            expansion = request.url.params["expansion_id"]
+            if expansion == "2077":
+                return httpx.Response(200, json=[
+                    blueprint(1, "Paras", "001/100", ["jp"], tcg=555),
+                    blueprint(2, "Eternatus VMAX", "101/100", ["jp"]),
+                    blueprint(3, "Eternatus VMAX", "101/100", ["jp"]),
+                    blueprint(4, "Parasect", "002/100", ["en", "fr"]),
+                    blueprint(5, "Pikachu", "010/100", ["jp"]),
+                    blueprint(6, "Pikachu V", "010/100", ["jp"]),
+                ])
+            if expansion == "9":
+                # Listed with Cardmarket ids, and one card without a number.
+                return httpx.Response(200, json=[
+                    blueprint(20, "Ekans", "", ["jp"], ids=[801]),
+                    blueprint(21, "Zubat", "", ["jp"], ids=[802]),
+                    blueprint(22, "Grimer", None, ["jp"]),
+                ])
+            return httpx.Response(200, json=[blueprint(30, "Trapinch", "001", ["jp"])])
+        return httpx.Response(200, json={"1": [_product(210, language="jp")]})
+
+    reader = CardTrader(
+        "token", tmp_path / "cardtrader.sqlite",
+        client=httpx.Client(base_url="https://ct.test", transport=httpx.MockTransport(handle)),
+    )
+    reader.import_map(pause_s=0)
+    return reader
+
+
+def test_a_set_is_found_by_its_matching_cards_name_code_or_a_close_name(tmp_path):
+    reader = _numbered_reader(tmp_path)
+    # By name, and by code.
+    assert reader.expansions_for([], {"infinityzone"}, "", "ja") == {2077}
+    assert reader.expansions_for([], set(), "s3", "ja") == {2077}
+    # A name spelt almost the same.
+    assert reader.expansions_for([], {"holonphantom"}, "", "ja") == {10}
+    # Where most of the set's matching cards are filed, whatever it is called.
+    assert reader.expansions_for([801, 802], {"somethingelse"}, "", "ja") == {9}
+    assert reader.expansions_for([], {"nothinglikeit"}, "", "ja") == set()
+    reader.close()
+
+
+def test_a_card_without_a_cardmarket_id_is_found_by_number_and_name(tmp_path):
+    reader = _numbered_reader(tmp_path)
+    zone = {2077}
+    assert reader.find(zone, "001", ["parass31"], "ja") == (1, 555)
+    # "Pikachu V" is not taken for "Pikachu", nor the other way round.
+    assert reader.find(zone, "010", ["pikachuvs3010"], "ja") == (6, None)
+    assert reader.find(zone, "10", ["pikachu"], "ja") == (5, None)
+    # Another name, two cards the name cannot tell apart, a card that does
+    # not exist in Japanese, or no name to check: nothing.
+    assert reader.find(zone, "001", ["butterfrees31"], "ja") is None
+    assert reader.find(zone, "101", ["eternatusvmaxs3101"], "ja") is None
+    assert reader.find(zone, "002", ["parasects32"], "ja") is None
+    assert reader.find(zone, "001", [], "ja") is None
+    # Listed without a number: by its name alone.
+    assert reader.find({9}, "003", ["grimer"], "ja") == (22, None)
+    # Used only when the Cardmarket id finds nothing.
+    assert reader.prices(481104, "ja", fallback=1)["prices"][0]["amount"] == 2.1
+    assert reader.prices(481104, "ja")["matched"] is False
+    reader.close()
+
+
+def test_the_routes_find_a_card_cardtrader_lists_without_a_cardmarket_id(tmp_path):
+    from app.tcgplayer import TcgplayerPrices
+
+    reader = _numbered_reader(tmp_path)
+    catalog = connect(tmp_path / "catalog.sqlite")
+    init_catalog(catalog)
+    base = "https://www.cardmarket.com/en/Pokemon/Products/Singles/Infinity-Zone/"
+    for card_id, name, number, market_id, url in (
+        ("ja:S3-001", "パラス", "001", 481104, base + "Paras-s31"),
+        ("ja:S3-055", "なにか", "055", None, None),
+    ):
+        values = {"id": card_id, "name": name, "language": "ja", "set_id": "S3",
+                  "set_name": "Infinity Zone", "collector_number": number,
+                  "cardmarket_id": market_id, "cardmarket_url": url}
+        values.update({
+            row[1]: "" for row in catalog.execute("PRAGMA table_info(cards)")
+            if row[3] and row[4] is None and row[1] not in values
+        })
+        catalog.execute(
+            f"INSERT INTO cards ({', '.join(values)}) VALUES ({', '.join('?' for _ in values)})",
+            list(values.values()),
+        )
+    catalog.commit()
+    store = TcgplayerPrices(tmp_path / "tcgplayer.sqlite", client=httpx.Client(
+        base_url="https://tcg.test",
+        transport=httpx.MockTransport(lambda request: httpx.Response(500)),
+    ))
+    store._conn.executemany(
+        "INSERT INTO listed VALUES (85, 7, 's3', ?, ?, ?)",
+        [("1", "paras", 555), ("55", "somecard", 777)],
+    )
+    store._conn.executemany(
+        "INSERT INTO prices VALUES (?, 'Normal', ?, ?, ?)",
+        [(555, 1.25, 0.9, 1.3), (777, None, 0.4, 0.6)],
+    )
+    store._conn.executemany(
+        "INSERT INTO meta VALUES (?, ?)",
+        [("imported_at", "99999999999"), ("version", "2"), ("priced_at", "2026-11-20T20:06:21+0000")],
+    )
+    store._conn.commit()
+    app = FastAPI()
+    app.include_router(router, prefix="/api/v1")
+    app.state.cardtrader = reader
+    app.state.tcgplayer = store
+    app.state.dbs = type("Dbs", (), {"catalog": catalog})()
+    client = TestClient(app)
+
+    def answer(path, card_id):
+        return client.get(f"/api/v1/{path}/prices", params={"card_id": card_id}).json()
+
+    assert [p["amount"] for p in answer("cardtrader", "ja:S3-001")["prices"]] == [2.1]
+    assert answer("tcgplayer", "ja:S3-001")["prices"][0] == {
+        "label": "Market", "amount": 1.25, "currency": "USD", "source": "tcgplayer",
+    }
+    # No Cardmarket id and no name in Latin letters: not on CardTrader, but
+    # TCGplayer's own set has the number, with a low price and no sales.
+    assert answer("cardtrader", "ja:S3-055") == {
+        "enabled": True, "matched": False, "count": 0, "prices": [], "observed_at": None,
+    }
+    assert [p["label"] for p in answer("tcgplayer", "ja:S3-055")["prices"]] == ["Low", "Mid"]
+    reader.close()
+    store.close()

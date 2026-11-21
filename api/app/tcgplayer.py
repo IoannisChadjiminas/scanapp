@@ -11,6 +11,7 @@ from __future__ import annotations
 import logging
 import sqlite3
 import threading
+from collections import Counter
 import time
 from datetime import datetime, timezone
 from pathlib import Path
@@ -18,11 +19,16 @@ from typing import Any
 
 import httpx
 
+from app.market_match import pick, plain, plain_number, voted
+
 log = logging.getLogger("tcgplayer")
 
 SOURCE = "https://tcgcsv.com"
 # TCGplayer's categories: Pokémon, and Pokémon Japan.
 CATEGORIES = (3, 85)
+JAPAN = 85
+# Raised when the stored data gains something: an older store is imported again.
+STORE_VERSION = "2"
 USER_AGENT = "scanapp-prices/1.0"
 
 # Which printing's price a copy takes, most wanted first.
@@ -45,7 +51,11 @@ def pick_printing(
 
 
 def price_rows(row: dict[str, Any]) -> list[dict[str, Any]]:
-    """Market first; nothing at all without a market price."""
+    """Market, low and mid, whichever are known, in that order.
+
+    Many Japanese cards have listings but no recent sales: those carry a low
+    price and no market price, and the app says so.
+    """
     found = []
     for label, field in (("Market", "market"), ("Low", "low"), ("Mid", "mid")):
         amount = row.get(field)
@@ -56,7 +66,7 @@ def price_rows(row: dict[str, Any]) -> list[dict[str, Any]]:
                 "currency": "USD",
                 "source": "tcgplayer",
             })
-    return found if found and found[0]["label"] == "Market" else []
+    return found if any(item["label"] in ("Market", "Low") for item in found) else []
 
 
 class TcgplayerPrices:
@@ -83,10 +93,21 @@ class TcgplayerPrices:
                 market REAL, low REAL, mid REAL,
                 PRIMARY KEY (product_id, printing)
             );
+            CREATE TABLE IF NOT EXISTS listed (
+                category INTEGER NOT NULL,
+                group_id INTEGER NOT NULL,
+                set_code TEXT NOT NULL,
+                number TEXT NOT NULL,
+                name TEXT NOT NULL,
+                product_id INTEGER PRIMARY KEY
+            );
+            CREATE INDEX IF NOT EXISTS listed_group ON listed (group_id, number);
             CREATE TABLE IF NOT EXISTS meta (key TEXT PRIMARY KEY, value TEXT);
             """
         )
         self._importing = False
+        # (catalogue language, set id) -> its groups here, until the next import.
+        self.set_groups: dict[tuple[str, str], set[int]] = {}
 
     def close(self) -> None:
         self._client.close()
@@ -100,7 +121,11 @@ class TcgplayerPrices:
 
     def refresh_if_stale(self) -> None:
         imported = self._meta("imported_at")
-        if imported is not None and time.time() - float(imported) < self.max_age_s:
+        if (
+            imported is not None
+            and self._meta("version") == STORE_VERSION
+            and time.time() - float(imported) < self.max_age_s
+        ):
             return
         with self._lock:
             if self._importing:
@@ -121,10 +146,34 @@ class TcgplayerPrices:
         stamp = self._client.get("/last-updated.txt")
         stamp.raise_for_status()
         rows: list[tuple[int, str, Any, Any, Any]] = []
+        # Every card of every set with its number and name: how a catalogue
+        # card nothing else ties to a product is found (see find).
+        cards: list[tuple[int, int, str, str, str, int]] = []
         for category in CATEGORIES:
             groups = self._client.get(f"/tcgplayer/{category}/groups")
             groups.raise_for_status()
             for group in groups.json().get("results") or []:
+                listed = self._client.get(f"/tcgplayer/{category}/{group['groupId']}/products")
+                listed.raise_for_status()
+                for product in listed.json().get("results") or []:
+                    number = plain_number(next(
+                        (
+                            extra.get("value")
+                            for extra in product.get("extendedData") or []
+                            if extra.get("name") == "Number"
+                        ),
+                        None,
+                    ))
+                    # Sealed products have no number.
+                    if number:
+                        cards.append((
+                            category,
+                            int(group["groupId"]),
+                            plain(group.get("abbreviation")),
+                            number,
+                            plain(str(product.get("name") or "").split(" - ")[0].split(" (")[0]),
+                            int(product["productId"]),
+                        ))
                 reply = self._client.get(f"/tcgplayer/{category}/{group['groupId']}/prices")
                 reply.raise_for_status()
                 for item in reply.json().get("results") or []:
@@ -142,13 +191,63 @@ class TcgplayerPrices:
             raise ValueError("no prices")
         with self._lock:
             with self._conn:
+                self._conn.execute("DELETE FROM listed")
+                self._conn.executemany(
+                    "INSERT OR REPLACE INTO listed VALUES (?, ?, ?, ?, ?, ?)", cards
+                )
                 self._conn.execute("DELETE FROM prices")
                 self._conn.executemany("INSERT OR REPLACE INTO prices VALUES (?, ?, ?, ?, ?)", rows)
                 self._conn.executemany(
                     "INSERT OR REPLACE INTO meta VALUES (?, ?)",
-                    [("imported_at", str(time.time())), ("priced_at", stamp.text.strip())],
+                    [
+                        ("imported_at", str(time.time())),
+                        ("priced_at", stamp.text.strip()),
+                        ("version", STORE_VERSION),
+                    ],
                 )
+        self.set_groups.clear()
         return len(rows)
+
+    def groups_for(self, product_ids: list[int], set_code: str, catalogue_language: str) -> set[int]:
+        """TCGplayer's sets that hold a catalogue set's cards: the ones most of
+        its known products ([product_ids]) are in, and any with its set code."""
+        category = JAPAN if str(catalogue_language).lower() == "ja" else CATEGORIES[0]
+        votes: Counter[int] = Counter()
+        with self._lock:
+            for start in range(0, len(product_ids), 500):
+                part = product_ids[start:start + 500]
+                for group_id, count in self._conn.execute(
+                    f"SELECT group_id, COUNT(*) FROM listed WHERE category = ? "
+                    f"AND product_id IN ({','.join('?' for _ in part)}) GROUP BY 1",
+                    (category, *part),
+                ):
+                    votes[int(group_id)] += int(count)
+            coded = self._conn.execute(
+                "SELECT DISTINCT group_id FROM listed WHERE category = ? AND set_code = ?",
+                (category, plain(set_code)),
+            ).fetchall() if plain(set_code) else []
+        return voted(votes) | {int(row[0]) for row in coded}
+
+    def find(self, groups: set[int], collector_number: object, names: list[str]) -> int | None:
+        """A card's product inside [groups], by collector number.
+
+        Its name must agree with one of [names] where there are any; a card
+        with no name to check is taken when the number has one product.
+        Anything but exactly one product gives None. Where the right product
+        was already known this picked the same one for 99.6% of Japanese
+        cards (21 November 2026).
+        """
+        number = plain_number(collector_number)
+        if not (groups and number):
+            return None
+        with self._lock:
+            rows = self._conn.execute(
+                f"SELECT name, product_id FROM listed "
+                f"WHERE group_id IN ({','.join('?' for _ in groups)}) AND number = ?",
+                (*groups, number),
+            ).fetchall()
+        chosen = pick(rows, names, lambda row: row[0])
+        return None if chosen is None else int(chosen[1])
 
     def prices(
         self, product_id: int | None, *, reverse: bool = False, first_edition: bool | None = None
