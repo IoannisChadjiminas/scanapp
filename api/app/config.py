@@ -456,6 +456,15 @@ class Settings(BaseSettings):
     # for cards CardTrader's list ties to a TCGplayer product. Needs the
     # CardTrader token above.
     tcgplayer_prices_enabled: bool = True
+    # eBay's Browse API keys (an application's App ID and Cert ID). Empty: no
+    # eBay row in the app. Graded copies only: the average asking price of
+    # the cheapest Buy It Now listings. "sandbox" keys reach test items only.
+    ebay_client_id: str = ""
+    ebay_client_secret: str = ""
+    ebay_environment: str = "production"
+    ebay_marketplace: str = "EBAY_US"
+    ebay_currency: str = "USD"
+    ebay_reuse_minutes: int = 360
     # No paid read for a card whose Cardmarket trend is below this (EUR). A card
     # with no known trend is still read. 0 reads every card.
     # 0 = no flat floor: the value tiers in CARDMARKET_FRESH_TIERS decide.

@@ -98,6 +98,7 @@ from app.routes.card_index import router as card_index_router
 from app.routes.card_prices import router as card_prices_router
 from app.routes.cardmarket import router as cardmarket_router
 from app.routes.cardtrader import router as cardtrader_router
+from app.routes.ebay import router as ebay_router
 from app.routes.cards import router as cards_router
 from app.routes.health import router as health_router
 from app.routes.images import router as images_router
@@ -138,6 +139,9 @@ async def lifespan(app: FastAPI):
     from app.cardtrader import from_settings as cardtrader_from_settings
 
     app.state.cardtrader = cardtrader_from_settings(settings)
+    from app.ebay import from_settings as ebay_from_settings
+
+    app.state.ebay = ebay_from_settings(settings)
     app.state.tcgplayer = None
     if app.state.cardtrader is not None:
         app.state.cardtrader.refresh_map_if_stale()
@@ -200,6 +204,8 @@ async def lifespan(app: FastAPI):
             app.state.cardtrader.close()
         if app.state.tcgplayer is not None:
             app.state.tcgplayer.close()
+        if app.state.ebay is not None:
+            app.state.ebay.close()
         price_history.bind(None)
         runtime.close()
         dbs.close()
@@ -260,4 +266,5 @@ app.include_router(scans_router, prefix="/api/v1", tags=["scans"])
 app.include_router(cards_router, prefix="/api/v1", tags=["cards"])
 app.include_router(cardmarket_router, prefix="/api/v1", tags=["cardmarket"])
 app.include_router(cardtrader_router, prefix="/api/v1", tags=["cardtrader"])
+app.include_router(ebay_router, prefix="/api/v1", tags=["ebay"])
 app.include_router(internal_router, prefix="/api/v1", tags=["internal"])
