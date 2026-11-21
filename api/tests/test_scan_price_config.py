@@ -29,6 +29,9 @@ def test_config_reports_the_safe_defaults():
     assert body.price_fresh_minutes >= 1
     assert body.slab_detection is False
     assert body.scan_prices.phone_reads.scan_gap_s == 20
+    assert body.scan_prices.phone_reads.budget_pages == 4
+    assert body.scan_prices.phone_reads.budget_window_s == 600
+    assert body.live_offer_reuse_minutes == 1440
 
 
 def test_config_keeps_the_phone_scan_gap_within_the_app_bounds():
@@ -38,6 +41,20 @@ def test_config_keeps_the_phone_scan_gap_within_the_app_bounds():
     assert gap(20) == 20
     assert gap(600) == 60
     assert gap(-5) == 0
+
+
+def test_config_keeps_the_page_budget_and_reuse_window_within_the_app_bounds():
+    body = scan_price_config(
+        Settings(
+            scan_price_phone_budget_pages=500,
+            scan_price_phone_budget_window_s=5,
+            live_offer_reuse_minutes=99999,
+        )
+    )
+    assert body.scan_prices.phone_reads.budget_pages == 60
+    assert body.scan_prices.phone_reads.budget_window_s == 60
+    assert body.live_offer_reuse_minutes == 1440
+    assert scan_price_config(Settings(scan_price_phone_budget_pages=0)).scan_prices.phone_reads.budget_pages == 0
 
 
 def test_config_lets_the_server_switch_slab_detection_on():

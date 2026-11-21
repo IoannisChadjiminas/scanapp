@@ -18,6 +18,8 @@ class ServerReadConfig(BaseModel):
 class PhoneReadsConfig(BaseModel):
     # The phone's other limits keep its own defaults.
     scan_gap_s: int
+    budget_pages: int = 4
+    budget_window_s: int = 600
 
 
 class ScanPriceConfig(BaseModel):
@@ -68,6 +70,9 @@ class AppConfigResponse(BaseModel):
     search_presets: list[dict] = Field(default_factory=list)
     search_history: dict[str, bool] = Field(default_factory=dict)
     price_fresh_minutes: int
+    # A live read younger than this is shown as it is; the phone opens no
+    # Cardmarket page and shows no refresh button.
+    live_offer_reuse_minutes: int = 1440
     listing_max_age_s: int = 7 * 86400
     config_ttl_s: int
     slab_detection: bool = False
@@ -99,6 +104,7 @@ def scan_price_config(settings) -> AppConfigResponse:
     return AppConfigResponse(
         search_presets=SEARCH_PRESETS,
         price_fresh_minutes=max(1, min(minutes, 24 * 60)),
+        live_offer_reuse_minutes=max(0, min(int(settings.live_offer_reuse_minutes), 24 * 60)),
         listing_max_age_s=max(1, min(int(settings.cardmarket_listing_max_age_days), 90)) * 86400,
         config_ttl_s=max(30, min(ttl, 24 * 60 * 60)),
         slab_detection=bool(settings.app_slab_detection),
@@ -147,9 +153,12 @@ def scan_price_config(settings) -> AppConfigResponse:
                 delay_ms=max(0, min(delay, 60_000)),
                 daily_pages=max(0, min(pages, 100_000)),
             ),
-            # The phone accepts 0 to 60.
+            # The phone accepts a gap of 0 to 60 s, 0 to 60 pages and a window
+            # of a minute to a day.
             phone_reads=PhoneReadsConfig(
                 scan_gap_s=max(0, min(int(settings.scan_price_phone_scan_gap_s), 60)),
+                budget_pages=max(0, min(int(settings.scan_price_phone_budget_pages), 60)),
+                budget_window_s=max(60, min(int(settings.scan_price_phone_budget_window_s), 86400)),
             ),
         ),
     )
