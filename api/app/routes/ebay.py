@@ -99,6 +99,11 @@ def get_graded(
         reverse=reverse,
         first_edition=first_edition,
         set_name=str(row["set_name"] or ""),
+        set_code=str(row["set_id"] or "").lower(),
+        unique_name=catalog.execute(
+            "SELECT COUNT(*) FROM cards WHERE set_id = ? AND language = ? AND name = ?",
+            (row["set_id"], row["language"], row["name"]),
+        ).fetchone()[0] == 1,
     )
     try:
         return EbayGraded.model_validate(reader.graded(card))

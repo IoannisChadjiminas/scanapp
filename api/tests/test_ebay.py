@@ -17,8 +17,12 @@ MEW_JA = GradedCard("Mew ex", "205", "PSA", "10", total=165, year=2023, japanese
                     set_name="Pokemon Card 151")
 
 
+_ids = iter(range(1, 10**6))
+
+
 def _item(title, value, *, currency="USD", options=("FIXED_PRICE",), country="US"):
     return {
+        "itemId": f"v1|{next(_ids)}|0",
         "title": title,
         "price": {"value": str(value), "currency": currency},
         "buyingOptions": list(options),
@@ -112,6 +116,48 @@ def test_the_printing_follows_the_copy():
     assert not listing_is("Pikachu 2023 Pokemon 151 CGC PRISTINE 10 #25/165", plain)
 
 
+def test_a_slab_label_title_is_matched_by_its_set():
+    # The catalogue numbers this reprint 001 of 30; sellers write the "#4"
+    # printed on it, and no "x/y" at all.
+    classic = GradedCard("Charizard", "001", "PSA", "10", total=30, year=2026,
+                         set_name="30th Classic Collection", set_code="30th-c", unique_name=True)
+    label = "2026 Pokemon 30C EN-30th Celebration Classic Collection #4 Charizard PSA 10"
+    assert classic.search == "Charizard 001/30 PSA 10"
+    assert classic.set_search == "Charizard 30th classic collection PSA 10"
+    assert listing_is(label, classic)
+    # Several cards in one listing are not the card.
+    base_charizard = GradedCard("Charizard", "4", "PSA", "9", total=102, year=1999,
+                                set_name="Base Set", unique_name=True)
+    assert not listing_is(
+        "1999 Pokemon Base Set Unlimited Charizard Blastoise Venusaur PSA 9 - BIG THREE", base_charizard)
+    assert not listing_is("1999 Pokemon Base Set Unlimited Charizard Holo PSA 9", base_charizard)
+    assert listing_is("1999 POKEMON BASE SET UNLIMITED #4 CHARIZARD-HOLO PSA 9", base_charizard)
+    # Not the 2021 reprint, nor the 1999 card.
+    assert not listing_is("PSA 10 Charizard Holo 4/102 - 2021 Pokemon Celebrations Classic Collection", classic)
+    assert not listing_is("Charizard 4/102 Base Set Holo Rare 1999 English PSA 10", classic)
+    # A name that is not the only one in its set still needs its number.
+    shared = GradedCard("Pikachu", "5", "PSA", "10", total=30, year=2026,
+                        set_name="30th Classic Collection")
+    assert listing_is("2026 Pokemon 30th Celebration Classic Collection #5 Pikachu PSA 10", shared)
+    assert not listing_is("2026 Pokemon 30th Celebration Classic Collection #9 Pikachu PSA 10", shared)
+    # Without "x/y" the set must be named: a bare number is any card.
+    lugia = GradedCard("Lugia V", "186", "PSA", "10", total=195, year=2022, set_name="Silver Tempest")
+    assert listing_is("2022 POKEMON SWORD & SHIELD SILVER TEMPEST #186 LUGIA V PSA 10", lugia)
+    assert not listing_is("2022 POKEMON #186 LUGIA V FULL ART PSA 10", lugia)
+    # With no set total on file, "x/y" alone is not enough either.
+    radiant = GradedCard("Charizard", "001", "PSA", "10", set_name="30th Classic Collection")
+    assert not listing_is("PSA 10 Radiant Charizard - svF - 001/038 - Kouki Saitou", radiant)
+    # A Japanese set is named by its code.
+    mew = GradedCard("Mew ex", "205", "PSA", "10", total=165, year=2023, japanese=True,
+                     set_name="ポケモンカード151", set_code="sv2a")
+    assert mew.set_search == "Mew ex sv2a Japanese PSA 10"
+    assert listing_is("2023 POKEMON JAPANESE SV2A-POKEMON CARD 151 #205 MEW EX PSA 10", mew)
+    # "Base Set 2" is another set.
+    base = GradedCard("Charizard", "4", "PSA", "9", total=102, year=1999, set_name="Base Set")
+    assert listing_is("1999 POKEMON GAME BASE SET #4 CHARIZARD HOLO PSA 9", base)
+    assert not listing_is("2000 POKEMON BASE SET 2 #4 CHARIZARD HOLO PSA 9", base)
+
+
 def test_only_buy_it_now_listings_count_and_a_stray_cheap_one_is_left_out():
     items = [_item(f"Charizard 4/102 Base Set 1999 PSA 9 #{n}", n) for n in (3500, 3900, 4000, 4000, 4200)]
     items += [
@@ -163,11 +209,13 @@ def test_the_cheapest_five_are_averaged_and_asked_once_in_six_hours():
     assert [item["amount"] for item in first["listings"]] == [100, 110, 120, 130, 140]
     assert first["observed_at"].endswith("Z")
     assert reader.graded(PIKACHU) == first
-    # One token, one search, for the card as sellers title it.
+    # One token and two searches, by number and by set.
     assert calls == [
         "/identity/v1/oauth2/token",
         "/buy/browse/v1/item_summary/search",
         "Pikachu 58/102 PSA 10",
+        "/buy/browse/v1/item_summary/search",
+        "Pikachu base PSA 10",
     ]
     reader.close()
 
@@ -216,9 +264,10 @@ def test_the_route_builds_the_search_from_the_catalogue_card(tmp_path):
 
     body = ask(card_id="en:base1-58", grader="psa", grade="10").json()
     assert body["enabled"] is True and body["average"] == 20.0 and len(body["listings"]) == 3
-    assert calls[-1] == "Pikachu 58/102 PSA 10"
+    assert "Pikachu 58/102 PSA 10" in calls and calls[-1] == "Pikachu base PSA 10"
     ask(card_id="ja:SV2a-205", grader="PSA", grade="10")
-    assert calls[-1] == "Mew ex 205/165 Japanese PSA 10"
+    assert "Mew ex 205/165 Japanese PSA 10" in calls
+    assert calls[-1] == "Mew ex pokemon 151 Japanese PSA 10" or calls[-1] == "Mew ex 151 Japanese PSA 10"
     # No eBay search for a language sellers do not title reliably.
     before = len(calls)
     assert ask(card_id="de:x-1", grader="PSA", grade="10").json() == {
