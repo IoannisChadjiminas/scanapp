@@ -10,6 +10,7 @@ from pydantic import BaseModel, Field
 
 from app.cardmarket import normalize_product_url
 from app.cardtrader import CONDITIONS
+from app.market_match import card_names, plain, set_names
 from app.price_sources import product_id_for_url
 
 router = APIRouter()
@@ -26,7 +27,8 @@ def _product(request: Request, card_id: str, url: str | None):
     of another version. Any other address means the card's main listing.
     """
     row = request.app.state.dbs.catalog.execute(
-        "SELECT cardmarket_id, cardmarket_url, language FROM cards WHERE id = ?",
+        "SELECT cardmarket_id, cardmarket_url, language, collector_number, set_id, set_name, name "
+        "FROM cards WHERE id = ?",
         (card_id,),
     ).fetchone()
     if row is None:
@@ -48,6 +50,58 @@ def _product(request: Request, card_id: str, url: str | None):
     if other is None:
         return row, main
     return row, product_id_for_url(catalog, picked)
+
+
+def _set_cards(request: Request, row) -> tuple[list[int], list[str]]:
+    """The Cardmarket ids and addresses of every card in the card's set."""
+    rows = request.app.state.dbs.catalog.execute(
+        "SELECT cardmarket_id, cardmarket_url FROM cards WHERE set_id = ? AND language = ?",
+        (row["set_id"], row["language"]),
+    ).fetchall()
+    return (
+        [int(item["cardmarket_id"]) for item in rows if item["cardmarket_id"] is not None],
+        [str(item["cardmarket_url"]) for item in rows if item["cardmarket_url"]],
+    )
+
+
+def _main(row, product: int | None) -> bool:
+    """Whether the prices are for the card's own main listing (not a picked
+    V2 or a first edition kept elsewhere): only then may the card be looked
+    for by its set, number and name."""
+    main = row["cardmarket_id"]
+    return product == (int(main) if main is not None else None)
+
+
+def _on_cardtrader(request: Request, reader, row) -> tuple[int, int | None] | None:
+    """The card on CardTrader by its set, number and name (app/market_match.py):
+    (blueprint, TCGplayer product or None)."""
+    language = str(row["language"] or "en").lower()
+    key = (language, str(row["set_id"]))
+    expansions = reader.set_expansions.get(key)
+    if expansions is None:
+        ids, urls = _set_cards(request, row)
+        expansions = reader.expansions_for(
+            ids, set_names(language, key[1], row["set_name"], urls), plain(key[1]), language
+        )
+        reader.set_expansions[key] = expansions
+    return reader.find(
+        expansions,
+        row["collector_number"],
+        card_names(row["cardmarket_url"], row["name"]),
+        language,
+    )
+
+
+def _on_tcgplayer(request: Request, reader, store, row) -> int | None:
+    """The card's TCGplayer product by its set and number."""
+    language = str(row["language"] or "en").lower()
+    key = (language, str(row["set_id"]))
+    groups = store.set_groups.get(key)
+    if groups is None:
+        ids, _ = _set_cards(request, row)
+        groups = store.groups_for(reader.tcgplayer_products(ids), key[1], language)
+        store.set_groups[key] = groups
+    return store.find(groups, row["collector_number"], card_names(row["cardmarket_url"], row["name"]))
 
 
 class CardTraderPrice(BaseModel):
@@ -82,16 +136,24 @@ def get_prices(
     if condition not in CONDITIONS.values():
         raise HTTPException(status_code=422, detail="Unknown condition")
     row, product = _product(request, card_id, url)
-    if product is None:
+    main = _main(row, product)
+    if product is None and not main:
+        # A picked listing whose product is not known.
         return CardTraderPrices(enabled=True)
+    if first_edition and product is not None:
+        product = reader.first_edition_product(product) or product
     try:
+        found = _on_cardtrader(request, reader, row) if main else None
+        if product is None and found is None:
+            return CardTraderPrices(enabled=True)
         return CardTraderPrices.model_validate(
             reader.prices(
-                product,
+                product if product is not None else 0,
                 str(row["language"] or "en"),
                 condition=condition,
                 reverse=reverse,
                 first_edition=first_edition,
+                fallback=None if found is None else found[0],
             )
         )
     except (httpx.HTTPError, ValueError) as exc:
@@ -122,12 +184,25 @@ def get_tcgplayer_prices(
         return TcgplayerPrices()
     row, product = _product(request, card_id, url)
     # TCGplayer prices English and Japanese printings only.
-    if product is None or str(row["language"] or "en").lower() not in {"en", "ja"}:
+    if str(row["language"] or "en").lower() not in {"en", "ja"}:
         return TcgplayerPrices(enabled=True)
-    return TcgplayerPrices.model_validate(
-        store.prices(
-            reader.tcgplayer_id(product),
-            reverse=reverse,
-            first_edition=first_edition,
-        )
-    )
+    main = _main(row, product)
+    if product is None and not main:
+        return TcgplayerPrices(enabled=True)
+    if first_edition and product is not None:
+        product = reader.first_edition_product(product) or product
+        main = _main(row, product)
+    # The product CardTrader names for the card first; else the card in
+    # TCGplayer's own set, or the product of the CardTrader card found by
+    # set and number. The first with a price is shown.
+    candidates = [reader.tcgplayer_id(product) if product is not None else None]
+    if main:
+        candidates.append(_on_tcgplayer(request, reader, store, row))
+        found = _on_cardtrader(request, reader, row)
+        candidates.append(None if found is None else found[1])
+    answer = store.prices(None)
+    for candidate in dict.fromkeys(item for item in candidates if item is not None):
+        answer = store.prices(candidate, reverse=reverse, first_edition=first_edition)
+        if answer["prices"]:
+            break
+    return TcgplayerPrices.model_validate(answer)

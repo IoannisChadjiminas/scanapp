@@ -10,12 +10,15 @@ from __future__ import annotations
 import logging
 import sqlite3
 import threading
+from collections import Counter
 import time
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
 import httpx
+
+from app.market_match import close_names, pick, plain, plain_number, voted
 
 log = logging.getLogger("cardtrader")
 
@@ -25,7 +28,11 @@ MAX_ROWS = 20
 MAX_BLUEPRINTS = 3
 USER_AGENT = "scanapp-cardtrader/1.0"
 # Raised when the stored list gains something: an older list is imported again.
-MAP_VERSION = "2"
+MAP_VERSION = "5"
+# First edition copies of these expansions are kept in another one, as its
+# own cards with their own Cardmarket and TCGplayer products: "Base Set"
+# (1472) first editions are in "Base Set Shadowless" (1969).
+FIRST_EDITION_EXPANSIONS = {1472: 1969}
 
 # CardTrader's condition names, best first, with the short codes the app and
 # Cardmarket use.
@@ -154,11 +161,28 @@ class CardTrader:
                 cardmarket_id INTEGER PRIMARY KEY,
                 product_id INTEGER NOT NULL
             );
+            CREATE TABLE IF NOT EXISTS listed (
+                expansion_id INTEGER NOT NULL,
+                expansion TEXT NOT NULL,
+                code TEXT NOT NULL,
+                number TEXT NOT NULL,
+                name TEXT NOT NULL,
+                languages TEXT NOT NULL,
+                blueprint_id INTEGER PRIMARY KEY,
+                tcgplayer_id INTEGER
+            );
+            CREATE INDEX IF NOT EXISTS listed_expansion ON listed (expansion_id, number);
+            CREATE TABLE IF NOT EXISTS first_editions (
+                cardmarket_id INTEGER PRIMARY KEY,
+                first_edition_id INTEGER NOT NULL
+            );
             CREATE TABLE IF NOT EXISTS meta (key TEXT PRIMARY KEY, value TEXT);
             """
         )
         self._listings: dict[tuple[int, str], tuple[float, list[dict[str, Any]]]] = {}
         self._importing = False
+        # (catalogue language, set id) -> its expansions here, until the next import.
+        self.set_expansions: dict[tuple[str, str], set[int]] = {}
 
     def close(self) -> None:
         self._client.close()
@@ -207,6 +231,12 @@ class CardTrader:
         response.raise_for_status()
         pairs: set[tuple[int, int]] = set()
         tcgplayer: dict[int, int] = {}
+        # (expansion, card name, collector number) -> its Cardmarket ids.
+        named: dict[tuple[int, str, str], list[int]] = {}
+        paired = set(FIRST_EDITION_EXPANSIONS) | set(FIRST_EDITION_EXPANSIONS.values())
+        # Every card with its set, number and name, for cards listed here
+        # without a Cardmarket id (many Japanese sets).
+        listed: list[tuple[int, str, str, str, str, str, int, int | None]] = []
         for expansion in response.json():
             if expansion.get("game_id") != POKEMON_GAME_ID:
                 continue
@@ -215,6 +245,33 @@ class CardTrader:
             )
             reply.raise_for_status()
             for blueprint in reply.json():
+                languages = next(
+                    (
+                        prop.get("possible_values") or []
+                        for prop in blueprint.get("editable_properties") or []
+                        if prop.get("name") == "pokemon_language"
+                    ),
+                    [],
+                )
+                tcg_id = blueprint.get("tcg_player_id")
+                listed.append((
+                    int(expansion["id"]),
+                    plain(expansion.get("name")),
+                    plain(expansion.get("code")),
+                    plain_number((blueprint.get("fixed_properties") or {}).get("collector_number")),
+                    plain(blueprint.get("name")),
+                    "," + ",".join(str(code) for code in languages) + ",",
+                    int(blueprint["id"]),
+                    tcg_id if isinstance(tcg_id, int) else None,
+                ))
+                if expansion["id"] in paired:
+                    number = (blueprint.get("fixed_properties") or {}).get("collector_number")
+                    if number:
+                        named[(expansion["id"], str(blueprint.get("name")), str(number))] = [
+                            market_id
+                            for market_id in blueprint.get("card_market_ids") or []
+                            if isinstance(market_id, int)
+                        ]
                 for market_id in blueprint.get("card_market_ids") or []:
                     if isinstance(market_id, int):
                         pairs.add((market_id, int(blueprint["id"])))
@@ -227,6 +284,23 @@ class CardTrader:
             with self._conn:
                 self._conn.execute("DELETE FROM blueprints")
                 self._conn.executemany("INSERT INTO blueprints VALUES (?, ?)", pairs)
+                self._conn.execute("DELETE FROM listed")
+                self._conn.executemany(
+                    "INSERT OR REPLACE INTO listed VALUES (?, ?, ?, ?, ?, ?, ?, ?)", listed
+                )
+                self._conn.execute("DELETE FROM first_editions")
+                self._conn.executemany(
+                    "INSERT OR REPLACE INTO first_editions VALUES (?, ?)",
+                    [
+                        (market_id, first[0])
+                        for (expansion_id, name, number), ids in named.items()
+                        if expansion_id in FIRST_EDITION_EXPANSIONS
+                        and (first := named.get(
+                            (FIRST_EDITION_EXPANSIONS[expansion_id], name, number)
+                        ))
+                        for market_id in ids
+                    ],
+                )
                 self._conn.execute("DELETE FROM tcgplayer_ids")
                 self._conn.executemany(
                     "INSERT INTO tcgplayer_ids VALUES (?, ?)", tcgplayer.items()
@@ -235,6 +309,7 @@ class CardTrader:
                     "INSERT OR REPLACE INTO meta VALUES (?, ?)",
                     [("imported_at", str(time.time())), ("version", MAP_VERSION)],
                 )
+        self.set_expansions.clear()
         return len(pairs)
 
     def blueprints(self, cardmarket_id: int) -> list[int]:
@@ -245,6 +320,118 @@ class CardTrader:
                 (cardmarket_id, MAX_BLUEPRINTS),
             ).fetchall()
         return [int(row[0]) for row in rows]
+
+    def expansions_for(
+        self, cardmarket_ids: list[int], names: set[str], code: str, catalogue_language: str
+    ) -> set[int]:
+        """The expansions here that hold a catalogue set's cards.
+
+        [cardmarket_ids] are the set's cards: the expansions most of those
+        that match are filed under count first. [names] are the plain names
+        the set may go by and [code] its plain code; a name spelt almost the
+        same counts too. Only expansions with cards in the set's language.
+        """
+        language = LANGUAGE_CODES.get(str(catalogue_language or "").lower())
+        if not language:
+            return set()
+        self.refresh_map_if_stale()
+        votes: Counter[int] = Counter()
+        with self._lock:
+            for start in range(0, len(cardmarket_ids), 500):
+                part = cardmarket_ids[start:start + 500]
+                for expansion_id, count in self._conn.execute(
+                    f"SELECT l.expansion_id, COUNT(*) FROM blueprints b "
+                    f"JOIN listed l ON l.blueprint_id = b.blueprint_id "
+                    f"WHERE b.cardmarket_id IN ({','.join('?' for _ in part)}) GROUP BY 1",
+                    part,
+                ):
+                    votes[int(expansion_id)] += int(count)
+            # Expansions with a card in the language, or that say no language.
+            known = self._conn.execute(
+                "SELECT DISTINCT expansion_id, expansion, code FROM listed "
+                "WHERE languages LIKE ? OR languages = ',,'",
+                (f"%,{language},%",),
+            ).fetchall()
+        by_name: dict[str, set[int]] = {}
+        found = voted(votes)
+        for expansion_id, name, expansion_code in known:
+            by_name.setdefault(name, set()).add(int(expansion_id))
+            if code and expansion_code == code:
+                found.add(int(expansion_id))
+        for name in names | close_names(names, list(by_name)):
+            found |= by_name.get(name, set())
+        return found
+
+    def find(
+        self,
+        expansions: set[int],
+        collector_number: object,
+        names: list[str],
+        catalogue_language: str,
+    ) -> tuple[int, int | None] | None:
+        """A card inside [expansions]: (blueprint, TCGplayer product or None).
+
+        By collector number where the name agrees; else, for a card listed
+        here without a usable number, by its name alone. The card must exist
+        in the catalogue card's language, and [names] must not be empty: a
+        number alone is not enough here, where stamped and jumbo copies share
+        it. Anything but exactly one card gives None.
+        """
+        language = LANGUAGE_CODES.get(str(catalogue_language or "").lower())
+        if not (language and expansions and names):
+            return None
+        marks = ",".join("?" for _ in expansions)
+        with self._lock:
+            every = self._conn.execute(
+                f"SELECT name, number, blueprint_id, tcgplayer_id, languages FROM listed "
+                f"WHERE expansion_id IN ({marks})",
+                tuple(expansions),
+            ).fetchall()
+
+        def speaks(row) -> bool:
+            return row[4] == ",," or f",{language}," in row[4]
+
+        number = plain_number(collector_number)
+        chosen = pick(
+            [row for row in every if number and row[1] == number and speaks(row)],
+            names,
+            lambda row: row[0],
+        )
+        if chosen is None:
+            # By name among every card of the set, whatever its language, so
+            # "Paras" is never taken for a "Parasect" listed in another one.
+            # A very short name ("N") would agree with too much.
+            chosen = pick([row for row in every if len(row[0]) >= 4], names, lambda row: row[0])
+            if chosen is not None and not speaks(chosen):
+                chosen = None
+        return None if chosen is None else (int(chosen[2]), chosen[3])
+
+    def tcgplayer_products(self, cardmarket_ids: list[int]) -> list[int]:
+        """The TCGplayer products of a set's cards, where CardTrader knows them."""
+        found: list[int] = []
+        with self._lock:
+            for start in range(0, len(cardmarket_ids), 500):
+                part = cardmarket_ids[start:start + 500]
+                found += [
+                    int(row[0])
+                    for row in self._conn.execute(
+                        f"SELECT product_id FROM tcgplayer_ids "
+                        f"WHERE cardmarket_id IN ({','.join('?' for _ in part)})",
+                        part,
+                    )
+                ]
+        return found
+
+    def first_edition_product(self, cardmarket_id: int) -> int | None:
+        """The Cardmarket product that holds this card's first edition copies,
+        where the marketplaces keep them apart; None where they do not."""
+        self.refresh_map_if_stale()
+        with self._lock:
+            row = self._conn.execute(
+                "SELECT first_edition_id FROM first_editions WHERE cardmarket_id = ?",
+                (cardmarket_id,),
+            ).fetchone()
+        return None if row is None else int(row[0])
 
     def tcgplayer_id(self, cardmarket_id: int) -> int | None:
         """TCGplayer's product for a Cardmarket one, where CardTrader knows it."""
@@ -285,11 +472,18 @@ class CardTrader:
         condition: str = "NM",
         reverse: bool = False,
         first_edition: bool | None = None,
+        fallback: int | None = None,
     ) -> dict[str, Any]:
-        """The app's payload: seller rows, how many matched, and when read."""
+        """The app's payload: seller rows, how many matched, and when read.
+
+        [fallback] is the blueprint found by set, number and name (see find),
+        used when the Cardmarket id finds none.
+        """
         self.refresh_map_if_stale()
         language = LANGUAGE_CODES.get(catalogue_language.lower())
         blueprints = self.blueprints(cardmarket_id) if language else []
+        if language and not blueprints and fallback is not None:
+            blueprints = [fallback]
         rows: list[dict[str, Any]] = []
         observed: float | None = None
         for blueprint_id in blueprints:
