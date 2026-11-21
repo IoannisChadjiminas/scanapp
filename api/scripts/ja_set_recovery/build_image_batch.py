@@ -35,7 +35,11 @@ from catalogue.bootstrap.checks import BLUR_LIMIT, MIN_SIDE, load_facts  # noqa:
 
 MODERN = {"Mega Evolution Era", "Scarlet & Violet Era", "Sword & Shield Era", "Sun & Moon Era"}
 T = 0.95
-LANG = os.environ.get("JAREC_LANGUAGE", "ja")  # "en": English rows; twins are looked for within that language
+LANG = os.environ.get("JAREC_LANGUAGE", "ja")  # default language; a fill's id prefix ("en:", "ja:") wins, twins are looked for within it
+
+
+def lang_of(card_id):
+    return card_id.split(":", 1)[0] if ":" in card_id else LANG
 
 
 def sha_file(path):
@@ -79,8 +83,10 @@ def main(run_dir, parent_dir, fill_file, model_path, name, image_dir_name):
     p_pad = np.load(parent / "vectors/pad/embeddings.npy")
     pman = json.loads((parent / "vectors/pad/manifest.json").read_text())
     assert sha_file(parent / "vectors/pad/embeddings.npy") == pman["embeddings_sha256"]
-    ja = np.char.startswith(p_ids, LANG + ":")
-    ja_ids, ja_pad = p_ids[ja], p_pad[ja]
+    by_lang = {}
+    for lang in {lang_of(b["fill"]["id"]) for b in batch}:
+        sel = np.char.startswith(p_ids, lang + ":")
+        by_lang[lang] = (p_ids[sel], p_pad[sel])
     assert not {b["fill"]["id"] for b in batch} & set(p_ids)
 
     # earliest printing first (larger registry line = older), then id
@@ -88,10 +94,12 @@ def main(run_dir, parent_dir, fill_file, model_path, name, image_dir_name):
     kept = []
     for b in order:
         cid = b["fill"]["id"]
+        ja_ids, ja_pad = by_lang[lang_of(cid)]
         sims = ja_pad @ b["pad"]
         j = int(sims.argmax())
         b["nearest_indexed"] = [str(ja_ids[j]), round(float(sims[j]), 4)]
-        twin_new = next((k["fill"]["id"] for k in kept if float(k["pad"] @ b["pad"]) >= T), None)
+        twin_new = next((k["fill"]["id"] for k in kept if lang_of(k["fill"]["id"]) == lang_of(cid)
+                         and float(k["pad"] @ b["pad"]) >= T), None)
         if b["era"] not in MODERN:
             b["treatment"], b["reason"] = "printing_alternative", f"older era ({b['era']}); vectors held like JAREC2"
         elif sims[j] >= T:
@@ -110,7 +118,7 @@ def main(run_dir, parent_dir, fill_file, model_path, name, image_dir_name):
     np.save(vdir / "embedding_card_ids.npy", np.asarray(ids, dtype=str))
     np.save(vdir / "embeddings.npy", pad)
     new_pman = dict(pman)
-    new_pman.update(indexed_ids=ids, indexed_count=len(ids), missing_images=pman["missing_images"] - len(batch),
+    new_pman.update(indexed_ids=ids, indexed_count=len(ids), missing_images=pman["missing_images"] - sum(1 for b in batch if not b["fill"].get("new_row_from")),
                     embeddings_sha256=sha_file(vdir / "embeddings.npy"), ids_sha256=sha_file(vdir / "embedding_card_ids.npy"),
                     parent_embeddings_sha256=pman["embeddings_sha256"], parent_ids_sha256=pman["ids_sha256"],
                     retrieval_segments=list(pman["retrieval_segments"]) + ([len(scannable)] if scannable else []),
@@ -123,9 +131,9 @@ def main(run_dir, parent_dir, fill_file, model_path, name, image_dir_name):
     add_recs, add_vecs = [], []
     for b in scannable:
         for profile in PROFILES:
-            add_recs.append({"card_id": b["fill"]["id"], "profile": profile, "language": LANG,
+            add_recs.append({"card_id": b["fill"]["id"], "profile": profile, "language": lang_of(b["fill"]["id"]),
                              "name": b["fill"]["official_name_ja"], "set_name": b["fill"]["set_name"],
-                             "collector_number": b["fill"]["id"].rsplit("-", 1)[-1], "reference_sha256": b["sha"]})
+                             "collector_number": b["fill"].get("collector_number") or b["fill"]["id"].rsplit("-", 1)[-1], "reference_sha256": b["sha"]})
             add_vecs.append(b["art"][profile])
     adir = out / "artwork"
     adir.mkdir()
@@ -144,7 +152,8 @@ def main(run_dir, parent_dir, fill_file, model_path, name, image_dir_name):
     updates = [{"id": b["fill"]["id"], "image_path": f"{image_root}/{b['file'].name}", "image_sha256": b["sha"],
                 "name_ja": b["fill"]["official_name_ja"], "name_en": b["fill"]["name"], "treatment": b["treatment"],
                 "reason": b["reason"], "nearest_indexed": b["nearest_indexed"], "era": b["era"],
-                "source": {k: b["fill"][k] for k in ("detail_url", "image_url", "official_card_id", "official_number", "sha256")}}
+                "source": {k: b["fill"][k] for k in ("detail_url", "image_url", "official_card_id", "official_number", "sha256")},
+                **{k: b["fill"][k] for k in ("source_kind", "new_row_from", "collector_number", "tcgc_label") if b["fill"].get(k)}}
                for b in sorted(batch, key=lambda b: b["fill"]["id"].encode())]
     (out / "updates.json").write_text(json.dumps(updates, ensure_ascii=False, indent=1) + "\n")
     (out / "feature-rows.json").write_text(json.dumps([{"id": u["id"], "image_path": u["image_path"], "rarity": ""}
