@@ -138,8 +138,14 @@ async def lifespan(app: FastAPI):
     from app.cardtrader import from_settings as cardtrader_from_settings
 
     app.state.cardtrader = cardtrader_from_settings(settings)
+    app.state.tcgplayer = None
     if app.state.cardtrader is not None:
         app.state.cardtrader.refresh_map_if_stale()
+        if settings.tcgplayer_prices_enabled:
+            from app.tcgplayer import TcgplayerPrices
+
+            app.state.tcgplayer = TcgplayerPrices(settings.data_dir / "tcgplayer.sqlite")
+            app.state.tcgplayer.refresh_if_stale()
     lanes = max(1, settings.scan_lanes)
     app.state.scan_limiter = ScanLimiter(settings.scan_wait_limit, slots=lanes)
     from app.recognition.stage1_check import Stage1Checker
@@ -192,6 +198,8 @@ async def lifespan(app: FastAPI):
         app.state.image_executor.shutdown(wait=False, cancel_futures=True)
         if app.state.cardtrader is not None:
             app.state.cardtrader.close()
+        if app.state.tcgplayer is not None:
+            app.state.tcgplayer.close()
         price_history.bind(None)
         runtime.close()
         dbs.close()

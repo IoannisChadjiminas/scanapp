@@ -79,7 +79,7 @@ def _reader(tmp_path, calls):
             return httpx.Response(200, json=[{"id": 7, "game_id": 5}, {"id": 8, "game_id": 1}])
         if request.url.path.endswith("/blueprints/export"):
             return httpx.Response(200, json=[
-                {"id": 70, "card_market_ids": [271823]},
+                {"id": 70, "card_market_ids": [271823], "tcg_player_id": 42346},
                 {"id": 71, "card_market_ids": []},
             ])
         return httpx.Response(200, json={"70": [_product(250), _product(400, language="jp")]})
@@ -93,6 +93,8 @@ def test_a_card_is_found_by_its_cardmarket_id_and_read_once_an_hour(tmp_path):
     reader = _reader(tmp_path, calls)
     assert reader.import_map(pause_s=0) == 1
     assert reader.blueprints(271823) == [70]
+    assert reader.tcgplayer_id(271823) == 42346
+    assert reader.tcgplayer_id(1) is None
 
     first = reader.prices(271823, "en")
     again = reader.prices(271823, "en")

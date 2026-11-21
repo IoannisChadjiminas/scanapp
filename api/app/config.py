@@ -452,6 +452,10 @@ class Settings(BaseSettings):
     cardtrader_api_token: str = ""
     cardtrader_reuse_minutes: int = 60
     cardtrader_map_max_age_h: int = 168
+    # TCGplayer's daily prices (market, low, mid) from TCGCSV's public copy,
+    # for cards CardTrader's list ties to a TCGplayer product. Needs the
+    # CardTrader token above.
+    tcgplayer_prices_enabled: bool = True
     # No paid read for a card whose Cardmarket trend is below this (EUR). A card
     # with no known trend is still read. 0 reads every card.
     # 0 = no flat floor: the value tiers in CARDMARKET_FRESH_TIERS decide.
