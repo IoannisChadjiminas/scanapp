@@ -37,6 +37,19 @@ SCOPE = "https://api.ebay.com/oauth/api_scope"
 # eBay's category for single trading cards: no boxes, packs or lots.
 SINGLE_CARDS = "183454"
 GRADERS = ("PSA", "BGS", "CGC", "TAG", "AGS")
+# eBay's own name for each grader, as its "Professional Grader" field and
+# filter spell it (read from eBay on 22 November 2026).
+GRADER_NAMES = {
+    "PSA": "Professional Sports Authenticator (PSA)",
+    "BGS": "Beckett Grading Services (BGS)",
+    "CGC": "Certified Guaranty Company (CGC)",
+    "TAG": "Technical Authentication & Grading (TAG)",
+    "AGS": "Automated Grading Systems (AGS)",
+}
+# eBay's condition for a card in a grader's slab.
+GRADED_CONDITION = "2750"
+# How many of the cheapest listings are opened to confirm the average.
+CHECKS = 12
 # Graders the app does not offer still mark a listing as another slab.
 _ALL_GRADERS = (*GRADERS, "SGC", "ACE", "PCA", "MNT", "GMA", "HGA", "CGA", "ARS", "BECKETT")
 GRADE = re.compile(r"^(10|[1-9](\.5)?)$")
@@ -149,6 +162,22 @@ def _plain_number(text: str) -> str:
     return head.lstrip("0") or ("0" if head else "")
 
 
+def other_slab(title: str, grader: str, grade: str) -> bool:
+    """Whether a title names another grader, or this grader with another
+    number: "PSA 9 ... BGS", "PSA 9 ... PSA 10" for a wanted PSA 10."""
+    for other in _ALL_GRADERS:
+        if other != grader and re.search(rf"(?<![A-Za-z]){other}(?![A-Za-z])", title, re.IGNORECASE):
+            return True
+    for found in re.finditer(
+        rf"(?<![A-Za-z]){re.escape(grader)}{_FILLER}\s*[:\-\]]?\s*(10|\d(?:\.5)?)(?![\d+]|\.\d)",
+        title,
+        re.IGNORECASE,
+    ):
+        if found.group(1) != grade:
+            return True
+    return False
+
+
 def names_grade(title: str, grader: str, grade: str) -> bool:
     """Whether a title says this grader and exact grade, and no other slab:
     "PSA 10", "PSA10", "PSA GEM MT 10", "[PSA: 9]"; never "PSA 10" for a
@@ -156,18 +185,7 @@ def names_grade(title: str, grader: str, grade: str) -> bool:
     wanted = rf"(?<![A-Za-z]){re.escape(grader)}{_FILLER}\s*[:\-\]]?\s*{re.escape(grade)}(?![\d+]|\.\d)"
     if re.search(wanted, title, re.IGNORECASE) is None:
         return False
-    for other in _ALL_GRADERS:
-        if other != grader and re.search(rf"(?<![A-Za-z]){other}(?![A-Za-z])", title, re.IGNORECASE):
-            return False
-    # The same grader with another number: "PSA 9 ... PSA 10".
-    for found in re.finditer(
-        rf"(?<![A-Za-z]){re.escape(grader)}{_FILLER}\s*[:\-\]]?\s*(10|\d(?:\.5)?)(?![\d+]|\.\d)",
-        title,
-        re.IGNORECASE,
-    ):
-        if found.group(1) != grade:
-            return False
-    return True
+    return not other_slab(title, grader, grade)
 
 
 def _names_set(title: str, card: GradedCard) -> bool:
@@ -190,9 +208,18 @@ def _names_set(title: str, card: GradedCard) -> bool:
     return True
 
 
-def listing_is(title: str, card: GradedCard) -> bool:
-    """Whether a listing's title is this card in this grade and nothing else."""
-    if not names_grade(title, card.grader, card.grade):
+def listing_is(title: str, card: GradedCard, *, graded: bool = False) -> bool:
+    """Whether a listing's title is this card in this grade and nothing else.
+
+    [graded]: eBay's own grader and grade fields already say so (the listing
+    came through that filter). Such a title need not repeat the grade, since
+    many are eBay's catalogue titles ("Charizard ex 199/165 ... Holo"); it
+    still must not name another slab.
+    """
+    if graded:
+        if other_slab(title, card.grader, card.grade):
+            return False
+    elif not names_grade(title, card.grader, card.grade):
         return False
     if _NOT_A_CARD.search(title) or _BAIT.search(title):
         return False
@@ -273,9 +300,10 @@ def graded_listings(
             continue
         if "FIXED_PRICE" not in (item.get("buyingOptions") or []):
             continue
-        if not listing_is(title, card):
+        if not listing_is(title, card, graded=bool(item.get("gradedByEbay"))):
             continue
         found.append({
+            "id": str(item.get("itemId") or ""),
             "title": title[:120],
             "amount": round(amount, 2),
             "currency": currency,
@@ -287,6 +315,39 @@ def graded_listings(
         floor = OUTLIER_SHARE * statistics.median(item["amount"] for item in found)
         found = [item for item in found if item["amount"] >= floor]
     return found
+
+
+def item_confirms(item: dict[str, Any], card: GradedCard) -> bool:
+    """Whether an opened listing's own fields agree it is the card in the grade."""
+    recorded = {
+        str(entry.get("name")): str((entry.get("values") or [{}])[0].get("content") or "")
+        for entry in item.get("conditionDescriptors") or []
+    }
+    grader = recorded.get("Professional Grader")
+    if grader and grader != GRADER_NAMES.get(card.grader):
+        return False
+    grade = recorded.get("Grade")
+    if grade and grade != card.grade:
+        return False
+    entered = {
+        str(aspect.get("name")): str(aspect.get("value") or "")
+        for aspect in item.get("localizedAspects") or []
+    }
+    language = entered.get("Language", "").strip().lower()
+    if language and language != "not specified":
+        if card.japanese != (language == "japanese") or (
+            not card.japanese and language != "english"
+        ):
+            return False
+    number = entered.get("Card Number", "").strip()
+    if number and card.set_code not in REPRINT_SETS:
+        parts = _FRACTION.findall(number)
+        head = parts[0][0] if parts else number.lstrip("#")
+        if head.strip().isdigit() and _plain_number(head) != _plain_number(card.number):
+            return False
+        if parts and card.total and int(parts[0][1]) != card.total:
+            return False
+    return True
 
 
 class Ebay:
@@ -341,31 +402,75 @@ class Ebay:
             self._token = (time.time() + max(60, int(body.get("expires_in", 7200)) - 60), token)
         return token
 
-    def search(self, card: GradedCard) -> list[dict[str, Any]]:
-        """eBay's Buy It Now single-card listings for the card, from both
-        searches (by number, and by set), each cheapest first."""
-        found: dict[str, dict[str, Any]] = {}
-        for query in dict.fromkeys(q for q in (card.search, card.set_search) if q):
-            reply = self._client.get(
-                "/buy/browse/v1/item_summary/search",
-                headers={
-                    "Authorization": f"Bearer {self._bearer()}",
-                    "X-EBAY-C-MARKETPLACE-ID": self.marketplace,
-                },
-                params={
-                    "q": query,
-                    "category_ids": SINGLE_CARDS,
-                    "filter": "buyingOptions:{FIXED_PRICE}",
-                    "sort": "price",
-                    "limit": 200,
-                },
+    def _page(self, query: str, *, graded: GradedCard | None) -> list[dict[str, Any]]:
+        params = {
+            "q": query,
+            "category_ids": SINGLE_CARDS,
+            "filter": "buyingOptions:{FIXED_PRICE}",
+            "sort": "price",
+            "limit": 200,
+        }
+        if graded is not None:
+            params["filter"] += f",conditionIds:{{{GRADED_CONDITION}}}"
+            params["aspect_filter"] = (
+                f"categoryId:{SINGLE_CARDS},"
+                f"Professional Grader:{{{GRADER_NAMES[graded.grader]}}},Grade:{{{graded.grade}}}"
             )
-            reply.raise_for_status()
-            for item in reply.json().get("itemSummaries") or []:
-                # One listing found by both searches counts once.
+        reply = self._client.get(
+            "/buy/browse/v1/item_summary/search",
+            headers={
+                "Authorization": f"Bearer {self._bearer()}",
+                "X-EBAY-C-MARKETPLACE-ID": self.marketplace,
+            },
+            params=params,
+        )
+        reply.raise_for_status()
+        return reply.json().get("itemSummaries") or []
+
+    def search(self, card: GradedCard) -> list[dict[str, Any]]:
+        """eBay's Buy It Now single-card listings that may be the card.
+
+        Four searches, merged. Two ask eBay for its own grader and grade
+        fields, with the card by number and by set: they find listings whose
+        title never says the grade (16% of a sample on 22 November 2026).
+        Two put the grade in the words instead: they find slabs listed under
+        the wrong condition, and listings on eBay's other sites. A listing
+        from the first two carries "gradedByEbay".
+        """
+        jp = " Japanese" if card.japanese else ""
+        number = f"{card.number}/{card.total}" if card.total else card.number
+        named = " ".join(card.set_words) if card.set_name.isascii() else card.set_code
+        found: dict[str, dict[str, Any]] = {}
+        if card.grader in GRADER_NAMES:
+            for query in dict.fromkeys(
+                q for q in (f"{card.name} {number}{jp}", f"{card.name} {named}{jp}" if named else "") if q
+            ):
+                for item in self._page(query, graded=card):
+                    key = str(item.get("itemId") or item.get("itemWebUrl") or item.get("title"))
+                    found[key] = {**item, "gradedByEbay": True}
+        for query in dict.fromkeys(q for q in (card.search, card.set_search) if q):
+            for item in self._page(query, graded=None):
+                # One listing found by several searches counts once.
                 key = str(item.get("itemId") or item.get("itemWebUrl") or item.get("title"))
                 found.setdefault(key, item)
         return list(found.values())
+
+    def confirms(self, item_id: str, card: GradedCard) -> bool:
+        """Whether the listing itself, opened, is the card in the grade: its
+        recorded grader and grade, and the card number and language the
+        seller entered. What it does not record is not held against it."""
+        if not item_id:
+            return False
+        reply = self._client.get(
+            f"/buy/browse/v1/item/{item_id}",
+            headers={
+                "Authorization": f"Bearer {self._bearer()}",
+                "X-EBAY-C-MARKETPLACE-ID": self.marketplace,
+            },
+        )
+        if reply.status_code != 200:
+            return False
+        return item_confirms(reply.json(), card)
 
     def graded(self, card: GradedCard) -> dict[str, Any]:
         """The app's payload: the average of the cheapest listings, how many
@@ -373,16 +478,34 @@ class Ebay:
         kept = self._kept.get(card)
         if kept is not None and time.time() - kept[0] < self.reuse_s:
             return kept[1]
-        listings = graded_listings(self.search(card), card, currency=self.currency)
-        cheapest = listings[: self.take]
-        enough = len(listings) >= self.least
+        items = self.search(card)
+        listings = graded_listings(items, card, currency=self.currency)
+        # The cheapest listings set the average, so each is opened and
+        # checked before it counts.
+        cheapest: list[dict[str, Any]] = []
+        refused = 0
+        for listing in listings[:CHECKS]:
+            if len(cheapest) == self.take:
+                break
+            if self.confirms(listing["id"], card):
+                cheapest.append(listing)
+            else:
+                refused += 1
+        enough = len(cheapest) >= self.least
+        log.info(
+            "ebay graded grader=%s grade=%s fetched=%s kept=%s confirmed=%s refused=%s",
+            card.grader, card.grade, len(items), len(listings), len(cheapest), refused,
+        )
+        cheapest = [
+            {key: value for key, value in listing.items() if key != "id"} for listing in cheapest
+        ]
         answer = {
             "enabled": True,
             "average": round(sum(item["amount"] for item in cheapest) / len(cheapest), 2)
             if enough
             else None,
             "currency": self.currency,
-            "count": len(listings),
+            "count": max(0, len(listings) - refused),
             "listings": cheapest if enough else [],
             "observed_at": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
         }
