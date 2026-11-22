@@ -253,6 +253,26 @@ def test_a_picked_listing_is_priced_as_its_own_product(tmp_path):
     }
     # A first edition has no Cardmarket trend, and no such printing here.
     assert history(first_edition="true") == {"cardmarket": [], "tcgplayer": []}
+
+    # A collection's copies valued from TCGplayer's market price, in euros.
+    from app.fx import EuroRate
+
+    ask = lambda: client.post("/api/v1/tcgplayer/values", json={"copies": [  # noqa: E731
+        {"card_id": "base1-58"},
+        {"card_id": "base1-58", "url": second},
+        {"card_id": "base1-58", "url": unknown},
+        {"card_id": "nope"},
+    ]}).json()
+    # Without a rate there is no value: dollars are never counted as euros.
+    assert ask() == {"enabled": False, "values": [{"value_eur": None, "market": None}] * 4}
+    app.state.fx = EuroRate(client=httpx.Client(transport=httpx.MockTransport(
+        lambda request: httpx.Response(200, text="<Cube currency='USD' rate='1.2500'/>"))))
+    assert ask() == {"enabled": True, "values": [
+        {"value_eur": 3.6, "market": 4.5},
+        {"value_eur": 48.0, "market": 60.0},
+        {"value_eur": None, "market": None},
+        {"value_eur": None, "market": None},
+    ]}
     reader.close()
     store.close()
 

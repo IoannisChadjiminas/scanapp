@@ -275,3 +275,60 @@ def get_price_history(
                 answer.tcgplayer = _reaching(points, priced)
                 break
     return answer
+
+
+class TcgplayerCopy(BaseModel):
+    card_id: str = Field(min_length=1, max_length=120)
+    reverse: bool = False
+    first_edition: bool | None = None
+    url: str | None = Field(default=None, max_length=500)
+
+
+class TcgplayerCopies(BaseModel):
+    copies: list[TcgplayerCopy] = Field(max_length=500)
+
+
+class TcgplayerValue(BaseModel):
+    # TCGplayer's market price in euros at the day's reference rate; None
+    # without a market price (listings alone are not a value) or a rate.
+    value_eur: float | None = None
+    market: float | None = None
+
+
+class TcgplayerValues(BaseModel):
+    enabled: bool = False
+    # One for each copy asked about, in the same order.
+    values: list[TcgplayerValue] = Field(default_factory=list)
+
+
+@router.post("/tcgplayer/values", response_model=TcgplayerValues)
+def tcgplayer_values(payload: TcgplayerCopies, request: Request) -> TcgplayerValues:
+    """What TCGplayer's market price values a collection's copies at, in
+    euros: for the copies Cardmarket has no price for. Read from the day's
+    stored prices; nothing is fetched."""
+    reader = getattr(request.app.state, "cardtrader", None)
+    store = getattr(request.app.state, "tcgplayer", None)
+    rate = getattr(request.app.state, "fx", None)
+    if reader is None or store is None or rate is None:
+        return TcgplayerValues(values=[TcgplayerValue() for _ in payload.copies])
+    values: list[TcgplayerValue] = []
+    for copy in payload.copies:
+        market = None
+        try:
+            row, product = _product(request, copy.card_id, copy.url)
+        except HTTPException:
+            row = None
+        if row is not None and str(row["language"] or "en").lower() in {"en", "ja"}:
+            for candidate in _tcgplayer_candidates(
+                request, reader, store, row, product, copy.first_edition
+            ):
+                prices = store.prices(
+                    candidate, reverse=copy.reverse, first_edition=copy.first_edition
+                )["prices"]
+                if prices:
+                    market = next(
+                        (item["amount"] for item in prices if item["label"] == "Market"), None
+                    )
+                    break
+        values.append(TcgplayerValue(value_eur=rate.usd_to_eur(market), market=market))
+    return TcgplayerValues(enabled=True, values=values)
