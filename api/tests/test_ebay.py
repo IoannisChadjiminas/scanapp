@@ -8,7 +8,9 @@ from fastapi import FastAPI
 from fastapi.testclient import TestClient
 
 from app.db import connect, init_catalog
-from app.ebay import Ebay, GradedCard, graded_listings, listing_is, name_from_listing, names_grade
+from app.ebay import (
+    Ebay, GradedCard, graded_listings, item_confirms, listing_is, name_from_listing, names_grade,
+)
 from app.routes.ebay import router
 
 CHARIZARD = GradedCard("Charizard", "4", "PSA", "9", total=102, year=1999, set_name="Base Set")
@@ -198,18 +200,31 @@ def test_a_japanese_cards_english_name_comes_from_its_cardmarket_address():
     assert name_from_listing(None) == ""
 
 
-def _reader(calls, items):
+def _reader(calls, items, *, by_ebay=(), details=None):
+    """[items] answer the searches by words, [by_ebay] the ones that ask for
+    eBay's own grader and grade; [details] is what opening a listing shows."""
     def handle(request: httpx.Request) -> httpx.Response:
-        calls.append(request.url.path)
-        if request.url.path.endswith("/oauth2/token"):
+        path = request.url.path
+        if path.endswith("/oauth2/token"):
             assert request.headers["authorization"].startswith("Basic ")
             return httpx.Response(200, json={"access_token": "token", "expires_in": 7200})
         assert request.headers["authorization"] == "Bearer token"
         assert request.headers["x-ebay-c-marketplace-id"] == "EBAY_US"
+        if "/item/" in path:
+            calls.append("open")
+            item_id = path.rsplit("/", 1)[-1]
+            if details is not None and item_id not in details:
+                return httpx.Response(404)
+            return httpx.Response(200, json=(details or {}).get(item_id, {}))
         assert request.url.params["category_ids"] == "183454"
-        assert request.url.params["filter"] == "buyingOptions:{FIXED_PRICE}"
-        calls.append(request.url.params["q"])
-        return httpx.Response(200, json={"itemSummaries": items})
+        graded = "aspect_filter" in request.url.params
+        assert request.url.params["filter"] == (
+            "buyingOptions:{FIXED_PRICE},conditionIds:{2750}" if graded else "buyingOptions:{FIXED_PRICE}"
+        )
+        calls.append(("ebay:" if graded else "") + request.url.params["q"])
+        if graded:
+            calls.append(request.url.params["aspect_filter"])
+        return httpx.Response(200, json={"itemSummaries": list(by_ebay) if graded else items})
 
     return Ebay("id", "secret", client=httpx.Client(
         base_url="https://ebay.test", transport=httpx.MockTransport(handle)))
@@ -226,16 +241,83 @@ def test_the_cheapest_five_are_averaged_and_asked_once_in_six_hours():
     assert first["average"] == 120.0
     assert first["count"] == 7
     assert [item["amount"] for item in first["listings"]] == [100, 110, 120, 130, 140]
+    assert "id" not in first["listings"][0]
     assert first["observed_at"].endswith("Z")
     assert reader.graded(PIKACHU) == first
-    # One token and two searches, by number and by set.
+    psa10 = "categoryId:183454,Professional Grader:{Professional Sports Authenticator (PSA)},Grade:{10}"
+    # Four searches: eBay's own grade fields by number and by set, then the
+    # grade in words by number and by set. The five cheapest are opened.
     assert calls == [
-        "/identity/v1/oauth2/token",
-        "/buy/browse/v1/item_summary/search",
-        "Pikachu 58/102 PSA 10",
-        "/buy/browse/v1/item_summary/search",
-        "Pikachu base PSA 10",
+        "ebay:Pikachu 58/102", psa10, "ebay:Pikachu base", psa10,
+        "Pikachu 58/102 PSA 10", "Pikachu base PSA 10",
+        "open", "open", "open", "open", "open",
     ]
+    reader.close()
+
+
+def test_ebays_own_grade_stands_in_for_a_title_that_does_not_say_it():
+    catalogue = "Pikachu 58/102 Base Set Holo"
+    assert not listing_is(catalogue, PIKACHU)
+    assert listing_is(catalogue, PIKACHU, graded=True)
+    # Still not another slab, card or language.
+    assert not listing_is("Pikachu 58/102 Base Set Holo BGS 9.5", PIKACHU, graded=True)
+    assert not listing_is("Pikachu 58/102 Base Set PSA 9", PIKACHU, graded=True)
+    assert not listing_is("Pikachu 60/64 Jungle Holo", PIKACHU, graded=True)
+    reader = _reader(
+        [],
+        [_item("Pikachu 58/102 Base Set PSA 10", 300)],
+        by_ebay=[_item(catalogue, 100), _item(catalogue, 200), _item("Raichu 14/102 Base Set", 5)],
+    )
+    answer = reader.graded(PIKACHU)
+    assert [item["amount"] for item in answer["listings"]] == [100, 200, 300]
+    assert answer["average"] == 200.0
+    reader.close()
+
+
+def test_an_opened_listing_must_agree_before_it_counts():
+    psa = {"name": "Professional Grader", "values": [{"content": "Professional Sports Authenticator (PSA)"}]}
+    ten = {"name": "Grade", "values": [{"content": "10"}]}
+    aspect = lambda name, value: {"name": name, "value": value}  # noqa: E731
+    good = {"conditionDescriptors": [psa, ten],
+            "localizedAspects": [aspect("Card Number", "58/102"), aspect("Language", "English")]}
+    assert item_confirms(good, PIKACHU)
+    assert item_confirms({}, PIKACHU)  # nothing recorded, nothing against it
+    assert item_confirms({"localizedAspects": [aspect("Card Number", "#58"), aspect("Language", "Not Specified")]}, PIKACHU)
+    for wrong in (
+        {"conditionDescriptors": [psa, {"name": "Grade", "values": [{"content": "9"}]}]},
+        {"conditionDescriptors": [{"name": "Professional Grader",
+                                   "values": [{"content": "Certified Guaranty Company (CGC)"}]}, ten]},
+        {"localizedAspects": [aspect("Card Number", "60/64")]},
+        {"localizedAspects": [aspect("Card Number", "58/108")]},
+        {"localizedAspects": [aspect("Language", "Japanese")]},
+        {"localizedAspects": [aspect("Language", "Italian")]},
+    ):
+        assert not item_confirms(wrong, PIKACHU), wrong
+    japanese = GradedCard("Mew ex", "205", "PSA", "10", total=165, japanese=True)
+    assert item_confirms({"localizedAspects": [aspect("Language", "Japanese")]}, japanese)
+    assert not item_confirms({"localizedAspects": [aspect("Language", "English")]}, japanese)
+
+    # The cheapest listing turns out to be a PSA 9 once opened: it is left
+    # out, and the next ones make the average.
+    items = [_item(f"Pikachu 58/102 Base Set PSA 10 #{n}", n) for n in (50, 100, 110, 120)]
+    details = {item["itemId"]: good for item in items[1:]}
+    details[items[0]["itemId"]] = {"conditionDescriptors": [psa, {"name": "Grade", "values": [{"content": "9"}]}]}
+    reader = _reader([], items, details=details)
+    answer = reader.graded(PIKACHU)
+    assert [item["amount"] for item in answer["listings"]] == [100, 110, 120]
+    assert answer["average"] == 110.0 and answer["count"] == 3
+    reader.close()
+
+
+def test_every_grader_the_app_offers_has_ebays_name():
+    from app.ebay import GRADER_NAMES, GRADERS
+
+    assert set(GRADER_NAMES) == set(GRADERS)
+    calls: list[str] = []
+    card = GradedCard("Pikachu", "58", "TAG", "9.5", total=102, set_name="Base Set")
+    reader = _reader(calls, [])
+    reader.graded(card)
+    assert "categoryId:183454,Professional Grader:{Technical Authentication & Grading (TAG)},Grade:{9.5}" in calls
     reader.close()
 
 
@@ -283,10 +365,10 @@ def test_the_route_builds_the_search_from_the_catalogue_card(tmp_path):
 
     body = ask(card_id="en:base1-58", grader="psa", grade="10").json()
     assert body["enabled"] is True and body["average"] == 20.0 and len(body["listings"]) == 3
-    assert "Pikachu 58/102 PSA 10" in calls and calls[-1] == "Pikachu base PSA 10"
+    assert "Pikachu 58/102 PSA 10" in calls and "Pikachu base PSA 10" in calls
     ask(card_id="ja:SV2a-205", grader="PSA", grade="10")
     assert "Mew ex 205/165 Japanese PSA 10" in calls
-    assert calls[-1] == "Mew ex pokemon 151 Japanese PSA 10" or calls[-1] == "Mew ex 151 Japanese PSA 10"
+    assert "ebay:Mew ex 205/165 Japanese" in calls
     # No eBay search for a language sellers do not title reliably.
     before = len(calls)
     assert ask(card_id="de:x-1", grader="PSA", grade="10").json() == {
