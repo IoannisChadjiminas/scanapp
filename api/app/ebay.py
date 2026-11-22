@@ -80,6 +80,8 @@ _OTHER_LANGUAGE = re.compile(
     r"portuguese|dutch|russian|ita|deu|ger|fra|fre|esp|spa|por)\b",
     re.IGNORECASE,
 )
+# Sets whose cards keep the number of the card they reprint.
+REPRINT_SETS = {"30th-c", "cel25c"}
 # Words of a set's name that do not tell sets apart.
 _SET_NOISE = {"pokemon", "pokémon", "the", "and", "of", "set", "tcg", "card", "cards", "game"}
 _YEAR = re.compile(r"(?<!\d)(19[89]\d|20[0-4]\d)(?!\d)")
@@ -102,8 +104,8 @@ class GradedCard:
     set_name: str = ""
     # The set's code ("sv2a"), which sellers of Japanese cards put in titles.
     set_code: str = ""
-    # No other card in the set has this name, so the set and the name are
-    # the card even where the title's number differs from the catalogue's.
+    # No other card in the set has this name: in a reprint set (REPRINT_SETS)
+    # the set and the name are then the card, whatever number is printed.
     unique_name: bool = False
 
     @property
@@ -213,12 +215,19 @@ def listing_is(title: str, card: GradedCard) -> bool:
     else:
         if not _names_set(title, card):
             return False
-        if wanted not in {_plain_number(word) for word in present}:
-            # The catalogue's number is not always the printed one (a reprint
-            # numbered 001 of 30 that sellers list as "#4"). Then the set and
-            # a name no other card in it has are the card, on a title that
-            # gives one "#number" like a single slab's label.
-            if not (card.unique_name and len(re.findall(r"#\s*\d+", title)) == 1):
+        # A "#185" is the card's number, whatever else the title holds: the
+        # 151 set's labels read "MEW EN-151", so "151" alone proves nothing.
+        marked = [_plain_number(number) for number in re.findall(r"#\s*(\d+)", title)]
+        numbered = all(number == wanted for number in marked) if marked else (
+            wanted in {_plain_number(word) for word in present}
+        )
+        if not numbered:
+            # A few reprint sets are numbered in the catalogue by their own
+            # order, not by what is printed ("#4" for card 001 of 30). There
+            # the set and a name no other card in it has are the card.
+            if not (
+                card.set_code in REPRINT_SETS and card.unique_name and len(marked) == 1
+            ):
                 return False
     # The language.
     if card.japanese != bool(_JAPANESE.search(title)) or _OTHER_LANGUAGE.search(title):
