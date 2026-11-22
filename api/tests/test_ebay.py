@@ -139,7 +139,7 @@ def test_a_slab_label_title_is_matched_by_its_set():
     assert not listing_is("Charizard 4/102 Base Set Holo Rare 1999 English PSA 10", classic)
     # A name that is not the only one in its set still needs its number.
     shared = GradedCard("Pikachu", "5", "PSA", "10", total=30, year=2026,
-                        set_name="30th Classic Collection")
+                        set_name="30th Classic Collection", set_code="30th-c")
     assert listing_is("2026 Pokemon 30th Celebration Classic Collection #5 Pikachu PSA 10", shared)
     assert not listing_is("2026 Pokemon 30th Celebration Classic Collection #9 Pikachu PSA 10", shared)
     # Without "x/y" the set must be named: a bare number is any card.
@@ -234,6 +234,51 @@ def test_a_word_of_the_sets_own_name_does_not_rule_a_listing_out():
     assert not listing_is("Mega Zygarde ex 124/088 Perfect Order CGC Perfect 10", cgc)
     assert not listing_is("Mega Zygarde ex 124/088 Perfect Order CGC Pristine 10", cgc)
     assert not listing_is("Mega Zygarde ex 124/088 Perfect Order booster box PSA 10", zygarde)
+
+
+def test_a_japanese_promo_is_found_by_its_series_and_number():
+    pikachu = GradedCard("Pikachu ex", "132", "PSA", "10", total=132, year=2025, japanese=True,
+                         set_name="メガ プロモカード", set_code="m-p")
+    assert pikachu.promo
+    assert pikachu.search == "Pikachu ex 132 Japanese PSA 10"
+    assert pikachu.set_search == "Pikachu ex m-p Japanese PSA 10"
+    assert listing_is("2026 POKEMON JAPANESE M-P PROMO #132 PIKACHU EX PSA 10", pikachu)
+    assert not listing_is("2026 POKEMON JAPANESE M-P PROMO #131 PIKACHU EX PSA 10", pikachu)
+    assert not listing_is("PSA 10 Pikachu ex McDONALD'S PROMO 132/M-P Pokemon card Set of 3 Japanese", pikachu)
+    eevee = GradedCard("Eevee", "196", "PSA", "8", total=288, year=2022, japanese=True,
+                       set_name="スカーレット&バイオレット プロモカード", set_code="sv-p")
+    assert listing_is("Pokemon TCG SV-P Promo Eevee 196/SV-P Holo JP 2024 PSA 8 Graded", eevee)
+    assert listing_is("2024 POKEMON JPN SV-P PROMO LET'S START POKECA BATTLE CAMPAIGN #196 EEVEE PSA 8", eevee)
+    # No number, or a grade that is only a guess.
+    assert not listing_is("2024 POKEMON JAPANESE SV-P PROMO BATTLE CAMPAIGN EEVEE PSA 8", eevee)
+    assert not listing_is("PSA 8 2024 Pokemon Eevee SV-P JP Promo Card #196 PSA 8 or lower", eevee)
+    # A Japanese set's code says Japanese where the word is missing.
+    flygon = GradedCard("Flygon GX", "098", "PSA", "10", total=95, year=2019, japanese=True,
+                        set_name="オルタージェネシス", set_code="sm12")
+    assert listing_is("Flygon GX SR SM12 Alter Genesis 098/095 PSA 10", flygon)
+    assert not listing_is("Flygon GX SR Alter Genesis 098/095 PSA 10", flygon)
+
+
+def test_guessed_grades_and_dearer_slabs_are_left_out():
+    zygarde = GradedCard("Mega Zygarde ex", "124", "PSA", "9", total=88, year=2026,
+                         set_name="Perfect Order", set_code="me03")
+    assert not listing_is(
+        "Mega Zygarde EX Hyper Rare Gold Perfect Order 124/088 English (Likely PSA 9)",
+        zygarde, graded=True)
+    zacian = GradedCard("Zacian V", "GG48", "CGC", "10", total=70, year=2023,
+                        set_name="Crown Zenith Galarian Gallery", set_code="swsh12.5gg")
+    assert listing_is("Pokemon ZACIAN V Galarian Gallery Holo #GG48/GG70 Crown Zenith CGC 10 Gem Mint", zacian)
+    assert not listing_is("2023 POKEMON CROWN ZENITH GALARIAN GALLERY - HOLO #GG48 ZACIAN V CGC 10 PERFECT", zacian)
+    surfer = GradedCard("Surfer", "293", "CGC", "10", total=217, year=2026, set_name="Ascended Heroes")
+    assert not listing_is("Surfer SIR Holo 293/217 2026 Pokemon Ascended Heroes CGC 10 Pristine BL", surfer)
+    # A promo's own stamp belongs to it; a staff copy never does.
+    charizard = GradedCard("Charizard", "SWSH066", "PSA", "10", total=307,
+                           set_name="SWSH Black Star Promos", set_code="swshp")
+    assert listing_is("2020 Pokemon TCG Charizard SWSH066 Promo Holo Prerelease PSA 10", charizard)
+    assert not listing_is("2020 Pokemon TCG Charizard SWSH066 Promo Prerelease STAFF PSA 10", charizard)
+    # Outside promos a stamp is another printing, wherever it comes in the title.
+    plain = GradedCard("Charizard", "25", "PSA", "10", total=185, year=2020, set_name="Vivid Voltage")
+    assert not listing_is("Charizard 25/185 Vivid Voltage Holo Prerelease Stamped PSA 10", plain)
 
 
 def test_only_buy_it_now_listings_count_and_a_stray_cheap_one_is_left_out():
