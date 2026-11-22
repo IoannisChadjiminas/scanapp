@@ -70,13 +70,14 @@ _NOT_A_CARD = re.compile(
     # Merchandise filed among single cards: a "LARGE BLANKET 50x60".
     r"blanket|poster|playmat|play\s+mat|sleeves?|binder|plush|keychain|magnet|"
     r"stickers?|canvas|towel|shirt|mug|coin|pin|art\s+print|read|"
-    r"(?:pristine|perfect)\s*10|black\s+label)\b",
+    r"pristine|perfect|black\s+label|bl)\b",
     re.IGNORECASE,
 )
 # A raw card dressed as a slab: "NOT PSA 10", "PSA 10 worthy", "PSA ready".
 _BAIT = re.compile(
     r"\b(not|no|non|worthy|candidate|potential|possible|contender|ready|"
-    r"regrade|crack|quality|like|ungraded|raw)\b|\?",
+    r"regrade|crack|quality|like|likely|maybe|ungraded|raw)\b|"
+    r"\bor\s+(?:lower|better|higher)\b|\?",
     re.IGNORECASE,
 )
 # Another printing of the same card, worth something else.
@@ -97,7 +98,14 @@ _OTHER_LANGUAGE = re.compile(
     re.IGNORECASE,
 )
 # Sets whose cards keep the number of the card they reprint.
-REPRINT_SETS = {"30th-c", "cel25c", "cel25cc"}
+# Each with the anniversary words its own listings carry: "30th" marks
+# another set on a Celebrations (25th) title, and the other way round.
+_ANNIVERSARY = {"celebration", "celebrations", "classic collection", "anniversary"}
+REPRINT_SETS = {
+    "30th-c": _ANNIVERSARY | {"30th"},
+    "cel25c": _ANNIVERSARY | {"25th"},
+    "cel25cc": _ANNIVERSARY | {"25th"},
+}
 # Words of a set's name that do not tell sets apart.
 _SET_NOISE = {"pokemon", "pokémon", "the", "and", "of", "set", "tcg", "card", "cards", "game"}
 _YEAR = re.compile(r"(?<!\d)(19[89]\d|20[0-4]\d)(?!\d)")
@@ -132,9 +140,23 @@ class GradedCard:
         return any(ch.isalpha() for ch in self.number)
 
     @property
+    def promo(self) -> bool:
+        """A promo series: "XY Black Star Promos", or a Japanese one, whose
+        code ends in "-P" ("SV-P", "M-P"). Its cards are numbered without a
+        total, over several years, and often carry an event's stamp."""
+        return (
+            "promo" in self.set_words
+            or "プロモ" in self.set_name
+            or self.set_code.endswith("-p")
+        )
+
+    @property
     def number_label(self) -> str:
-        """The number as sellers write it: "4/102", or "XY28" alone."""
-        return f"{self.number}/{self.total}" if self.total and not self.lettered else self.number
+        """The number as sellers write it: "4/102", or "XY28" or a promo's
+        "132" alone."""
+        if self.total and not self.lettered and not self.promo:
+            return f"{self.number}/{self.total}"
+        return self.number
 
     @property
     def search(self) -> str:
@@ -219,7 +241,19 @@ def _names_set(title: str, card: GradedCard) -> bool:
     present = [_one(word) for word in _words(title)]
     words = card.set_words
     by_name = bool(words) and all(word in present for word in words)
-    by_code = bool(card.set_code) and card.set_code.lower() in present
+    # "sv2a" as a word; "sv-p" also as "SV-P", "SVP" or "SV P".
+    code = card.set_code.lower()
+    by_code = bool(code) and (
+        code in present
+        or (
+            "-" in code
+            and re.search(
+                r"(?<![a-z0-9])" + r"[-\s]?".join(map(re.escape, code.split("-"))) + r"(?![a-z0-9])",
+                title.lower(),
+            )
+            is not None
+        )
+    )
     if not (by_name or by_code):
         return False
     if by_name and not by_code:
@@ -248,10 +282,16 @@ def listing_is(title: str, card: GradedCard, *, graded: bool = False) -> bool:
         return False
     # A word that rules a listing out does not when it is part of the card's
     # or the set's own name (the set "Perfect Order", a card named "Pick").
+    # It may appear as often as the name holds it and no more: "Perfect
+    # Order ... CGC 10 PERFECT" is still the dearer slab.
     own = f"{card.name} {card.set_name}".lower()
     for rule in (_NOT_A_CARD, _BAIT):
-        if any(found.group(0).lower() not in own for found in rule.finditer(title)):
-            return False
+        seen: dict[str, int] = {}
+        for found in rule.finditer(title):
+            word = found.group(0).lower()
+            seen[word] = seen.get(word, 0) + 1
+            if seen[word] > own.count(word):
+                return False
     # Every word of the card's name.
     present = set(_words(title))
     if not all(word in present for word in _words(card.name)):
@@ -291,7 +331,11 @@ def listing_is(title: str, card: GradedCard, *, graded: bool = False) -> bool:
         if not numbered and not (reprint and len(marked) == 1):
             return False
     # The language.
-    if card.japanese != bool(_JAPANESE.search(title)) or _OTHER_LANGUAGE.search(title):
+    # A Japanese set's code ("sm12", "sv2a") says Japanese as well as the word.
+    says_japanese = bool(_JAPANESE.search(title)) or (
+        card.japanese and bool(card.set_code) and card.set_code.lower() in present
+    )
+    if card.japanese != says_japanese or _OTHER_LANGUAGE.search(title):
         return False
     # The printing.
     if card.reverse != bool(re.search(r"\breverse\b", title, re.IGNORECASE)):
@@ -301,15 +345,22 @@ def listing_is(title: str, card: GradedCard, *, graded: bool = False) -> bool:
     first = bool(re.search(r"\b1st\b|\bfirst\s+ed", title, re.IGNORECASE))
     if bool(card.first_edition) != first:
         return False
+    # Every such word, not only the first. A promo is often an event's own
+    # stamped card, so those words belong to it; "staff" is always dearer.
+    promo_words = {"promo", "prerelease", "pre-release", "stamp", "stamped", "league", "winner"}
     for rule in (_VARIANT, _REPRINT):
-        found = rule.search(title)
-        if found and found.group(0).lower() not in card.set_name.lower():
-            # "shadowless" belongs to a first edition copy.
-            if not (card.first_edition and found.group(0).lower() == "shadowless"):
-                return False
+        for found in rule.finditer(title):
+            word = found.group(0).lower()
+            if word in card.set_name.lower() or (card.promo and word in promo_words):
+                continue
+            if " ".join(word.split()) in REPRINT_SETS.get(card.set_code, ()):
+                continue
+            if card.first_edition and word == "shadowless":
+                continue
+            return False
     # The year, where the title gives one: a reprint is years later.
     # Not for promos: one promo series is printed over several years.
-    if card.year is not None and "promo" not in card.set_words:
+    if card.year is not None and not card.promo:
         years = [int(year) for year in _YEAR.findall(title)]
         if any(abs(year - card.year) > 1 for year in years):
             return False
