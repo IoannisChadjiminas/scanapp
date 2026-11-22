@@ -219,6 +219,40 @@ def test_a_picked_listing_is_priced_as_its_own_product(tmp_path):
     # A listing whose product is not known shows nothing, never another version's price.
     assert amounts("cardtrader", unknown) == []
     assert amounts("tcgplayer", unknown) == []
+
+    # The card's price over time, from what was kept: Cardmarket's trend on
+    # the days it changed, TCGplayer's price on the days it moved, each line
+    # run to the newest day.
+    from app import price_history
+
+    price_history.ensure_schema(catalog)
+    catalog.executemany(
+        "INSERT INTO price_history_daily (id_product, day, trend, low) VALUES (?, ?, ?, ?)",
+        [(271823, "2026-11-07", 10.0, 5.0), (271823, "2026-11-09", 10.0, 6.0),
+         (271823, "2026-11-12", 12.5, 6.0), (555001, "2026-11-08", 90.0, 80.0)],
+    )
+    catalog.execute("INSERT INTO price_guide_import_days VALUES ('2026-11-20')")
+    catalog.commit()
+    app.state.dbs.portfolio = catalog
+    assert store.record_day("2026-11-01", [(42346, "Normal", 4.0, 2.0), (42999, "Normal", None, 50.0)]) == 2
+    # A cent's move is not a point; a real one is.
+    assert store.record_day("2026-11-05", [(42346, "Normal", 4.01, 2.0)]) == 0
+    assert store.record_day("2026-11-10", [(42346, "Normal", 4.5, 2.0)]) == 1
+
+    def history(**params):
+        body = client.get("/api/v1/prices/history", params={"card_id": "base1-58"} | params).json()
+        return {name: [(p["day"], p["amount"]) for p in body[name]] for name in body}
+
+    assert history() == {
+        "cardmarket": [("2026-11-07", 10.0), ("2026-11-12", 12.5), ("2026-11-20", 12.5)],
+        "tcgplayer": [("2026-11-01", 4.0), ("2026-11-10", 4.5), ("2026-11-20", 4.5)],
+    }
+    assert history(url=second) == {
+        "cardmarket": [("2026-11-08", 90.0), ("2026-11-20", 90.0)],
+        "tcgplayer": [("2026-11-01", 50.0), ("2026-11-20", 50.0)],
+    }
+    # A first edition has no Cardmarket trend, and no such printing here.
+    assert history(first_edition="true") == {"cardmarket": [], "tcgplayer": []}
     reader.close()
     store.close()
 
