@@ -466,6 +466,9 @@ class Settings(BaseSettings):
     ebay_currency: str = "USD"
     # How long an answer for a card and grade stands, for every collector.
     ebay_reuse_minutes: int = 1440
+    # eBay lookups a day for graded copies in collections, made in the
+    # background when nobody is waiting. Each is about a dozen eBay calls.
+    ebay_background_daily: int = 200
     # No paid read for a card whose Cardmarket trend is below this (EUR). A card
     # with no known trend is still read. 0 reads every card.
     # 0 = no flat floor: the value tiers in CARDMARKET_FRESH_TIERS decide.

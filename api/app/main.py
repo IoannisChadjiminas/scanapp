@@ -142,6 +142,9 @@ async def lifespan(app: FastAPI):
     from app.ebay import from_settings as ebay_from_settings
 
     app.state.ebay = ebay_from_settings(settings)
+    from app.fx import EuroRate
+
+    app.state.fx = EuroRate(settings.data_dir / "fx.json")
     app.state.tcgplayer = None
     if app.state.cardtrader is not None:
         app.state.cardtrader.refresh_map_if_stale()
@@ -206,6 +209,7 @@ async def lifespan(app: FastAPI):
             app.state.tcgplayer.close()
         if app.state.ebay is not None:
             app.state.ebay.close()
+        app.state.fx.close()
         price_history.bind(None)
         runtime.close()
         dbs.close()

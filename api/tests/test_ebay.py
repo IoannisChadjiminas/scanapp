@@ -496,13 +496,16 @@ def test_every_grader_the_app_offers_has_ebays_name():
     reader.close()
 
 
-def test_too_few_listings_give_no_average_but_are_still_listed():
-    reader = _reader([], [_item("Pikachu 58/102 PSA 10", 100), _item("Pikachu 58/102 PSA 10", 120)])
-    answer = reader.graded(PIKACHU)
-    # No average from two listings, but the two are still sent.
-    assert answer["average"] is None and answer["count"] == 2
-    assert [item["amount"] for item in answer["listings"]] == [100, 120]
-    reader.close()
+def test_two_listings_are_a_price_and_one_is_only_listed():
+    two = _reader([], [_item("Pikachu 58/102 PSA 10", 100), _item("Pikachu 58/102 PSA 10", 120)])
+    answer = two.graded(PIKACHU)
+    assert answer["average"] == 110.0 and answer["count"] == 2
+    two.close()
+    one = _reader([], [_item("Pikachu 58/102 PSA 10", 100)])
+    answer = one.graded(PIKACHU)
+    # One seller's price is shown as a listing, never used as the value.
+    assert answer["average"] is None and [item["amount"] for item in answer["listings"]] == [100]
+    one.close()
 
 
 def test_the_route_builds_the_search_from_the_catalogue_card(tmp_path):
@@ -549,8 +552,8 @@ def test_the_route_builds_the_search_from_the_catalogue_card(tmp_path):
     # No eBay search for a language sellers do not title reliably.
     before = len(calls)
     assert ask(card_id="de:x-1", grader="PSA", grade="10").json() == {
-        "enabled": True, "average": None, "currency": "USD", "count": 0,
-        "listings": [], "observed_at": None,
+        "enabled": True, "average": None, "average_eur": None, "currency": "USD", "count": 0,
+        "listings": [], "observed_at": None, "change_percent": None, "change_days": None,
     }
     assert len(calls) == before
     assert ask(card_id="en:base1-58", grader="XYZ", grade="10").status_code == 422
@@ -564,7 +567,118 @@ def test_the_route_builds_the_search_from_the_catalogue_card(tmp_path):
     before = len(calls)
     miss = ask(card_id="en:base1-58", grader="PSA", grade="9", cached_only="true").json()
     assert miss["enabled"] is True and miss["average"] is None and miss["listings"] == []
+    assert held["average_eur"] is None  # no rate without a bank to ask
     assert len(calls) == before
 
     app.state.ebay = None
     assert ask(card_id="en:base1-58", grader="PSA", grade="10").json()["enabled"] is False
+
+
+def test_dollars_become_euros_at_the_banks_rate(tmp_path):
+    from app.fx import EuroRate
+
+    asked: list[str] = []
+    xml = "<Cube time='2026-11-20'><Cube currency='USD' rate='1.2500'/><Cube currency='JPY' rate='160'/></Cube>"
+
+    def bank(request: httpx.Request) -> httpx.Response:
+        asked.append(str(request.url))
+        return httpx.Response(200, text=xml)
+
+    rate = EuroRate(tmp_path / "fx.json", client=httpx.Client(transport=httpx.MockTransport(bank)))
+    assert rate.usd_to_eur(100) == 80.0 and rate.day == "2026-11-20"
+    assert rate.usd_to_eur(None) is None
+    assert rate.usd_to_eur(50) == 40.0 and len(asked) == 1
+    rate.close()
+    # After a restart with the bank unreachable, the last rate still serves.
+    down = EuroRate(tmp_path / "fx.json", client=httpx.Client(
+        transport=httpx.MockTransport(lambda request: httpx.Response(503))))
+    assert down.usd_to_eur(100) == 80.0
+    down.close()
+    never = EuroRate(tmp_path / "none.json", client=httpx.Client(
+        transport=httpx.MockTransport(lambda request: httpx.Response(503))))
+    assert never.usd_to_eur(100) is None
+    never.close()
+
+
+def test_a_collections_graded_copies_are_valued_from_what_is_held(tmp_path):
+    from app.fx import EuroRate
+
+    catalog = connect(tmp_path / "catalog.sqlite")
+    init_catalog(catalog)
+    values = {"id": "en:base1-58", "name": "Pikachu", "language": "en", "set_id": "base1",
+              "set_name": "Base Set", "collector_number": "58"}
+    values.update({
+        row[1]: "" for row in catalog.execute("PRAGMA table_info(cards)")
+        if row[3] and row[4] is None and row[1] not in values
+    })
+    catalog.execute(
+        f"INSERT INTO cards ({', '.join(values)}) VALUES ({', '.join('?' for _ in values)})",
+        list(values.values()),
+    )
+    catalog.commit()
+    calls: list[str] = []
+    reader = _reader(calls, [_item(f"Pikachu 58/102 Base Set PSA 10 #{n}", n) for n in (100, 120)])
+    reader.background_daily = 0  # nothing is fetched behind the test's back
+    app = FastAPI()
+    app.include_router(router, prefix="/api/v1")
+    app.state.dbs = type("Dbs", (), {"catalog": catalog})()
+    app.state.ebay = reader
+    app.state.fx = EuroRate(client=httpx.Client(transport=httpx.MockTransport(
+        lambda request: httpx.Response(200, text="<Cube currency='USD' rate='1.2500'/>"))))
+    client = TestClient(app)
+    copies = [
+        {"card_id": "en:base1-58", "grader": "PSA", "grade": "10"},
+        {"card_id": "en:base1-58", "grader": "PSA", "grade": "9"},
+        {"card_id": "nope", "grader": "PSA", "grade": "10"},
+        {"card_id": "en:base1-58", "grader": "XYZ", "grade": "10"},
+    ]
+    ask = lambda: client.post("/api/v1/ebay/graded/values", json={"copies": copies}).json()  # noqa: E731
+
+    # Nothing held: no values, and eBay was not asked while answering.
+    before = ask()
+    assert before["enabled"] is True and [v["value_eur"] for v in before["values"]] == [None] * 4
+    assert calls == []
+    # Once someone has looked at the PSA 10, the collection is valued from it.
+    client.get("/api/v1/ebay/graded", params={"card_id": "en:base1-58", "grader": "PSA", "grade": "10"})
+    after = ask()["values"]
+    assert after[0]["value_eur"] == 88.0 and after[0]["average"] == 110.0 and after[0]["count"] == 2
+    assert [v["value_eur"] for v in after[1:]] == [None, None, None]
+    # An answer past its day still values the collection, rather than nothing.
+    reader.reuse_s = 0
+    assert ask()["values"][0]["value_eur"] == 88.0
+    reader.close()
+
+
+def test_the_price_move_needs_a_week_of_history_and_held_slabs_are_read_daily():
+    from datetime import datetime, timedelta, timezone
+
+    calls: list[str] = []
+    reader = _reader(calls, [_item(f"Charizard 4/102 Base Set PSA 9 #{n}", n) for n in (100, 120)])
+    reader.background_daily = 0
+    # Today's price alone is no move.
+    assert reader.graded(CHARIZARD)["average"] == 110.0
+    assert reader.change(CHARIZARD) is None
+    today = datetime.now(timezone.utc).date()
+
+    def earlier(days: int, average: float) -> None:
+        reader._store.execute(
+            "INSERT OR REPLACE INTO history VALUES (?, ?, ?)",
+            (repr(CHARIZARD), (today - timedelta(days=days)).isoformat(), average),
+        )
+
+    # Three days back is too short a time to call a move.
+    earlier(3, 90.0)
+    assert reader.change(CHARIZARD) is None
+    # The oldest price in the last 30 days is what today's is set against;
+    # one older than that is not.
+    earlier(20, 100.0)
+    earlier(60, 10.0)
+    assert reader.change(CHARIZARD) == {"percent": 10.0, "days": 20}
+    assert reader.change(UMBREON) is None
+
+    # A slab a collection holds is queued again once its price is a day old.
+    reader.own(CHARIZARD)
+    assert reader.refresh_owned() == 0
+    reader.reuse_s = 0
+    assert reader.refresh_owned() == 1
+    reader.close()

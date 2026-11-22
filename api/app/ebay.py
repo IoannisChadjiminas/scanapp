@@ -24,8 +24,9 @@ import sqlite3
 import statistics
 import threading
 import time
+import dataclasses
 from dataclasses import dataclass
-from datetime import datetime, timezone
+from datetime import date, datetime, timedelta, timezone
 from pathlib import Path
 from typing import Any
 
@@ -54,6 +55,12 @@ GRADER_NAMES = {
 GRADED_CONDITION = "2750"
 # How many of the cheapest listings are opened to confirm the average.
 CHECKS = 12
+# How long an answer is kept at all. A day old it is asked again when someone
+# looks; a collection's value may use it for longer than see no value.
+KEEP_S = 45 * 86400
+# A slab stays on the daily round this long after a collection last asked.
+OWNED_S = 30 * 86400
+HISTORY_DAYS = 400
 # Graders the app does not offer still mark a listing as another slab.
 _ALL_GRADERS = (*GRADERS, "SGC", "ACE", "PCA", "MNT", "GMA", "HGA", "CGA", "ARS", "BECKETT")
 GRADE = re.compile(r"^(10|[1-9](\.5)?)$")
@@ -458,7 +465,8 @@ class Ebay:
         reuse_s: int = 24 * 3600,
         path: Path | None = None,
         take: int = 5,
-        least: int = 3,
+        least: int = 2,
+        background_daily: int = 200,
         client: httpx.Client | None = None,
     ) -> None:
         self._basic = base64.b64encode(f"{client_id}:{client_secret}".encode()).decode()
@@ -467,6 +475,12 @@ class Ebay:
         self.reuse_s = reuse_s
         self.take = take
         self.least = least
+        # Lookups nobody is waiting for: graded copies in collections, asked
+        # about one at a time, up to a number a day.
+        self.background_daily = background_daily
+        self._wanted: dict[GradedCard, None] = {}
+        self._filled: list[float] = []
+        self._filler: threading.Thread | None = None
         self._client = client or httpx.Client(
             base_url=HOSTS.get(environment, HOSTS["production"]),
             timeout=20,
@@ -480,22 +494,128 @@ class Ebay:
         self._store.execute(
             "CREATE TABLE IF NOT EXISTS answers (card TEXT PRIMARY KEY, at REAL NOT NULL, answer TEXT NOT NULL)"
         )
+        # What each card and grade went for, one figure a day, for the rise
+        # or fall; and the slabs collections hold, read again every day.
+        self._store.execute(
+            "CREATE TABLE IF NOT EXISTS history (card TEXT NOT NULL, day TEXT NOT NULL, "
+            "average REAL NOT NULL, PRIMARY KEY (card, day))"
+        )
+        self._store.execute(
+            "CREATE TABLE IF NOT EXISTS owned (card TEXT PRIMARY KEY, spec TEXT NOT NULL, at REAL NOT NULL)"
+        )
         self._store.commit()
+        self._closed = threading.Event()
+
+    def own(self, card: GradedCard) -> None:
+        """Notes that a collection holds the card in the grade, so its price
+        is read again each day for as long as collections keep asking."""
+        with self._lock:
+            with self._store:
+                self._store.execute(
+                    "INSERT OR REPLACE INTO owned VALUES (?, ?, ?)",
+                    (repr(card), json.dumps(dataclasses.asdict(card)), time.time()),
+                )
+
+    def refresh_owned(self) -> int:
+        """Queues every held slab whose price is more than a day old. Slabs
+        no collection asked about for 30 days are forgotten."""
+        with self._lock:
+            with self._store:
+                self._store.execute("DELETE FROM owned WHERE at < ?", (time.time() - OWNED_S,))
+            rows = self._store.execute(
+                "SELECT o.spec FROM owned o LEFT JOIN answers a ON a.card = o.card "
+                "WHERE a.at IS NULL OR a.at < ?",
+                (time.time() - self.reuse_s,),
+            ).fetchall()
+        for (spec,) in rows:
+            self.want(GradedCard(**json.loads(spec)))
+        return len(rows)
+
+    def keep_fresh(self, every_s: float = 3600) -> None:
+        """Reads held slabs again each day, without anyone opening the app,
+        so the price history has a point for every day."""
+        def loop() -> None:
+            while not self._closed.wait(every_s):
+                try:
+                    self.refresh_owned()
+                except Exception as exc:
+                    log.warning("ebay daily refresh failed error_type=%s", type(exc).__name__)
+
+        threading.Thread(target=loop, name="ebay-daily", daemon=True).start()
+
+    def change(self, card: GradedCard, *, days: int = 30, least_days: int = 7) -> dict[str, Any] | None:
+        """How the price moved: today's figure against the oldest one in the
+        last [days], when that is at least a week back. None before then."""
+        today = datetime.now(timezone.utc).date()
+        with self._lock:
+            rows = self._store.execute(
+                "SELECT day, average FROM history WHERE card = ? AND day >= ? ORDER BY day",
+                (repr(card), (today - timedelta(days=days)).isoformat()),
+            ).fetchall()
+        if len(rows) < 2:
+            return None
+        first, last = rows[0], rows[-1]
+        span = (date.fromisoformat(last[0]) - date.fromisoformat(first[0])).days
+        # The newest figure has to be a current one, and the old one real.
+        if span < least_days or (today - date.fromisoformat(last[0])).days > 2 or first[1] <= 0:
+            return None
+        return {"percent": round((last[1] / first[1] - 1) * 100, 1), "days": span}
+
+    def daily(self) -> "Ebay":
+        self.keep_fresh()
+        return self
 
     def close(self) -> None:
+        self._closed.set()
         self._client.close()
         with self._lock:
             self._store.close()
 
-    def kept(self, card: GradedCard) -> dict[str, Any] | None:
-        """The answer already held for the card and grade, while it stands."""
+    def kept(self, card: GradedCard, *, max_age_s: float | None = None) -> dict[str, Any] | None:
+        """The answer already held for the card and grade, while it stands:
+        a day for a look at one card; [max_age_s] for a longer view."""
+        found = self.last(card)
+        if found is None or found[0] >= (self.reuse_s if max_age_s is None else max_age_s):
+            return None
+        return found[1]
+
+    def last(self, card: GradedCard) -> tuple[float, dict[str, Any]] | None:
+        """The last answer held, however old, with its age in seconds."""
         with self._lock:
             row = self._store.execute(
                 "SELECT at, answer FROM answers WHERE card = ?", (repr(card),)
             ).fetchone()
-        if row is None or time.time() - float(row[0]) >= self.reuse_s:
-            return None
-        return json.loads(row[1])
+        return None if row is None else (time.time() - float(row[0]), json.loads(row[1]))
+
+    def want(self, card: GradedCard) -> None:
+        """Asks eBay about the card in the background, when its turn comes."""
+        with self._lock:
+            self._wanted.setdefault(card, None)
+            if self._filler is None or not self._filler.is_alive():
+                self._filler = threading.Thread(target=self._fill, name="ebay-fill", daemon=True)
+                self._filler.start()
+
+    def _fill(self) -> None:
+        while True:
+            with self._lock:
+                day_ago = time.time() - 86400
+                self._filled = [at for at in self._filled if at > day_ago]
+                if not self._wanted or len(self._filled) >= self.background_daily:
+                    # Out of work, or out of today's allowance: what is left
+                    # waits for the next request to start this again.
+                    if len(self._filled) >= self.background_daily:
+                        self._wanted.clear()
+                    self._filler = None
+                    return
+                card = next(iter(self._wanted))
+                del self._wanted[card]
+                self._filled.append(time.time())
+            try:
+                if self.kept(card) is None:
+                    self.graded(card)
+            except Exception as exc:  # one card failing does not stop the rest
+                log.warning("ebay background read failed error_type=%s", type(exc).__name__)
+            time.sleep(1.0)
 
     def _bearer(self) -> str:
         with self._lock:
@@ -634,8 +754,18 @@ class Ebay:
                     (repr(card), time.time(), json.dumps(answer)),
                 )
                 self._store.execute(
-                    "DELETE FROM answers WHERE at < ?", (time.time() - self.reuse_s,)
+                    "DELETE FROM answers WHERE at < ?", (time.time() - KEEP_S,)
                 )
+                if answer["average"] is not None:
+                    today = datetime.now(timezone.utc).date()
+                    self._store.execute(
+                        "INSERT OR REPLACE INTO history VALUES (?, ?, ?)",
+                        (repr(card), today.isoformat(), answer["average"]),
+                    )
+                    self._store.execute(
+                        "DELETE FROM history WHERE day < ?",
+                        ((today - timedelta(days=HISTORY_DAYS)).isoformat(),),
+                    )
         return answer
 
 
@@ -666,5 +796,6 @@ def from_settings(settings) -> Ebay | None:
         marketplace=settings.ebay_marketplace,
         currency=settings.ebay_currency,
         reuse_s=max(300, int(settings.ebay_reuse_minutes) * 60),
+        background_daily=max(0, int(settings.ebay_background_daily)),
         path=settings.data_dir / "ebay.sqlite",
-    )
+    ).daily()
