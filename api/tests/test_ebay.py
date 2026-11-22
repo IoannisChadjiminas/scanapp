@@ -259,6 +259,32 @@ def test_a_japanese_promo_is_found_by_its_series_and_number():
     assert not listing_is("Flygon GX SR Alter Genesis 098/095 PSA 10", flygon)
 
 
+def test_more_raw_cards_other_languages_and_reverse_copies_are_left_out():
+    mew = GradedCard("Mew ex", "158", "PSA", "10", total=128, year=2026,
+                     set_name="30th Celebration", set_code="30th")
+    assert listing_is("2026 POKEMON 30C EN-30TH CELEBRATION FUTURISTIC RARE #158 MEW EX PSA 10", mew)
+    for title in (
+        "Mew Ex 158/128 Futuristic Rare Pokémon TCG: 30th Celebration PSA 10 CONTENDOR",
+        "Mew ex 158/128 30th Celebration Futuristic Rare NM/Mint – Strong PSA 10 Candidat",
+        "Mew ex 158/128 30th Celebration PSA10 Equivalent",
+    ):
+        assert not listing_is(title, mew), title
+    herdier = GradedCard("Herdier", "155", "PSA", "10", total=86, year=2025, set_name="White Flare")
+    assert listing_is("2025 POKEMON WHT EN-WHITE FLARE ILLUSTRATION RARE #155 HERDIER PSA 10", herdier)
+    assert not listing_is("Pokemon Terribark Herdier 155/086 PSA 10 DE White Flames White Flare IR", herdier)
+    # A Japanese reverse holo is a "Mirror" or "Rev.Foil".
+    pikachu = GradedCard("Pikachu", "014", "PSA", "9", total=71, year=2022, japanese=True,
+                         set_name="ダークファンタズマ", set_code="s10a")
+    assert listing_is("Pikachu C S10a 014/071 PSA 9 Japanese Pokémon", pikachu)
+    assert not listing_is("PSA 9 Pikachu Mirror s10a 014/071 Pokemon Japanese", pikachu)
+    assert not listing_is("PSA 9 Pikachu C 014/071 S10a Rev.Foil Dark Phantasma 2022 Pokemon Card Japanese", pikachu)
+    mirror = GradedCard("Pikachu", "014", "PSA", "9", total=71, japanese=True,
+                        set_name="ダークファンタズマ", set_code="s10a", reverse=True)
+    assert listing_is("PSA 9 Pikachu Mirror s10a 014/071 Pokemon Japanese", mirror)
+    # A number the grader does not give is not this grade.
+    assert not names_grade("PSA 20 Seismitoad 105/086 Sv: Black Bolt Holo PSA 10", "PSA", "10")
+
+
 def test_guessed_grades_and_dearer_slabs_are_left_out():
     zygarde = GradedCard("Mega Zygarde ex", "124", "PSA", "9", total=88, year=2026,
                          set_name="Perfect Order", set_code="me03")

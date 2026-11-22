@@ -75,7 +75,8 @@ _NOT_A_CARD = re.compile(
 )
 # A raw card dressed as a slab: "NOT PSA 10", "PSA 10 worthy", "PSA ready".
 _BAIT = re.compile(
-    r"\b(not|no|non|worthy|candidate|potential|possible|contender|ready|"
+    r"\b(not|no|non|worthy|candidat\w*|potential|possible|contend\w*|ready|"
+    r"strong|equivalent|"
     r"regrade|crack|quality|like|likely|maybe|ungraded|raw)\b|"
     r"\bor\s+(?:lower|better|higher)\b|\?",
     re.IGNORECASE,
@@ -108,6 +109,11 @@ REPRINT_SETS = {
 }
 # Words of a set's name that do not tell sets apart.
 _SET_NOISE = {"pokemon", "pokémon", "the", "and", "of", "set", "tcg", "card", "cards", "game"}
+# A two-letter language code in capitals: "PSA 10 DE White Flames". Lower
+# case would catch ordinary words.
+_LANGUAGE_CODE = re.compile(r"(?<![A-Za-z0-9])(DE|FR|ES|PT|KR|KO|CN|ZH)(?![A-Za-z0-9])")
+# A reverse holo, as English and Japanese listings say it.
+_REVERSE = re.compile(r"\b(reverse|rev\.?\s*(?:foil|holo)|mirror|parallel)\b", re.IGNORECASE)
 _YEAR = re.compile(r"(?<!\d)(19[89]\d|20[0-4]\d)(?!\d)")
 _FRACTION = re.compile(r"(?<![\d.])(\d{1,3})\s*/\s*(\d{1,3})(?![\d.])")
 
@@ -216,10 +222,11 @@ def other_slab(title: str, grader: str, grade: str) -> bool:
         if other != grader and re.search(rf"(?<![A-Za-z]){other}(?![A-Za-z])", title, re.IGNORECASE):
             return True
     for found in re.finditer(
-        rf"(?<![A-Za-z]){re.escape(grader)}{_FILLER}\s*[:\-\]]?\s*(10|\d(?:\.5)?)(?![\d+]|\.\d)",
+        rf"(?<![A-Za-z]){re.escape(grader)}{_FILLER}\s*[:\-\]]?\s*(\d{{1,2}}(?:\.5)?\+?)(?![\d]|\.\d)",
         title,
         re.IGNORECASE,
     ):
+        # Any other number, a made-up one included ("PSA 20", "PSA 9+").
         if found.group(1) != grade:
             return True
     return False
@@ -337,8 +344,10 @@ def listing_is(title: str, card: GradedCard, *, graded: bool = False) -> bool:
     )
     if card.japanese != says_japanese or _OTHER_LANGUAGE.search(title):
         return False
+    if _LANGUAGE_CODE.search(title):
+        return False
     # The printing.
-    if card.reverse != bool(re.search(r"\breverse\b", title, re.IGNORECASE)):
+    if card.reverse != bool(_REVERSE.search(title)):
         return False
     # A copy not marked first edition is an unlimited one: a "1st Edition"
     # listing is another, dearer card.
