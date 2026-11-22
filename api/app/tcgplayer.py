@@ -103,6 +103,15 @@ class TcgplayerPrices:
             );
             CREATE INDEX IF NOT EXISTS listed_group ON listed (group_id, number);
             CREATE TABLE IF NOT EXISTS meta (key TEXT PRIMARY KEY, value TEXT);
+            -- A printing's price on the days it moved: the market price, or
+            -- the lowest listing where nothing sold. For a chart.
+            CREATE TABLE IF NOT EXISTS history (
+                product_id INTEGER NOT NULL,
+                printing TEXT NOT NULL,
+                day TEXT NOT NULL,
+                price REAL NOT NULL,
+                PRIMARY KEY (product_id, printing, day)
+            ) WITHOUT ROWID;
             """
         )
         self._importing = False
@@ -206,7 +215,56 @@ class TcgplayerPrices:
                     ],
                 )
         self.set_groups.clear()
+        day = (_utc(stamp.text.strip()) or datetime.now(timezone.utc).strftime("%Y-%m-%d"))[:10]
+        self.record_day(day, ((row[0], row[1], row[2], row[3]) for row in rows))
         return len(rows)
+
+    def record_day(self, day: str, rows) -> int:
+        """Keeps [day]'s prices, (product, printing, market, low) each, where
+        they moved: a price within 2% (or two cents) of the last one kept
+        before that day adds nothing a chart would show."""
+        kept = 0
+        with self._lock:
+            with self._conn:
+                for product_id, printing, market, low in rows:
+                    price = market if isinstance(market, (int, float)) and market > 0 else low
+                    if not isinstance(price, (int, float)) or price <= 0:
+                        continue
+                    last = self._conn.execute(
+                        "SELECT price FROM history WHERE product_id = ? AND printing = ? AND day < ? "
+                        "ORDER BY day DESC LIMIT 1",
+                        (product_id, printing, day),
+                    ).fetchone()
+                    if last is not None and abs(price - last[0]) < max(0.02, 0.02 * last[0]):
+                        continue
+                    self._conn.execute(
+                        "INSERT OR REPLACE INTO history VALUES (?, ?, ?, ?)",
+                        (int(product_id), str(printing), day, round(float(price), 2)),
+                    )
+                    kept += 1
+        return kept
+
+    def history(
+        self, product_id: int | None, *, reverse: bool = False, first_edition: bool | None = None
+    ) -> list[tuple[str, float]]:
+        """(day, dollars) for the copy's printing, oldest first: the days
+        its price moved. Empty for a product or printing never priced."""
+        if product_id is None:
+            return []
+        with self._lock:
+            printings = [row[0] for row in self._conn.execute(
+                "SELECT DISTINCT printing FROM history WHERE product_id = ?", (product_id,)
+            )]
+            chosen = pick_printing(
+                {name: {"name": name} for name in printings},
+                reverse=reverse, first_edition=first_edition,
+            )
+            if chosen is None:
+                return []
+            return [(str(day), float(price)) for day, price in self._conn.execute(
+                "SELECT day, price FROM history WHERE product_id = ? AND printing = ? ORDER BY day",
+                (product_id, chosen["name"]),
+            )]
 
     def groups_for(self, product_ids: list[int], set_code: str, catalogue_language: str) -> set[int]:
         """TCGplayer's sets that hold a catalogue set's cards: the ones most of

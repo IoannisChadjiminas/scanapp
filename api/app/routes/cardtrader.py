@@ -104,6 +104,26 @@ def _on_tcgplayer(request: Request, reader, store, row) -> int | None:
     return store.find(groups, row["collector_number"], card_names(row["cardmarket_url"], row["name"]))
 
 
+def _tcgplayer_candidates(
+    request: Request, reader, store, row, product: int | None, first_edition: bool | None
+) -> list[int]:
+    """The TCGplayer products that may be the card, most trusted first: the
+    one CardTrader names for the card; else the card in TCGplayer's own set,
+    or the product of the CardTrader card found by set and number."""
+    main = _main(row, product)
+    if product is None and not main:
+        return []
+    if first_edition and product is not None:
+        product = reader.first_edition_product(product) or product
+        main = _main(row, product)
+    candidates = [reader.tcgplayer_id(product) if product is not None else None]
+    if main:
+        candidates.append(_on_tcgplayer(request, reader, store, row))
+        found = _on_cardtrader(request, reader, row)
+        candidates.append(None if found is None else found[1])
+    return list(dict.fromkeys(item for item in candidates if item is not None))
+
+
 class CardTraderPrice(BaseModel):
     label: str
     amount: float
@@ -186,23 +206,72 @@ def get_tcgplayer_prices(
     # TCGplayer prices English and Japanese printings only.
     if str(row["language"] or "en").lower() not in {"en", "ja"}:
         return TcgplayerPrices(enabled=True)
-    main = _main(row, product)
-    if product is None and not main:
-        return TcgplayerPrices(enabled=True)
-    if first_edition and product is not None:
-        product = reader.first_edition_product(product) or product
-        main = _main(row, product)
-    # The product CardTrader names for the card first; else the card in
-    # TCGplayer's own set, or the product of the CardTrader card found by
-    # set and number. The first with a price is shown.
-    candidates = [reader.tcgplayer_id(product) if product is not None else None]
-    if main:
-        candidates.append(_on_tcgplayer(request, reader, store, row))
-        found = _on_cardtrader(request, reader, row)
-        candidates.append(None if found is None else found[1])
     answer = store.prices(None)
-    for candidate in dict.fromkeys(item for item in candidates if item is not None):
+    for candidate in _tcgplayer_candidates(request, reader, store, row, product, first_edition):
         answer = store.prices(candidate, reverse=reverse, first_edition=first_edition)
         if answer["prices"]:
             break
     return TcgplayerPrices.model_validate(answer)
+
+
+class HistoryPoint(BaseModel):
+    day: str
+    amount: float
+
+
+class PriceHistory(BaseModel):
+    # Cardmarket's daily trend, in euros, on the days it changed, with the
+    # newest day repeated so the line reaches it.
+    cardmarket: list[HistoryPoint] = Field(default_factory=list)
+    # TCGplayer's market price (or lowest listing), in dollars, likewise.
+    tcgplayer: list[HistoryPoint] = Field(default_factory=list)
+
+
+def _reaching(points: list[tuple[str, float]], last_day: str | None) -> list[HistoryPoint]:
+    """The stored changes as a line that runs to [last_day]."""
+    found = [HistoryPoint(day=day, amount=round(amount, 2)) for day, amount in points if amount > 0]
+    if found and last_day and last_day > found[-1].day:
+        found.append(HistoryPoint(day=last_day, amount=found[-1].amount))
+    return found
+
+
+@router.get("/prices/history", response_model=PriceHistory)
+def get_price_history(
+    request: Request,
+    card_id: str = Query(min_length=1, max_length=120),
+    reverse: bool = False,
+    first_edition: bool | None = None,
+    url: str | None = Query(default=None, max_length=500),
+) -> PriceHistory:
+    """A card's price over time, for a chart, from what the server kept."""
+    from app import price_history
+
+    row, product = _product(request, card_id, url)
+    answer = PriceHistory()
+    # Cardmarket's trend is the unlimited print's: a first edition has none.
+    if product is not None and not first_edition:
+        history = request.app.state.dbs.portfolio
+        first, second = ("trend_holo", "trend") if reverse else ("trend", "trend_holo")
+        try:
+            rows = price_history.guide_history(history, product)
+            last = history.execute("SELECT MAX(day) FROM price_guide_import_days").fetchone()
+        except Exception as exc:  # no history tables yet
+            log.warning("price history read failed error_type=%s", type(exc).__name__)
+            rows, last = [], None
+        points: list[tuple[str, float]] = []
+        for item in rows:
+            amount = item.get(first) or item.get(second)
+            # Rows are kept when any figure changed: only a new trend is a point.
+            if amount and (not points or points[-1][1] != amount):
+                points.append((str(item["day"]), float(amount)))
+        answer.cardmarket = _reaching(points, None if last is None else str(last[0] or "") or None)
+    reader = getattr(request.app.state, "cardtrader", None)
+    store = getattr(request.app.state, "tcgplayer", None)
+    if reader is not None and store is not None and str(row["language"] or "en").lower() in {"en", "ja"}:
+        for candidate in _tcgplayer_candidates(request, reader, store, row, product, first_edition):
+            points = store.history(candidate, reverse=reverse, first_edition=first_edition)
+            if points:
+                priced = (store._meta("priced_at") or "")[:10] or None
+                answer.tcgplayer = _reaching(points, priced)
+                break
+    return answer
