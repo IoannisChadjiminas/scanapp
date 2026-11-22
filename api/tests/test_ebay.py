@@ -194,6 +194,13 @@ def test_a_promo_is_found_by_its_code():
     assert not listing_is("2014 POKEMON XY BLACK STAR PROMO #XY29 CHARIZARD EX PSA 10", venusaur)
     assert not listing_is("Venusaur EX XY123 Black Star Promo PSA 10", venusaur)
     assert not listing_is("Venusaur EX XY28 Jumbo Oversized Promo PSA 10", venusaur)
+    # Merchandise a seller filed as a graded single card.
+    jirachi = GradedCard("Jirachi", "XY67a", "PSA", "10", total=211,
+                         set_name="XY Black Star Promos", set_code="xyp")
+    assert listing_is("2017 POKEMON XY BLACK STAR PROMO #XY67A FULL ART/JIRACHI PSA 10", jirachi)
+    assert not listing_is(
+        "READ Jirachi 2017 Premium Trainer XY Collection Promo XY67a LARGE BLANKET 50x60",
+        jirachi, graded=True)
     # A promo series runs for years: the title's year is not held against it.
     assert listing_is("2017 POKEMON XY BLACK STAR PROMO #XY28 FULL ART/VENUSAUR EX PSA 10", venusaur)
     # A numbered promo is named by its series and "promo".
