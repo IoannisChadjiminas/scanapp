@@ -464,7 +464,8 @@ class Settings(BaseSettings):
     ebay_environment: str = "production"
     ebay_marketplace: str = "EBAY_US"
     ebay_currency: str = "USD"
-    ebay_reuse_minutes: int = 360
+    # How long an answer for a card and grade stands, for every collector.
+    ebay_reuse_minutes: int = 1440
     # No paid read for a card whose Cardmarket trend is below this (EUR). A card
     # with no known trend is still read. 0 reads every card.
     # 0 = no flat floor: the value tiers in CARDMARKET_FRESH_TIERS decide.
