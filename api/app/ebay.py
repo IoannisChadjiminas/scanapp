@@ -218,8 +218,11 @@ def listing_is(title: str, card: GradedCard) -> bool:
         # A "#185" is the card's number, whatever else the title holds: the
         # 151 set's labels read "MEW EN-151", so "151" alone proves nothing.
         marked = [_plain_number(number) for number in re.findall(r"#\s*(\d+)", title)]
+        # An unmarked number counts unless it is also a word of the set's
+        # or the card's name: "151" in a title of the 151 set is the set.
+        spoken = {_plain_number(word) for word in (*card.set_words, *_words(card.name))}
         numbered = all(number == wanted for number in marked) if marked else (
-            wanted in {_plain_number(word) for word in present}
+            wanted not in spoken and wanted in {_plain_number(word) for word in present}
         )
         if not numbered:
             # A few reprint sets are numbered in the catalogue by their own

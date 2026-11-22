@@ -159,6 +159,14 @@ def test_a_slab_label_title_is_matched_by_its_set():
     assert listing_is("2023 POKEMON MEW EN-151 #151 MEW EX PSA 10", mew151)
     assert not listing_is("2023 POKEMON MEW EN-151 #185 ARBOK ex ULTRA RARE PSA 10", mew151)
     assert not listing_is("2023 POKEMON MEW EN 151 ULTRA RARE #192 ZAPDOS EX PSA 10", mew151)
+    # No "#" at all: the bare "151" is the set, not the card's number.
+    assert not listing_is("Zapdos ex Ultra Rare Pokemon Scarlet & Violet 151 MEW PSA 10 GEM MT", mew151)
+    assert not listing_is("Mew ex SR Pokemon Card 151 PSA 10", mew151)
+    assert listing_is("MEW EX 151/165 Double Rare RR Pokemon EN 151 S&V English 2023 PSA 10 GEM", mew151)
+    # A bare number that is not a set word still counts.
+    umbreon = GradedCard("Umbreon VMAX", "215", "PSA", "10", total=203, year=2021,
+                         set_name="Evolving Skies", set_code="swsh7")
+    assert listing_is("Umbreon VMAX 215 Evolving Skies Secret Rare Holo 2021 PSA 10 67718943", umbreon)
     # Outside the reprint sets a name alone never stands in for the number.
     arbok = GradedCard("Arbok", "24", "PSA", "10", total=165, year=2023,
                        set_name="151", set_code="sv03.5", unique_name=True)
