@@ -67,6 +67,9 @@ _NOT_A_CARD = re.compile(
     r"read\s+desc\w*|empty|case\s+only|display|sealed|booster|box|pack|"
     r"signed|autograph\w*|auto|error|misprint|miscut|damaged|"
     r"big\s+three|trio|duo|pair|both|all\s+three|set\s+of|complete|"
+    # Merchandise filed among single cards: a "LARGE BLANKET 50x60".
+    r"blanket|poster|playmat|play\s+mat|sleeves?|binder|plush|keychain|magnet|"
+    r"stickers?|canvas|towel|shirt|mug|coin|pin|art\s+print|read|"
     r"(?:pristine|perfect)\s*10|black\s+label)\b",
     re.IGNORECASE,
 )
