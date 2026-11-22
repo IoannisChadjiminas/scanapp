@@ -64,6 +64,9 @@ def get_graded(
     grade: str = Query(min_length=1, max_length=3),
     reverse: bool = False,
     first_edition: bool | None = None,
+    # Only what is already held: eBay is not asked. For showing a price
+    # another collector's check already paid for, without a press.
+    cached_only: bool = False,
 ) -> EbayGraded:
     reader = getattr(request.app.state, "ebay", None)
     if reader is None:
@@ -105,6 +108,9 @@ def get_graded(
             (row["set_id"], row["language"], row["name"]),
         ).fetchone()[0] == 1,
     )
+    if cached_only:
+        kept = reader.kept(card)
+        return EbayGraded.model_validate(kept) if kept else EbayGraded(enabled=True)
     try:
         return EbayGraded.model_validate(reader.graded(card))
     except (httpx.HTTPError, ValueError, KeyError) as exc:

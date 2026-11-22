@@ -361,7 +361,7 @@ def _reader(calls, items, *, by_ebay=(), details=None):
 PIKACHU = GradedCard("Pikachu", "58", "PSA", "10", total=102, year=1999, set_name="Base Set")
 
 
-def test_the_cheapest_five_are_averaged_and_asked_once_in_six_hours():
+def test_the_cheapest_five_are_averaged_and_asked_once_a_day():
     calls: list[str] = []
     prices = [100, 110, 120, 130, 140, 900, 1500]
     reader = _reader(calls, [_item(f"Pikachu 58/102 Base Set PSA 10 #{n}", n) for n in prices])
@@ -389,6 +389,45 @@ def test_one_dear_listing_does_not_move_the_price():
     # The middle of the five, where their mean would be 1,200.80.
     assert reader.graded(PIKACHU)["average"] == 775.0
     reader.close()
+
+
+def test_an_answer_stands_a_day_for_everyone_and_survives_a_restart(tmp_path):
+    found = [_item(f"Pikachu 58/102 Base Set PSA 10 #{n}", n) for n in (100, 110, 120)]
+
+    def reader(calls):
+        return Ebay("id", "secret", path=tmp_path / "ebay.sqlite", client=httpx.Client(
+            base_url="https://ebay.test",
+            transport=httpx.MockTransport(lambda request: (
+                calls.append(request.url.path),
+                httpx.Response(200, json=(
+                    {"access_token": "token", "expires_in": 7200}
+                    if request.url.path.endswith("/token")
+                    else {"itemSummaries": found} if "search" in request.url.path else {}
+                )),
+            )[1]),
+        ))
+
+    first_calls: list[str] = []
+    first = reader(first_calls)
+    # Nothing held yet: the cache alone has no answer, and eBay is not asked.
+    assert first.kept(PIKACHU) is None and first_calls == []
+    answer = first.graded(PIKACHU)
+    assert answer["average"] == 110.0 and first_calls
+    assert first.kept(PIKACHU) == answer
+    first.close()
+
+    # Another server process, another collector: read from disk, no eBay call.
+    second_calls: list[str] = []
+    second = reader(second_calls)
+    assert second.kept(PIKACHU) == answer
+    assert second.graded(PIKACHU) == answer and second_calls == []
+    # Another grade of the same card is another question.
+    other = GradedCard("Pikachu", "58", "PSA", "9", total=102, year=1999, set_name="Base Set")
+    assert second.kept(other) is None
+    # After a day it is asked again.
+    second.reuse_s = 0
+    assert second.kept(PIKACHU) is None
+    second.close()
 
 
 def test_ebays_own_grade_stands_in_for_a_title_that_does_not_say_it():
@@ -517,6 +556,15 @@ def test_the_route_builds_the_search_from_the_catalogue_card(tmp_path):
     assert ask(card_id="en:base1-58", grader="XYZ", grade="10").status_code == 422
     assert ask(card_id="en:base1-58", grader="PSA", grade="11").status_code == 422
     assert ask(card_id="nope", grader="PSA", grade="10").status_code == 404
+
+    # The cache alone: the card just asked about is there, another is not,
+    # and eBay is not asked for it.
+    held = ask(card_id="en:base1-58", grader="PSA", grade="10", cached_only="true").json()
+    assert held["average"] == 20.0
+    before = len(calls)
+    miss = ask(card_id="en:base1-58", grader="PSA", grade="9", cached_only="true").json()
+    assert miss["enabled"] is True and miss["average"] is None and miss["listings"] == []
+    assert len(calls) == before
 
     app.state.ebay = None
     assert ask(card_id="en:base1-58", grader="PSA", grade="10").json()["enabled"] is False

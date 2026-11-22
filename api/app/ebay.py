@@ -4,7 +4,8 @@ Only graded copies, and only asking prices: eBay gives sold prices to approved
 partners alone, so this is the average of the cheapest Buy It Now listings for
 the card in the copy's grade. Auctions are left out: a current bid says
 nothing until the auction ends. The server asks, never the phone; an answer is
-reused for six hours.
+reused for a day, by everyone: the first
+collector to ask about a card pays for the lookup, the rest read it from here.
 
 eBay titles are free text, so a listing counts only when its title passes
 every rule in `listing_is` (the card's name, number, year and language; the
@@ -16,13 +17,16 @@ the same number (Celebrations "4/102"), raw cards titled "NOT PSA 10" and
 from __future__ import annotations
 
 import base64
+import json
 import logging
 import re
+import sqlite3
 import statistics
 import threading
 import time
 from dataclasses import dataclass
 from datetime import datetime, timezone
+from pathlib import Path
 from typing import Any
 
 import httpx
@@ -451,7 +455,8 @@ class Ebay:
         environment: str = "production",
         marketplace: str = "EBAY_US",
         currency: str = "USD",
-        reuse_s: int = 6 * 3600,
+        reuse_s: int = 24 * 3600,
+        path: Path | None = None,
         take: int = 5,
         least: int = 3,
         client: httpx.Client | None = None,
@@ -469,10 +474,28 @@ class Ebay:
         )
         self._lock = threading.Lock()
         self._token: tuple[float, str] | None = None
-        self._kept: dict[GradedCard, tuple[float, dict[str, Any]]] = {}
+        # Answers by card and grade. On disk where a path is given, so a
+        # restart does not ask eBay for everything again.
+        self._store = sqlite3.connect(path or ":memory:", check_same_thread=False)
+        self._store.execute(
+            "CREATE TABLE IF NOT EXISTS answers (card TEXT PRIMARY KEY, at REAL NOT NULL, answer TEXT NOT NULL)"
+        )
+        self._store.commit()
 
     def close(self) -> None:
         self._client.close()
+        with self._lock:
+            self._store.close()
+
+    def kept(self, card: GradedCard) -> dict[str, Any] | None:
+        """The answer already held for the card and grade, while it stands."""
+        with self._lock:
+            row = self._store.execute(
+                "SELECT at, answer FROM answers WHERE card = ?", (repr(card),)
+            ).fetchone()
+        if row is None or time.time() - float(row[0]) >= self.reuse_s:
+            return None
+        return json.loads(row[1])
 
     def _bearer(self) -> str:
         with self._lock:
@@ -567,9 +590,9 @@ class Ebay:
     def graded(self, card: GradedCard) -> dict[str, Any]:
         """The app's payload: the average of the cheapest listings, how many
         matched, the listings averaged, and when eBay was asked."""
-        kept = self._kept.get(card)
-        if kept is not None and time.time() - kept[0] < self.reuse_s:
-            return kept[1]
+        kept = self.kept(card)
+        if kept is not None:
+            return kept
         items = self.search(card)
         listings = graded_listings(items, card, currency=self.currency)
         # The cheapest listings set the average, so each is opened and
@@ -604,10 +627,15 @@ class Ebay:
             "listings": cheapest,
             "observed_at": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
         }
-        self._kept[card] = (time.time(), answer)
-        if len(self._kept) > 5000:
-            cutoff = time.time() - self.reuse_s
-            self._kept = {k: v for k, v in self._kept.items() if v[0] >= cutoff}
+        with self._lock:
+            with self._store:
+                self._store.execute(
+                    "INSERT OR REPLACE INTO answers VALUES (?, ?, ?)",
+                    (repr(card), time.time(), json.dumps(answer)),
+                )
+                self._store.execute(
+                    "DELETE FROM answers WHERE at < ?", (time.time() - self.reuse_s,)
+                )
         return answer
 
 
@@ -638,4 +666,5 @@ def from_settings(settings) -> Ebay | None:
         marketplace=settings.ebay_marketplace,
         currency=settings.ebay_currency,
         reuse_s=max(300, int(settings.ebay_reuse_minutes) * 60),
+        path=settings.data_dir / "ebay.sqlite",
     )
