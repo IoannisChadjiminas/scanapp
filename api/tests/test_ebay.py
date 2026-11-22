@@ -152,6 +152,17 @@ def test_a_slab_label_title_is_matched_by_its_set():
                      set_name="ポケモンカード151", set_code="sv2a")
     assert mew.set_search == "Mew ex sv2a Japanese PSA 10"
     assert listing_is("2023 POKEMON JAPANESE SV2A-POKEMON CARD 151 #205 MEW EX PSA 10", mew)
+    # The 151 set's labels read "MEW EN-151": another card of it holds
+    # every word of "Mew ex" and the number 151, but says "#185".
+    mew151 = GradedCard("Mew ex", "151", "PSA", "10", total=165, year=2023,
+                        set_name="151", set_code="sv03.5")
+    assert listing_is("2023 POKEMON MEW EN-151 #151 MEW EX PSA 10", mew151)
+    assert not listing_is("2023 POKEMON MEW EN-151 #185 ARBOK ex ULTRA RARE PSA 10", mew151)
+    assert not listing_is("2023 POKEMON MEW EN 151 ULTRA RARE #192 ZAPDOS EX PSA 10", mew151)
+    # Outside the reprint sets a name alone never stands in for the number.
+    arbok = GradedCard("Arbok", "24", "PSA", "10", total=165, year=2023,
+                       set_name="151", set_code="sv03.5", unique_name=True)
+    assert not listing_is("2023 POKEMON MEW EN-151 #185 ARBOK ex ULTRA RARE PSA 10", arbok)
     # "Base Set 2" is another set.
     base = GradedCard("Charizard", "4", "PSA", "9", total=102, year=1999, set_name="Base Set")
     assert listing_is("1999 POKEMON GAME BASE SET #4 CHARIZARD HOLO PSA 9", base)
