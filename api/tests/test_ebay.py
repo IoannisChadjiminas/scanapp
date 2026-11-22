@@ -179,6 +179,56 @@ def test_a_slab_label_title_is_matched_by_its_set():
     assert not listing_is("2000 POKEMON BASE SET 2 #4 CHARIZARD HOLO PSA 9", base)
 
 
+def test_a_promo_is_found_by_its_code():
+    venusaur = GradedCard("Venusaur EX", "XY28", "PSA", "10", total=211, year=2014,
+                          set_name="XY Black Star Promos", set_code="xyp")
+    # Never "XY28/211": promos carry no total.
+    assert venusaur.search == "Venusaur EX XY28 PSA 10"
+    assert venusaur.set_search == "Venusaur EX xy promo PSA 10"
+    for title in (
+        "2014 POKEMON XY BLACK STAR PROMO #XY28 VENUSAUR EX PSA 10",
+        "Venusaur EX XY28 Black Star Promo Holo PSA 10 GEM MINT",
+        "Pokemon Venusaur EX XY28 PSA 10",
+    ):
+        assert listing_is(title, venusaur), title
+    assert not listing_is("2014 POKEMON XY BLACK STAR PROMO #XY29 CHARIZARD EX PSA 10", venusaur)
+    assert not listing_is("Venusaur EX XY123 Black Star Promo PSA 10", venusaur)
+    assert not listing_is("Venusaur EX XY28 Jumbo Oversized Promo PSA 10", venusaur)
+    # A promo series runs for years: the title's year is not held against it.
+    assert listing_is("2017 POKEMON XY BLACK STAR PROMO #XY28 FULL ART/VENUSAUR EX PSA 10", venusaur)
+    # A numbered promo is named by its series and "promo".
+    resort = GradedCard("Paradise Resort", "150", "PSA", "10", total=225, year=2024,
+                        set_name="SVP Black Star Promos", set_code="svp")
+    assert listing_is("2024 POKEMON SVP EN-SV BLACK STAR PROMO #150 PARADISE RESORT PSA 10", resort)
+    assert not listing_is("2024 POKEMON SVP EN-SV BLACK STAR PROMO #151 PARADISE RESORT PSA 10", resort)
+    # A trainer gallery number.
+    mimikyu = GradedCard("Mimikyu V", "TG16", "PSA", "10", total=30, year=2022,
+                         set_name="Brilliant Stars Trainer Gallery", set_code="swsh9tg")
+    assert mimikyu.search == "Mimikyu V TG16 PSA 10"
+    assert listing_is("PSA 10 Mimikyu V TG16/TG30 Pokemon Brilliant Stars Trainer Gallery", mimikyu)
+    assert not listing_is("PSA 10 Mimikyu VMAX TG17/TG30 Pokemon Brilliant Stars", mimikyu)
+    # A reprint set's card under the number it reprints.
+    magikarp = GradedCard("Shining Magikarp", "CC010", "PSA", "10", total=25, year=2021,
+                          set_name="Celebrations Classic Collection", set_code="cel25cc",
+                          unique_name=True)
+    assert listing_is("2021 Pokemon Celebrations Classic Collection Shining Magikarp 66/64 PSA 10", magikarp)
+    assert not listing_is("2001 Pokemon Neo Revelation Shining Magikarp 66/64 PSA 10", magikarp)
+
+
+def test_a_word_of_the_sets_own_name_does_not_rule_a_listing_out():
+    zygarde = GradedCard("Mega Zygarde ex", "124", "PSA", "10", total=88, year=2026,
+                         set_name="Perfect Order", set_code="me03")
+    assert listing_is("2026 POKEMON PERFECT ORDER #124 MEGA ZYGARDE EX PSA 10", zygarde)
+    assert listing_is("Mega Zygarde ex 124/088 Perfect Order SIR PSA 10 GEM MINT", zygarde)
+    # "Perfect 10" and "Pristine 10" are still dearer slabs, for any set.
+    cgc = GradedCard("Mega Zygarde ex", "124", "CGC", "10", total=88, year=2026,
+                     set_name="Perfect Order", set_code="me03")
+    assert listing_is("Mega Zygarde ex 124/088 Perfect Order CGC 10 Gem Mint", cgc)
+    assert not listing_is("Mega Zygarde ex 124/088 Perfect Order CGC Perfect 10", cgc)
+    assert not listing_is("Mega Zygarde ex 124/088 Perfect Order CGC Pristine 10", cgc)
+    assert not listing_is("Mega Zygarde ex 124/088 Perfect Order booster box PSA 10", zygarde)
+
+
 def test_only_buy_it_now_listings_count_and_a_stray_cheap_one_is_left_out():
     items = [_item(f"Charizard 4/102 Base Set 1999 PSA 9 #{n}", n) for n in (3500, 3900, 4000, 4000, 4200)]
     items += [
@@ -255,6 +305,14 @@ def test_the_cheapest_five_are_averaged_and_asked_once_in_six_hours():
     reader.close()
 
 
+def test_one_dear_listing_does_not_move_the_price():
+    prices = [680, 750, 775, 800, 2999]
+    reader = _reader([], [_item(f"Pikachu 58/102 Base Set PSA 10 #{n}", n) for n in prices])
+    # The middle of the five, where their mean would be 1,200.80.
+    assert reader.graded(PIKACHU)["average"] == 775.0
+    reader.close()
+
+
 def test_ebays_own_grade_stands_in_for_a_title_that_does_not_say_it():
     catalogue = "Pikachu 58/102 Base Set Holo"
     assert not listing_is(catalogue, PIKACHU)
@@ -321,10 +379,12 @@ def test_every_grader_the_app_offers_has_ebays_name():
     reader.close()
 
 
-def test_too_few_listings_give_no_average():
+def test_too_few_listings_give_no_average_but_are_still_listed():
     reader = _reader([], [_item("Pikachu 58/102 PSA 10", 100), _item("Pikachu 58/102 PSA 10", 120)])
     answer = reader.graded(PIKACHU)
-    assert answer["average"] is None and answer["listings"] == [] and answer["count"] == 2
+    # No average from two listings, but the two are still sent.
+    assert answer["average"] is None and answer["count"] == 2
+    assert [item["amount"] for item in answer["listings"]] == [100, 120]
     reader.close()
 
 
