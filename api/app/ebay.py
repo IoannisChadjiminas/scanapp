@@ -67,7 +67,7 @@ _NOT_A_CARD = re.compile(
     r"read\s+desc\w*|empty|case\s+only|display|sealed|booster|box|pack|"
     r"signed|autograph\w*|auto|error|misprint|miscut|damaged|"
     r"big\s+three|trio|duo|pair|both|all\s+three|set\s+of|complete|"
-    r"pristine|perfect|black\s+label)\b",
+    r"(?:pristine|perfect)\s*10|black\s+label)\b",
     re.IGNORECASE,
 )
 # A raw card dressed as a slab: "NOT PSA 10", "PSA 10 worthy", "PSA ready".
@@ -94,7 +94,7 @@ _OTHER_LANGUAGE = re.compile(
     re.IGNORECASE,
 )
 # Sets whose cards keep the number of the card they reprint.
-REPRINT_SETS = {"30th-c", "cel25c"}
+REPRINT_SETS = {"30th-c", "cel25c", "cel25cc"}
 # Words of a set's name that do not tell sets apart.
 _SET_NOISE = {"pokemon", "pokémon", "the", "and", "of", "set", "tcg", "card", "cards", "game"}
 _YEAR = re.compile(r"(?<!\d)(19[89]\d|20[0-4]\d)(?!\d)")
@@ -122,19 +122,36 @@ class GradedCard:
     unique_name: bool = False
 
     @property
+    def lettered(self) -> bool:
+        """A number with letters ("XY28", "SM167", "TG16") is a promo's or a
+        subset's code: with the card's name it is the card, and it is never
+        written over the set's total."""
+        return any(ch.isalpha() for ch in self.number)
+
+    @property
+    def number_label(self) -> str:
+        """The number as sellers write it: "4/102", or "XY28" alone."""
+        return f"{self.number}/{self.total}" if self.total and not self.lettered else self.number
+
+    @property
     def search(self) -> str:
         """What eBay is asked for, as sellers title their listings."""
-        number = f"{self.number}/{self.total}" if self.total else self.number
         return " ".join(
             part for part in (
-                self.name, number, "Japanese" if self.japanese else "", self.grader, self.grade
+                self.name, self.number_label, "Japanese" if self.japanese else "",
+                self.grader, self.grade,
             ) if part
         )
 
     @property
     def set_words(self) -> list[str]:
-        """The words that name the set, without ones every title has."""
-        return [word for word in _words(self.set_name) if word not in _SET_NOISE]
+        """The words that name the set, each in the singular, without ones
+        every title has. A promo set is its series and "promo": sellers
+        seldom write "Black Star"."""
+        words = [_one(word) for word in _words(self.set_name) if word not in _SET_NOISE]
+        if "promo" in words:
+            words = [word for word in words if word not in {"black", "star"}]
+        return words
 
     @property
     def set_search(self) -> str:
@@ -149,6 +166,11 @@ class GradedCard:
                 self.name, named, "Japanese" if self.japanese else "", self.grader, self.grade
             ) if part
         )
+
+
+def _one(word: str) -> str:
+    """"promos" and "promo", "celebrations" and "celebration" are one word."""
+    return word[:-1] if len(word) > 3 and word.endswith("s") and not word.endswith("ss") else word
 
 
 def _words(text: str) -> list[str]:
@@ -191,7 +213,7 @@ def names_grade(title: str, grader: str, grade: str) -> bool:
 def _names_set(title: str, card: GradedCard) -> bool:
     """Whether a title names the card's set: every word of its name, or its
     code; and not a later set that only adds a number ("Base Set 2")."""
-    present = _words(title)
+    present = [_one(word) for word in _words(title)]
     words = card.set_words
     by_name = bool(words) and all(word in present for word in words)
     by_code = bool(card.set_code) and card.set_code.lower() in present
@@ -221,8 +243,12 @@ def listing_is(title: str, card: GradedCard, *, graded: bool = False) -> bool:
             return False
     elif not names_grade(title, card.grader, card.grade):
         return False
-    if _NOT_A_CARD.search(title) or _BAIT.search(title):
-        return False
+    # A word that rules a listing out does not when it is part of the card's
+    # or the set's own name (the set "Perfect Order", a card named "Pick").
+    own = f"{card.name} {card.set_name}".lower()
+    for rule in (_NOT_A_CARD, _BAIT):
+        if any(found.group(0).lower() not in own for found in rule.finditer(title)):
+            return False
     # Every word of the card's name.
     present = set(_words(title))
     if not all(word in present for word in _words(card.name)):
@@ -231,14 +257,22 @@ def listing_is(title: str, card: GradedCard, *, graded: bool = False) -> bool:
     # a title without one ("#4", as on a slab's label) must name the set too.
     wanted = _plain_number(card.number)
     fractions = _FRACTION.findall(title)
-    if fractions:
-        if any(_plain_number(number) != wanted for number, _ in fractions):
-            return False
-        if card.total:
-            if not any(int(total) == card.total for _, total in fractions):
+    # A reprint set's cards keep the number of the card they reprint, not
+    # the catalogue's: there the set and a name no other card in it has are
+    # the card, whatever number the title gives.
+    reprint = card.set_code in REPRINT_SETS and card.unique_name and _names_set(title, card)
+    if card.lettered and wanted in {_plain_number(word) for word in present}:
+        # "XY28", "TG16": a code that, with the name, is the card.
+        pass
+    elif fractions:
+        if not reprint:
+            if any(_plain_number(number) != wanted for number, _ in fractions):
                 return False
-        elif not _names_set(title, card):
-            return False
+            if card.total:
+                if not any(int(total) == card.total for _, total in fractions):
+                    return False
+            elif not _names_set(title, card):
+                return False
     else:
         if not _names_set(title, card):
             return False
@@ -251,14 +285,8 @@ def listing_is(title: str, card: GradedCard, *, graded: bool = False) -> bool:
         numbered = all(number == wanted for number in marked) if marked else (
             wanted not in spoken and wanted in {_plain_number(word) for word in present}
         )
-        if not numbered:
-            # A few reprint sets are numbered in the catalogue by their own
-            # order, not by what is printed ("#4" for card 001 of 30). There
-            # the set and a name no other card in it has are the card.
-            if not (
-                card.set_code in REPRINT_SETS and card.unique_name and len(marked) == 1
-            ):
-                return False
+        if not numbered and not (reprint and len(marked) == 1):
+            return False
     # The language.
     if card.japanese != bool(_JAPANESE.search(title)) or _OTHER_LANGUAGE.search(title):
         return False
@@ -277,7 +305,8 @@ def listing_is(title: str, card: GradedCard, *, graded: bool = False) -> bool:
             if not (card.first_edition and found.group(0).lower() == "shadowless"):
                 return False
     # The year, where the title gives one: a reprint is years later.
-    if card.year is not None:
+    # Not for promos: one promo series is printed over several years.
+    if card.year is not None and "promo" not in card.set_words:
         years = [int(year) for year in _YEAR.findall(title)]
         if any(abs(year - card.year) > 1 for year in years):
             return False
@@ -438,7 +467,7 @@ class Ebay:
         from the first two carries "gradedByEbay".
         """
         jp = " Japanese" if card.japanese else ""
-        number = f"{card.number}/{card.total}" if card.total else card.number
+        number = card.number_label
         named = " ".join(card.set_words) if card.set_name.isascii() else card.set_code
         found: dict[str, dict[str, Any]] = {}
         if card.grader in GRADER_NAMES:
@@ -501,12 +530,15 @@ class Ebay:
         ]
         answer = {
             "enabled": True,
-            "average": round(sum(item["amount"] for item in cheapest) / len(cheapest), 2)
+            # The middle of the cheapest listings, not their mean: four at
+            # $750 and one at $2,999 are a $775 card, not a $1,200 one.
+            "average": round(statistics.median(item["amount"] for item in cheapest), 2)
             if enough
             else None,
             "currency": self.currency,
             "count": max(0, len(listings) - refused),
-            "listings": cheapest if enough else [],
+            # Fewer than enough for an average are still shown as they are.
+            "listings": cheapest,
             "observed_at": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
         }
         self._kept[card] = (time.time(), answer)
