@@ -1076,21 +1076,20 @@ def listing_product_id(src: str | None) -> int | None:
 
 
 def remember_listing_product(conn: sqlite3.Connection, url: str, image_url: str | None) -> None:
-    """Keep the product number a read page showed, for a listing already known.
+    """Keep the product number a read page showed, by its page.
 
-    Only the number is kept, in its own column: the listing's shown photo is
-    left alone. A listing the catalogue does not know is not added here.
+    The page of a card names the card's own product; that settles whose a
+    number shared by several cards is (`app/card_products.py`).
     """
     product_id = listing_product_id(image_url)
     product = normalize_product_url(url)
     if not product_id or not product:
         return
-    with conn:
-        conn.execute(
-            "UPDATE cardmarket_expansion_products SET product_id = ? "
-            "WHERE url = ? AND product_id IS NOT ?",
-            (product_id, product, product_id),
-        )
+    # In the server's own table: the catalogue is published separately and
+    # is not written here.
+    from app.card_products import remember_page
+
+    remember_page(conn, product, product_id)
 
 
 def public_listing_image(src: str) -> str:

@@ -12,6 +12,7 @@ from fastapi import APIRouter, HTTPException, Query, Request
 from fastapi.responses import FileResponse
 
 from app.card_images import display_image_url
+from app.card_products import SQL_JOIN, SQL_PRODUCT
 from app.catalogue_titles import stored_view_title
 from app.cardmarket import mapping_from_row, variants_for_row
 from app.price_sources import scan_finishes, scan_prices
@@ -97,10 +98,12 @@ _CTE = f"""WITH raw_prices AS (
       CASE WHEN {_GUIDE} THEN g.guide_date WHEN {_EUR} THEN COALESCE(json_extract({_DEX}, '$.updated'), t.fetched_at) END AS m_date,
       CASE WHEN {_GUIDE} THEN 'cardmarket_file' WHEN {_EUR} AND t.cardmarket_json IS NOT NULL THEN 'tcgdex' END AS m_source,
       {_RAW},
-      COALESCE(fix.plain, 0) AS m_fix_plain, COALESCE(fix.holo, 0) AS m_fix_holo
+      COALESCE(fix.plain, 0) AS m_fix_plain, COALESCE(fix.holo, 0) AS m_fix_holo,
+      {SQL_PRODUCT} AS m_product
     FROM cards{_RELEASES}
-    LEFT JOIN cardmarket_guide g ON g.id_product=cards.cardmarket_id
-    LEFT JOIN cardmarket_trend_repairs fix ON fix.id_product=cards.cardmarket_id
+    {SQL_JOIN}
+    LEFT JOIN cardmarket_guide g ON g.id_product={SQL_PRODUCT}
+    LEFT JOIN cardmarket_trend_repairs fix ON fix.id_product={SQL_PRODUCT}
     LEFT JOIN tcgdex_prices t ON t.card_id=cards.id
 ), priced AS (
     SELECT cards.*,
@@ -108,7 +111,7 @@ _CTE = f"""WITH raw_prices AS (
       {_MARKET_SELECT}, s.trend_7d_ago, s.trend_30d_ago,
       s.sales_days_30 AS m_sales_days_30, s.weekly_min_change
     FROM raw_prices cards LEFT JOIN card_market_stats s
-      ON s.id_product=cards.cardmarket_id AND s.as_of=SUBSTR(cards.m_date, 1, 10)
+      ON s.id_product=cards.m_product AND s.as_of=SUBSTR(cards.m_date, 1, 10)
       AND cards.m_source='cardmarket_file'
       AND s.basis=CASE WHEN {_HOLO} THEN 'holo' ELSE 'normal' END
 ), market_cards AS (

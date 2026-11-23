@@ -17,6 +17,7 @@ from typing import Any
 
 import httpx
 
+from app.card_products import product_for
 from app.cardmarket import prices_from_market, snapshot_record
 from app.config import Settings
 
@@ -354,11 +355,19 @@ def product_id_for_url(conn: sqlite3.Connection, url: str | None) -> int | None:
         return None
     product = normalize_product_url(url) or url
     row = conn.execute(
-        "SELECT cardmarket_id FROM cards WHERE cardmarket_url = ? AND cardmarket_id IS NOT NULL LIMIT 1",
+        "SELECT id, cardmarket_id FROM cards WHERE cardmarket_url = ? AND cardmarket_id IS NOT NULL LIMIT 1",
         (product,),
     ).fetchone()
     if row:
-        return int(row["cardmarket_id"])
+        return product_for(conn, row["id"], row["cardmarket_id"])
+    try:
+        seen = conn.execute(
+            "SELECT product_id FROM cardmarket_page_products WHERE url = ?", (product,)
+        ).fetchone()
+    except sqlite3.Error:
+        seen = None
+    if seen:
+        return int(seen["product_id"])
     try:
         listing = conn.execute(
             "SELECT product_id, listing_image_url FROM cardmarket_expansion_products WHERE url = ?",
@@ -424,7 +433,7 @@ def best_prices(conn: sqlite3.Connection, card_id: str, url: str | None) -> list
         "SELECT cardmarket_id, variants_json FROM cards WHERE id = ?", (card_id,)
     ).fetchone()
     variants = _json(card["variants_json"]) if card else {}
-    market = guide_market(conn, card["cardmarket_id"] if card else None)
+    market = guide_market(conn, product_for(conn, card_id, card["cardmarket_id"]) if card else None)
     record = snapshot_record(conn, url) if url else None
     live = list((record or {}).get("prices") or [])
     observed = (record or {}).get("observed_at") or (record or {}).get("fetched_at")
@@ -469,7 +478,7 @@ def reverse_holo_prices(conn: sqlite3.Connection, card_id: str) -> list[dict[str
     ).fetchone()
     if card is None or not finishes(_json(card["variants_json"])):
         return []
-    market = guide_market(conn, card["cardmarket_id"])
+    market = guide_market(conn, product_for(conn, card_id, card["cardmarket_id"]))
     if market:
         prices = prices_from_market(_reverse_only(market))
         if prices:
