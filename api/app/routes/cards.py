@@ -159,9 +159,9 @@ def search_sets(request: Request, language: str = "") -> list[dict]:
     cached = getattr(state, "search_sets_cache", None)
     if cached is None or cached[0] != signature:
         rows = catalog.execute(f"""SELECT cards.language, cards.set_id, MAX(cards.set_name) AS set_name,
-            set_releases.release_date, COUNT(*) AS cards FROM cards{_RELEASES}
+            set_releases.release_date, set_releases.era, COUNT(*) AS cards FROM cards{_RELEASES}
             WHERE {_PHYSICAL} AND {_LISTED_ONCE}
-            GROUP BY cards.language, cards.set_id
+            GROUP BY cards.language, cards.set_id, set_releases.release_date, set_releases.era
             ORDER BY release_date IS NULL, release_date DESC, set_name, cards.language, cards.set_id""").fetchall()
         # An expansion's market value: the sum of its cards' euro trends, as
         # search prices them. Sets with no priced card have none.

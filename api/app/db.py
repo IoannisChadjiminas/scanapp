@@ -394,6 +394,8 @@ def init_catalog(conn: sqlite3.Connection) -> None:
             ON portfolio_products(opened_at);
         """
     )
+    # Each set's era and how it was found (app.set_eras).
+    _add_columns(conn, "set_releases", {"era": "TEXT", "era_source": "TEXT"})
     conn.commit()
 
 

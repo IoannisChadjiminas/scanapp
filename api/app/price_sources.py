@@ -645,6 +645,16 @@ def refresh_tcgdex(
     return done
 
 
+def _refresh_set_eras(conn: sqlite3.Connection, catalog: sqlite3.Connection | None) -> None:
+    """Store every set's era (app.set_eras). A failure keeps the stored ones."""
+    try:
+        from app.set_eras import refresh_set_eras
+
+        refresh_set_eras(conn, catalog=catalog)
+    except Exception as exc:
+        log.info("set eras failed error=%s", type(exc).__name__)
+
+
 def refresh_all(
     conn: sqlite3.Connection,
     settings: Settings,
@@ -654,9 +664,11 @@ def refresh_all(
 ) -> None:
     """One nightly pass. A failed source leaves the older data in place.
 
-    The pass also runs once at every server start. The set totals come first:
-    they are one quick request per language, and cards show them at once.
+    The pass also runs once at every server start. Set eras come first, from
+    stored data only, then the set totals: one quick request per language,
+    and cards show them at once.
     """
+    _refresh_set_eras(conn, catalog)
     try:
         from app.set_totals import refresh_set_totals
 
@@ -683,6 +695,7 @@ def refresh_all(
         refresh_set_releases(conn, settings, catalog=catalog)
     except Exception as exc:
         log.info("set releases failed error=%s", type(exc).__name__)
+    _refresh_set_eras(conn, catalog)
 
 
 def refresh_all_on_own_connection(settings: Settings, catalog: sqlite3.Connection | None = None) -> None:
