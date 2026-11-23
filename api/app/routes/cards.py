@@ -160,7 +160,18 @@ def search_sets(request: Request, language: str = "") -> list[dict]:
             WHERE {_PHYSICAL} AND {_LISTED_ONCE}
             GROUP BY cards.language, cards.set_id
             ORDER BY release_date IS NULL, release_date DESC, set_name, cards.language, cards.set_id""").fetchall()
-        cached = (signature, [dict(row) for row in rows])
+        # An expansion's market value: the sum of its cards' euro trends, as
+        # search prices them. Sets with no priced card have none.
+        values = {
+            (row["language"], row["set_id"]): row["value"]
+            for row in catalog.execute(f"""{_CTE}
+                SELECT cards.language, cards.set_id, ROUND(SUM(m_trend), 2) AS value
+                FROM signals cards WHERE {_PHYSICAL} AND {_LISTED_ONCE} AND m_trend > 0
+                GROUP BY cards.language, cards.set_id""").fetchall()
+        }
+        cached = (signature, [
+            {**dict(row), "value": values.get((row["language"], row["set_id"]))} for row in rows
+        ])
         state.search_sets_cache = cached
     langs = expand_language(language) if language and language != "auto" else ()
     return [

@@ -69,6 +69,9 @@ def test_sets_and_language_and_fts(catalog):
     sets = search_sets(_request(catalog), language='en')
     assert [s['set_id'] for s in sets] == ['new', 'old']
     assert [s['cards'] for s in sets] == [1, 3]
+    # A set's value sums its cards' trends as search prices them: a (20,
+    # reverse only, from the holo column) and e (8) in old; d has no price.
+    assert [s['value'] for s in sets] == [10, 28]
 
 
 @pytest.mark.parametrize('sort,expected', [('price_asc', ['e','b','c','a','d']), ('momentum', ['a','b','c','e','d']), ('discount', ['e','c','a','b','d']), ('under_trend', ['b','c','a','e','d'])])
