@@ -13,6 +13,7 @@ from fastapi.responses import FileResponse
 
 from app.card_images import display_image_url
 from app.catalogue_titles import stored_view_title
+from app.set_titles import ja_sets_titled, set_view_title
 from app.cardmarket import mapping_from_row, variants_for_row
 from app.price_sources import scan_finishes, scan_prices
 from app.market_stats import capabilities
@@ -162,7 +163,10 @@ def search_sets(request: Request, language: str = "") -> list[dict]:
         cached = (signature, [dict(row) for row in rows])
         state.search_sets_cache = cached
     langs = expand_language(language) if language and language != "auto" else ()
-    return [item for item in cached[1] if not langs or item["language"] in langs]
+    return [
+        {**item, "set_view_title": set_view_title(item["language"], item["set_id"])}
+        for item in cached[1] if not langs or item["language"] in langs
+    ]
 
 
 @router.get("/search-options")
@@ -269,8 +273,25 @@ def search_cards(
         tokens = re.findall(r"[A-Za-z0-9]+", remaining)
         if tokens:
             # Quoted so a word like "and" or "not" is not read as an operator.
-            clauses.append("cards.id IN (SELECT id FROM cards_fts WHERE cards_fts MATCH ?)")
-            params.append(" ".join(f'"{token}"*' for token in tokens))
+            def fts(words: list[str]) -> str:
+                return " ".join(f'"{word}"*' for word in words)
+
+            titled, used = ja_sets_titled(tokens)
+            if titled:
+                # A Japanese expansion's English title finds its cards too; the
+                # other words still search them. Additive: nothing found by the
+                # catalogue's own names is lost.
+                rest = [token for token in tokens if token not in used]
+                ja_scope = (
+                    f"(cards.language='ja' AND cards.set_id IN ({','.join('?' for _ in titled)})"
+                    + (" AND cards.id IN (SELECT id FROM cards_fts WHERE cards_fts MATCH ?)" if rest else "")
+                    + ")"
+                )
+                clauses.append(f"(cards.id IN (SELECT id FROM cards_fts WHERE cards_fts MATCH ?) OR {ja_scope})")
+                params.extend([fts(tokens), *titled, *([fts(rest)] if rest else [])])
+            else:
+                clauses.append("cards.id IN (SELECT id FROM cards_fts WHERE cards_fts MATCH ?)")
+                params.append(fts(tokens))
     langs = expand_language(language) if language and language != "auto" else ()
     if langs:
         clause = f"cards.language IN ({','.join('?' for _ in langs)})"
