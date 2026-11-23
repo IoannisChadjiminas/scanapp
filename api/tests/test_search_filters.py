@@ -124,7 +124,33 @@ def test_http_params_and_validation(catalog):
             assert response.json()['total'] == 5
         assert client.get('/cards?offset=-1').status_code == 422
         assert client.post('/cards/search', json={'offset': -1}).status_code == 422
-        assert client.get('/search-options').json()['rarities'] == [{'value': 'rare', 'label': 'Rare'}]
+        assert client.get('/search-options').json()['rarities'] == [{'value': 'rare', 'label': 'Rare', 'cards': 5}]
+
+
+def test_search_options_rarities_of_one_set(catalog):
+    from fastapi import FastAPI
+    from fastapi.testclient import TestClient
+    from types import SimpleNamespace
+    from app.routes.cards import router
+
+    catalog.execute("UPDATE cards SET rarity = 'Special illustration rare' WHERE id = 'b'")
+    # A digital-only Pocket card's rarity is not offered.
+    catalog.execute('''INSERT INTO cards(id, provider_id, name, set_id, set_name, collector_number, language, rarity, category, variants_json)
+        VALUES ('p', 'p', 'Pikachu', 'A1', 'Genetic Apex', '1', 'en', 'One Diamond', 'Pokemon', '{}')''')
+    catalog.commit()
+    app = FastAPI()
+    app.state.dbs = SimpleNamespace(catalog=catalog)
+    app.include_router(router)
+    with TestClient(app) as client:
+        everything = client.get('/search-options').json()['rarities']
+        assert [r['value'] for r in everything] == ['rare', 'special illustration rare']
+        assert client.get('/search-options?set=en:new').json()['rarities'] == [
+            {'value': 'special illustration rare', 'label': 'Special illustration rare', 'cards': 1},
+        ]
+        assert client.get('/search-options?set=en:old').json()['rarities'] == [
+            {'value': 'rare', 'label': 'Rare', 'cards': 3},
+        ]
+        assert client.get('/search-options?set=en:none').json()['rarities'] == []
 
 
 def test_attached_snapshot_join_and_sets_cache(catalog):

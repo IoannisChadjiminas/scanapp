@@ -170,10 +170,32 @@ def search_sets(request: Request, language: str = "") -> list[dict]:
 
 
 @router.get("/search-options")
-def search_options(request: Request) -> dict:
-    rows = request.app.state.dbs.catalog.execute("""SELECT LOWER(TRIM(rarity)) AS value, MIN(TRIM(rarity)) AS label
-        FROM cards WHERE rarity IS NOT NULL AND LOWER(TRIM(rarity)) NOT IN ('', 'none', 'null')
-        GROUP BY LOWER(TRIM(rarity)) ORDER BY value""").fetchall()
+def search_options(
+    request: Request,
+    set_key: Annotated[str | None, Query(alias="set", max_length=64)] = None,
+) -> dict:
+    """The rarities search can filter by, with how many cards have each.
+
+    Digital-only Pocket cards are left out, as search leaves them out. With
+    `set` (`ja:SV10`), only the rarities of that expansion's cards.
+    """
+    where = [
+        "cards.rarity IS NOT NULL",
+        "LOWER(TRIM(cards.rarity)) NOT IN ('', 'none', 'null')",
+        _PHYSICAL,
+        _LISTED_ONCE,
+    ]
+    params: list[str] = []
+    if set_key and ":" in set_key:
+        language, set_id = set_key.split(":", 1)
+        where.append("cards.language = ? AND cards.set_id = ?")
+        params.extend([language, set_id])
+    rows = request.app.state.dbs.catalog.execute(
+        f"""SELECT LOWER(TRIM(cards.rarity)) AS value, MIN(TRIM(cards.rarity)) AS label,
+            COUNT(*) AS cards FROM cards WHERE {' AND '.join(where)}
+            GROUP BY LOWER(TRIM(cards.rarity)) ORDER BY value""",
+        params,
+    ).fetchall()
     return {"rarities": [dict(row) for row in rows], "history": capabilities(request.app.state.dbs.catalog)}
 
 
