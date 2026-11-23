@@ -335,6 +335,13 @@ def init_catalog(conn: sqlite3.Connection) -> None:
             avg1_holo REAL, avg7_holo REAL, avg30_holo REAL,
             guide_date TEXT NOT NULL
         );
+        CREATE TABLE IF NOT EXISTS cardmarket_card_products (
+            card_id TEXT PRIMARY KEY, product_id INTEGER,
+            source TEXT NOT NULL, updated_at TEXT NOT NULL
+        );
+        CREATE TABLE IF NOT EXISTS cardmarket_page_products (
+            url TEXT PRIMARY KEY, product_id INTEGER NOT NULL, seen_at TEXT NOT NULL
+        );
         CREATE TABLE IF NOT EXISTS cardmarket_trend_repairs (
             id_product INTEGER PRIMARY KEY,
             plain INTEGER NOT NULL, holo INTEGER NOT NULL
@@ -617,6 +624,19 @@ class Databases:
             from app.planetscale import load_cloud_catalogue
             try:
                 self.cloud_snapshot = load_cloud_catalogue(settings, self.catalog)
+                import logging
+
+                from app.card_products import withhold_shared
+
+                # A number shared by cards on different pages prices none
+                # of them: see app/card_products.py.
+                try:
+                    withheld = withhold_shared(self.catalog)
+                    logging.getLogger("cardmarket.prices").info(
+                        "shared product numbers withheld cards=%s", withheld)
+                except sqlite3.Error as exc:
+                    logging.getLogger("cardmarket.prices").warning(
+                        "shared product numbers not withheld error=%s", type(exc).__name__)
             except Exception:
                 self.close()
                 raise

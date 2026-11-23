@@ -84,6 +84,9 @@ def build_rows(catalog: sqlite3.Connection, ids: list[str]) -> tuple[list[str], 
         int(row[0]): (row[1], row[2])
         for row in catalog.execute("SELECT id_product, trend, trend_holo FROM cardmarket_guide")
     }
+    from app.card_products import all_products
+
+    local = all_products(catalog)
     wanted = set(ids)
     cards: dict[str, Any] = {}
     for row in catalog.execute("SELECT * FROM cards"):
@@ -96,7 +99,8 @@ def build_rows(catalog: sqlite3.Connection, ids: list[str]) -> tuple[list[str], 
         if row is None:
             continue
         trend = None
-        product = row["cardmarket_id"]
+        # The local answer for a card whose catalogue number is another's.
+        product = local[card_id] if card_id in local else row["cardmarket_id"]
         if product and int(product) in guide:
             try:
                 variants = json.loads(row["variants_json"] or "{}")

@@ -33,7 +33,9 @@ def _product(request: Request, card_id: str, url: str | None):
     ).fetchone()
     if row is None:
         raise HTTPException(status_code=404, detail="Card not found")
-    main = int(row["cardmarket_id"]) if row["cardmarket_id"] is not None else None
+    from app.card_products import product_for
+
+    main = product_for(request.app.state.dbs.catalog, card_id, row["cardmarket_id"])
     picked = normalize_product_url(url)
     if picked is None or picked == normalize_product_url(row["cardmarket_url"]):
         return row, main
