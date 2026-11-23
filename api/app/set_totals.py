@@ -163,8 +163,12 @@ def refresh_set_releases(
             date = value[:10] if _DATE.match(value) else None
             now = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
             with conn:
+                # Only the date: the row's era is app.set_eras's.
                 conn.execute(
-                    "INSERT OR REPLACE INTO set_releases (language, set_id, release_date, fetched_at) VALUES (?, ?, ?, ?)",
+                    """INSERT INTO set_releases (language, set_id, release_date, fetched_at) VALUES (?, ?, ?, ?)
+                    ON CONFLICT (language, set_id) DO UPDATE SET
+                      release_date = COALESCE(excluded.release_date, set_releases.release_date),
+                      fetched_at = excluded.fetched_at""",
                     (language, set_id, date, now),
                 )
             stored += date is not None

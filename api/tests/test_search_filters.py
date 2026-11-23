@@ -213,7 +213,7 @@ def test_chase_top_ten_per_set_before_other_filters_and_paging(catalog):
 def test_chase_name_search_covers_all_sets_before_filtering_and_paging(catalog):
     for set_id, released in [('vintage', '2020-01-01'), ('undated', None), ('recent', date.today().isoformat())]:
         if released:
-            catalog.execute("INSERT INTO set_releases VALUES ('en', ?, ?, 'x')", (set_id, released))
+            catalog.execute("INSERT INTO set_releases (language, set_id, release_date, fetched_at) VALUES ('en', ?, ?, 'x')", (set_id, released))
         for index in range(12):
             card_id = f'en:{set_id}-{index:02d}'
             # The eleventh-ranked card matches too, but must not be promoted.

@@ -530,7 +530,7 @@ def test_the_route_builds_the_search_from_the_catalogue_card(tmp_path):
             list(values.values()),
         )
     catalog.execute("INSERT INTO set_totals VALUES ('en', 'base1', 102, '')")
-    catalog.execute("INSERT INTO set_releases VALUES ('en', 'base1', '1999-01-09', '')")
+    catalog.execute("INSERT INTO set_releases (language, set_id, release_date, fetched_at) VALUES ('en', 'base1', '1999-01-09', '')")
     catalog.execute("INSERT INTO set_totals VALUES ('ja', 'SV2a', 165, '')")
     catalog.commit()
 
