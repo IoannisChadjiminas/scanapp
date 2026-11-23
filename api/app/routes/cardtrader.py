@@ -293,6 +293,30 @@ class TcgplayerValue(BaseModel):
     # without a market price (listings alone are not a value) or a rate.
     value_eur: float | None = None
     market: float | None = None
+    # What value_eur is: "tcgplayer", or "cardmarket_low" when TCGplayer has
+    # no market price and Cardmarket's file has only a lowest listing for the
+    # product. The last resort: a lowest listing is often a damaged copy.
+    source: str | None = None
+
+
+def _lowest_listing(request: Request, product: int | None, copy: TcgplayerCopy) -> float | None:
+    """Cardmarket's lowest listing for a product its file has no trend for.
+    None for a first edition: the file prices the unlimited print."""
+    from app.price_sources import guide_market, market_trend
+
+    if product is None or copy.first_edition:
+        return None
+    try:
+        market = guide_market(request.app.state.dbs.catalog, product)
+    except sqlite3.Error:
+        return None
+    if not market or market_trend(market, reverse=copy.reverse):
+        return None
+    for key in ("low-holo",) if copy.reverse else ("low", "low-holo"):
+        value = market.get(key)
+        if isinstance(value, (int, float)) and not isinstance(value, bool) and value > 0:
+            return round(float(value), 2)
+    return None
 
 
 class TcgplayerValues(BaseModel):
@@ -314,6 +338,7 @@ def tcgplayer_values(payload: TcgplayerCopies, request: Request) -> TcgplayerVal
     values: list[TcgplayerValue] = []
     for copy in payload.copies:
         market = None
+        product = None
         try:
             row, product = _product(request, copy.card_id, copy.url)
         except HTTPException:
@@ -330,5 +355,11 @@ def tcgplayer_values(payload: TcgplayerCopies, request: Request) -> TcgplayerVal
                         (item["amount"] for item in prices if item["label"] == "Market"), None
                     )
                     break
-        values.append(TcgplayerValue(value_eur=rate.usd_to_eur(market), market=market))
+        euros = rate.usd_to_eur(market)
+        if euros:
+            values.append(TcgplayerValue(value_eur=euros, market=market, source="tcgplayer"))
+        elif low := _lowest_listing(request, product, copy) if row is not None else None:
+            values.append(TcgplayerValue(value_eur=low, source="cardmarket_low"))
+        else:
+            values.append(TcgplayerValue(market=market))
     return TcgplayerValues(enabled=True, values=values)

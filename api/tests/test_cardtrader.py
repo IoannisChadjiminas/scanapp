@@ -264,14 +264,15 @@ def test_a_picked_listing_is_priced_as_its_own_product(tmp_path):
         {"card_id": "nope"},
     ]}).json()
     # Without a rate there is no value: dollars are never counted as euros.
-    assert ask() == {"enabled": False, "values": [{"value_eur": None, "market": None}] * 4}
+    nothing = {"value_eur": None, "market": None, "source": None}
+    assert ask() == {"enabled": False, "values": [nothing] * 4}
     app.state.fx = EuroRate(client=httpx.Client(transport=httpx.MockTransport(
         lambda request: httpx.Response(200, text="<Cube currency='USD' rate='1.2500'/>"))))
     assert ask() == {"enabled": True, "values": [
-        {"value_eur": 3.6, "market": 4.5},
-        {"value_eur": 48.0, "market": 60.0},
-        {"value_eur": None, "market": None},
-        {"value_eur": None, "market": None},
+        {"value_eur": 3.6, "market": 4.5, "source": "tcgplayer"},
+        {"value_eur": 48.0, "market": 60.0, "source": "tcgplayer"},
+        nothing,
+        nothing,
     ]}
     reader.close()
     store.close()
@@ -483,3 +484,30 @@ def test_the_routes_find_a_card_cardtrader_lists_without_a_cardmarket_id(tmp_pat
     assert [p["label"] for p in answer("tcgplayer", "ja:S3-055")["prices"]] == ["Low", "Mid"]
     reader.close()
     store.close()
+
+
+def test_the_lowest_listing_is_the_last_resort(tmp_path):
+    """A product the file has only a lowest listing for is valued at it."""
+    from types import SimpleNamespace
+
+    from app.db import connect, init_catalog
+    from app.price_sources import import_guide
+    from app.routes.cardtrader import TcgplayerCopy, _lowest_listing
+
+    conn = connect(tmp_path / "catalog.sqlite")
+    init_catalog(conn)
+    import_guide(conn, {"createdAt": "2026-11-23T02:00:00+0100", "priceGuides": [
+        {"idProduct": 1, "low": 7.5, "low-holo": 9.0},
+        {"idProduct": 2, "low": 3.0, "trend": 4.0},
+        {"idProduct": 3},
+    ]})
+    request = SimpleNamespace(app=SimpleNamespace(state=SimpleNamespace(dbs=SimpleNamespace(catalog=conn))))
+    low = lambda product, **copy: _lowest_listing(request, product, TcgplayerCopy(card_id="x", **copy))  # noqa: E731
+    assert low(1) == 7.5
+    assert low(1, reverse=True) == 9.0
+    # The file prices the unlimited print only.
+    assert low(1, first_edition=True) is None
+    # A product with a trend is never valued at its lowest listing.
+    assert low(2) is None
+    assert low(3) is None
+    assert low(None) is None
