@@ -4,7 +4,9 @@ from datetime import datetime
 from enum import Enum
 from typing import Any, Literal
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, model_validator
+
+from app.set_titles import card_set_view_title, set_view_title
 
 
 class ScanStatus(str, Enum):
@@ -50,6 +52,15 @@ class Candidate(BaseModel):
     name: str
     view_title: str | None = None
     set_name: str
+    # English title shown for a Japanese expansion; set_name stays for matching.
+    set_view_title: str | None = None
+
+    @model_validator(mode="after")
+    def _set_view_title(self):  # noqa: ANN202
+        if self.set_view_title is None:
+            self.set_view_title = card_set_view_title(self.card_id, getattr(self, "language", None) or None)
+        return self
+
     collector_number: str
     set_total: int | None = None
     image_url: str
@@ -127,6 +138,15 @@ class PlausiblePrinting(BaseModel):
     name: str
     view_title: str | None = None
     set_name: str
+    # English title shown for a Japanese expansion; set_name stays for matching.
+    set_view_title: str | None = None
+
+    @model_validator(mode="after")
+    def _set_view_title(self):  # noqa: ANN202
+        if self.set_view_title is None:
+            self.set_view_title = card_set_view_title(self.card_id, getattr(self, "language", None) or None)
+        return self
+
     collector_number: str
     set_total: int | None = None
     language: str
@@ -267,6 +287,15 @@ class CardSummary(BaseModel):
     view_title: str | None = None
     set_id: str
     set_name: str
+    # English title shown for a Japanese expansion; set_name stays for matching.
+    set_view_title: str | None = None
+
+    @model_validator(mode="after")
+    def _set_view_title(self):  # noqa: ANN202
+        if self.set_view_title is None:
+            self.set_view_title = set_view_title(self.language, self.set_id)
+        return self
+
     collector_number: str
     set_total: int | None = None
     language: str

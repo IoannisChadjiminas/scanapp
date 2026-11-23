@@ -14,6 +14,7 @@ from fastapi.responses import FileResponse
 from app.card_images import display_image_url
 from app.card_products import SQL_JOIN, SQL_PRODUCT
 from app.catalogue_titles import stored_view_title
+from app.set_titles import ja_sets_titled, set_view_title
 from app.cardmarket import mapping_from_row, variants_for_row
 from app.price_sources import scan_finishes, scan_prices
 from app.market_stats import capabilities
@@ -162,17 +163,53 @@ def search_sets(request: Request, language: str = "") -> list[dict]:
             WHERE {_PHYSICAL} AND {_LISTED_ONCE}
             GROUP BY cards.language, cards.set_id
             ORDER BY release_date IS NULL, release_date DESC, set_name, cards.language, cards.set_id""").fetchall()
-        cached = (signature, [dict(row) for row in rows])
+        # An expansion's market value: the sum of its cards' euro trends, as
+        # search prices them. Sets with no priced card have none.
+        values = {
+            (row["language"], row["set_id"]): row["value"]
+            for row in catalog.execute(f"""{_CTE}
+                SELECT cards.language, cards.set_id, ROUND(SUM(m_trend), 2) AS value
+                FROM signals cards WHERE {_PHYSICAL} AND {_LISTED_ONCE} AND m_trend > 0
+                GROUP BY cards.language, cards.set_id""").fetchall()
+        }
+        cached = (signature, [
+            {**dict(row), "value": values.get((row["language"], row["set_id"]))} for row in rows
+        ])
         state.search_sets_cache = cached
     langs = expand_language(language) if language and language != "auto" else ()
-    return [item for item in cached[1] if not langs or item["language"] in langs]
+    return [
+        {**item, "set_view_title": set_view_title(item["language"], item["set_id"])}
+        for item in cached[1] if not langs or item["language"] in langs
+    ]
 
 
 @router.get("/search-options")
-def search_options(request: Request) -> dict:
-    rows = request.app.state.dbs.catalog.execute("""SELECT LOWER(TRIM(rarity)) AS value, MIN(TRIM(rarity)) AS label
-        FROM cards WHERE rarity IS NOT NULL AND LOWER(TRIM(rarity)) NOT IN ('', 'none', 'null')
-        GROUP BY LOWER(TRIM(rarity)) ORDER BY value""").fetchall()
+def search_options(
+    request: Request,
+    set_key: Annotated[str | None, Query(alias="set", max_length=64)] = None,
+) -> dict:
+    """The rarities search can filter by, with how many cards have each.
+
+    Digital-only Pocket cards are left out, as search leaves them out. With
+    `set` (`ja:SV10`), only the rarities of that expansion's cards.
+    """
+    where = [
+        "cards.rarity IS NOT NULL",
+        "LOWER(TRIM(cards.rarity)) NOT IN ('', 'none', 'null')",
+        _PHYSICAL,
+        _LISTED_ONCE,
+    ]
+    params: list[str] = []
+    if set_key and ":" in set_key:
+        language, set_id = set_key.split(":", 1)
+        where.append("cards.language = ? AND cards.set_id = ?")
+        params.extend([language, set_id])
+    rows = request.app.state.dbs.catalog.execute(
+        f"""SELECT LOWER(TRIM(cards.rarity)) AS value, MIN(TRIM(cards.rarity)) AS label,
+            COUNT(*) AS cards FROM cards WHERE {' AND '.join(where)}
+            GROUP BY LOWER(TRIM(cards.rarity)) ORDER BY value""",
+        params,
+    ).fetchall()
     return {"rarities": [dict(row) for row in rows], "history": capabilities(request.app.state.dbs.catalog)}
 
 
@@ -272,8 +309,25 @@ def search_cards(
         tokens = re.findall(r"[A-Za-z0-9]+", remaining)
         if tokens:
             # Quoted so a word like "and" or "not" is not read as an operator.
-            clauses.append("cards.id IN (SELECT id FROM cards_fts WHERE cards_fts MATCH ?)")
-            params.append(" ".join(f'"{token}"*' for token in tokens))
+            def fts(words: list[str]) -> str:
+                return " ".join(f'"{word}"*' for word in words)
+
+            titled, used = ja_sets_titled(tokens)
+            if titled:
+                # A Japanese expansion's English title finds its cards too; the
+                # other words still search them. Additive: nothing found by the
+                # catalogue's own names is lost.
+                rest = [token for token in tokens if token not in used]
+                ja_scope = (
+                    f"(cards.language='ja' AND cards.set_id IN ({','.join('?' for _ in titled)})"
+                    + (" AND cards.id IN (SELECT id FROM cards_fts WHERE cards_fts MATCH ?)" if rest else "")
+                    + ")"
+                )
+                clauses.append(f"(cards.id IN (SELECT id FROM cards_fts WHERE cards_fts MATCH ?) OR {ja_scope})")
+                params.extend([fts(tokens), *titled, *([fts(rest)] if rest else [])])
+            else:
+                clauses.append("cards.id IN (SELECT id FROM cards_fts WHERE cards_fts MATCH ?)")
+                params.append(fts(tokens))
     langs = expand_language(language) if language and language != "auto" else ()
     if langs:
         clause = f"cards.language IN ({','.join('?' for _ in langs)})"
