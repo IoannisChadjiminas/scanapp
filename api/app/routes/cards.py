@@ -96,9 +96,11 @@ _CTE = f"""WITH raw_prices AS (
     SELECT cards.*, set_releases.release_date,
       CASE WHEN {_GUIDE} THEN g.guide_date WHEN {_EUR} THEN COALESCE(json_extract({_DEX}, '$.updated'), t.fetched_at) END AS m_date,
       CASE WHEN {_GUIDE} THEN 'cardmarket_file' WHEN {_EUR} AND t.cardmarket_json IS NOT NULL THEN 'tcgdex' END AS m_source,
-      {_RAW}
+      {_RAW},
+      COALESCE(fix.plain, 0) AS m_fix_plain, COALESCE(fix.holo, 0) AS m_fix_holo
     FROM cards{_RELEASES}
     LEFT JOIN cardmarket_guide g ON g.id_product=cards.cardmarket_id
+    LEFT JOIN cardmarket_trend_repairs fix ON fix.id_product=cards.cardmarket_id
     LEFT JOIN tcgdex_prices t ON t.card_id=cards.id
 ), priced AS (
     SELECT cards.*,
@@ -134,7 +136,11 @@ SEARCH_PRESETS = [
 def _market(row) -> CardMarket | None:
     if "m_date" not in row.keys() or row["m_date"] is None:
         return None
-    return CardMarket(basis=row["m_basis"], source=row["m_source"], as_of=row["m_date"], below_average=row["m_below_average"], **{
+    source = row["m_source"]
+    # The 7-day average stands in for a trend Cardmarket published broken.
+    if source == "cardmarket_file" and row["m_fix_holo" if row["m_basis"] == "holo" else "m_fix_plain"]:
+        source = "cardmarket_file_avg7"
+    return CardMarket(basis=row["m_basis"], source=source, as_of=row["m_date"], below_average=row["m_below_average"], **{
         field: row[f"m_{field}"] for field in ("low", "trend", "avg1", "avg7", "avg30", "momentum", "discount", "under_trend", "change_7d", "change_30d", "sales_days_30")
     })
 

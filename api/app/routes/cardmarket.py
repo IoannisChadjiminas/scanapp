@@ -227,6 +227,9 @@ class PriceResponse(BaseModel):
     # The price file's Cardmarket trend for this product, for when no listing read counts.
     guide_trend: float | None = None
     guide_trend_at: str | None = None
+    # "cardmarket_file", or "cardmarket_file_avg7" when the 7-day average
+    # stands in for a trend Cardmarket published broken.
+    guide_trend_source: str | None = None
     unlisted: bool = False
     scraper_ready: bool = False
     challenge_fallback_minutes: int = 10
@@ -309,6 +312,7 @@ def _price_response(payload: dict[str, Any]) -> PriceResponse:
         fresh_for_s=payload.get("fresh_for_s"),
         guide_trend=payload.get("guide_trend"),
         guide_trend_at=payload.get("guide_trend_at"),
+        guide_trend_source=payload.get("guide_trend_source"),
         deadline_at=payload.get("deadline_at"),
         queue_position=payload.get("queue_position"),
         queued=payload.get("queued"),

@@ -33,6 +33,49 @@ MIN_KEEP_RATIO = 0.5
 REVERSE_HOLO_FILTER = "isReverseHolo"
 
 
+# What a file figure is tagged with: the trend, or the 7-day average standing
+# in for a trend Cardmarket published broken.
+FILE_SOURCE = "cardmarket_file"
+FILE_AVG7_SOURCE = "cardmarket_file_avg7"
+
+
+def trend_is_broken(trend: Any, low: Any, avg7: Any) -> bool:
+    """A trend far below both the lowest listing and the week's sales.
+
+    Cardmarket's file now and then gives a card that sells for tens of euros
+    a trend of a few cents. About one product in two hundred; the 7-day
+    average is the file's figure closest to a sound trend.
+    """
+    trend, low, avg7 = _number(trend), _number(low), _number(avg7)
+    if not trend or not low or not avg7 or trend <= 0:
+        return False
+    return trend < low * 0.5 and trend < avg7 * 0.25
+
+
+def repair_trends(entry: dict[str, Any]) -> tuple[dict[str, Any], bool, bool]:
+    """The entry with each broken trend replaced by its 7-day average, and
+    whether the plain and the -holo trend were replaced."""
+    plain = trend_is_broken(entry.get("trend"), entry.get("low"), entry.get("avg7"))
+    holo = trend_is_broken(entry.get("trend-holo"), entry.get("low-holo"), entry.get("avg7-holo"))
+    if not plain and not holo:
+        return entry, False, False
+    fixed = dict(entry)
+    if plain:
+        fixed["trend"] = entry["avg7"]
+    if holo:
+        fixed["trend-holo"] = entry["avg7-holo"]
+    return fixed, plain, holo
+
+
+def _keep_repairs(conn: sqlite3.Connection, repairs: list[tuple[int, int, int]]) -> None:
+    conn.execute(
+        "CREATE TABLE IF NOT EXISTS cardmarket_trend_repairs ("
+        "id_product INTEGER PRIMARY KEY, plain INTEGER NOT NULL, holo INTEGER NOT NULL)"
+    )
+    conn.execute("DELETE FROM cardmarket_trend_repairs")
+    conn.executemany("INSERT INTO cardmarket_trend_repairs VALUES (?, ?, ?)", repairs)
+
+
 def _now() -> str:
     return datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
 
@@ -66,6 +109,13 @@ def import_guide(conn: sqlite3.Connection, payload: Any, history: Any = None) ->
     ``history`` is the connection that keeps one row per product per day.
     A failure there leaves the import done."""
     date, rows = parse_guide(payload)
+    # A broken trend is replaced once, here: every price, total, chart and
+    # change read from the stored file then follows the 7-day average.
+    repairs: list[tuple[int, int, int]] = []
+    for index, entry in enumerate(rows):
+        rows[index], plain, holo = repair_trends(entry)
+        if plain or holo:
+            repairs.append((entry["idProduct"], int(plain), int(holo)))
     previous = conn.execute("SELECT row_count FROM cardmarket_guide_meta WHERE id = 1").fetchone()
     if not rows:
         raise ValueError("Price guide has no products")
@@ -86,6 +136,7 @@ def import_guide(conn: sqlite3.Connection, payload: Any, history: Any = None) ->
             ],
         )
         conn.execute("DELETE FROM cardmarket_guide WHERE guide_date != ?", (date,))
+        _keep_repairs(conn, repairs)
         conn.execute(
             "INSERT OR REPLACE INTO cardmarket_guide_meta (id, guide_date, row_count, imported_at) "
             "VALUES (1, ?, ?, ?)",
@@ -132,7 +183,28 @@ def guide_market(conn: sqlite3.Connection, product_id: int | None) -> dict[str, 
     market: dict[str, Any] = {"unit": "EUR", "updated": row["guide_date"]}
     for name in GUIDE_COLUMNS:
         market[name] = row[name.replace("-", "_")]
+    try:
+        fixed = conn.execute(
+            "SELECT plain, holo FROM cardmarket_trend_repairs WHERE id_product = ?", (product_id,)
+        ).fetchone()
+    except sqlite3.Error:  # a catalogue from before the table
+        fixed = None
+    market["trend-avg7"] = bool(fixed and fixed["plain"])
+    market["trend-holo-avg7"] = bool(fixed and fixed["holo"])
     return market
+
+
+def file_source(market: dict[str, Any] | None, *, reverse: bool = False, holo_first: bool = False) -> str:
+    """The tag of the file's trend as `market_trend` and the price lists read
+    it: the 7-day average's when that stands in for the column used."""
+    if not market:
+        return FILE_SOURCE
+    order = ("trend-holo",) if reverse else ("trend-holo", "trend") if holo_first else ("trend", "trend-holo")
+    for key in order:
+        value = _number(market.get(key))
+        if value and value > 0:
+            return FILE_AVG7_SOURCE if market.get(f"{key}-avg7") else FILE_SOURCE
+    return FILE_SOURCE
 
 
 def refresh_guide(conn: sqlite3.Connection, settings: Settings, history: Any = None) -> int:
@@ -318,6 +390,15 @@ def guide_trend_for_url(conn: sqlite3.Connection, url: str | None) -> tuple[floa
     return (trend, str(market.get("updated") or "") or None) if trend else (None, None)
 
 
+def guide_trend_source_for_url(conn: sqlite3.Connection, url: str | None) -> str:
+    """What the trend `guide_trend_for_url` gives is: the file's trend, or its
+    7-day average."""
+    if not url:
+        return FILE_SOURCE
+    market = guide_market(conn, product_id_for_url(conn, url))
+    return file_source(market, reverse=is_reverse_holo_url(url))
+
+
 def fresh_window(conn: sqlite3.Connection, url: str | None, *, trend: float | None = None) -> int:
     """How long a listing sample for this product stays fresh, in seconds."""
     from app.cardmarket_queue import fresh_seconds
@@ -361,7 +442,7 @@ def best_prices(conn: sqlite3.Connection, card_id: str, url: str | None) -> list
     if market:
         prices = prices_from_market(_swap_holo(market) if _holo_first(variants) else market)
         if prices:
-            return _tag(prices, "cardmarket_file", market["updated"])
+            return _tag(prices, file_source(market, holo_first=_holo_first(variants)), market["updated"])
 
     stored = conn.execute(
         "SELECT cardmarket_json, tcgplayer_json, fetched_at FROM tcgdex_prices WHERE card_id = ?",
@@ -392,7 +473,7 @@ def reverse_holo_prices(conn: sqlite3.Connection, card_id: str) -> list[dict[str
     if market:
         prices = prices_from_market(_reverse_only(market))
         if prices:
-            return _tag(prices, "cardmarket_file", market["updated"])
+            return _tag(prices, file_source(market, reverse=True), market["updated"])
     stored = conn.execute(
         "SELECT cardmarket_json, fetched_at FROM tcgdex_prices WHERE card_id = ?", (card_id,)
     ).fetchone()
@@ -429,7 +510,7 @@ def scan_prices(conn: sqlite3.Connection, card_id: str, url: str | None) -> list
 
 _LISTING_FIELDS = (
     "url", "prices", "status", "observed_at", "sampled_offer_count", "freshness", "fresh_for_s",
-    "guide_trend", "guide_trend_at", "unlisted", "scraper_ready", "webview_enabled",
+    "guide_trend", "guide_trend_at", "guide_trend_source", "unlisted", "scraper_ready", "webview_enabled",
     "challenge_fallback_minutes", "helper_online", "helper_ready", "helper_paused",
 )
 

@@ -449,3 +449,43 @@ def test_a_read_page_gives_a_known_listing_its_product_number(tmp_path):
     # A listing the catalogue does not know is not added.
     remember_listing_product(conn, URL + "-V9", PHOTO.format(999))
     assert conn.execute("SELECT COUNT(*) FROM cardmarket_expansion_products").fetchone()[0] == 1
+
+
+BROKEN = {
+    **GUIDE,
+    "priceGuides": [
+        # Cardmarket's own figures for a card that sells for tens of euros.
+        {"idProduct": 100, "avg": 55.18, "low": 9.98, "trend": 0.02, "avg7": 47.86, "avg30": 97.57,
+         "low-holo": 9.0, "trend-holo": 12.0, "avg7-holo": 11.0},
+        # Cheap against its week, but above half its lowest listing: kept.
+        {"idProduct": 101, "low": 3.0, "trend": 2.0, "avg7": 20.0},
+    ],
+}
+
+
+def test_a_broken_trend_is_replaced_by_the_seven_day_average(tmp_path):
+    conn = _catalog(tmp_path)
+    _card(conn, "en:a", product=100, url=URL)
+    _card(conn, "en:b", product=101)
+    import_guide(conn, BROKEN)
+    prices = best_prices(conn, "en:a", None)
+    assert _labels(prices) == {"From": 9.98, "Trend": 47.86, "7-day": 47.86}
+    assert {p["source"] for p in prices} == {"cardmarket_file_avg7"}
+    assert price_sources.guide_trend_for_url(conn, URL)[0] == 47.86
+    assert price_sources.guide_trend_source_for_url(conn, URL) == "cardmarket_file_avg7"
+    # The reverse holo trend was sound, and stays the trend.
+    assert price_sources.guide_trend_for_url(conn, URL + "?isReverseHolo=Y")[0] == 12.0
+    assert price_sources.guide_trend_source_for_url(conn, URL + "?isReverseHolo=Y") == "cardmarket_file"
+    kept = best_prices(conn, "en:b", None)
+    assert _labels(kept)["Trend"] == 2.0
+    assert {p["source"] for p in kept} == {"cardmarket_file"}
+
+
+def test_a_trend_that_recovers_is_the_trend_again(tmp_path):
+    conn = _catalog(tmp_path)
+    _card(conn, "en:a", product=100)
+    import_guide(conn, BROKEN)
+    import_guide(conn, {**GUIDE, "createdAt": "2026-10-09T02:51:56+0200"})
+    prices = best_prices(conn, "en:a", None)
+    assert _labels(prices)["Trend"] == 4.2
+    assert {p["source"] for p in prices} == {"cardmarket_file"}

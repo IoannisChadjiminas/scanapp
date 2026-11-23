@@ -59,8 +59,13 @@ def rebuild(catalog, history, as_of: str) -> int:
                     return None
                 first, second = (field, field + '_holo') if basis == 'normal' else (field + '_holo', field)
                 return positive(row[first]) or positive(row[second])
-            seven = value(today - timedelta(days=7), 'trend')
-            thirty = value(today - timedelta(days=30), 'trend')
+            # A trend the import replaced with the 7-day average equals it:
+            # the change is then measured against the older 7-day averages,
+            # not against a trend it was never comparable with.
+            now = value(today, 'trend')
+            field = 'avg7' if now is not None and now == value(today, 'avg7') else 'trend'
+            seven = value(today - timedelta(days=7), field)
+            thirty = value(today - timedelta(days=30), field)
             window = [today - timedelta(days=offset) for offset in range(30)]
             complete = all(day.isoformat() in receipts and value(day, 'trend') is not None for day in window)
             sales = sum(value(day, 'avg1') is not None for day in window) if complete else None
