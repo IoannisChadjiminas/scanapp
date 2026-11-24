@@ -17,6 +17,7 @@ from app.catalogue_titles import stored_view_title
 from app.set_titles import ja_sets_titled, set_view_title
 from app.cardmarket import mapping_from_row, variants_for_row
 from app.price_sources import scan_finishes, scan_prices
+from app.reverse_holos import with_reverse
 from app.market_stats import capabilities
 from app.recognition.language import expand_language
 from app.set_totals import set_total
@@ -63,7 +64,7 @@ def _summary(row, catalog=None) -> CardSummary:  # noqa: ANN001
         has_image=bool(image_url),
         image_url=image_url,
         image_owner_id=owner["id"] if owner is not row else None,
-        variants=json.loads(row["variants_json"] or "{}"),
+        variants=with_reverse(json.loads(row["variants_json"] or "{}"), row),
         cardmarket_url=url,
         # Only alongside the verified URL it was stored with.
         cardmarket_id=mapping.product_id if url else None,

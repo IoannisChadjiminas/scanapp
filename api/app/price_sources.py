@@ -20,6 +20,7 @@ import httpx
 from app.card_products import product_for
 from app.cardmarket import prices_from_market, snapshot_record
 from app.config import Settings
+from app.reverse_holos import with_reverse
 
 log = logging.getLogger("price.sources")
 
@@ -293,6 +294,17 @@ def _json(raw: Any) -> dict[str, Any]:
     return value if isinstance(value, dict) else {}
 
 
+_CARD = (
+    "SELECT cardmarket_id, variants_json, set_id, collector_number, rarity, name, language"
+    " FROM cards WHERE id = ?"
+)
+
+
+def card_variants(card: sqlite3.Row | None) -> dict[str, Any]:
+    """A card's finishes: TCGdex's, plus the reverse holos it leaves out."""
+    return with_reverse(_json(card["variants_json"]), card) if card is not None else {}
+
+
 def parse_tiers(text: str) -> list[tuple[float | None, int]]:
     """"2:604800,20:86400,*:3600" -> [(2.0, 604800), (20.0, 86400), (None, 3600)]."""
     tiers: list[tuple[float | None, int]] = []
@@ -429,10 +441,8 @@ def best_prices(conn: sqlite3.Connection, card_id: str, url: str | None) -> list
     """The prices to show with one card, each tagged with its source."""
     from app.cardmarket_queue import _age_seconds
 
-    card = conn.execute(
-        "SELECT cardmarket_id, variants_json FROM cards WHERE id = ?", (card_id,)
-    ).fetchone()
-    variants = _json(card["variants_json"]) if card else {}
+    card = conn.execute(_CARD, (card_id,)).fetchone()
+    variants = card_variants(card)
     market = guide_market(conn, product_for(conn, card_id, card["cardmarket_id"]) if card else None)
     record = snapshot_record(conn, url) if url else None
     live = list((record or {}).get("prices") or [])
@@ -473,10 +483,8 @@ def best_prices(conn: sqlite3.Connection, card_id: str, url: str | None) -> list
 
 def reverse_holo_prices(conn: sqlite3.Connection, card_id: str) -> list[dict[str, Any]]:
     """Cardmarket's reverse holo figures for a card that also has another finish."""
-    card = conn.execute(
-        "SELECT cardmarket_id, variants_json FROM cards WHERE id = ?", (card_id,)
-    ).fetchone()
-    if card is None or not finishes(_json(card["variants_json"])):
+    card = conn.execute(_CARD, (card_id,)).fetchone()
+    if card is None or not finishes(card_variants(card)):
         return []
     market = guide_market(conn, product_for(conn, card_id, card["cardmarket_id"]))
     if market:
@@ -497,8 +505,8 @@ def reverse_holo_prices(conn: sqlite3.Connection, card_id: str) -> list[dict[str
 def scan_finishes(conn: sqlite3.Connection, card_id: str) -> dict[str, Any]:
     """The finish choice for one card, which must never fail a scan."""
     try:
-        card = conn.execute("SELECT variants_json FROM cards WHERE id = ?", (card_id,)).fetchone()
-        offered = finishes(_json(card["variants_json"])) if card else []
+        card = conn.execute(_CARD, (card_id,)).fetchone()
+        offered = finishes(card_variants(card))
         return {
             "finishes": offered,
             "reverse_holo_prices": reverse_holo_prices(conn, card_id) if offered else [],
