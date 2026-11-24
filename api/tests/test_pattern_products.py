@@ -102,14 +102,14 @@ def test_a_pattern_photo_is_saved_on_first_request(tmp_path, monkeypatch):
     def fake_fetch(source, target):
         asked.append(source)
         target.parent.mkdir(parents=True, exist_ok=True)
-        target.write_bytes(b"\xff\xd8jpeg")
+        target.write_bytes(b"\xff\xd8\xffjpeg")
         return True
 
     monkeypatch.setattr(pattern_products, "fetch_image", fake_fetch)
     request = SimpleNamespace(app=SimpleNamespace(state=SimpleNamespace(
         settings=SimpleNamespace(data_dir=str(tmp_path)), dbs=SimpleNamespace(catalog=conn))))
     response = listing_image("806409", request)
-    assert Path(response.path).read_bytes() == b"\xff\xd8jpeg"
+    assert Path(response.path).read_bytes() == b"\xff\xd8\xffjpeg"
     listing_image("806409", request)  # cached: no second fetch
     assert asked == [IMG.format(806409)]
     with pytest.raises(HTTPException):
@@ -142,3 +142,29 @@ def test_numbered_listings_with_a_reviewed_name():
     winner = variant_record({"url": f"{BASE}/SV-Black-Star-Promos/Pikachu-V6-SVP225",
                              "name": "Pikachu (SVP 225)From 48,00 €", "card_id": "en:svp-225"})
     assert (tinsel["label"], winner["label"]) == ("Tinsel", "League winner stamp")
+
+
+def test_the_photo_host_mislabels_its_pictures(tmp_path, monkeypatch):
+    import httpx
+
+    class Reply:
+        status_code = 200
+        headers = {"content-type": "multerS3.AUTO_CONTENT_TYPE"}
+        content = b"\xff\xd8\xff\xe0 photo"
+
+    monkeypatch.setattr(httpx, "get", lambda *args, **kwargs: Reply())
+    assert pattern_products.fetch_image(IMG.format(806409), tmp_path / "806409.jpg")
+    Reply.content = b"<?xml version='1.0'?><Error>AccessDenied</Error>"
+    assert not pattern_products.fetch_image(IMG.format(806408), tmp_path / "806408.jpg")
+
+
+def test_japanese_pattern_cards_have_no_plain_reverse():
+    from app.reverse_holos import PATTERN_ONLY, with_reverse
+
+    for card_id in ("ja:SV8a-001", "ja:SV11B-001", "ja:SV11W-001", "ja:M2a-001", "ja:SV2a-001"):
+        card = {"id": card_id, "set_id": card_id[3:].split("-")[0], "collector_number": "001",
+                "rarity": "Common", "name": "x", "language": "ja"}
+        assert card_id in PATTERN_ONLY
+        assert with_reverse({"normal": True, "reverse": True}, card)["reverse"] is False
+    # English pattern sets keep their plain reverse.
+    assert "en:sv08.5-001" not in PATTERN_ONLY

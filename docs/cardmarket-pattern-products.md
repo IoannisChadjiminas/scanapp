@@ -70,3 +70,12 @@ are their own products.
 - EX-era Darkness and Metal Energy (ex11–ex16) are special Energy Rares with a
   reverse holo; they now offer one. Holon Phantoms and Power Keepers holo basic
   Energy do not.
+
+## Found on staging after the first deploy
+
+- Pattern photos returned 404: Cardmarket's photo host labels its files
+  `multerS3.AUTO_CONTENT_TYPE` instead of `image/jpeg`. The server now checks
+  the file's first bytes.
+- Japanese Terastal Festival, Black Bolt, White Flare and 28 MEGA Dream ex
+  cards still offered a plain Reverse. Japanese sets with patterns print no
+  plain mirror, so every Japanese card with pattern products now offers none.

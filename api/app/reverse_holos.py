@@ -19,7 +19,8 @@ sells as its own product, as in JP 151 and Ascended Heroes. TCGdex still flags
 them `reverse`, and the main product's reverse holo figures are then other
 products' sales (8.33 € for JP 151 Bulbasaur, whose Poké Ball and Master Ball
 versions sell at 1.58 € and 38.99 €). `pattern_only_reverses.csv` lists those
-cards, read from TCGdex's detailed variants; they offer no plain reverse.
+cards, read from TCGdex's detailed variants, and every Japanese card in
+`cardmarket_pattern_products.csv` joins them; they offer no plain reverse.
 """
 from __future__ import annotations
 
@@ -30,6 +31,7 @@ from pathlib import Path
 from typing import Any, Mapping
 
 PATTERN_ONLY_FILE = Path(__file__).with_name("pattern_only_reverses.csv")
+PATTERN_PRODUCTS_FILE = Path(__file__).with_name("cardmarket_pattern_products.csv")
 
 
 def _read_pattern_only(path: Path = PATTERN_ONLY_FILE) -> frozenset[str]:
@@ -40,7 +42,21 @@ def _read_pattern_only(path: Path = PATTERN_ONLY_FILE) -> frozenset[str]:
         return frozenset()
 
 
-PATTERN_ONLY: frozenset[str] = _read_pattern_only()
+def _japanese_pattern_cards(path: Path = PATTERN_PRODUCTS_FILE) -> frozenset[str]:
+    """Japanese cards with pattern products. Japanese sets with patterns (151,
+    Terastal Festival, Black Bolt, White Flare, MEGA Dream ex) print no plain
+    mirror next to them, whatever TCGdex lists."""
+    try:
+        with open(path, newline="", encoding="utf-8") as handle:
+            return frozenset(
+                row["card_id"] for row in csv.DictReader(handle)
+                if (row.get("card_id") or "").startswith("ja:")
+            )
+    except FileNotFoundError:
+        return frozenset()
+
+
+PATTERN_ONLY: frozenset[str] = _read_pattern_only() | _japanese_pattern_cards()
 
 # Printed set totals of the sets with reverse holos for their regular cards.
 # Sets with none (Generations, Double Crisis, Dragon Vault, Detective Pikachu,
