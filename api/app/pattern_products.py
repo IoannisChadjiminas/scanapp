@@ -14,7 +14,6 @@ from __future__ import annotations
 
 import csv
 import logging
-import re
 import sqlite3
 from datetime import datetime, timezone
 from pathlib import Path
@@ -95,11 +94,9 @@ def apply_reviewed_file(conn: sqlite3.Connection, path: Path = REVIEWED) -> int:
 
 
 def label(pattern: str, url: str) -> str:
-    """"Master Ball" for a known pattern, else the listing's version ("V2")."""
-    if pattern in LABELS:
-        return LABELS[pattern]
-    match = re.search(r"-(V\d+)-x[^/]*$", url)
-    return match.group(1) if match else ""
+    """"Master Ball" for a known pattern; a listing whose pattern nobody has
+    confirmed yet (no photo on Cardmarket) is a "Ball pattern"."""
+    return LABELS.get(pattern, "Ball pattern")
 
 
 def variants(conn: sqlite3.Connection, card_id: str) -> list[dict[str, Any]]:

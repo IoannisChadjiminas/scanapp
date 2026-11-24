@@ -111,3 +111,11 @@ def test_pattern_only_list_ships_with_the_server():
 
     assert "ja:SV2a-001" in PATTERN_ONLY and "en:me02.5-001" in PATTERN_ONLY
     assert "en:sv08.5-001" not in PATTERN_ONLY  # Prismatic Evolutions also has a plain reverse
+
+
+def test_ex_era_special_energy_has_a_reverse():
+    assert prints_reverse("ex11", "103", "Rare", "Darkness Energy")  # Delta Species
+    assert prints_reverse("ex16", "88", "Rare", "Metal Energy")  # Power Keepers
+    # Holon Phantoms' holo basic Energy and BW's basic Energy have none.
+    assert not prints_reverse("ex13", "105", "Rare", "Grass Energy")
+    assert not prints_reverse("bw1", "112", "Common", "Darkness Energy")

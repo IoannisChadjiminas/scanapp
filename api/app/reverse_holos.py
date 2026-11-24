@@ -5,7 +5,8 @@ card from Delta Species to Power Keepers, as having no reverse holo (Cubone
 90/214 from Unbroken Bonds, for one), so no finish choice was offered for them.
 Those sets print a reverse holo of every Common, Uncommon and Rare inside the
 printed set total; the ex/EX, GX, BREAK, Prism Star, Gold Star, basic Energy
-and secret cards above the total have none. Cardmarket's price file is no help
+and secret cards above the total have none (EX-era Darkness and Metal
+Energy are special Energy Rares and do have one). Cardmarket's price file is no help
 here: its reverse holo columns also carry figures for ultra rares and for Base
 Set cards, so it cannot say which cards have one.
 
@@ -58,6 +59,7 @@ PRINTED_TOTALS: dict[str, int] = {
 _REGULAR = {"common", "uncommon", "rare"}
 # TCGdex files some of these as plain "Rare".
 _NO_REVERSE_NAME = re.compile(r"(-| )(EX|ex)\b|\bGX\b|\bBREAK\b|◇|☆|Prism Star|^M ")
+_SPECIAL_ENERGY = {"Darkness Energy", "Metal Energy"}
 _BASIC_ENERGY = re.compile(r"^(Grass|Fire|Water|Lightning|Psychic|Fighting|Darkness|Metal|Fairy) Energy$")
 
 
@@ -69,10 +71,18 @@ def prints_reverse(set_id: Any, number: Any, rarity: Any, name: Any, language: A
     number = str(number or "").strip()
     if total is None or not number.isdigit() or not 0 < int(number) <= total:
         return False
-    if str(rarity or "").strip().lower() not in _REGULAR:
+    rarity_key = str(rarity or "").strip().lower()
+    if rarity_key not in _REGULAR:
         return False
     name = str(name or "").strip()
-    return not (_NO_REVERSE_NAME.search(name) or _BASIC_ENERGY.match(name))
+    if _NO_REVERSE_NAME.search(name):
+        return False
+    # EX-era Darkness and Metal Energy are special Energy cards, printed as
+    # Rares with a reverse holo like any other Rare.
+    if _BASIC_ENERGY.match(name):
+        special = str(set_id).startswith("ex") and name in _SPECIAL_ENERGY and rarity_key == "rare"
+        return special
+    return True
 
 
 def with_reverse(variants: dict[str, Any], card: Mapping[str, Any] | Any) -> dict[str, Any]:

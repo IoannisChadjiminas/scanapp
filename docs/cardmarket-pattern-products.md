@@ -42,3 +42,31 @@ versions (Cosmos holo, stamps), not reverse patterns.
 
 `image` is the listing photo on Cardmarket's image host, which answers only
 requests sent with Cardmarket as the referrer.
+
+## MEGA Dream ex V2 listings named from photos
+
+TCGdex gives no pattern for 28 MEGA Dream ex V2 listings. 26 were named on
+24 November 2026 by comparing Cardmarket's photo with a known listing of each
+pattern (Poké, Quick, Friend and Dusk Ball, Team Rocket). Cards owned by a
+named trainer (Ethan's, Cynthia's, Hop's, N's) use the Poké Ball in 19 of 20
+known cases; Ethan's Pinsir, whose photo is missing, follows that. Charcadet
+(030) and Bouffalant (140) have no photo yet and show as "Ball pattern".
+
+## Other numbered listings
+
+`api/app/cardmarket_listing_labels.csv` names listings Cardmarket only numbers
+(V1, V2) where the version is known: the tinsel copies of Scarlet & Violet
+basic Energy 017–024, and SVP 225 Pikachu's Worlds 2025 and League winner
+stamps. Those cards have no plain reverse; the tinsel copy and the winner stamp
+are their own products.
+
+## Checked, no change needed
+
+- Shiny Treasure ex, VMAX Climax and VSTAR Universe (JP): the mirror reverse is
+  sold under the card's own product, with reverse holo figures; Normal/Reverse
+  is right.
+- 30th Celebration (EN): no reverses; Cardmarket records no reverse holo sales,
+  and its Additionals expansion holds code cards only.
+- EX-era Darkness and Metal Energy (ex11–ex16) are special Energy Rares with a
+  reverse holo; they now offer one. Holon Phantoms and Power Keepers holo basic
+  Energy do not.

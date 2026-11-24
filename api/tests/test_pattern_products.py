@@ -87,8 +87,8 @@ def test_the_setting_turns_patterns_off(tmp_path, monkeypatch):
     assert variants_for_row(conn, row) == []
 
 
-def test_unnamed_pattern_shows_its_version():
-    assert pattern_products.label("", f"{BASE}/MEGA-Dream-ex-Additionals/Ethans-Pinsir-V2-xm2a001") == "V2"
+def test_unconfirmed_pattern_is_a_ball_pattern():
+    assert pattern_products.label("", f"{BASE}/MEGA-Dream-ex-Additionals/Charcadet-V2-xm2a030") == "Ball pattern"
     assert pattern_products.label("team-rocket", POKE) == "Team Rocket"
 
 
@@ -123,3 +123,22 @@ def test_the_shipped_list():
     # Cardmarket's V1 is the Poké Ball even where TCGdex says otherwise (White Flare Swadloon).
     assert by_product[836496]["pattern"] == "pokeball" and "-V1-" in by_product[836496]["url"]
     assert by_product[837231]["card_id"] == "ja:SV2a-001" and by_product[837231]["pattern"] == "masterball"
+
+
+def test_mega_dream_patterns_are_named_from_their_photos():
+    by_product = {row["product_id"]: row for row in read_reviewed()}
+    assert by_product[861527]["pattern"] == "pokeball"  # Ethan's Pinsir
+    assert by_product[861529]["pattern"] == "quickball"  # Yanma
+    assert by_product[861583]["pattern"] == "team-rocket"  # Team Rocket's Articuno
+    unnamed = sorted(row["card_id"] for row in read_reviewed() if not row["pattern"])
+    assert unnamed == ["ja:M2a-030", "ja:M2a-140"]  # no photo on Cardmarket yet
+
+
+def test_numbered_listings_with_a_reviewed_name():
+    from app.cardmarket import variant_record
+
+    tinsel = variant_record({"url": f"{BASE}/Scarlet-Violet-Energies/Basic-Fire-Energy-V2-SVE018",
+                             "name": "Basic Fire Energy (SVE 018)From 0,02 €", "card_id": "en:sve-018"})
+    winner = variant_record({"url": f"{BASE}/SV-Black-Star-Promos/Pikachu-V6-SVP225",
+                             "name": "Pikachu (SVP 225)From 48,00 €", "card_id": "en:svp-225"})
+    assert (tinsel["label"], winner["label"]) == ("Tinsel", "League winner stamp")
