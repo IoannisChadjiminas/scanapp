@@ -131,6 +131,13 @@ def image_source(conn: sqlite3.Connection, product_id: int) -> str | None:
     return image if image.startswith(_IMAGE_HOST) else None
 
 
+def is_image(data: bytes) -> bool:
+    """JPEG, PNG or WebP, judged by the file's first bytes."""
+    return data.startswith((b"\xff\xd8\xff", b"\x89PNG\r\n\x1a\n")) or (
+        data[:4] == b"RIFF" and data[8:12] == b"WEBP"
+    )
+
+
 def fetch_image(source: str, target: Path) -> bool:
     """Save a Cardmarket product photo. Its host answers only requests that
     come from Cardmarket's own pages, hence the referrer."""
@@ -148,7 +155,9 @@ def fetch_image(source: str, target: Path) -> bool:
     except httpx.HTTPError as exc:
         log.info("pattern image fetch failed error=%s", type(exc).__name__)
         return False
-    if response.status_code != 200 or not response.headers.get("content-type", "").startswith("image/"):
+    # The host labels its files "multerS3.AUTO_CONTENT_TYPE", so the bytes
+    # themselves say whether this is a picture.
+    if response.status_code != 200 or not is_image(response.content):
         log.info("pattern image fetch refused status=%s", response.status_code)
         return False
     target.parent.mkdir(parents=True, exist_ok=True)
