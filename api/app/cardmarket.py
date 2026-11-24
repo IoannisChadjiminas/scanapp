@@ -1118,9 +1118,32 @@ def variant_metadata(row: Any) -> dict[str, str]:
     }
 
 
+_LISTING_LABELS_FILE = Path(__file__).with_name("cardmarket_listing_labels.csv")
+_listing_labels_cache: dict[str, str] | None = None
+
+
+def listing_labels() -> dict[str, str]:
+    """Reviewed names for listings Cardmarket only numbers (V1, V2), such as the
+    tinsel copies of the Scarlet & Violet basic Energy cards."""
+    global _listing_labels_cache
+    if _listing_labels_cache is None:
+        import csv
+
+        try:
+            with open(_LISTING_LABELS_FILE, newline="", encoding="utf-8") as handle:
+                _listing_labels_cache = {
+                    row["url"].strip(): row["label"].strip()
+                    for row in csv.DictReader(handle)
+                    if (row.get("url") or "").strip() and (row.get("label") or "").strip()
+                }
+        except FileNotFoundError:
+            _listing_labels_cache = {}
+    return _listing_labels_cache
+
+
 def variant_record(row: Any, owner: Any = None) -> dict[str, Any]:
     url = str(_row_value(row, "url") or "")
-    label = _variant_label_from_card(owner) or clean_product_label(
+    label = listing_labels().get(url) or _variant_label_from_card(owner) or clean_product_label(
         str(_row_value(row, "name") or ""),
         url,
     )
@@ -1339,14 +1362,45 @@ def variants_for_row(
         """,
         (card_id,),
     ).fetchall()
-    if len(products) < 2:
-        return []
     # Stored ownership is necessary but not sufficient: an erroneous imported
     # owner must not turn a different Pokemon into a selectable finish. Use the
     # existing primary listing's title for Japanese names, without a network
     # translation or learning aliases from the suspect sibling itself.
-    valid = _identity_filtered_products(row, products)
-    return [variant_record(item) for item in valid] if len(valid) >= 2 else []
+    valid = _identity_filtered_products(row, products) if len(products) >= 2 else []
+    listed = [variant_record(item) for item in valid] if len(valid) >= 2 else []
+    patterns = _pattern_variants(conn, row, card_id)
+    if not patterns:
+        return listed
+    # The card's own listing comes first: the plain card (and its plain
+    # reverse holo, where there is one), then each pattern.
+    if not listed:
+        listed = [{**main, "label": "Normal"} for main in _main_listing(conn, row, products)]
+    return [*listed, *patterns] if listed else []
+
+
+def _pattern_variants(conn: sqlite3.Connection, row: Any, card_id: str) -> list[dict[str, Any]]:
+    from app.config import get_settings
+    from app.pattern_products import variants
+
+    if not get_settings().pattern_versions:
+        return []
+    return variants(conn, card_id)
+
+
+def _main_listing(conn: sqlite3.Connection, row: Any, products: list[Any]) -> list[dict[str, Any]]:
+    """The card's own Cardmarket listing as a version record."""
+    url = str(_row_value(row, "cardmarket_url") or "").strip()
+    if not url:
+        return []
+    own = next((item for item in products if str(item["url"]) == url), None)
+    if own is None:
+        own = conn.execute(
+            "SELECT url, name, expansion, card_id, matched, listing_image_url "
+            "FROM cardmarket_expansion_products WHERE url = ?", (url,),
+        ).fetchone()
+    if own is not None:
+        return [variant_record(own)]
+    return [{"url": url, "slug": product_slug(url), "label": "", "card_id": str(_row_value(row, "id"))}]
 
 
 def apply_variants_to_candidate(

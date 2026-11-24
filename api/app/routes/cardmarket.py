@@ -73,8 +73,15 @@ def listing_image(product_id: str, request: Request) -> FileResponse:
         raise HTTPException(status_code=404, detail="Listing image not found")
     root = (Path(request.app.state.settings.data_dir) / "listing-images").resolve()
     path = (root / f"{product_id}.jpg").resolve()
-    if path.parent != root or not path.is_file():
+    if path.parent != root:
         raise HTTPException(status_code=404, detail="Listing image not found")
+    if not path.is_file():
+        # A reverse pattern's photo is saved the first time it is asked for.
+        from app.pattern_products import fetch_image, image_source
+
+        source = image_source(request.app.state.dbs.catalog, int(product_id))
+        if not source or not fetch_image(source, path):
+            raise HTTPException(status_code=404, detail="Listing image not found")
     return FileResponse(path, media_type="image/jpeg")
 
 

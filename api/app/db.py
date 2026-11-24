@@ -592,6 +592,20 @@ def coverage_payload(conn: sqlite3.Connection) -> Coverage:
     )
 
 
+def _load_patterns(catalog: sqlite3.Connection) -> None:
+    """The reverse patterns Cardmarket sells as their own products: see
+    app/pattern_products.py. Never stops the server from starting."""
+    import logging
+
+    from app.pattern_products import apply_reviewed_file
+
+    log = logging.getLogger("cardmarket.patterns")
+    try:
+        log.info("pattern products loaded rows=%s", apply_reviewed_file(catalog))
+    except (sqlite3.Error, OSError) as exc:
+        log.warning("pattern products not loaded error=%s", type(exc).__name__)
+
+
 class Databases:
     def __init__(self, settings: Settings) -> None:
         self.cloud_snapshot = None
@@ -636,6 +650,7 @@ class Databases:
                 # A number shared by cards on different pages prices none
                 # of them, unless the reviewed list says whose it is: see
                 # app/card_products.py.
+                _load_patterns(self.catalog)
                 try:
                     reviewed = apply_reviewed_file(self.catalog)
                     withheld = withhold_shared(self.catalog)
@@ -653,6 +668,7 @@ class Databases:
 
         backfill_remote_image_urls(self.catalog, settings.data_dir)
         sync_cardmarket_links(settings.data_dir, self.catalog)
+        _load_patterns(self.catalog)
 
     def close(self) -> None:
         if getattr(self, "_portfolio_owned", False):
