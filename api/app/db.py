@@ -98,6 +98,9 @@ def connect(path: Path, *, factory=sqlite3.Connection) -> sqlite3.Connection:
     conn.execute("PRAGMA journal_mode=WAL")
     conn.execute("PRAGMA foreign_keys=ON")
     conn.execute("PRAGMA busy_timeout=5000")
+    from app.reverse_holos import register
+
+    register(conn)
     return conn
 
 
