@@ -69,3 +69,22 @@ def test_a_reviewed_correction_outranks_the_rest(tmp_path):
     assert card_products.withhold_shared(conn) == 0
     assert _trend(conn, "en:a-34") == 12.0
     assert _trend(conn, "en:a-114") == 220.0
+
+
+def test_the_shipped_list_names_products_before_shared_numbers_are_withheld(tmp_path):
+    conn = _catalog(tmp_path)
+    listed = tmp_path / "reviewed.csv"
+    listed.write_text("card_id,product_id,evidence\nen:a-34,100,read\nen:a-114,200,read\nen:a-9,,none\n")
+    assert card_products.apply_reviewed_file(conn, listed) == 2
+    assert card_products.withhold_shared(conn) == 0
+    assert _trend(conn, "en:a-34") == 12.0
+    assert _trend(conn, "en:a-114") == 220.0
+    # A restart applies the same list and changes nothing.
+    assert card_products.apply_reviewed_file(conn, listed) == 0
+    assert card_products.apply_reviewed_file(conn, tmp_path / "absent.csv") == 0
+
+
+def test_the_shipped_list_is_well_formed():
+    listed = card_products.read_reviewed()
+    assert len(listed) > 1800
+    assert all(product > 0 for product in listed.values())

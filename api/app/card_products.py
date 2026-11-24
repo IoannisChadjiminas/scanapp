@@ -13,9 +13,15 @@ not changed here; this local table says what the price file may be read with.
 """
 from __future__ import annotations
 
+import csv
 import sqlite3
 from datetime import datetime, timezone
+from pathlib import Path
 from typing import Any
+
+# Reviewed corrections shipped with the server: one row per card whose own
+# product is known. See docs/cardmarket-card-products.md.
+REVIEWED = Path(__file__).with_name("cardmarket_card_products.csv")
 
 SCHEMA = """
 CREATE TABLE IF NOT EXISTS cardmarket_card_products (
@@ -117,14 +123,38 @@ def remember_page(conn: sqlite3.Connection, url: str, product_id: int) -> None:
 
 
 def apply_review(conn: sqlite3.Connection, corrections: dict[str, int | None]) -> int:
-    """Reviewed corrections, by card id. They outrank everything else."""
+    """Reviewed corrections, by card id. They outrank everything else.
+    Returns the rows that changed; applying the same ones again changes none."""
     ensure_schema(conn)
     now = _now()
+    before = conn.total_changes
     with conn:
         conn.executemany(
             "INSERT INTO cardmarket_card_products (card_id, product_id, source, updated_at) "
             "VALUES (?, ?, 'review', ?) ON CONFLICT (card_id) DO UPDATE SET "
-            "product_id = excluded.product_id, source = 'review', updated_at = excluded.updated_at",
+            "product_id = excluded.product_id, source = 'review', updated_at = excluded.updated_at "
+            "WHERE cardmarket_card_products.source != 'review' "
+            "OR cardmarket_card_products.product_id IS NOT excluded.product_id",
             [(card, product, now) for card, product in corrections.items()],
         )
-    return len(corrections)
+    return conn.total_changes - before
+
+
+def read_reviewed(path: Path = REVIEWED) -> dict[str, int]:
+    """The corrections in a reviewed file: `card_id` and `product_id` (or
+    `proposed_product`). Rows without a product are skipped."""
+    with open(path, newline="", encoding="utf-8") as handle:
+        out: dict[str, int] = {}
+        for row in csv.DictReader(handle):
+            product = (row.get("product_id") or row.get("proposed_product") or "").strip()
+            if row.get("card_id") and product.isdigit():
+                out[row["card_id"]] = int(product)
+        return out
+
+
+def apply_reviewed_file(conn: sqlite3.Connection, path: Path = REVIEWED) -> int:
+    """Apply the shipped corrections. Run at start, before `withhold_shared`.
+    Returns the rows that changed; a missing file changes nothing."""
+    if not path.exists():
+        return 0
+    return apply_review(conn, read_reviewed(path))
