@@ -45,12 +45,38 @@ requests sent with Cardmarket as the referrer.
 
 ## MEGA Dream ex V2 listings named from photos
 
-TCGdex gives no pattern for 28 MEGA Dream ex V2 listings. 26 were named on
+TCGdex gives no pattern for 28 MEGA Dream ex V2 listings. 25 were named on
 24 November 2026 by comparing Cardmarket's photo with a known listing of each
-pattern (Poké, Quick, Friend and Dusk Ball, Team Rocket). Cards owned by a
-named trainer (Ethan's, Cynthia's, Hop's, N's) use the Poké Ball in 19 of 20
-known cases; Ethan's Pinsir, whose photo is missing, follows that. Charcadet
-(030) and Bouffalant (140) have no photo yet and show as "Ball pattern".
+pattern (Poké, Quick, Friend and Dusk Ball, Team Rocket). Ethan's Pinsir
+(001), Charcadet (030) and Bouffalant (140) have no photo yet and show as
+"Ball pattern": a pattern is never guessed. Cards owned by a named trainer use
+the Poké Ball in 19 of 20 known cases, so Ethan's Pinsir is probably one, but
+that is not confirmed.
+
+## Stamped promos among the Additionals
+
+Not every Additionals listing is a ball pattern. The V1 and V2 order does not
+say which is which, so a listing whose price or product number looks out of
+place is named from the caption on its own photo:
+
+| Card | Listing | What it is |
+|---|---|---|
+| Prismatic Evolutions 026 Glaceon ex | V1 (810425) | Surprise Box stamped promo |
+| Prismatic Evolutions 026 Glaceon ex | V2 (845410) | Holiday Calendar 2025 snowflake stamp |
+| Prismatic Evolutions 051 Lucario ex | V1 (845429) | Set logo stamp |
+| Prismatic Evolutions 051 Lucario ex | V2 (845430) | Oversized card, not tournament legal |
+| Prismatic Evolutions 076 Snorlax ex | V1 (841278) | Set logo stamp |
+| Prismatic Evolutions 076 Snorlax ex | V2 (841279) | Oversized card |
+| Prismatic Evolutions 082 Lugia ex | V1 (841280) | Set logo stamp |
+| Prismatic Evolutions 082 Lugia ex | V2 (841281) | Oversized card |
+| Black Bolt 079 Air Balloon | V2 (922111) | 30th anniversary stamp |
+| Black Bolt 084 Pokégear 3.0 | V2 (922116) | 30th anniversary stamp |
+| White Flare 084 Hilda | V2 (922118) | 30th anniversary stamp |
+
+Read on Cardmarket on 24 November 2026. Checked the same way and found
+correct: Foongus (Black Bolt 010) and Scream Tail (Terastal Festival 071),
+whose V2 is the Master Ball although it costs less than the V1. Cardmarket
+also lists a third Lugia ex product (868293) that is not in the list.
 
 ## Other numbered listings
 

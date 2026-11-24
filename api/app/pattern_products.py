@@ -43,6 +43,13 @@ LABELS = {
     "quickball": "Quick Ball",
     "friendball": "Friend Ball",
     "team-rocket": "Team Rocket",
+    # Stamped promos Cardmarket keeps beside the patterns; named from the
+    # caption on each listing's own photo.
+    "surprise-box-stamp": "Surprise Box stamp",
+    "holiday-calendar-2025-stamp": "Holiday Calendar 2025 stamp",
+    "30th-stamp": "30th anniversary stamp",
+    "set-logo-stamp": "Set logo stamp",
+    "oversized": "Oversized",
 }
 
 _IMAGE_HOST = "https://product-images.s3.cardmarket.com/"
