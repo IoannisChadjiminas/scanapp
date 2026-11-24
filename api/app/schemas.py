@@ -45,6 +45,9 @@ class CardmarketVariant(BaseModel):
     number: str = ""
     price_text: str = ""
     image: str = ""
+    # A reverse pattern or stamped promo sold as its own product, not a
+    # listing of the card that the reverse holo filter applies to.
+    pattern: bool = False
 
 
 class Candidate(BaseModel):

@@ -54,6 +54,11 @@ def test_patterns_are_versions_after_the_card_itself(tmp_path):
         (MAIN, "Normal"), (POKE, "Poké Ball"), (MASTER, "Master Ball"),
     ]
     assert found[2]["image"] == "/api/v1/cardmarket/listing-images/806409.jpg"
+    # The app tells a pattern from the card's own listing by this flag.
+    assert [bool(v.get("pattern")) for v in found] == [False, True, True]
+    from app.schemas import CardmarketVariant
+
+    assert [CardmarketVariant.model_validate(v).pattern for v in found] == [False, True, True]
 
 
 def test_each_pattern_is_priced_from_its_own_product(tmp_path):
