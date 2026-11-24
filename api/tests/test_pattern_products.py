@@ -127,11 +127,11 @@ def test_the_shipped_list():
 
 def test_mega_dream_patterns_are_named_from_their_photos():
     by_product = {row["product_id"]: row for row in read_reviewed()}
-    assert by_product[861527]["pattern"] == "pokeball"  # Ethan's Pinsir
     assert by_product[861529]["pattern"] == "quickball"  # Yanma
     assert by_product[861583]["pattern"] == "team-rocket"  # Team Rocket's Articuno
     unnamed = sorted(row["card_id"] for row in read_reviewed() if not row["pattern"])
-    assert unnamed == ["ja:M2a-030", "ja:M2a-140"]  # no photo on Cardmarket yet
+    # No photo on Cardmarket yet, Ethan's Pinsir (001) included: none is guessed.
+    assert unnamed == ["ja:M2a-001", "ja:M2a-030", "ja:M2a-140"]
 
 
 def test_numbered_listings_with_a_reviewed_name():
@@ -168,3 +168,27 @@ def test_japanese_pattern_cards_have_no_plain_reverse():
         assert with_reverse({"normal": True, "reverse": True}, card)["reverse"] is False
     # English pattern sets keep their plain reverse.
     assert "en:sv08.5-001" not in PATTERN_ONLY
+
+
+def test_stamped_promos_and_unseen_patterns_are_not_called_ball_names():
+    """Glaceon ex's two listings are stamped promos and Air Balloon's second
+    is a 30th anniversary stamp, as their photos say (so are Pokégear 3.0's
+    and Hilda's); Ethan's Pinsir has no
+    photo yet, so its pattern is not guessed."""
+    listed = {row["product_id"]: row["pattern"] for row in pattern_products.read_reviewed()}
+    assert listed[810425] == "surprise-box-stamp"
+    assert listed[845410] == "holiday-calendar-2025-stamp"
+    assert listed[922111] == listed[922116] == listed[922118] == "30th-stamp"
+    # Lucario ex, Snorlax ex and Lugia ex: a set logo stamp and an oversized card.
+    assert [listed[p] for p in (845429, 841278, 841280)] == ["set-logo-stamp"] * 3
+    assert [listed[p] for p in (845430, 841279, 841281)] == ["oversized"] * 3
+    # An ex card has no ball pattern.
+    assert not [
+        row["url"] for row in pattern_products.read_reviewed()
+        if "-ex-V" in row["url"] and row["pattern"].endswith("ball")
+    ]
+    assert listed[861527] == ""
+    assert pattern_products.label(listed[810425], "") == "Surprise Box stamp"
+    assert pattern_products.label(listed[861527], "") == "Ball pattern"
+    # Every named pattern has a label of its own.
+    assert {p for p in listed.values() if p} <= set(pattern_products.LABELS)
