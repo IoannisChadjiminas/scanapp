@@ -141,6 +141,9 @@ class Settings(BaseSettings):
     # Japanese two-half sets whose TCGdex total is stored under another set id (XY1a for
     # Collection X), and TCGdex totals known to be wrong (SM7a prints /060). Replay first.
     set_total_aliases: bool = True
+    # Offer the Poké Ball, Master Ball and other reverse patterns Cardmarket sells
+    # as their own products as versions of a card: app/pattern_products.py.
+    pattern_versions: bool = True
     # A clean printed fraction keeps its card ahead of a same-name twin that local artwork
     # verification confirmed (Base Set 88/102 over Base Set 2 116/130). On in staging since 2026-11-10.
     rank_fraction_confirmed: bool = True
