@@ -11,11 +11,35 @@ Set cards, so it cannot say which cards have one.
 
 The rule only adds a reverse finish next to a plain or holo one, so prices of
 reverse-only printings are unchanged.
+
+The other way round, some cards have no plain reverse at all: every reverse
+they have is a pattern (Poké Ball, Master Ball, Energy...) that Cardmarket
+sells as its own product, as in JP 151 and Ascended Heroes. TCGdex still flags
+them `reverse`, and the main product's reverse holo figures are then other
+products' sales (8.33 € for JP 151 Bulbasaur, whose Poké Ball and Master Ball
+versions sell at 1.58 € and 38.99 €). `pattern_only_reverses.csv` lists those
+cards, read from TCGdex's detailed variants; they offer no plain reverse.
 """
 from __future__ import annotations
 
+import csv
+import json
 import re
+from pathlib import Path
 from typing import Any, Mapping
+
+PATTERN_ONLY_FILE = Path(__file__).with_name("pattern_only_reverses.csv")
+
+
+def _read_pattern_only(path: Path = PATTERN_ONLY_FILE) -> frozenset[str]:
+    try:
+        with open(path, newline="", encoding="utf-8") as handle:
+            return frozenset(row["card_id"] for row in csv.DictReader(handle) if row.get("card_id"))
+    except FileNotFoundError:
+        return frozenset()
+
+
+PATTERN_ONLY: frozenset[str] = _read_pattern_only()
 
 # Printed set totals of the sets with reverse holos for their regular cards.
 # Sets with none (Generations, Double Crisis, Dragon Vault, Detective Pikachu,
@@ -52,17 +76,46 @@ def prints_reverse(set_id: Any, number: Any, rarity: Any, name: Any, language: A
 
 
 def with_reverse(variants: dict[str, Any], card: Mapping[str, Any] | Any) -> dict[str, Any]:
-    """The stored variants, with the reverse finish the rule says exists.
+    """The stored variants, corrected: the reverse finish the rule says exists
+    is added, and a reverse that is only sold as pattern products is removed.
 
-    `card` is a catalogue row with `set_id`, `collector_number`, `rarity`,
-    `name` and `language`; a row without them is returned as stored.
+    `card` is a catalogue row with `id`, `set_id`, `collector_number`,
+    `rarity`, `name` and `language`; a row without them is returned as stored.
     """
-    if variants.get("reverse") or not (variants.get("normal") or variants.get("holo")):
+    if not (variants.get("normal") or variants.get("holo")):
         return variants
     try:
+        if variants.get("reverse"):
+            return {**variants, "reverse": False} if card["id"] in PATTERN_ONLY else variants
         printed = prints_reverse(
             card["set_id"], card["collector_number"], card["rarity"], card["name"], card["language"]
         )
     except (KeyError, IndexError, TypeError):
         return variants
     return {**variants, "reverse": True} if printed else variants
+
+
+def has_reverse(card_id: Any, set_id: Any, number: Any, rarity: Any, name: Any,
+                language: Any, variants_json: Any) -> int:
+    """`with_reverse` for SQL, registered on catalogue connections as
+    `card_has_reverse`, so a search by finish agrees with the card page."""
+    try:
+        variants = json.loads(variants_json or "{}")
+    except (TypeError, ValueError):
+        return 0
+    if not isinstance(variants, dict):
+        return 0
+    card = {"id": card_id, "set_id": set_id, "collector_number": number,
+            "rarity": rarity, "name": name, "language": language}
+    return int(bool(with_reverse(variants, card).get("reverse")))
+
+
+def register(conn: Any) -> None:
+    """Make `card_has_reverse(...)` available to SQL on this connection."""
+    conn.create_function("card_has_reverse", 7, has_reverse, deterministic=True)
+
+
+REVERSE_SQL = (
+    "card_has_reverse(cards.id, cards.set_id, cards.collector_number, cards.rarity,"
+    " cards.name, cards.language, cards.variants_json)=1"
+)

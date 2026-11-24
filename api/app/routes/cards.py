@@ -17,7 +17,7 @@ from app.catalogue_titles import stored_view_title
 from app.set_titles import ja_sets_titled, set_view_title
 from app.cardmarket import mapping_from_row, variants_for_row
 from app.price_sources import scan_finishes, scan_prices
-from app.reverse_holos import with_reverse
+from app.reverse_holos import REVERSE_SQL, with_reverse
 from app.market_stats import capabilities
 from app.recognition.language import expand_language
 from app.set_totals import set_total
@@ -366,7 +366,8 @@ def search_cards(
         key = {"normal": "normal", "holo": "holo", "reverse": "reverse"}.get(finish)
         if key is None:
             raise HTTPException(422, "Unknown finish")
-        clauses.append(f"json_extract(cards.variants_json, '$.{key}')=1")
+        # A reverse is the corrected one: see app/reverse_holos.py.
+        clauses.append(REVERSE_SQL if key == "reverse" else f"json_extract(cards.variants_json, '$.{key}')=1")
     if category:
         clauses.append("LOWER(cards.category)=?")
         params.append(category.lower())

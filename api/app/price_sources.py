@@ -295,7 +295,7 @@ def _json(raw: Any) -> dict[str, Any]:
 
 
 _CARD = (
-    "SELECT cardmarket_id, variants_json, set_id, collector_number, rarity, name, language"
+    "SELECT id, cardmarket_id, variants_json, set_id, collector_number, rarity, name, language"
     " FROM cards WHERE id = ?"
 )
 

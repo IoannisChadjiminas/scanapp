@@ -89,3 +89,25 @@ def test_reverse_only_and_listed_variants_stay_as_stored():
     nothing = {"normal": False, "holo": False, "reverse": False}
     assert with_reverse(nothing, row) is nothing
     assert with_reverse({"normal": True}, {}) == {"normal": True}
+
+
+def test_pattern_only_reverse_offers_no_plain_reverse(tmp_path, monkeypatch):
+    from app import reverse_holos
+
+    monkeypatch.setattr(reverse_holos, "PATTERN_ONLY", frozenset({"ja:SV2a-001"}))
+    conn = _catalog(tmp_path)
+    _card(conn, "ja:SV2a-001", name="フシギダネ", set_id="SV2a", number="001", rarity="Common",
+          variants={"normal": True, "reverse": True}, product=719442, language="ja")
+    import_guide(conn, {**GUIDE, "priceGuides": [
+        {"idProduct": 719442, "low": 0.02, "trend": 0.08, "low-holo": 0.1, "trend-holo": 8.33},
+    ]})
+    assert price_sources.scan_finishes(conn, "ja:SV2a-001") == {"finishes": [], "reverse_holo_prices": []}
+    plain = {p["label"]: p["amount"] for p in price_sources.best_prices(conn, "ja:SV2a-001", None)}
+    assert plain["Trend"] == 0.08
+
+
+def test_pattern_only_list_ships_with_the_server():
+    from app.reverse_holos import PATTERN_ONLY
+
+    assert "ja:SV2a-001" in PATTERN_ONLY and "en:me02.5-001" in PATTERN_ONLY
+    assert "en:sv08.5-001" not in PATTERN_ONLY  # Prismatic Evolutions also has a plain reverse

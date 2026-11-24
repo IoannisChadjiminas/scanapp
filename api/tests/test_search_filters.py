@@ -237,3 +237,17 @@ def test_chase_name_search_covers_all_sets_before_filtering_and_paging(catalog):
     assert search(catalog, preset='new_set', q='chari', ownership='only_owned', owned_ids=['en:vintage-10']).total == 0
     # Browsing without a name still defaults to recent releases.
     assert {card.set_id for card in search(catalog, preset='new_set', q='   ').items} == {'new', 'recent'}
+
+
+def test_reverse_filter_uses_the_corrected_finishes(catalog, monkeypatch):
+    # TCGdex lists no reverse for Cubone 90/214, which has one; JP 151
+    # Bulbasaur's reverses are all pattern products, so it has no plain one.
+    from app import reverse_holos
+
+    monkeypatch.setattr(reverse_holos, "PATTERN_ONLY", frozenset({"e"}))
+    catalog.execute('''INSERT INTO cards(id, provider_id, name, set_id, set_name, collector_number, language, rarity, category, variants_json)
+        VALUES ('cubone', 'cubone', 'Cubone', 'sm10', 'Unbroken Bonds', '90', 'en', 'Common', 'Pokemon',
+                '{"normal":true,"reverse":false}')''')
+    catalog.execute("INSERT INTO cards_fts(id,name,set_name,collector_number) VALUES ('cubone', 'Cubone', 'Unbroken Bonds', '90')")
+    catalog.commit()
+    assert ids(search(catalog, finish='reverse')) == ['a', 'cubone']
