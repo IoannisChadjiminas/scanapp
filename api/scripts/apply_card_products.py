@@ -3,8 +3,10 @@ own table (`app/card_products.py`). The catalogue itself is not changed.
 
     python scripts/apply_card_products.py corrections.csv /data/catalog.sqlite
 
-The CSV has a header with `card_id` and `proposed_product`; rows with no
-proposed product are skipped. Loading the same file again changes nothing.
+The server applies `app/cardmarket_card_products.csv` by itself at start; this
+script is for loading a list by hand without a restart. The CSV has a header
+with `card_id` and `product_id` (or `proposed_product`); rows with no product
+are skipped. Loading the same file again changes nothing.
 """
 from __future__ import annotations
 
@@ -17,9 +19,9 @@ from datetime import datetime, timezone
 def main(source: str, path: str) -> None:
     with open(source, newline="", encoding="utf-8") as handle:
         rows = [
-            (row["card_id"], int(row["proposed_product"]))
+            (row["card_id"], int((row.get("product_id") or row.get("proposed_product")).strip()))
             for row in csv.DictReader(handle)
-            if (row.get("proposed_product") or "").strip().isdigit()
+            if (row.get("product_id") or row.get("proposed_product") or "").strip().isdigit()
         ]
     now = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
     conn = sqlite3.connect(path, timeout=60)

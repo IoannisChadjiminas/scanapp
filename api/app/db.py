@@ -628,14 +628,16 @@ class Databases:
                 self.cloud_snapshot = load_cloud_catalogue(settings, self.catalog)
                 import logging
 
-                from app.card_products import withhold_shared
+                from app.card_products import apply_reviewed_file, withhold_shared
 
                 # A number shared by cards on different pages prices none
-                # of them: see app/card_products.py.
+                # of them, unless the reviewed list says whose it is: see
+                # app/card_products.py.
                 try:
+                    reviewed = apply_reviewed_file(self.catalog)
                     withheld = withhold_shared(self.catalog)
                     logging.getLogger("cardmarket.prices").info(
-                        "shared product numbers withheld cards=%s", withheld)
+                        "shared product numbers reviewed_changes=%s withheld cards=%s", reviewed, withheld)
                 except sqlite3.Error as exc:
                     logging.getLogger("cardmarket.prices").warning(
                         "shared product numbers not withheld error=%s", type(exc).__name__)

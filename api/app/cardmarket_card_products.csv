@@ -1,0 +1,1822 @@
+card_id,product_id,previous_product,name,number,set,evidence
+en:base2-1,273798,273798,Clefable,1,Jungle,read from Cardmarket
+en:base2-10,273807,273807,Scyther,10,Jungle,read from Cardmarket
+en:base2-11,273808,273808,Snorlax,11,Jungle,read from Cardmarket
+en:base2-12,273809,273809,Vaporeon,12,Jungle,read from Cardmarket
+en:base2-13,273810,273810,Venomoth,13,Jungle,read from Cardmarket
+en:base2-14,273811,273811,Victreebel,14,Jungle,read from Cardmarket
+en:base2-15,273812,273812,Vileplume,15,Jungle,read from Cardmarket
+en:base2-16,273813,273813,Wigglytuff,16,Jungle,read from Cardmarket
+en:base2-17,273814,273798,Clefable,17,Jungle,read from Cardmarket
+en:base2-18,273815,273799,Electrode,18,Jungle,read from Cardmarket
+en:base2-19,273816,273800,Flareon,19,Jungle,read from Cardmarket
+en:base2-2,273799,273799,Electrode,2,Jungle,read from Cardmarket
+en:base2-20,273817,273801,Jolteon,20,Jungle,read from Cardmarket
+en:base2-21,273818,273802,Kangaskhan,21,Jungle,read from Cardmarket
+en:base2-22,273819,273803,Mr. Mime,22,Jungle,read from Cardmarket
+en:base2-23,273820,273804,Nidoqueen,23,Jungle,read from Cardmarket
+en:base2-24,273821,273805,Pidgeot,24,Jungle,read from Cardmarket
+en:base2-25,273822,273806,Pinsir,25,Jungle,read from Cardmarket
+en:base2-26,273823,273807,Scyther,26,Jungle,read from Cardmarket
+en:base2-27,273824,273808,Snorlax,27,Jungle,read from Cardmarket
+en:base2-28,273825,273809,Vaporeon,28,Jungle,read from Cardmarket
+en:base2-29,273826,273810,Venomoth,29,Jungle,read from Cardmarket
+en:base2-3,273800,273800,Flareon,3,Jungle,read from Cardmarket
+en:base2-30,273827,273811,Victreebel,30,Jungle,read from Cardmarket
+en:base2-31,273828,273812,Vileplume,31,Jungle,read from Cardmarket
+en:base2-32,273829,273813,Wigglytuff,32,Jungle,read from Cardmarket
+en:base2-4,273801,273801,Jolteon,4,Jungle,read from Cardmarket
+en:base2-5,273802,273802,Kangaskhan,5,Jungle,read from Cardmarket
+en:base2-6,273803,273803,Mr. Mime,6,Jungle,read from Cardmarket
+en:base2-7,273804,273804,Nidoqueen,7,Jungle,read from Cardmarket
+en:base2-8,273805,273805,Pidgeot,8,Jungle,read from Cardmarket
+en:base2-9,273806,273806,Pinsir,9,Jungle,read from Cardmarket
+en:base3-1,273862,273862,Aerodactyl,1,Fossil,page photo
+en:base3-10,273871,273871,Lapras,10,Fossil,read from Cardmarket
+en:base3-11,273872,273872,Magneton,11,Fossil,read from Cardmarket
+en:base3-12,273873,273873,Moltres,12,Fossil,read from Cardmarket
+en:base3-13,273874,273874,Muk,13,Fossil,read from Cardmarket
+en:base3-14,273875,273875,Raichu,14,Fossil,read from Cardmarket
+en:base3-15,273876,273876,Zapdos,15,Fossil,read from Cardmarket
+en:base3-16,273877,273862,Aerodactyl,16,Fossil,read from Cardmarket
+en:base3-17,273878,273863,Articuno,17,Fossil,read from Cardmarket
+en:base3-18,273879,273864,Ditto,18,Fossil,read from Cardmarket
+en:base3-19,273880,273865,Dragonite,19,Fossil,read from Cardmarket
+en:base3-2,273863,273863,Articuno,2,Fossil,read from Cardmarket
+en:base3-20,273881,273866,Gengar,20,Fossil,read from Cardmarket
+en:base3-21,273882,273867,Haunter,21,Fossil,read from Cardmarket
+en:base3-22,273883,273868,Hitmonlee,22,Fossil,read from Cardmarket
+en:base3-23,273884,273869,Hypno,23,Fossil,read from Cardmarket
+en:base3-24,273885,273870,Kabutops,24,Fossil,read from Cardmarket
+en:base3-25,273886,273871,Lapras,25,Fossil,read from Cardmarket
+en:base3-26,273887,273872,Magneton,26,Fossil,read from Cardmarket
+en:base3-27,273888,273873,Moltres,27,Fossil,read from Cardmarket
+en:base3-28,273889,273874,Muk,28,Fossil,read from Cardmarket
+en:base3-29,273890,273875,Raichu,29,Fossil,read from Cardmarket
+en:base3-3,273864,273864,Ditto,3,Fossil,read from Cardmarket
+en:base3-30,273891,273876,Zapdos,30,Fossil,read from Cardmarket
+en:base3-4,273865,273865,Dragonite,4,Fossil,read from Cardmarket
+en:base3-5,273866,273866,Gengar,5,Fossil,read from Cardmarket
+en:base3-6,273867,273867,Haunter,6,Fossil,read from Cardmarket
+en:base3-7,273868,273868,Hitmonlee,7,Fossil,read from Cardmarket
+en:base3-8,273869,273869,Hypno,8,Fossil,read from Cardmarket
+en:base3-9,273870,273870,Kabutops,9,Fossil,read from Cardmarket
+en:base5-1,274054,274054,Dark Alakazam,1,Team Rocket,read from Cardmarket
+en:base5-10,274063,274063,Dark Machamp,10,Team Rocket,read from Cardmarket
+en:base5-11,274064,274064,Dark Magneton,11,Team Rocket,read from Cardmarket
+en:base5-12,274065,274065,Dark Slowbro,12,Team Rocket,read from Cardmarket
+en:base5-13,274066,274066,Dark Vileplume,13,Team Rocket,read from Cardmarket
+en:base5-14,274067,274067,Dark Weezing,14,Team Rocket,read from Cardmarket
+en:base5-15,274068,274068,Here Comes Team Rocket!,15,Team Rocket,read from Cardmarket
+en:base5-16,274069,274069,Rocket's Sneak Attack,16,Team Rocket,read from Cardmarket
+en:base5-17,274070,274070,Rainbow Energy,17,Team Rocket,read from Cardmarket
+en:base5-18,274071,274054,Dark Alakazam,18,Team Rocket,read from Cardmarket
+en:base5-19,274072,274055,Dark Arbok,19,Team Rocket,read from Cardmarket
+en:base5-2,274055,274055,Dark Arbok,2,Team Rocket,read from Cardmarket
+en:base5-20,274073,274056,Dark Blastoise,20,Team Rocket,read from Cardmarket
+en:base5-21,274074,274057,Dark Charizard,21,Team Rocket,read from Cardmarket
+en:base5-22,274075,274058,Dark Dragonite,22,Team Rocket,read from Cardmarket
+en:base5-23,274076,274059,Dark Dugtrio,23,Team Rocket,read from Cardmarket
+en:base5-24,274077,274060,Dark Golbat,24,Team Rocket,read from Cardmarket
+en:base5-25,274078,274061,Dark Gyarados,25,Team Rocket,read from Cardmarket
+en:base5-26,274079,274062,Dark Hypno,26,Team Rocket,read from Cardmarket
+en:base5-27,274080,274063,Dark Machamp,27,Team Rocket,read from Cardmarket
+en:base5-28,274081,274064,Dark Magneton,28,Team Rocket,read from Cardmarket
+en:base5-29,274082,274065,Dark Slowbro,29,Team Rocket,read from Cardmarket
+en:base5-3,274056,274056,Dark Blastoise,3,Team Rocket,read from Cardmarket
+en:base5-30,274083,274066,Dark Vileplume,30,Team Rocket,read from Cardmarket
+en:base5-31,274084,274067,Dark Weezing,31,Team Rocket,read from Cardmarket
+en:base5-4,274057,274057,Dark Charizard,4,Team Rocket,read from Cardmarket
+en:base5-5,274058,274058,Dark Dragonite,5,Team Rocket,read from Cardmarket
+en:base5-6,274059,274059,Dark Dugtrio,6,Team Rocket,read from Cardmarket
+en:base5-7,274060,274060,Dark Golbat,7,Team Rocket,read from Cardmarket
+en:base5-71,274124,274068,Here Comes Team Rocket!,71,Team Rocket,read from Cardmarket
+en:base5-72,274125,274069,Rocket's Sneak Attack,72,Team Rocket,read from Cardmarket
+en:base5-8,274061,274061,Dark Gyarados,8,Team Rocket,page photo
+en:base5-80,274133,274070,Rainbow Energy,80,Team Rocket,read from Cardmarket
+en:base5-9,274062,274062,Dark Hypno,9,Team Rocket,read from Cardmarket
+en:bw1-1,279739,279739,Snivy,1,Black & White,page photo
+en:bw1-11,279749,279749,Maractus,11,Black & White,attacks match one product
+en:bw1-113,279851,279764,Reshiram,113,Black & White,read from Cardmarket
+en:bw1-114,279852,279785,Zekrom,114,Black & White,read from Cardmarket
+en:bw1-12,279750,279749,Maractus,12,Black & White,attacks match one product
+en:bw1-15,279753,279753,Tepig,15,Black & White,page photo
+en:bw1-16,279754,279753,Tepig,16,Black & White,attacks match one product
+en:bw1-17,279755,279755,Pignite,17,Black & White,attacks match one product
+en:bw1-18,279756,279755,Pignite,18,Black & White,attacks match one product
+en:bw1-19,279757,279757,Emboar,19,Black & White,attacks match one product
+en:bw1-2,279740,279739,Snivy,2,Black & White,attacks match one product
+en:bw1-20,279758,279757,Emboar,20,Black & White,attacks match one product
+en:bw1-23,279761,279761,Darumaka,23,Black & White,attacks match one product
+en:bw1-24,279762,279761,Darumaka,24,Black & White,attacks match one product
+en:bw1-26,279764,279764,Reshiram,26,Black & White,read from Cardmarket
+en:bw1-27,279765,279765,Oshawott,27,Black & White,page photo
+en:bw1-28,279766,279765,Oshawott,28,Black & White,attacks match one product
+en:bw1-29,279767,279767,Dewott,29,Black & White,attacks match one product
+en:bw1-3,279741,279741,Servine,3,Black & White,attacks match one product
+en:bw1-30,279768,279767,Dewott,30,Black & White,attacks match one product
+en:bw1-31,279769,279769,Samurott,31,Black & White,attacks match one product
+en:bw1-32,279770,279769,Samurott,32,Black & White,attacks match one product
+en:bw1-38,279776,279776,Alomomola,38,Black & White,attacks match one product
+en:bw1-39,279777,279776,Alomomola,39,Black & White,attacks match one product
+en:bw1-4,279742,279741,Servine,4,Black & White,attacks match one product
+en:bw1-40,279778,279778,Blitzle,40,Black & White,attacks match one product
+en:bw1-41,279779,279778,Blitzle,41,Black & White,attacks match one product
+en:bw1-42,279780,279780,Zebstrika,42,Black & White,page photo
+en:bw1-43,279781,279780,Zebstrika,43,Black & White,attacks match one product
+en:bw1-44,279782,279782,Joltik,44,Black & White,attacks match one product
+en:bw1-45,279783,279782,Joltik,45,Black & White,attacks plus a set or type tag
+en:bw1-47,279785,279785,Zekrom,47,Black & White,read from Cardmarket
+en:bw1-5,279743,279743,Serperior,5,Black & White,attacks match one product
+en:bw1-58,279796,279796,Timburr,58,Black & White,attacks match one product
+en:bw1-59,279797,279796,Timburr,59,Black & White,attacks match one product
+en:bw1-6,279744,279743,Serperior,6,Black & White,attacks match one product
+en:bw1-77,279815,279815,Patrat,77,Black & White,attacks match one product
+en:bw1-78,279816,279815,Patrat,78,Black & White,attacks match one product
+en:bw1-90,279828,279828,Bouffalant,90,Black & White,attacks match one product
+en:bw1-91,279829,279828,Bouffalant,91,Black & White,attacks match one product
+en:bw10-101,281122,281102,Iris,101,Plasma Blast,read from Cardmarket
+en:bw10-105,281126,281106,Rare Candy,105,Plasma Blast,read from Cardmarket
+en:bw10-49,281070,281070,Machamp,49,Plasma Blast,attacks match one product
+en:bw10-50,281071,281070,Machamp,50,Plasma Blast,attacks match one product
+en:bw10-81,281102,281102,Iris,81,Plasma Blast,read from Cardmarket
+en:bw10-85,281106,281106,Rare Candy,85,Plasma Blast,read from Cardmarket
+en:bw11-10,281161,281160,Sewaddle,10,Legendary Treasures,attacks match one product
+en:bw11-104,281255,281128,Minccino,104,Legendary Treasures,attacks match one product
+en:bw11-105,281256,281127,Cinccino,105,Legendary Treasures,read from Cardmarket
+en:bw11-115,281266,281202,Zekrom,115,Legendary Treasures,read from Cardmarket
+en:bw11-28,281179,281139,Reshiram,28,Legendary Treasures,read from Cardmarket
+en:bw11-33,281184,281141,Piplup,33,Legendary Treasures,attacks match one product
+en:bw11-49,281200,281147,Emolga,49,Legendary Treasures,read from Cardmarket
+en:bw11-51,281202,281202,Zekrom,51,Legendary Treasures,read from Cardmarket
+en:bw11-59,281210,281143,Ralts,59,Legendary Treasures,attacks match one product
+en:bw11-6,281157,281150,Snivy,6,Legendary Treasures,attacks match one product
+en:bw11-60,281211,281144,Kirlia,60,Legendary Treasures,attacks match one product
+en:bw11-69,281220,281220,Gothita,69,Legendary Treasures,attacks match one product
+en:bw11-7,281158,281129,Servine,7,Legendary Treasures,attacks match one product
+en:bw11-70,281221,281220,Gothita,70,Legendary Treasures,attacks match one product
+en:bw11-73,281224,281224,Solosis,73,Legendary Treasures,attacks match one product
+en:bw11-74,281225,281224,Solosis,74,Legendary Treasures,attacks match one product
+en:bw11-78,281229,281134,Meloetta,78,Legendary Treasures,read from Cardmarket
+en:bw11-8,281159,281151,Serperior,8,Legendary Treasures,attacks match one product
+en:bw11-83,281234,281136,Stunfisk,83,Legendary Treasures,attacks match one product
+en:bw11-9,281160,281160,Sewaddle,9,Legendary Treasures,attacks match one product
+en:bw11-RC1,281150,281150,Snivy,RC1,Legendary Treasures,attacks match one product
+en:bw11-RC11,281134,281134,Meloetta-EX,RC11,Legendary Treasures,attacks match one product
+en:bw11-RC12,281136,281136,Stunfisk,RC12,Legendary Treasures,attacks match one product
+en:bw11-RC18,281128,281128,Minccino,RC18,Legendary Treasures,attacks match one product
+en:bw11-RC19,281127,281127,Cinccino,RC19,Legendary Treasures,read from Cardmarket
+en:bw11-RC2,281129,281129,Servine,RC2,Legendary Treasures,attacks match one product
+en:bw11-RC22,281139,281139,Reshiram,RC22,Legendary Treasures,read from Cardmarket
+en:bw11-RC23,281147,281147,Emolga,RC23,Legendary Treasures,read from Cardmarket
+en:bw11-RC3,281151,281151,Serperior,RC3,Legendary Treasures,attacks match one product
+en:bw11-RC6,281141,281141,Piplup,RC6,Legendary Treasures,attacks match one product
+en:bw11-RC8,281143,281143,Ralts,RC8,Legendary Treasures,attacks match one product
+en:bw11-RC9,281144,281144,Kirlia,RC9,Legendary Treasures,attacks match one product
+en:bw2-10,279975,279974,Cottonee,10,Emerging Powers,attacks match one product
+en:bw2-11,279976,279976,Whimsicott,11,Emerging Powers,attacks match one product
+en:bw2-12,279977,279976,Whimsicott,12,Emerging Powers,attacks match one product
+en:bw2-24,279989,279989,Basculin,24,Emerging Powers,attacks match one product
+en:bw2-25,279990,279989,Basculin,25,Emerging Powers,attacks match one product
+en:bw2-28,279993,279993,Cubchoo,28,Emerging Powers,attacks match one product
+en:bw2-29,279994,279993,Cubchoo,29,Emerging Powers,attacks match one product
+en:bw2-3,279968,279968,Sewaddle,3,Emerging Powers,attacks match one product
+en:bw2-30,279995,279995,Beartic,30,Emerging Powers,attacks match one product
+en:bw2-31,279996,279995,Beartic,31,Emerging Powers,attacks match one product
+en:bw2-35,280000,280000,Thundurus,35,Emerging Powers,read from Cardmarket
+en:bw2-4,279969,279968,Sewaddle,4,Emerging Powers,attacks match one product
+en:bw2-41,280006,280006,Sigilyph,41,Emerging Powers,attacks match one product
+en:bw2-42,280007,280006,Sigilyph,42,Emerging Powers,attacks match one product
+en:bw2-43,280008,280008,Gothita,43,Emerging Powers,attacks match one product
+en:bw2-44,280009,280008,Gothita,44,Emerging Powers,attacks match one product
+en:bw2-45,280010,280010,Gothorita,45,Emerging Powers,attacks match one product
+en:bw2-46,280011,280010,Gothorita,46,Emerging Powers,attacks match one product
+en:bw2-47,280012,280012,Gothitelle,47,Emerging Powers,attacks match one product
+en:bw2-48,280013,280012,Gothitelle,48,Emerging Powers,attacks match one product
+en:bw2-49,280014,280014,Roggenrola,49,Emerging Powers,attacks match one product
+en:bw2-5,279970,279970,Swadloon,5,Emerging Powers,attacks match one product
+en:bw2-50,280015,280014,Roggenrola,50,Emerging Powers,attacks match one product
+en:bw2-51,280016,280016,Boldore,51,Emerging Powers,attacks match one product
+en:bw2-52,280017,280016,Boldore,52,Emerging Powers,attacks match one product
+en:bw2-54,280019,280019,Drilbur,54,Emerging Powers,attacks match one product
+en:bw2-55,280020,280019,Drilbur,55,Emerging Powers,attacks match one product
+en:bw2-56,280021,280021,Excadrill,56,Emerging Powers,attacks match one product
+en:bw2-57,280022,280021,Excadrill,57,Emerging Powers,attacks match one product
+en:bw2-6,279971,279970,Swadloon,6,Emerging Powers,attacks match one product
+en:bw2-7,279972,279972,Leavanny,7,Emerging Powers,attacks match one product
+en:bw2-70,280035,280035,Ferroseed,70,Emerging Powers,attacks match one product
+en:bw2-71,280036,280035,Ferroseed,71,Emerging Powers,attacks match one product
+en:bw2-72,280037,280037,Ferrothorn,72,Emerging Powers,attacks match one product
+en:bw2-73,280038,280037,Ferrothorn,73,Emerging Powers,attacks match one product
+en:bw2-8,279973,279972,Leavanny,8,Emerging Powers,attacks match one product
+en:bw2-86,280051,280051,Rufflet,86,Emerging Powers,attacks match one product
+en:bw2-87,280052,280051,Rufflet,87,Emerging Powers,attacks match one product
+en:bw2-89,280054,280054,Tornadus,89,Emerging Powers,read from Cardmarket
+en:bw2-9,279974,279974,Cottonee,9,Emerging Powers,attacks match one product
+en:bw2-97,280062,280000,Thundurus,97,Emerging Powers,read from Cardmarket
+en:bw2-98,280063,280054,Tornadus,98,Emerging Powers,read from Cardmarket
+en:bw3-100,280223,280207,Cobalion,100,Noble Victories,read from Cardmarket
+en:bw3-101,280224,280215,N,101,Noble Victories,read from Cardmarket
+en:bw3-14,280137,280137,Victini,14,Noble Victories,read from Cardmarket
+en:bw3-15,280138,280137,Victini,15,Noble Victories,read from Cardmarket
+en:bw3-19,280142,280142,Larvesta,19,Noble Victories,attacks match one product
+en:bw3-20,280143,280142,Larvesta,20,Noble Victories,attacks match one product
+en:bw3-32,280155,280155,Cryogonal,32,Noble Victories,page photo
+en:bw3-33,280156,280155,Cryogonal,33,Noble Victories,attacks match one product
+en:bw3-38,280161,280161,Tynamo,38,Noble Victories,attacks match one product
+en:bw3-39,280162,280161,Tynamo,39,Noble Victories,attacks match one product
+en:bw3-42,280165,280165,Stunfisk,42,Noble Victories,attacks match one product
+en:bw3-43,280166,280137,Victini,43,Noble Victories,attacks match one product
+en:bw3-44,280167,280167,Yamask,44,Noble Victories,attacks match one product
+en:bw3-45,280168,280167,Yamask,45,Noble Victories,attacks match one product
+en:bw3-46,280169,280169,Cofagrigus,46,Noble Victories,attacks match one product
+en:bw3-47,280170,280169,Cofagrigus,47,Noble Victories,attacks match one product
+en:bw3-52,280175,280175,Reuniclus,52,Noble Victories,attacks match one product
+en:bw3-53,280176,280175,Reuniclus,53,Noble Victories,attacks match one product
+en:bw3-54,280177,280177,Elgyem,54,Noble Victories,attacks match one product
+en:bw3-55,280178,280177,Elgyem,55,Noble Victories,attacks match one product
+en:bw3-57,280180,280180,Litwick,57,Noble Victories,attacks match one product
+en:bw3-58,280181,280180,Litwick,58,Noble Victories,attacks match one product
+en:bw3-64,280187,280187,Conkeldurr,64,Noble Victories,attacks match one product
+en:bw3-65,280188,280187,Conkeldurr,65,Noble Victories,attacks match one product
+en:bw3-68,280191,280165,Stunfisk,68,Noble Victories,attacks match one product
+en:bw3-73,280196,280196,Terrakion,73,Noble Victories,read from Cardmarket
+en:bw3-75,280198,280198,Pawniard,75,Noble Victories,attacks match one product
+en:bw3-76,280199,280199,Bisharp,76,Noble Victories,attacks match one product
+en:bw3-81,280204,280198,Pawniard,81,Noble Victories,attacks match one product
+en:bw3-82,280205,280199,Bisharp,82,Noble Victories,attacks match one product
+en:bw3-84,280207,280207,Cobalion,84,Noble Victories,read from Cardmarket
+en:bw3-92,280215,280215,N,92,Noble Victories,read from Cardmarket
+en:bw3-98,280221,280137,Victini,98,Noble Victories,read from Cardmarket
+en:bw3-99,280222,280196,Terrakion,99,Noble Victories,read from Cardmarket
+en:bw4-10,280235,280235,Growlithe,10,Next Destinies,attacks match one product
+en:bw4-11,280236,280235,Growlithe,11,Next Destinies,attacks match one product
+en:bw4-12,280237,280237,Arcanine,12,Next Destinies,attacks match one product
+en:bw4-13,280238,280237,Arcanine,13,Next Destinies,attacks match one product
+en:bw4-25,280250,280250,Lapras,25,Next Destinies,attacks match one product
+en:bw4-26,280251,280250,Lapras,26,Next Destinies,attacks match one product
+en:bw4-42,280267,280267,Shinx,42,Next Destinies,attacks match one product
+en:bw4-43,280268,280267,Shinx,43,Next Destinies,attacks match one product
+en:bw4-44,280269,280269,Luxio,44,Next Destinies,attacks match one product
+en:bw4-45,280270,280269,Luxio,45,Next Destinies,attacks match one product
+en:bw5-14,280342,280342,Torchic,14,Dark Explorers,attacks match one product
+en:bw5-15,280343,280342,Torchic,15,Dark Explorers,attacks plus a set or type tag
+en:bw5-20,280348,280348,Larvesta,20,Dark Explorers,attacks match one product
+en:bw5-21,280349,280348,Larvesta,21,Dark Explorers,attacks match one product
+en:bw5-41,280369,280369,Joltik,41,Dark Explorers,attacks match one product
+en:bw5-42,280370,280369,Joltik,42,Dark Explorers,attacks match one product
+en:bw5-44,280372,280372,Tynamo,44,Dark Explorers,attacks match one product
+en:bw5-45,280373,280372,Tynamo,45,Dark Explorers,attacks match one product
+en:bw5-56,280384,280384,Excadrill,56,Dark Explorers,attacks match one product
+en:bw5-57,280385,280384,Excadrill,57,Dark Explorers,attacks match one product
+en:bw5-60,280388,280388,Umbreon,60,Dark Explorers,page photo
+en:bw5-61,280389,280388,Umbreon,61,Dark Explorers,attacks match one product
+en:bw5-69,280397,280397,Zorua,69,Dark Explorers,attacks match one product
+en:bw5-70,280398,280397,Zorua,70,Dark Explorers,attacks match one product
+en:bw5-72,280400,280400,Bisharp,72,Dark Explorers,attacks match one product
+en:bw5-79,280407,280400,Bisharp,79,Dark Explorers,attacks match one product
+en:bw5-80,280408,280408,Chansey,80,Dark Explorers,attacks match one product
+en:bw5-81,280409,280408,Chansey,81,Dark Explorers,attacks match one product
+en:bw6-104,280543,280543,Swablu,104,Dragons Exalted,attacks match one product
+en:bw6-105,280544,280543,Swablu,105,Dragons Exalted,attacks plus a set or type tag
+en:bw6-12,280451,280451,Roselia,12,Dragons Exalted,attacks match one product
+en:bw6-13,280452,280451,Roselia,13,Dragons Exalted,attacks match one product
+en:bw6-14,280453,280453,Roserade,14,Dragons Exalted,attacks match one product
+en:bw6-15,280454,280453,Roserade,15,Dragons Exalted,attacks match one product
+en:bw6-41,280480,280480,Electrike,41,Dragons Exalted,attacks match one product
+en:bw6-42,280481,280480,Electrike,42,Dragons Exalted,attacks match one product
+en:bw6-43,280482,280482,Manectric,43,Dragons Exalted,attacks match one product
+en:bw6-44,280483,280482,Manectric,44,Dragons Exalted,attacks match one product
+en:bw6-49,280488,280488,Drifloon,49,Dragons Exalted,attacks match one product
+en:bw6-50,280489,280488,Drifloon,50,Dragons Exalted,attacks match one product
+en:bw6-86,280525,280525,Gible,86,Dragons Exalted,attacks match one product
+en:bw6-87,280526,280525,Gible,87,Dragons Exalted,attacks match one product
+en:bw6-88,280527,280527,Gabite,88,Dragons Exalted,attacks match one product
+en:bw6-89,280528,280527,Gabite,89,Dragons Exalted,attacks match one product
+en:bw6-90,280529,280529,Garchomp,90,Dragons Exalted,attacks match one product
+en:bw6-91,280530,280529,Garchomp,91,Dragons Exalted,attacks match one product
+en:bw6-93,280532,280532,Deino,93,Dragons Exalted,attacks match one product
+en:bw6-94,280533,280532,Deino,94,Dragons Exalted,attacks match one product
+en:bw6-95,280534,280534,Zweilous,95,Dragons Exalted,attacks match one product
+en:bw6-96,280535,280534,Zweilous,96,Dragons Exalted,attacks match one product
+en:bw6-97,280536,280536,Hydreigon,97,Dragons Exalted,attacks match one product
+en:bw6-98,280537,280536,Hydreigon,98,Dragons Exalted,attacks match one product
+en:bw7-134,280721,280721,Skyla,134,Boundaries Crossed,page photo
+en:bw7-149,280736,280721,Skyla,149,Boundaries Crossed,read from Cardmarket
+en:bw7-32,280619,280619,Psyduck,32,Boundaries Crossed,attacks match one product
+en:bw7-33,280620,280619,Psyduck,33,Boundaries Crossed,attacks match one product
+en:bw7-34,280621,280621,Golduck,34,Boundaries Crossed,attacks match one product
+en:bw7-35,280622,280621,Golduck,35,Boundaries Crossed,attacks match one product
+en:bw7-47,280634,280634,Keldeo,47,Boundaries Crossed,attacks match one product
+en:bw7-48,280635,280634,Keldeo,48,Boundaries Crossed,attacks match one product
+en:bw7-64,280651,280651,Croagunk,64,Boundaries Crossed,attacks match one product
+en:bw7-65,280652,280651,Croagunk,65,Boundaries Crossed,attacks match one product
+en:bw7-86,280673,280673,Mienfoo,86,Boundaries Crossed,attacks match one product
+en:bw7-87,280674,280673,Mienfoo,87,Boundaries Crossed,attacks match one product
+en:bw7-95,280682,280682,Skarmory,95,Boundaries Crossed,attacks match one product
+en:bw7-96,280683,280682,Skarmory,96,Boundaries Crossed,attacks match one product
+en:bw8-110,280850,280850,Patrat,110,Plasma Storm,attacks match one product
+en:bw8-111,280851,280850,Patrat,111,Plasma Storm,attacks match one product
+en:bw8-112,280852,280852,Watchog,112,Plasma Storm,attacks match one product
+en:bw8-113,280853,280852,Watchog,113,Plasma Storm,attacks match one product
+en:bw8-118,280858,280858,Colress,118,Plasma Storm,page photo
+en:bw8-135,280875,280858,Colress,135,Plasma Storm,read from Cardmarket
+en:bw8-42,280782,280782,Magnemite,42,Plasma Storm,attacks match one product
+en:bw8-43,280783,280782,Magnemite,43,Plasma Storm,attacks match one product
+en:bw8-44,280784,280784,Magneton,44,Plasma Storm,attacks match one product
+en:bw8-45,280785,280784,Magneton,45,Plasma Storm,attacks match one product
+en:bw8-52,280792,280792,Zubat,52,Plasma Storm,attacks match one product
+en:bw8-53,280793,280792,Zubat,53,Plasma Storm,attacks match one product
+en:bw8-56,280796,280796,Koffing,56,Plasma Storm,attacks match one product
+en:bw8-57,280797,280796,Koffing,57,Plasma Storm,attacks match one product
+en:bw8-63,280803,280803,Trubbish,63,Plasma Storm,attacks match one product
+en:bw8-64,280804,280803,Trubbish,64,Plasma Storm,attacks match one product
+en:bw8-65,280805,280803,Trubbish,65,Plasma Storm,attacks match one product
+en:bw8-66,280806,280806,Garbodor,66,Plasma Storm,attacks match one product
+en:bw8-67,280807,280806,Garbodor,67,Plasma Storm,attacks match one product
+en:bw8-68,280808,280808,Elgyem,68,Plasma Storm,attacks match one product
+en:bw8-69,280809,280808,Elgyem,69,Plasma Storm,attacks match one product
+en:bw8-75,280815,280815,Riolu,75,Plasma Storm,attacks match one product
+en:bw8-76,280816,280815,Riolu,76,Plasma Storm,attacks match one product
+en:bw8-77,280817,280817,Lucario,77,Plasma Storm,attacks match one product
+en:bw8-78,280818,280817,Lucario,78,Plasma Storm,attacks match one product
+en:bw8-82,280822,280822,Purrloin,82,Plasma Storm,attacks match one product
+en:bw8-83,280823,280822,Purrloin,83,Plasma Storm,attacks match one product
+en:bw8-91,280831,280831,Durant,91,Plasma Storm,attacks match one product
+en:bw8-92,280832,280831,Durant,92,Plasma Storm,attacks match one product
+en:bw9-101,280979,280979,Ghetsis,101,Plasma Freeze,read from Cardmarket
+en:bw9-115,280993,280979,Ghetsis,115,Plasma Freeze,read from Cardmarket
+en:bw9-54,280932,280932,Yamask,54,Plasma Freeze,attacks match one product
+en:bw9-55,280933,280932,Yamask,55,Plasma Freeze,attacks match one product
+en:bw9-56,280934,280934,Cofagrigus,56,Plasma Freeze,attacks match one product
+en:bw9-57,280935,280934,Cofagrigus,57,Plasma Freeze,attacks match one product
+en:bw9-71,280949,280949,Pawniard,71,Plasma Freeze,attacks match one product
+en:bw9-72,280950,280949,Pawniard,72,Plasma Freeze,attacks match one product
+en:bw9-73,280951,280951,Bisharp,73,Plasma Freeze,attacks match one product
+en:bw9-74,280952,280951,Bisharp,74,Plasma Freeze,attacks match one product
+en:bw9-75,280953,280953,Deino,75,Plasma Freeze,attacks match one product
+en:bw9-76,280954,280953,Deino,76,Plasma Freeze,attacks match one product
+en:bw9-89,280967,280967,Eevee,89,Plasma Freeze,attacks match one product
+en:bw9-90,280968,280967,Eevee,90,Plasma Freeze,attacks match one product
+en:col1-87,279730,279730,Metal Energy,87,Call of Legends,read from Cardmarket
+en:col1-95,279738,279730,Metal Energy,95,Call of Legends,page photo
+en:dp2-58,277687,277687,Parasect,58,Mysterious Treasures,attacks match one product
+en:dp2-92,277721,277687,Paras,92,Mysterious Treasures,attacks match one product
+en:dp4-3,277905,277905,Darkrai,3,Great Encounters,attacks match one product
+en:dp4-4,277906,277905,Darkrai,4,Great Encounters,attacks match one product
+en:dp4-6,277908,277908,Porygon-Z,6,Great Encounters,attacks match one product
+en:dp4-81,277983,277908,Porygon,81,Great Encounters,attacks match one product
+en:dp5-12,278061,278061,Phione,12,Majestic Dawn,attacks match one product
+en:dp5-20,278069,278054,Glaceon,20,Majestic Dawn,read from Cardmarket
+en:dp5-24,278073,278056,Leafeon,24,Majestic Dawn,attacks match one product
+en:dp5-27,278076,278061,Phione,27,Majestic Dawn,attacks match one product
+en:dp5-5,278054,278054,Glaceon,5,Majestic Dawn,attacks match one product
+en:dp5-50,278099,278099,Aipom,50,Majestic Dawn,attacks match one product
+en:dp5-51,278100,278099,Aipom,51,Majestic Dawn,attacks match one product
+en:dp5-6,278055,278055,Kabutops,6,Majestic Dawn,attacks match one product
+en:dp5-62,278111,278111,Eevee,62,Majestic Dawn,attacks match one product
+en:dp5-63,278112,278111,Eevee,63,Majestic Dawn,attacks match one product
+en:dp5-67,278116,278055,Kabuto,67,Majestic Dawn,attacks match one product
+en:dp5-7,278056,278056,Leafeon,7,Majestic Dawn,attacks match one product
+en:dp6-111,278260,278260,Oddish,111,Legends Awakened,attacks match one product
+en:dp6-112,278261,278260,Oddish,112,Legends Awakened,attacks match one product
+en:dp6-15,278164,278164,Regigigas,15,Legends Awakened,attacks match one product
+en:dp6-37,278186,278164,Regigigas,37,Legends Awakened,read from Cardmarket
+en:dp6-5,278154,278154,Gliscor,5,Legends Awakened,attacks match one product
+en:dp6-55,278204,278154,Gliscor,55,Legends Awakened,attacks match one product
+en:dp6-58,278207,278207,Lanturn,58,Legends Awakened,read from Cardmarket
+en:dp6-59,278208,278207,Lanturn,59,Legends Awakened,attacks match one product
+en:dp6-64,278213,278213,Metang,64,Legends Awakened,attacks match one product
+en:dp6-65,278214,278213,Metang,65,Legends Awakened,attacks match one product
+en:dp6-83,278232,278232,Beldum,83,Legends Awakened,attacks match one product
+en:dp6-84,278233,278232,Beldum,84,Legends Awakened,attacks match one product
+en:dp6-87,278236,278236,Chinchou,87,Legends Awakened,attacks match one product
+en:dp6-88,278237,278236,Chinchou,88,Legends Awakened,attacks match one product
+en:dp6-94,278243,278243,Gligar,94,Legends Awakened,attacks match one product
+en:dp6-95,278244,278243,Gligar,95,Legends Awakened,attacks match one product
+en:dp6-96,278245,278245,Gloom,96,Legends Awakened,attacks match one product
+en:dp6-97,278246,278245,Gloom,97,Legends Awakened,attacks match one product
+en:dp7-1,278299,278299,Dusknoir,1,Stormfront,attacks match one product
+en:dp7-17,278315,278299,Dusknoir,17,Stormfront,attacks match one product
+en:dp7-34,278332,278332,Dusclops,34,Stormfront,attacks match one product
+en:dp7-35,278333,278332,Dusclops,35,Stormfront,attacks match one product
+en:dp7-36,278334,278334,Electrode,36,Stormfront,attacks match one product
+en:dp7-37,278335,278334,Electrode,37,Stormfront,attacks match one product
+en:dp7-42,278340,278340,Magneton,42,Stormfront,attacks match one product
+en:dp7-43,278341,278340,Magneton,43,Stormfront,attacks match one product
+en:dp7-5,278303,278303,Magnezone,5,Stormfront,attacks match one product
+en:dp7-58,278356,278297,Drifloon,58,Stormfront,attacks match one product
+en:dp7-59,278357,278298,Duskull,59,Stormfront,attacks match one product
+en:dp7-6,278304,278303,Magnezone,6,Stormfront,attacks match one product
+en:dp7-60,278358,278298,Duskull,60,Stormfront,attacks match one product
+en:dp7-66,278364,278364,Magnemite,66,Stormfront,attacks plus a set or type tag
+en:dp7-67,278365,278364,Magnemite,67,Stormfront,attacks match one product
+en:dp7-80,278378,278296,Voltorb,80,Stormfront,attacks match one product
+en:dp7-81,278379,278296,Voltorb,81,Stormfront,attacks match one product
+en:dp7-SH1,278297,278297,Drifloon,SH1,Stormfront,attacks match one product
+en:dp7-SH2,278298,278298,Duskull,SH2,Stormfront,attacks match one product
+en:dp7-SH3,278296,278296,Voltorb,SH3,Stormfront,attacks match one product
+en:dv1-1,281001,281001,Dratini,1,Dragon Vault,attacks plus a set or type tag
+en:dv1-12,281012,281012,Axew,12,Dragon Vault,attacks match one product
+en:dv1-13,281013,281012,Axew,13,Dragon Vault,attacks match one product
+en:dv1-14,281014,281014,Fraxure,14,Dragon Vault,attacks match one product
+en:dv1-15,281015,281014,Fraxure,15,Dragon Vault,attacks match one product
+en:dv1-2,281002,281001,Dratini,2,Dragon Vault,attacks match one product
+en:dv1-3,281003,281003,Dragonair,3,Dragon Vault,attacks match one product
+en:dv1-4,281004,281003,Dragonair,4,Dragon Vault,attacks match one product
+en:ecard1-1,274876,274876,Alakazam,1,Expedition Base Set,page photo
+en:ecard1-10,274885,274885,Dugtrio,10,Expedition Base Set,read from Cardmarket
+en:ecard1-100,274975,274974,Chikorita,100,Expedition Base Set,attacks match one product
+en:ecard1-104,274979,274979,Cyndaquil,104,Expedition Base Set,attacks match one product
+en:ecard1-105,274980,274979,Cyndaquil,105,Expedition Base Set,attacks plus a set or type tag
+en:ecard1-11,274886,274886,Fearow,11,Expedition Base Set,read from Cardmarket
+en:ecard1-13,274888,274888,Gengar,13,Expedition Base Set,read from Cardmarket
+en:ecard1-131,275006,275006,Squirtle,131,Expedition Base Set,attacks match one product
+en:ecard1-132,275007,275006,Squirtle,132,Expedition Base Set,attacks match one product
+en:ecard1-134,275009,275009,Totodile,134,Expedition Base Set,attacks match one product
+en:ecard1-135,275010,275009,Totodile,135,Expedition Base Set,attacks match one product
+en:ecard1-14,274889,274889,Golem,14,Expedition Base Set,read from Cardmarket
+en:ecard1-15,274890,274890,Kingler,15,Expedition Base Set,read from Cardmarket
+en:ecard1-16,274891,274891,Machamp,16,Expedition Base Set,read from Cardmarket
+en:ecard1-17,274892,274892,Magby,17,Expedition Base Set,read from Cardmarket
+en:ecard1-18,274893,274893,Meganium,18,Expedition Base Set,read from Cardmarket
+en:ecard1-19,274894,274894,Mew,19,Expedition Base Set,read from Cardmarket
+en:ecard1-2,274877,274877,Ampharos,2,Expedition Base Set,read from Cardmarket
+en:ecard1-21,274896,274896,Ninetales,21,Expedition Base Set,read from Cardmarket
+en:ecard1-22,274897,274897,Pichu,22,Expedition Base Set,read from Cardmarket
+en:ecard1-23,274898,274898,Pidgeot,23,Expedition Base Set,read from Cardmarket
+en:ecard1-24,274899,274899,Poliwrath,24,Expedition Base Set,read from Cardmarket
+en:ecard1-25,274900,274900,Raichu,25,Expedition Base Set,read from Cardmarket
+en:ecard1-26,274901,274901,Rapidash,26,Expedition Base Set,read from Cardmarket
+en:ecard1-27,274902,274902,Skarmory,27,Expedition Base Set,read from Cardmarket
+en:ecard1-28,274903,274903,Typhlosion,28,Expedition Base Set,read from Cardmarket
+en:ecard1-3,274878,274878,Arbok,3,Expedition Base Set,read from Cardmarket
+en:ecard1-30,274905,274905,Venusaur,30,Expedition Base Set,read from Cardmarket
+en:ecard1-31,274906,274906,Vileplume,31,Expedition Base Set,read from Cardmarket
+en:ecard1-32,274907,274907,Weezing,32,Expedition Base Set,read from Cardmarket
+en:ecard1-33,274908,274876,Alakazam,33,Expedition Base Set,read from Cardmarket
+en:ecard1-34,274909,274877,Ampharos,34,Expedition Base Set,read from Cardmarket
+en:ecard1-35,274910,274878,Arbok,35,Expedition Base Set,read from Cardmarket
+en:ecard1-36,274911,274879,Blastoise,36,Expedition Base Set,attacks match one product
+en:ecard1-37,274912,274879,Blastoise,37,Expedition Base Set,read from Cardmarket
+en:ecard1-38,274913,274880,Butterfree,38,Expedition Base Set,read from Cardmarket
+en:ecard1-39,274914,274881,Charizard,39,Expedition Base Set,attacks match one product
+en:ecard1-4,274879,274879,Blastoise,4,Expedition Base Set,read from Cardmarket
+en:ecard1-40,274915,274881,Charizard,40,Expedition Base Set,read from Cardmarket
+en:ecard1-41,274916,274882,Clefable,41,Expedition Base Set,read from Cardmarket
+en:ecard1-42,274917,274883,Cloyster,42,Expedition Base Set,read from Cardmarket
+en:ecard1-43,274918,274884,Dragonite,43,Expedition Base Set,read from Cardmarket
+en:ecard1-44,274919,274885,Dugtrio,44,Expedition Base Set,read from Cardmarket
+en:ecard1-45,274920,274886,Fearow,45,Expedition Base Set,read from Cardmarket
+en:ecard1-48,274923,274888,Gengar,48,Expedition Base Set,read from Cardmarket
+en:ecard1-49,274924,274889,Golem,49,Expedition Base Set,read from Cardmarket
+en:ecard1-5,274880,274880,Butterfree,5,Expedition Base Set,read from Cardmarket
+en:ecard1-50,274925,274890,Kingler,50,Expedition Base Set,read from Cardmarket
+en:ecard1-51,274926,274891,Machamp,51,Expedition Base Set,read from Cardmarket
+en:ecard1-52,274927,274892,Magby,52,Expedition Base Set,read from Cardmarket
+en:ecard1-53,274928,274893,Meganium,53,Expedition Base Set,attacks match one product
+en:ecard1-54,274929,274893,Meganium,54,Expedition Base Set,read from Cardmarket
+en:ecard1-55,274930,274894,Mew,55,Expedition Base Set,read from Cardmarket
+en:ecard1-56,274931,274894,Mewtwo,56,Expedition Base Set,attacks match one product
+en:ecard1-57,274932,274896,Ninetales,57,Expedition Base Set,read from Cardmarket
+en:ecard1-58,274933,274897,Pichu,58,Expedition Base Set,read from Cardmarket
+en:ecard1-59,274934,274898,Pidgeot,59,Expedition Base Set,read from Cardmarket
+en:ecard1-6,274881,274881,Charizard,6,Expedition Base Set,read from Cardmarket
+en:ecard1-60,274935,274899,Poliwrath,60,Expedition Base Set,read from Cardmarket
+en:ecard1-61,274936,274900,Raichu,61,Expedition Base Set,read from Cardmarket
+en:ecard1-62,274937,274901,Rapidash,62,Expedition Base Set,read from Cardmarket
+en:ecard1-63,274938,274902,Skarmory,63,Expedition Base Set,read from Cardmarket
+en:ecard1-64,274939,274903,Typhlosion,64,Expedition Base Set,attacks match one product
+en:ecard1-65,274940,274903,Typhlosion,65,Expedition Base Set,read from Cardmarket
+en:ecard1-67,274942,274905,Venusaur,67,Expedition Base Set,attacks match one product
+en:ecard1-69,274944,274906,Vileplume,69,Expedition Base Set,read from Cardmarket
+en:ecard1-7,274882,274882,Clefable,7,Expedition Base Set,read from Cardmarket
+en:ecard1-70,274945,274907,Weezing,70,Expedition Base Set,read from Cardmarket
+en:ecard1-8,274883,274883,Cloyster,8,Expedition Base Set,read from Cardmarket
+en:ecard1-9,274884,274884,Dragonite,9,Expedition Base Set,read from Cardmarket
+en:ecard1-94,274969,274969,Bulbasaur,94,Expedition Base Set,attacks match one product
+en:ecard1-95,274970,274969,Bulbasaur,95,Expedition Base Set,attacks match one product
+en:ecard1-97,274972,274972,Charmander,97,Expedition Base Set,attacks match one product
+en:ecard1-98,274973,274972,Charmander,98,Expedition Base Set,attacks match one product
+en:ecard1-99,274974,274974,Chikorita,99,Expedition Base Set,read from Cardmarket
+en:ecard2-1,275073,275052,Ampharos,1,Aquapolis,read from Cardmarket
+en:ecard2-103a,275179,275179,Porygon,103a,Aquapolis,page photo
+en:ecard2-103b,275178,275179,Porygon,103b,Aquapolis,page photo
+en:ecard2-106,275182,275130,Scyther,106,Aquapolis,attacks match one product
+en:ecard2-111,275187,275135,Spinarak,111,Aquapolis,attacks match one product
+en:ecard2-115,275191,275137,Voltorb,115,Aquapolis,attacks match one product
+en:ecard2-117,275193,275139,Wooper,117,Aquapolis,attacks match one product
+en:ecard2-13,275085,275084,Exeggutor,13,Aquapolis,attacks match one product
+en:ecard2-148,275224,275091,Kingdra,148,Aquapolis,attacks match one product
+en:ecard2-15,275087,275086,Houndoom,15,Aquapolis,read from Cardmarket
+en:ecard2-150,275226,275096,Nidoking,150,Aquapolis,attacks match one product
+en:ecard2-2,275074,275041,Arcanine,2,Aquapolis,read from Cardmarket
+en:ecard2-21,275093,275092,Lanturn,21,Aquapolis,read from Cardmarket
+en:ecard2-3,275075,275072,Ariados,3,Aquapolis,read from Cardmarket
+en:ecard2-4,275076,275060,Azumarill,4,Aquapolis,read from Cardmarket
+en:ecard2-45,275117,275117,Bellsprout,45,Aquapolis,attacks match one product
+en:ecard2-5,275077,275059,Bellossom,5,Aquapolis,read from Cardmarket
+en:ecard2-50a,275122,275122,Golduck,50a,Aquapolis,page photo
+en:ecard2-50b,275123,275122,Golduck,50b,Aquapolis,page photo
+en:ecard2-51,275124,275124,Growlithe,51,Aquapolis,attacks match one product
+en:ecard2-52,275125,275125,Magnemite,52,Aquapolis,attacks match one product
+en:ecard2-57,275130,275130,Scyther,57,Aquapolis,attacks match one product
+en:ecard2-6,275078,275062,Blissey,6,Aquapolis,read from Cardmarket
+en:ecard2-62,275135,275135,Spinarak,62,Aquapolis,attacks match one product
+en:ecard2-64,275137,275137,Voltorb,64,Aquapolis,attacks match one product
+en:ecard2-66,275139,275139,Wooper,66,Aquapolis,attacks match one product
+en:ecard2-68,275141,275117,Bellsprout,68,Aquapolis,attacks match one product
+en:ecard2-70,275143,275143,Chinchou,70,Aquapolis,attacks match one product
+en:ecard2-71,275144,275143,Chinchou,71,Aquapolis,attacks match one product
+en:ecard2-74a,275148,275147,Drowzee,74a,Aquapolis,page photo
+en:ecard2-74b,275147,275147,Drowzee,74b,Aquapolis,page photo
+en:ecard2-76,275150,275150,Exeggcute,76,Aquapolis,attacks match one product
+en:ecard2-77,275151,275150,Exeggcute,77,Aquapolis,attacks match one product
+en:ecard2-80,275154,275124,Growlithe,80,Aquapolis,attacks match one product
+en:ecard2-84,275158,275158,Horsea,84,Aquapolis,attacks match one product
+en:ecard2-85,275159,275158,Horsea,85,Aquapolis,attacks match one product
+en:ecard2-86,275160,275160,Houndour,86,Aquapolis,attacks match one product
+en:ecard2-87,275161,275160,Houndour,87,Aquapolis,attacks match one product
+en:ecard2-91,275165,275125,Magnemite,91,Aquapolis,attacks match one product
+en:ecard2-95a,275170,275169,Mr. Mime,95a,Aquapolis,page photo
+en:ecard2-95b,275169,275169,Mr. Mime,95b,Aquapolis,page photo
+en:ecard2-H01,275052,275052,Ampharos,H01,Aquapolis,read from Cardmarket
+en:ecard2-H02,275041,275041,Arcanine,H02,Aquapolis,read from Cardmarket
+en:ecard2-H03,275072,275072,Ariados,H03,Aquapolis,read from Cardmarket
+en:ecard2-H04,275060,275060,Azumarill,H04,Aquapolis,read from Cardmarket
+en:ecard2-H05,275059,275059,Bellossom,H05,Aquapolis,read from Cardmarket
+en:ecard2-H06,275062,275062,Blissey,H06,Aquapolis,read from Cardmarket
+en:ecard2-H10,275084,275084,Exeggutor,H10,Aquapolis,attacks match one product
+en:ecard2-H11,275050,275086,Houndoom,H11,Aquapolis,read from Cardmarket
+en:ecard2-H14,275091,275091,Kingdra,H14,Aquapolis,attacks match one product
+en:ecard2-H15,275055,275092,Lanturn,H15,Aquapolis,read from Cardmarket
+en:ecard2-H18,275096,275096,Nidoking,H18,Aquapolis,attacks match one product
+en:ecard3-147,275405,275264,Crobat,147,Skyridge,page photo
+en:ecard3-150,275408,275272,Kabutops,150,Skyridge,page photo
+en:ecard3-18,275275,275276,Magcargo,18,Skyridge,read from Cardmarket
+en:ecard3-20,275278,275277,Magneton,20,Skyridge,read from Cardmarket
+en:ecard3-33,275291,275252,Vaporeon,33,Skyridge,read from Cardmarket
+en:ecard3-43,275282,275301,Piloswine,43,Skyridge,attacks match one product
+en:ecard3-44,275302,275288,Starmie,44,Skyridge,attacks match one product
+en:ecard3-56,275314,275267,Forretress,56,Skyridge,attacks match one product
+en:ecard3-H05,275264,275264,Crobat,H05,Skyridge,attacks match one product
+en:ecard3-H08,275267,275267,Forretress,H08,Skyridge,attacks match one product
+en:ecard3-H13,275272,275272,Kabutops,H13,Skyridge,attacks match one product
+en:ecard3-H16,275235,275276,Magcargo,H16,Skyridge,read from Cardmarket
+en:ecard3-H17,275234,275276,Magcargo,H17,Skyridge,read from Cardmarket
+en:ecard3-H18,275229,275277,Magneton,H18,Skyridge,read from Cardmarket
+en:ecard3-H19,275228,275277,Magneton,H19,Skyridge,read from Cardmarket
+en:ecard3-H22,275301,275301,Piloswine,H22,Skyridge,attacks match one product
+en:ecard3-H28,275288,275288,Starmie,H28,Skyridge,attacks match one product
+en:ecard3-H31,275252,275252,Vaporeon,H31,Skyridge,read from Cardmarket
+en:ex11-15,276778,276778,Starmie δ,15,Delta Species,attacks match one product
+en:ex11-30,276793,276778,Starmie δ,30,Delta Species,attacks match one product
+en:ex11-35,276798,276798,Ditto,35,Delta Species,attacks match one product
+en:ex11-36,276799,276798,Ditto,36,Delta Species,attacks plus a set or type tag
+en:ex11-37,276800,276798,Ditto,37,Delta Species,attacks plus a set or type tag
+en:ex11-38,276801,276798,Ditto,38,Delta Species,attacks plus a set or type tag
+en:ex11-39,276802,276798,Ditto,39,Delta Species,attacks plus a set or type tag
+en:ex11-40,276803,276798,Ditto,40,Delta Species,attacks plus a set or type tag
+en:ex11-41,276804,276804,Dragonair δ,41,Delta Species,attacks match one product
+en:ex11-42,276805,276804,Dragonair δ,42,Delta Species,attacks match one product
+en:ex11-53,276816,276816,Shelgon δ,53,Delta Species,attacks match one product
+en:ex11-54,276817,276816,Shelgon δ,54,Delta Species,attacks match one product
+en:ex11-57,276820,276820,Bagon δ,57,Delta Species,attacks match one product
+en:ex11-58,276821,276820,Bagon δ,58,Delta Species,attacks match one product
+en:ex11-61,276824,276798,Ditto,61,Delta Species,attacks plus a set or type tag
+en:ex11-62,276825,276798,Ditto,62,Delta Species,attacks plus a set or type tag
+en:ex11-63,276826,276798,Ditto,63,Delta Species,attacks plus a set or type tag
+en:ex11-64,276827,276798,Ditto,64,Delta Species,attacks plus a set or type tag
+en:ex11-65,276828,276828,Dratini δ,65,Delta Species,attacks match one product
+en:ex11-66,276829,276828,Dratini δ,66,Delta Species,attacks match one product
+en:ex13-16,276986,276986,Rayquaza δ,16,Holon Phantoms,attacks match one product
+en:ex13-26,276996,276986,Rayquaza δ,26,Holon Phantoms,attacks match one product
+en:ex13-3,276973,276973,Deoxys δ,3,Holon Phantoms,attacks match one product
+en:ex13-4,276974,276973,Deoxys δ,4,Holon Phantoms,attacks match one product
+en:ex13-5,276975,276973,Deoxys δ,5,Holon Phantoms,attacks match one product
+en:ex13-6,276976,276973,Deoxys δ,6,Holon Phantoms,attacks match one product
+en:ex15-22,277227,277227,Seadra δ,22,Dragon Frontiers,attacks match one product
+en:ex15-24,277229,277229,Vibrava δ,24,Dragon Frontiers,attacks match one product
+en:ex15-31,277236,277236,Horsea δ,31,Dragon Frontiers,attacks match one product
+en:ex15-37,277242,277227,Seadra δ,37,Dragon Frontiers,attacks match one product
+en:ex15-42,277247,277229,Vibrava δ,42,Dragon Frontiers,attacks match one product
+en:ex15-50,277255,277236,Horsea δ,50,Dragon Frontiers,attacks match one product
+en:ex15-68,277273,277273,Trapinch δ,68,Dragon Frontiers,attacks match one product
+en:ex15-69,277274,277273,Trapinch δ,69,Dragon Frontiers,attacks match one product
+en:ex2-1,275778,275778,Armaldo,1,Sandstorm,page photo
+en:ex2-10,275787,275787,Sableye,10,Sandstorm,attacks match one product
+en:ex2-11,275788,275788,Seviper,11,Sandstorm,attacks match one product
+en:ex2-12,275789,275789,Shiftry,12,Sandstorm,attacks match one product
+en:ex2-13,275790,275790,Solrock,13,Sandstorm,attacks match one product
+en:ex2-14,275791,275791,Zangoose,14,Sandstorm,attacks match one product
+en:ex2-15,275792,275792,Arcanine,15,Sandstorm,attacks match one product
+en:ex2-16,275793,275793,Espeon,16,Sandstorm,attacks match one product
+en:ex2-17,275794,275794,Golduck,17,Sandstorm,attacks match one product
+en:ex2-18,275795,275795,Kecleon,18,Sandstorm,attacks match one product
+en:ex2-19,275796,275796,Omastar,19,Sandstorm,attacks match one product
+en:ex2-2,275779,275779,Cacturne,2,Sandstorm,attacks match one product
+en:ex2-20,275797,275797,Pichu,20,Sandstorm,attacks match one product
+en:ex2-21,275798,275798,Sandslash,21,Sandstorm,attacks match one product
+en:ex2-22,275799,275799,Shiftry,22,Sandstorm,attacks match one product
+en:ex2-23,275800,275800,Steelix,23,Sandstorm,attacks match one product
+en:ex2-24,275801,275801,Umbreon,24,Sandstorm,attacks match one product
+en:ex2-25,275802,275802,Vaporeon,25,Sandstorm,attacks match one product
+en:ex2-26,275803,275803,Wobbuffet,26,Sandstorm,attacks match one product
+en:ex2-27,275804,275804,Anorith,27,Sandstorm,attacks match one product
+en:ex2-28,275805,275805,Anorith,28,Sandstorm,attacks match one product
+en:ex2-29,275806,275806,Arbok,29,Sandstorm,attacks match one product
+en:ex2-3,275780,275780,Cradily,3,Sandstorm,attacks match one product
+en:ex2-30,275807,275807,Azumarill,30,Sandstorm,attacks match one product
+en:ex2-31,275808,275808,Azurill,31,Sandstorm,attacks match one product
+en:ex2-32,275809,275809,Baltoy,32,Sandstorm,attacks plus a set or type tag
+en:ex2-33,275810,275810,Breloom,33,Sandstorm,attacks match one product
+en:ex2-34,275811,275811,Delcatty,34,Sandstorm,attacks match one product
+en:ex2-35,275812,275812,Electabuzz,35,Sandstorm,attacks match one product
+en:ex2-36,275813,275813,Elekid,36,Sandstorm,attacks match one product
+en:ex2-37,275814,275814,Fearow,37,Sandstorm,attacks match one product
+en:ex2-38,275815,275815,Illumise,38,Sandstorm,attacks match one product
+en:ex2-39,275816,275816,Kabuto,39,Sandstorm,attacks match one product
+en:ex2-4,275781,275781,Dusclops,4,Sandstorm,attacks match one product
+en:ex2-40,275817,275817,Kirlia,40,Sandstorm,attacks match one product
+en:ex2-41,275818,275818,Lairon,41,Sandstorm,attacks match one product
+en:ex2-42,275819,275819,Lileep,42,Sandstorm,attacks match one product
+en:ex2-43,275820,275820,Lileep,43,Sandstorm,attacks match one product
+en:ex2-44,275821,275821,Linoone,44,Sandstorm,attacks match one product
+en:ex2-45,275822,275822,Lombre,45,Sandstorm,attacks match one product
+en:ex2-46,275823,275823,Lombre,46,Sandstorm,attacks match one product
+en:ex2-47,275824,275824,Murkrow,47,Sandstorm,attacks match one product
+en:ex2-48,275825,275825,Nuzleaf,48,Sandstorm,attacks match one product
+en:ex2-49,275826,275826,Nuzleaf,49,Sandstorm,attacks match one product
+en:ex2-5,275782,275782,Flareon,5,Sandstorm,attacks match one product
+en:ex2-50,275827,275827,Pelipper,50,Sandstorm,attacks match one product
+en:ex2-51,275828,275828,Quilava,51,Sandstorm,attacks match one product
+en:ex2-52,275829,275829,Vigoroth,52,Sandstorm,attacks match one product
+en:ex2-53,275830,275830,Volbeat,53,Sandstorm,attacks match one product
+en:ex2-54,275831,275831,Wynaut,54,Sandstorm,attacks match one product
+en:ex2-55,275832,275832,Xatu,55,Sandstorm,attacks match one product
+en:ex2-56,275833,275833,Aron,56,Sandstorm,attacks match one product
+en:ex2-57,275834,275834,Cacnea,57,Sandstorm,attacks match one product
+en:ex2-58,275835,275835,Cacnea,58,Sandstorm,attacks plus a set or type tag
+en:ex2-59,275836,275836,Cyndaquil,59,Sandstorm,attacks match one product
+en:ex2-6,275783,275783,Jolteon,6,Sandstorm,attacks match one product
+en:ex2-60,275837,275837,Dunsparce,60,Sandstorm,attacks match one product
+en:ex2-61,275838,275838,Duskull,61,Sandstorm,attacks match one product
+en:ex2-62,275839,275839,Duskull,62,Sandstorm,attacks match one product
+en:ex2-63,275840,275840,Eevee,63,Sandstorm,attacks match one product
+en:ex2-64,275841,275841,Ekans,64,Sandstorm,attacks match one product
+en:ex2-65,275842,275842,Growlithe,65,Sandstorm,attacks match one product
+en:ex2-66,275843,275843,Lotad,66,Sandstorm,attacks match one product
+en:ex2-67,275844,275844,Lotad,67,Sandstorm,attacks match one product
+en:ex2-68,275845,275845,Marill,68,Sandstorm,attacks match one product
+en:ex2-69,275846,275846,Natu,69,Sandstorm,attacks match one product
+en:ex2-7,275784,275784,Ludicolo,7,Sandstorm,attacks match one product
+en:ex2-70,275847,275847,Omanyte,70,Sandstorm,attacks match one product
+en:ex2-71,275848,275848,Onix,71,Sandstorm,attacks match one product
+en:ex2-72,275849,275849,Pikachu,72,Sandstorm,attacks match one product
+en:ex2-73,275850,275850,Psyduck,73,Sandstorm,attacks plus a set or type tag
+en:ex2-74,275851,275851,Ralts,74,Sandstorm,attacks match one product
+en:ex2-75,275852,275852,Sandshrew,75,Sandstorm,attacks match one product
+en:ex2-76,275853,275853,Seedot,76,Sandstorm,attacks match one product
+en:ex2-77,275854,275854,Seedot,77,Sandstorm,attacks match one product
+en:ex2-78,275855,275855,Shroomish,78,Sandstorm,attacks match one product
+en:ex2-79,275856,275856,Skitty,79,Sandstorm,attacks match one product
+en:ex2-8,275785,275785,Lunatone,8,Sandstorm,attacks match one product
+en:ex2-80,275857,275857,Slakoth,80,Sandstorm,attacks match one product
+en:ex2-81,275858,275858,Spearow,81,Sandstorm,attacks match one product
+en:ex2-82,275859,275859,Trapinch,82,Sandstorm,attacks match one product
+en:ex2-83,275860,275860,Wailmer,83,Sandstorm,attacks match one product
+en:ex2-84,275861,275861,Wingull,84,Sandstorm,attacks match one product
+en:ex2-85,275862,275862,Zigzagoon,85,Sandstorm,attacks match one product
+en:ex2-86,275863,275863,Double Full Heal,86,Sandstorm,only free product with this name
+en:ex2-87,275864,275864,Lanette's Net Search,87,Sandstorm,only free product with this name
+en:ex2-88,275865,275865,Rare Candy,88,Sandstorm,only free product with this name
+en:ex2-89,275866,275866,Wally's Training,89,Sandstorm,only free product with this name
+en:ex2-9,275786,275786,Mawile,9,Sandstorm,attacks match one product
+en:ex2-94,275871,275871,Aerodactyl ex,94,Sandstorm,attacks match one product
+en:ex2-95,275872,275872,Aggron ex,95,Sandstorm,attacks match one product
+en:ex4-1,275978,275778,Team Aqua's Cacturne,1,Team Magma vs Team Aqua,attacks match one product
+en:ex4-10,275987,275787,Team Magma's Houndoom,10,Team Magma vs Team Aqua,attacks match one product
+en:ex4-11,275988,275788,Team Magma's Rhydon,11,Team Magma vs Team Aqua,attacks match one product
+en:ex4-12,275989,275789,Team Magma's Torkoal,12,Team Magma vs Team Aqua,attacks match one product
+en:ex4-13,275990,275790,Raichu,13,Team Magma vs Team Aqua,attacks match one product
+en:ex4-14,275991,275791,Team Aqua's Crawdaunt,14,Team Magma vs Team Aqua,attacks match one product
+en:ex4-15,275992,275792,Team Aqua's Mightyena,15,Team Magma vs Team Aqua,attacks match one product
+en:ex4-16,275993,275793,Team Aqua's Sealeo,16,Team Magma vs Team Aqua,attacks match one product
+en:ex4-17,275994,275794,Team Aqua's Seviper,17,Team Magma vs Team Aqua,attacks match one product
+en:ex4-18,275995,275795,Team Aqua's Sharpedo,18,Team Magma vs Team Aqua,attacks match one product
+en:ex4-19,275996,275796,Team Magma's Camerupt,19,Team Magma vs Team Aqua,attacks match one product
+en:ex4-2,275979,275779,Team Aqua's Crawdaunt,2,Team Magma vs Team Aqua,attacks match one product
+en:ex4-20,275997,275797,Team Magma's Lairon,20,Team Magma vs Team Aqua,attacks match one product
+en:ex4-21,275998,275798,Team Magma's Mightyena,21,Team Magma vs Team Aqua,attacks match one product
+en:ex4-22,275999,275799,Team Magma's Rhydon,22,Team Magma vs Team Aqua,attacks match one product
+en:ex4-23,276000,275800,Team Magma's Zangoose,23,Team Magma vs Team Aqua,attacks match one product
+en:ex4-24,276001,275801,Team Aqua's Cacnea,24,Team Magma vs Team Aqua,read from Cardmarket
+en:ex4-25,276002,275802,Team Aqua's Carvanha,25,Team Magma vs Team Aqua,attacks match one product
+en:ex4-26,276003,275803,Team Aqua's Corphish,26,Team Magma vs Team Aqua,attacks match one product
+en:ex4-27,276004,275804,Team Aqua's Electrike,27,Team Magma vs Team Aqua,attacks match one product
+en:ex4-28,276005,275805,Team Aqua's Lanturn,28,Team Magma vs Team Aqua,attacks match one product
+en:ex4-29,276006,275806,Team Aqua's Manectric,29,Team Magma vs Team Aqua,attacks match one product
+en:ex4-3,275980,275780,Team Aqua's Kyogre,3,Team Magma vs Team Aqua,attacks match one product
+en:ex4-30,276007,275807,Team Aqua's Mightyena,30,Team Magma vs Team Aqua,attacks match one product
+en:ex4-31,276008,275808,Team Aqua's Sealeo,31,Team Magma vs Team Aqua,attacks match one product
+en:ex4-32,276009,275809,Team Magma's Baltoy,32,Team Magma vs Team Aqua,attacks match one product
+en:ex4-33,276010,275810,Team Magma's Claydol,33,Team Magma vs Team Aqua,attacks match one product
+en:ex4-34,276011,275811,Team Magma's Houndoom,34,Team Magma vs Team Aqua,attacks match one product
+en:ex4-35,276012,275812,Team Magma's Houndour,35,Team Magma vs Team Aqua,attacks match one product
+en:ex4-36,276013,275813,Team Magma's Lairon,36,Team Magma vs Team Aqua,attacks match one product
+en:ex4-37,276014,275814,Team Magma's Mightyena,37,Team Magma vs Team Aqua,attacks match one product
+en:ex4-38,276015,275815,Team Magma's Rhyhorn,38,Team Magma vs Team Aqua,attacks match one product
+en:ex4-39,276016,275816,Bulbasaur,39,Team Magma vs Team Aqua,attacks match one product
+en:ex4-4,275981,275781,Team Aqua's Manectric,4,Team Magma vs Team Aqua,attacks match one product
+en:ex4-40,276017,275817,Cubone,40,Team Magma vs Team Aqua,attacks match one product
+en:ex4-41,276018,275818,Jigglypuff,41,Team Magma vs Team Aqua,attacks match one product
+en:ex4-42,276019,275819,Meowth,42,Team Magma vs Team Aqua,attacks match one product
+en:ex4-43,276020,275820,Pikachu,43,Team Magma vs Team Aqua,attacks match one product
+en:ex4-44,276021,275821,Psyduck,44,Team Magma vs Team Aqua,attacks match one product
+en:ex4-45,276022,275822,Slowpoke,45,Team Magma vs Team Aqua,attacks match one product
+en:ex4-46,276023,275823,Squirtle,46,Team Magma vs Team Aqua,attacks match one product
+en:ex4-47,276024,275824,Team Aqua's Carvanha,47,Team Magma vs Team Aqua,attacks match one product
+en:ex4-48,276025,275825,Team Aqua's Carvanha,48,Team Magma vs Team Aqua,read from Cardmarket
+en:ex4-49,276026,275826,Team Aqua's Chinchou,49,Team Magma vs Team Aqua,attacks match one product
+en:ex4-5,275982,275782,Team Aqua's Sharpedo,5,Team Magma vs Team Aqua,attacks match one product
+en:ex4-50,276027,275827,Team Aqua's Corphish,50,Team Magma vs Team Aqua,attacks match one product
+en:ex4-51,276028,275828,Team Aqua's Corphish,51,Team Magma vs Team Aqua,attacks match one product
+en:ex4-52,276029,275829,Team Aqua's Electrike,52,Team Magma vs Team Aqua,attacks match one product
+en:ex4-53,276030,275830,Team Aqua's Electrike,53,Team Magma vs Team Aqua,attacks match one product
+en:ex4-54,276031,275831,Team Aqua's Poochyena,54,Team Magma vs Team Aqua,attacks match one product
+en:ex4-55,276032,275832,Team Aqua's Poochyena,55,Team Magma vs Team Aqua,attacks match one product
+en:ex4-56,276033,275833,Team Aqua's Spheal,56,Team Magma vs Team Aqua,attacks match one product
+en:ex4-57,276034,275834,Team Aqua's Spheal,57,Team Magma vs Team Aqua,attacks match one product
+en:ex4-58,276035,275835,Team Magma's Aron,58,Team Magma vs Team Aqua,attacks match one product
+en:ex4-59,276036,275836,Team Magma's Aron,59,Team Magma vs Team Aqua,attacks match one product
+en:ex4-6,275983,275783,Team Aqua's Walrein,6,Team Magma vs Team Aqua,attacks match one product
+en:ex4-60,276037,275837,Team Magma's Baltoy,60,Team Magma vs Team Aqua,attacks match one product
+en:ex4-61,276038,275838,Team Magma's Baltoy,61,Team Magma vs Team Aqua,attacks match one product
+en:ex4-62,276039,275839,Team Magma's Houndour,62,Team Magma vs Team Aqua,attacks match one product
+en:ex4-63,276040,275840,Team Magma's Houndour,63,Team Magma vs Team Aqua,attacks match one product
+en:ex4-64,276041,275841,Team Magma's Numel,64,Team Magma vs Team Aqua,attacks match one product
+en:ex4-65,276042,275842,Team Magma's Poochyena,65,Team Magma vs Team Aqua,attacks match one product
+en:ex4-66,276043,275843,Team Magma's Poochyena,66,Team Magma vs Team Aqua,attacks match one product
+en:ex4-67,276044,275844,Team Magma's Rhyhorn,67,Team Magma vs Team Aqua,attacks match one product
+en:ex4-68,276045,275845,Team Magma's Rhyhorn,68,Team Magma vs Team Aqua,attacks match one product
+en:ex4-69,276046,275846,Team Aqua Schemer,69,Team Magma vs Team Aqua,only free product with this name
+en:ex4-7,275984,275784,Team Magma's Aggron,7,Team Magma vs Team Aqua,attacks match one product
+en:ex4-70,276047,275847,Team Magma Schemer,70,Team Magma vs Team Aqua,only free product with this name
+en:ex4-71,276048,275848,Archie,71,Team Magma vs Team Aqua,only free product with this name
+en:ex4-72,276049,275849,Dual Ball,72,Team Magma vs Team Aqua,only free product with this name
+en:ex4-73,276050,275850,Maxie,73,Team Magma vs Team Aqua,only free product with this name
+en:ex4-74,276051,275851,Strength Charm,74,Team Magma vs Team Aqua,only free product with this name
+en:ex4-75,276052,275852,Team Aqua Ball,75,Team Magma vs Team Aqua,only free product with this name
+en:ex4-76,276053,275853,Team Aqua Belt,76,Team Magma vs Team Aqua,only free product with this name
+en:ex4-77,276054,275854,Team Aqua Conspirator,77,Team Magma vs Team Aqua,only free product with this name
+en:ex4-78,276055,275855,Team Aqua Hideout,78,Team Magma vs Team Aqua,only free product with this name
+en:ex4-79,276056,275856,Team Aqua Technical Machine 01,79,Team Magma vs Team Aqua,read from Cardmarket
+en:ex4-8,275985,275785,Team Magma's Claydol,8,Team Magma vs Team Aqua,attacks match one product
+en:ex4-80,276057,275857,Team Magma Ball,80,Team Magma vs Team Aqua,only free product with this name
+en:ex4-81,276058,275858,Team Magma Belt,81,Team Magma vs Team Aqua,only free product with this name
+en:ex4-82,276059,275859,Team Magma Conspirator,82,Team Magma vs Team Aqua,only free product with this name
+en:ex4-83,276060,275860,Team Magma Hideout,83,Team Magma vs Team Aqua,only free product with this name
+en:ex4-84,276061,275861,Team Magma Technical Machine 01,84,Team Magma vs Team Aqua,read from Cardmarket
+en:ex4-85,276062,275862,Warp Point,85,Team Magma vs Team Aqua,only free product with this name
+en:ex4-86,276063,275863,Aqua Energy,86,Team Magma vs Team Aqua,only free product with this name
+en:ex4-87,276064,275864,Magma Energy,87,Team Magma vs Team Aqua,only free product with this name
+en:ex4-88,276065,275865,Double Rainbow Energy,88,Team Magma vs Team Aqua,only free product with this name
+en:ex4-89,276066,275866,Blaziken ex,89,Team Magma vs Team Aqua,attacks match one product
+en:ex4-9,275986,275786,Team Magma's Groudon,9,Team Magma vs Team Aqua,attacks match one product
+en:ex4-94,276071,275871,Suicune ex,94,Team Magma vs Team Aqua,attacks match one product
+en:ex4-95,276072,275872,Swampert ex,95,Team Magma vs Team Aqua,attacks match one product
+en:ex8-107,276510,276425,Rayquaza ☆,107,Deoxys,attacks match one product
+en:ex8-16,276419,276419,Deoxys,16,Deoxys,read from Cardmarket
+en:ex8-17,276420,276419,Deoxys,17,Deoxys,attacks match one product
+en:ex8-18,276421,276419,Deoxys,18,Deoxys,attacks match one product
+en:ex8-22,276425,276425,Rayquaza,22,Deoxys,read from Cardmarket
+en:ex8-98,276501,276419,Deoxys ex,98,Deoxys,read from Cardmarket
+en:ex8-99,276502,276419,Deoxys ex,99,Deoxys,attacks match one product
+en:g1-11,288405,288405,Charizard EX,11,Generations,attacks match one product
+en:g1-26,288464,288464,Pikachu,26,Generations,page photo
+en:g1-27,288465,288465,Raichu,27,Generations,read from Cardmarket
+en:g1-37,288475,288475,Meowstic EX,37,Generations,attacks match one product
+en:g1-73,288508,288508,Team Flare Grunt,73,Generations,read from Cardmarket
+en:g1-73a,311413,288508,Team Flare Grunt,73a,Generations,read from Cardmarket
+en:g1-RC15,288524,288475,Meowstic,RC15,Generations,attacks match one product
+en:g1-RC21,288530,288530,Sylveon EX,RC21,Generations,read from Cardmarket
+en:g1-RC28,288537,288515,Flareon EX,RC28,Generations,read from Cardmarket
+en:g1-RC29,288538,288464,Pikachu,RC29,Generations,read from Cardmarket
+en:g1-RC32,288541,288530,Sylveon EX,RC32,Generations,read from Cardmarket
+en:g1-RC5,288514,288405,Charizard,RC5,Generations,attacks match one product
+en:g1-RC6,288515,288515,Flareon EX,RC6,Generations,read from Cardmarket
+en:g1-RC9,288518,288465,Raichu,RC9,Generations,read from Cardmarket
+en:gym1-100,274236,274152,Erika,100,Gym Heroes,read from Cardmarket
+en:gym1-101,274237,274153,Lt. Surge,101,Gym Heroes,read from Cardmarket
+en:gym1-102,274238,274154,Misty,102,Gym Heroes,read from Cardmarket
+en:gym1-15,274151,274151,Brock,15,Gym Heroes,read from Cardmarket
+en:gym1-16,274152,274152,Erika,16,Gym Heroes,read from Cardmarket
+en:gym1-17,274153,274153,Lt. Surge,17,Gym Heroes,read from Cardmarket
+en:gym1-18,274154,274154,Misty,18,Gym Heroes,read from Cardmarket
+en:gym1-27,274163,274142,Lt. Surge's Electabuzz,27,Gym Heroes,attacks match one product
+en:gym1-35,274171,274171,Blaine's Growlithe,35,Gym Heroes,attacks match one product
+en:gym1-46,274182,274152,Erika's Gloom,46,Gym Heroes,attacks match one product
+en:gym1-49,274185,274152,Erika's Weepinbell,49,Gym Heroes,attacks match one product
+en:gym1-57,274193,274154,Misty's Tentacool,57,Gym Heroes,attacks match one product
+en:gym1-6,274142,274142,Lt. Surge's Electabuzz,6,Gym Heroes,attacks match one product
+en:gym1-62,274198,274171,Blaine's Growlithe,62,Gym Heroes,attacks match one product
+en:gym1-66,274202,274151,Brock's Geodude,66,Gym Heroes,attacks match one product
+en:gym1-68,274204,274151,Brock's Mankey,68,Gym Heroes,attacks match one product
+en:gym1-69,274205,274151,Brock's Onix,69,Gym Heroes,attacks match one product
+en:gym1-70,274206,274151,Brock's Rhyhorn,70,Gym Heroes,attacks match one product
+en:gym1-72,274208,274151,Brock's Sandshrew,72,Gym Heroes,attacks match one product
+en:gym1-74,274210,274151,Brock's Zubat,74,Gym Heroes,attacks match one product
+en:gym1-76,274212,274152,Erika's Bellsprout,76,Gym Heroes,attacks match one product
+en:gym1-77,274213,274152,Erika's Exeggcute,77,Gym Heroes,attacks match one product
+en:gym1-78,274214,274152,Erika's Oddish,78,Gym Heroes,attacks match one product
+en:gym1-80,274216,274153,Lt. Surge's Magnemite,80,Gym Heroes,attacks match one product
+en:gym1-83,274219,274153,Lt. Surge's Spearow,83,Gym Heroes,attacks match one product
+en:gym1-85,274221,274154,Misty's Goldeen,85,Gym Heroes,attacks match one product
+en:gym1-98,274234,274151,Brock,98,Gym Heroes,read from Cardmarket
+en:gym2-100,274368,274285,Blaine,100,Gym Challenge,read from Cardmarket
+en:gym2-104,274372,274286,Giovanni,104,Gym Challenge,read from Cardmarket
+en:gym2-106,274374,274287,Koga,106,Gym Challenge,read from Cardmarket
+en:gym2-110,274378,274288,Sabrina,110,Gym Challenge,read from Cardmarket
+en:gym2-17,274285,274285,Blaine,17,Gym Challenge,read from Cardmarket
+en:gym2-18,274286,274286,Giovanni,18,Gym Challenge,read from Cardmarket
+en:gym2-19,274287,274287,Koga,19,Gym Challenge,read from Cardmarket
+en:gym2-20,274288,274288,Sabrina,20,Gym Challenge,read from Cardmarket
+en:gym2-74,274342,274286,Giovanni's Meowth,74,Gym Challenge,attacks match one product
+en:gym2-79,274347,274287,Koga's Koffing,79,Gym Challenge,attacks match one product
+en:gym2-80,274348,274287,Koga's Pidgey,80,Gym Challenge,attacks match one product
+en:gym2-94,274362,274288,Sabrina's Abra,94,Gym Challenge,attacks match one product
+en:gym2-97,274365,274288,Sabrina's Gastly,97,Gym Challenge,attacks match one product
+en:hgss1-105,279077,278986,Ampharos,105,HeartGold SoulSilver,attacks plus a set or type tag
+en:hgss1-106,279078,279008,Blissey,106,HeartGold SoulSilver,attacks plus a set or type tag
+en:hgss1-108,279080,278992,Feraligatr,108,HeartGold SoulSilver,attacks plus a set or type tag
+en:hgss1-110,279082,279004,Typhlosion,110,HeartGold SoulSilver,attacks plus a set or type tag
+en:hgss1-111,279083,279083,Ho-Oh LEGEND,111,HeartGold SoulSilver,read from Cardmarket
+en:hgss1-112,279084,279083,Ho-Oh LEGEND,112,HeartGold SoulSilver,read from Cardmarket
+en:hgss1-113,279085,279085,Lugia LEGEND,113,HeartGold SoulSilver,read from Cardmarket
+en:hgss1-114,279086,279085,Lugia LEGEND,114,HeartGold SoulSilver,read from Cardmarket
+en:hgss1-123,279095,278976,Gyarados,123,HeartGold SoulSilver,attacks match one product
+en:hgss1-14,278986,278986,Ampharos,14,HeartGold SoulSilver,attacks match one product
+en:hgss1-20,278992,278992,Feraligatr,20,HeartGold SoulSilver,attacks match one product
+en:hgss1-32,279004,279004,Typhlosion,32,HeartGold SoulSilver,attacks match one product
+en:hgss1-36,279008,279008,Blissey,36,HeartGold SoulSilver,attacks match one product
+en:hgss1-4,278976,278976,Gyarados,4,HeartGold SoulSilver,attacks match one product
+en:hgss1-54,279026,279026,Unown,54,HeartGold SoulSilver,attacks match one product
+en:hgss1-55,279027,279026,Unown,55,HeartGold SoulSilver,attacks match one product
+en:hgss2-14,279170,279170,Crobat,14,Unleashed,page photo
+en:hgss2-18,279174,279174,Lanturn,18,Unleashed,attacks match one product
+en:hgss2-24,279180,279180,Steelix,24,Unleashed,page photo
+en:hgss2-26,279182,279182,Tyranitar,26,Unleashed,attacks match one product
+en:hgss2-27,279183,279183,Ursaring,27,Unleashed,attacks match one product
+en:hgss2-84,279240,279170,Crobat,84,Unleashed,attacks plus a set or type tag
+en:hgss2-86,279242,279174,Lanturn,86,Unleashed,attacks plus a set or type tag
+en:hgss2-87,279243,279180,Steelix,87,Unleashed,attacks plus a set or type tag
+en:hgss2-88,279244,279182,Tyranitar,88,Unleashed,attacks plus a set or type tag
+en:hgss2-89,279245,279183,Ursaring,89,Unleashed,attacks plus a set or type tag
+en:hgss2-90,279246,279246,Entei & Raikou LEGEND,90,Unleashed,read from Cardmarket
+en:hgss2-91,279247,279246,Entei & Raikou LEGEND,91,Unleashed,read from Cardmarket
+en:hgss2-92,279248,279248,Raikou & Suicune LEGEND,92,Unleashed,read from Cardmarket
+en:hgss2-93,279249,279248,Raikou & Suicune LEGEND,93,Unleashed,read from Cardmarket
+en:hgss4-100,279630,279629,Darkrai & Cresselia LEGEND,100,Triumphant,read from Cardmarket
+en:hgss4-101,279631,279631,Palkia & Dialga LEGEND,101,Triumphant,read from Cardmarket
+en:hgss4-102,279632,279631,Palkia & Dialga LEGEND,102,Triumphant,read from Cardmarket
+en:hgss4-26,279556,279556,Machamp,26,Triumphant,attacks match one product
+en:hgss4-3,279533,279533,Celebi,3,Triumphant,attacks match one product
+en:hgss4-34,279564,279564,Electrode,34,Triumphant,attacks match one product
+en:hgss4-54,279584,279584,Yanmega,54,Triumphant,attacks match one product
+en:hgss4-92,279622,279533,Celebi,92,Triumphant,attacks plus a set or type tag
+en:hgss4-93,279623,279564,Electrode,93,Triumphant,attacks plus a set or type tag
+en:hgss4-95,279625,279556,Machamp,95,Triumphant,attacks plus a set or type tag
+en:hgss4-98,279628,279584,Yanmega,98,Triumphant,attacks plus a set or type tag
+en:hgss4-99,279629,279629,Darkrai & Cresselia LEGEND,99,Triumphant,read from Cardmarket
+en:neo1-10,274410,274410,Meganium,10,Neo Genesis,attacks match one product
+en:neo1-11,274411,274410,Meganium,11,Neo Genesis,attacks match one product
+en:neo1-17,274417,274417,Typhlosion,17,Neo Genesis,attacks match one product
+en:neo1-18,274418,274417,Typhlosion,18,Neo Genesis,attacks match one product
+en:neo1-28,274428,274428,Bayleef,28,Neo Genesis,attacks match one product
+en:neo1-29,274429,274428,Bayleef,29,Neo Genesis,attacks match one product
+en:neo1-31,274431,274431,Croconaw,31,Neo Genesis,attacks match one product
+en:neo1-32,274432,274431,Croconaw,32,Neo Genesis,attacks match one product
+en:neo1-4,274404,274404,Feraligatr,4,Neo Genesis,attacks match one product
+en:neo1-46,274446,274446,Quilava,46,Neo Genesis,attacks match one product
+en:neo1-47,274447,274446,Quilava,47,Neo Genesis,attacks match one product
+en:neo1-5,274405,274404,Feraligatr,5,Neo Genesis,attacks match one product
+en:neo2-1,274512,274512,Espeon,1,Neo Discovery,attacks match one product
+en:neo2-10,274521,274521,Scizor,10,Neo Discovery,read from Cardmarket
+en:neo2-11,274522,274522,Smeargle,11,Neo Discovery,read from Cardmarket
+en:neo2-12,274523,274523,Tyranitar,12,Neo Discovery,read from Cardmarket
+en:neo2-13,274524,274524,Umbreon,13,Neo Discovery,attacks match one product
+en:neo2-14,274525,274525,Unown [A],14,Neo Discovery,read from Cardmarket
+en:neo2-15,274526,274526,Ursaring,15,Neo Discovery,read from Cardmarket
+en:neo2-16,274527,274527,Wobbuffet,16,Neo Discovery,read from Cardmarket
+en:neo2-17,274528,274528,Yanma,17,Neo Discovery,read from Cardmarket
+en:neo2-2,274513,274513,Forretress,2,Neo Discovery,read from Cardmarket
+en:neo2-20,274531,274512,Espeon,20,Neo Discovery,attacks match one product
+en:neo2-21,274532,274513,Forretress,21,Neo Discovery,read from Cardmarket
+en:neo2-22,274533,274514,Hitmontop,22,Neo Discovery,read from Cardmarket
+en:neo2-23,274534,274515,Houndoom,23,Neo Discovery,read from Cardmarket
+en:neo2-24,274535,274516,Houndour,24,Neo Discovery,read from Cardmarket
+en:neo2-25,274536,274517,Kabutops,25,Neo Discovery,read from Cardmarket
+en:neo2-26,274537,274518,Magnemite,26,Neo Discovery,read from Cardmarket
+en:neo2-27,274538,274519,Politoed,27,Neo Discovery,read from Cardmarket
+en:neo2-28,274539,274520,Poliwrath,28,Neo Discovery,read from Cardmarket
+en:neo2-29,274540,274521,Scizor,29,Neo Discovery,read from Cardmarket
+en:neo2-3,274514,274514,Hitmontop,3,Neo Discovery,read from Cardmarket
+en:neo2-30,274541,274522,Smeargle,30,Neo Discovery,read from Cardmarket
+en:neo2-31,274542,274523,Tyranitar,31,Neo Discovery,read from Cardmarket
+en:neo2-32,274543,274524,Umbreon,32,Neo Discovery,attacks match one product
+en:neo2-33,274544,274525,Unown [A],33,Neo Discovery,read from Cardmarket
+en:neo2-34,274545,274526,Ursaring,34,Neo Discovery,read from Cardmarket
+en:neo2-35,274546,274527,Wobbuffet,35,Neo Discovery,read from Cardmarket
+en:neo2-36,274547,274528,Yanma,36,Neo Discovery,read from Cardmarket
+en:neo2-39,274550,274516,Houndour,39,Neo Discovery,attacks match one product
+en:neo2-4,274515,274515,Houndoom,4,Neo Discovery,read from Cardmarket
+en:neo2-5,274516,274516,Houndour,5,Neo Discovery,read from Cardmarket
+en:neo2-6,274517,274517,Kabutops,6,Neo Discovery,read from Cardmarket
+en:neo2-7,274518,274518,Magnemite,7,Neo Discovery,read from Cardmarket
+en:neo2-8,274519,274519,Politoed,8,Neo Discovery,read from Cardmarket
+en:neo2-9,274520,274520,Poliwrath,9,Neo Discovery,read from Cardmarket
+en:neo3-13,274599,274599,Raikou,13,Neo Revelation,attacks match one product
+en:neo3-14,274600,274600,Suicune,14,Neo Revelation,attacks match one product
+en:neo3-16,274602,274589,Celebi,16,Neo Revelation,attacks match one product
+en:neo3-17,274603,274592,Entei,17,Neo Revelation,attacks match one product
+en:neo3-18,274604,274593,Ho-oh,18,Neo Revelation,attacks match one product
+en:neo3-22,274608,274599,Raikou,22,Neo Revelation,attacks match one product
+en:neo3-27,274613,274600,Suicune,27,Neo Revelation,attacks match one product
+en:neo3-3,274589,274589,Celebi,3,Neo Revelation,attacks match one product
+en:neo3-6,274592,274592,Entei,6,Neo Revelation,attacks match one product
+en:neo3-7,274593,274593,Ho-oh,7,Neo Revelation,attacks match one product
+en:pl1-10,278431,278430,Giratina,10,Platinum,attacks match one product
+en:pl1-102,278523,278420,Vulpix,102,Platinum,attacks match one product
+en:pl1-12,278433,278433,Palkia G,12,Platinum,attacks plus a set or type tag
+en:pl1-126,278547,278547,Shaymin LV.X,126,Platinum,attacks match one product
+en:pl1-127,278548,278547,Shaymin LV.X,127,Platinum,attacks match one product
+en:pl1-14,278435,278435,Shaymin,14,Platinum,attacks match one product
+en:pl1-15,278436,278435,Shaymin,15,Platinum,attacks match one product
+en:pl1-23,278444,278426,Dialga,23,Platinum,attacks match one product
+en:pl1-27,278448,278430,Giratina,27,Platinum,attacks match one product
+en:pl1-28,278449,278430,Giratina,28,Platinum,attacks match one product
+en:pl1-37,278458,278433,Palkia,37,Platinum,attacks match one product
+en:pl1-38,278459,278435,Shaymin,38,Platinum,attacks match one product
+en:pl1-43,278464,278464,Carnivine,43,Platinum,attacks match one product
+en:pl1-5,278426,278426,Dialga,5,Platinum,attacks match one product
+en:pl1-6,278427,278426,Dialga,6,Platinum,attacks match one product
+en:pl1-68,278489,278464,Carnivine,68,Platinum,attacks match one product
+en:pl1-81,278502,278419,Lotad,81,Platinum,attacks match one product
+en:pl1-9,278430,278430,Giratina,9,Platinum,attacks match one product
+en:pl1-97,278518,278421,Swablu,97,Platinum,attacks match one product
+en:pl1-SH4,278419,278419,Lotad,SH4,Platinum,attacks match one product
+en:pl1-SH5,278421,278421,Swablu,SH5,Platinum,attacks match one product
+en:pl1-SH6,278420,278420,Vulpix,SH6,Platinum,read from Cardmarket
+en:pl2-1,278575,278570,Arcanine,1,Rising Rivals,attacks match one product
+en:pl2-2,278576,278569,Bastiodon GL,2,Rising Rivals,attacks plus a set or type tag
+en:pl2-3,278577,278572,Darkrai G,3,Rising Rivals,attacks plus a set or type tag
+en:pl2-4,278578,278571,Floatzel GL,4,Rising Rivals,attacks plus a set or type tag
+en:pl2-6,278580,278574,Froslass GL,6,Rising Rivals,attacks plus a set or type tag
+en:pl2-RT1,278570,278570,Fan Rotom,RT1,Rising Rivals,attacks match one product
+en:pl2-RT2,278569,278569,Frost Rotom,RT2,Rising Rivals,attacks match one product
+en:pl2-RT3,278572,278572,Heat Rotom,RT3,Rising Rivals,attacks match one product
+en:pl2-RT4,278571,278571,Mow Rotom,RT4,Rising Rivals,attacks match one product
+en:pl2-RT6,278574,278574,Charon's Choice,RT6,Rising Rivals,only free product with this name
+en:pl3-7,278698,278689,Metagross,7,Supreme Victors,attacks match one product
+en:pl3-8,278699,278690,Rayquaza C,8,Supreme Victors,attacks plus a set or type tag
+en:pl3-9,278700,278691,Regigigas FB,9,Supreme Victors,attacks plus a set or type tag
+en:pl3-SH7,278689,278689,Milotic,SH7,Supreme Victors,attacks match one product
+en:pl3-SH8,278690,278690,Relicanth,SH8,Supreme Victors,attacks match one product
+en:pl3-SH9,278691,278691,Yanma,SH9,Supreme Victors,attacks match one product
+en:pl4-14,278886,278886,Bronzong,14,Arceus,attacks match one product
+en:pl4-16,278888,278888,Gengar,16,Arceus,attacks match one product
+en:pl4-17,278889,278888,Gengar,17,Arceus,attacks match one product
+en:pl4-22,278894,278894,Manectric,22,Arceus,attacks match one product
+en:pl4-24,278896,278896,Pelipper,24,Arceus,attacks match one product
+en:pl4-28,278900,278900,Rapidash,28,Arceus,attacks match one product
+en:pl4-30,278902,278902,Sceptile,30,Arceus,attacks match one product
+en:pl4-31,278903,278902,Sceptile,31,Arceus,attacks match one product
+en:pl4-33,278905,278886,Bronzong,33,Arceus,attacks match one product
+en:pl4-34,278906,278906,Bronzor,34,Arceus,attacks match one product
+en:pl4-36,278908,278908,Gastly,36,Arceus,attacks match one product
+en:pl4-38,278910,278910,Grovyle,38,Arceus,attacks match one product
+en:pl4-39,278911,278910,Grovyle,39,Arceus,attacks match one product
+en:pl4-4,278876,278876,Kabutops,4,Arceus,attacks match one product
+en:pl4-40,278912,278912,Gulpin,40,Arceus,attacks match one product
+en:pl4-41,278913,278913,Haunter,41,Arceus,attacks match one product
+en:pl4-42,278914,278913,Haunter,42,Arceus,attacks match one product
+en:pl4-44,278916,278894,Manectric,44,Arceus,attacks match one product
+en:pl4-45,278917,278896,Pelipper,45,Arceus,attacks match one product
+en:pl4-46,278918,278869,Ponyta,46,Arceus,attacks match one product
+en:pl4-47,278919,278900,Rapidash,47,Arceus,attacks match one product
+en:pl4-52,278924,278870,Bagon,52,Arceus,attacks match one product
+en:pl4-54,278926,278906,Bronzor,54,Arceus,attacks match one product
+en:pl4-62,278934,278934,Electrike,62,Arceus,attacks match one product
+en:pl4-63,278935,278934,Electrike,63,Arceus,attacks match one product
+en:pl4-64,278936,278908,Gastly,64,Arceus,attacks match one product
+en:pl4-66,278938,278912,Gulpin,66,Arceus,attacks match one product
+en:pl4-67,278939,278876,Kabuto,67,Arceus,attacks match one product
+en:pl4-72,278944,278869,Ponyta,72,Arceus,attacks match one product
+en:pl4-74,278946,278872,Shinx,74,Arceus,attacks match one product
+en:pl4-76,278948,278948,Tangela,76,Arceus,attacks match one product
+en:pl4-77,278949,278948,Tangela,77,Arceus,attacks match one product
+en:pl4-78,278950,278950,Treecko,78,Arceus,attacks match one product
+en:pl4-79,278951,278950,Treecko,79,Arceus,attacks match one product
+en:pl4-80,278952,278952,Wingull,80,Arceus,attacks match one product
+en:pl4-81,278953,278952,Wingull,81,Arceus,attacks match one product
+en:pl4-AR1,278865,278861,Arceus,AR1,Arceus,attacks plus a set or type tag
+en:pl4-AR2,278864,278861,Arceus,AR2,Arceus,attacks plus a set or type tag
+en:pl4-AR3,278863,278861,Arceus,AR3,Arceus,attacks plus a set or type tag
+en:pl4-AR4,278861,278861,Arceus,AR4,Arceus,attacks plus a set or type tag
+en:pl4-AR5,278867,278861,Arceus,AR5,Arceus,attacks match one product
+en:pl4-AR6,278862,278861,Arceus,AR6,Arceus,attacks match one product
+en:pl4-AR7,278866,278861,Arceus,AR7,Arceus,attacks plus a set or type tag
+en:pl4-AR8,278868,278861,Arceus,AR8,Arceus,attacks plus a set or type tag
+en:pl4-AR9,278871,278861,Arceus,AR9,Arceus,attacks match one product
+en:pl4-SH10,278870,278870,Bagon,SH10,Arceus,attacks match one product
+en:pl4-SH11,278869,278869,Ponyta,SH11,Arceus,attacks match one product
+en:pl4-SH12,278872,278872,Shinx,SH12,Arceus,attacks match one product
+en:ru1-10,278851,278850,Mew,10,Pokémon Rumble,attacks match one product
+en:ru1-9,278850,278850,Mewtwo,9,Pokémon Rumble,attacks match one product
+en:sm10-1,370785,370785,Pheromosa & Buzzwole GX,1,Unbroken Bonds,read from Cardmarket
+en:sm10-10,372303,372302,Venonat,10,Unbroken Bonds,attacks match one product
+en:sm10-107,370788,370788,Greninja & Zoroark GX,107,Unbroken Bonds,read from Cardmarket
+en:sm10-113,372403,372403,Sandile,113,Unbroken Bonds,attacks match one product
+en:sm10-114,372404,372403,Sandile,114,Unbroken Bonds,attacks match one product
+en:sm10-130,370790,370790,Gardevoir & Sylveon GX,130,Unbroken Bonds,page photo
+en:sm10-154,372442,372442,Porygon,154,Unbroken Bonds,attacks match one product
+en:sm10-155,372443,372442,Porygon,155,Unbroken Bonds,attacks match one product
+en:sm10-191,372473,370785,Pheromosa & Buzzwole GX,191,Unbroken Bonds,read from Cardmarket
+en:sm10-192,372474,370785,Pheromosa & Buzzwole GX,192,Unbroken Bonds,read from Cardmarket
+en:sm10-196,372478,370786,Muk & Alolan Muk GX,196,Unbroken Bonds,read from Cardmarket
+en:sm10-197,372479,370786,Muk & Alolan Muk GX,197,Unbroken Bonds,read from Cardmarket
+en:sm10-198,372480,372373,Marshadow & Machamp GX,198,Unbroken Bonds,read from Cardmarket
+en:sm10-199,372481,372373,Marshadow & Machamp GX,199,Unbroken Bonds,read from Cardmarket
+en:sm10-200,372482,370788,Greninja & Zoroark GX,200,Unbroken Bonds,read from Cardmarket
+en:sm10-201,372483,370788,Greninja & Zoroark GX,201,Unbroken Bonds,read from Cardmarket
+en:sm10-204,372486,370790,Gardevoir & Sylveon GX,204,Unbroken Bonds,read from Cardmarket
+en:sm10-205,372487,370790,Gardevoir & Sylveon GX,205,Unbroken Bonds,read from Cardmarket
+en:sm10-26,372318,372318,Litten,26,Unbroken Bonds,attacks match one product
+en:sm10-27,372319,372318,Litten,27,Unbroken Bonds,attacks match one product
+en:sm10-36,372327,372327,Poliwag,36,Unbroken Bonds,attacks match one product
+en:sm10-37,372328,372327,Poliwag,37,Unbroken Bonds,attacks match one product
+en:sm10-5,372298,372298,Oddish,5,Unbroken Bonds,attacks match one product
+en:sm10-6,372299,372298,Oddish,6,Unbroken Bonds,attacks match one product
+en:sm10-61,370786,370786,Muk & Alolan Muk GX,61,Unbroken Bonds,read from Cardmarket
+en:sm10-67,372355,372355,Gastly,67,Unbroken Bonds,attacks match one product
+en:sm10-68,372356,372355,Gastly,68,Unbroken Bonds,attacks match one product
+en:sm10-81,372373,370787,Marshadow,81,Unbroken Bonds,read from Cardmarket
+en:sm10-82,370787,370787,Marshadow & Machamp GX,82,Unbroken Bonds,read from Cardmarket
+en:sm10-9,372302,372302,Venonat,9,Unbroken Bonds,attacks match one product
+en:sm10-92,372383,372383,Rhyhorn,92,Unbroken Bonds,attacks match one product
+en:sm10-93,372384,372383,Rhyhorn,93,Unbroken Bonds,attacks match one product
+en:sm11-114,388377,377496,Garchomp,114,Unified Minds,attacks match one product
+en:sm11-115,388372,388372,Riolu,115,Unified Minds,read from Cardmarket
+en:sm11-116,388382,388372,Riolu,116,Unified Minds,read from Cardmarket
+en:sm11-128,388432,388432,Murkrow,128,Unified Minds,attacks match one product
+en:sm11-129,388442,388432,Murkrow,129,Unified Minds,attacks match one product
+en:sm11-146,377496,377496,Garchomp & Giratina GX,146,Unified Minds,attacks match one product
+en:sm11-147,388527,388527,Dratini,147,Unified Minds,attacks match one product
+en:sm11-148,388532,388527,Dratini,148,Unified Minds,attacks match one product
+en:sm11-149,388537,388537,Dragonair,149,Unified Minds,attacks match one product
+en:sm11-150,388542,388537,Dragonair,150,Unified Minds,attacks match one product
+en:sm11-151,388552,388547,Dragonite,151,Unified Minds,attacks match one product
+en:sm11-152,388547,388547,Dragonite GX,152,Unified Minds,attacks match one product
+en:sm11-167,388622,388622,Slakoth,167,Unified Minds,attacks match one product
+en:sm11-168,388627,388622,Slakoth,168,Unified Minds,attacks match one product
+en:sm11-27,387967,387967,Litwick,27,Unified Minds,read from Cardmarket
+en:sm11-28,387972,387967,Litwick,28,Unified Minds,read from Cardmarket
+en:sm11-33,387997,387997,Salandit,33,Unified Minds,attacks match one product
+en:sm11-34,388002,388002,Salazzle,34,Unified Minds,attacks match one product
+en:sm11-55,388097,388097,Pikachu,55,Unified Minds,attacks match one product
+en:sm11-56,388102,388097,Pikachu,56,Unified Minds,attacks match one product
+en:sm11-6,387862,387862,Sewaddle,6,Unified Minds,attacks match one product
+en:sm11-63,388137,388137,Tynamo,63,Unified Minds,attacks match one product
+en:sm11-64,388142,388137,Tynamo,64,Unified Minds,attacks match one product
+en:sm11-7,387867,387862,Sewaddle,7,Unified Minds,attacks match one product
+en:sm11-92,388262,388262,Honedge,92,Unified Minds,attacks match one product
+en:sm11-93,388272,388262,Honedge,93,Unified Minds,attacks match one product
+en:sm11-98,388297,387997,Salandit,98,Unified Minds,attacks match one product
+en:sm11-99,388302,388002,Salazzle,99,Unified Minds,attacks match one product
+en:sm115-38,394597,394597,Clefairy,38,Hidden Fates,attacks match one product
+en:sm115-39,394652,394597,Clefairy,39,Hidden Fates,attacks match one product
+en:sm12-115,408224,398554,Excadrill,115,Cosmic Eclipse,read from Cardmarket
+en:sm12-139,408344,398559,Steelix,139,Cosmic Eclipse,read from Cardmarket
+en:sm12-176,408504,398519,Stoutland,176,Cosmic Eclipse,read from Cardmarket
+en:sm12-237,398524,398524,Torkoal,237,Cosmic Eclipse,read from Cardmarket
+en:sm12-238,398529,398529,Weavile,238,Cosmic Eclipse,read from Cardmarket
+en:sm12-239,398504,398504,Piplup,239,Cosmic Eclipse,read from Cardmarket
+en:sm12-240,398509,398509,Wishiwashi,240,Cosmic Eclipse,read from Cardmarket
+en:sm12-241,398534,398534,Pikachu,241,Cosmic Eclipse,read from Cardmarket
+en:sm12-242,398539,398539,Magnemite,242,Cosmic Eclipse,read from Cardmarket
+en:sm12-243,398544,398544,Koffing,243,Cosmic Eclipse,read from Cardmarket
+en:sm12-244,398549,398549,Gallade,244,Cosmic Eclipse,read from Cardmarket
+en:sm12-245,398514,398514,Mimikyu,245,Cosmic Eclipse,read from Cardmarket
+en:sm12-246,398554,398554,Excadrill,246,Cosmic Eclipse,read from Cardmarket
+en:sm12-247,398559,398559,Steelix,247,Cosmic Eclipse,read from Cardmarket
+en:sm12-248,398519,398519,Stoutland,248,Cosmic Eclipse,read from Cardmarket
+en:sm12-29,407794,398524,Torkoal,29,Cosmic Eclipse,read from Cardmarket
+en:sm12-44,407869,398529,Weavile,44,Cosmic Eclipse,read from Cardmarket
+en:sm12-54,407919,398504,Piplup,54,Cosmic Eclipse,read from Cardmarket
+en:sm12-62,407959,398509,Wishiwashi,62,Cosmic Eclipse,read from Cardmarket
+en:sm12-66,407979,398534,Pikachu,66,Cosmic Eclipse,read from Cardmarket
+en:sm12-68,407989,398539,Magnemite,68,Cosmic Eclipse,read from Cardmarket
+en:sm12-76,408024,398544,Koffing,76,Cosmic Eclipse,read from Cardmarket
+en:sm12-82,408054,398549,Gallade,82,Cosmic Eclipse,read from Cardmarket
+en:sm12-96,408124,398514,Mimikyu,96,Cosmic Eclipse,read from Cardmarket
+en:sm2-126,297578,296848,Hala,126,Guardians Rising,page photo
+en:sm2-14,297478,297478,Oricorio,14,Guardians Rising,page photo
+en:sm2-143,296848,296848,Hala,143,Guardians Rising,read from Cardmarket
+en:sm2-55,297517,297478,Oricorio,55,Guardians Rising,read from Cardmarket
+en:sm2-62,297523,297523,Machop,62,Guardians Rising,attacks match one product
+en:sm2-63,297524,297523,Machop,63,Guardians Rising,attacks match one product
+en:sm3-75,299477,299477,Lycanroc,75,Burning Shadows,attacks match one product
+en:sm3-76,299478,299477,Lycanroc,76,Burning Shadows,attacks match one product
+en:sm3.5-39,301167,301167,Mewtwo GX,39,Shining Legends,read from Cardmarket
+en:sm3.5-78,302215,301167,Mewtwo GX,78,Shining Legends,read from Cardmarket
+en:sm5-100,316026,316026,Dialga GX,100,Ultra Prism,read from Cardmarket
+en:sm5-101,316027,316027,Palkia GX,101,Ultra Prism,read from Cardmarket
+en:sm5-104,316030,316030,Eevee,104,Ultra Prism,attacks match one product
+en:sm5-105,316031,316030,Eevee,105,Ultra Prism,attacks match one product
+en:sm5-111,316037,315946,Shaymin,111,Ultra Prism,attacks match one product
+en:sm5-122,316047,316047,Escape Board,122,Ultra Prism,page photo
+en:sm5-129,316054,316054,Missing Clover,129,Ultra Prism,read from Cardmarket
+en:sm5-13,315503,315503,Leafeon GX,13,Ultra Prism,read from Cardmarket
+en:sm5-140,316064,316064,Pheromosa GX,140,Ultra Prism,read from Cardmarket
+en:sm5-142,316066,316066,Xurkitree GX,142,Ultra Prism,read from Cardmarket
+en:sm5-144,316068,316068,Celesteela GX,144,Ultra Prism,read from Cardmarket
+en:sm5-15,315946,315946,Shaymin,15,Ultra Prism,attacks match one product
+en:sm5-157,316081,315503,Leafeon GX,157,Ultra Prism,read from Cardmarket
+en:sm5-158,316082,316064,Pheromosa GX,158,Ultra Prism,read from Cardmarket
+en:sm5-159,316083,315504,Glaceon GX,159,Ultra Prism,read from Cardmarket
+en:sm5-160,316084,316066,Xurkitree GX,160,Ultra Prism,read from Cardmarket
+en:sm5-161,316085,315828,Dawn Wings Necrozma GX,161,Ultra Prism,read from Cardmarket
+en:sm5-162,316086,316068,Celesteela GX,162,Ultra Prism,read from Cardmarket
+en:sm5-163,316087,315829,Dusk Mane Necrozma GX,163,Ultra Prism,read from Cardmarket
+en:sm5-164,316088,316026,Dialga GX,164,Ultra Prism,read from Cardmarket
+en:sm5-165,316089,316027,Palkia GX,165,Ultra Prism,read from Cardmarket
+en:sm5-167,316091,316047,Escape Board,167,Ultra Prism,read from Cardmarket
+en:sm5-168,316092,316054,Missing Clover,168,Ultra Prism,read from Cardmarket
+en:sm5-20,315951,315951,Chimchar,20,Ultra Prism,attacks plus a set or type tag
+en:sm5-21,315952,315951,Chimchar,21,Ultra Prism,attacks match one product
+en:sm5-31,315962,315962,Piplup,31,Ultra Prism,attacks match one product
+en:sm5-32,315963,315962,Piplup,32,Ultra Prism,read from Cardmarket
+en:sm5-39,315504,315504,Glaceon GX,39,Ultra Prism,read from Cardmarket
+en:sm5-45,315975,315975,Shinx,45,Ultra Prism,attacks match one product
+en:sm5-46,315976,315975,Shinx,46,Ultra Prism,attacks match one product
+en:sm5-6,315938,315938,Turtwig,6,Ultra Prism,attacks match one product
+en:sm5-63,315828,315828,Dawn Wings Necrozma GX,63,Ultra Prism,page photo
+en:sm5-7,315939,315938,Turtwig,7,Ultra Prism,attacks match one product
+en:sm5-80,316007,316007,Magnemite,80,Ultra Prism,attacks match one product
+en:sm5-81,316008,316007,Magnemite,81,Ultra Prism,attacks match one product
+en:sm5-90,315829,315829,Dusk Mane Necrozma GX,90,Ultra Prism,page photo
+en:sm5-96,316022,316022,Gible,96,Ultra Prism,attacks match one product
+en:sm5-97,316023,316022,Gible,97,Ultra Prism,attacks match one product
+en:sm6-103,355616,327209,Bonnie,103,Forbidden Light,read from Cardmarket
+en:sm6-128,327209,327209,Bonnie,128,Forbidden Light,read from Cardmarket
+en:sm6-14,355534,355534,Fennekin,14,Forbidden Light,attacks match one product
+en:sm6-15,355535,355534,Fennekin,15,Forbidden Light,read from Cardmarket
+en:sm6-21,355541,355541,Froakie,21,Forbidden Light,attacks match one product
+en:sm6-22,355542,355541,Froakie,22,Forbidden Light,attacks match one product
+en:sm6-46,355565,355565,Honedge,46,Forbidden Light,attacks match one product
+en:sm6-47,355566,355565,Honedge,47,Forbidden Light,attacks match one product
+en:sm6-5,355526,355526,Scatterbug,5,Forbidden Light,attacks match one product
+en:sm6-6,355527,355526,Scatterbug,6,Forbidden Light,attacks match one product
+en:sm6-71,355658,327207,Zygarde,71,Forbidden Light,read from Cardmarket
+en:sm6-73,327207,327207,Zygarde GX,73,Forbidden Light,attacks match one product
+en:sm6-83,355597,355597,Flabébé,83,Forbidden Light,attacks match one product
+en:sm6-84,355598,355597,Flabébé,84,Forbidden Light,attacks match one product
+en:sm6-91,355605,355605,Goomy,91,Forbidden Light,attacks match one product
+en:sm6-92,355606,355605,Goomy,92,Forbidden Light,attacks match one product
+en:sm7-103,361344,361344,Bagon,103,Celestial Storm,attacks match one product
+en:sm7-104,361345,361344,Bagon,104,Celestial Storm,attacks match one product
+en:sm7-11,361258,361258,Seedot,11,Celestial Storm,attacks match one product
+en:sm7-116,361355,361355,Whismur,116,Celestial Storm,attacks match one product
+en:sm7-117,361356,361355,Whismur,117,Celestial Storm,attacks match one product
+en:sm7-12,361259,361258,Seedot,12,Celestial Storm,attacks match one product
+en:sm7-30,361277,361277,Oricorio,30,Celestial Storm,attacks match one product
+en:sm7-32,361279,361279,Mudkip,32,Celestial Storm,attacks match one product
+en:sm7-33,361280,361279,Mudkip,33,Celestial Storm,attacks match one product
+en:sm7-55,361301,361277,Oricorio,55,Celestial Storm,attacks match one product
+en:sm7-67,361312,361312,Deoxys,67,Celestial Storm,attacks match one product
+en:sm7-68,361313,361312,Deoxys,68,Celestial Storm,attacks match one product
+en:sm7-69,361314,361312,Deoxys,69,Celestial Storm,attacks match one product
+en:sm7-7,361254,361254,Treecko,7,Celestial Storm,attacks match one product
+en:sm7-8,361255,361254,Treecko,8,Celestial Storm,page photo
+en:sm7-92,361336,361336,Beldum,92,Celestial Storm,attacks match one product
+en:sm7-93,361337,361336,Beldum,93,Celestial Storm,attacks match one product
+en:sm7.5-15,363487,363487,Horsea,15,Dragon Majesty,attacks match one product
+en:sm7.5-16,363488,363487,Horsea,16,Dragon Majesty,attacks match one product
+en:sm7.5-34,363506,363506,Dratini,34,Dragon Majesty,attacks plus a set or type tag
+en:sm7.5-35,363507,363506,Dratini,35,Dragon Majesty,read from Cardmarket
+en:sm8-105,365742,365706,Mareanie,105,Lost Thunder,attacks match one product
+en:sm8-11,365578,365578,Hoppip,11,Lost Thunder,attacks match one product
+en:sm8-114,365751,365751,Larvitar,114,Lost Thunder,attacks match one product
+en:sm8-115,365752,365751,Larvitar,115,Lost Thunder,attacks match one product
+en:sm8-117,365754,365754,Carbink,117,Lost Thunder,attacks match one product
+en:sm8-12,365579,365578,Hoppip,12,Lost Thunder,attacks match one product
+en:sm8-142,365779,365722,Dedenne,142,Lost Thunder,attacks match one product
+en:sm8-143,365780,365754,Carbink,143,Lost Thunder,attacks match one product
+en:sm8-161,365797,365797,Kecleon,161,Lost Thunder,attacks plus a set or type tag
+en:sm8-162,365798,365797,Kecleon,162,Lost Thunder,attacks match one product
+en:sm8-163,365799,365799,Pikipek,163,Lost Thunder,attacks match one product
+en:sm8-164,365800,365799,Pikipek,164,Lost Thunder,attacks match one product
+en:sm8-39,365679,365679,Cyndaquil,39,Lost Thunder,attacks match one product
+en:sm8-40,365680,365679,Cyndaquil,40,Lost Thunder,attacks match one product
+en:sm8-5,365573,365573,Chikorita,5,Lost Thunder,attacks match one product
+en:sm8-59,365698,364940,Suicune,59,Lost Thunder,attacks match one product
+en:sm8-6,365574,365573,Chikorita,6,Lost Thunder,attacks match one product
+en:sm8-60,364940,364940,Suicune GX,60,Lost Thunder,read from Cardmarket
+en:sm8-64,365702,365702,Popplio,64,Lost Thunder,attacks match one product
+en:sm8-65,365703,365702,Popplio,65,Lost Thunder,attacks match one product
+en:sm8-68,365706,365706,Mareanie,68,Lost Thunder,attacks match one product
+en:sm8-75,365713,365713,Mareep,75,Lost Thunder,page photo
+en:sm8-76,365714,365713,Mareep,76,Lost Thunder,attacks match one product
+en:sm8-84,365722,365722,Dedenne,84,Lost Thunder,attacks match one product
+en:sm8-90,365727,365727,Unown,90,Lost Thunder,attacks match one product
+en:sm8-91,365728,365727,Unown,91,Lost Thunder,attacks match one product
+en:sm8-92,365729,365727,Unown,92,Lost Thunder,attacks match one product
+en:sm9-11,368944,368944,Charmander,11,Team Up,attacks match one product
+en:sm9-114,369042,369042,Alolan Exeggutor,114,Team Up,attacks match one product
+en:sm9-115,369043,369042,Alolan Exeggutor,115,Team Up,attacks match one product
+en:sm9-116,369044,369044,Dratini,116,Team Up,attacks match one product
+en:sm9-117,369045,369044,Dratini,117,Team Up,attacks match one product
+en:sm9-12,368945,368944,Charmander,12,Team Up,attacks match one product
+en:sm9-121,369048,369048,Pidgey,121,Team Up,attacks match one product
+en:sm9-122,369049,369048,Pidgey,122,Team Up,attacks match one product
+en:sm9-2,368935,368935,Weedle,2,Team Up,attacks match one product
+en:sm9-22,368954,368954,Squirtle,22,Team Up,attacks match one product
+en:sm9-23,368955,368954,Squirtle,23,Team Up,attacks match one product
+en:sm9-3,368936,368935,Weedle,3,Team Up,attacks match one product
+en:sm9-34,368965,368965,Alolan Geodude,34,Team Up,attacks match one product
+en:sm9-35,368966,368965,Alolan Geodude,35,Team Up,attacks match one product
+en:smp-SM04,295296,295296,Pikachu,SM04,SM Black Star Promos,read from Cardmarket
+en:smp-SM106,321166,321166,Dawn Wings Necrozma,SM106,SM Black Star Promos,read from Cardmarket
+en:smp-SM107,321167,321167,Dusk Mane Necrozma,SM107,SM Black Star Promos,read from Cardmarket
+en:smp-SM123,358428,321166,Dawn Wings Necrozma,SM123,SM Black Star Promos,read from Cardmarket
+en:smp-SM124,358426,321167,Dusk Mane Necrozma,SM124,SM Black Star Promos,read from Cardmarket
+en:smp-SM148,363381,313448,Champions Festival,SM148,SM Black Star Promos,read from Cardmarket
+en:smp-SM158,368851,368851,Charizard,SM158,SM Black Star Promos,read from Cardmarket
+en:smp-SM174,369353,369353,Eevee GX,SM174,SM Black Star Promos,page photo
+en:smp-SM180,371773,371773,Stakataka,SM180,SM Black Star Promos,read from Cardmarket
+en:smp-SM205,377529,377529,Terrakion,SM205,SM Black Star Promos,read from Cardmarket
+en:smp-SM209,377541,371773,Stakataka,SM209,SM Black Star Promos,read from Cardmarket
+en:smp-SM223,399669,377529,Terrakion,SM223,SM Black Star Promos,read from Cardmarket
+en:smp-SM226,412909,368851,Charizard,SM226,SM Black Star Promos,read from Cardmarket
+en:smp-SM231,394837,313448,Champions Festival,SM231,SM Black Star Promos,read from Cardmarket
+en:smp-SM233,412929,369353,Eevee GX,SM233,SM Black Star Promos,read from Cardmarket
+en:smp-SM242,449233,369353,Eevee GX,SM242,SM Black Star Promos,read from Cardmarket
+en:smp-SM30,298284,298284,Tapu Koko,SM30,SM Black Star Promos,read from Cardmarket
+en:smp-SM31,298285,298284,Tapu Koko,SM31,SM Black Star Promos,read from Cardmarket
+en:smp-SM76,313453,295296,Pikachu,SM76,SM Black Star Promos,read from Cardmarket
+en:smp-SM78,313448,313448,Champions Festival,SM78,SM Black Star Promos,read from Cardmarket
+en:smp-SM81,311416,295296,Pikachu,SM81,SM Black Star Promos,read from Cardmarket
+en:swsh1-101,436624,436624,Baltoy,101,Sword & Shield,attacks match one product
+en:swsh1-102,436629,436624,Baltoy,102,Sword & Shield,attacks match one product
+en:swsh1-107,436654,436654,Silicobra,107,Sword & Shield,attacks match one product
+en:swsh1-108,436659,436654,Silicobra,108,Sword & Shield,attacks match one product
+en:swsh1-109,436664,436664,Sandaconda,109,Sword & Shield,attacks match one product
+en:swsh1-110,436669,436664,Sandaconda,110,Sword & Shield,attacks match one product
+en:swsh1-111,436674,436674,Clobbopus,111,Sword & Shield,attacks match one product
+en:swsh1-112,436679,436674,Clobbopus,112,Sword & Shield,attacks match one product
+en:swsh1-114,436689,427191,Stonjourner,114,Sword & Shield,attacks match one product
+en:swsh1-115,427191,427191,Stonjourner V,115,Sword & Shield,attacks match one product
+en:swsh1-12,436234,436234,Thwackey,12,Sword & Shield,attacks match one product
+en:swsh1-13,436239,436234,Thwackey,13,Sword & Shield,attacks match one product
+en:swsh1-14,427196,427196,Rillaboom,14,Sword & Shield,page photo
+en:swsh1-145,436819,436819,Minccino,145,Sword & Shield,attacks match one product
+en:swsh1-146,436824,436819,Minccino,146,Sword & Shield,attacks match one product
+en:swsh1-15,436244,427196,Rillaboom,15,Sword & Shield,attacks match one product
+en:swsh1-152,436854,436854,Wooloo,152,Sword & Shield,attacks match one product
+en:swsh1-153,436859,436854,Wooloo,153,Sword & Shield,attacks match one product
+en:swsh1-16,436249,436249,Blipbug,16,Sword & Shield,attacks match one product
+en:swsh1-17,436254,436249,Blipbug,17,Sword & Shield,attacks match one product
+en:swsh1-2,436189,436189,Roselia,2,Sword & Shield,attacks match one product
+en:swsh1-3,436194,436189,Roselia,3,Sword & Shield,attacks match one product
+en:swsh1-32,436319,436319,Raboot,32,Sword & Shield,attacks match one product
+en:swsh1-33,436324,436319,Raboot,33,Sword & Shield,attacks match one product
+en:swsh1-34,427226,427226,Cinderace,34,Sword & Shield,page photo
+en:swsh1-35,436329,427226,Cinderace,35,Sword & Shield,attacks match one product
+en:swsh1-36,436334,427226,Cinderace,36,Sword & Shield,attacks match one product
+en:swsh1-37,436339,436339,Sizzlipede,37,Sword & Shield,attacks match one product
+en:swsh1-38,436344,436339,Sizzlipede,38,Sword & Shield,attacks match one product
+en:swsh1-42,436364,436364,Krabby,42,Sword & Shield,attacks match one product
+en:swsh1-43,436369,436364,Krabby,43,Sword & Shield,attacks match one product
+en:swsh1-45,436379,436379,Goldeen,45,Sword & Shield,attacks plus a set or type tag
+en:swsh1-46,436384,436379,Goldeen,46,Sword & Shield,attacks match one product
+en:swsh1-56,436419,436419,Drizzile,56,Sword & Shield,attacks match one product
+en:swsh1-57,436424,436419,Drizzile,57,Sword & Shield,attacks match one product
+en:swsh1-58,427216,427216,Inteleon,58,Sword & Shield,page photo
+en:swsh1-59,436429,427216,Inteleon,59,Sword & Shield,attacks match one product
+en:swsh1-67,436469,436469,Chinchou,67,Sword & Shield,attacks match one product
+en:swsh1-68,436474,436469,Chinchou,68,Sword & Shield,attacks match one product
+en:swsh1-73,436494,436494,Yamper,73,Sword & Shield,attacks match one product
+en:swsh1-74,436499,436494,Yamper,74,Sword & Shield,attacks match one product
+en:swsh1-75,436504,436504,Boltund,75,Sword & Shield,attacks match one product
+en:swsh1-76,436509,436504,Boltund,76,Sword & Shield,page photo
+en:swsh1-96,436599,436599,Rhyhorn,96,Sword & Shield,attacks match one product
+en:swsh1-97,436604,436599,Rhyhorn,97,Sword & Shield,attacks match one product
+en:swsh11-130,670816,670816,Giratina V,130,Lost Origin,attacks match one product
+en:swsh11-201,674207,670816,Giratina VSTAR,201,Lost Origin,read from Cardmarket
+en:tk-bw-e-1,280123,280093,Lillipup,1,BW trainer Kit (Excadrill),page photo
+en:tk-bw-e-10,280104,280073,Fighting Energy,10,BW trainer Kit (Excadrill),page photo
+en:tk-bw-e-11,280103,280072,Timburr,11,BW trainer Kit (Excadrill),page photo
+en:tk-bw-e-12,280105,280074,Audino,12,BW trainer Kit (Excadrill),page photo
+en:tk-bw-e-13,280106,280075,Drilbur,13,BW trainer Kit (Excadrill),page photo
+en:tk-bw-e-14,280107,280077,Gurdurr,14,BW trainer Kit (Excadrill),page photo
+en:tk-bw-e-15,280102,280076,Potion,15,BW trainer Kit (Excadrill),page photo
+en:tk-bw-e-16,280101,280071,PlusPower,16,BW trainer Kit (Excadrill),page photo
+en:tk-bw-e-17,280096,280070,Excadrill,17,BW trainer Kit (Excadrill),page photo
+en:tk-bw-e-18,280095,280065,Audino,18,BW trainer Kit (Excadrill),page photo
+en:tk-bw-e-19,280097,280064,Herdier,19,BW trainer Kit (Excadrill),page photo
+en:tk-bw-e-2,280098,280066,Fighting Energy,2,BW trainer Kit (Excadrill),page photo
+en:tk-bw-e-20,280100,280067,Fighting Energy,20,BW trainer Kit (Excadrill),page photo
+en:tk-bw-e-21,280099,280069,Energy Search,21,BW trainer Kit (Excadrill),page photo
+en:tk-bw-e-22,280108,280068,Fighting Energy,22,BW trainer Kit (Excadrill),page photo
+en:tk-bw-e-23,280109,280078,Potion,23,BW trainer Kit (Excadrill),page photo
+en:tk-bw-e-24,280119,280079,Pokémon Communication,24,BW trainer Kit (Excadrill),page photo
+en:tk-bw-e-25,280118,280089,Drilbur,25,BW trainer Kit (Excadrill),page photo
+en:tk-bw-e-26,280120,280088,Fighting Energy,26,BW trainer Kit (Excadrill),page photo
+en:tk-bw-e-27,280121,280090,Lillipup,27,BW trainer Kit (Excadrill),page photo
+en:tk-bw-e-28,280122,280091,Fighting Energy,28,BW trainer Kit (Excadrill),page photo
+en:tk-bw-e-29,280117,280092,Timburr,29,BW trainer Kit (Excadrill),page photo
+en:tk-bw-e-3,280116,280087,Fighting Energy,3,BW trainer Kit (Excadrill),page photo
+en:tk-bw-e-30,280111,280086,Excadrill,30,BW trainer Kit (Excadrill),page photo
+en:tk-bw-e-4,280110,280081,Energy Switch,4,BW trainer Kit (Excadrill),page photo
+en:tk-bw-e-5,280112,280080,Fighting Energy,5,BW trainer Kit (Excadrill),page photo
+en:tk-bw-e-6,280113,280082,Fighting Energy,6,BW trainer Kit (Excadrill),page photo
+en:tk-bw-e-7,280115,280083,Fighting Energy,7,BW trainer Kit (Excadrill),page photo
+en:tk-bw-e-8,280114,280085,Fighting Energy,8,BW trainer Kit (Excadrill),page photo
+en:tk-bw-e-9,280094,280084,Fighting Energy,9,BW trainer Kit (Excadrill),page photo
+en:tk-bw-z-1,280093,280093,Purrloin,1,BW trainer Kit (Zoroark),page photo
+en:tk-bw-z-10,280073,280073,Darkness Energy,10,BW trainer Kit (Zoroark),page photo
+en:tk-bw-z-11,280072,280072,PlusPower,11,BW trainer Kit (Zoroark),page photo
+en:tk-bw-z-12,280074,280074,Patrat,12,BW trainer Kit (Zoroark),page photo
+en:tk-bw-z-13,280075,280075,Zorua,13,BW trainer Kit (Zoroark),page photo
+en:tk-bw-z-14,280077,280077,Pidove,14,BW trainer Kit (Zoroark),page photo
+en:tk-bw-z-15,280076,280076,Tranquill,15,BW trainer Kit (Zoroark),page photo
+en:tk-bw-z-16,280071,280071,Energy Retrieval,16,BW trainer Kit (Zoroark),page photo
+en:tk-bw-z-17,280070,280070,Zoroark,17,BW trainer Kit (Zoroark),page photo
+en:tk-bw-z-18,280065,280065,Pokémon Communication,18,BW trainer Kit (Zoroark),page photo
+en:tk-bw-z-19,280064,280064,Minccino,19,BW trainer Kit (Zoroark),page photo
+en:tk-bw-z-2,280066,280066,Watchog,2,BW trainer Kit (Zoroark),page photo
+en:tk-bw-z-20,280067,280067,Darkness Energy,20,BW trainer Kit (Zoroark),page photo
+en:tk-bw-z-21,280069,280069,Pidove,21,BW trainer Kit (Zoroark),page photo
+en:tk-bw-z-22,280068,280068,Darkness Energy,22,BW trainer Kit (Zoroark),page photo
+en:tk-bw-z-23,280078,280078,Zorua,23,BW trainer Kit (Zoroark),page photo
+en:tk-bw-z-24,280079,280079,Darkness Energy,24,BW trainer Kit (Zoroark),page photo
+en:tk-bw-z-25,280089,280089,Purrloin,25,BW trainer Kit (Zoroark),page photo
+en:tk-bw-z-26,280088,280088,Darkness Energy,26,BW trainer Kit (Zoroark),page photo
+en:tk-bw-z-27,280090,280090,Energy Search,27,BW trainer Kit (Zoroark),page photo
+en:tk-bw-z-28,280091,280091,Darkness Energy,28,BW trainer Kit (Zoroark),page photo
+en:tk-bw-z-29,280092,280092,Patrat,29,BW trainer Kit (Zoroark),page photo
+en:tk-bw-z-3,280087,280087,Darkness Energy,3,BW trainer Kit (Zoroark),page photo
+en:tk-bw-z-30,280086,280086,Zoroark,30,BW trainer Kit (Zoroark),page photo
+en:tk-bw-z-4,280081,280081,Minccino,4,BW trainer Kit (Zoroark),page photo
+en:tk-bw-z-5,280080,280080,Darkness Energy,5,BW trainer Kit (Zoroark),page photo
+en:tk-bw-z-6,280082,280082,Darkness Energy,6,BW trainer Kit (Zoroark),page photo
+en:tk-bw-z-7,280083,280083,Darkness Energy,7,BW trainer Kit (Zoroark),page photo
+en:tk-bw-z-8,280085,280085,Darkness Energy,8,BW trainer Kit (Zoroark),page photo
+en:tk-bw-z-9,280084,280084,Darkness Energy,9,BW trainer Kit (Zoroark),page photo
+en:tk-dp-l-1,278009,278010,Geodude,1,DP trainer Kit (Lucario),attacks match one product
+en:tk-dp-l-10,278027,278028,Quick Ball,10,DP trainer Kit (Lucario),only free product with this name
+en:tk-dp-l-11,278030,278029,Fighting Energy,11,DP trainer Kit (Lucario),only free product with this name
+en:tk-dp-l-2,278011,278012,Graveler,2,DP trainer Kit (Lucario),attacks match one product
+en:tk-dp-l-3,278014,278013,Lucario,3,DP trainer Kit (Lucario),attacks match one product
+en:tk-dp-l-4,278015,278016,Machoke,4,DP trainer Kit (Lucario),attacks match one product
+en:tk-dp-l-5,278018,278017,Machop,5,DP trainer Kit (Lucario),attacks match one product
+en:tk-dp-l-6,278019,278020,Riolu,6,DP trainer Kit (Lucario),attacks match one product
+en:tk-dp-l-7,278021,278022,Starly,7,DP trainer Kit (Lucario),attacks match one product
+en:tk-dp-l-8,278024,278023,Energy Search,8,DP trainer Kit (Lucario),read from Cardmarket
+en:tk-dp-l-9,278025,278026,Potion,9,DP trainer Kit (Lucario),read from Cardmarket
+en:tk-dp-m-1,278010,278010,Buizel,1,DP trainer Kit (Manaphy),attacks match one product
+en:tk-dp-m-10,278028,278028,Energy Search,10,DP trainer Kit (Manaphy),read from Cardmarket
+en:tk-dp-m-11,278029,278029,Potion,11,DP trainer Kit (Manaphy),read from Cardmarket
+en:tk-dp-m-2,278012,278012,Floatzel,2,DP trainer Kit (Manaphy),attacks match one product
+en:tk-dp-m-3,278013,278013,Goldeen,3,DP trainer Kit (Manaphy),attacks match one product
+en:tk-dp-m-4,278016,278016,Manaphy,4,DP trainer Kit (Manaphy),attacks match one product
+en:tk-dp-m-5,278017,278017,Piplup,5,DP trainer Kit (Manaphy),attacks match one product
+en:tk-dp-m-6,278020,278020,Prinplup,6,DP trainer Kit (Manaphy),attacks match one product
+en:tk-dp-m-7,278022,278022,Seaking,7,DP trainer Kit (Manaphy),attacks match one product
+en:tk-dp-m-8,278023,278023,Totodile,8,DP trainer Kit (Manaphy),attacks match one product
+en:tk-dp-m-9,278026,278026,Dusk Ball,9,DP trainer Kit (Manaphy),only free product with this name
+en:tk-hs-g-1,279155,279125,Totodile,1,HS trainer Kit (Gyarados),read from Cardmarket
+en:tk-hs-g-10,279136,279105,Water Energy,10,HS trainer Kit (Gyarados),read from Cardmarket
+en:tk-hs-g-11,279135,279104,Water Energy,11,HS trainer Kit (Gyarados),read from Cardmarket
+en:tk-hs-g-12,279137,279106,Magikarp,12,HS trainer Kit (Gyarados),read from Cardmarket
+en:tk-hs-g-13,279138,279107,Croconaw,13,HS trainer Kit (Gyarados),read from Cardmarket
+en:tk-hs-g-14,279139,279109,Totodile,14,HS trainer Kit (Gyarados),read from Cardmarket
+en:tk-hs-g-15,279134,279108,Marill,15,HS trainer Kit (Gyarados),read from Cardmarket
+en:tk-hs-g-16,279133,279103,Water Energy,16,HS trainer Kit (Gyarados),read from Cardmarket
+en:tk-hs-g-17,279128,279102,Croconaw,17,HS trainer Kit (Gyarados),read from Cardmarket
+en:tk-hs-g-18,279127,279097,Bill,18,HS trainer Kit (Gyarados),read from Cardmarket
+en:tk-hs-g-19,279129,279096,Magikarp,19,HS trainer Kit (Gyarados),read from Cardmarket
+en:tk-hs-g-2,279130,279098,Water Energy,2,HS trainer Kit (Gyarados),read from Cardmarket
+en:tk-hs-g-21,279131,279101,Energy Switch,21,HS trainer Kit (Gyarados),read from Cardmarket
+en:tk-hs-g-22,279140,279100,Pokémon Communication,22,HS trainer Kit (Gyarados),read from Cardmarket
+en:tk-hs-g-23,279141,279110,Poké Ball,23,HS trainer Kit (Gyarados),read from Cardmarket
+en:tk-hs-g-24,279151,279111,Marill,24,HS trainer Kit (Gyarados),read from Cardmarket
+en:tk-hs-g-25,279150,279121,Professor Elm's Training Method,25,HS trainer Kit (Gyarados),only free product with this name
+en:tk-hs-g-26,279152,279120,Water Energy,26,HS trainer Kit (Gyarados),read from Cardmarket
+en:tk-hs-g-27,279153,279122,Pokémon Communication,27,HS trainer Kit (Gyarados),read from Cardmarket
+en:tk-hs-g-28,279154,279123,Switch,28,HS trainer Kit (Gyarados),read from Cardmarket
+en:tk-hs-g-29,279149,279124,Water Energy,29,HS trainer Kit (Gyarados),read from Cardmarket
+en:tk-hs-g-3,279148,279119,Water Energy,3,HS trainer Kit (Gyarados),read from Cardmarket
+en:tk-hs-g-30,279143,279118,Gyarados,30,HS trainer Kit (Gyarados),read from Cardmarket
+en:tk-hs-g-4,279142,279113,Water Energy,4,HS trainer Kit (Gyarados),read from Cardmarket
+en:tk-hs-g-5,279144,279112,Bill,5,HS trainer Kit (Gyarados),read from Cardmarket
+en:tk-hs-g-6,279145,279114,Water Energy,6,HS trainer Kit (Gyarados),read from Cardmarket
+en:tk-hs-g-7,279147,279115,Water Energy,7,HS trainer Kit (Gyarados),read from Cardmarket
+en:tk-hs-g-8,279146,279117,Water Energy,8,HS trainer Kit (Gyarados),read from Cardmarket
+en:tk-hs-g-9,279126,279116,Water Energy,9,HS trainer Kit (Gyarados),read from Cardmarket
+en:tk-hs-r-1,279125,279125,Moomoo Milk,1,HS trainer Kit (Raichu),read from Cardmarket
+en:tk-hs-r-10,279105,279105,Lightning Energy,10,HS trainer Kit (Raichu),read from Cardmarket
+en:tk-hs-r-11,279104,279104,Lightning Energy,11,HS trainer Kit (Raichu),read from Cardmarket
+en:tk-hs-r-12,279106,279106,Meowth,12,HS trainer Kit (Raichu),read from Cardmarket
+en:tk-hs-r-13,279107,279107,Mareep,13,HS trainer Kit (Raichu),attacks match one product
+en:tk-hs-r-14,279109,279109,Lightning Energy,14,HS trainer Kit (Raichu),read from Cardmarket
+en:tk-hs-r-15,279108,279108,Lightning Energy,15,HS trainer Kit (Raichu),read from Cardmarket
+en:tk-hs-r-16,279103,279103,Pikachu,16,HS trainer Kit (Raichu),read from Cardmarket
+en:tk-hs-r-17,279102,279102,Flaaffy,17,HS trainer Kit (Raichu),read from Cardmarket
+en:tk-hs-r-18,279097,279097,Lightning Energy,18,HS trainer Kit (Raichu),read from Cardmarket
+en:tk-hs-r-19,279096,279096,Raichu,19,HS trainer Kit (Raichu),read from Cardmarket
+en:tk-hs-r-2,279098,279098,Pikachu,2,HS trainer Kit (Raichu),read from Cardmarket
+en:tk-hs-r-21,279101,279101,Copycat,21,HS trainer Kit (Raichu),only free product with this name
+en:tk-hs-r-22,279100,279100,Pokémon Collector,22,HS trainer Kit (Raichu),read from Cardmarket
+en:tk-hs-r-23,279110,279110,Lightning Energy,23,HS trainer Kit (Raichu),read from Cardmarket
+en:tk-hs-r-24,279111,279111,Switch,24,HS trainer Kit (Raichu),read from Cardmarket
+en:tk-hs-r-25,279121,279121,Poké Ball,25,HS trainer Kit (Raichu),read from Cardmarket
+en:tk-hs-r-26,279120,279120,Moomoo Milk,26,HS trainer Kit (Raichu),read from Cardmarket
+en:tk-hs-r-27,279122,279122,Pokémon Collector,27,HS trainer Kit (Raichu),read from Cardmarket
+en:tk-hs-r-28,279123,279123,Lightning Energy,28,HS trainer Kit (Raichu),read from Cardmarket
+en:tk-hs-r-29,279124,279124,Energy Switch,29,HS trainer Kit (Raichu),read from Cardmarket
+en:tk-hs-r-3,279119,279119,Flaaffy,3,HS trainer Kit (Raichu),read from Cardmarket
+en:tk-hs-r-30,279118,279118,Raichu,30,HS trainer Kit (Raichu),read from Cardmarket
+en:tk-hs-r-4,279113,279113,Meowth,4,HS trainer Kit (Raichu),read from Cardmarket
+en:tk-hs-r-5,279112,279112,Lightning Energy,5,HS trainer Kit (Raichu),read from Cardmarket
+en:tk-hs-r-6,279114,279114,Lightning Energy,6,HS trainer Kit (Raichu),read from Cardmarket
+en:tk-hs-r-7,279115,279115,Lightning Energy,7,HS trainer Kit (Raichu),read from Cardmarket
+en:tk-hs-r-8,279117,279117,Lightning Energy,8,HS trainer Kit (Raichu),read from Cardmarket
+en:tk-hs-r-9,279116,279116,Lightning Energy,9,HS trainer Kit (Raichu),read from Cardmarket
+en:tk-sm-l-1,297232,297232,Caterpie,1,SM trainer Kit (Lycanroc),attacks match one product
+en:tk-sm-l-12,297243,297243,Yungoos,12,SM trainer Kit (Lycanroc),attacks match one product
+en:tk-sm-l-27,297259,297259,Big Malasada,27,SM trainer Kit (Lycanroc),only free product with this name
+en:tk-sm-l-5,297235,297235,Fighting Energy,5,SM trainer Kit (Lycanroc),read from Cardmarket
+en:tk-sm-r-1,297262,297232,Lightning Energy,1,SM trainer Kit (Alolan Raichu),read from Cardmarket
+en:tk-sm-r-12,297270,297243,Lightning Energy,12,SM trainer Kit (Alolan Raichu),read from Cardmarket
+en:tk-sm-r-27,297286,297259,Psychic Energy,27,SM trainer Kit (Alolan Raichu),read from Cardmarket
+en:tk-sm-r-5,297265,297235,Lightning Energy,5,SM trainer Kit (Alolan Raichu),read from Cardmarket
+en:xy0-32,281298,281298,Furfrou,32,Kalos Starter Set,read from Cardmarket
+en:xy0-33,281299,281298,Furfrou,33,Kalos Starter Set,read from Cardmarket
+en:xy1-1,281338,281338,Venusaur EX,1,XY,read from Cardmarket
+en:xy1-141,281478,281338,Venusaur EX,141,XY,read from Cardmarket
+en:xy1-142,281479,281366,Blastoise EX,142,XY,read from Cardmarket
+en:xy1-143,281480,281383,Emolga EX,143,XY,read from Cardmarket
+en:xy1-144,281481,281415,Yveltal EX,144,XY,attacks match one product
+en:xy1-145,281482,281417,Skarmory EX,145,XY,read from Cardmarket
+en:xy1-146,281483,281433,Xerneas EX,146,XY,attacks match one product
+en:xy1-29,281366,281366,Blastoise EX,29,XY,read from Cardmarket
+en:xy1-46,281383,281383,Emolga EX,46,XY,read from Cardmarket
+en:xy1-74,281411,281411,Inkay,74,XY,attacks match one product
+en:xy1-75,281412,281411,Inkay,75,XY,attacks match one product
+en:xy1-76,281413,281413,Malamar,76,XY,attacks match one product
+en:xy1-77,281414,281413,Malamar,77,XY,attacks match one product
+en:xy1-78,281415,281415,Yveltal,78,XY,attacks match one product
+en:xy1-80,281417,281417,Skarmory EX,80,XY,read from Cardmarket
+en:xy1-85,281422,281422,Aegislash,85,XY,page photo
+en:xy1-86,281423,281422,Aegislash,86,XY,attacks match one product
+en:xy1-87,281424,281424,Jigglypuff,87,XY,attacks match one product
+en:xy1-88,281425,281424,Jigglypuff,88,XY,attacks match one product
+en:xy1-89,281426,281426,Wigglytuff,89,XY,attacks match one product
+en:xy1-90,281427,281426,Wigglytuff,90,XY,attacks match one product
+en:xy1-96,281433,281433,Xerneas,96,XY,attacks match one product
+en:xy10-10,289836,289836,Fennekin,10,Fates Collide,attacks match one product
+en:xy10-105,289925,289925,N,105,Fates Collide,read from Cardmarket
+en:xy10-105a,300302,289925,N,105a,Fates Collide,read from Cardmarket
+en:xy10-11,289837,289836,Fennekin,11,Fates Collide,attacks match one product
+en:xy10-111,289931,289931,Shauna,111,Fates Collide,read from Cardmarket
+en:xy10-111a,311411,289931,Shauna,111a,Fates Collide,read from Cardmarket
+en:xy10-3,289829,289829,Wormadam,3,Fates Collide,attacks match one product
+en:xy10-40,290534,290534,Larvitar,40,Fates Collide,attacks match one product
+en:xy10-41,290535,290534,Larvitar,41,Fates Collide,attacks match one product
+en:xy10-43,289867,289867,Regirock EX,43,Fates Collide,read from Cardmarket
+en:xy10-43a,311406,289867,Regirock EX,43a,Fates Collide,read from Cardmarket
+en:xy10-44,289868,289829,Wormadam,44,Fates Collide,attacks match one product
+en:xy10-45,290536,290536,Riolu,45,Fates Collide,attacks match one product
+en:xy10-46,290537,290536,Riolu,46,Fates Collide,attacks match one product
+en:xy10-47,289869,289869,Lucario,47,Fates Collide,attacks match one product
+en:xy10-52,289873,289873,Zygarde,52,Fates Collide,attacks match one product
+en:xy10-53,289874,289873,Zygarde,53,Fates Collide,attacks match one product
+en:xy10-54,289875,289875,Zygarde EX,54,Fates Collide,page photo
+en:xy10-54a,297893,289875,Zygarde EX,54a,Fates Collide,read from Cardmarket
+en:xy10-59,289880,289829,Wormadam,59,Fates Collide,attacks match one product
+en:xy10-63,289884,289869,Lucario,63,Fates Collide,page photo
+en:xy10-86,289907,289907,Minccino,86,Fates Collide,attacks match one product
+en:xy10-87,289908,289907,Minccino,87,Fates Collide,attacks match one product
+en:xy11-23,291616,291527,Pyroar,23,Steam Siege,attacks match one product
+en:xy11-24,291527,291527,Pyroar BREAK,24,Steam Siege,attacks match one product
+en:xy11-34,291569,291531,Clawitzer,34,Steam Siege,attacks match one product
+en:xy11-35,291531,291531,Clawitzer BREAK,35,Steam Siege,attacks match one product
+en:xy11-86,291647,291547,Hydreigon,86,Steam Siege,attacks match one product
+en:xy11-87,291547,291547,Hydreigon BREAK,87,Steam Siege,attacks match one product
+en:xy2-100,281583,281494,Charizard EX,100,Flashfire,read from Cardmarket
+en:xy2-101,281584,281518,Magnezone EX,101,Flashfire,read from Cardmarket
+en:xy2-102,281585,281524,Toxicroak EX,102,Flashfire,read from Cardmarket
+en:xy2-103,281586,281561,Kangaskhan EX,103,Flashfire,read from Cardmarket
+en:xy2-104,281587,281573,Lysandre,104,Flashfire,read from Cardmarket
+en:xy2-105,281588,281576,Pokémon Center Lady,105,Flashfire,read from Cardmarket
+en:xy2-106,281589,281577,Pokémon Fan Club,106,Flashfire,read from Cardmarket
+en:xy2-11,281494,281494,Charizard EX,11,Flashfire,read from Cardmarket
+en:xy2-12,281495,281494,Charizard EX,12,Flashfire,attacks match one product
+en:xy2-18,281501,281501,Litleo,18,Flashfire,attacks match one product
+en:xy2-19,281502,281501,Litleo,19,Flashfire,attacks match one product
+en:xy2-35,281518,281518,Magnezone EX,35,Flashfire,read from Cardmarket
+en:xy2-41,281524,281524,Toxicroak EX,41,Flashfire,read from Cardmarket
+en:xy2-50,281533,281533,Sneasel,50,Flashfire,attacks match one product
+en:xy2-51,281534,281533,Sneasel,51,Flashfire,attacks match one product
+en:xy2-53,281536,281536,Stunky,53,Flashfire,attacks match one product
+en:xy2-54,281537,281536,Stunky,54,Flashfire,attacks match one product
+en:xy2-62,281545,281545,Flabébé,62,Flashfire,attacks match one product
+en:xy2-63,281546,281545,Flabébé,63,Flashfire,attacks match one product
+en:xy2-64,281547,281547,Floette,64,Flashfire,attacks match one product
+en:xy2-65,281548,281547,Floette,65,Flashfire,attacks match one product
+en:xy2-78,281561,281561,Kangaskhan EX,78,Flashfire,read from Cardmarket
+en:xy2-88,281571,281571,Blacksmith,88,Flashfire,read from Cardmarket
+en:xy2-88a,311412,281571,Blacksmith,88a,Flashfire,read from Cardmarket
+en:xy2-90,281573,281573,Lysandre,90,Flashfire,read from Cardmarket
+en:xy2-93,281576,281576,Pokémon Center Lady,93,Flashfire,read from Cardmarket
+en:xy2-94,281577,281577,Pokémon Fan Club,94,Flashfire,page photo
+en:xy3-105,281769,281668,Heracross EX,105,Furious Fists,read from Cardmarket
+en:xy3-106,281770,281684,Seismitoad EX,106,Furious Fists,read from Cardmarket
+en:xy3-107,281771,281718,Lucario EX,107,Furious Fists,read from Cardmarket
+en:xy3-108,281772,281738,Dragonite EX,108,Furious Fists,read from Cardmarket
+en:xy3-109,281773,281752,Battle Reporter,109,Furious Fists,read from Cardmarket
+en:xy3-110,281774,281756,Fossil Researcher,110,Furious Fists,read from Cardmarket
+en:xy3-111,281775,281759,Korrina,111,Furious Fists,read from Cardmarket
+en:xy3-20,281684,281684,Seismitoad EX,20,Furious Fists,read from Cardmarket
+en:xy3-4,281668,281668,Heracross EX,4,Furious Fists,read from Cardmarket
+en:xy3-54,281718,281718,Lucario EX,54,Furious Fists,read from Cardmarket
+en:xy3-59,281723,281723,Pancham,59,Furious Fists,attacks match one product
+en:xy3-60,281724,281723,Pancham,60,Furious Fists,attacks match one product
+en:xy3-69,281733,281733,Clefairy,69,Furious Fists,attacks match one product
+en:xy3-70,281734,281733,Clefairy,70,Furious Fists,attacks match one product
+en:xy3-74,281738,281738,Dragonite EX,74,Furious Fists,page photo
+en:xy3-88,281752,281752,Battle Reporter,88,Furious Fists,page photo
+en:xy3-92,281756,281756,Fossil Researcher,92,Furious Fists,read from Cardmarket
+en:xy3-95,281759,281759,Korrina,95,Furious Fists,read from Cardmarket
+en:xy4-110,281917,281917,Xerosic,110,Phantom Forces,read from Cardmarket
+en:xy4-113,281920,281827,Manectric EX,113,Phantom Forces,read from Cardmarket
+en:xy4-114,281921,281840,Gengar EX,114,Phantom Forces,read from Cardmarket
+en:xy4-115,281922,281864,Malamar EX,115,Phantom Forces,read from Cardmarket
+en:xy4-116,281923,281873,Florges EX,116,Phantom Forces,read from Cardmarket
+en:xy4-117,281924,281897,AZ,117,Phantom Forces,read from Cardmarket
+en:xy4-118,281925,281906,Lysandre's Trump Card,118,Phantom Forces,read from Cardmarket
+en:xy4-119,281926,281917,Xerosic,119,Phantom Forces,read from Cardmarket
+en:xy4-122,281929,281868,Dialga EX,122,Phantom Forces,read from Cardmarket
+en:xy4-23,281827,281827,Manectric EX,23,Phantom Forces,read from Cardmarket
+en:xy4-28,281833,281833,Helioptile,28,Phantom Forces,attacks match one product
+en:xy4-29,281834,281833,Helioptile,29,Phantom Forces,attacks match one product
+en:xy4-34,281840,281840,Gengar EX,34,Phantom Forces,read from Cardmarket
+en:xy4-58,281864,281864,Malamar EX,58,Phantom Forces,read from Cardmarket
+en:xy4-62,281868,281868,Dialga EX,62,Phantom Forces,read from Cardmarket
+en:xy4-65,281871,281871,Aegislash EX,65,Phantom Forces,read from Cardmarket
+en:xy4-65a,311407,281871,Aegislash EX,65a,Phantom Forces,read from Cardmarket
+en:xy4-67,281873,281873,Florges EX,67,Phantom Forces,read from Cardmarket
+en:xy4-91,281897,281897,AZ,91,Phantom Forces,read from Cardmarket
+en:xy4-99,281906,281906,Lysandre's Trump Card,99,Phantom Forces,read from Cardmarket
+en:xy5-103,273634,273634,Azumarill,103,Primal Clash,attacks match one product
+en:xy5-104,273635,273634,Azumarill,104,Primal Clash,attacks match one product
+en:xy5-105,273636,273636,Gardevoir EX,105,Primal Clash,read from Cardmarket
+en:xy5-107,273638,273638,Kingdra,107,Primal Clash,attacks match one product
+en:xy5-108,273639,273638,Kingdra,108,Primal Clash,attacks match one product
+en:xy5-116,273647,273647,Bidoof,116,Primal Clash,attacks match one product
+en:xy5-117,273648,273647,Bidoof,117,Primal Clash,attacks match one product
+en:xy5-12,273543,273543,Ludicolo,12,Primal Clash,attacks match one product
+en:xy5-120,273651,273651,Bunnelby,120,Primal Clash,attacks match one product
+en:xy5-121,273652,273651,Bunnelby,121,Primal Clash,attacks match one product
+en:xy5-124,273655,273655,Archie's Ace in the Hole,124,Primal Clash,read from Cardmarket
+en:xy5-125,273656,273656,Dive Ball,125,Primal Clash,read from Cardmarket
+en:xy5-133,273664,273664,Maxie's Hidden Ball Trick,133,Primal Clash,read from Cardmarket
+en:xy5-134,273665,273665,Professor Birch's Observations,134,Primal Clash,read from Cardmarket
+en:xy5-141,273672,273672,Teammates,141,Primal Clash,read from Cardmarket
+en:xy5-142,273673,273673,Weakness Policy,142,Primal Clash,read from Cardmarket
+en:xy5-145,273676,273550,Trevenant EX,145,Primal Clash,read from Cardmarket
+en:xy5-146,273677,273560,Camerupt EX,146,Primal Clash,read from Cardmarket
+en:xy5-147,273678,273569,Wailord EX,147,Primal Clash,read from Cardmarket
+en:xy5-148,273679,273584,Kyogre EX,148,Primal Clash,attacks match one product
+en:xy5-149,273680,273586,Primal Kyogre EX,149,Primal Clash,read from Cardmarket
+en:xy5-150,273681,273615,Groudon EX,150,Primal Clash,attacks match one product
+en:xy5-151,273682,273617,Primal Groudon EX,151,Primal Clash,read from Cardmarket
+en:xy5-152,273683,273622,Sharpedo EX,152,Primal Clash,read from Cardmarket
+en:xy5-153,273684,273624,Aggron EX,153,Primal Clash,read from Cardmarket
+en:xy5-155,273686,273636,Gardevoir EX,155,Primal Clash,read from Cardmarket
+en:xy5-157,273688,273655,Archie's Ace in the Hole,157,Primal Clash,read from Cardmarket
+en:xy5-158,273689,273664,Maxie's Hidden Ball Trick,158,Primal Clash,read from Cardmarket
+en:xy5-159,273690,273665,Professor Birch's Observations,159,Primal Clash,read from Cardmarket
+en:xy5-160,273691,273672,Teammates,160,Primal Clash,read from Cardmarket
+en:xy5-161,273692,273656,Dive Ball,161,Primal Clash,read from Cardmarket
+en:xy5-164,273695,273673,Weakness Policy,164,Primal Clash,read from Cardmarket
+en:xy5-19,273550,273550,Trevenant EX,19,Primal Clash,read from Cardmarket
+en:xy5-23,273554,273554,Magcargo,23,Primal Clash,attacks match one product
+en:xy5-24,273555,273554,Magcargo,24,Primal Clash,attacks match one product
+en:xy5-25,273556,273556,Torchic,25,Primal Clash,attacks match one product
+en:xy5-26,273557,273556,Torchic,26,Primal Clash,attacks match one product
+en:xy5-29,273560,273560,Camerupt EX,29,Primal Clash,read from Cardmarket
+en:xy5-35,273566,273566,Swampert,35,Primal Clash,attacks match one product
+en:xy5-36,273567,273566,Swampert,36,Primal Clash,attacks plus a set or type tag
+en:xy5-37,273568,273543,Ludicolo,37,Primal Clash,attacks match one product
+en:xy5-38,273569,273569,Wailord EX,38,Primal Clash,read from Cardmarket
+en:xy5-40,273571,273571,Whiscash,40,Primal Clash,attacks match one product
+en:xy5-41,273572,273571,Whiscash,41,Primal Clash,attacks match one product
+en:xy5-45,273576,273576,Spheal,45,Primal Clash,attacks match one product
+en:xy5-46,273577,273576,Spheal,46,Primal Clash,attacks match one product
+en:xy5-51,273582,273582,Gorebyss,51,Primal Clash,attacks match one product
+en:xy5-52,273583,273582,Gorebyss,52,Primal Clash,attacks match one product
+en:xy5-53,273584,273584,Kyogre,53,Primal Clash,attacks match one product
+en:xy5-55,273586,273586,Primal Kyogre EX,55,Primal Clash,read from Cardmarket
+en:xy5-59,273590,273590,Electrike,59,Primal Clash,attacks match one product
+en:xy5-60,273591,273590,Electrike,60,Primal Clash,attacks match one product
+en:xy5-63,273594,273594,Eelektrik,63,Primal Clash,attacks match one product
+en:xy5-64,273595,273594,Eelektrik,64,Primal Clash,attacks match one product
+en:xy5-68,273599,273599,Nidoqueen,68,Primal Clash,attacks match one product
+en:xy5-69,273600,273599,Nidoqueen,69,Primal Clash,attacks match one product
+en:xy5-70,273601,273601,Tentacool,70,Primal Clash,attacks match one product
+en:xy5-71,273602,273601,Tentacool,71,Primal Clash,attacks match one product
+en:xy5-76,273607,273607,Rhyperior,76,Primal Clash,attacks match one product
+en:xy5-77,273608,273607,Rhyperior,77,Primal Clash,attacks plus a set or type tag
+en:xy5-8,273539,273539,Sceptile,8,Primal Clash,attacks match one product
+en:xy5-80,273611,273611,Medicham,80,Primal Clash,attacks match one product
+en:xy5-81,273612,273611,Medicham,81,Primal Clash,attacks match one product
+en:xy5-84,273615,273615,Groudon,84,Primal Clash,attacks match one product
+en:xy5-86,273617,273617,Primal Groudon EX,86,Primal Clash,page photo
+en:xy5-9,273540,273539,Sceptile,9,Primal Clash,attacks match one product
+en:xy5-91,273622,273622,Sharpedo EX,91,Primal Clash,read from Cardmarket
+en:xy5-93,273624,273624,Aggron EX,93,Primal Clash,read from Cardmarket
+en:xy5-96,273627,273627,Excadrill,96,Primal Clash,attacks match one product
+en:xy5-97,273628,273627,Excadrill,97,Primal Clash,attacks match one product
+en:xy6-101,282769,282726,Latios EX,101,Roaring Skies,read from Cardmarket
+en:xy6-103,282771,282730,Hydreigon EX,103,Roaring Skies,read from Cardmarket
+en:xy6-104,282772,282728,Rayquaza EX,104,Roaring Skies,read from Cardmarket
+en:xy6-106,282774,282745,Shaymin EX,106,Roaring Skies,read from Cardmarket
+en:xy6-107,282775,282762,Wally,107,Roaring Skies,read from Cardmarket
+en:xy6-108,282776,282764,Winona,108,Roaring Skies,read from Cardmarket
+en:xy6-16,282684,282684,Articuno,16,Roaring Skies,attacks match one product
+en:xy6-17,282685,282684,Articuno,17,Roaring Skies,attacks match one product
+en:xy6-26,282694,282694,Thundurus EX,26,Roaring Skies,read from Cardmarket
+en:xy6-27,282695,282695,Natu,27,Roaring Skies,attacks match one product
+en:xy6-28,282696,282695,Natu,28,Roaring Skies,attacks match one product
+en:xy6-31,282699,282699,Banette,31,Roaring Skies,attacks match one product
+en:xy6-32,282700,282699,Banette,32,Roaring Skies,attacks match one product
+en:xy6-34,282702,282702,Gallade EX,34,Roaring Skies,read from Cardmarket
+en:xy6-45,282713,282713,Togekiss,45,Roaring Skies,attacks match one product
+en:xy6-46,282714,282713,Togekiss,46,Roaring Skies,attacks plus a set or type tag
+en:xy6-51,282719,282719,Dragonite,51,Roaring Skies,attacks match one product
+en:xy6-52,282720,282719,Dragonite,52,Roaring Skies,attacks match one product
+en:xy6-53,282721,282721,Altaria,53,Roaring Skies,attacks match one product
+en:xy6-54,282722,282722,Bagon,54,Roaring Skies,attacks match one product
+en:xy6-55,282723,282722,Bagon,55,Roaring Skies,attacks match one product
+en:xy6-58,282726,282726,Latios EX,58,Roaring Skies,read from Cardmarket
+en:xy6-60,282728,282728,Rayquaza EX,60,Roaring Skies,attacks match one product
+en:xy6-62,282730,282730,Hydreigon EX,62,Roaring Skies,read from Cardmarket
+en:xy6-7,282675,282675,Dustox,7,Roaring Skies,attacks match one product
+en:xy6-71,282739,282739,Swellow,71,Roaring Skies,attacks match one product
+en:xy6-72,282740,282739,Swellow,72,Roaring Skies,attacks match one product
+en:xy6-74,282742,282721,Altaria,74,Roaring Skies,attacks plus a set or type tag
+en:xy6-75,282743,282728,Rayquaza EX,75,Roaring Skies,read from Cardmarket
+en:xy6-77,282745,282745,Shaymin EX,77,Roaring Skies,read from Cardmarket
+en:xy6-77a,300303,282745,Shaymin EX,77a,Roaring Skies,read from Cardmarket
+en:xy6-8,282676,282675,Dustox,8,Roaring Skies,attacks match one product
+en:xy6-80,282748,282748,Unfezant,80,Roaring Skies,attacks match one product
+en:xy6-81,282749,282748,Unfezant,81,Roaring Skies,attacks match one product
+en:xy6-92,282760,282760,Trainers' Mail,92,Roaring Skies,read from Cardmarket
+en:xy6-92a,297897,282760,Trainers' Mail,92a,Roaring Skies,read from Cardmarket
+en:xy6-94,282762,282762,Wally,94,Roaring Skies,read from Cardmarket
+en:xy6-96,282764,282764,Winona,96,Roaring Skies,read from Cardmarket
+en:xy6-98,282766,282694,Thundurus EX,98,Roaring Skies,read from Cardmarket
+en:xy6-99,282767,282702,Gallade EX,99,Roaring Skies,read from Cardmarket
+en:xy7-10,284191,284191,Vespiquen,10,Ancient Origins,read from Cardmarket
+en:xy7-11,284192,284191,Vespiquen,11,Ancient Origins,attacks match one product
+en:xy7-14,284195,284195,Entei,14,Ancient Origins,attacks match one product
+en:xy7-15,284196,284195,Entei,15,Ancient Origins,attacks match one product
+en:xy7-17,284198,284198,Volcarona,17,Ancient Origins,attacks match one product
+en:xy7-18,284199,284198,Volcarona,18,Ancient Origins,attacks match one product
+en:xy7-25,284206,284206,Kyurem EX,25,Ancient Origins,read from Cardmarket
+en:xy7-27,284208,284208,Ampharos EX,27,Ancient Origins,read from Cardmarket
+en:xy7-31,284212,284212,Baltoy,31,Ancient Origins,attacks match one product
+en:xy7-32,284213,284212,Baltoy,32,Ancient Origins,attacks match one product
+en:xy7-35,284216,284216,Golurk,35,Ancient Origins,attacks match one product
+en:xy7-36,284217,284217,Hoopa EX,36,Ancient Origins,page photo
+en:xy7-37,284218,284218,Machamp EX,37,Ancient Origins,read from Cardmarket
+en:xy7-41,284222,284216,Golurk,41,Ancient Origins,attacks match one product
+en:xy7-42,284223,284223,Tyranitar EX,42,Ancient Origins,read from Cardmarket
+en:xy7-49,284230,284230,Metagross,49,Ancient Origins,attacks match one product
+en:xy7-50,284231,284230,Metagross,50,Ancient Origins,attacks match one product
+en:xy7-57,284238,284238,Giratina EX,57,Ancient Origins,read from Cardmarket
+en:xy7-64,284245,284245,Porygon,64,Ancient Origins,attacks match one product
+en:xy7-67,284248,284245,Porygon-Z,67,Ancient Origins,attacks match one product
+en:xy7-68,284249,284249,Lugia EX,68,Ancient Origins,read from Cardmarket
+en:xy7-7,284188,284188,Sceptile EX,7,Ancient Origins,read from Cardmarket
+en:xy7-75,284256,284256,Hex Maniac,75,Ancient Origins,read from Cardmarket
+en:xy7-75a,311409,284256,Hex Maniac,75a,Ancient Origins,page photo
+en:xy7-84,284265,284188,Sceptile EX,84,Ancient Origins,read from Cardmarket
+en:xy7-86,284267,284206,Kyurem EX,86,Ancient Origins,read from Cardmarket
+en:xy7-87,284268,284208,Ampharos EX,87,Ancient Origins,read from Cardmarket
+en:xy7-89,284270,284217,Hoopa EX,89,Ancient Origins,read from Cardmarket
+en:xy7-90,284271,284218,Machamp EX,90,Ancient Origins,read from Cardmarket
+en:xy7-91,284272,284223,Tyranitar EX,91,Ancient Origins,read from Cardmarket
+en:xy7-93,284274,284238,Giratina EX,93,Ancient Origins,read from Cardmarket
+en:xy7-94,284275,284249,Lugia EX,94,Ancient Origins,read from Cardmarket
+en:xy8-100,286346,286314,Ralts,100,BREAKthrough,attacks match one product
+en:xy8-108,286354,286354,Axew,108,BREAKthrough,attacks match one product
+en:xy8-109,286355,286354,Axew,109,BREAKthrough,attacks match one product
+en:xy8-115,286361,286361,Doduo,115,BREAKthrough,attacks match one product
+en:xy8-116,286362,286361,Doduo,116,BREAKthrough,attacks match one product
+en:xy8-131,286377,286377,Noibat,131,BREAKthrough,attacks match one product
+en:xy8-132,286378,286377,Noibat,132,BREAKthrough,attacks match one product
+en:xy8-146,286392,286392,Professor's Letter,146,BREAKthrough,only free product with this name
+en:xy8-146a,782671,286392,Professor's Letter,146a,BREAKthrough,page photo
+en:xy8-157,286403,286307,Mewtwo EX,157,BREAKthrough,read from Cardmarket
+en:xy8-158,286404,286307,Mewtwo EX,158,BREAKthrough,read from Cardmarket
+en:xy8-163,286409,286307,Mewtwo EX,163,BREAKthrough,read from Cardmarket
+en:xy8-164,286410,286307,Mewtwo EX,164,BREAKthrough,read from Cardmarket
+en:xy8-31,286277,286277,Remoraid,31,BREAKthrough,read from Cardmarket
+en:xy8-32,286278,286277,Remoraid,32,BREAKthrough,read from Cardmarket
+en:xy8-51,286297,286297,Magnemite,51,BREAKthrough,attacks match one product
+en:xy8-52,286298,286297,Magnemite,52,BREAKthrough,attacks match one product
+en:xy8-61,286307,286307,Mewtwo EX,61,BREAKthrough,read from Cardmarket
+en:xy8-62,286308,286307,Mewtwo EX,62,BREAKthrough,read from Cardmarket
+en:xy8-68,286314,286314,Ralts,68,BREAKthrough,attacks match one product
+en:xy8-7,286253,286253,Chespin,7,BREAKthrough,attacks match one product
+en:xy8-8,286254,286253,Chespin,8,BREAKthrough,attacks match one product
+en:xy8-89,286335,286335,Zorua,89,BREAKthrough,attacks match one product
+en:xy8-9,286255,286253,Chespin,9,BREAKthrough,attacks match one product
+en:xy8-90,286336,286335,Zorua,90,BREAKthrough,attacks match one product
+en:xy9-107,288282,288282,Professor Sycamore,107,BREAKpoint,read from Cardmarket
+en:xy9-107a,297896,288282,Professor Sycamore,107a,BREAKpoint,page photo
+en:xy9-22,288197,288197,Shellder,22,BREAKpoint,attacks match one product
+en:xy9-23,288198,288197,Shellder,23,BREAKpoint,attacks match one product
+en:xy9-98,288273,288273,Delinquent,98,BREAKpoint,only free product with this name
+en:xy9-98a,782672,288273,Delinquent,98a,BREAKpoint,page photo
+en:xy9-98b,311410,288273,Delinquent,98b,BREAKpoint,page photo
+en:xya-107a,297896,288282,Professor Sycamore,107a,Yellow A Alternate,page photo
+en:xya-54a,297893,289875,Zygarde-EX,54a,Yellow A Alternate,read from Cardmarket
+en:xya-92a,297897,282760,Trainers’ Mail,92a,Yellow A Alternate,read from Cardmarket
+en:xyp-XY101,289821,554275,Mewtwo,XY101,XY Black Star Promos,read from Cardmarket
+en:xyp-XY106,289556,289556,Gyarados EX,XY106,XY Black Star Promos,attacks plus a set or type tag
+en:xyp-XY107,289557,554275,Mewtwo EX,XY107,XY Black Star Promos,read from Cardmarket
+en:xyp-XY109,289559,289556,Gyarados,XY109,XY Black Star Promos,attacks match one product
+en:xyp-XY112,291575,289787,Jirachi,XY112,XY Black Star Promos,read from Cardmarket
+en:xyp-XY113,291576,291576,Manaphy,XY113,XY Black Star Promos,read from Cardmarket
+en:xyp-XY115,291578,291578,Shaymin,XY115,XY Black Star Promos,read from Cardmarket
+en:xyp-XY116,291973,289806,Arceus,XY116,XY Black Star Promos,read from Cardmarket
+en:xyp-XY118,293189,293189,Keldeo,XY118,XY Black Star Promos,read from Cardmarket
+en:xyp-XY119,295149,295149,Genesect,XY119,XY Black Star Promos,read from Cardmarket
+en:xyp-XY120,295150,295150,Meloetta,XY120,XY Black Star Promos,read from Cardmarket
+en:xyp-XY124,363899,554190,Pikachu EX,XY124,XY Black Star Promos,read from Cardmarket
+en:xyp-XY125,293004,554275,Mewtwo EX,XY125,XY Black Star Promos,read from Cardmarket
+en:xyp-XY128,290101,289804,White Kyurem,XY128,XY Black Star Promos,attacks match one product
+en:xyp-XY14,281331,552809,Trevenant,XY14,XY Black Star Promos,attacks match one product
+en:xyp-XY145,291585,553958,Volcanion,XY145,XY Black Star Promos,attacks match one product
+en:xyp-XY147,291587,553491,Hoopa,XY147,XY Black Star Promos,read from Cardmarket
+en:xyp-XY149,290108,552954,Xerneas EX,XY149,XY Black Star Promos,attacks match one product
+en:xyp-XY164,295155,553958,Volcanion,XY164,XY Black Star Promos,read from Cardmarket
+en:xyp-XY17,281321,552849,Charizard EX,XY17,XY Black Star Promos,read from Cardmarket
+en:xyp-XY185,295174,553958,Volcanion,XY185,XY Black Star Promos,read from Cardmarket
+en:xyp-XY187,295175,553429,Celebi,XY187,XY Black Star Promos,attacks match one product
+en:xyp-XY188,295181,291578,Shaymin,XY188,XY Black Star Promos,read from Cardmarket
+en:xyp-XY190,295182,291576,Manaphy,XY190,XY Black Star Promos,read from Cardmarket
+en:xyp-XY191,295177,293189,Keldeo,XY191,XY Black Star Promos,read from Cardmarket
+en:xyp-XY192,295183,554275,Mew,XY192,XY Black Star Promos,attacks match one product
+en:xyp-XY193,295184,295150,Meloetta,XY193,XY Black Star Promos,read from Cardmarket
+en:xyp-XY194,295178,552884,Darkrai,XY194,XY Black Star Promos,read from Cardmarket
+en:xyp-XY196,295185,295149,Genesect,XY196,XY Black Star Promos,read from Cardmarket
+en:xyp-XY197,295186,289806,Arceus,XY197,XY Black Star Promos,read from Cardmarket
+en:xyp-XY20,281310,678788,Greninja EX,XY20,XY Black Star Promos,read from Cardmarket
+en:xyp-XY202,295187,289809,Pikachu,XY202,XY Black Star Promos,attacks match one product
+en:xyp-XY203,295188,554217,Gym Badge,XY203,XY Black Star Promos,read from Cardmarket
+en:xyp-XY204,295189,554217,Gym Badge,XY204,XY Black Star Promos,read from Cardmarket
+en:xyp-XY205,295190,554217,Gym Badge,XY205,XY Black Star Promos,read from Cardmarket
+en:xyp-XY206,295191,554217,Gym Badge,XY206,XY Black Star Promos,read from Cardmarket
+en:xyp-XY207,295192,554217,Gym Badge,XY207,XY Black Star Promos,read from Cardmarket
+en:xyp-XY208,295193,554217,Gym Badge,XY208,XY Black Star Promos,read from Cardmarket
+en:xyp-XY210,295195,554217,Gym Badge,XY210,XY Black Star Promos,read from Cardmarket
+en:xyp-XY22,281306,552884,Darkrai,XY22,XY Black Star Promos,read from Cardmarket
+en:xyp-XY24,289696,678788,Greninja,XY24,XY Black Star Promos,attacks match one product
+en:xyp-XY27,281314,709547,Champions Festival,XY27,XY Black Star Promos,read from Cardmarket
+en:xyp-XY29,281320,552849,Charizard EX,XY29,XY Black Star Promos,attacks match one product
+en:xyp-XY31,281317,552954,Xerneas,XY31,XY Black Star Promos,read from Cardmarket
+en:xyp-XY60,289785,289556,Gyarados,XY60,XY Black Star Promos,attacks match one product
+en:xyp-XY64,363673,553219,Rayquaza,XY64,XY Black Star Promos,attacks match one product
+en:xyp-XY65,289796,553449,Latios,XY65,XY Black Star Promos,read from Cardmarket
+en:xyp-XY66,289723,553219,Rayquaza EX,XY66,XY Black Star Promos,read from Cardmarket
+en:xyp-XY67,289787,289787,Jirachi,XY67,XY Black Star Promos,page photo
+en:xyp-XY71,289790,553491,Hoopa EX,XY71,XY Black Star Promos,read from Cardmarket
+en:xyp-XY72,289791,553449,Latios EX,XY72,XY Black Star Promos,read from Cardmarket
+en:xyp-XY73,289792,553219,Rayquaza EX,XY73,XY Black Star Promos,attacks match one product
+en:xyp-XY81,289804,289804,White Kyurem,XY81,XY Black Star Promos,attacks match one product
+en:xyp-XY83,289806,289806,Arceus,XY83,XY Black Star Promos,attacks match one product
+en:xyp-XY84,289809,554190,Pikachu EX,XY84,XY Black Star Promos,read from Cardmarket
+en:xyp-XY85,289810,553491,Hoopa EX,XY85,XY Black Star Promos,attacks match one product
+en:xyp-XY89,289812,554190,Pikachu,XY89,XY Black Star Promos,attacks match one product
+en:xyp-XY91,289793,709547,Champions Festival,XY91,XY Black Star Promos,read from Cardmarket
+en:xyp-XY93,289795,553429,Celebi,XY93,XY Black Star Promos,read from Cardmarket
+en:xyp-XY94,289814,552809,Trevenant,XY94,XY Black Star Promos,read from Cardmarket
+en:xyp-XY95,289815,289809,Pikachu,XY95,XY Black Star Promos,attacks match one product
+ja:SV-P-262,821707,821707,コダック,262,スカーレット&バイオレット プロモカード,read from Cardmarket
+ja:SV9a-022,816675,821707,カスミのコダック,022,熱風のアリーナ,read from Cardmarket
+ja:SV9a-071,816724,821707,カスミのコダック,071,熱風のアリーナ,read from Cardmarket
