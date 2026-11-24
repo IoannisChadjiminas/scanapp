@@ -123,6 +123,9 @@ def variants(conn: sqlite3.Connection, card_id: str) -> list[dict[str, Any]]:
         "label": label(row["pattern"], row["url"]),
         "card_id": card_id,
         "image": f"/api/v1/cardmarket/listing-images/{row['product_id']}.jpg",
+        # A product of its own, never a reverse of the card's listing: the
+        # app drops the reverse holo filter when one is picked.
+        "pattern": True,
     } for row in rows]
 
 
