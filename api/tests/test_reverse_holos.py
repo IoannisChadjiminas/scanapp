@@ -53,6 +53,9 @@ def test_cubone_from_unbroken_bonds_offers_reverse_with_its_prices(tmp_path):
     ("xy9", "1", "Uncommon", "Pinsir"),
     ("bw4", "20", "Rare", "Charizard"),
     ("sm115", "68", "Rare", "Ultra Ball"),
+    ("ex11", "4", "Rare", "Espeon δ"),
+    ("ex16", "50", "Common", "Electrike"),
+    ("sm1", "136", "Uncommon", "Double Colorless Energy"),
 ])
 def test_regular_cards_print_a_reverse(set_id, number, rarity, name):
     assert prints_reverse(set_id, number, rarity, name)
@@ -68,6 +71,9 @@ def test_regular_cards_print_a_reverse(set_id, number, rarity, name):
     ("sm5", "99", "Rare", "Lunala ◇", "en"),
     ("xy8", "45", "Rare", "Florges BREAK", "en"),
     ("xy4", "55", "Rare", "M Gengar-EX", "en"),
+    ("ex11", "99", "Rare", "Mewtwo ex", "en"),
+    ("ex11", "114", "Rare", "Mew ☆", "en"),
+    ("bw1", "105", "Common", "Grass Energy", "en"),
     ("g1", "1", "Common", "Venusaur", "en"),  # Generations: no reverse holos
     ("base1", "58", "Common", "Pikachu", "en"),
     ("sm10", "90", "Common", "Cubone", "ja"),

@@ -1,10 +1,11 @@
 """Reverse holo printings TCGdex leaves out.
 
-TCGdex marks almost every Black & White, XY and Sun & Moon card as having no
-reverse holo (Cubone 90/214 from Unbroken Bonds, for one), so no finish choice
-was offered for them. Those sets print a reverse holo of every Common, Uncommon
-and Rare inside the printed set total; the ex/EX, GX, BREAK, Prism Star and
-secret cards above the total have none. Cardmarket's price file is no help
+TCGdex marks almost every Black & White, XY and Sun & Moon card, and every
+card from Delta Species to Power Keepers, as having no reverse holo (Cubone
+90/214 from Unbroken Bonds, for one), so no finish choice was offered for them.
+Those sets print a reverse holo of every Common, Uncommon and Rare inside the
+printed set total; the ex/EX, GX, BREAK, Prism Star, Gold Star, basic Energy
+and secret cards above the total have none. Cardmarket's price file is no help
 here: its reverse holo columns also carry figures for ultra rares and for Base
 Set cards, so it cannot say which cards have one.
 
@@ -20,6 +21,7 @@ from typing import Any, Mapping
 # Sets with none (Generations, Double Crisis, Dragon Vault, Detective Pikachu,
 # the Kalos Starter Set, Radiant Collection and promos) are left out.
 PRINTED_TOTALS: dict[str, int] = {
+    "ex11": 113, "ex12": 92, "ex13": 110, "ex14": 100, "ex15": 101, "ex16": 108,
     "bw1": 114, "bw2": 98, "bw3": 101, "bw4": 99, "bw5": 108, "bw6": 124,
     "bw7": 149, "bw8": 135, "bw9": 116, "bw10": 101, "bw11": 113,
     "xy1": 146, "xy2": 106, "xy3": 111, "xy4": 119, "xy5": 160, "xy6": 108,
@@ -31,7 +33,8 @@ PRINTED_TOTALS: dict[str, int] = {
 
 _REGULAR = {"common", "uncommon", "rare"}
 # TCGdex files some of these as plain "Rare".
-_NO_REVERSE_NAME = re.compile(r"(-| )EX\b|\bGX\b|\bBREAK\b|◇|Prism Star|^M ")
+_NO_REVERSE_NAME = re.compile(r"(-| )(EX|ex)\b|\bGX\b|\bBREAK\b|◇|☆|Prism Star|^M ")
+_BASIC_ENERGY = re.compile(r"^(Grass|Fire|Water|Lightning|Psychic|Fighting|Darkness|Metal|Fairy) Energy$")
 
 
 def prints_reverse(set_id: Any, number: Any, rarity: Any, name: Any, language: Any = "en") -> bool:
@@ -44,7 +47,8 @@ def prints_reverse(set_id: Any, number: Any, rarity: Any, name: Any, language: A
         return False
     if str(rarity or "").strip().lower() not in _REGULAR:
         return False
-    return not _NO_REVERSE_NAME.search(str(name or ""))
+    name = str(name or "").strip()
+    return not (_NO_REVERSE_NAME.search(name) or _BASIC_ENERGY.match(name))
 
 
 def with_reverse(variants: dict[str, Any], card: Mapping[str, Any] | Any) -> dict[str, Any]:
