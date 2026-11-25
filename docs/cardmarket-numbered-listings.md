@@ -1,7 +1,7 @@
 # Cardmarket numbered listings
 
 Cardmarket names many listings of one card only by number: V1, V2, V3 in the
-address (`151/Bulbasaur-V3-MEW001`). Without a name the version tile read
+address (`151/Bulbasaur-V3-MEW001`). Without a name, the version tile read
 "Bulbasaur (V3-MEW001)", and an unnumbered listing showed its whole address,
 "Professor Juniper (Professor-Juniper-BLW101)".
 `api/app/cardmarket_listing_labels.csv` gives these listings a short name.
@@ -9,60 +9,81 @@ address (`151/Bulbasaur-V3-MEW001`). Without a name the version tile read
 "-Additionals" expansions are covered separately, in
 [cardmarket-pattern-products.md](cardmarket-pattern-products.md).
 
-## Scope, 25 November 2026
+## Scope and result, 25 November 2026
 
 These are the English cards in `pokesingle_completion_20261120_disp1` with two
 or more matched listings outside the Additionals expansions: 1,273 cards and
-2,796 listings in 137 expansions. One card's listings can span several
-expansions.
+2,796 listings in 137 expansions.
 
-| | Listings | Cards |
-|---|---:|---:|
-| Named before (tinsel Energy, SVP 225 Pikachu) | 18 | 9 |
-| Named by rule on 25 November 2026 | 910 | 562 |
-| Still numbered | 1,868 | — |
+**1,740 listings are named and 1,056 are still numbered.**
 
-## The file
+| Source (`rule` column) | Listings |
+|---|---:|
+| Cardmarket photo caption, read in the owner's browser (`photo …`) | 709 |
+| TCGdex by Cardmarket product id, each one checked against the listing photo (`tcgdex …`) | 587 |
+| Product id from Cardmarket's list view, TCGdex for that id, confirmed on the photo (`photo+tcgdex …`) | 123 |
+| The card's own unnumbered listing, alone in its expansion (`own listing`) | 145 |
+| The listing sits in another expansion: Professor Program, Southeast Asia promo, W stamp, Trainer Kit (`expansion`) | 108 |
+| McDonald's 25th Anniversary: V1 non-holo, V2 holo, which TCGdex confirms for every pair (`mcdonalds`) | 50 |
+| Named before 25 November: tinsel Energy, SVP 225 Pikachu (`reviewed`) | 18 |
 
-Columns: `url,label,card_id,product_id,rule`. The server reads only `url` and
-`label`. `rule` records where a name came from:
+## How a name is decided
 
-- `reviewed`: read on Cardmarket earlier (tinsel Energy, SVP 225).
-- `tcgdex <product id>`: TCGdex `variants_detailed` gives this Cardmarket
-  product a stamp, a special foil or the jumbo size. Or it gives the product
-  only plain finishes, which makes it the card's own listing: "Normal". When
-  a card has several plain products, they are named "Non-holo", "Holo" or
-  "Reverse holo". The product id is read from the listing photo address.
-- `mcdonalds`: McDonald's Collection 25th Anniversary. V1 is the non-holo
-  and V2 the holo; TCGdex agrees on all 25 pairs it has.
-- `expansion`: the listing sits in a different expansion from the card itself:
-  Professor Program, Southeast Asia promo, W stamp, Trainer Kit.
-- `own listing`: the card's own listing, with no V number and alone in its
-  expansion, is "Normal".
+A name is never guessed. Each name needs either Cardmarket's own words, or
+two sources that agree.
 
-## Safeguards
+- **Cardmarket's caption.** Cardmarket burns a caption into many listing
+  photos: "Staff Version", "Holo Version", "Attention: Oversized Card",
+  "Prerelease Promo", "Non-Holo Lucario ex Battle Deck", "Cosmo Holo
+  Knock Out Collection". The caption names that listing directly, and the
+  label keeps its words ("Non-holo, Lucario ex Battle Deck"; "Jumbo" for an
+  oversized card).
+- **Prize Pack.** All nine series were read pair by pair. Cardmarket
+  captions every V2 "Holo Version", so V1 is the non-holo copy (400
+  listings). Basic Energy pairs carry no caption and keep their numbers.
+- **TCGdex.** `variants_detailed` names a product by its Cardmarket product
+  id. Every one of these names was compared with the listing photo, and 18
+  were corrected (below).
+- **"Normal".** A card's own listing with no caption is named "Normal" only
+  when every other listing of that card already has a name.
+- **No name.** A listing keeps its number when:
+  - its photo has no caption and no second source names it;
+  - two listings of one card would get the same name, as with the two Nest
+    Ball "Staff Version" listings (PRSVI 181);
+  - the caption does not name a version, such as "Not Tournament Legal".
 
-A name is never guessed. A listing keeps its number when:
+Photos come from the addresses already stored in the catalogue, or from
+Cardmarket's list view (30 products per page, each row with its product id
+and photo). No product pages were opened. The list view was read for SV
+Black Star Promos and all nine Prize Pack series: 49 pages, with two browser
+checks passed by the owner.
 
-- TCGdex's stamp or foil is not in the vocabulary of
-  `api/scripts/name_numbered_listings.py`. Player-name Worlds stamps, Horizons,
-  Asia promo, 1st Edition (a condition on Cardmarket) and league foils without
-  a stamp are all left out.
-- A stamped, special-foil or jumbo product does not trend above the card's
-  plain listing in Cardmarket's price guide.
-- TCGdex contradicts itself for the card: one product is both plain and
-  special, or the plain product is not the card's own listing. Froakie
-  (Obsidian Flames 056) and Terapagos (Surging Sparks 161) are examples.
-- Two listings of one card would get the same name, for example two Southeast
-  Asia promos, or the two Trainer Kit decks.
+## TCGdex corrections found on the photos
+
+| Listing | TCGdex | Photo |
+|---|---|---|
+| Black Kyurem ex SSP 048 V3 / V4 | V3 jumbo | V4 is the oversized one |
+| Hearthflame Mask Ogerpon ex TWM 040 V4 / V5 | V4 jumbo | V5 is the oversized one |
+| Hisuian Decidueye VSTAR ASR 084 V3 | set logo | oversized, with the set logo |
+| Deino LTR 97 V2–V5 | Play! Pokémon 1st–4th place | Pokémon League 1st–4th place |
+| Skeledirge SSP 031 V2, Togekiss SSP 072 V2 | plain (Normal) | cosmos holo, Premium Checklane Blister |
+| Scream Tail TEF 077 V2, Iron Valiant TEF 079 V2 | cosmos | holo, Back to School |
+| Flutter Mane TEF 078 V2 | cosmos | non-holo |
+| Pikachu PGO 027 V2 | cosmos | holo, Pokémon GO Gift Tin |
+| Pikachu EVS 049 V2 | reverse | League stamp |
+| Snorlax CL 000 V2, Palafin OBF 062 V3, Espeon OBF 086 V2, Umbreon OBF 130 V4 | stamp only | Cardmarket's more precise caption |
+
+13 SV Black Star Promo jumbo cards are listed by TCGdex as standard size.
+Cardmarket's "Oversized Card" caption names them.
 
 ## Regenerating
 
-`api/scripts/name_numbered_listings.py` writes candidate rows. It skips URLs
-that are already in the file. It needs three inputs:
+`api/scripts/name_numbered_listings.py` writes the rule-based candidate rows
+(TCGdex, expansions, McDonald's, own listing). It skips URLs that are
+already in the file. Its inputs:
 
-- `--rows`: a JSON list of listings, read-only from the catalogue. Run this in
-  the staging API container, which holds the catalogue credentials:
+- `--rows`: a JSON list of listings, read-only from the catalogue. Run this
+  in the staging API container, which holds the catalogue credentials:
 
   ```sql
   WITH p AS (SELECT * FROM <schema>.cardmarket_products
@@ -72,21 +93,21 @@ that are already in the file. It needs three inputs:
   FROM p JOIN c USING(card_id) JOIN <schema>.cards k ON k.id=p.card_id
   ```
 
-- `--tcgdex`: `https://api.tcgdex.net/v2/en/cards/<id>` for each card,
-  stored as `{id: {"variants_detailed": [...]}}`.
+- `--tcgdex`: `https://api.tcgdex.net/v2/en/cards/<id>` for each card.
 - `--guide`: Cardmarket's public `price_guide_6.json`.
 
-Review the output before merging it into the file. `api/tests/test_cardmarket_listing_labels.py`
-checks each rule, and checks that no card has two identical names.
+**Check new TCGdex rows against their photos before shipping.** Three
+corrections in the table above are size or stamp swaps that only the photo
+shows. `api/tests/test_cardmarket_listing_labels.py` checks each rule, and
+checks that no card has two identical names.
 
 ## Still numbered, and why
 
-| Listings | Cards | Why | Next step |
+| Listings | Cards | Why | What would name them |
 |---:|---:|---|---|
-| 872 | 462 | Nothing names them without a photo: older main-set duplicates, SV Energy 001–008 V1–V5, the "Promos" expansion | Photo reading. 305 of these cards already have a photo for every listing |
-| 498 | 249 | Prize Pack V1/V2: TCGdex has no Prize Pack data, and V2 costs more in only 179 of 248 pairs | Read a few pairs on Cardmarket, then one rule if they agree |
-| 278 | 136 | Black Star Promos: TCGdex names the stamps by product id, but these listings have no photo address to give their id | Read product ids from Cardmarket's list view, then name them by TCGdex |
-| 105 | 82 | TCGdex named them, but the price, an unknown stamp or a contradiction failed the check | Photo reading |
+| 476 | 239 | The photo has no caption. Many show a printed stamp (League, Toys R Us, Build-A-Bear), but nothing else confirms it | A second source: TCGdex once it lists the product id, or the product page |
+| 225 | 143 | No photo address in the catalogue | Cardmarket list-view pages for those expansions (about 5–12 pages per set), then the photos |
+| 139 | 68 | Black Star Promos outside the SVP list: MEP 76, Best of Game 22, Nintendo 12, XY 10, SVP 7 (beyond the 300-row list), SM 6, Wizards 4, BW 2 | List view of each promo expansion (about 15 pages), then TCGdex and the photo |
+| 98 | 49 | Prize Pack basic Energy (no caption) and Cheren's Care, which has no V2 in the list | Not resolvable from Cardmarket's photos |
 | 78 | 78 | Japanese XY-era sets (Phantom Gate, Rising Fist, Wild Blaze, Emerald Break, Rage of the Broken Heavens) linked to English cards. These are wrong links, not versions | Owner's decision: hide them, not name them |
-| 33 | 14 | The same expansion name would apply twice on one card | Photo reading |
-| 4 | 4 | The card's own listing sits beside a same-expansion sibling | Photo reading |
+| 40 | 16 | SV basic Energy 001–008, V1–V5, with no photo address | List view of Scarlet & Violet Energies (2 pages), then the photos |
