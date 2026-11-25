@@ -69,6 +69,9 @@ the owner's.
    (production's default) until it is.
 9. Image delivery is unchanged by this release (`docs/card-image-cdn.md`): no Cardmarket product
    photo and no listing photo is mirrored.
+10. After the switch, the API log line `catalogue corrections applied=<n>` shows how many of the
+    reviewed fixes in `api/app/catalogue_corrections.csv` this release lacked. Any `n` is
+    handled; it is not an error (`docs/planetscale-staging.md`).
 
 ## Staging and production configuration
 

@@ -2,12 +2,14 @@
 from __future__ import annotations
 
 import hashlib
+import logging
 import re
 import sqlite3
 from urllib.parse import urlsplit
 
 import numpy as np
 
+from app import catalogue_corrections
 from app.config import Settings
 from app.db import SerializedConnection, SerializedCursor
 from app.recognition.artifacts import ArtifactError, ArtifactSnapshot, sha256_file, validate_embeddings
@@ -111,6 +113,8 @@ def load_cloud_catalogue(settings: Settings, local: sqlite3.Connection) -> Artif
                         row_hashes.extend(hashlib.md5("|".join(_field_token(v) for v in row).encode()).hexdigest() for row in rows)
                 if len(row_hashes) != metadata["counts"][source] or hashlib.md5("".join(row_hashes).encode()).hexdigest() != digest["md5"]:
                     raise ArtifactError("PlanetScale catalogue checksum mismatch")
+            corrected = catalogue_corrections.apply(local, "cloud")
+            logging.getLogger("catalogue").info("catalogue corrections applied=%s", corrected)
             local.execute("CREATE UNIQUE INDEX cloud.cards_id ON cards(id)")
             local.execute("CREATE INDEX cloud.cards_language ON cards(language)")
             local.execute("CREATE INDEX cloud.cards_url ON cards(cardmarket_url)")
