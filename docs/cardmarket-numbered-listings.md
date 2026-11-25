@@ -15,7 +15,9 @@ These are the English cards in `pokesingle_completion_20261120_disp1` with two
 or more matched listings outside the Additionals expansions: 1,273 cards and
 2,796 listings in 137 expansions.
 
-**1,740 listings are named and 1,056 are still numbered.**
+**1,740 listings are named and 978 are still numbered.** The other 78 were
+Japanese XY listings wrongly linked to English cards; they were unlinked from
+the catalogue on 25 November 2026 (see [planetscale-staging.md](planetscale-staging.md)).
 
 | Source (`rule` column) | Listings |
 |---|---:|
@@ -109,5 +111,4 @@ checks that no card has two identical names.
 | 225 | 143 | No photo address in the catalogue | Cardmarket list-view pages for those expansions (about 5–12 pages per set), then the photos |
 | 139 | 68 | Black Star Promos outside the SVP list: MEP 76, Best of Game 22, Nintendo 12, XY 10, SVP 7 (beyond the 300-row list), SM 6, Wizards 4, BW 2 | List view of each promo expansion (about 15 pages), then TCGdex and the photo |
 | 98 | 49 | Prize Pack basic Energy (no caption) and Cheren's Care, which has no V2 in the list | Not resolvable from Cardmarket's photos |
-| 78 | 78 | Japanese XY-era sets (Phantom Gate, Rising Fist, Wild Blaze, Emerald Break, Rage of the Broken Heavens) linked to English cards. These are wrong links, not versions | Owner's decision: hide them, not name them |
 | 40 | 16 | SV basic Energy 001–008, V1–V5, with no photo address | List view of Scarlet & Violet Energies (2 pages), then the photos |
