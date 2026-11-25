@@ -15,8 +15,8 @@ These are the English cards in `pokesingle_completion_20261120_disp1` with two
 or more matched listings outside the Additionals expansions: 1,273 cards and
 2,796 listings in 137 expansions.
 
-**2,326 listings are named and 387 are still numbered.** The other 83 were
-foreign-language listings (78 Japanese XY, 5 others) wrongly linked to English cards; they were unlinked from
+**2,327 listings are named and 381 are still numbered.** The other 88 were
+foreign-language listings (78 Japanese XY, 10 others) wrongly linked to English cards; they were unlinked from
 the catalogue on 25 November 2026 (see [planetscale-staging.md](planetscale-staging.md)).
 
 | Source (`rule` column) | Listings |
@@ -102,10 +102,10 @@ unlinked from the catalogue like the Japanese XY links (see
 [planetscale-staging.md](planetscale-staging.md)).
 
 The list-view pass also turned up more non-English prints linked to English
-cards, left unnamed and noted for a catalogue fix: Italian Ho-Oh (EX Unseen
-Forces 27 V2), German Deoxys (EX Deoxys 16 V3) and Rayquaza (EX Deoxys 22 V2),
-and Japanese Rowlet and Dartrix (Sun & Moon Starter Set, on Hidden Fates SV2
-and SV3).
+cards: Italian Ho-Oh (EX Unseen Forces 27 V2), German Deoxys (EX Deoxys 16
+V3) and Rayquaza (EX Deoxys 22 V2), and Japanese Rowlet and Dartrix (Sun &
+Moon Starter Set, on Hidden Fates SV2 and SV3). They were unlinked from the
+catalogue too (see [planetscale-staging.md](planetscale-staging.md)).
 
 ## Regenerating
 
@@ -136,6 +136,6 @@ checks that no card has two identical names.
 
 | Listings | Cards | Why | What would name them |
 |---:|---:|---|---|
-| 257 | 176 | The photo has no caption and no legible stamp text: plain reverse holos, bare logos (the small Play! Pokémon logo, snowflakes), and listings that would share a name | A second source, or the product page |
+| 252 | 172 | The photo has no caption and no legible stamp text: plain reverse holos, bare logos (the small Play! Pokémon logo, snowflakes), and listings that would share a name | A second source, or the product page |
 | 32 | 25 | No product found in Cardmarket's list view or name search (Charizard ex SVP 196, Mew ex 151, Team Rocket's Mewtwo ex DRI, some older promos and starter-set listings) | The product page |
 | 98 | 49 | Prize Pack basic Energy (no caption) and Cheren's Care, which has no V2 in the list | Not resolvable from Cardmarket's photos |

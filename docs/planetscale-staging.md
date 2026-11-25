@@ -1,5 +1,19 @@
 # Staging catalogue source
 
+## More non-English prints unlinked from English cards — 2026-11-25
+
+Found during the list-view naming pass: Italian Ho-Oh
+(`EX-Unseen-Forces/Ho-Oh-V2-UF27`, on `en:ex10-27`), German Deoxys
+(`EX-Deoxys/Deoxys-V3-DX16`, `en:ex8-16`) and Rayquaza
+(`EX-Deoxys/Rayquaza-V2-DX22`, `en:ex8-22`), and Japanese Rowlet and Dartrix
+(`Sun-Moon-Starter-Set/Rowlet`, `/Dartrix`, on Hidden Fates `en:sma-SV2`,
+`en:sma-SV3`). None was a primary URL. Same guarded procedure as below:
+`matched=0`, `card_id=NULL`, products digest
+`a30288f54e98a114076260329745effc` → `daaef25bcaaed92fced1f456a6359eed`,
+manifest `corrections` appended. The API restarted and passed its checksum
+check; Ho-Oh UF 27 and Rowlet SV2 now offer no foreign version. Rollback
+record: `docs/catalogue-foreign-prints-2-20261125.json`.
+
 ## Foreign-language prints unlinked from English cards — 2026-11-25
 
 Reading listing photos for version names showed five Cardmarket products whose
