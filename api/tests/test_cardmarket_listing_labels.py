@@ -36,11 +36,11 @@ def _labels(listings, variants=(), guide=None):
 
 def test_the_shipped_file():
     rows = _shipped()
-    assert len(rows) == 928
+    assert len(rows) == 1067
     assert len({row["url"] for row in rows}) == len(rows)
     for row in rows:
         assert row["label"] and len(row["label"]) <= 40 and not re.search(r"\bV\d", row["label"])
-        assert row["rule"].split()[0] in {"reviewed", "tcgdex", "mcdonalds", "expansion", "own"}
+        assert row["rule"].split()[0] in {"reviewed", "tcgdex", "mcdonalds", "expansion", "own", "photo+tcgdex", "photo"}
     per_card = collections.defaultdict(list)
     for row in rows:
         per_card[row["card_id"]].append(row["label"])
