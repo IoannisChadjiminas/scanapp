@@ -1,5 +1,20 @@
 # Staging catalogue source
 
+## Foreign-language prints unlinked from English cards — 2026-11-25
+
+Reading listing photos for version names showed five Cardmarket products whose
+photo is a non-English print, linked to English cards as versions: French
+Electropower (`Lost-Thunder/Electropower-V3-LOT172`, on `en:sm8-172`),
+Portuguese Nest Ball (`Promos/Nest-Ball-V1-PRSVI-181`, `en:sv01-181`) and
+Buddy-Buddy Poffin (`Promos/Buddy-Buddy-Poffin-V2/V3-PRTEF-144`,
+`en:sv05-144`), and German Team Rocket's Giovanni
+(`Promos/Team-Rockets-Giovanni-V1-PRDRI-174`, `en:sv10-174`). None was a
+primary URL. Same guarded procedure as the Japanese XY unlinking below:
+`matched=0`, `card_id=NULL`, products digest `80470e4f5f11bec9503c5343339e47c1`
+→ `a30288f54e98a114076260329745effc`, manifest `corrections` appended. The API
+restarted and passed its checksum check; Electropower LOT 172 now offers no
+version choice. Rollback record: `docs/catalogue-foreign-prints-20261125.json`.
+
 ## Japanese XY listings unlinked from English cards — 2026-11-25
 
 85 Cardmarket listings from the Japanese XY-era expansions Phantom Gate,

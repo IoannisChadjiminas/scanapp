@@ -15,8 +15,8 @@ These are the English cards in `pokesingle_completion_20261120_disp1` with two
 or more matched listings outside the Additionals expansions: 1,273 cards and
 2,796 listings in 137 expansions.
 
-**2,232 listings are named and 486 are still numbered.** The other 78 were
-Japanese XY listings wrongly linked to English cards; they were unlinked from
+**2,232 listings are named and 481 are still numbered.** The other 83 were
+foreign-language listings (78 Japanese XY, 5 others) wrongly linked to English cards; they were unlinked from
 the catalogue on 25 November 2026 (see [planetscale-staging.md](planetscale-staging.md)).
 
 | Source (`rule` column) | Listings |
@@ -92,10 +92,11 @@ without readable text (the small red Play! Pokémon logo, snowflakes) were not
 named. A card's own listing is "Normal" only when every other listing of the
 card is named and its own photo carries no stamp.
 
-Five listings are foreign-language prints linked to English cards (French
+Five listings were foreign-language prints linked to English cards (French
 Electropower LOT 172 V3, Portuguese Nest Ball PRSVI 181 V1 and Buddy-Buddy
-Poffin PRTEF 144 V2/V3, German Team Rocket's Giovanni PRDRI 174 V1). They are
-left unnamed; like the Japanese XY links they belong in a catalogue fix.
+Poffin PRTEF 144 V2/V3, German Team Rocket's Giovanni PRDRI 174 V1). They were
+unlinked from the catalogue like the Japanese XY links (see
+[planetscale-staging.md](planetscale-staging.md)).
 
 ## Regenerating
 
@@ -126,6 +127,6 @@ checks that no card has two identical names.
 
 | Listings | Cards | Why | What would name them |
 |---:|---:|---|---|
-| 151 | 99 | The photo has no caption and no legible stamp text: plain reverse holos, bare logos (the small Play! Pokémon logo, snowflakes), and two listings of one card that would get the same name | A second source, or the product page |
+| 146 | 96 | The photo has no caption and no legible stamp text: plain reverse holos, bare logos (the small Play! Pokémon logo, snowflakes), and two listings of one card that would get the same name | A second source, or the product page |
 | 237 | 148 | No photo address in the catalogue, including Charizard ex SVP 196, which is not in Cardmarket's list | Cardmarket list-view pages for those sets (roughly 100 pages), then the photos |
 | 98 | 49 | Prize Pack basic Energy (no caption) and Cheren's Care, which has no V2 in the list | Not resolvable from Cardmarket's photos |
