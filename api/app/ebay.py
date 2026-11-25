@@ -25,7 +25,7 @@ import statistics
 import threading
 import time
 import dataclasses
-from dataclasses import dataclass
+from dataclasses import dataclass, fields
 from datetime import date, datetime, timedelta, timezone
 from pathlib import Path
 from typing import Any
@@ -92,9 +92,25 @@ _BAIT = re.compile(
     r"\bor\s+(?:lower|better|higher)\b|\?",
     re.IGNORECASE,
 )
+# A reverse pattern a copy can be: the words sellers title it with, and what
+# eBay is asked for. The other patterns Cardmarket lists (Energy, Team
+# Rocket) and the stamped promos have no settled wording in titles, so a
+# copy of one is not priced from eBay at all.
+PATTERNS: dict[str, tuple[str, re.Pattern[str]]] = {
+    key: (label, re.compile(words, re.IGNORECASE))
+    for key, label, words in (
+        ("pokeball", "Poke Ball", r"\bpok[eé]\s*-?\s*ball\b"),
+        ("masterball", "Master Ball", r"\bmaster\s*-?\s*ball\b"),
+        ("loveball", "Love Ball", r"\blove\s*-?\s*ball\b"),
+        ("duskball", "Dusk Ball", r"\bdusk\s*-?\s*ball\b"),
+        ("quickball", "Quick Ball", r"\bquick\s*-?\s*ball\b"),
+        ("friendball", "Friend Ball", r"\bfriend\s*-?\s*ball\b"),
+    )
+}
 # Another printing of the same card, worth something else.
 _VARIANT = re.compile(
-    r"\b(pok[eé]\s*ball|master\s*ball|stamp(?:ed)?|staff|pre-?release|jumbo|"
+    r"\b(pok[eé]\s*ball|master\s*ball|love\s*ball|dusk\s*ball|quick\s*ball|"
+    r"friend\s*ball|stamp(?:ed)?|staff|pre-?release|jumbo|"
     r"oversized|cosmos|costco|league|winner|promo|shadowless|metal|sequential|"
     r"exclusive|best\s+buy|gamestop|walmart|target|pok[eé]mon\s+cent(?:er|re))\b",
     re.IGNORECASE,
@@ -148,6 +164,31 @@ class GradedCard:
     # No other card in the set has this name: in a reprint set (REPRINT_SETS)
     # the set and the name are then the card, whatever number is printed.
     unique_name: bool = False
+    # The copy is this reverse pattern of the card (a key of PATTERNS): a
+    # product of its own, priced apart from the card's plain and reverse copies.
+    pattern: str = ""
+
+    def __repr__(self) -> str:
+        """The key answers and price history are kept under. A copy without a
+        pattern reads exactly as it did before patterns, so what is held for
+        it still stands."""
+        parts = [
+            f"{field.name}={getattr(self, field.name)!r}"
+            for field in fields(self) if field.name != "pattern"
+        ]
+        if self.pattern:
+            parts.append(f"pattern={self.pattern!r}")
+        return f"GradedCard({', '.join(parts)})"
+
+    @property
+    def pattern_label(self) -> str:
+        """"Master Ball", as eBay is asked for it; empty for other copies."""
+        return PATTERNS[self.pattern][0] if self.pattern in PATTERNS else ""
+
+    @property
+    def titled(self) -> str:
+        """The card's name with its pattern, as a search names the copy."""
+        return f"{self.name} {self.pattern_label}".strip()
 
     @property
     def lettered(self) -> bool:
@@ -180,7 +221,7 @@ class GradedCard:
         """What eBay is asked for, as sellers title their listings."""
         return " ".join(
             part for part in (
-                self.name, self.number_label, "Japanese" if self.japanese else "",
+                self.titled, self.number_label, "Japanese" if self.japanese else "",
                 self.grader, self.grade,
             ) if part
         )
@@ -205,7 +246,7 @@ class GradedCard:
             return ""
         return " ".join(
             part for part in (
-                self.name, named, "Japanese" if self.japanese else "", self.grader, self.grade
+                self.titled, named, "Japanese" if self.japanese else "", self.grader, self.grade
             ) if part
         )
 
@@ -357,8 +398,17 @@ def listing_is(title: str, card: GradedCard, *, graded: bool = False) -> bool:
         return False
     if _LANGUAGE_CODE.search(title):
         return False
-    # The printing.
-    if card.reverse != bool(_REVERSE.search(title)):
+    # The printing. A pattern copy is titled with its pattern, with or
+    # without "reverse holo", and never with another pattern beside it.
+    own_pattern = PATTERNS.get(card.pattern)
+    if own_pattern is not None:
+        if own_pattern[1].search(title) is None:
+            return False
+        if any(
+            words.search(title) for key, (_, words) in PATTERNS.items() if key != card.pattern
+        ):
+            return False
+    elif card.reverse != bool(_REVERSE.search(title)):
         return False
     # A copy not marked first edition is an unlimited one: a "1st Edition"
     # listing is another, dearer card.
@@ -376,6 +426,8 @@ def listing_is(title: str, card: GradedCard, *, graded: bool = False) -> bool:
             if " ".join(word.split()) in REPRINT_SETS.get(card.set_code, ()):
                 continue
             if card.first_edition and word == "shadowless":
+                continue
+            if own_pattern is not None and own_pattern[1].search(word):
                 continue
             return False
     # The year, where the title gives one: a reprint is years later.
@@ -678,7 +730,7 @@ class Ebay:
         found: dict[str, dict[str, Any]] = {}
         if card.grader in GRADER_NAMES:
             for query in dict.fromkeys(
-                q for q in (f"{card.name} {number}{jp}", f"{card.name} {named}{jp}" if named else "") if q
+                q for q in (f"{card.titled} {number}{jp}", f"{card.titled} {named}{jp}" if named else "") if q
             ):
                 for item in self._page(query, graded=card):
                     key = str(item.get("itemId") or item.get("itemWebUrl") or item.get("title"))

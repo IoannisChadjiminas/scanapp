@@ -8,7 +8,7 @@ import httpx
 from fastapi import APIRouter, HTTPException, Query, Request
 from pydantic import BaseModel, Field
 
-from app.ebay import GRADE, GRADERS, GradedCard, name_from_listing
+from app.ebay import GRADE, GRADERS, PATTERNS, GradedCard, name_from_listing
 
 router = APIRouter()
 log = logging.getLogger("ebay")
@@ -61,12 +61,38 @@ def _total(conn, language: str, set_id: str) -> int | None:
     return int(row[0]) if row and row[0] else None
 
 
+def _pattern(catalog, card_id: str, listing: str | None) -> str | None:
+    """The reverse pattern a copy is, from the Cardmarket listing the
+    collector chose for it: a key of PATTERNS, "" for the card's own listing,
+    and None for a version eBay's titles cannot tell apart (an unnamed
+    pattern, an Energy or Team Rocket one, a stamped promo), which is then
+    not priced from eBay rather than priced as the plain card."""
+    url = (listing or "").split("?")[0].strip()
+    if not url:
+        return ""
+    try:
+        row = catalog.execute(
+            "SELECT pattern FROM cardmarket_pattern_products WHERE url = ? AND card_id = ?",
+            (url, card_id),
+        ).fetchone()
+    except sqlite3.Error:
+        return ""
+    if row is None:
+        return ""
+    pattern = str(row[0] or "")
+    return pattern if pattern in PATTERNS else None
+
+
 def _graded_card(
-    catalog, card_id: str, grader: str, grade: str, reverse: bool, first_edition: bool | None
+    catalog, card_id: str, grader: str, grade: str, reverse: bool, first_edition: bool | None,
+    listing: str | None = None,
 ) -> GradedCard | None:
     """What eBay is asked about for a catalogue card and grade. None for a
     card that is not in the catalogue, or that sellers do not title reliably
-    (another language, no name or number)."""
+    (another language, no name or number, a version without a settled name)."""
+    pattern = _pattern(catalog, card_id, listing)
+    if pattern is None:
+        return None
     row = catalog.execute(
         "SELECT name, set_id, set_name, collector_number, language, cardmarket_url "
         "FROM cards WHERE id = ?",
@@ -91,8 +117,10 @@ def _graded_card(
         total=_total(catalog, language, str(row["set_id"])),
         year=_year(catalog, language, str(row["set_id"])),
         japanese=language == "ja",
-        reverse=reverse,
+        # A pattern is never the reverse holo of the card's own listing.
+        reverse=reverse and not pattern,
         first_edition=first_edition,
+        pattern=pattern,
         set_name=str(row["set_name"] or ""),
         set_code=str(row["set_id"] or "").lower(),
         unique_name=catalog.execute(
@@ -128,6 +156,9 @@ def get_graded(
     # Only what is already held: eBay is not asked. For showing a price
     # another collector's check already paid for, without a press.
     cached_only: bool = False,
+    # The Cardmarket listing of the version the copy is, when the collector
+    # chose one: a Master Ball copy is asked for as one.
+    listing: str | None = Query(default=None, max_length=500),
 ) -> EbayGraded:
     reader = getattr(request.app.state, "ebay", None)
     if reader is None:
@@ -138,7 +169,7 @@ def get_graded(
     catalog = request.app.state.dbs.catalog
     if catalog.execute("SELECT 1 FROM cards WHERE id = ?", (card_id,)).fetchone() is None:
         raise HTTPException(status_code=404, detail="Card not found")
-    card = _graded_card(catalog, card_id, grader, grade, reverse, first_edition)
+    card = _graded_card(catalog, card_id, grader, grade, reverse, first_edition, listing)
     if card is None:
         return EbayGraded(enabled=True)
     if cached_only:
@@ -158,6 +189,7 @@ class GradedCopy(BaseModel):
     grade: str = Field(min_length=1, max_length=3)
     reverse: bool = False
     first_edition: bool | None = None
+    listing: str | None = Field(default=None, max_length=500)
 
 
 class GradedCopies(BaseModel):
@@ -200,7 +232,10 @@ def graded_values(payload: GradedCopies, request: Request) -> GradedValues:
     for copy in payload.copies:
         grader = copy.grader.upper()
         card = (
-            _graded_card(catalog, copy.card_id, grader, copy.grade, copy.reverse, copy.first_edition)
+            _graded_card(
+                catalog, copy.card_id, grader, copy.grade, copy.reverse, copy.first_edition,
+                copy.listing,
+            )
             if grader in GRADERS and GRADE.match(copy.grade)
             else None
         )

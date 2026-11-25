@@ -682,3 +682,98 @@ def test_the_price_move_needs_a_week_of_history_and_held_slabs_are_read_daily():
     reader.reuse_s = 0
     assert reader.refresh_owned() == 1
     reader.close()
+
+
+SPRITZEE = GradedCard("Spritzee", "038", "CGC", "10", total=131, year=2025,
+                      set_name="Prismatic Evolutions")
+SPRITZEE_MASTER = GradedCard("Spritzee", "038", "CGC", "10", total=131, year=2025,
+                             set_name="Prismatic Evolutions", pattern="masterball")
+
+
+def test_a_pattern_copy_is_its_own_card_on_ebay():
+    master = "CGC 10 Spritzee 038/131 Master Ball Reverse Holo Prismatic Evolutions 2025"
+    poke = "2025 Pokemon Prismatic Evolutions Spritzee 038/131 Poke Ball CGC 10"
+    plain = "2025 Pokemon Prismatic Evolutions Spritzee 038/131 CGC 10 Gem Mint"
+    # The Master Ball copy: its own listings, with or without "reverse holo".
+    assert listing_is(master, SPRITZEE_MASTER)
+    assert listing_is("Spritzee 038/131 Masterball Prismatic Evolutions CGC 10", SPRITZEE_MASTER)
+    assert not listing_is(poke, SPRITZEE_MASTER)
+    assert not listing_is(plain, SPRITZEE_MASTER)
+    assert not listing_is(
+        "Spritzee 038/131 Poke Ball & Master Ball Prismatic Evolutions CGC 10", SPRITZEE_MASTER)
+    # The plain copy never takes a pattern's listing.
+    assert listing_is(plain, SPRITZEE)
+    assert not listing_is(master, SPRITZEE) and not listing_is(poke, SPRITZEE)
+    # It is asked for by name.
+    assert SPRITZEE_MASTER.search == "Spritzee Master Ball 038/131 CGC 10"
+    assert SPRITZEE.search == "Spritzee 038/131 CGC 10"
+    # CGC's Pristine 10 stays out of a plain "10", as before: the dearer slab.
+    assert not listing_is(master + " Pristine 10", SPRITZEE_MASTER)
+
+
+def test_what_is_held_for_a_copy_without_a_pattern_keeps_its_key():
+    assert repr(CHARIZARD) == (
+        "GradedCard(name='Charizard', number='4', grader='PSA', grade='9', total=102, "
+        "year=1999, japanese=False, reverse=False, first_edition=None, set_name='Base Set', "
+        "set_code='', unique_name=False)"
+    )
+    assert repr(SPRITZEE_MASTER).endswith("unique_name=False, pattern='masterball')")
+    assert repr(SPRITZEE_MASTER) != repr(SPRITZEE)
+
+
+def test_the_route_asks_for_the_version_the_collector_chose(tmp_path):
+    from app.pattern_products import SCHEMA
+
+    own = "https://www.cardmarket.com/en/Pokemon/Products/Singles/Prismatic-Evolutions/Spritzee-PRE038"
+    extra = "https://www.cardmarket.com/en/Pokemon/Products/Singles/Prismatic-Evolutions-Additionals/Spritzee-{}-xPRE038"
+    calls: list[str] = []
+    catalog = connect(tmp_path / "catalog.sqlite")
+    init_catalog(catalog)
+    values = {"id": "en:sv08.5-038", "name": "Spritzee", "language": "en", "set_id": "sv08.5",
+              "set_name": "Prismatic Evolutions", "collector_number": "038", "cardmarket_url": own}
+    values.update({
+        row[1]: "" for row in catalog.execute("PRAGMA table_info(cards)")
+        if row[3] and row[4] is None and row[1] not in values
+    })
+    catalog.execute(
+        f"INSERT INTO cards ({', '.join(values)}) VALUES ({', '.join('?' for _ in values)})",
+        list(values.values()),
+    )
+    catalog.execute("INSERT INTO set_totals VALUES ('en', 'sv08.5', 131, '')")
+    catalog.executescript(SCHEMA)
+    catalog.executemany(
+        "INSERT INTO cardmarket_pattern_products VALUES (?, 'en:sv08.5-038', ?, ?, '')",
+        [(1, "pokeball", extra.format("V1")), (2, "masterball", extra.format("V2")),
+         (3, "surprise-box-stamp", extra.format("V3"))],
+    )
+    catalog.commit()
+    app = FastAPI()
+    app.include_router(router, prefix="/api/v1")
+    app.state.dbs = type("Dbs", (), {"catalog": catalog})()
+    reader = _reader(calls, [
+        _item(f"Spritzee 038/131 Master Ball Reverse Holo Prismatic Evolutions CGC 10 #{n}", n)
+        for n in (40, 50, 60)
+    ] + [_item(f"Spritzee 038/131 Prismatic Evolutions CGC 10 #{n}", n) for n in (4, 5, 6)])
+    app.state.ebay = reader
+    client = TestClient(app)
+    ask = lambda **params: client.get(  # noqa: E731
+        "/api/v1/ebay/graded", params={"card_id": "en:sv08.5-038", "grader": "CGC", "grade": "10", **params}
+    ).json()
+
+    master = ask(listing=extra.format("V2") + "?language=1", reverse="true")
+    assert master["average"] == 50.0
+    assert "Spritzee Master Ball 038/131 CGC 10" in calls
+    # The card's own listing, or none, is the plain card as before.
+    assert ask(listing=own)["average"] == 5.0 and ask()["average"] == 5.0
+    # A version with no settled wording on eBay is not priced as the plain card.
+    before = len(calls)
+    stamp = ask(listing=extra.format("V3"))
+    assert stamp["enabled"] is True and stamp["average"] is None and stamp["listings"] == []
+    assert len(calls) == before
+    # A collection's Master Ball slab is valued from the Master Ball answer.
+    values = client.post("/api/v1/ebay/graded/values", json={"copies": [
+        {"card_id": "en:sv08.5-038", "grader": "CGC", "grade": "10", "listing": extra.format("V2")},
+        {"card_id": "en:sv08.5-038", "grader": "CGC", "grade": "10"},
+    ]}).json()["values"]
+    assert [value["average"] for value in values] == [50.0, 5.0]
+    reader.close()
