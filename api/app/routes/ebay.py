@@ -8,6 +8,7 @@ import httpx
 from fastapi import APIRouter, HTTPException, Query, Request
 from pydantic import BaseModel, Field
 
+from app.live_permit import require_live_permit
 from app.ebay import (
     GRADE, GRADERS, PATTERNS, PRISTINE, PRISTINE_GRADERS, GradedCard, name_from_listing,
 )
@@ -186,6 +187,8 @@ def get_graded(
     if cached_only:
         kept = reader.kept(card)
         return EbayGraded.model_validate(_in_euros(request, kept, card)) if kept else EbayGraded(enabled=True)
+    # A live read is a Pro check: it spends one permit (no-op before the gate is ready).
+    require_live_permit(request, 'ebay')
     try:
         return EbayGraded.model_validate(_in_euros(request, reader.graded(card), card))
     except (httpx.HTTPError, ValueError, KeyError) as exc:

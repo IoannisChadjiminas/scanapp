@@ -37,6 +37,8 @@ class Settings(BaseSettings):
     # Deployment readiness switch; the product API controls actual quota rollout.
     product_api_scan_gate_ready: bool = False
     product_api_paid_gate_ready: bool = False
+    # Live checks (eBay, CardTrader, live Cardmarket parses) need a claimed permit.
+    product_api_live_gate_ready: bool = False
     planetscale_schema: str = "pokesingle_import_20261001"
     planetscale_import_id: str = "PS-IMPORT-001-20261001"
     tmp_dir: Path = Path("/tmp/scanapp")

@@ -10,6 +10,7 @@ from pydantic import BaseModel, Field
 
 from app.cardmarket import normalize_product_url
 from app.cardtrader import CONDITIONS
+from app.live_permit import require_live_permit
 from app.market_match import card_names, plain, set_names
 from app.price_sources import product_id_for_url
 
@@ -162,6 +163,8 @@ def get_prices(
     if product is None and not main:
         # A picked listing whose product is not known.
         return CardTraderPrices(enabled=True)
+    # A live read is a Pro check: it spends one permit (no-op before the gate is ready).
+    require_live_permit(request, 'cardtrader')
     if first_edition and product is not None:
         product = reader.first_edition_product(product) or product
     try:

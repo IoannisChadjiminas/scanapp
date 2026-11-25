@@ -16,6 +16,10 @@ class SubscriptionUnavailable(Exception):
     pass
 
 
+class PermitRefused(Exception):
+    """The product API answered and refused the permit (unknown, used, expired)."""
+
+
 class SubscriptionClient:
     def __init__(self, settings: Settings, *, client: httpx.Client | None = None):
         self.base = settings.product_api_url.rstrip('/')
@@ -28,11 +32,15 @@ class SubscriptionClient:
         if parsed.scheme != 'https' and parsed.hostname not in {'localhost', '127.0.0.1', '::1'}:
             raise SubscriptionUnavailable('product API requires HTTPS')
 
-    def _request(self, method: str, path: str, **kwargs) -> dict:
+    def _request(self, method: str, path: str, *, refusals: frozenset[str] = frozenset(), **kwargs) -> dict:
         try:
             with httpx.Client(timeout=8, follow_redirects=False) if self.client is None else _borrow(self.client) as client:
                 response = client.request(method, self.base + path,
                     headers={'Authorization': f'Bearer {self.token}'}, **kwargs)
+                if response.status_code == 403 and refusals:
+                    body = response.json()
+                    if isinstance(body, dict) and body.get('code') in refusals:
+                        raise PermitRefused()
                 response.raise_for_status()
                 result = response.json()
                 if not isinstance(result, dict):
@@ -65,6 +73,14 @@ class SubscriptionClient:
         if not isinstance(value, bool):
             raise SubscriptionUnavailable('invalid price authorization')
         return value
+
+    def claim_live(self, permit: str, kind: str) -> None:
+        """Spend a single-use live-check permit; PermitRefused when it is not valid."""
+        body = self._request('POST', '/internal/live-checks/permits/claim',
+                             refusals=frozenset({'permit_invalid', 'permit_expired'}),
+                             json={'permit': permit, 'kind': kind})
+        if body.get('state') != 'claimed':
+            raise SubscriptionUnavailable('invalid live-check claim')
 
     def price_budget(self) -> tuple[int, int]:
         _, _, refresh = self.candidates(limit=1)
