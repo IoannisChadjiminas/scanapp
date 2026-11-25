@@ -15,7 +15,7 @@ These are the English cards in `pokesingle_completion_20261120_disp1` with two
 or more matched listings outside the Additionals expansions: 1,273 cards and
 2,796 listings in 137 expansions.
 
-**2,332 listings are named and 376 are still numbered.** The other 88 were
+**2,332 listings are named and 374 are still numbered.** The other 88 were
 foreign-language listings (78 Japanese XY, 10 others) wrongly linked to English cards; they were unlinked from
 the catalogue on 25 November 2026 (see [planetscale-staging.md](planetscale-staging.md)).
 
@@ -112,8 +112,9 @@ their Cardmarket product page (25 November 2026): Charizard LC 3 V3 ("Non-Holo
 Lava Theme Deck"), Arboliva SVI 023 V3 ("Non-Holo Kangaskhan ex Battle Deck"),
 Lechonk SVI 155 V2 ("Pokémon Center SV ETB Holo"), Mew ex MEW 151 V1 and Team
 Rocket's Mewtwo ex DRI 081 V1 (no caption; Normal, since their only other
-listing is the Southeast Asia promo). Charizard ex SVP 196 V1 and V2 are dead
-addresses.
+listing is the Southeast Asia promo). Charizard ex SVP 196 V1 and V2 were dead
+addresses; the card now points to its working V3 listing (see
+[planetscale-staging.md](planetscale-staging.md)).
 
 ## Regenerating
 
@@ -145,5 +146,4 @@ checks that no card has two identical names.
 | Listings | Cards | Why | What would name them |
 |---:|---:|---|---|
 | 277 | 188 | The photo has no caption and no legible stamp text: plain reverse holos, bare logos (the small Play! Pokémon logo, snowflakes), Best of Game and Nintendo "Winner" prints without a caption, and listings that would share a name | A second source |
-| 2 | 1 | Charizard ex SVP 196 V1 and V2: Cardmarket redirects both addresses to the expansion page (no such product) | A catalogue fix: the card's working listing is V3 |
 | 98 | 49 | Prize Pack basic Energy (no caption) and Cheren's Care, which has no V2 in the list | Not resolvable from Cardmarket's photos |
