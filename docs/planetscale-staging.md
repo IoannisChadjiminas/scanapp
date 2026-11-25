@@ -1,5 +1,27 @@
 # Staging catalogue source
 
+## Japanese XY listings unlinked from English cards — 2026-11-25
+
+85 Cardmarket listings from the Japanese XY-era expansions Phantom Gate,
+Rising Fist, Emerald Break, Wild Blaze and Rage of the Broken Heavens were
+linked to English cards (for example `Phantom-Gate/Venonat` on `en:xy4-1`,
+Phantom Forces Venonat), so the English card offered the Japanese print as a
+version. None was an English card's primary URL. In the active
+`pokesingle_completion_20261120_disp1` snapshot they are now unmatched like
+the other 32,375 unmatched listings (`matched=0`, `card_id=NULL`); Japanese
+cards' links to these expansions are unchanged.
+
+One guarded PL/pgSQL block checked the stored products digest, required
+exactly 85 rows, updated them, set the products digest
+`296cd8a5b04c5fb56155402cd26b4248` → `80470e4f5f11bec9503c5343339e47c1` (row
+count 72,079 unchanged; the new value was computed in advance with the
+loader's own hashing, which reproduced the old one) and appended the change
+to the manifest's `corrections`. Import ID stays
+`PS-CATALOGUE-EN-JA-DISP1-20261120`. The staging API was restarted, passed
+its checksum check, and `/api/v1/cards/en:xy4-1` offers no Japanese version.
+Rollback: `docs/catalogue-ja-xy-links-20261125.json` holds each URL with its
+former `card_id`; restore those and the old digest in one transaction.
+
 ## Charizard ex SVP 196 route correction — 2026-10-17
 
 The user reported that `Charizard-ex-V1-SVP196` returns Cardmarket's **Invalid product** page and supplied the working `Charizard-ex-V3-SVP196` URL. Corrected `en:svp-196` in the active `pokesingle_completion_20261016_jalinks14` snapshot: primary card URL, matching product row and cloud helper metadata. A guarded atomic transaction preserved counts and recalculated the cards digest (`395a51ddc6f07d6922f6e0d6bef978b3`) and products digest (`1fb63607f8b5a76bda45c67da7806380`). Import ID stays `PS-CATALOGUE-EN-JA-LINKS14-20261016`.

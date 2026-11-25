@@ -1,0 +1,436 @@
+{
+ "schema": "pokesingle_completion_20261120_disp1",
+ "import_id": "PS-CATALOGUE-EN-JA-DISP1-20261120",
+ "date": "2026-11-25",
+ "change": "cardmarket_products: Japanese XY-era listings linked to English cards set to matched=0, card_id=NULL",
+ "products_md5_before": "296cd8a5b04c5fb56155402cd26b4248",
+ "products_md5_after": "80470e4f5f11bec9503c5343339e47c1",
+ "rows": 72079,
+ "unlinked": [
+  {
+   "url": "https://www.cardmarket.com/en/Pokemon/Products/Singles/Emerald-Break/Articuno-V2",
+   "card_id": "en:xy6-16",
+   "matched": 1
+  },
+  {
+   "url": "https://www.cardmarket.com/en/Pokemon/Products/Singles/Emerald-Break/Beautifly-XY6005",
+   "card_id": "en:xy6-5",
+   "matched": 1
+  },
+  {
+   "url": "https://www.cardmarket.com/en/Pokemon/Products/Singles/Emerald-Break/Cascoon",
+   "card_id": "en:xy6-6",
+   "matched": 1
+  },
+  {
+   "url": "https://www.cardmarket.com/en/Pokemon/Products/Singles/Emerald-Break/Dustox-V1",
+   "card_id": "en:xy6-7",
+   "matched": 1
+  },
+  {
+   "url": "https://www.cardmarket.com/en/Pokemon/Products/Singles/Emerald-Break/Dustox-V2",
+   "card_id": "en:xy6-8",
+   "matched": 1
+  },
+  {
+   "url": "https://www.cardmarket.com/en/Pokemon/Products/Singles/Emerald-Break/Exeggcute",
+   "card_id": "en:xy6-1",
+   "matched": 1
+  },
+  {
+   "url": "https://www.cardmarket.com/en/Pokemon/Products/Singles/Emerald-Break/Exeggutor",
+   "card_id": "en:xy6-2",
+   "matched": 1
+  },
+  {
+   "url": "https://www.cardmarket.com/en/Pokemon/Products/Singles/Emerald-Break/Nincada",
+   "card_id": "en:xy6-9",
+   "matched": 1
+  },
+  {
+   "url": "https://www.cardmarket.com/en/Pokemon/Products/Singles/Emerald-Break/Ninjask-XY6010",
+   "card_id": "en:xy6-10",
+   "matched": 1
+  },
+  {
+   "url": "https://www.cardmarket.com/en/Pokemon/Products/Singles/Emerald-Break/Shedinja",
+   "card_id": "en:xy6-11",
+   "matched": 1
+  },
+  {
+   "url": "https://www.cardmarket.com/en/Pokemon/Products/Singles/Emerald-Break/Silcoon",
+   "card_id": "en:xy6-4",
+   "matched": 1
+  },
+  {
+   "url": "https://www.cardmarket.com/en/Pokemon/Products/Singles/Emerald-Break/Tropius",
+   "card_id": "en:xy6-12",
+   "matched": 1
+  },
+  {
+   "url": "https://www.cardmarket.com/en/Pokemon/Products/Singles/Emerald-Break/Wurmple",
+   "card_id": "en:xy6-3",
+   "matched": 1
+  },
+  {
+   "url": "https://www.cardmarket.com/en/Pokemon/Products/Singles/Phantom-Gate/Alomomola",
+   "card_id": "en:xy4-22",
+   "matched": 1
+  },
+  {
+   "url": "https://www.cardmarket.com/en/Pokemon/Products/Singles/Phantom-Gate/Croconaw",
+   "card_id": "en:xy4-16",
+   "matched": 1
+  },
+  {
+   "url": "https://www.cardmarket.com/en/Pokemon/Products/Singles/Phantom-Gate/Feraligatr",
+   "card_id": "en:xy4-17",
+   "matched": 1
+  },
+  {
+   "url": "https://www.cardmarket.com/en/Pokemon/Products/Singles/Phantom-Gate/Finneon",
+   "card_id": "en:xy4-18",
+   "matched": 1
+  },
+  {
+   "url": "https://www.cardmarket.com/en/Pokemon/Products/Singles/Phantom-Gate/Fletchinder",
+   "card_id": "en:xy4-9",
+   "matched": 1
+  },
+  {
+   "url": "https://www.cardmarket.com/en/Pokemon/Products/Singles/Phantom-Gate/Frillish",
+   "card_id": "en:xy4-20",
+   "matched": 1
+  },
+  {
+   "url": "https://www.cardmarket.com/en/Pokemon/Products/Singles/Phantom-Gate/Galvantula",
+   "card_id": "en:xy4-27",
+   "matched": 1
+  },
+  {
+   "url": "https://www.cardmarket.com/en/Pokemon/Products/Singles/Phantom-Gate/Helioptile-XY4028",
+   "card_id": "en:xy4-28",
+   "matched": 1
+  },
+  {
+   "url": "https://www.cardmarket.com/en/Pokemon/Products/Singles/Phantom-Gate/Jellicent",
+   "card_id": "en:xy4-21",
+   "matched": 1
+  },
+  {
+   "url": "https://www.cardmarket.com/en/Pokemon/Products/Singles/Phantom-Gate/Joltik",
+   "card_id": "en:xy4-26",
+   "matched": 1
+  },
+  {
+   "url": "https://www.cardmarket.com/en/Pokemon/Products/Singles/Phantom-Gate/Karrablast",
+   "card_id": "en:xy4-8",
+   "matched": 1
+  },
+  {
+   "url": "https://www.cardmarket.com/en/Pokemon/Products/Singles/Phantom-Gate/Kingler",
+   "card_id": "en:xy4-14",
+   "matched": 1
+  },
+  {
+   "url": "https://www.cardmarket.com/en/Pokemon/Products/Singles/Phantom-Gate/Krabby",
+   "card_id": "en:xy4-13",
+   "matched": 1
+  },
+  {
+   "url": "https://www.cardmarket.com/en/Pokemon/Products/Singles/Phantom-Gate/Leavanny",
+   "card_id": "en:xy4-7",
+   "matched": 1
+  },
+  {
+   "url": "https://www.cardmarket.com/en/Pokemon/Products/Singles/Phantom-Gate/Litleo",
+   "card_id": "en:xy4-11",
+   "matched": 1
+  },
+  {
+   "url": "https://www.cardmarket.com/en/Pokemon/Products/Singles/Phantom-Gate/Lumineon",
+   "card_id": "en:xy4-19",
+   "matched": 1
+  },
+  {
+   "url": "https://www.cardmarket.com/en/Pokemon/Products/Singles/Phantom-Gate/Manectric-EX-V1",
+   "card_id": "en:xy4-23",
+   "matched": 1
+  },
+  {
+   "url": "https://www.cardmarket.com/en/Pokemon/Products/Singles/Phantom-Gate/Pachirisu",
+   "card_id": "en:xy4-25",
+   "matched": 1
+  },
+  {
+   "url": "https://www.cardmarket.com/en/Pokemon/Products/Singles/Phantom-Gate/Pyroar-XY4012",
+   "card_id": "en:xy4-12",
+   "matched": 1
+  },
+  {
+   "url": "https://www.cardmarket.com/en/Pokemon/Products/Singles/Phantom-Gate/Sewaddle",
+   "card_id": "en:xy4-5",
+   "matched": 1
+  },
+  {
+   "url": "https://www.cardmarket.com/en/Pokemon/Products/Singles/Phantom-Gate/Swadloon",
+   "card_id": "en:xy4-6",
+   "matched": 1
+  },
+  {
+   "url": "https://www.cardmarket.com/en/Pokemon/Products/Singles/Phantom-Gate/Talonflame",
+   "card_id": "en:xy4-10",
+   "matched": 1
+  },
+  {
+   "url": "https://www.cardmarket.com/en/Pokemon/Products/Singles/Phantom-Gate/Totodile",
+   "card_id": "en:xy4-15",
+   "matched": 1
+  },
+  {
+   "url": "https://www.cardmarket.com/en/Pokemon/Products/Singles/Phantom-Gate/Venomoth",
+   "card_id": "en:xy4-2",
+   "matched": 1
+  },
+  {
+   "url": "https://www.cardmarket.com/en/Pokemon/Products/Singles/Phantom-Gate/Venonat",
+   "card_id": "en:xy4-1",
+   "matched": 1
+  },
+  {
+   "url": "https://www.cardmarket.com/en/Pokemon/Products/Singles/Phantom-Gate/Yanma",
+   "card_id": "en:xy4-3",
+   "matched": 1
+  },
+  {
+   "url": "https://www.cardmarket.com/en/Pokemon/Products/Singles/Phantom-Gate/Yanmega",
+   "card_id": "en:xy4-4",
+   "matched": 1
+  },
+  {
+   "url": "https://www.cardmarket.com/en/Pokemon/Products/Singles/Rage-of-the-Broken-Heavens/Bayleef",
+   "card_id": "en:xy9-2",
+   "matched": 1
+  },
+  {
+   "url": "https://www.cardmarket.com/en/Pokemon/Products/Singles/Rage-of-the-Broken-Heavens/Chikorita",
+   "card_id": "en:xy9-1",
+   "matched": 1
+  },
+  {
+   "url": "https://www.cardmarket.com/en/Pokemon/Products/Singles/Rage-of-the-Broken-Heavens/Durant",
+   "card_id": "en:xy9-9",
+   "matched": 1
+  },
+  {
+   "url": "https://www.cardmarket.com/en/Pokemon/Products/Singles/Rage-of-the-Broken-Heavens/Kricketot",
+   "card_id": "en:xy9-5",
+   "matched": 1
+  },
+  {
+   "url": "https://www.cardmarket.com/en/Pokemon/Products/Singles/Rage-of-the-Broken-Heavens/Kricketune",
+   "card_id": "en:xy9-6",
+   "matched": 1
+  },
+  {
+   "url": "https://www.cardmarket.com/en/Pokemon/Products/Singles/Rage-of-the-Broken-Heavens/Lilligant",
+   "card_id": "en:xy9-8",
+   "matched": 1
+  },
+  {
+   "url": "https://www.cardmarket.com/en/Pokemon/Products/Singles/Rage-of-the-Broken-Heavens/Meganium-XY9003",
+   "card_id": "en:xy9-3",
+   "matched": 1
+  },
+  {
+   "url": "https://www.cardmarket.com/en/Pokemon/Products/Singles/Rage-of-the-Broken-Heavens/Petilil",
+   "card_id": "en:xy9-7",
+   "matched": 1
+  },
+  {
+   "url": "https://www.cardmarket.com/en/Pokemon/Products/Singles/Rage-of-the-Broken-Heavens/Seedot",
+   "card_id": "en:xy9-4",
+   "matched": 1
+  },
+  {
+   "url": "https://www.cardmarket.com/en/Pokemon/Products/Singles/Rising-Fist/Accelgor",
+   "card_id": "en:xy3-9",
+   "matched": 1
+  },
+  {
+   "url": "https://www.cardmarket.com/en/Pokemon/Products/Singles/Rising-Fist/Amaura",
+   "card_id": "en:xy3-25",
+   "matched": 1
+  },
+  {
+   "url": "https://www.cardmarket.com/en/Pokemon/Products/Singles/Rising-Fist/Aurorus-XY3026",
+   "card_id": "en:xy3-26",
+   "matched": 1
+  },
+  {
+   "url": "https://www.cardmarket.com/en/Pokemon/Products/Singles/Rising-Fist/Beartic",
+   "card_id": "en:xy3-22",
+   "matched": 1
+  },
+  {
+   "url": "https://www.cardmarket.com/en/Pokemon/Products/Singles/Rising-Fist/Bellsprout",
+   "card_id": "en:xy3-1",
+   "matched": 1
+  },
+  {
+   "url": "https://www.cardmarket.com/en/Pokemon/Products/Singles/Rising-Fist/Blaziken",
+   "card_id": "en:xy3-14",
+   "matched": 1
+  },
+  {
+   "url": "https://www.cardmarket.com/en/Pokemon/Products/Singles/Rising-Fist/Clauncher",
+   "card_id": "en:xy3-23",
+   "matched": 1
+  },
+  {
+   "url": "https://www.cardmarket.com/en/Pokemon/Products/Singles/Rising-Fist/Clawitzer",
+   "card_id": "en:xy3-24",
+   "matched": 1
+  },
+  {
+   "url": "https://www.cardmarket.com/en/Pokemon/Products/Singles/Rising-Fist/Combusken",
+   "card_id": "en:xy3-13",
+   "matched": 1
+  },
+  {
+   "url": "https://www.cardmarket.com/en/Pokemon/Products/Singles/Rising-Fist/Cubchoo",
+   "card_id": "en:xy3-21",
+   "matched": 1
+  },
+  {
+   "url": "https://www.cardmarket.com/en/Pokemon/Products/Singles/Rising-Fist/Glaceon",
+   "card_id": "en:xy3-19",
+   "matched": 1
+  },
+  {
+   "url": "https://www.cardmarket.com/en/Pokemon/Products/Singles/Rising-Fist/Heracross-EX-V1",
+   "card_id": "en:xy3-4",
+   "matched": 1
+  },
+  {
+   "url": "https://www.cardmarket.com/en/Pokemon/Products/Singles/Rising-Fist/Leafeon",
+   "card_id": "en:xy3-7",
+   "matched": 1
+  },
+  {
+   "url": "https://www.cardmarket.com/en/Pokemon/Products/Singles/Rising-Fist/Magmar",
+   "card_id": "en:xy3-10",
+   "matched": 1
+  },
+  {
+   "url": "https://www.cardmarket.com/en/Pokemon/Products/Singles/Rising-Fist/Magmortar",
+   "card_id": "en:xy3-11",
+   "matched": 1
+  },
+  {
+   "url": "https://www.cardmarket.com/en/Pokemon/Products/Singles/Rising-Fist/Politoed",
+   "card_id": "en:xy3-18",
+   "matched": 1
+  },
+  {
+   "url": "https://www.cardmarket.com/en/Pokemon/Products/Singles/Rising-Fist/Poliwag",
+   "card_id": "en:xy3-15",
+   "matched": 1
+  },
+  {
+   "url": "https://www.cardmarket.com/en/Pokemon/Products/Singles/Rising-Fist/Poliwhirl",
+   "card_id": "en:xy3-16",
+   "matched": 1
+  },
+  {
+   "url": "https://www.cardmarket.com/en/Pokemon/Products/Singles/Rising-Fist/Poliwrath",
+   "card_id": "en:xy3-17",
+   "matched": 1
+  },
+  {
+   "url": "https://www.cardmarket.com/en/Pokemon/Products/Singles/Rising-Fist/Seismitoad-EX-V1",
+   "card_id": "en:xy3-20",
+   "matched": 1
+  },
+  {
+   "url": "https://www.cardmarket.com/en/Pokemon/Products/Singles/Rising-Fist/Shelmet",
+   "card_id": "en:xy3-8",
+   "matched": 1
+  },
+  {
+   "url": "https://www.cardmarket.com/en/Pokemon/Products/Singles/Rising-Fist/Shroomish",
+   "card_id": "en:xy3-6",
+   "matched": 1
+  },
+  {
+   "url": "https://www.cardmarket.com/en/Pokemon/Products/Singles/Rising-Fist/Torchic",
+   "card_id": "en:xy3-12",
+   "matched": 1
+  },
+  {
+   "url": "https://www.cardmarket.com/en/Pokemon/Products/Singles/Rising-Fist/Victreebel-XY3003",
+   "card_id": "en:xy3-3",
+   "matched": 1
+  },
+  {
+   "url": "https://www.cardmarket.com/en/Pokemon/Products/Singles/Rising-Fist/Weepinbell",
+   "card_id": "en:xy3-2",
+   "matched": 1
+  },
+  {
+   "url": "https://www.cardmarket.com/en/Pokemon/Products/Singles/Wild-Blaze/Butterfree",
+   "card_id": "en:xy2-3",
+   "matched": 1
+  },
+  {
+   "url": "https://www.cardmarket.com/en/Pokemon/Products/Singles/Wild-Blaze/Caterpie-XY2001",
+   "card_id": "en:xy2-1",
+   "matched": 1
+  },
+  {
+   "url": "https://www.cardmarket.com/en/Pokemon/Products/Singles/Wild-Blaze/Charizard-EX-V1-XY2011",
+   "card_id": "en:xy2-11",
+   "matched": 1
+  },
+  {
+   "url": "https://www.cardmarket.com/en/Pokemon/Products/Singles/Wild-Blaze/Maractus",
+   "card_id": "en:xy2-10",
+   "matched": 1
+  },
+  {
+   "url": "https://www.cardmarket.com/en/Pokemon/Products/Singles/Wild-Blaze/Metapod",
+   "card_id": "en:xy2-2",
+   "matched": 1
+  },
+  {
+   "url": "https://www.cardmarket.com/en/Pokemon/Products/Singles/Wild-Blaze/Nuzleaf",
+   "card_id": "en:xy2-6",
+   "matched": 1
+  },
+  {
+   "url": "https://www.cardmarket.com/en/Pokemon/Products/Singles/Wild-Blaze/Pineco",
+   "card_id": "en:xy2-4",
+   "matched": 1
+  },
+  {
+   "url": "https://www.cardmarket.com/en/Pokemon/Products/Singles/Wild-Blaze/Roselia",
+   "card_id": "en:xy2-8",
+   "matched": 1
+  },
+  {
+   "url": "https://www.cardmarket.com/en/Pokemon/Products/Singles/Wild-Blaze/Roserade",
+   "card_id": "en:xy2-9",
+   "matched": 1
+  },
+  {
+   "url": "https://www.cardmarket.com/en/Pokemon/Products/Singles/Wild-Blaze/Seedot",
+   "card_id": "en:xy2-5",
+   "matched": 1
+  },
+  {
+   "url": "https://www.cardmarket.com/en/Pokemon/Products/Singles/Wild-Blaze/Shiftry-XY2007",
+   "card_id": "en:xy2-7",
+   "matched": 1
+  }
+ ]
+}
