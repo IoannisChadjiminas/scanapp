@@ -1,0 +1,46 @@
+{
+ "schema": "pokesingle_completion_20261120_disp1",
+ "import_id": "PS-CATALOGUE-EN-JA-DISP1-20261120",
+ "date": "2026-11-25",
+ "change": "en:svp-196: cards.cardmarket_url and product row V1 -> V3 (listing_image_url 821616); dead V2 row unlinked",
+ "cards_md5_before": "7207c79266a70ab038ee8cb37d7a722d",
+ "cards_md5_after": "9c85e3324cdfbb004c00e69abb1e38cb",
+ "products_md5_before": "daaef25bcaaed92fced1f456a6359eed",
+ "products_md5_after": "9c322a1f18af58da031f955175ce48e9",
+ "before": {
+  "cards": [
+   {
+    "id": "en:svp-196",
+    "cardmarket_id": 821616,
+    "cardmarket_url": "https://www.cardmarket.com/en/Pokemon/Products/Singles/SV-Black-Star-Promos/Charizard-ex-V1-SVP196",
+    "cardmarket_verified": 1,
+    "cardmarket_provenance": "tcggo-product-id-official-outbound-route-crosswalk-v2",
+    "cardmarket_verified_at": null
+   }
+  ],
+  "cardmarket_products": [
+   {
+    "url": "https://www.cardmarket.com/en/Pokemon/Products/Singles/SV-Black-Star-Promos/Charizard-ex-V1-SVP196",
+    "expansion": "SV-Black-Star-Promos",
+    "name": "Charizard ex (SVP 196)From 1,40 \u20ac",
+    "source": "crawl",
+    "page_url": "https://www.cardmarket.com/en/Pokemon/Products/Singles/SV-Black-Star-Promos",
+    "card_id": "en:svp-196",
+    "matched": 1,
+    "imported_at": "2026-09-19T06:00:33Z",
+    "listing_image_url": null
+   },
+   {
+    "url": "https://www.cardmarket.com/en/Pokemon/Products/Singles/SV-Black-Star-Promos/Charizard-ex-V2-SVP196",
+    "expansion": "SV-Black-Star-Promos",
+    "name": "Charizard ex (SVP 196)From 0,85 \u20ac",
+    "source": "crawl",
+    "page_url": "https://www.cardmarket.com/en/Pokemon/Products/Singles/SV-Black-Star-Promos",
+    "card_id": "en:svp-196",
+    "matched": 1,
+    "imported_at": "2026-09-19T06:00:37Z",
+    "listing_image_url": null
+   }
+  ]
+ }
+}

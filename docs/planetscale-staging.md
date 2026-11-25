@@ -1,5 +1,20 @@
 # Staging catalogue source
 
+## Charizard ex SVP 196 dead links replaced — 2026-11-25
+
+In this snapshot `en:svp-196` still pointed at `Charizard-ex-V1-SVP196` (the
+17 October correction was made in the older `jalinks14` snapshot), and its V2
+row is also dead: Cardmarket redirects both to the expansion page. The card's
+`cardmarket_id` was already 821616, the working `Charizard-ex-V3-SVP196`
+(checked on Cardmarket 25 November). One guarded block changed the card's
+`cardmarket_url` and its V1 product row to the V3 address (photo 821616),
+unlinked the V2 row (`matched=0`, `card_id=NULL`), and set both digests:
+products `daaef25b…` → `9c322a1f18af58da031f955175ce48e9`, cards
+`7207c792…` → `9c85e3324cdfbb004c00e69abb1e38cb` (row counts unchanged), with
+a `corrections` entry. The API restarted, passed its checksum check, and
+`/api/v1/cards/en:svp-196` returns V3 with no version choice. Rollback record
+with the original rows: `docs/catalogue-charizard-svp196-20261125.json`.
+
 ## More non-English prints unlinked from English cards — 2026-11-25
 
 Found during the list-view naming pass: Italian Ho-Oh
