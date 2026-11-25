@@ -1,0 +1,36 @@
+{
+ "schema": "pokesingle_completion_20261120_disp1",
+ "import_id": "PS-CATALOGUE-EN-JA-DISP1-20261120",
+ "date": "2026-11-25",
+ "change": "cardmarket_products: French, Portuguese and German prints linked to English cards set to matched=0, card_id=NULL",
+ "products_md5_before": "80470e4f5f11bec9503c5343339e47c1",
+ "products_md5_after": "a30288f54e98a114076260329745effc",
+ "rows": 72079,
+ "unlinked": [
+  {
+   "url": "https://www.cardmarket.com/en/Pokemon/Products/Singles/Lost-Thunder/Electropower-V3-LOT172",
+   "card_id": "en:sm8-172",
+   "matched": 1
+  },
+  {
+   "url": "https://www.cardmarket.com/en/Pokemon/Products/Singles/Promos/Buddy-Buddy-Poffin-V2-PRTEF-144",
+   "card_id": "en:sv05-144",
+   "matched": 1
+  },
+  {
+   "url": "https://www.cardmarket.com/en/Pokemon/Products/Singles/Promos/Buddy-Buddy-Poffin-V3-PRTEF-144",
+   "card_id": "en:sv05-144",
+   "matched": 1
+  },
+  {
+   "url": "https://www.cardmarket.com/en/Pokemon/Products/Singles/Promos/Nest-Ball-V1-PRSVI-181",
+   "card_id": "en:sv01-181",
+   "matched": 1
+  },
+  {
+   "url": "https://www.cardmarket.com/en/Pokemon/Products/Singles/Promos/Team-Rockets-Giovanni-V1-PRDRI-174",
+   "card_id": "en:sv10-174",
+   "matched": 1
+  }
+ ]
+}
