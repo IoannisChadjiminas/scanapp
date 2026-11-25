@@ -1,5 +1,20 @@
 # Staging catalogue source
 
+## Catalogue corrections re-applied at load — 2026-11-25
+
+The four in-place fixes of 25 November (85 Japanese XY links, 10 other
+non-English prints, Charizard ex SVP 196) live in the `disp1` snapshot only.
+A release cloned from `disp1` keeps them; one built from an older snapshot or
+from scratch, such as the phase-e release, would not. So the server now
+re-applies them: `api/app/catalogue_corrections.csv` (97 rows, made from the
+rollback records below) is applied by `app/catalogue_corrections.py` right
+after the checksum check and before the catalogue is made read-only, and on
+the local SQLite catalogue after its Cardmarket links sync. A row only acts
+while the catalogue still holds the exact wrong value, so it is a no-op on
+`disp1` and on any later catalogue that fixed the row another way. The API
+logs `catalogue corrections applied=<n>`; `0` means the catalogue already had
+the fixes. Add a row there for any future in-place catalogue fix.
+
 ## Charizard ex SVP 196 dead links replaced — 2026-11-25
 
 In this snapshot `en:svp-196` still pointed at `Charizard-ex-V1-SVP196` (the

@@ -668,6 +668,13 @@ class Databases:
 
         backfill_remote_image_urls(self.catalog, settings.data_dir)
         sync_cardmarket_links(settings.data_dir, self.catalog)
+        import logging
+
+        from app import catalogue_corrections
+
+        corrected = catalogue_corrections.apply(self.catalog)
+        self.catalog.commit()
+        logging.getLogger("catalogue").info("catalogue corrections applied=%s", corrected)
         _load_patterns(self.catalog)
 
     def close(self) -> None:
