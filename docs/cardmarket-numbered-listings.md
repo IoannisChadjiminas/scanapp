@@ -15,16 +15,16 @@ These are the English cards in `pokesingle_completion_20261120_disp1` with two
 or more matched listings outside the Additionals expansions: 1,273 cards and
 2,796 listings in 137 expansions.
 
-**2,232 listings are named and 481 are still numbered.** The other 83 were
+**2,326 listings are named and 387 are still numbered.** The other 83 were
 foreign-language listings (78 Japanese XY, 5 others) wrongly linked to English cards; they were unlinked from
 the catalogue on 25 November 2026 (see [planetscale-staging.md](planetscale-staging.md)).
 
 | Source (`rule` column) | Listings |
 |---|---:|
-| Cardmarket photo caption, read in the owner's browser (`photo …`) | 866 |
+| Cardmarket photo caption, read in the owner's browser (`photo …`) | 936 |
 | TCGdex by Cardmarket product id, each one checked against the listing photo (`tcgdex …`) | 587 |
-| Product id from Cardmarket's list view, TCGdex for that id, confirmed on the photo (`photo+tcgdex …`) | 241 |
-| Stamp text printed on the card, read on the listing photo (`printed stamp …`) | 217 |
+| Product id from Cardmarket's list view, TCGdex for that id, confirmed on the photo (`photo+tcgdex …`) | 255 |
+| Stamp text printed on the card, read on the listing photo (`printed stamp …`) | 227 |
 | The card's own unnumbered listing, alone in its expansion (`own listing`) | 145 |
 | The listing sits in another expansion: Professor Program, Southeast Asia promo, W stamp, Trainer Kit (`expansion`) | 108 |
 | McDonald's 25th Anniversary: V1 non-holo, V2 holo, which TCGdex confirms for every pair (`mcdonalds`) | 50 |
@@ -60,7 +60,10 @@ Cardmarket's list view (30 products per page, each row with its product id
 and photo). No product pages were opened. The list view was read for SV
 Black Star Promos and all nine Prize Pack series (49 pages, two browser
 checks), then MEP, Best of Game, Nintendo and SV Energies in full and name
-searches in the XY, SM, Wizards, BW and SV promo lists (30 pages, one check).
+searches in the XY, SM, Wizards, BW and SV promo lists (30 pages, one check),
+then Scarlet & Violet, Supreme Victors, Shrouded Fable, Kalos and Sun & Moon
+starter sets in full plus name searches in about 60 other sets for the
+listings with no photo address (about 118 pages, one check).
 
 ## TCGdex corrections found on the photos
 
@@ -98,6 +101,12 @@ Poffin PRTEF 144 V2/V3, German Team Rocket's Giovanni PRDRI 174 V1). They were
 unlinked from the catalogue like the Japanese XY links (see
 [planetscale-staging.md](planetscale-staging.md)).
 
+The list-view pass also turned up more non-English prints linked to English
+cards, left unnamed and noted for a catalogue fix: Italian Ho-Oh (EX Unseen
+Forces 27 V2), German Deoxys (EX Deoxys 16 V3) and Rayquaza (EX Deoxys 22 V2),
+and Japanese Rowlet and Dartrix (Sun & Moon Starter Set, on Hidden Fates SV2
+and SV3).
+
 ## Regenerating
 
 `api/scripts/name_numbered_listings.py` writes the rule-based candidate rows
@@ -127,6 +136,6 @@ checks that no card has two identical names.
 
 | Listings | Cards | Why | What would name them |
 |---:|---:|---|---|
-| 146 | 96 | The photo has no caption and no legible stamp text: plain reverse holos, bare logos (the small Play! Pokémon logo, snowflakes), and two listings of one card that would get the same name | A second source, or the product page |
-| 237 | 148 | No photo address in the catalogue, including Charizard ex SVP 196, which is not in Cardmarket's list | Cardmarket list-view pages for those sets (roughly 100 pages), then the photos |
+| 257 | 176 | The photo has no caption and no legible stamp text: plain reverse holos, bare logos (the small Play! Pokémon logo, snowflakes), and listings that would share a name | A second source, or the product page |
+| 32 | 25 | No product found in Cardmarket's list view or name search (Charizard ex SVP 196, Mew ex 151, Team Rocket's Mewtwo ex DRI, some older promos and starter-set listings) | The product page |
 | 98 | 49 | Prize Pack basic Energy (no caption) and Cheren's Care, which has no V2 in the list | Not resolvable from Cardmarket's photos |
