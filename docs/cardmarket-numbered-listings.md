@@ -15,15 +15,15 @@ These are the English cards in `pokesingle_completion_20261120_disp1` with two
 or more matched listings outside the Additionals expansions: 1,273 cards and
 2,796 listings in 137 expansions.
 
-**1,874 listings are named and 844 are still numbered.** The other 78 were
+**1,890 listings are named and 828 are still numbered.** The other 78 were
 Japanese XY listings wrongly linked to English cards; they were unlinked from
 the catalogue on 25 November 2026 (see [planetscale-staging.md](planetscale-staging.md)).
 
 | Source (`rule` column) | Listings |
 |---|---:|
-| Cardmarket photo caption, read in the owner's browser (`photo …`) | 733 |
+| Cardmarket photo caption, read in the owner's browser (`photo …`) | 741 |
 | TCGdex by Cardmarket product id, each one checked against the listing photo (`tcgdex …`) | 587 |
-| Product id from Cardmarket's list view, TCGdex for that id, confirmed on the photo (`photo+tcgdex …`) | 233 |
+| Product id from Cardmarket's list view, TCGdex for that id, confirmed on the photo (`photo+tcgdex …`) | 241 |
 | The card's own unnumbered listing, alone in its expansion (`own listing`) | 145 |
 | The listing sits in another expansion: Professor Program, Southeast Asia promo, W stamp, Trainer Kit (`expansion`) | 108 |
 | McDonald's 25th Anniversary: V1 non-holo, V2 holo, which TCGdex confirms for every pair (`mcdonalds`) | 50 |
@@ -112,4 +112,3 @@ checks that no card has two identical names.
 | 225 | 143 | No photo address in the catalogue | Cardmarket list-view pages for those expansions (about 5–12 pages per set), then the photos |
 | 31 | 20 | Promos read on 25 November with no caption and no TCGdex name: Best of Game "Winner" prints, Nintendo winner prints, SM Detective Pikachu logos, MEP Pikachu 093, BW N, Charizard ex SVP 196 (not in Cardmarket's list) | The product page, or a second source |
 | 98 | 49 | Prize Pack basic Energy (no caption) and Cheren's Care, which has no V2 in the list | Not resolvable from Cardmarket's photos |
-| 16 | 8 | SV basic Energy V4/V5: these are the SVE 009–016 prints (another card number) grouped with SVE 001–008 | A catalogue fix, like the Japanese links |
