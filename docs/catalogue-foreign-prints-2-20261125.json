@@ -1,0 +1,36 @@
+{
+ "schema": "pokesingle_completion_20261120_disp1",
+ "import_id": "PS-CATALOGUE-EN-JA-DISP1-20261120",
+ "date": "2026-11-25",
+ "change": "cardmarket_products: Italian, German and Japanese prints linked to English cards set to matched=0, card_id=NULL",
+ "products_md5_before": "a30288f54e98a114076260329745effc",
+ "products_md5_after": "daaef25bcaaed92fced1f456a6359eed",
+ "rows": 72079,
+ "unlinked": [
+  {
+   "url": "https://www.cardmarket.com/en/Pokemon/Products/Singles/EX-Deoxys/Deoxys-V3-DX16",
+   "card_id": "en:ex8-16",
+   "matched": 1
+  },
+  {
+   "url": "https://www.cardmarket.com/en/Pokemon/Products/Singles/EX-Deoxys/Rayquaza-V2-DX22",
+   "card_id": "en:ex8-22",
+   "matched": 1
+  },
+  {
+   "url": "https://www.cardmarket.com/en/Pokemon/Products/Singles/EX-Unseen-Forces/Ho-Oh-V2-UF27",
+   "card_id": "en:ex10-27",
+   "matched": 1
+  },
+  {
+   "url": "https://www.cardmarket.com/en/Pokemon/Products/Singles/Sun-Moon-Starter-Set/Dartrix",
+   "card_id": "en:sma-SV3",
+   "matched": 1
+  },
+  {
+   "url": "https://www.cardmarket.com/en/Pokemon/Products/Singles/Sun-Moon-Starter-Set/Rowlet",
+   "card_id": "en:sma-SV2",
+   "matched": 1
+  }
+ ]
+}
