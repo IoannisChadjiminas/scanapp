@@ -43,6 +43,7 @@ from app.cardmarket_budget import (
 from app.session import client_ip, existing_session, get_or_create_session
 from app.config import get_settings
 from app.subscription_client import SubscriptionClient, SubscriptionUnavailable
+from app.live_permit import require_live_permit
 from app.paid_refresh_requests import PriceRequestConflict, attach as attach_paid_request, register as register_paid_request
 from app.cardmarket_queue import (
     AuthError,
@@ -197,6 +198,9 @@ class ChartPoint(BaseModel):
 class ParseRequest(BaseModel):
     url: str = Field(min_length=8, max_length=500)
     html: str = Field(min_length=1, max_length=2_000_000)
+    # A collector's "Check live offers" read: spends a live-check permit once
+    # the gate is ready. Background and scan-time parses leave it False.
+    live: bool = False
 
 
 class ParseResponse(BaseModel):
@@ -656,6 +660,12 @@ def parse_cardmarket_page(
 ) -> ParseResponse:
     """Parse HTML the phone's WebView already loaded. Does not fetch the URL."""
     settings = request.app.state.settings
+    if payload.live:
+        # Checked before anything is kept: a refused live read stores nothing,
+        # not even a session.
+        if not is_verified_singles_url(payload.url):
+            raise HTTPException(status_code=400, detail="Cardmarket product URL required")
+        require_live_permit(request, 'cardmarket')
     session = get_or_create_session(request, response, request.app.state.dbs, settings)
     if not is_verified_singles_url(payload.url):
         raise HTTPException(status_code=400, detail="Cardmarket product URL required")
