@@ -86,6 +86,11 @@ basic Energy 017–024, and SVP 225 Pikachu's Worlds 2025 and League winner
 stamps. Those cards have no plain reverse; the tinsel copy and the winner stamp
 are their own products.
 
+Since 25 November 2026 the same file also names about 900 numbered listings
+outside the Additionals by rule (TCGdex by product id, McDonald's, other
+expansions, the card's own listing): see
+[cardmarket-numbered-listings.md](cardmarket-numbered-listings.md).
+
 ## Checked, no change needed
 
 - Shiny Treasure ex, VMAX Climax and VSTAR Universe (JP): the mirror reverse is
