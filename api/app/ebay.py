@@ -63,11 +63,16 @@ OWNED_S = 30 * 86400
 HISTORY_DAYS = 400
 # Graders the app does not offer still mark a listing as another slab.
 _ALL_GRADERS = (*GRADERS, "SGC", "ACE", "PCA", "MNT", "GMA", "HGA", "CGA", "ARS", "BECKETT")
-GRADE = re.compile(r"^(10|[1-9](\.5)?)$")
+# CGC's grade above its Gem Mint 10, on the label as "Pristine 10" (and, on
+# older slabs, "Perfect 10"): the same number, a dearer card.
+PRISTINE = "P10"
+PRISTINE_GRADERS = ("CGC",)
+GRADE = re.compile(r"^(10|[1-9](\.5)?|P10)$")
+_PRISTINE = re.compile(r"\b(pristine|perfect)\b", re.IGNORECASE)
 USER_AGENT = "scanapp-prices/1.0"
 
 # Words sellers put between the grader and the number: "PSA GEM MT 10".
-_FILLER = r"(?:\s*[:\[\]\(\)\-#]?\s*(?:gem|mint|mt|nm|nm-mt|grade|graded)\b)*"
+_FILLER = r"(?:\s*[:\[\]\(\)\-#]?\s*(?:gem|mint|mt|nm|nm-mt|grade|graded|pristine|perfect)\b)*"
 # A cheaper listing than this share of the middle price is left out of the
 # average: a mislisted card or a bait title that passed the other rules.
 OUTLIER_SHARE = 0.5
@@ -181,6 +186,20 @@ class GradedCard:
         return f"GradedCard({', '.join(parts)})"
 
     @property
+    def pristine(self) -> bool:
+        return self.grade == PRISTINE
+
+    @property
+    def grade_number(self) -> str:
+        """The number on the slab: "10" for a Pristine 10 too."""
+        return "10" if self.pristine else self.grade
+
+    @property
+    def grade_words(self) -> str:
+        """The grade as eBay is asked for it."""
+        return "Pristine 10" if self.pristine else self.grade
+
+    @property
     def pattern_label(self) -> str:
         """"Master Ball", as eBay is asked for it; empty for other copies."""
         return PATTERNS[self.pattern][0] if self.pattern in PATTERNS else ""
@@ -222,7 +241,7 @@ class GradedCard:
         return " ".join(
             part for part in (
                 self.titled, self.number_label, "Japanese" if self.japanese else "",
-                self.grader, self.grade,
+                self.grader, self.grade_words,
             ) if part
         )
 
@@ -246,7 +265,8 @@ class GradedCard:
             return ""
         return " ".join(
             part for part in (
-                self.titled, named, "Japanese" if self.japanese else "", self.grader, self.grade
+                self.titled, named, "Japanese" if self.japanese else "", self.grader,
+                self.grade_words,
             ) if part
         )
 
@@ -335,19 +355,30 @@ def listing_is(title: str, card: GradedCard, *, graded: bool = False) -> bool:
     still must not name another slab.
     """
     if graded:
-        if other_slab(title, card.grader, card.grade):
+        if other_slab(title, card.grader, card.grade_number):
             return False
-    elif not names_grade(title, card.grader, card.grade):
+    elif not names_grade(title, card.grader, card.grade_number):
         return False
+    # A Pristine 10 says so; eBay's own grade field reads "10" for both, so
+    # the title is what tells them apart.
     # A word that rules a listing out does not when it is part of the card's
     # or the set's own name (the set "Perfect Order", a card named "Pick").
     # It may appear as often as the name holds it and no more: "Perfect
     # Order ... CGC 10 PERFECT" is still the dearer slab.
     own = f"{card.name} {card.set_name}".lower()
+    # A Pristine 10 says so, beyond what the card's own name says; eBay's
+    # own grade field reads "10" for both, so the title is what tells them
+    # apart.
+    if card.pristine:
+        said = [found.group(0).lower() for found in _PRISTINE.finditer(title)]
+        if not any(said.count(word) > own.count(word) for word in set(said)):
+            return False
     for rule in (_NOT_A_CARD, _BAIT):
         seen: dict[str, int] = {}
         for found in rule.finditer(title):
             word = found.group(0).lower()
+            if card.pristine and _PRISTINE.fullmatch(word):
+                continue
             seen[word] = seen.get(word, 0) + 1
             if seen[word] > own.count(word):
                 return False
@@ -482,7 +513,7 @@ def item_confirms(item: dict[str, Any], card: GradedCard) -> bool:
     if grader and grader != GRADER_NAMES.get(card.grader):
         return False
     grade = recorded.get("Grade")
-    if grade and grade != card.grade:
+    if grade and grade != card.grade_number:
         return False
     entered = {
         str(aspect.get("name")): str(aspect.get("value") or "")
@@ -701,7 +732,7 @@ class Ebay:
             params["filter"] += f",conditionIds:{{{GRADED_CONDITION}}}"
             params["aspect_filter"] = (
                 f"categoryId:{SINGLE_CARDS},"
-                f"Professional Grader:{{{GRADER_NAMES[graded.grader]}}},Grade:{{{graded.grade}}}"
+                f"Professional Grader:{{{GRADER_NAMES[graded.grader]}}},Grade:{{{graded.grade_number}}}"
             )
         reply = self._client.get(
             "/buy/browse/v1/item_summary/search",

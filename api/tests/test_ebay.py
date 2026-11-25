@@ -3,6 +3,8 @@
 The title rules are checked against titles eBay returned on 21 November 2026.
 """
 
+from dataclasses import replace
+
 import httpx
 from fastapi import FastAPI
 from fastapi.testclient import TestClient
@@ -777,3 +779,49 @@ def test_the_route_asks_for_the_version_the_collector_chose(tmp_path):
     ]}).json()["values"]
     assert [value["average"] for value in values] == [50.0, 5.0]
     reader.close()
+
+
+SPRITZEE_PRISTINE = GradedCard("Spritzee", "038", "CGC", "P10", total=131, year=2025,
+                               set_name="Prismatic Evolutions", pattern="masterball")
+
+
+def test_a_cgc_pristine_10_is_its_own_grade():
+    reported = "CGC 10 Spritzee 038/131 Master Ball Reverse Holo Prismatic Evolutions 2025 Pristine 10"
+    gem = "CGC 10 Gem Mint Spritzee 038/131 Master Ball Reverse Holo Prismatic Evolutions 2025"
+    # The listing a collector reported: a Master Ball in Pristine 10.
+    assert listing_is(reported, SPRITZEE_PRISTINE)
+    assert listing_is("Spritzee 038/131 Master Ball Prismatic Evolutions CGC PRISTINE 10", SPRITZEE_PRISTINE)
+    assert listing_is("Spritzee 038/131 Master Ball Prismatic Evolutions CGC Perfect 10", SPRITZEE_PRISTINE)
+    # eBay's own grade field reads 10 for both: without the word it is the Gem Mint.
+    assert not listing_is(gem, SPRITZEE_PRISTINE)
+    assert not listing_is(gem, SPRITZEE_PRISTINE, graded=True)
+    assert listing_is(reported, SPRITZEE_PRISTINE, graded=True)
+    assert not listing_is(reported.replace("CGC 10", "CGC 9.5"), SPRITZEE_PRISTINE)
+    assert not listing_is(reported.replace("CGC", "PSA"), SPRITZEE_PRISTINE)
+    # The Gem Mint 10 keeps leaving the dearer slab out.
+    assert listing_is(gem, SPRITZEE_MASTER)
+    assert not listing_is(reported, SPRITZEE_MASTER)
+    # A set's own name is not the grade: "Perfect Order".
+    ordered = GradedCard("Spritzee", "038", "CGC", "P10", total=131, set_name="Perfect Order")
+    assert not listing_is("CGC 10 Gem Mint Spritzee 038/131 Perfect Order", ordered)
+    assert not listing_is("Spritzee 038/131 Perfect Order", ordered, graded=True)
+    assert listing_is("CGC Pristine 10 Spritzee 038/131 Perfect Order", ordered)
+    assert listing_is("CGC 10 PERFECT Spritzee 038/131 Perfect Order", ordered)
+    assert not listing_is("CGC 10 PERFECT Spritzee 038/131 Perfect Order", replace(ordered, grade="10"))
+    # Asked for by name, and kept apart from the 10.
+    assert SPRITZEE_PRISTINE.search == "Spritzee Master Ball 038/131 CGC Pristine 10"
+    assert SPRITZEE_PRISTINE.grade_number == "10"
+    assert repr(SPRITZEE_PRISTINE) != repr(SPRITZEE_MASTER)
+    # The listing opened: its grade field says 10.
+    assert item_confirms({"conditionDescriptors": [
+        {"name": "Grade", "values": [{"content": "10"}]}]}, SPRITZEE_PRISTINE)
+    assert not item_confirms({"conditionDescriptors": [
+        {"name": "Grade", "values": [{"content": "9.5"}]}]}, SPRITZEE_PRISTINE)
+
+
+def test_only_cgc_has_a_pristine_10():
+    from app.routes.ebay import _grade_known
+
+    assert _grade_known("CGC", "P10") and _grade_known("CGC", "10") and _grade_known("PSA", "10")
+    assert not _grade_known("PSA", "P10") and not _grade_known("BGS", "P10")
+    assert not _grade_known("CGC", "P9") and not _grade_known("XYZ", "10")
