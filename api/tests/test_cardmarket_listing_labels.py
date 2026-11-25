@@ -36,7 +36,7 @@ def _labels(listings, variants=(), guide=None):
 
 def test_the_shipped_file():
     rows = _shipped()
-    assert len(rows) == 2232
+    assert len(rows) == 2326
     assert len({row["url"] for row in rows}) == len(rows)
     for row in rows:
         assert row["label"] and len(row["label"]) <= 60 and not re.search(r"\bV\d", row["label"])
