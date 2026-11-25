@@ -8,7 +8,9 @@ import httpx
 from fastapi import APIRouter, HTTPException, Query, Request
 from pydantic import BaseModel, Field
 
-from app.ebay import GRADE, GRADERS, PATTERNS, GradedCard, name_from_listing
+from app.ebay import (
+    GRADE, GRADERS, PATTERNS, PRISTINE, PRISTINE_GRADERS, GradedCard, name_from_listing,
+)
 
 router = APIRouter()
 log = logging.getLogger("ebay")
@@ -59,6 +61,14 @@ def _total(conn, language: str, set_id: str) -> int | None:
     except sqlite3.Error:
         return None
     return int(row[0]) if row and row[0] else None
+
+
+def _grade_known(grader: str, grade: str) -> bool:
+    """A grader the app offers and a grade it awards: 1 to 10 in half steps,
+    and "P10", a Pristine 10, from the graders that have one."""
+    if grader not in GRADERS or not GRADE.match(grade):
+        return False
+    return grade != PRISTINE or grader in PRISTINE_GRADERS
 
 
 def _pattern(catalog, card_id: str, listing: str | None) -> str | None:
@@ -164,7 +174,8 @@ def get_graded(
     if reader is None:
         return EbayGraded()
     grader = grader.upper()
-    if grader not in GRADERS or not GRADE.match(grade):
+    grade = grade.upper()
+    if not _grade_known(grader, grade):
         raise HTTPException(status_code=422, detail="Unknown grade")
     catalog = request.app.state.dbs.catalog
     if catalog.execute("SELECT 1 FROM cards WHERE id = ?", (card_id,)).fetchone() is None:
@@ -231,12 +242,13 @@ def graded_values(payload: GradedCopies, request: Request) -> GradedValues:
     values: list[GradedValue] = []
     for copy in payload.copies:
         grader = copy.grader.upper()
+        grade = copy.grade.upper()
         card = (
             _graded_card(
-                catalog, copy.card_id, grader, copy.grade, copy.reverse, copy.first_edition,
+                catalog, copy.card_id, grader, grade, copy.reverse, copy.first_edition,
                 copy.listing,
             )
-            if grader in GRADERS and GRADE.match(copy.grade)
+            if _grade_known(grader, grade)
             else None
         )
         if card is None:
