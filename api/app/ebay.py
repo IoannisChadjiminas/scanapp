@@ -53,8 +53,8 @@ GRADER_NAMES = {
 }
 # eBay's condition for a card in a grader's slab.
 GRADED_CONDITION = "2750"
-# How many of the cheapest listings are opened to confirm the average.
-CHECKS = 12
+# Listings in one search: eBay's most.
+PAGE = 200
 # How long an answer is kept at all. A day old it is asked again when someone
 # looks; a collection's value may use it for longer than see no value.
 KEEP_S = 45 * 86400
@@ -63,6 +63,18 @@ OWNED_S = 30 * 86400
 HISTORY_DAYS = 400
 # Graders the app does not offer still mark a listing as another slab.
 _ALL_GRADERS = (*GRADERS, "SGC", "ACE", "PCA", "MNT", "GMA", "HGA", "CGA", "ARS", "BECKETT")
+# Card and set words that read as a grader's name: every Tag Team card, the
+# Japanese "Tag Bolt" and "Tag All Stars" sets, ACE SPEC cards.
+_NOT_A_GRADER = re.compile(r"\btag\s*-?\s*(?:team|bolt|all\s*-?\s*stars?)\b|\bace\s*-?\s*spec\b", re.IGNORECASE)
+_NON_SHADOWLESS = re.compile(r"\bnon\s*-?\s*shadowless\b", re.IGNORECASE)
+# Graders whose names are also title words: one counts only with a grade.
+_WORD_GRADERS = {"TAG", "ACE", "MNT"}
+# Another name for a grader the app offers: "BECKETT BGS 9.5" is one slab.
+_SAME_GRADER = {"BECKETT": "BGS"}
+# Words a slab label names a set by, besides its own name: PSA labels the 151
+# set "MEW EN-151", and sellers copy "Mew EN" without the 151; it labels Base
+# Set "1999 POKEMON GAME #4 CHARIZARD-HOLO".
+_SET_LABELS = {"sv03.5": ("mew",), "base1": ("game",)}
 # CGC's grade above its Gem Mint 10, on the label as "Pristine 10" (and, on
 # older slabs, "Perfect 10"): the same number, a dearer card.
 PRISTINE = "P10"
@@ -256,19 +268,17 @@ class GradedCard:
         return words
 
     @property
-    def set_search(self) -> str:
-        """The second search, by set instead of number: slab labels read
-        "2026 POKEMON 30TH CELEBRATION CLASSIC COLLECTION #4 CHARIZARD", with
-        no "4/102" for the first search to find. Empty with no set to name."""
-        named = " ".join(self.set_words) if self.set_name.isascii() else self.set_code
-        if not named:
-            return ""
-        return " ".join(
-            part for part in (
-                self.titled, named, "Japanese" if self.japanese else "", self.grader,
-                self.grade_words,
-            ) if part
-        )
+    def number_search(self) -> str:
+        """The number as eBay is asked for it, in each form sellers write:
+        "(4, 004)", "(085, 85)", "XY28". An eBay word list in brackets is
+        any of them; "4/102" would miss "#4" and "004/102"."""
+        if self.lettered:
+            return self.number
+        plain = _plain_number(self.number)
+        forms = list(dict.fromkeys(
+            (self.number, plain, plain.zfill(3)) if plain.isdigit() else (self.number,)
+        ))
+        return forms[0] if len(forms) == 1 else f"({', '.join(forms)})"
 
 
 def _one(word: str) -> str:
@@ -289,9 +299,16 @@ def _plain_number(text: str) -> str:
 
 def other_slab(title: str, grader: str, grade: str) -> bool:
     """Whether a title names another grader, or this grader with another
-    number: "PSA 9 ... BGS", "PSA 9 ... PSA 10" for a wanted PSA 10."""
+    number: "PSA 9 ... BGS", "PSA 9 ... PSA 10" for a wanted PSA 10. A
+    card's own words are no grader: "Tag Team", "Tag Bolt", "ACE SPEC"."""
+    title = _NOT_A_GRADER.sub(" ", title)
     for other in _ALL_GRADERS:
-        if other != grader and re.search(rf"(?<![A-Za-z]){other}(?![A-Za-z])", title, re.IGNORECASE):
+        if other == grader or _SAME_GRADER.get(other) == grader:
+            continue
+        # "TAG", "ACE" and "MNT" are also ordinary words of titles ("SUN &
+        # MOON TAG", "GEM MNT"): they are a slab only with a grade after them.
+        graded = rf"{_FILLER}\s*[:\-\]]?\s*\d" if other in _WORD_GRADERS else ""
+        if re.search(rf"(?<![A-Za-z]){other}(?![A-Za-z]){graded}", title, re.IGNORECASE):
             return True
     for found in re.finditer(
         rf"(?<![A-Za-z]){re.escape(grader)}{_FILLER}\s*[:\-\]]?\s*(\d{{1,2}}(?:\.5)?\+?)(?![\d]|\.\d)",
@@ -319,7 +336,10 @@ def _names_set(title: str, card: GradedCard) -> bool:
     code; and not a later set that only adds a number ("Base Set 2")."""
     present = [_one(word) for word in _words(title)]
     words = card.set_words
-    by_name = bool(words) and all(word in present for word in words)
+    # A promo series is named by any of its words: "Black Star Promo 085"
+    # and "SVP 085" are both the Scarlet & Violet promo.
+    by_name = bool(words) and (any if card.promo else all)(word in present for word in words)
+    by_label = any(word in present for word in _SET_LABELS.get(card.set_code.lower(), ()))
     # "sv2a" as a word; "sv-p" also as "SV-P", "SVP" or "SV P".
     code = card.set_code.lower()
     by_code = bool(code) and (
@@ -333,9 +353,9 @@ def _names_set(title: str, card: GradedCard) -> bool:
             is not None
         )
     )
-    if not (by_name or by_code):
+    if not (by_name or by_code or by_label):
         return False
-    if by_name and not by_code:
+    if (by_name or by_label) and not by_code and words:
         last = words[-1]
         # "Base Set 2": past words like "set", which every title has.
         told = [word for word in present if word not in _SET_NOISE]
@@ -354,6 +374,9 @@ def listing_is(title: str, card: GradedCard, *, graded: bool = False) -> bool:
     many are eBay's catalogue titles ("Charizard ex 199/165 ... Holo"); it
     still must not name another slab.
     """
+    # "Non-Shadowless" is the unlimited printing, not a raw card ("non") or
+    # the Shadowless one.
+    title = _NON_SHADOWLESS.sub("unlimited", title)
     if graded:
         if other_slab(title, card.grader, card.grade_number):
             return False
@@ -407,7 +430,11 @@ def listing_is(title: str, card: GradedCard, *, graded: bool = False) -> bool:
             elif not _names_set(title, card):
                 return False
     else:
-        if not _names_set(title, card):
+        # A promo with a long name of its own needs no series: PSA labels the
+        # Van Gogh promo "2023 POKEMON X VAN GOGH #085 PIKACHU WITH GREY FELT
+        # HAT PSA 10". Its number below must still be there.
+        named_alone = card.promo and len(_words(card.name)) >= 4
+        if not named_alone and not _names_set(title, card):
             return False
         # A "#185" is the card's number, whatever else the title holds: the
         # 151 set's labels read "MEW EN-151", so "151" alone proves nothing.
@@ -503,37 +530,9 @@ def graded_listings(
     return found
 
 
-def item_confirms(item: dict[str, Any], card: GradedCard) -> bool:
-    """Whether an opened listing's own fields agree it is the card in the grade."""
-    recorded = {
-        str(entry.get("name")): str((entry.get("values") or [{}])[0].get("content") or "")
-        for entry in item.get("conditionDescriptors") or []
-    }
-    grader = recorded.get("Professional Grader")
-    if grader and grader != GRADER_NAMES.get(card.grader):
-        return False
-    grade = recorded.get("Grade")
-    if grade and grade != card.grade_number:
-        return False
-    entered = {
-        str(aspect.get("name")): str(aspect.get("value") or "")
-        for aspect in item.get("localizedAspects") or []
-    }
-    language = entered.get("Language", "").strip().lower()
-    if language and language != "not specified":
-        if card.japanese != (language == "japanese") or (
-            not card.japanese and language != "english"
-        ):
-            return False
-    number = entered.get("Card Number", "").strip()
-    if number and card.set_code not in REPRINT_SETS:
-        parts = _FRACTION.findall(number)
-        head = parts[0][0] if parts else number.lstrip("#")
-        if head.strip().isdigit() and _plain_number(head) != _plain_number(card.number):
-            return False
-        if parts and card.total and int(parts[0][1]) != card.total:
-            return False
-    return True
+def _key(item: dict[str, Any]) -> str:
+    """One listing found by both searches counts once."""
+    return str(item.get("itemId") or item.get("itemWebUrl") or item.get("title"))
 
 
 class Ebay:
@@ -720,75 +719,75 @@ class Ebay:
             self._token = (time.time() + max(60, int(body.get("expires_in", 7200)) - 60), token)
         return token
 
-    def _page(self, query: str, *, graded: GradedCard | None) -> list[dict[str, Any]]:
-        params = {
-            "q": query,
-            "category_ids": SINGLE_CARDS,
-            "filter": "buyingOptions:{FIXED_PRICE}",
-            "sort": "price",
-            "limit": 200,
-        }
-        if graded is not None:
-            params["filter"] += f",conditionIds:{{{GRADED_CONDITION}}}"
-            params["aspect_filter"] = (
-                f"categoryId:{SINGLE_CARDS},"
-                f"Professional Grader:{{{GRADER_NAMES[graded.grader]}}},Grade:{{{graded.grade_number}}}"
-            )
+    def _page(self, query: str, card: GradedCard, *, offset: int = 0) -> tuple[list[dict[str, Any]], int]:
+        """One page of the cheapest Buy It Now slabs eBay files under the
+        card's grader and grade, and how many there are in all."""
         reply = self._client.get(
             "/buy/browse/v1/item_summary/search",
             headers={
                 "Authorization": f"Bearer {self._bearer()}",
                 "X-EBAY-C-MARKETPLACE-ID": self.marketplace,
             },
-            params=params,
-        )
-        reply.raise_for_status()
-        return reply.json().get("itemSummaries") or []
-
-    def search(self, card: GradedCard) -> list[dict[str, Any]]:
-        """eBay's Buy It Now single-card listings that may be the card.
-
-        Four searches, merged. Two ask eBay for its own grader and grade
-        fields, with the card by number and by set: they find listings whose
-        title never says the grade (16% of a sample on 22 November 2026).
-        Two put the grade in the words instead: they find slabs listed under
-        the wrong condition, and listings on eBay's other sites. A listing
-        from the first two carries "gradedByEbay".
-        """
-        jp = " Japanese" if card.japanese else ""
-        number = card.number_label
-        named = " ".join(card.set_words) if card.set_name.isascii() else card.set_code
-        found: dict[str, dict[str, Any]] = {}
-        if card.grader in GRADER_NAMES:
-            for query in dict.fromkeys(
-                q for q in (f"{card.titled} {number}{jp}", f"{card.titled} {named}{jp}" if named else "") if q
-            ):
-                for item in self._page(query, graded=card):
-                    key = str(item.get("itemId") or item.get("itemWebUrl") or item.get("title"))
-                    found[key] = {**item, "gradedByEbay": True}
-        for query in dict.fromkeys(q for q in (card.search, card.set_search) if q):
-            for item in self._page(query, graded=None):
-                # One listing found by several searches counts once.
-                key = str(item.get("itemId") or item.get("itemWebUrl") or item.get("title"))
-                found.setdefault(key, item)
-        return list(found.values())
-
-    def confirms(self, item_id: str, card: GradedCard) -> bool:
-        """Whether the listing itself, opened, is the card in the grade: its
-        recorded grader and grade, and the card number and language the
-        seller entered. What it does not record is not held against it."""
-        if not item_id:
-            return False
-        reply = self._client.get(
-            f"/buy/browse/v1/item/{item_id}",
-            headers={
-                "Authorization": f"Bearer {self._bearer()}",
-                "X-EBAY-C-MARKETPLACE-ID": self.marketplace,
+            params={
+                "q": query,
+                "category_ids": SINGLE_CARDS,
+                "filter": f"buyingOptions:{{FIXED_PRICE}},conditionIds:{{{GRADED_CONDITION}}}",
+                "aspect_filter": (
+                    f"categoryId:{SINGLE_CARDS},"
+                    f"Professional Grader:{{{GRADER_NAMES[card.grader]}}},Grade:{{{card.grade_number}}}"
+                ),
+                "sort": "price",
+                "limit": PAGE,
+                **({"offset": offset} if offset else {}),
             },
         )
-        if reply.status_code != 200:
-            return False
-        return item_confirms(reply.json(), card)
+        reply.raise_for_status()
+        body = reply.json()
+        items = body.get("itemSummaries") or []
+        return items, int(body.get("total") or len(items))
+
+    def search(self, card: GradedCard) -> list[dict[str, Any]]:
+        """eBay's Buy It Now listings of slabs in the copy's grade that may
+        be the card: usually one search, never more than two.
+
+        eBay's own grader and grade fields do the grading, so a title need
+        not say the grade; the words are the card's name and its number in
+        every form sellers write it ("(4, 004)"), never "4/102": eBay then
+        misses "#4" and "4/102" alike. Measured on the live API on 26
+        November 2026, this one search kept as many listings as the four it
+        replaced, or more (Umbreon VMAX 215 PSA 10: 90 against 70), and the
+        listing pages it saved changed no price. Only when eBay holds more
+        than a page is a second search made: the next page, when two pages
+        hold them all, or else one narrowed to listings that name the set's
+        total or the set ("Charizard (4, 004) (102, base)": Celebrations
+        reprints fill the cheapest pages of "Charizard 4").
+        """
+        jp = " Japanese" if card.japanese else ""
+        # Older CGC labels say "Perfect 10".
+        pristine = " (Pristine, Perfect)" if card.pristine else ""
+        if card.set_code in REPRINT_SETS and card.unique_name:
+            # Its listings carry the reprinted card's number, not the
+            # catalogue's: the set and the name find them.
+            named = " ".join(card.set_words)
+            first, narrower = f"{card.titled} {named}{jp}{pristine}", ""
+        else:
+            hints = [str(card.total)] if card.total and not card.lettered and not card.promo else []
+            word = (card.set_words or [""])[0] if card.set_name.isascii() else card.set_code
+            hints += [word] if word and word not in hints else []
+            hints += [label for label in _SET_LABELS.get(card.set_code.lower(), ()) if label not in hints]
+            told = hints[0] if len(hints) == 1 else f"({', '.join(hints)})" if hints else ""
+            first = f"{card.titled} {card.number_search}{jp}{pristine}"
+            narrower = f"{card.titled} {card.number_search} {told}{jp}{pristine}" if told else ""
+        items, total = self._page(first, card)
+        if total > len(items):
+            if total <= 2 * PAGE:
+                more, _ = self._page(first, card, offset=PAGE)
+            elif narrower:
+                more, _ = self._page(narrower, card)
+            else:
+                more = []
+            items = list({_key(item): item for item in (*items, *more)}.values())
+        return [{**item, "gradedByEbay": True} for item in items]
 
     def graded(self, card: GradedCard) -> dict[str, Any]:
         """The app's payload: the average of the cheapest listings, how many
@@ -798,21 +797,11 @@ class Ebay:
             return kept
         items = self.search(card)
         listings = graded_listings(items, card, currency=self.currency)
-        # The cheapest listings set the average, so each is opened and
-        # checked before it counts.
-        cheapest: list[dict[str, Any]] = []
-        refused = 0
-        for listing in listings[:CHECKS]:
-            if len(cheapest) == self.take:
-                break
-            if self.confirms(listing["id"], card):
-                cheapest.append(listing)
-            else:
-                refused += 1
+        cheapest = listings[: self.take]
         enough = len(cheapest) >= self.least
         log.info(
-            "ebay graded grader=%s grade=%s fetched=%s kept=%s confirmed=%s refused=%s",
-            card.grader, card.grade, len(items), len(listings), len(cheapest), refused,
+            "ebay graded grader=%s grade=%s fetched=%s kept=%s",
+            card.grader, card.grade, len(items), len(listings),
         )
         cheapest = [
             {key: value for key, value in listing.items() if key != "id"} for listing in cheapest
@@ -825,7 +814,7 @@ class Ebay:
             if enough
             else None,
             "currency": self.currency,
-            "count": max(0, len(listings) - refused),
+            "count": len(listings),
             # Fewer than enough for an average are still shown as they are.
             "listings": cheapest,
             "observed_at": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
