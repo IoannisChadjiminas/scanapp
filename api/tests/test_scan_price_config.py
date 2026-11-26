@@ -31,7 +31,7 @@ def test_config_reports_the_safe_defaults():
     assert body.scan_prices.phone_reads.scan_gap_s == 20
     assert body.scan_prices.phone_reads.budget_pages == 4
     assert body.scan_prices.phone_reads.budget_window_s == 600
-    assert body.live_offer_reuse_minutes == 1440
+    assert body.live_offer_reuse_minutes == 360
 
 
 def test_config_keeps_the_phone_scan_gap_within_the_app_bounds():
