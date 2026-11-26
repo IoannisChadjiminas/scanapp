@@ -208,6 +208,8 @@ services:
       EBAY_CLIENT_ID: ${EBAY_CLIENT_ID:-}
       EBAY_CLIENT_SECRET: ${EBAY_CLIENT_SECRET:-}
       EBAY_ENVIRONMENT: ${EBAY_ENVIRONMENT:-production}
+      # eBay's licence: listing data shown is at most 6 hours old.
+      EBAY_REUSE_MINUTES: ${EBAY_REUSE_MINUTES:-360}
     volumes:
       - scanapp-data:/data
       - scanapp-tmp:/tmp/scanapp

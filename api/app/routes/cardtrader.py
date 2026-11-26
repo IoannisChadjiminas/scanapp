@@ -141,6 +141,8 @@ class CardTraderPrices(BaseModel):
     matched: bool = False
     count: int = 0
     prices: list[CardTraderPrice] = Field(default_factory=list)
+    # The card's CardTrader page; None when no card was matched.
+    url: str | None = None
     observed_at: str | None = None
 
 
@@ -192,6 +194,8 @@ class TcgplayerPrices(BaseModel):
     enabled: bool = False
     # Market first, then Low and Mid, in dollars; empty when there is no price.
     prices: list[CardTraderPrice] = Field(default_factory=list)
+    # The matched product's TCGplayer page; None without a priced product.
+    url: str | None = None
     observed_at: str | None = None
 
 

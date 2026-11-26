@@ -24,6 +24,8 @@ from app.market_match import pick, plain, plain_number, voted
 log = logging.getLogger("tcgplayer")
 
 SOURCE = "https://tcgcsv.com"
+# A product's public page on TCGplayer.
+PRODUCT_PAGE = "https://www.tcgplayer.com/product/{product_id}"
 # TCGplayer's categories: Pokémon, and Pokémon Japan.
 CATEGORIES = (3, 85)
 JAPAN = 85
@@ -324,6 +326,8 @@ class TcgplayerPrices:
         return {
             "enabled": True,
             "prices": found,
+            # The product's page, for a product with prices (a matched one).
+            "url": PRODUCT_PAGE.format(product_id=product_id) if found else None,
             "observed_at": _utc(self._meta("priced_at")) if found else None,
         }
 

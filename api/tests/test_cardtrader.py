@@ -105,11 +105,15 @@ def test_a_card_is_found_by_its_cardmarket_id_and_read_once_an_hour(tmp_path):
     assert first["matched"] is True and first["count"] == 1
     assert first["prices"][0]["amount"] == 2.5
     assert first["observed_at"].endswith("Z")
+    assert first["url"] == "https://www.cardtrader.com/cards/70"
     assert sum("marketplace" in call for call in calls) == 1
 
     unknown = reader.prices(1, "en")
     assert unknown["matched"] is False and unknown["prices"] == []
     assert unknown["observed_at"] is None
+    assert unknown["url"] is None
+    # Found by set, number and name: the fallback blueprint's page.
+    assert reader.prices(1, "en", fallback=72)["url"] == "https://www.cardtrader.com/cards/72"
     reader.close()
 
 
@@ -142,6 +146,8 @@ def test_the_route_answers_for_a_catalogue_card(tmp_path):
     body = client.get("/api/v1/cardtrader/prices", params={"card_id": "base1-58"}).json()
     assert body["enabled"] is True and body["matched"] is True
     assert [price["amount"] for price in body["prices"]] == [2.5]
+    # The matched blueprint's public page.
+    assert body["url"] == "https://www.cardtrader.com/cards/70"
     assert client.get("/api/v1/cardtrader/prices", params={"card_id": "nope"}).status_code == 404
     assert client.get(
         "/api/v1/cardtrader/prices", params={"card_id": "base1-58", "condition": "XX"}
@@ -149,7 +155,9 @@ def test_the_route_answers_for_a_catalogue_card(tmp_path):
 
     app.state.cardtrader = None
     off = client.get("/api/v1/cardtrader/prices", params={"card_id": "base1-58"}).json()
-    assert off == {"enabled": False, "matched": False, "count": 0, "prices": [], "observed_at": None}
+    assert off == {
+        "enabled": False, "matched": False, "count": 0, "prices": [], "url": None, "observed_at": None,
+    }
     reader.close()
 
 
@@ -476,12 +484,14 @@ def test_the_routes_find_a_card_cardtrader_lists_without_a_cardmarket_id(tmp_pat
     assert answer("tcgplayer", "ja:S3-001")["prices"][0] == {
         "label": "Market", "amount": 1.25, "currency": "USD", "source": "tcgplayer",
     }
+    assert answer("tcgplayer", "ja:S3-001")["url"] == "https://www.tcgplayer.com/product/555"
     # No Cardmarket id and no name in Latin letters: not on CardTrader, but
     # TCGplayer's own set has the number, with a low price and no sales.
     assert answer("cardtrader", "ja:S3-055") == {
-        "enabled": True, "matched": False, "count": 0, "prices": [], "observed_at": None,
+        "enabled": True, "matched": False, "count": 0, "prices": [], "url": None, "observed_at": None,
     }
     assert [p["label"] for p in answer("tcgplayer", "ja:S3-055")["prices"]] == ["Low", "Mid"]
+    assert answer("tcgplayer", "ja:S3-055")["url"] == "https://www.tcgplayer.com/product/777"
     reader.close()
     store.close()
 

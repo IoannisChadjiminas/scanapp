@@ -23,6 +23,9 @@ from app.market_match import close_names, pick, plain, plain_number, voted
 log = logging.getLogger("cardtrader")
 
 API = "https://api.cardtrader.com/api/v2"
+# A card's public page by its blueprint id; CardTrader redirects it to the
+# localised, slugged address (/en-EU/cards/225754-arceus-v-204-...).
+CARD_PAGE = "https://www.cardtrader.com/cards/{blueprint_id}"
 POKEMON_GAME_ID = 5
 MAX_ROWS = 20
 MAX_BLUEPRINTS = 3
@@ -504,6 +507,8 @@ class CardTrader:
             "matched": bool(blueprints),
             "count": len(rows),
             "prices": rows[:MAX_ROWS],
+            # The page of the card the listings are for (the first blueprint).
+            "url": CARD_PAGE.format(blueprint_id=blueprints[0]) if blueprints else None,
             "observed_at": None
             if observed is None
             else datetime.fromtimestamp(observed, timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
