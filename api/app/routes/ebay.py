@@ -35,6 +35,8 @@ class EbayGraded(BaseModel):
     currency: str = "USD"
     count: int = 0
     listings: list[EbayListing] = Field(default_factory=list)
+    # When eBay was read (UTC), not when this request was made: a reused
+    # answer keeps the time of the read it came from.
     observed_at: str | None = None
     # The move over the last [change_days], once there is a week of history.
     change_percent: float | None = None
@@ -233,8 +235,8 @@ class GradedValues(BaseModel):
 def graded_values(payload: GradedCopies, request: Request) -> GradedValues:
     """What a collection's graded copies are valued at, from what is held.
 
-    Nothing here waits for eBay: a copy never asked about, or last asked more
-    than a day ago, is queued for the background and answered from its last
+    Nothing here waits for eBay: a copy never asked about, or last asked
+    longer ago than the reuse window (EBAY_REUSE_MINUTES), is queued for the background and answered from its last
     price meanwhile (up to 45 days old), so a collection's total does not
     drop to the raw value each time an answer goes stale.
     """

@@ -470,7 +470,9 @@ class Settings(BaseSettings):
     ebay_marketplace: str = "EBAY_US"
     ebay_currency: str = "USD"
     # How long an answer for a card and grade stands, for every collector.
-    ebay_reuse_minutes: int = 1440
+    # eBay's API License Agreement allows listing data shown to be at most
+    # six hours older than eBay's (or labelled with its age): keep it <= 360.
+    ebay_reuse_minutes: int = 360
     # eBay lookups a day for graded copies in collections, made in the
     # background when nobody is waiting. Each is one eBay search, two for a
     # card with more than a page of listings.

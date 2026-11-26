@@ -661,9 +661,14 @@ def test_a_collections_graded_copies_are_valued_from_what_is_held(tmp_path):
     assert before["enabled"] is True and [v["value_eur"] for v in before["values"]] == [None] * 4
     assert calls == []
     # Once someone has looked at the PSA 10, the collection is valued from it.
-    client.get("/api/v1/ebay/graded", params={"card_id": "en:base1-58", "grader": "PSA", "grade": "10"})
+    looked = client.get(
+        "/api/v1/ebay/graded", params={"card_id": "en:base1-58", "grader": "PSA", "grade": "10"}
+    ).json()
     after = ask()["values"]
     assert after[0]["value_eur"] == 88.0 and after[0]["average"] == 110.0 and after[0]["count"] == 2
+    # Each value says when eBay was read: the read's own time, not this request's.
+    assert looked["observed_at"].endswith("Z")
+    assert after[0]["observed_at"] == looked["observed_at"]
     assert [v["value_eur"] for v in after[1:]] == [None, None, None]
     # An answer past its day still values the collection, rather than nothing.
     reader.reuse_s = 0
@@ -892,3 +897,56 @@ def test_real_listings_the_rules_used_to_turn_away():
     zard = GradedCard("Charizard ex", "199", "PSA", "10", total=165, year=2023, set_name="151", set_code="sv03.5")
     assert listing_is("Pokemon Charizard ex #199 2023 Mew EN Special Illustration Rare Holo PSA 10", zard)
     assert not listing_is("Pokemon Charizard ex #185 2023 Mew EN Special Illustration Rare Holo PSA 10", zard)
+
+
+def test_answers_stand_six_hours_by_default_and_the_window_is_a_setting(tmp_path, monkeypatch):
+    """eBay's API License Agreement: listing data shown is at most six hours
+    older than eBay's. The window is EBAY_REUSE_MINUTES."""
+    import json
+    import time
+
+    from app.config import Settings
+    from app.ebay import from_settings
+
+    monkeypatch.delenv("EBAY_REUSE_MINUTES", raising=False)
+    settings = Settings(_env_file=None, ebay_client_id="id", ebay_client_secret="secret",
+                        data_dir=tmp_path)
+    assert settings.ebay_reuse_minutes == 360
+    reader = from_settings(settings)
+    assert reader.reuse_s == 6 * 3600
+    reader.close()
+    monkeypatch.setenv("EBAY_REUSE_MINUTES", "90")
+    overridden = Settings(_env_file=None, ebay_client_id="id", ebay_client_secret="secret",
+                          data_dir=tmp_path)
+    assert overridden.ebay_reuse_minutes == 90
+    reader = from_settings(overridden)
+    assert reader.reuse_s == 90 * 60
+    reader.close()
+    assert Ebay("id", "secret").reuse_s == 6 * 3600
+
+    calls: list[str] = []
+    reader = _reader(calls, [_item(f"Pikachu 58/102 Base Set PSA 10 #{n}", n) for n in (100, 120)])
+    held = {"enabled": True, "average": 50.0, "currency": "USD", "count": 2, "listings": [],
+            "observed_at": "2026-11-26T06:00:00Z"}
+
+    def hold(age_s: float) -> None:
+        with reader._store:
+            reader._store.execute(
+                "INSERT OR REPLACE INTO answers VALUES (?, ?, ?)",
+                (repr(PIKACHU), time.time() - age_s, json.dumps(held)),
+            )
+
+    # Five hours old: reused as it is, with the time eBay was read.
+    hold(5 * 3600)
+    assert reader.graded(PIKACHU) == held and calls == []
+    # Seven hours old: past the window, so eBay is asked again.
+    hold(7 * 3600)
+    fresh = reader.graded(PIKACHU)
+    assert calls and fresh["average"] == 110.0
+    assert fresh["observed_at"] != held["observed_at"]
+    # A shorter window from the setting: the same five-hour answer is stale.
+    calls.clear()
+    reader.reuse_s = 4 * 3600
+    hold(5 * 3600)
+    assert reader.graded(PIKACHU)["average"] == 110.0 and calls
+    reader.close()

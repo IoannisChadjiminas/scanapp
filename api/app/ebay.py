@@ -4,7 +4,9 @@ Only graded copies, and only asking prices: eBay gives sold prices to approved
 partners alone, so this is the average of the cheapest Buy It Now listings for
 the card in the copy's grade. Auctions are left out: a current bid says
 nothing until the auction ends. The server asks, never the phone; an answer is
-reused for a day, by everyone: the first
+reused for six hours (EBAY_REUSE_MINUTES), by everyone: eBay's API License
+Agreement allows displayed listing data to be at most six hours older than
+eBay's. The first
 collector to ask about a card pays for the lookup, the rest read it from here.
 
 eBay titles are free text, so a listing counts only when its title passes
@@ -544,7 +546,7 @@ class Ebay:
         environment: str = "production",
         marketplace: str = "EBAY_US",
         currency: str = "USD",
-        reuse_s: int = 24 * 3600,
+        reuse_s: int = 6 * 3600,
         path: Path | None = None,
         take: int = 5,
         least: int = 2,
@@ -599,7 +601,7 @@ class Ebay:
                 )
 
     def refresh_owned(self) -> int:
-        """Queues every held slab whose price is more than a day old. Slabs
+        """Queues every held slab whose price is older than [reuse_s]. Slabs
         no collection asked about for 30 days are forgotten."""
         with self._lock:
             with self._store:
@@ -655,7 +657,8 @@ class Ebay:
 
     def kept(self, card: GradedCard, *, max_age_s: float | None = None) -> dict[str, Any] | None:
         """The answer already held for the card and grade, while it stands:
-        a day for a look at one card; [max_age_s] for a longer view."""
+        [reuse_s] (six hours) for a look at one card; [max_age_s] for a
+        longer view."""
         found = self.last(card)
         if found is None or found[0] >= (self.reuse_s if max_age_s is None else max_age_s):
             return None

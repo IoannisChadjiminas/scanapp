@@ -54,11 +54,12 @@ def test_prices_are_imported_once_a_day_and_sent_in_dollars(tmp_path):
             {"label": "Low", "amount": 2.0, "currency": "USD", "source": "tcgplayer"},
             {"label": "Mid", "amount": 5.12, "currency": "USD", "source": "tcgplayer"},
         ],
+        "url": "https://www.tcgplayer.com/product/42346",
         "observed_at": "2026-11-20T20:06:21Z",
     }
     assert store.prices(42346, first_edition=True)["prices"][0]["amount"] == 60.0
     for missing in (store.prices(42346, reverse=True), store.prices(None)):
-        assert missing == {"enabled": True, "prices": [], "observed_at": None}
+        assert missing == {"enabled": True, "prices": [], "url": None, "observed_at": None}
     # Listings but no sales: the low price, no market price.
     assert [row["label"] for row in store.prices(9)["prices"]] == ["Low", "Mid"]
     # Fresh prices: nothing is fetched again.
