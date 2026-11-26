@@ -449,8 +449,9 @@ class Settings(BaseSettings):
     scan_price_phone_budget_pages: int = 4
     scan_price_phone_budget_window_s: int = 600
     # How long a card's live read stands, whichever phone made it: inside it
-    # the card page shows the stored offers with no refresh button.
-    live_offer_reuse_minutes: int = 1440
+    # a tap on the card page's Cardmarket heading opens the card instead of
+    # checking it again. Six hours, the same as a price's fresh window.
+    live_offer_reuse_minutes: int = 360
     # CardTrader's API token. Empty: no CardTrader box in the app. Listings
     # are reused for the minutes below; the list that ties a Cardmarket
     # product to a CardTrader card is imported again after the hours below.

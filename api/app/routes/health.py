@@ -72,7 +72,7 @@ class AppConfigResponse(BaseModel):
     price_fresh_minutes: int
     # A live read younger than this is shown as it is; the phone opens no
     # Cardmarket page and shows no refresh button.
-    live_offer_reuse_minutes: int = 1440
+    live_offer_reuse_minutes: int = 360
     listing_max_age_s: int = 7 * 86400
     config_ttl_s: int
     slab_detection: bool = False
