@@ -11,7 +11,7 @@ from fastapi.testclient import TestClient
 
 from app.db import connect, init_catalog
 from app.ebay import (
-    Ebay, GradedCard, graded_listings, item_confirms, listing_is, name_from_listing, names_grade,
+    Ebay, GradedCard, graded_listings, listing_is, name_from_listing, names_grade,
 )
 from app.routes.ebay import router
 
@@ -127,7 +127,8 @@ def test_a_slab_label_title_is_matched_by_its_set():
                          set_name="30th Classic Collection", set_code="30th-c", unique_name=True)
     label = "2026 Pokemon 30C EN-30th Celebration Classic Collection #4 Charizard PSA 10"
     assert classic.search == "Charizard 001/30 PSA 10"
-    assert classic.set_search == "Charizard 30th classic collection PSA 10"
+    # Asked for by its set and name: the catalogue number is not on it.
+    assert _asked(classic) == "Charizard 30th classic collection"
     assert listing_is(label, classic)
     # Several cards in one listing are not the card.
     base_charizard = GradedCard("Charizard", "4", "PSA", "9", total=102, year=1999,
@@ -154,7 +155,7 @@ def test_a_slab_label_title_is_matched_by_its_set():
     # A Japanese set is named by its code.
     mew = GradedCard("Mew ex", "205", "PSA", "10", total=165, year=2023, japanese=True,
                      set_name="ポケモンカード151", set_code="sv2a")
-    assert mew.set_search == "Mew ex sv2a Japanese PSA 10"
+    assert _asked(mew) == "Mew ex 205 Japanese"
     assert listing_is("2023 POKEMON JAPANESE SV2A-POKEMON CARD 151 #205 MEW EX PSA 10", mew)
     # The 151 set's labels read "MEW EN-151": another card of it holds
     # every word of "Mew ex" and the number 151, but says "#185".
@@ -186,7 +187,7 @@ def test_a_promo_is_found_by_its_code():
                           set_name="XY Black Star Promos", set_code="xyp")
     # Never "XY28/211": promos carry no total.
     assert venusaur.search == "Venusaur EX XY28 PSA 10"
-    assert venusaur.set_search == "Venusaur EX xy promo PSA 10"
+    assert _asked(venusaur) == "Venusaur EX XY28"
     for title in (
         "2014 POKEMON XY BLACK STAR PROMO #XY28 VENUSAUR EX PSA 10",
         "Venusaur EX XY28 Black Star Promo Holo PSA 10 GEM MINT",
@@ -243,7 +244,7 @@ def test_a_japanese_promo_is_found_by_its_series_and_number():
                          set_name="メガ プロモカード", set_code="m-p")
     assert pikachu.promo
     assert pikachu.search == "Pikachu ex 132 Japanese PSA 10"
-    assert pikachu.set_search == "Pikachu ex m-p Japanese PSA 10"
+    assert _asked(pikachu) == "Pikachu ex 132 Japanese"
     assert listing_is("2026 POKEMON JAPANESE M-P PROMO #132 PIKACHU EX PSA 10", pikachu)
     assert not listing_is("2026 POKEMON JAPANESE M-P PROMO #131 PIKACHU EX PSA 10", pikachu)
     assert not listing_is("PSA 10 Pikachu ex McDONALD'S PROMO 132/M-P Pokemon card Set of 3 Japanese", pikachu)
@@ -330,9 +331,9 @@ def test_a_japanese_cards_english_name_comes_from_its_cardmarket_address():
     assert name_from_listing(None) == ""
 
 
-def _reader(calls, items, *, by_ebay=(), details=None):
-    """[items] answer the searches by words, [by_ebay] the ones that ask for
-    eBay's own grader and grade; [details] is what opening a listing shows."""
+def _reader(calls, items, *, total=None, narrower=()):
+    """[items] answer a search; [total] is how many eBay says there are in
+    all, and [narrower] answers the second search that a larger total asks."""
     def handle(request: httpx.Request) -> httpx.Response:
         path = request.url.path
         if path.endswith("/oauth2/token"):
@@ -340,24 +341,30 @@ def _reader(calls, items, *, by_ebay=(), details=None):
             return httpx.Response(200, json={"access_token": "token", "expires_in": 7200})
         assert request.headers["authorization"] == "Bearer token"
         assert request.headers["x-ebay-c-marketplace-id"] == "EBAY_US"
-        if "/item/" in path:
-            calls.append("open")
-            item_id = path.rsplit("/", 1)[-1]
-            if details is not None and item_id not in details:
-                return httpx.Response(404)
-            return httpx.Response(200, json=(details or {}).get(item_id, {}))
+        assert "/item_summary/search" in path, "a listing is never opened"
         assert request.url.params["category_ids"] == "183454"
-        graded = "aspect_filter" in request.url.params
-        assert request.url.params["filter"] == (
-            "buyingOptions:{FIXED_PRICE},conditionIds:{2750}" if graded else "buyingOptions:{FIXED_PRICE}"
-        )
-        calls.append(("ebay:" if graded else "") + request.url.params["q"])
-        if graded:
-            calls.append(request.url.params["aspect_filter"])
-        return httpx.Response(200, json={"itemSummaries": list(by_ebay) if graded else items})
+        assert request.url.params["filter"] == "buyingOptions:{FIXED_PRICE},conditionIds:{2750}"
+        assert request.url.params["sort"] == "price" and request.url.params["limit"] == "200"
+        offset = request.url.params.get("offset")
+        calls.append(request.url.params["q"] + (f" @{offset}" if offset else ""))
+        calls.append(request.url.params["aspect_filter"])
+        asked = [call for call in calls if not call.startswith("categoryId:")]
+        second = bool(narrower) and asked[-1] != asked[0]
+        found = list(narrower) if second else list(items)
+        return httpx.Response(200, json={
+            "itemSummaries": found, "total": len(found) if second or total is None else total,
+        })
 
     return Ebay("id", "secret", client=httpx.Client(
         base_url="https://ebay.test", transport=httpx.MockTransport(handle)))
+
+
+def _asked(card: GradedCard) -> str:
+    """The words of the one search a lookup of the card makes."""
+    calls: list[str] = []
+    _reader(calls, []).graded(card)
+    assert len(calls) == 2
+    return calls[0]
 
 
 PIKACHU = GradedCard("Pikachu", "58", "PSA", "10", total=102, year=1999, set_name="Base Set")
@@ -375,14 +382,51 @@ def test_the_cheapest_five_are_averaged_and_asked_once_a_day():
     assert first["observed_at"].endswith("Z")
     assert reader.graded(PIKACHU) == first
     psa10 = "categoryId:183454,Professional Grader:{Professional Sports Authenticator (PSA)},Grade:{10}"
-    # Four searches: eBay's own grade fields by number and by set, then the
-    # grade in words by number and by set. The five cheapest are opened.
-    assert calls == [
-        "ebay:Pikachu 58/102", psa10, "ebay:Pikachu base", psa10,
-        "Pikachu 58/102 PSA 10", "Pikachu base PSA 10",
-        "open", "open", "open", "open", "open",
-    ]
+    # One search: eBay's own grade fields, the name and the number in each
+    # form sellers write it. No listing is opened.
+    assert calls == ["Pikachu (58, 058)", psa10]
     reader.close()
+
+
+def test_the_number_is_asked_for_as_sellers_write_it():
+    assert PIKACHU.number_search == "(58, 058)"
+    assert GradedCard("Charizard", "4", "PSA", "9", total=102).number_search == "(4, 004)"
+    assert GradedCard("Pikachu", "085", "PSA", "10").number_search == "(085, 85)"
+    assert GradedCard("Umbreon VMAX", "215", "PSA", "10", total=203).number_search == "215"
+    assert GradedCard("Pikachu", "XY28", "PSA", "10").number_search == "XY28"
+
+
+def test_a_second_narrower_search_only_when_ebay_holds_more_than_a_page():
+    calls: list[str] = []
+    cheap = [_item(f"Charizard 4/102 Celebrations PSA 9 #{n}", n) for n in range(1, 4)]
+    real = [_item(f"Charizard 4/102 Base Set Holo PSA 9 #{n}", n) for n in (900, 1000)]
+    reader = _reader(calls, cheap, total=636, narrower=real)
+    answer = reader.graded(CHARIZARD)
+    # Too many for two pages: the second names the set's total or the set.
+    assert [call for call in calls if not call.startswith("categoryId:")] == [
+        "Charizard (4, 004)", "Charizard (4, 004) (102, base)",
+    ]
+    assert answer["average"] == 950.0 and answer["count"] == 2
+    reader.close()
+    # Two pages hold them all: the second is the next page.
+    calls = []
+    _reader(calls, cheap, total=300, narrower=real).graded(CHARIZARD)
+    assert calls[::2] == ["Charizard (4, 004)", "Charizard (4, 004) @200"]
+    # A page holds them all: one search.
+    calls = []
+    _reader(calls, cheap, total=3).graded(CHARIZARD)
+    assert calls[::2] == ["Charizard (4, 004)"]
+    # A promo has no total to narrow by: its series' name does it.
+    calls = []
+    promo = GradedCard("Pikachu with Grey Felt Hat", "085", "PSA", "10", set_name="SVP Black Star Promos")
+    _reader(calls, [], total=500).graded(promo)
+    assert calls[2] == "Pikachu with Grey Felt Hat (085, 85) svp"
+    # A reprint set's cards carry the old number: the set's name finds them.
+    calls = []
+    classic = GradedCard("Charizard", "4", "PSA", "10", total=102, set_name="Celebrations: Classic Collection",
+                         set_code="cel25c", unique_name=True)
+    _reader(calls, []).graded(classic)
+    assert calls[0] == "Charizard celebration classic collection"
 
 
 def test_one_dear_listing_does_not_move_the_price():
@@ -440,50 +484,27 @@ def test_ebays_own_grade_stands_in_for_a_title_that_does_not_say_it():
     assert not listing_is("Pikachu 58/102 Base Set Holo BGS 9.5", PIKACHU, graded=True)
     assert not listing_is("Pikachu 58/102 Base Set PSA 9", PIKACHU, graded=True)
     assert not listing_is("Pikachu 60/64 Jungle Holo", PIKACHU, graded=True)
-    reader = _reader(
-        [],
-        [_item("Pikachu 58/102 Base Set PSA 10", 300)],
-        by_ebay=[_item(catalogue, 100), _item(catalogue, 200), _item("Raichu 14/102 Base Set", 5)],
-    )
+    reader = _reader([], [
+        _item(catalogue, 100), _item(catalogue, 200), _item("Pikachu 58/102 Base Set PSA 10", 300),
+        _item("Raichu 14/102 Base Set", 5),
+    ])
     answer = reader.graded(PIKACHU)
     assert [item["amount"] for item in answer["listings"]] == [100, 200, 300]
     assert answer["average"] == 200.0
     reader.close()
 
 
-def test_an_opened_listing_must_agree_before_it_counts():
-    psa = {"name": "Professional Grader", "values": [{"content": "Professional Sports Authenticator (PSA)"}]}
-    ten = {"name": "Grade", "values": [{"content": "10"}]}
-    aspect = lambda name, value: {"name": name, "value": value}  # noqa: E731
-    good = {"conditionDescriptors": [psa, ten],
-            "localizedAspects": [aspect("Card Number", "58/102"), aspect("Language", "English")]}
-    assert item_confirms(good, PIKACHU)
-    assert item_confirms({}, PIKACHU)  # nothing recorded, nothing against it
-    assert item_confirms({"localizedAspects": [aspect("Card Number", "#58"), aspect("Language", "Not Specified")]}, PIKACHU)
-    for wrong in (
-        {"conditionDescriptors": [psa, {"name": "Grade", "values": [{"content": "9"}]}]},
-        {"conditionDescriptors": [{"name": "Professional Grader",
-                                   "values": [{"content": "Certified Guaranty Company (CGC)"}]}, ten]},
-        {"localizedAspects": [aspect("Card Number", "60/64")]},
-        {"localizedAspects": [aspect("Card Number", "58/108")]},
-        {"localizedAspects": [aspect("Language", "Japanese")]},
-        {"localizedAspects": [aspect("Language", "Italian")]},
-    ):
-        assert not item_confirms(wrong, PIKACHU), wrong
-    japanese = GradedCard("Mew ex", "205", "PSA", "10", total=165, japanese=True)
-    assert item_confirms({"localizedAspects": [aspect("Language", "Japanese")]}, japanese)
-    assert not item_confirms({"localizedAspects": [aspect("Language", "English")]}, japanese)
-
-    # The cheapest listing turns out to be a PSA 9 once opened: it is left
-    # out, and the next ones make the average.
-    items = [_item(f"Pikachu 58/102 Base Set PSA 10 #{n}", n) for n in (50, 100, 110, 120)]
-    details = {item["itemId"]: good for item in items[1:]}
-    details[items[0]["itemId"]] = {"conditionDescriptors": [psa, {"name": "Grade", "values": [{"content": "9"}]}]}
-    reader = _reader([], items, details=details)
-    answer = reader.graded(PIKACHU)
-    assert [item["amount"] for item in answer["listings"]] == [100, 110, 120]
-    assert answer["average"] == 110.0 and answer["count"] == 3
-    reader.close()
+def test_a_tag_team_card_is_not_another_graders_slab():
+    gengar = GradedCard("Gengar Mimikyu GX", "103", "PSA", "10", total=95, year=2019, japanese=True,
+                        set_name="タッグボルト", set_code="sm9")
+    # Staging found 87 listings of this card on 25 November 2026 and kept none.
+    assert listing_is("Gengar & Mimikyu GX 103/095 Tag Bolt SR Japanese PSA 10", gengar)
+    assert listing_is("2019 POKEMON JAPANESE SM9 TAG BOLT #103 GENGAR & MIMIKYU GX PSA 10", gengar)
+    zekrom = GradedCard("Pikachu & Zekrom-GX", "162", "PSA", "10", total=181, year=2019, set_name="Team Up")
+    assert listing_is("Pikachu & Zekrom GX 162/181 Tag Team Team Up PSA 10", zekrom)
+    # A real TAG slab still is one.
+    assert not listing_is("Pikachu & Zekrom GX 162/181 Tag Team Team Up TAG 10", zekrom, graded=True)
+    assert not listing_is("Pikachu & Zekrom GX 162/181 Team Up PSA 10 TAG 9", zekrom)
 
 
 def test_every_grader_the_app_offers_has_ebays_name():
@@ -547,10 +568,9 @@ def test_the_route_builds_the_search_from_the_catalogue_card(tmp_path):
 
     body = ask(card_id="en:base1-58", grader="psa", grade="10").json()
     assert body["enabled"] is True and body["average"] == 20.0 and len(body["listings"]) == 3
-    assert "Pikachu 58/102 PSA 10" in calls and "Pikachu base PSA 10" in calls
+    assert "Pikachu (58, 058)" in calls
     ask(card_id="ja:SV2a-205", grader="PSA", grade="10")
-    assert "Mew ex 205/165 Japanese PSA 10" in calls
-    assert "ebay:Mew ex 205/165 Japanese" in calls
+    assert "Mew ex 205 Japanese" in calls
     # No eBay search for a language sellers do not title reliably.
     before = len(calls)
     assert ask(card_id="de:x-1", grader="PSA", grade="10").json() == {
@@ -764,7 +784,7 @@ def test_the_route_asks_for_the_version_the_collector_chose(tmp_path):
 
     master = ask(listing=extra.format("V2") + "?language=1", reverse="true")
     assert master["average"] == 50.0
-    assert "Spritzee Master Ball 038/131 CGC 10" in calls
+    assert "Spritzee Master Ball (038, 38)" in calls
     # The card's own listing, or none, is the plain card as before.
     assert ask(listing=own)["average"] == 5.0 and ask()["average"] == 5.0
     # A version with no settled wording on eBay is not priced as the plain card.
@@ -812,11 +832,11 @@ def test_a_cgc_pristine_10_is_its_own_grade():
     assert SPRITZEE_PRISTINE.search == "Spritzee Master Ball 038/131 CGC Pristine 10"
     assert SPRITZEE_PRISTINE.grade_number == "10"
     assert repr(SPRITZEE_PRISTINE) != repr(SPRITZEE_MASTER)
-    # The listing opened: its grade field says 10.
-    assert item_confirms({"conditionDescriptors": [
-        {"name": "Grade", "values": [{"content": "10"}]}]}, SPRITZEE_PRISTINE)
-    assert not item_confirms({"conditionDescriptors": [
-        {"name": "Grade", "values": [{"content": "9.5"}]}]}, SPRITZEE_PRISTINE)
+    # eBay's grade field says 10 for it; the search asks for the word.
+    calls: list[str] = []
+    _reader(calls, []).graded(SPRITZEE_PRISTINE)
+    assert calls == ["Spritzee Master Ball (038, 38) (Pristine, Perfect)",
+                     "categoryId:183454,Professional Grader:{Certified Guaranty Company (CGC)},Grade:{10}"]
 
 
 def test_only_cgc_has_a_pristine_10():
@@ -825,3 +845,50 @@ def test_only_cgc_has_a_pristine_10():
     assert _grade_known("CGC", "P10") and _grade_known("CGC", "10") and _grade_known("PSA", "10")
     assert not _grade_known("PSA", "P10") and not _grade_known("BGS", "P10")
     assert not _grade_known("CGC", "P9") and not _grade_known("XYZ", "10")
+
+
+def test_real_listings_the_rules_used_to_turn_away():
+    """Titles from eBay's live listings on 26 November 2026, each the card in
+    its grade, that an earlier version of the rules left out."""
+    gengar = GradedCard("Gengar Mimikyu GX", "103", "PSA", "10", total=95, year=2019, japanese=True,
+                        set_name="タッグボルト", set_code="sm9")
+    # "TAG" as a word of the title, not a grade: no TAG slab.
+    assert listing_is("PSA 10 2018 GENGAR & MIMIKYU GX 103/095 TAG BOLT-FA POKEMON JAPANESE SUN & MOON TAG", gengar)
+    assert listing_is("[Pokémon] - Gengar & Mimikyu GX Tag Bolt Japanese 103/095 SR - PSA 10 Tag", gengar)
+    assert not listing_is("Gengar & Mimikyu GX 103/095 Japanese TAG 10 PSA 10", gengar)
+    umbreon_bgs = GradedCard("Umbreon VMAX", "215", "BGS", "9.5", total=203, year=2021,
+                             set_name="Evolving Skies", set_code="swsh7")
+    # Beckett is BGS.
+    assert listing_is("POKEMON BECKETT BGS 9.5 UMBREON VMAX Alternate ALT ART 215/203 EVOLVING SKIES", umbreon_bgs)
+    assert not listing_is("POKEMON BECKETT 9.5 UMBREON VMAX 215/203 EVOLVING SKIES PSA 10", UMBREON)
+    # "GEM MNT" is PSA's label wording, not the grader MNT.
+    assert listing_is("2021 Pokémon UMBREON VMAX Alt Art PSA 10 GEM MNT SWSH EVOLVING SKIES 215/203", UMBREON)
+    assert not listing_is("Umbreon VMAX 215/203 Evolving Skies MNT 10 PSA 10", UMBREON)
+    # A promo series is named by "promo" alone.
+    felt = GradedCard("Pikachu with Grey Felt Hat", "085", "PSA", "10", year=2023,
+                      set_name="SVP Black Star Promos", set_code="svp")
+    assert listing_is("PSA 10 Pikachu with Grey Felt Hat 085 Black Star Promo Holo English 2023", felt)
+    assert listing_is("Pokémon Pikachu with Grey Felt Hat Promo 085  PSA 10 Gem Mint", felt)
+    assert not listing_is("Pokémon Pikachu with Grey Felt Hat Promo 086 PSA 10 Gem Mint", felt)
+    # Its PSA label names neither: the long name is the card.
+    assert listing_is("2023 POKEMON X VAN GOGH #085 PIKACHU WITH GREY FELT HAT PSA 10", felt)
+    assert not listing_is("2023 POKEMON X VAN GOGH #086 PIKACHU WITH GREY FELT HAT PSA 10", felt)
+    # A short name is not: "#132 PIKACHU EX" could be any series' promo.
+    pikachu = GradedCard("Pikachu ex", "132", "PSA", "10", total=132, japanese=True,
+                         set_name="メガ プロモカード", set_code="m-p")
+    assert not listing_is("2026 POKEMON JAPANESE #132 PIKACHU EX PSA 10", pikachu)
+    # Non-Shadowless is the unlimited card.
+    assert listing_is("PSA 9 CHARIZARD 1999 Pokemon Base Unlimited #4/102 Holo Non-Shadowless Rare MINT", CHARIZARD)
+    assert not listing_is("PSA 9 CHARIZARD 1999 Pokemon Base Set #4/102 Holo Shadowless Rare MINT", CHARIZARD)
+    # PSA labels Base Set "POKEMON GAME", and the narrower search asks for it.
+    base = replace(CHARIZARD, set_code="base1")
+    assert listing_is("1999 POKEMON GAME #4 CHARIZARD-HOLO PSA 9", base)
+    assert not listing_is("1999 POKEMON GAME #5 CHARIZARD-HOLO PSA 9", base)
+    assert not listing_is("2000 POKEMON GAME BASE SET 2 #4 CHARIZARD-HOLO PSA 9", base)
+    calls: list[str] = []
+    _reader(calls, [], total=900).graded(base)
+    assert calls[2] == "Charizard (4, 004) (102, base, game)"
+    # PSA labels the 151 set "MEW EN".
+    zard = GradedCard("Charizard ex", "199", "PSA", "10", total=165, year=2023, set_name="151", set_code="sv03.5")
+    assert listing_is("Pokemon Charizard ex #199 2023 Mew EN Special Illustration Rare Holo PSA 10", zard)
+    assert not listing_is("Pokemon Charizard ex #185 2023 Mew EN Special Illustration Rare Holo PSA 10", zard)
