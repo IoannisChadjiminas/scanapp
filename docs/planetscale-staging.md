@@ -1,5 +1,13 @@
 # Staging catalogue source
 
+## English rarities, catalogue RAR2 — 2026-11-27
+
+Staging serves `PS-CATALOGUE-EN-JA-RAR2-20261127` (schema `pokesingle_completion_20261127_rar2`,
+features `20261127-rar2`): RAR1 with 285 more English rarities (TCGdex, reprints' original cards,
+alternates where pokemontcg.io agrees, Unown from the printed star). 733 English cards stay empty,
+each with its reason. Gate clean (no answer changed). Record:
+`docs/catalogue-english-rarity-20261127.md`.
+
 ## Delta Reign rarities, catalogue RAR1 — 2026-11-27
 
 Staging serves `PS-CATALOGUE-EN-JA-RAR1-20261127` (schema `pokesingle_completion_20261127_rar1`,
