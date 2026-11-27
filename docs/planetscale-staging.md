@@ -1,5 +1,14 @@
 # Staging catalogue source
 
+## Delta Reign rarities, catalogue RAR1 — 2026-11-27
+
+Staging serves `PS-CATALOGUE-EN-JA-RAR1-20261127` (schema `pokesingle_completion_20261127_rar1`,
+features `20261127-rar1`): DISP1 with the 141 Delta Reign (`en:me06`) rarities from TCGdex and the
+37 full-art cards' reference features rebuilt. A rarity cannot be fixed in place or by
+`catalogue_corrections.csv`: the reference-feature bundle is signed over every card's rarity, so a
+changed rarity needs a release with a re-signed bundle. Gate clean (no answer changed). Record:
+`docs/catalogue-delta-reign-rarity-20261127.md`.
+
 ## Catalogue corrections re-applied at load — 2026-11-25
 
 The four in-place fixes of 25 November (85 Japanese XY links, 10 other

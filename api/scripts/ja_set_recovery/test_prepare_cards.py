@@ -35,6 +35,40 @@ class PrepareCardsTest(unittest.TestCase):
             self.assertTrue(all(c["problem"] is None for c in cards))
             self.assertTrue(all(c["source_row_url"].startswith("https://limitlesstcg.com/") for c in cards))
 
+    def _tcgdex_run(self, run, row):
+        group = {"group_id": "me06", "name": "Delta Reign", "code": "me06",
+                 "coverage": "absent", "catalogue_codes": []}
+        (run / "set-registry.json").write_text(json.dumps([group]))
+        (run / "catalogue.json").write_text(json.dumps({}))
+        for filename, values in [
+            ("new-or-incomplete-printings.jsonl", [row]),
+            ("image-chosen.jsonl", [dict(row, status="no_file")]),
+            ("held-mappings.jsonl", [dict(row, status="held", reason="not_verified")]),
+        ]:
+            (run / filename).write_text(json.dumps(values[0]) + "\n")
+        (run / "verified-mappings.jsonl").write_text("")
+
+    def test_tcgdex_rows_keep_their_rarity(self):
+        with tempfile.TemporaryDirectory() as directory:
+            run = Path(directory)
+            row = {"group_id": "me06", "printed_number": "104/103", "card_name": "Mega Gardevoir ex",
+                   "source_row_url": "https://api.tcgdex.net/v2/en/cards/me06-104",
+                   "rarity": "Ultra Rare", "category": "Pokemon", "illustrator": "aky CG Works"}
+            self._tcgdex_run(run, row)
+            main(str(run), str(run / "catalogue.json"))
+            card = json.loads((run / "cards.json").read_text())[0]
+            self.assertEqual((card["rarity"], card["category"], card["illustrator"]),
+                             ("Ultra Rare", "Pokemon", "aky CG Works"))
+
+    def test_tcgdex_row_without_rarity_is_refused(self):
+        with tempfile.TemporaryDirectory() as directory:
+            run = Path(directory)
+            row = {"group_id": "me06", "printed_number": "001/103", "card_name": "Heracross",
+                   "source_row_url": "https://api.tcgdex.net/v2/en/cards/me06-001"}
+            self._tcgdex_run(run, row)
+            with self.assertRaises(SystemExit):
+                main(str(run), str(run / "catalogue.json"))
+
 
 if __name__ == "__main__":
     unittest.main()

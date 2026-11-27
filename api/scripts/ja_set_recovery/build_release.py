@@ -134,7 +134,7 @@ def main(run_dir, parent_dir, name):
                      "treatment": ("scannable" if card["id"] in set(scannable) else
                                    "printing_alternative" if path else "no_image")})
         if path:
-            feature_rows.append({"id": card["id"], "image_path": path, "rarity": ""})
+            feature_rows.append({"id": card["id"], "image_path": path, "rarity": card.get("rarity") or ""})
     (out / "new-cards.json").write_text(json.dumps(rows, ensure_ascii=False, indent=1) + "\n")
     (out / "feature-rows.json").write_text(json.dumps(feature_rows, ensure_ascii=False) + "\n")
     (out / "art-added.json").write_text(json.dumps([

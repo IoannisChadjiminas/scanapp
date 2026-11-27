@@ -114,7 +114,9 @@ def main(release_dir, role_file, feature_sha):
         new_rows.append({
             "id": c["id"], "provider_id": c["provider_id"], "name": c["name"], "set_id": c["set_id"],
             "set_name": c["set_name"], "collector_number": c["collector_number"], "language": LANG,
-            "category": None, "rarity": None, "illustrator": None, "variants_json": "{}",
+            # Source fields when the row has them (prepare_cards.py); the stored rarity must equal the
+            # one feature-rows.json was built with, since the feature signature covers it.
+            **{k: c.get(k) or None for k in ("category", "rarity", "illustrator")}, "variants_json": "{}",
             "image_path": c["image_path"], "has_image": 1 if c["image_path"] else 0,
             "cardmarket_id": int(c["cardmarket_id"]) if c["cardmarket_id"] else None,
             "cardmarket_url": c["cardmarket_url"], "cardmarket_verified": 1 if linked else 0,
@@ -142,7 +144,7 @@ def main(release_dir, role_file, feature_sha):
 
     # signature rows for the feature store (all catalogue rows)
     sig = [{"id": i, "image_path": p, "rarity": rr} for i, p, rr in conn.execute(f"SELECT id, image_path, rarity FROM {PARENT}.cards").fetchall()]
-    sig += [{"id": r["id"], "image_path": r["image_path"], "rarity": None} for r in new_rows]
+    sig += [{"id": r["id"], "image_path": r["image_path"], "rarity": r["rarity"]} for r in new_rows]
     (rel / "signature-rows.json").write_text(json.dumps(sig, ensure_ascii=False) + "\n")
     snapshot = meta["vectors"]["pad"]["snapshot"]
     conn.close()
