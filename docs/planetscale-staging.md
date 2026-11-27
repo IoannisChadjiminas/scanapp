@@ -1,5 +1,12 @@
 # Staging catalogue source
 
+## Japanese rarities from Limitless, catalogue RAR3 — 2026-11-27
+
+Staging serves `PS-CATALOGUE-EN-JA-RAR3-20261127` (schema `pokesingle_completion_20261127_rar3`,
+features `20261127-rar3`): RAR2 with 3,908 Japanese rarities from Limitless's set lists and the
+664 full-art cards' features rebuilt. 14,638 Japanese cards stay empty, each with its reason.
+Gate clean (no answer changed). Record: `docs/catalogue-japanese-rarity-20261127.md`.
+
 ## English rarities, catalogue RAR2 — 2026-11-27
 
 Staging serves `PS-CATALOGUE-EN-JA-RAR2-20261127` (schema `pokesingle_completion_20261127_rar2`,
