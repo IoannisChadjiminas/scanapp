@@ -26,6 +26,11 @@ from pathlib import Path
 
 LANG = os.environ.get("JAREC_LANGUAGE", "ja")  # "en" for English rows (second batch D); default keeps the Japanese recovery
 HELPER = ("pooka-", "pc-", "ra-")
+# Card fields a source row may carry (fill_tcgdex_fields.py adds them for TCGdex rows). The rarity
+# also picks the reference-feature art box, so a row from TCGdex must have it: the 13 November
+# batch stored Delta Reign without one (docs/catalogue-delta-reign-rarity-20261127.md).
+SOURCE_FIELDS = ("rarity", "category", "illustrator")
+TCGDEX_CARD = "https://api.tcgdex.net/v2/"
 
 
 def slug(text):
@@ -81,13 +86,16 @@ def main(run_dir, catalogue_path):
                 unnumbered[set_id] += 1
                 number = f"u{unnumbered[set_id]:02d}"
         card_id = f"{LANG}:{set_id}-{number}"
+        if str(row.get("source_row_url") or "").startswith(TCGDEX_CARD) and not row.get("rarity"):
+            raise SystemExit(f"{card_id}: TCGdex row without rarity; run fill_tcgdex_fields.py first")
         image = images[key].pop(0)
         link = links[key].pop(0)
         total = re.match(r"\s*\d+", printed.split("/")[1]) if "/" in printed else None
         card = {
             "id": card_id, "provider_id": f"{set_id}-{number}", "name": row["card_name"],
             "set_id": set_id, "set_name": group["name"], "collector_number": number,
-            "printed_number": printed, "language": LANG, "rarity": "",
+            "printed_number": printed, "language": LANG,
+            **{k: row.get(k) or "" for k in SOURCE_FIELDS},
             "group_id": row["group_id"],
             "local_file": image.get("file") if image["status"] == "chosen" else None,
             "image_status": image["status"], "image_source": image.get("source"),
