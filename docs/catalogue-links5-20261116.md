@@ -1,4 +1,4 @@
-# LINKS5 to 5T: Cardmarket links for Japanese rows, and 12 crossed links fixed (2026-11-16, last switched 2026-11-19)
+# LINKS5 to 5X: Cardmarket links for Japanese rows, and 12 crossed links fixed (2026-11-16, last switched 2026-11-20)
 
 Of the 2,966 Japanese rows without a Cardmarket link on IMG1, 1,245 get one (799 in LINKS5, 127 more in LINKS5B, 267 in LINKS5C, 52 in LINKS5D),
 plus the English `en:mep-120`
@@ -186,13 +186,23 @@ Titles found wrong (link columns only change, so not fixed here): `ja:SVM-042` /
 | LINKS5Q | `pokesingle_completion_20261118_links5q`, `PS-CATALOGUE-EN-JA-LINKS5Q-20261118`, parent LINKS5P; 6 cards (eye-checked), SQL sha256 `1b80682cea47fbebe24356f0c318146961bb8bf38c401dd6c0496906993b474a` |
 | LINKS5R | `pokesingle_completion_20261118_links5r`, `PS-CATALOGUE-EN-JA-LINKS5R-20261118`, parent LINKS5Q; 2 cards (duplicate rows `jr-miscellaneous-promos-086`/`052` share the links of `016`/`020`), SQL sha256 `dd375a46b79b770419da3043ba30c60a80249649f847754d4118ee97d0947fcc` |
 | LINKS5S | `pokesingle_completion_20261118_links5s`, `PS-CATALOGUE-EN-JA-LINKS5S-20261118`, parent LINKS5R; 39 cards (M-P, SV-P, XY-P, SM-P and BW-P promo versions, by picture), SQL sha256 `381c91c54a3d9536b511e4dd21281af2b906847b66a83fc68a30ac6d49729396`; links -> 50,254 |
-| LINKS5T (served) | `pokesingle_completion_20261119_links5t`, `PS-CATALOGUE-EN-JA-LINKS5T-20261119`, parent LINKS5S; 3 cards (duplicate rows share a link: XYP-362 with XYP-367, XYP-421 with XYP-028, SMP-444 with SMP-091; same art and printed number, checked side by side), SQL sha256 `8f042b5ad8bcc0a5ebd9020a32b0f84b11b3e9ec10be4ebc53c423aacded20df`; links -> 50,257; LINKS5T differs from LINKS5S in those 3 rows only |
+| LINKS5T | `pokesingle_completion_20261119_links5t`, `PS-CATALOGUE-EN-JA-LINKS5T-20261119`, parent LINKS5S; 3 cards (duplicate rows share a link: XYP-362 with XYP-367, XYP-421 with XYP-028, SMP-444 with SMP-091; same art and printed number, checked side by side), SQL sha256 `8f042b5ad8bcc0a5ebd9020a32b0f84b11b3e9ec10be4ebc53c423aacded20df`; links -> 50,257; LINKS5T differs from LINKS5S in those 3 rows only |
+| LINKS5U | `pokesingle_completion_20261120_links5u`, `PS-CATALOGUE-EN-JA-LINKS5U-20261120`, parent IMG2 (`docs/catalogue-images-img2-20261120.md`, PR #130); 75 cards: 22 gym-deck rows split by IMG2 (V1/V2 told apart by picture and attacks), 9 unnumbered BW promos (Cardmarket's oversized-card products, same pictures), 15 deck-kit links and 29 deck copies sharing an existing link (second-batch session, `deck-links-decisions-20261120.json`), SQL sha256 `afdcc4c67fcb252c1d1567f7171d004f0ef66519b06c6c23786f2ddd717b8825` |
+| LINKS5V | `pokesingle_completion_20261120_links5v`, `PS-CATALOGUE-EN-JA-LINKS5V-20261120`, parent LINKS5U; 13 cards sharing a link set in 5U (11 deck copies, plus the Magmortar and Dialga rows whose IMG2 picture is their twin's), SQL sha256 `e11e59632de6e742e7ffa212ac38562ad27907082354907d0b4e8c1efd8c9a0d` |
+| LINKS5W | `pokesingle_completion_20261120_links5w`, `PS-CATALOGUE-EN-JA-LINKS5W-20261120`, parent LINKS5V; 14 promo links (DP1 Torterra/Infernape/Empoleon, DP3 Darkrai, Moonlit Pursuit 063/064/066, LP-500/501 Illusion's Zorua/Zoroark, SMP-448/456 Champions Festival), from `promo-links-decisions-20261120.json`, SQL sha256 `bb711bbe6dff8328c300dd26554b7125d466048692f99cbe5edd7d84a2da4180` |
+| LINKS5X (served) | `pokesingle_completion_20261120_links5x`, `PS-CATALOGUE-EN-JA-LINKS5X-20261120`, parent LINKS5W; 2 Victory Symbol links (SV-P-u01 winner, u03 3rd place, Champions League 2023 Aichi), SQL sha256 `f52c46f8db409559c1b77deb274264d9fb95d68c011b610178a1bb596e59df2c`; links 50,257 -> 50,361; Japanese rows without a link 933 (IMG2 added 17 rows) |
 | Read back | all validated, inactive |
 | Bundles | features `20261116-img1`, artwork `20261116-img1` (unchanged) |
 
 Work files: `data/catalogue-gaps/ja-links-20261116/` (`matches.json`, `fixes.json`, `sql/`, `run_gate.sh`, `out/`).
 
 ## Gate
+
+LINKS5W (covers LINKS5X, which changes 2 link fields only): 1,891 photos replayed with the IMG2 bundles
+(`20261120-img2`), scored against the LINKS5S run: every panel unchanged (dev 636/3/663, dev2 232/0/238, dev3
+938/0/963), 0 right -> wrong. 3 changed answers (`dev2-ja-modern-002`, `-004`, `sealed-ja-modern-030`), all with the
+same first card, the same three IMG2's own gate showed. The LINKS5V run was stopped when 5W was added. The read
+role now lives 24 hours, so a run cannot outlast it.
 
 LINKS5S (covers LINKS5T): 1,891 photos replayed against LINKS5S (same setup), scored against LINKS5F's accepted run:
 every panel unchanged (dev 636/3/663, dev2 232/0/238, dev3 938/0/963), 0 right -> wrong, 0 expected cards lost.
@@ -223,6 +233,14 @@ The gates on LINKS5 to 5D were stopped part-way when the next step was added; on
 them, was replayed in full.
 
 ## Switch
+
+LINKS5X, 2026-11-20: `catalogue-release-switch.sh apply`, `RELEASE_NAME=catalogue-links5x-20261120`, release file
+`/root/catalogue-links5x-20261120.env` (only the schema and import lines changed, checked by diff; features and
+artwork stay `20261120-img2`). After: healthy, restarts 0, no OOM; all 104 new links of LINKS5U to 5X read back from
+`/api/v1/cards/{id}`. Rollback `/etc/scanapp-staging/catalogue-rollback/catalogue-links5x-20261120` (to IMG2).
+Approval: the owner asked to "finalize with the links" and to split and picture the 21 rows ("Yes, do both"); the
+deck, promo and Victory Symbol decisions came from the second-batch session, which read them in the owner's Chrome.
+Next on top: DISP1 (display-only pokemon-card.com pictures for 27 rows), switched by the second-batch session.
 
 LINKS5T, 2026-11-19: `catalogue-release-switch.sh apply`, `RELEASE_NAME=catalogue-links5t-20261119`, release file
 `/root/catalogue-links5t-20261119.env` (only the schema and import lines changed, checked by diff). After: container
@@ -256,6 +274,10 @@ LINKS5F:
 
 ## Phone index
 
+Since IMG2 (2026-11-20) the manifest answers 503 "Phone index unavailable": the snapshot's `catalogue_version` now
+ends `release-img2-20261120`, but v4 `0a46b0ab` and its base were built for `release-img1-20261116`. Links do not
+change it; the index has to be republished for IMG2 (asked of the image-batch session, as IMG1 did).
+
 LINKS5T: unchanged, v4 `0a46b0ab...`; `/api/v1/card-index/manifest` answers 200 after the switch.
 
 LINKS5M: unchanged, v4 `0a46b0abe0f8db7db415ffef544a1249a295965fb0bd848bb06d26c8831478e2` (published on 2026-11-17,
@@ -272,6 +294,12 @@ not in the phone index. Nothing was published: the manifest kept answering 200 a
 ids file matches, and a ranged request on the vectors returns 206.
 
 ## Going back
+
+To IMG2:
+
+```
+CONFIG_DIR=/etc/scanapp-staging RELEASE_NAME=catalogue-links5x-20261120 PROJECT=scanapp-scanapp-z1mwj4 COMPOSE_FILE=compose.dokploy.yaml scripts/catalogue-release-switch.sh rollback
+```
 
 To LINKS5M:
 
@@ -294,7 +322,20 @@ CONFIG_DIR=/etc/scanapp-staging RELEASE_NAME=catalogue-links5-20261116 PROJECT=s
 That goes back to LINKS5F. To go back further, run it again with `RELEASE_NAME=catalogue-links5-20261116` (to IMG1).
 The phone index stays as it is: IMG1, LINKS5F and LINKS5J use the same one.
 
-## Still without a link (1,020 Japanese rows after LINKS5T)
+## Still without a link (933 Japanese rows after LINKS5X)
+
+### LINKS5U to 5X: left without a link
+
+- `ja:BWP-u05` Oshawott and `-u09` Tepig carry the round Pokémon Smile stamp; no Cardmarket version has it.
+- Defender, Full Heal and Potion in the gym decks: Cardmarket lists each once, under one gym; the other deck copies
+  stay unlinked, as before.
+- `ja:jr-miscellaneous-promos-231`, the 2005 Victory Medal (no トレーナー subtitle): Cardmarket's V1 and V2 are the
+  2006 prints, already linked from `-261` and `-254`.
+- Victory Ring and Decoration rows beyond the three Cardmarket versions, `SV-P-u02` and the Victory Proof rows (no
+  Cardmarket photo).
+- 26 rows with no picture (Pikachu World Collection, Pokémon-e Starter Deck, SwSh, SM and Beginning Set promos)
+  still need one first (Japanese shop photos).
+- Title error: `ja:DP1-025` is titled Infernape LV.X but its picture is the Lv.40 card (same as `ja:DP1-024`).
 
 ### How LINKS5N to 5T were found
 
